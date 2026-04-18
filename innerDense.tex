@@ -318,6 +318,73 @@ p_w(\delta)
 \end{enumerate}
 \end{theorem}
 
+\begin{corollary}[Optimization-ready dense-inner envelopes]
+\label{cor:dense-inner-piecewise}
+Fix $\delta\in(0,1/2)$.
+Choose any $\varepsilon\in(0,1)$ and any $\xi>0$, and define
+\[
+L:=\lceil(2+\xi)\delta N\rceil,
+\]
+\[
+q_{\delta,\varepsilon}(N)
+:=
+\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)N\rfloor,\tfrac12)\le \delta N\ \right],
+\]
+\[
+b_{\delta,\xi}(N)
+:=
+\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta N\ \right].
+\]
+Then for every $w\ge 1$,
+\begin{equation}
+\label{eq:dense-inner-global-envelope}
+p_w(\delta)
+\;\le\;
+(1-\varepsilon)^w + N2^{-m} + q_{\delta,\varepsilon}(N),
+\end{equation}
+and also
+\begin{equation}
+\label{eq:dense-inner-smallw-envelope}
+p_w(\delta)
+\;\le\;
+\frac{w(w-1)}{N-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(N).
+\end{equation}
+Consequently, for every threshold $W_\star\in\{1,\dots,N\}$,
+\begin{equation}
+\label{eq:dense-inner-piecewise-threshold}
+p_w(\delta)
+\;\le\;
+\begin{cases}
+\displaystyle \frac{w(w-1)}{N-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(N),
+& 1\le w\le W_\star,\\[1.2ex]
+\displaystyle (1-\varepsilon)^w + N2^{-m} + q_{\delta,\varepsilon}(N),
+& W_\star < w\le N.
+\end{cases}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+The global bound \eqref{eq:dense-inner-global-envelope} is exactly the first part of
+Theorem~\ref{thm:inner-dense-interface}.
+For the second bound, apply the second part of Theorem~\ref{thm:inner-dense-interface}
+with the choice $r=w$.
+Then use \eqref{eq:runs-adjacent-bound} to bound
+\[
+\PP[R(U)<w]\le \frac{w(w-1)}{N-1},
+\]
+which yields \eqref{eq:dense-inner-smallw-envelope}.
+The thresholded form \eqref{eq:dense-inner-piecewise-threshold} is immediate.
+\end{proof}
+
+\paragraph{Why these are the right envelopes to optimize.}
+The bound \eqref{eq:dense-inner-global-envelope} is designed for the linear-weight regime:
+its first term decays exponentially in $w$, its second term exposes the ON$\to$OFF memory penalty $N2^{-m}$,
+and its third term is a pure large-deviation term in $N$.
+The bound \eqref{eq:dense-inner-smallw-envelope} is designed for small/intermediate weights:
+the adjacency correction $w(w-1)/(N-1)$ captures the run-count defect,
+the term $(L2^{-m})^w$ exposes the effect of state size $m$ directly,
+and the residual binomial tail is exponentially small in $N$ for fixed $(\delta,\xi)$.
+
 
 
 

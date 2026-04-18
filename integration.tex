@@ -68,8 +68,86 @@ for any proposed target distance \(\delta\), we must certify constants on the ou
 \((\alpha,c,\beta)\) and on the inner side \((a,\rho)\) that make
 \(\alpha\log(1/(\beta\rho))\) dominate the polynomial loss.
 
-\paragraph{Next synthesis step.}
-The next integration target is to sharpen this theorem using the piecewise framework corollary
-(Corollary~\ref{cor:framework-piecewise}) rather than the single-envelope specialization.
-That will let us use the strongest dense-inner bound in each weight range and will serve as the template for the
-eventual sparse outer + sparse inner flagship construction.
+\subsection{Dense+dense optimization target}
+\label{sec:integration-dense-dense-piecewise}
+
+To approach practically meaningful distances, especially at rate \(1/2\), the single-envelope theorem above is too coarse.
+The dense inner already provides two different bounds that are useful on different weight ranges
+(Corollary~\ref{cor:dense-inner-piecewise}), so the next step is to combine those with comparably sharp outer spectrum
+envelopes via the piecewise framework corollary.
+
+\begin{corollary}[Dense+dense piecewise reduction]
+\label{cor:dense-dense-piecewise-reduction}
+Fix \(\delta\in(0,1/2)\), choose \(\varepsilon\in(0,1)\), \(\xi>0\), and a threshold \(W_\star\in[n]\).
+Let
+\[
+L:=\lceil(2+\xi)\delta n\rceil,
+\qquad
+q_{\delta,\varepsilon}(n)
+:=
+\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)n\rfloor,\tfrac12)\le \delta n\ \right],
+\]
+\[
+b_{\delta,\xi}(n)
+:=
+\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta n\ \right].
+\]
+Suppose the dense outer satisfies an outer cutoff
+\[
+\Pr[d_{\min}(\Cone)<w_0]\le \varepsilon_{\mathrm{out}}(n),
+\]
+and admits expected-spectrum envelopes
+\[
+\EE[\enum_{\Cone,w}] \le A_w^{\mathrm{sm}}
+\qquad (w_0\le w\le W_\star),
+\]
+\[
+\EE[\enum_{\Cone,w}] \le A_w^{\mathrm{lg}}
+\qquad (W_\star < w\le n).
+\]
+Then the dense outer + dense inner serial concatenation satisfies
+\begin{align}
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;&\le\;
+\varepsilon_{\mathrm{out}}(n)
+\;+\;
+\sum_{w=w_0}^{W_\star}
+A_w^{\mathrm{sm}}
+\left(
+\frac{w(w-1)}{n-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(n)
+\right) \notag\\
+&\qquad\qquad
++\sum_{w=W_\star+1}^{n}
+A_w^{\mathrm{lg}}
+\left(
+(1-\varepsilon)^w + n2^{-m} + q_{\delta,\varepsilon}(n)
+\right).
+\label{eq:dense-dense-piecewise-objective}
+\end{align}
+\end{corollary}
+
+\begin{proof}
+Apply Corollary~\ref{cor:framework-piecewise} with the two weight ranges
+\[
+I_1:=\{w_0,\dots,W_\star\},
+\qquad
+I_2:=\{W_\star+1,\dots,n\},
+\]
+the prescribed outer envelopes on those two ranges,
+and the dense-inner envelopes from Corollary~\ref{cor:dense-inner-piecewise}:
+use \eqref{eq:dense-inner-smallw-envelope} on \(I_1\) and
+\eqref{eq:dense-inner-global-envelope} on \(I_2\).
+This yields \eqref{eq:dense-dense-piecewise-objective}.
+\end{proof}
+
+\paragraph{This is the optimization problem we now care about.}
+For a given blocklength \(n\), target distance \(\delta\), and inner memory \(m\),
+the dense+dense proof problem is to make the right-hand side of
+\eqref{eq:dense-dense-piecewise-objective} small by choosing:
+\begin{itemize}
+\item the outer memory / tap parameter (which controls the outer envelopes \(A_w^{\mathrm{sm}},A_w^{\mathrm{lg}}\)),
+\item the split point \(W_\star\),
+\item the dense-inner parameters \(\varepsilon\) and \(\xi\).
+\end{itemize}
+This formulation is the bridge from the current asymptotic proof to concrete finite-length questions such as
+\(n=2^{16},2^{20},\dots,2^{30}\) and to benchmark targets such as the binary Gilbert--Varshamov distance at rate \(1/2\).
