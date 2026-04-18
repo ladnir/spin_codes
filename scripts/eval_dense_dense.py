@@ -334,6 +334,19 @@ def parse_memory_values(args: argparse.Namespace) -> List[int]:
     return [args.m]
 
 
+def parse_outer_memory_values(args: argparse.Namespace) -> List[int]:
+    if args.M_values is not None:
+        return args.M_values
+    if args.M_min is not None or args.M_max is not None:
+        if args.M_min is None or args.M_max is None:
+            raise ValueError("Both --M-min and --M-max are required for a sweep.")
+        step = args.M_step
+        if step <= 0:
+            raise ValueError("--M-step must be positive")
+        return list(range(args.M_min, args.M_max + 1, step))
+    return [args.M]
+
+
 def choose_outer_streams(args: argparse.Namespace) -> Tuple[int, float]:
     if args.outer_streams is not None:
         streams = args.outer_streams
@@ -422,6 +435,10 @@ def main() -> int:
     parser.add_argument("--m-max", type=int, default=None, help="Maximum memory for a sweep.")
     parser.add_argument("--m-step", type=int, default=1, help="Step size for a memory sweep.")
     parser.add_argument("--m-values", type=str, default=None, help="Comma-separated explicit memory values.")
+    parser.add_argument("--M-min", type=int, default=None, help="Minimum outer memory for a sweep.")
+    parser.add_argument("--M-max", type=int, default=None, help="Maximum outer memory for a sweep.")
+    parser.add_argument("--M-step", type=int, default=1, help="Step size for an outer-memory sweep.")
+    parser.add_argument("--M-values", type=str, default=None, help="Comma-separated explicit outer-memory values.")
     parser.add_argument(
         "--span-window",
         type=int,
@@ -448,6 +465,7 @@ def main() -> int:
 
     args.w_values = parse_int_list(args.w_values)
     args.m_values = parse_int_list(args.m_values)
+    args.M_values = parse_int_list(args.M_values)
 
     if args.w is not None:
         args.w_values = [args.w]
@@ -460,6 +478,7 @@ def main() -> int:
 
     weights = choose_weights(args, args.n)
     memory_values = parse_memory_values(args)
+    outer_memory_values = parse_outer_memory_values(args)
 
     effective_n = (args.n // outer_streams) * outer_streams
     if effective_n != args.n and not args.allow_rounding:
@@ -490,34 +509,35 @@ def main() -> int:
     print()
 
     total_best_log = float("-inf")
-    best_row: Optional[Tuple[int, int, OuterSpectrumResult, InnerEnvelope, float]] = None
-    rows: List[Tuple[int, int, OuterSpectrumResult, InnerEnvelope, float]] = []
+    best_row: Optional[Tuple[int, int, int, OuterSpectrumResult, InnerEnvelope, float]] = None
+    rows: List[Tuple[int, int, int, OuterSpectrumResult, InnerEnvelope, float]] = []
 
-    for m_val in memory_values:
-        for w in weights:
-            outer, inner, log_term = evaluate_single_setting(
-                n=effective_n,
-                outer_rate=actual_rate,
-                outer_streams=outer_streams,
-                delta=args.delta,
-                M=args.M,
-                m=m_val,
-                epsilon=args.epsilon,
-                xi=args.xi,
-                w=w,
-                args=args,
-            )
-            row = (m_val, w, outer, inner, log_term)
-            rows.append(row)
-            if log_term > total_best_log:
-                total_best_log = log_term
-                best_row = row
+    for M_val in outer_memory_values:
+        for m_val in memory_values:
+            for w in weights:
+                outer, inner, log_term = evaluate_single_setting(
+                    n=effective_n,
+                    outer_rate=actual_rate,
+                    outer_streams=outer_streams,
+                    delta=args.delta,
+                    M=M_val,
+                    m=m_val,
+                    epsilon=args.epsilon,
+                    xi=args.xi,
+                    w=w,
+                    args=args,
+                )
+                row = (M_val, m_val, w, outer, inner, log_term)
+                rows.append(row)
+                if log_term > total_best_log:
+                    total_best_log = log_term
+                    best_row = row
 
     if not rows:
         print("No weights were selected for evaluation.", file=sys.stderr)
         return 2
 
-    objective_log = logsumexp([row[4] for row in rows])
+    objective_log = logsumexp([row[5] for row in rows])
     objective = safe_prob_from_log(objective_log)
 
     print("Main bound components")
@@ -526,9 +546,10 @@ def main() -> int:
     print()
 
     # Print the most influential rows in descending contribution order.
-    rows_sorted = sorted(rows, key=lambda row: row[4], reverse=True)[: max(1, args.top_k)]
-    for idx, (m_val, w, outer, inner, log_term) in enumerate(rows_sorted, start=1):
+    rows_sorted = sorted(rows, key=lambda row: row[5], reverse=True)[: max(1, args.top_k)]
+    for idx, (M_val, m_val, w, outer, inner, log_term) in enumerate(rows_sorted, start=1):
         print(f"Contributor #{idx}")
+        print(f"  outer M          : {M_val}")
         print(f"  memory m         : {m_val}")
         print(f"  weight w         : {w}")
         print(f"  outer A_w^dense  : {format_term(outer.log_aw)}")
@@ -545,8 +566,9 @@ def main() -> int:
         print()
 
     if best_row is not None:
-        m_val, w, outer, inner, log_term = best_row
+        M_val, m_val, w, outer, inner, log_term = best_row
         print("Best single point")
+        print(f"  outer M          : {M_val}")
         print(f"  memory m         : {m_val}")
         print(f"  weight w         : {w}")
         print(f"  outer A_w^dense  : {format_term(outer.log_aw)}")
