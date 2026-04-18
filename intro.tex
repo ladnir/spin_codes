@@ -1,0 +1,86 @@
+\section{Introduction}
+\label{sec:intro}
+
+\paragraph{Motivation.}
+A central goal in coding theory and in cryptography-facing applications is to obtain linear minimum distance together with
+streaming encodability, i.e., the ability to compute the encoding in a single pass over the input while producing output symbols incrementally and using only small working memory \stan{Peter: check if i explained correctly}, and near-linear work.  Classical turbo-style constructions suggest that random interleaving
+and recursion can produce excellent distance behavior in practice, but converting this intuition into
+clean, modular, proof-driven guarantees, especially under stringent work and locality constraints, remains subtle.
+
+\paragraph{Our viewpoint: serial concatenation as a modular distance amplifier.}
+We study depth-2 serial concatenation with a random interleaver:
+\[
+\Csc \;:=\; \Ctwo \circ \Pi \circ \Cone \subseteq \F_2^n,
+\qquad
+G_{\mathrm{sc}} \;=\; \Gone \cdot \Pi \cdot \Gtwo,
+\]
+where \(\Cone\) is an outer code, \(\Pi\) is a uniform random interleaver on \([n]\), and \(\Ctwo\) is a rate-1 recursive inner encoder. \stan{we need to add what G is}
+Our main conceptual contribution is to separate the minimum-distance proof into two independently verifiable interfaces:
+
+\begin{itemize}
+\item \textbf{Outer interface:} (i) logarithmic minimum distance \(d_{\min}(\Cone)\ge \alpha\log n\), and
+(ii) a spectrum bound \(\enum_{\Cone,w}\le \poly(n)\beta^w\) on the weight regime used by the first-moment argument.
+\item \textbf{Inner interface:} a slice-to-tail bound for a random interleaved input of weight \(w\),
+\[
+p_w(\delta)\ :=\ \Pr\big[\wt(\Ctwo(U))\le \delta n \,\big|\, \wt(U)=w\big],
+\]
+where \(U\) is uniform over the Hamming slice \(\{0,1\}^n\) conditioned on \(\wt(U)=w\).
+\end{itemize}
+
+Once these interfaces are established, a short first-moment calculation yields linear minimum distance for \(\Csc\) with high probability
+(over \(\Pi\) and any inner randomness).
+
+\stan{Add to prelims - spectrum bound, first moment argument}
+\stan{seems like standard terms, but i had to parse the second bullet point with chatgpt}
+
+\paragraph{Target performance characteristics.}
+Our design goals are the following.
+We want (i) provable linear minimum distance \(d_{\min}(\Csc)=\Omega(n)\) with high probability over the randomized construction
+(interleaver and any internal randomness), (ii) streaming/online encoding with small working memory (ideally \(O(\log n)\) or \(O(1)\) state),
+and (iii) near-linear work, measured by tap complexity: the number of state coordinates read/XORed per output symbol.
+Concretely, we aim for \(O(1)\) taps per symbol (hence \(O(n)\) total taps) with a single random interleaver.
+Our modular framework makes these tradeoffs explicit: the outer code controls the low-weight spectrum, the interleaver randomizes support,
+and the inner recursion supplies contraction  and large-deviation behavior.
+
+
+\paragraph{Outer instantiations.}
+We instantiate the outer interface in one of two ways.
+\begin{enumerate}
+\item \textbf{Dense log-memory outer.}
+A terminated, feedforward convolutional outer with memory \(M=\Theta(\log n)\) and dense taps within the band.
+It is encoding-friendly and satisfies both the logarithmic distance and the required spectrum shape.
+\item \textbf{Encodable banded LDPC outer (local expander on a cycle).}
+A banded LDPC parity-check matrix \(H=[A\mid B]\) with locality window \(W=o(n)\), where \(B\) is a staircase+gap parity part
+(enabling linear-time encoding) and \(A\) contributes random local edges that yield local expansion.
+This outer achieves the same interface guarantees while supporting linear-work encoding.
+\end{enumerate}
+
+\paragraph{Inner instantiations.}
+We likewise give three inner encoders, organized by work and by the strength of the contraction bound \(p_w(\delta)\).
+\begin{enumerate}
+\item \textbf{Accumulator inner.}
+The simplest recursive rate-$1$ inner.  It admits an exact input--output enumerator via a spacing/compositions count.
+This provides a clean baseline proof vehicle, but its certified \(\delta\) is limited.
+\item \textbf{Dense time-varying recursive inner (log memory).}
+A log-memory streaming recursion with fresh dense random taps at each time step.
+While the encoder is \(O(n\log n)\)-work, it yields a strong three-mechanism tail bound for \(p_w(\delta)\)
+(early-first-one, rare ON\(\to\)OFF termination, and a large-deviation term),
+and a forced-termination refinement that turns termination into a geometric-in-\(w\) contraction for small/intermediate weights.
+\item \textbf{Sparse-tap recursive inner with periodic refresh (linear work).}
+A streaming recursion that uses only \(d=O(1)\) taps per step and applies a periodic linear refresh on the state.
+We prove a refresh-to-balance property, exchangeable period starts, and between-refresh stability, giving a linear-work
+inner that supports the same modular framework.
+\end{enumerate}
+
+\paragraph{Putting the modules together.}
+The framework immediately yields a family of end-to-end concatenated ensembles, obtained by pairing any outer instantiation
+with any inner instantiation.  The most practically relevant combination is the linear-work pairing:
+banded-LDPC outer + sparse-refresh inner, which achieves linear encoding work with a single random interleaver
+and provable linear minimum distance.
+
+\paragraph{Organization.}
+Section~\ref{sec:sc-framework} states the modular serial-concatenation framework theorem and isolates the required outer and inner interfaces.
+Sections~\ref{sec:outer-dense-logmem} and \ref{sec:outer-local-expander} instantiate the outer interface (dense log-memory and banded LDPC).
+Sections~\ref{sec:inner-accumulator}, \ref{sec:inner-dense}, and \ref{sec:sparse-refresh-inner} instantiate the inner interface
+(accumulator, dense time-varying recursion, and sparse recursion with periodic refresh).
+A final synthesis section collects the main corollaries and summarizes the resulting work--distance tradeoffs.

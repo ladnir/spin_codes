@@ -1,0 +1,180 @@
+
+\section{Inner instantiation I: the accumulator (enumerator-based contraction)}
+\label{sec:inner-accumulator}
+
+This section instantiates the inner encoder \(\Ctwo\) as the length-\(n\) binary accumulator.
+It is the simplest recursive rate-1 inner, and it admits an exact input--output weight enumerator by a direct
+compositions (spacings) count. We package the result in the \emph{inner interface} form needed by the
+serial concatenation framework (Section~\ref{sec:sccc-framework}): a bound on
+\[
+p_w(\delta) \;:=\; \Pr\big[\wt(\Ctwo(U))\le \delta n \ \big|\ \wt(U)=w\big],
+\]
+where \(U\) is uniform on the Hamming slice \(\{u\in\{0,1\}^n:\wt(u)=w\}\).
+
+\subsection{Definition: the accumulator as a rate-1 linear map}
+\label{subsec:acc-def}
+
+Define \(\Ctwo=\Acc_n:\F_2^n\to\F_2^n\) by
+\[
+(\Acc_n(u))_t \;:=\; \sum_{i=1}^t u_i \pmod 2
+\qquad (t\in[n]).
+\]
+Equivalently, with \(y=\Acc_n(u)\) and \(y_0:=0\), we have the recursion
+\[
+y_t = y_{t-1}\oplus u_t.
+\]
+The associated generator matrix \(\Gtwo\in\F_2^{n\times n}\) is the lower-triangular all-ones matrix:
+\((\Gtwo)_{i,t}=1\) iff \(i\le t\), so \(y=u\cdot \Gtwo\).
+
+\subsection{Exact input--output weight enumerator}
+\label{subsec:acc-enum}
+
+For \(w,h\in\{0,1,\dots,n\}\), define the accumulator input--output enumerator
+\[
+\enum^{\Acc}_{w,h}
+\;:=\;
+\bigl|\{u\in\{0,1\}^n:\ \wt(u)=w,\ \wt(\Acc_n(u))=h\}\bigr|.
+\]
+Since the interleaver makes a weight-\(w\) word uniform on the slice, we will use
+\[
+\Pr[\wt(\Acc_n(U))=h\mid \wt(U)=w] \;=\; \frac{\enum^{\Acc}_{w,h}}{\binom{n}{w}}.
+\]
+
+\paragraph{Spacing model.}
+Let \(u\in\{0,1\}^n\) have ones at positions \(1\le p_1<\cdots<p_w\le n\), and set
+\(p_0:=0\), \(p_{w+1}:=n+1\). Define spacings
+\[
+\Delta_i:=p_i-p_{i-1}\qquad(i=1,\dots,w+1).
+\]
+Then \(\Delta_i\in\Z_{>0}\) and \(\sum_{i=1}^{w+1}\Delta_i=n+1\).
+If \(y=\Acc_n(u)\), then \(y\) flips at each \(p_i\), and the output weight equals the sum of the even-index spacings:
+\begin{equation}
+\label{eq:acc-weight-even-spacings}
+\wt(y) \;=\; \sum_{\substack{2\le i\le w+1\\ i\ \mathrm{even}}}\Delta_i.
+\end{equation}
+Let
+\[
+I := \{\,i\in[w+1]: i\text{ even}\,\},
+\qquad
+k:=|I|=\left\lfloor\frac{w+1}{2}\right\rfloor=\left\lceil\frac{w}{2}\right\rceil.
+\]
+
+\begin{lemma}[Exact accumulator enumerator]
+\label{lem:acc-enumerator-exact}
+Fix \(w\in\{1,\dots,n-1\}\) and let \(k:=\lceil w/2\rceil\).
+For any \(h\in\{0,1,\dots,n\}\),
+\[
+\enum^{\Acc}_{w,h}
+\;=\;
+\begin{cases}
+\displaystyle \binom{h-1}{k-1}\binom{n-h}{w-k}
+& \text{if } k \le h \le n-w+k,\\[1.0ex]
+0 & \text{otherwise.}
+\end{cases}
+\]
+\end{lemma}
+
+\begin{proof}
+A weight-\(w\) vector \(u\) corresponds bijectively to a composition
+\((\Delta_1,\dots,\Delta_{w+1})\in\Z_{>0}^{w+1}\) with \(\sum_{i=1}^{w+1}\Delta_i=n+1\)
+(via the ordered one-positions \(p_i\)).
+By \eqref{eq:acc-weight-even-spacings}, \(\wt(\Acc_n(u))=h\) iff
+\[
+\sum_{i\in I}\Delta_i=h
+\qquad\text{and hence}\qquad
+\sum_{i\notin I}\Delta_i=(n+1)-h.
+\]
+There are \(k=|I|\) even-index parts and \((w+1-k)\) odd-index parts.
+The number of ways to choose positive integers \((\Delta_i)_{i\in I}\) summing to \(h\) is \(\binom{h-1}{k-1}\),
+and independently the number of ways to choose positive integers \((\Delta_i)_{i\notin I}\) summing to \((n+1-h)\)
+is \(\binom{(n+1-h)-1}{(w+1-k)-1}=\binom{n-h}{w-k}\).
+Multiplying gives the stated formula. The feasibility range \(k\le h\le n-w+k\) is exactly the condition that both sums
+can be achieved with positive parts. \(\square\)
+\end{proof}
+
+\subsection{Tail bound and inner-interface contraction}
+\label{subsec:acc-contraction}
+
+Fix \(\delta\in(0,1)\). Define
+\[
+p_w(\delta)
+\;:=\;
+\Pr\big[\wt(\Acc_n(U))\le \delta n \ \big|\ \wt(U)=w\big]
+\;=\;
+\sum_{h\le \lfloor \delta n\rfloor}\frac{\enum^{\Acc}_{w,h}}{\binom{n}{w}}.
+\]
+
+\begin{lemma}[Accumulator low-output tail (simple contraction form)]
+\label{lem:acc-tail-contraction}
+Fix \(\delta\in(0,1/4)\). Let \(w\in\{1,\dots,\lfloor n/2\rfloor\}\) and let \(k:=\lceil w/2\rceil\).
+Then
+\[
+p_w(\delta)
+\;\le\;
+\binom{\lfloor \delta n\rfloor}{k}\cdot \prod_{i=0}^{k-1}\frac{w-i}{n-w+i+1}
+\;\le\;
+(4e\delta)^{\,k}
+\;\le\;
+(4e\delta)^{\,w/2}.
+\]
+\end{lemma}
+
+\begin{proof}
+Using Lemma~\ref{lem:acc-enumerator-exact} and the monotonicity \(\binom{n-h}{w-k}\le \binom{n}{w-k}\),
+\[
+\sum_{h\le \delta n}\enum^{\Acc}_{w,h}
+\;\le\;
+\binom{n}{w-k}\sum_{h\le \delta n}\binom{h-1}{k-1}
+\;=\;
+\binom{n}{w-k}\binom{\lfloor \delta n\rfloor}{k},
+\]
+where we used the hockey-stick identity \(\sum_{h=k}^{H}\binom{h-1}{k-1}=\binom{H}{k}\).
+
+Dividing by \(\binom{n}{w}\) yields
+\[
+p_w(\delta)\le \binom{\lfloor \delta n\rfloor}{k}\cdot \frac{\binom{n}{w-k}}{\binom{n}{w}}
+=
+\binom{\lfloor \delta n\rfloor}{k}\cdot \prod_{i=0}^{k-1}\frac{w-i}{n-w+i+1}.
+\]
+If \(w\le n/2\), then \(n-w+i+1\ge n/2\) and \(w-i\le w\), so the product is at most \((2w/n)^k\).
+Also \(\binom{\lfloor \delta n\rfloor}{k}\le (e\delta n/k)^k\).
+Since \(w\le 2k\), we get
+\[
+p_w(\delta)\le \Big(\frac{e\delta n}{k}\Big)^k \Big(\frac{2w}{n}\Big)^k
+\le (4e\delta)^k,
+\]
+as claimed. \(\square\)
+\end{proof}
+
+\begin{corollary}[Accumulator inner interface (for low/intermediate outer weights)]
+\label{cor:acc-inner-interface}
+Fix \(\delta\in(0,1/4)\). For all \(w\in\{1,\dots,\lfloor n/2\rfloor\}\),
+\[
+p_w(\delta)\;\le\; (4e\delta)^{\lceil w/2\rceil}
+\;\le\;
+(4e\delta)^{w/2}.
+\]
+In particular, the inner-interface bound \(p_w(\delta)\le \rho^w\) holds for \(w\le n/2\) with
+\[
+\rho \;:=\; \sqrt{4e\delta}\;<\;1.
+\]
+\end{corollary}
+
+\paragraph{Discussion (why the accumulator is structurally useful but distance-limited).}
+The contraction exponent is only \(\Theta(w)\) through \(\lceil w/2\rceil\), reflecting the fact that the accumulator output weight
+is controlled by about half of the spacing variables. In practice this leads to a relatively weak certified \(\delta\) compared
+to the stronger recursive inner constructions in later sections.
+Nevertheless, the accumulator case is valuable as a baseline because the enumerator is exact and the framework algebra is completely transparent.
+
+\subsection{TODOs}
+\label{subsec:acc-todos}
+
+If we want to sharpen constants (or extend the statement beyond \(w\le n/2\)), the remaining work is purely optional:
+\begin{enumerate}
+\item Derive a symmetric upper-tail analogue (for \(\Pr[\wt(\Acc_n(U))\ge (1-\delta)n]\)) and combine the two tails in a single bound.
+\item Optimize the \((4e\delta)^k\) constant by tightening the ratio \(\binom{n}{w-k}/\binom{n}{w}\) and using a sharper bound on
+      \(\sum_{h\le \delta n}\binom{h-1}{k-1}\).
+\item If needed for a particular region of the outer spectrum, extend the contraction bound to all \(w\le \mu n\) for any fixed \(\mu<1\)
+      by tracking \(\prod_{i=0}^{k-1}\frac{w-i}{n-w+i+1}\) as \((w/(n-w))^k\) instead of \((2w/n)^k\).
+\end{enumerate}
+```

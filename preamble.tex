@@ -1,0 +1,71 @@
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\wt}{\mathsf{wt}}
+
+\renewcommand{\sc}{\ensuremath{\mathsf{sc}}}
+\newcommand{\Csc}{{\mathcal{C}_\sc}}
+\newcommand{\Cone}{{\mathcal{C}_1}}
+\newcommand{\Ctwo}{{\mathcal{C}_2}}
+\newcommand{\Gsc}{{G_\sc}}
+\newcommand{\Gone}{{G_1}}
+\newcommand{\Gtwo}{{G_2}}
+\newcommand{\enum}{\mathsf{E}}
+
+
+\newcommand{\ON}{\ensuremath{\mathsf{ON}}}
+\newcommand{\OFF}{\ensuremath{\mathsf{OFF}}}
+\newcommand{\Acc}{\ensuremath{\mathsf{Acc}}}
+\newcommand{\Shift}{\ensuremath{\mathsf{Shift}}}
+\newcommand{\Refresh}{\ensuremath{\mathsf{Refresh}}}
+\newcommand{\Enc}{\ensuremath{\mathsf{Enc}}}
+\newcommand{\poly}{\ensuremath{\mathsf{poly}}}
+\newcommand{\supp}{\ensuremath{\mathsf{supp}}}
+\newcommand{\dist}{\ensuremath{\mathsf{dist}}}
+
+\DeclareMathOperator{\Dirichlet}{Dirichlet}
+\DeclareMathOperator{\Multinomial}{Multinomial}
+\DeclareMathOperator{\Binomial}{Binomial}
+\DeclareMathOperator{\Beta}{Beta}
+\newcommand{\EE}{\mathbb{E}}
+
+\newcommand{\tap}{\mathrm{tap}}
+\newcommand{\mref}{\mathrm{ref}}
+\newcommand{\stab}{\mathrm{stab}}
+\newcommand{\mix}{\mathrm{mix}}
+\newcommand{\Unif}{\mathrm{Unif}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{assumption}{Assumption}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1\baselineskip}
+
+
+\newcommand{\todotemplate}[3]{%
+    \mbox{}% prevent marginpar from being on previous paragraph
+    \marginpar{%
+        \colorbox{#2!80!black}{\textcolor{white}{#1}}%
+        \vspace*{-22pt}% hack!
+    }%
+    \textcolor{#2}{{#3}}%
+}
+
+\if\showTodos1
+    \newcommand{\stan}[1]{
+    \todotemplate{stan}{brown}{#1}
+    }
+    \newcommand{\peter}[1]{
+    \todotemplate{Peter}{red}{#1}
+    }
+\else
+    \newcommand{\stan}[1]{}
+    \newcommand{\peter}[1]{}
+\fi

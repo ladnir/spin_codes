@@ -1,0 +1,73 @@
+\section{Preliminaries and Notation}
+\label{sec:prelim}
+
+\paragraph{Basic notation.}
+For an integer \(m\ge 1\), write \([m]:=\{1,\dots,m\}\).
+We work over \(\F_2=\{0,1\}\) with addition \(\oplus\) (equivalently, addition modulo \(2\)).
+For \(x\in\{0,1\}^m\), let \(\wt(x)\) denote its Hamming weight and write \(p(x):=\wt(x)/m\).
+
+\paragraph{Probability and expectation.}
+All probabilities and expectations are taken with respect to the randomness explicitly specified in context.
+We write \(\PP[\cdot]\) for probability and \(\EE[\cdot]\) for expectation. Conditional expectation is written
+\(\EE[\cdot\mid \mathcal{F}]\) for a \(\sigma\)-algebra \(\mathcal{F}\).
+
+\paragraph{Uniform distribution.}
+For a finite set \(\mathcal{S}\), we write \(X\sim \Unif(\mathcal{S})\) to denote that \(X\) is uniform over \(\mathcal{S}\).
+Common examples include:
+\[
+I\sim \Unif([m]) \quad\text{(a uniform index)},\qquad
+\Pi\sim \Unif(S_m) \quad\text{(a uniform permutation)}.
+\]
+For sampling a uniform \(d\)-subset of \([m]\) (without replacement) we write
+\[
+S\sim \Unif\!\Big(\binom{[m]}{d}\Big).
+\]
+
+\paragraph{Permutations.}
+Let \(S_m\) denote the symmetric group on \([m]\).
+For \(\Pi\in S_m\) and \(x\in\{0,1\}^m\), we write \(\Pi(x)\) for the coordinate permutation
+\[
+(\Pi(x))_i := x_{\Pi^{-1}(i)}.
+\]
+
+\paragraph{Standard distributions.}
+We use the following classical distributions.
+
+\subsubsection*{Beta distribution}
+For parameters \(a,b>0\), the Beta distribution \(\Beta(a,b)\) is supported on \([0,1]\) with density
+\[
+f(s) = \frac{1}{B(a,b)}\, s^{a-1}(1-s)^{b-1},
+\]
+where \(B(a,b)=\Gamma(a)\Gamma(b)/\Gamma(a+b)\) is the Beta function.
+
+\subsubsection*{Dirichlet distribution}
+For parameters \(\alpha_1,\dots,\alpha_k>0\), the Dirichlet distribution \(\Dirichlet(\alpha_1,\dots,\alpha_k)\)
+is supported on the simplex
+\[
+\Delta_k := \Bigl\{(z_1,\dots,z_k)\in\R_{\ge 0}^k:\ \sum_{i=1}^k z_i = 1\Bigr\},
+\]
+with density proportional to \(\prod_{i=1}^k z_i^{\alpha_i-1}\).
+The special case \(\Dirichlet(1,\dots,1)\) is uniform on \(\Delta_k\).
+
+\subsubsection*{Multinomial distribution}
+For \(N\in\Z_{\ge 0}\) and \(p=(p_1,\dots,p_k)\in\Delta_k\), the multinomial distribution \(\Multinomial(N;p)\)
+is a distribution on \((K_1,\dots,K_k)\in\Z_{\ge 0}^k\) satisfying \(\sum_i K_i=N\), with probability mass function
+\[
+\PP[(K_1,\dots,K_k)=k]
+=
+\frac{N!}{\prod_{i=1}^k k_i!}\prod_{i=1}^k p_i^{k_i}.
+\]
+For any subset \(I\subseteq[k]\), the aggregate \(\sum_{i\in I}K_i\) is binomial:
+\[
+\sum_{i\in I}K_i\ \big|\ p \sim \Binomial\Bigl(N,\ \sum_{i\in I}p_i\Bigr).
+\]
+
+\paragraph{Dirichlet subset-sum marginal (Beta marginal).}
+If \((Z_1,\dots,Z_k)\sim \Dirichlet(\alpha_1,\dots,\alpha_k)\) and \(I\subseteq[k]\), then
+\[
+\sum_{i\in I} Z_i \sim \Beta\Bigl(\sum_{i\in I}\alpha_i,\ \sum_{i\notin I}\alpha_i\Bigr).
+\]
+In particular, for \((Z_1,\dots,Z_k)\sim \Dirichlet(1,\dots,1)\) and \(|I|=r\),
+\[
+\sum_{i\in I} Z_i \sim \Beta(r,k-r).
+\]

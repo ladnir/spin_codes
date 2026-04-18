@@ -1,0 +1,640 @@
+\section{Sparse-Tap Recursive Inner Encoder with Periodic Refresh}
+\label{sec:sparse-refresh-inner}
+
+\paragraph{Context and purpose.}
+This section isolates the \emph{inner} component used in the sparse-tap SCCC construction: a
+streaming, rate-1, recursive encoder whose per-symbol update touches only \(d=O(1)\) state bits,
+augmented with a periodic linear \emph{refresh} that restores diffusion.
+The global minimum-distance proof uses the inner code only through a small set of \emph{interface}
+properties stated explicitly below; everything else in the paper (outer spectrum and Markov/first-moment)
+treats the inner code as a black box once these properties are established.
+
+\paragraph{What the inner code must achieve (black-box interface).}
+For later sections it suffices to prove the following three facts about the \emph{random inner-code instance}
+(refresh permutations + tap-sets):
+\begin{enumerate}
+\item \textbf{Refresh-to-balance (mixing):} at each refresh boundary, the refresh map sends any nonzero state into a
+balanced weight window \(G_\eta\) with failure probability at most \(\varepsilon_{\mref}(m)\).
+\item \textbf{Exchangeable period starts:} conditional on its post-refresh weight, the period-start state is uniform on the
+corresponding Hamming slice (so the prefix of dropped bits over a period is hypergeometric).
+\item \textbf{Between-refresh stability:} starting a period from an exchangeable state in \(G_\eta\), the sparse-tap shift
+dynamics avoids the ultra-sparse OFF region over the next \(L\) steps with failure probability at most \(\varepsilon_{\stab}(m)\).
+\end{enumerate}
+Later sections will only union-bound over the \(J\approx n/L\) periods for a \emph{fixed} input difference,
+and then convert fixed-input tails into a minimum-distance statement using the outer enumerator and Markov’s inequality.
+(We will restate this glue at the end of the section.)
+
+\paragraph{Roadmap.}
+\begin{enumerate}
+\item \S\ref{sec:inner-randomness-model}: code ensemble / randomness model.
+\item \S\ref{sec:inner-definition}: inner encoder definition and explicit tap/work accounting.
+\item \S\ref{sec:refresher-definition}: refresher definition and exchangeability lemma.
+\item \S\ref{sec:one-round-distribution}: one-round weight distribution via spacings and a Beta--Binomial representation.
+\item \S\ref{sec:refresh-to-balance}: refresh-to-balance guarantee \(\varepsilon_{\mref}(m)\) (entry + wide-to-balanced + stability).
+\item \S\ref{sec:between-refresh-analysis}: between-refresh dynamics (parity-bias bound and per-period stability \(\varepsilon_{\stab}(m)\)).
+\item \S\ref{sec:burn-in-puncture-inner}: burn-in and puncturing.
+\item \S\ref{sec:no-union-messages-inner}: no union bound over messages (period union for fixed input, then enumerator + Markov).
+\end{enumerate}
+
+\paragraph{Notation.}
+For \(m\ge 2\) let \(\F_2^m\) denote the state space, \(\wt(\cdot)\) the Hamming weight,
+and \([m]:=\{1,\dots,m\}\). For a state \(s\in\F_2^m\) write \(p(s):=\wt(s)/m\).
+
+% ============================================================
+\subsection{Randomness model (inner-code ensemble)}
+\label{sec:inner-randomness-model}
+
+A \emph{random inner-code instance} samples, independently:
+\begin{itemize}
+\item \textbf{Refresh permutations:} for every refresh boundary \(t_j\) and each mixing round \(\ell\in[t_{\mix}]\),
+an independent uniform permutation \(\Pi_{j,\ell}\in S_m\), and an independent uniform \(\Pi_{j,\mathrm{out}}\in S_m\).
+\item \textbf{Tap-sets:} for every time \(t\ge 0\), an independent tap-set \(S_t\sim \binom{[m]}{d}\)
+(uniform size-\(d\) subset; sampling \emph{without} replacement).
+\end{itemize}
+Conditioned on these sampled objects, the encoder is deterministic and \(\F_2\)-linear in the input stream.
+All probabilities in this section are with respect to this ensemble unless explicitly stated otherwise.
+
+% ============================================================
+\subsection{Inner encoder with periodic refresh (definition and work model)}
+\label{sec:inner-definition}
+
+Fix parameters:
+state length \(m\ge 2\), tap count \(d\in\{1,\dots,m\}\), refresh period \(L\in\{1,\dots,m\}\),
+burn-in \(B=\Theta(m)\), and refresh depth \(t_{\mix}\ge 1\).
+
+\subsubsection*{Tap-shift recursion (streaming update)}
+
+The encoder maintains a state \(s_t\in\F_2^m\) and processes an input stream \((u_t)_{t\ge 0}\subseteq \F_2\).
+At each time \(t\ge 0\), sample \(S_t\sim\binom{[m]}{d}\), define the tap parity and the output/injected bit
+\[
+P_t := \bigoplus_{i\in S_t} (s_t)_i,
+\qquad
+y_t := u_t \oplus P_t,
+\]
+and update by shift-in
+\[
+s_{t+1} := \Shift(s_t,y_t) := ((s_t)_2,\dots,(s_t)_m,y_t).
+\]
+Write \(W_t:=\wt(s_t)\) and \(D_t:=(s_t)_1\) (the dropped bit). Then
+\[
+W_{t+1} = W_t - D_t + y_t,
+\qquad
+W_t = W_0 - \sum_{j=0}^{t-1}D_j + \sum_{j=0}^{t-1}y_j.
+\]
+
+\subsubsection*{Refresh schedule (burn-in + periodic refresh)}
+
+Let \(t_j := B + (j-1)L\) be the start time of period \(j\ge 1\).
+Initialize \(s_0\) arbitrarily. Run the tap-shift recursion for \(B\) steps (burn-in).
+Then for each period \(j=1,2,\dots\):
+\begin{enumerate}
+\item \textbf{Refresh at boundary:} replace \(s_{t_j}\leftarrow \Refresh_{t_{\mix}}(s_{t_j})\).
+\item \textbf{Run \(L\) sparse steps:} apply the tap-shift recursion for times \(t=t_j,\dots,t_j+L-1\).
+\end{enumerate}
+
+\subsubsection*{Tap/work accounting (explicit and amortized)}
+
+We measure inner work by \emph{tap complexity}: the number of state coordinates read/XORed.
+\begin{itemize}
+\item Each sparse step computes a parity of \(d\) tapped bits, costing \(d\) taps (plus \(O(1)\) bookkeeping for the shift).
+\item Each refresh mixing round applies an accumulator (prefix XOR), which costs \(\Theta(m)\) XORs/taps; we count it as \(m\) taps.
+Permutation application is treated as a memory permutation (implementation-dependent); the analysis counts only XOR-taps.
+\end{itemize}
+Thus for a length-\(n\) stream, the inner tap count is
+\[
+\mathrm{Taps}_{\mathrm{in}} \;\le\; d\,n \;+\; \Big\lceil\frac{n}{L}\Big\rceil\cdot (t_{\mix}\,m).
+\]
+If \(L=m/2\), the amortized refresh overhead is \((t_{\mix}m)/(m/2)=2t_{\mix}\) taps per symbol, so the total is
+\[
+\text{amortized taps/symbol} \;\le\; d + 2t_{\mix}.
+\]
+This is the sense in which the design achieves linear-time inner work (constant taps per symbol).
+
+\subsubsection*{Linearity}
+
+For a fixed inner-code instance (fixed tap-sets and refresh permutations),
+the mapping \(u\mapsto y\) is \(\F_2\)-linear since:
+(i) each step computes \(y_t=u_t\oplus\langle \mathbf{1}_{S_t}, s_t\rangle\) (linear),
+(ii) shifting is linear, and
+(iii) refresh is a fixed linear transform (composition of linear maps).
+
+% ============================================================
+\subsection{Refresher: definition and exchangeable period starts}
+\label{sec:refresher-definition}
+
+\subsubsection*{Accumulator and one mixing round}
+
+Define the accumulator \(\Acc:\F_2^m\to\F_2^m\) by
+\[
+(\Acc(x))_i := \sum_{j=1}^i x_j \pmod 2,
+\qquad (i\in[m]).
+\]
+For a permutation \(\Pi\in S_m\) write \(\Pi(x)\) for \((\Pi(x))_i := x_{\Pi^{-1}(i)}\).
+
+A \emph{mixing round} is the random linear map
+\[
+T := \Acc\circ \Pi,\qquad \Pi\sim \Unif(S_m).
+\]
+A depth-\(t_{\mix}\) mixing composition is
+\[
+M_{t_{\mix}} := T_{t_{\mix}}\circ \cdots \circ T_1,\qquad T_\ell:=\Acc\circ \Pi_\ell,
+\]
+with \(\Pi_1,\dots,\Pi_{t_{\mix}}\) independent and uniform.
+
+\subsubsection*{Final symmetrization (enforcing exchangeability)}
+
+Since \(\Acc\) is not coordinate-symmetric, we enforce exchangeability at period starts by appending a fresh final permutation:
+\begin{equation}
+\label{eq:Refresh-def-final}
+\Refresh_{t_{\mix}} := \Pi_{\mathrm{out}} \circ M_{t_{\mix}},
+\end{equation}
+where \(\Pi_{\mathrm{out}}\sim\Unif(S_m)\) is independent of all \(\Pi_\ell\).
+
+\begin{lemma}[Exchangeable output conditional on weight]
+\label{lem:exchangeable-by-final-perm}
+Let \(Z\) be any \(\F_2^m\)-valued random variable and let \(\Pi_{\mathrm{out}}\) be an independent uniform permutation.
+Then conditional on \(\wt(\Pi_{\mathrm{out}}(Z))=w\), the vector \(\Pi_{\mathrm{out}}(Z)\) is uniform over the Hamming slice
+\(\{x\in\{0,1\}^m:\wt(x)=w\}\).
+\end{lemma}
+
+\noindent
+\emph{Proof.}
+Fix any \(z\) with \(\wt(z)=w\). Then \(\Pi_{\mathrm{out}}(z)\) is uniform over the weight-\(w\) slice.
+Averaging over \(z\) with \(\wt(z)=w\) yields the claim. \(\square\)
+
+\subsubsection*{Zones and OFF barrier (single consistent choice)}
+
+Fix constants \(\eta\in(0,1/2)\) and \(\alpha\in(0,1/2)\) with
+\begin{equation}
+\label{eq:alpha-eta-relation}
+\alpha < \tfrac12-\eta.
+\end{equation}
+Define:
+\[
+G_\eta := \Bigl\{s:\ \wt(s)\in[(\tfrac12-\eta)m,(\tfrac12+\eta)m]\Bigr\}
+\quad\text{(balanced)},
+\]
+\[
+\OFF_\alpha := \{s:\ \wt(s)<\alpha m\},
+\qquad
+\ON_\alpha := \F_2^m\setminus \OFF_\alpha.
+\]
+For an integer \(\tau\in\{1,\dots,\lfloor m/2\rfloor\}\) define the wide zone
+\[
+S_\tau := \{s:\ \wt(s)\in[\tau,m-\tau]\}.
+\]
+When \(\tau\le (\tfrac12-\eta)m\), we have \(G_\eta\subseteq S_\tau\subseteq \ON_\alpha\) (by \eqref{eq:alpha-eta-relation} and choice of \(\tau\)).
+
+% ============================================================
+\subsection{One mixing round: spacings and a Beta--Binomial representation}
+\label{sec:one-round-distribution}
+
+Fix \(w\in\{1,\dots,m-1\}\). Let \(u\) be uniform over \(\{0,1\}^m\) with \(\wt(u)=w\), and set \(y:=\Acc(u)\).
+This is the law of \(T(s)=\Acc(\Pi(s))\) conditioned on \(\wt(s)=w\).
+
+\subsubsection*{Spacing representation}
+
+Let the one-positions of \(u\) be \(1\le p_1<\cdots<p_w\le m\), define \(p_0:=0\), \(p_{w+1}:=m+1\),
+and spacings \(\Delta_i:=p_i-p_{i-1}\) for \(i=1,\dots,w+1\).
+Then \(\Delta_i\in\Z_{>0}\) and \(\sum_{i=1}^{w+1}\Delta_i=m+1\).
+A direct check shows
+\begin{equation}
+\label{eq:acc-weight-spacings}
+\wt(y)=\sum_{\substack{2\le i\le w+1\\ i\ \mathrm{even}}}\Delta_i.
+\end{equation}
+Let \(I:=\{i\in[w+1]: i \text{ even}\}\) and \(k:=|I|=\lfloor(w+1)/2\rfloor\).
+
+\subsubsection*{Dirichlet--multinomial coupling and Beta--Binomial form}
+
+The spacing vector \((\Delta_1,\dots,\Delta_{w+1})\) is uniform over compositions of \(m+1\) into \(w+1\) positive parts.
+Equivalently, sample \((Z_1,\dots,Z_{w+1})\sim\Dirichlet(1,\dots,1)\), then
+\((K_1,\dots,K_{w+1})\sim\Multinomial(m-w;Z)\), and set \(\Delta_i:=K_i+1\).
+Let \(S:=\sum_{i\in I}Z_i\). Then
+\[
+S\sim\Beta(k,w+1-k),
+\qquad
+\sum_{i\in I}K_i \mid S \sim \Binomial(m-w,S),
+\]
+and combining with \eqref{eq:acc-weight-spacings} yields the \emph{exact} Beta--Binomial representation
+\begin{equation}
+\label{eq:acc-weight-betabinom}
+\wt(y) \;=\; k + \Binomial(m-w,S),
+\qquad S\sim\Beta(k,w+1-k).
+\end{equation}
+
+% ============================================================
+\subsection{Refresh-to-balance: entry, concentration, and interface}
+\label{sec:refresh-to-balance}
+
+We now prove the two one-round facts that drive refresh:
+(i) \emph{entry} into the wide zone \(S_\tau\) from any nonzero state with probability \(1-O(\tau/m)\), and
+(ii) \emph{wide-to-balanced} concentration with failure \(\exp(-\Omega(\tau))\).
+Together with one more stability round and the final symmetrizing permutation, these yield \(\varepsilon_{\mref}(m)\).
+
+\subsubsection{One-round entry into \(S_\tau\) uniformly over all weights}
+\label{sec:entry-lemma}
+
+\begin{lemma}[One-round entry into the wide zone \(S_\tau\)]
+\label{lem:enter-wide-zone}
+There exists an absolute constant \(C>0\) such that for all \(m\ge 2\), all \(\tau\le m/2\), and all nonzero \(s\in\F_2^m\),
+if \(T=\Acc\circ \Pi\) with \(\Pi\) uniform, then
+\[
+\Pr[T(s)\notin S_\tau]\le C\cdot \frac{\tau}{m}.
+\]
+\end{lemma}
+
+\begin{proof}
+Condition on \(\wt(s)=w\in\{1,\dots,m-1\}\). Then \(u:=\Pi(s)\) is uniform over weight-\(w\) vectors, and \(y=\Acc(u)\).
+Using \eqref{eq:acc-weight-spacings}, \(\wt(y)=\sum_{i\in I}\Delta_i\) where \((\Delta_1,\dots,\Delta_{w+1})\) is uniform over
+compositions of \(m+1\) into \(w+1\) positive parts. By exchangeability of spacings under the uniform composition law, the sum over the
+fixed index set \(I\) has the same distribution as the sum of the first \(k:=|I|=\lfloor(w+1)/2\rfloor\) parts.
+
+\paragraph{Lower tail \(\Pr[\wt(y)\le \tau]\).}
+If \(k>\tau\) then \(\wt(y)\ge k>\tau\) deterministically, so the probability is \(0\).
+Assume \(k\le \tau\). For each integer \(t\in\{k,\dots,\tau\}\), the number of compositions with
+\(\sum_{i=1}^k \Delta_i=t\) equals
+\[
+\binom{t-1}{k-1}\binom{m-t}{w-k},
+\]
+since we choose a composition of \(t\) into \(k\) positive parts and of \((m+1-t)\) into \((w+1-k)\) positive parts.
+The total number of compositions is \(\binom{m}{w}\). Hence
+\[
+\Pr[\wt(y)\le \tau]
+=
+\sum_{t=k}^{\tau}\frac{\binom{t-1}{k-1}\binom{m-t}{w-k}}{\binom{m}{w}}
+\;\le\;
+\frac{\binom{m}{w-k}}{\binom{m}{w}}
+\sum_{t=k}^{\tau}\binom{t-1}{k-1}.
+\]
+Using \(\sum_{t=k}^{\tau}\binom{t-1}{k-1}=\binom{\tau}{k}\) and the bounds
+\(\binom{\tau}{k}\le (e\tau/k)^k\) and
+\(\binom{m}{w-k}/\binom{m}{w}
+=\prod_{i=0}^{k-1}\frac{w-i}{m-w+i+1}
+\le \bigl(\frac{2w}{m}\bigr)^k\)
+when \(w\le m/2\), and using \(w\le 2k\), we obtain
+\[
+\Pr[\wt(y)\le \tau]
+\;\le\;
+\Bigl(\frac{4e\tau}{m}\Bigr)^k.
+\]
+If \(w>m/2\) and \(k\le \tau\), then necessarily \(\tau\ge m/4\), so \((\tau/m)\) is already a constant and the final
+\(C(\tau/m)\) bound is trivial after choosing \(C\ge 2\). Thus we may take the displayed bound as sufficient for all \(w\)
+after adjusting constants.
+
+\paragraph{Upper tail \(\Pr[\wt(y)\ge m-\tau]\).}
+Since \(\sum_{i=1}^{w+1}\Delta_i=m+1\), the event \(\sum_{i\in I}\Delta_i\ge m-\tau\) implies
+\(\sum_{i\notin I}\Delta_i\le \tau+1\). The complement index set has size \(w+1-k\ge 1\), and the same counting argument
+(with \(k\leftarrow w+1-k\) and \(\tau\leftarrow \tau+1\)) yields \(\Pr[\wt(y)\ge m-\tau]\le C'(\tau/m)\) for an absolute constant \(C'\).
+
+Combining the two tails and taking \(C\) to absorb constants gives
+\(\Pr[\wt(y)\notin[\tau,m-\tau]]\le C\,\tau/m\), uniformly over \(w\), as claimed. \(\square\)
+\end{proof}
+
+\subsubsection{Wide-to-balanced concentration (fully discrete, exponential in \(\min\{w,m-w\}\))}
+\label{sec:wide-to-balanced}
+
+We now make the wide-to-balanced step completely explicit using \eqref{eq:acc-weight-betabinom}.
+To avoid leaving “standard tail bounds” implicit, we record the two inequalities we use.
+
+\begin{lemma}[Chernoff bounds for \(\Gamma(k,1)\)]
+\label{lem:gamma-chernoff}
+Let \(G\sim \Gamma(k,1)\) be a sum of \(k\) i.i.d.\ \(\mathrm{Exp}(1)\) variables.
+Then for any \(\delta\in(0,1)\),
+\[
+\Pr[G\le (1-\delta)k]\le \exp\!\Big(-\frac{\delta^2}{2}\,k\Big),
+\qquad
+\Pr[G\ge (1+\delta)k]\le \exp\!\Big(-\frac{\delta^2}{3}\,k\Big).
+\]
+\end{lemma}
+
+\begin{lemma}[Chernoff bounds for \(\Binomial(n,p)\)]
+\label{lem:binom-chernoff}
+Let \(X\sim \Binomial(n,p)\) with mean \(\mu=np\).
+Then for any \(\delta\in(0,1)\),
+\[
+\Pr[X\le (1-\delta)\mu]\le \exp\!\Big(-\frac{\delta^2}{2}\,\mu\Big),
+\qquad
+\Pr[X\ge (1+\delta)\mu]\le \exp\!\Big(-\frac{\delta^2}{3}\,\mu\Big).
+\]
+\end{lemma}
+
+\begin{lemma}[Wide \(\Rightarrow\) balanced in one round (Beta--Binomial)]
+\label{lem:wide-to-balanced-betabinom}
+Fix \(\eta\in(0,1/2)\). There exist constants \(c_0=c_0(\eta)>0\) and \(m_0=m_0(\eta)\) such that for all \(m\ge m_0\) and all
+\(w\in\{1,\dots,m-1\}\):
+if \(u\) is uniform over \(\{0,1\}^m\) with \(\wt(u)=w\) and \(y:=\Acc(u)\), then
+\[
+\Pr\Big[\wt(y)\notin\bigl[(\tfrac12-\eta)m,\,(\tfrac12+\eta)m\bigr]\Big]
+\;\le\;
+2\exp\!\Big(-c_0\cdot \min\{w,m-w\}\Big).
+\]
+In particular, if \(w\in[\tau,m-\tau]\) then
+\[
+\Pr[y\notin G_\eta]\le 2e^{-c_0\tau}.
+\]
+\end{lemma}
+
+\begin{proof}
+Use \eqref{eq:acc-weight-betabinom}:
+\[
+\wt(y)=k+X,\qquad X\mid S \sim \Binomial(m-w,S),\qquad S\sim \Beta(k,w+1-k),
+\]
+where \(k=\lfloor(w+1)/2\rfloor\) and \(b:=w+1-k\).
+
+Represent \(S\) as \(S=G_1/(G_1+G_2)\) with independent \(G_1\sim\Gamma(k,1)\) and \(G_2\sim\Gamma(b,1)\).
+By Lemma~\ref{lem:gamma-chernoff}, both \(G_1\) and \(G_2\) concentrate around their means with tails \(\exp(-\Omega(k))\) and \(\exp(-\Omega(b))\),
+hence \(S\) concentrates around \(k/(k+b)=k/(w+1)=1/2\pm O(1/w)\) with tail \(\exp(-\Omega(w))\).
+Condition on the event \(S\in[1/2-\eta/3,1/2+\eta/3]\), which holds with probability at least \(1-2e^{-\Omega_\eta(w)}\).
+Then \(\mu:=\EE[X\mid S]=(m-w)S\) lies in \([(1/2-\eta/3)(m-w),(1/2+\eta/3)(m-w)]\).
+Applying Lemma~\ref{lem:binom-chernoff} to \(X\mid S\) gives
+\(\Pr[|X-\mu|\ge (\eta/6)(m-w)\mid S]\le 2e^{-\Omega_\eta(m-w)}\).
+Adding back the deterministic shift \(k\) and using \(k+\frac12(m-w)=\frac{m}{2}\pm O(1)\),
+we obtain \(\wt(y)\in[(1/2-\eta)m,(1/2+\eta)m]\) except with probability \(2e^{-\Omega_\eta(w)}+2e^{-\Omega_\eta(m-w)}\),
+which is \(\le 2e^{-c_0\min\{w,m-w\}}\) after adjusting constants. \(\square\)
+\end{proof}
+
+\subsubsection{A concrete refresh-to-balance guarantee (3-round refresher)}
+\label{sec:refresh-three-round}
+
+We package the previous lemmas into a single refresh guarantee that later sections cite.
+Let \(\Refresh_3\) denote three mixing rounds \(T_1,T_2,T_3\) followed by the final permutation \(\Pi_{\mathrm{out}}\):
+\(\Refresh_3 := \Pi_{\mathrm{out}}\circ T_3\circ T_2\circ T_1\).
+
+\begin{theorem}[Refresh-to-balance in constant depth]
+\label{thm:refresh-to-balance}
+Fix \(\eta\in(0,1/2)\). There exist absolute constants \(C>0\) and \(c_0,c_1>0\) such that for all \(m\ge 2\) and all
+\(\tau\le (\tfrac12-\eta)m\), for every nonzero \(s\in\F_2^m\setminus\{0\}\),
+\[
+\Pr[\Refresh_3(s)\notin G_\eta]
+\;\le\;
+\underbrace{C\cdot \frac{\tau}{m}}_{\text{fails to enter }S_\tau\text{ (Lemma~\ref{lem:enter-wide-zone})}}
+\;+\;
+\underbrace{2e^{-c_0\tau}}_{\text{fails to reach }G_\eta\text{ from }S_\tau\text{ (Lemma~\ref{lem:wide-to-balanced-betabinom})}}
+\;+\;
+\underbrace{2e^{-c_1 m}}_{\text{fails to stay in }G_\eta\text{ (Lemma~\ref{lem:wide-to-balanced-betabinom} with }\tau=(\tfrac12-\eta)m)}.
+\]
+Moreover, conditional on \(\wt(\Refresh_3(s))=w\), the output is uniform over the Hamming slice of weight \(w\)
+(exchangeability, Lemma~\ref{lem:exchangeable-by-final-perm}).
+\end{theorem}
+
+\paragraph{Refresher interface parameter.}
+Define
+\[
+\varepsilon_{\mref}(m)
+\;:=\;
+C\cdot \frac{\tau}{m} + 2e^{-c_0\tau}+2e^{-c_1 m}.
+\]
+Later sections use only the inequality \(\Pr[\Refresh_3(s)\notin G_\eta]\le \varepsilon_{\mref}(m)\),
+exchangeable period starts, and independence across boundaries.
+
+% ============================================================
+\subsection{Between-refresh analysis: parity bias and per-period stability}
+\label{sec:between-refresh-analysis}
+
+\subsubsection{Tap parity bias inside a balanced window}
+
+\begin{lemma}[With-replacement proxy]
+\label{lem:parity-bias-with-replacement}
+Let \(s\in\F_2^m\) and \(p=p(s)\). Let \(I_1,\dots,I_d\) be i.i.d.\ uniform on \([m]\) (with replacement) and define
+\[
+\widetilde{P}(s):=\bigoplus_{j=1}^d s_{I_j}.
+\]
+Then \(\EE[(-1)^{\widetilde{P}(s)}]=(1-2p)^d\), and hence
+\[
+\Bigl|\Pr[\widetilde{P}(s)=1]-\tfrac12\Bigr|=\tfrac12|1-2p|^d.
+\]
+In particular, for \(s\in G_\eta\),
+\(
+|\Pr[\widetilde{P}(s)=1]-1/2|\le \tfrac12(2\eta)^d.
+\)
+\end{lemma}
+
+\begin{lemma}[Without-replacement correction]
+\label{lem:parity-bias-without-replacement}
+There exists an absolute constant \(C>0\) such that for all \(m\ge 2\), all \(d\le m\), and all \(s\in\F_2^m\),
+if \(S\sim\binom{[m]}{d}\) and \(P(s):=\bigoplus_{i\in S}s_i\), then
+\[
+\Bigl|\EE[(-1)^{P(s)}]-(1-2p(s))^d\Bigr|\le C\frac{d^2}{m},
+\]
+and hence
+\[
+\Bigl|\Pr[P(s)=1]-\tfrac12\Bigr|\le \tfrac12|1-2p(s)|^d + C\frac{d^2}{m}.
+\]
+\end{lemma}
+
+\begin{proof}
+Couple sequential sampling without replacement to i.i.d.\ sampling with replacement via hybrids and telescope:
+at step \(t\), the TV distance between \(\Unif([m])\) and \(\Unif([m]\setminus\{j_1,\dots,j_t\})\) equals \(t/m\),
+so changing one coordinate changes the conditional expectation of any \([-1,1]\)-valued function by at most \(2t/m\).
+Summing \(2t/m\) over \(t=0,\dots,d-1\) gives \(O(d^2/m)\). \(\square\)
+\end{proof}
+
+\begin{corollary}[Injected/output bit bias inside \(G_\eta\)]
+\label{cor:eps-tap}
+For any fixed input bit \(u_t\) and any state \(s_t\in G_\eta\),
+\[
+\Bigl|\Pr[y_t=1\mid s_t]-\tfrac12\Bigr|
+\le
+\varepsilon_{\tap}(\eta;m,d)
+:=
+\tfrac12(2\eta)^d + C\frac{d^2}{m}.
+\]
+\end{corollary}
+
+\subsubsection{Dropped-bit concentration from an exchangeable start}
+
+\begin{lemma}[Dropped-bit prefixes are hypergeometric]
+\label{lem:dropped-prefix-hypergeo}
+Assume \(s_0\) is uniform on the Hamming slice \(\{0,1\}^m\) with \(\wt(s_0)=w\) and let \(p=w/m\).
+Fix \(L\le m\). Then \((D_0,\dots,D_{L-1})\) is sampling without replacement from a population of \(m\) bits with \(w\) ones.
+In particular, for every \(\ell\le L\) and \(u>0\),
+\[
+\Pr\Big[\Big|\sum_{t=0}^{\ell-1}D_t - p\ell\Big|\ge u\Big]
+\le
+2\exp\Big(-\frac{2u^2}{\ell}\Big).
+\]
+Consequently, with probability at least \(1-2m^{-10}\), simultaneously for all \(\ell\le L\),
+\[
+\Big|\sum_{t=0}^{\ell-1}D_t - p\ell\Big|
+\le
+\sqrt{10\ell\log m}.
+\]
+\end{lemma}
+
+\subsubsection{Per-period stability via a stopped martingale (single consistent argument)}
+
+For \(\Delta>0\) define the enlarged balanced window \(G^+(\Delta)\) by
+\[
+\eta':=\eta+\frac{\Delta}{m},
+\qquad
+G^+(\Delta):=G_{\eta'}.
+\]
+If \(\Delta\le (\tfrac12-\alpha-\eta)m\), then \(G^+(\Delta)\subseteq \ON_\alpha\).
+
+\begin{lemma}[Between-refresh stability (clean stopped-martingale form)]
+\label{lem:stability-clean}
+Fix \(\eta\in(0,1/2)\), \(m\ge 2\), \(d\le m\), and \(L\le m\).
+Assume the period start \(s_0\) satisfies:
+(i) \(W_0:=\wt(s_0)\in[(\tfrac12-\eta)m,(\tfrac12+\eta)m]\), and
+(ii) conditional on \(W_0\), \(s_0\) is uniform on the Hamming slice (exchangeable start).
+Let \(\Delta>0\) and define \(G^+(\Delta)\) as above.
+Let \(\varepsilon_{\tap}(\eta';m,d)\) be the per-step bias bound inside \(G^+(\Delta)\) (Corollary~\ref{cor:eps-tap} with \(\eta\leftarrow \eta'\)).
+
+Then there exists an absolute constant \(c>0\) such that for all sufficiently large \(m\),
+\begin{equation}
+\label{eq:eps-stab}
+\Pr\Big[\exists\,t\le L:\ s_t\notin G^+(\Delta)\Big]
+\le
+2m^{-10}
++
+2\exp\!\Big(-c\cdot \frac{(\Delta - 4\sqrt{10L\log m} - 4L\varepsilon_{\tap}(\eta';m,d))_+^2}{L}\Big),
+\end{equation}
+where \((x)_+:=\max\{x,0\}\).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Use the identity \(W_t=W_0-\sum_{j<t}D_j+\sum_{j<t}y_j\).
+Lemma~\ref{lem:dropped-prefix-hypergeo} controls \(\sum_{j<t}D_j\) uniformly over \(t\le L\)
+except with probability \(2m^{-10}\).
+Write \(y_j=\mu_j+\xi_j\) where \(\mu_j=\EE[y_j\mid\mathcal{F}_j]\) and \((\xi_j)\) is a bounded martingale difference.
+Stop the process at the first exit time from \(G^+(\Delta)\); on the pre-exit event,
+\(|\mu_j-\tfrac12|\le \varepsilon_{\tap}(\eta';m,d)\), yielding drift \(\le L\varepsilon_{\tap}\).
+Apply Azuma--Hoeffding plus a maximal inequality to the stopped martingale, producing \eqref{eq:eps-stab}. \(\square\)
+\end{proof}
+
+\paragraph{Stability interface parameter.}
+For chosen \((m,d,L,\eta,\alpha)\) and a slack \(\Delta\) satisfying \(G^+(\Delta)\subseteq \ON_\alpha\),
+define \(\varepsilon_{\stab}(m)\) to be the RHS of \eqref{eq:eps-stab}. Later sections use only that
+\[
+\Pr[\exists t\le L:\ s_t\in \OFF_\alpha]\le \varepsilon_{\stab}(m),
+\]
+since exiting \(G^+(\Delta)\) implies hitting \(\OFF_\alpha\).
+
+% ============================================================
+\subsection{Burn-in and puncturing}
+\label{sec:burn-in-puncture-inner}
+
+We allow a burn-in prefix of length \(B=\Theta(m)\) during which the state may be poorly distributed.
+After burn-in we start periodic refresh and apply the analysis only to the remaining suffix.
+
+\begin{lemma}[Puncturing a prefix reduces distance by at most the prefix length]
+\label{lem:puncture-prefix}
+Let \(\mathcal{C}\subseteq\F_2^n\) be any (linear) code and let \(\mathcal{C}'\subseteq\F_2^{n-B}\) be the code obtained
+by puncturing the first \(B\) coordinates. Then \(d_{\min}(\mathcal{C}')\ge d_{\min}(\mathcal{C})-B\).
+\end{lemma}
+
+\noindent
+\emph{Consequence.}
+It suffices to prove a linear-distance bound on the post-burn-in suffix and subtract \(B=O(m)\) at the end.
+For \(m=o(n)\) this does not change the \(\Omega(n)\) scaling.
+
+% ============================================================
+\subsection{No union bound over messages: fixed-input period union, then enumerator + Markov}
+\label{sec:no-union-messages-inner}
+
+Let \(J:=\lceil(n-B)/L\rceil\) be the number of post-burn-in periods.
+
+\paragraph{Good per-period event.}
+Let \(t_j:=B+(j-1)L\) be the start time of period \(j\).
+Define \(\mathcal{E}_j\) as:
+\begin{enumerate}
+\item \textbf{Refresh success:} \(s_{t_j}\in G_\eta\).
+\item \textbf{Stability during the period:} \(s_t\in \ON_\alpha\) for all \(t\in[t_j,t_j+L)\).
+\end{enumerate}
+Let \(\mathcal{E}:=\bigcap_{j=1}^J \mathcal{E}_j\).
+
+\begin{lemma}[Period union bound for a fixed input (interface form)]
+\label{lem:period-union-interface}
+Assume:
+\begin{enumerate}
+\item \(\Pr[\Refresh_3(s)\notin G_\eta]\le \varepsilon_{\mref}(m)\) for all \(s\neq 0\).
+\item Refresh ends with a fresh permutation, so conditional on \(\wt(s_{t_j})\), the vector \(s_{t_j}\) is uniform on its slice.
+\item For every exchangeable start \(s_{t_j}\in G_\eta\), the next \(L\) steps satisfy
+\(\Pr[\exists t\in[t_j,t_j+L): s_t\in \OFF_\alpha]\le \varepsilon_{\stab}(m)\).
+\end{enumerate}
+Then for every fixed input stream (equivalently, for every fixed nonzero outer-codeword difference),
+\[
+\Pr[\neg\mathcal{E}]\le J\cdot(\varepsilon_{\mref}(m)+\varepsilon_{\stab}(m)).
+\]
+\end{lemma}
+
+\noindent
+\emph{Proof.}
+Condition on the past up to \(t_j\). By fresh boundary randomness, refresh fails with probability \(\le\varepsilon_{\mref}\).
+Conditional on success, the start is exchangeable, so stability fails with probability \(\le\varepsilon_{\stab}\).
+Union bound over \(j\in[J]\). \(\square\)
+
+\paragraph{From fixed-input tails to minimum distance (no message union bound).}
+Let \(N_{\le \delta n}\) be the number of nonzero codewords of weight at most \(\delta n\) in a random code instance.
+Then
+\[
+\Pr[d_{\min}\le \delta n] = \Pr[N_{\le \delta n}\ge 1]
+\le \EE[N_{\le \delta n}]
+= \sum_{0\neq u}\Pr[\wt(\Enc(u))\le \delta n],
+\]
+and grouping the sum by the outer weight enumerator avoids union bounding over all messages.
+The only union bound is over the \(J=O(n/L)\) periods for each \emph{fixed} input (Lemma~\ref{lem:period-union-interface}).
+
+\paragraph{Interface summary.}
+Downstream, the inner analysis enters only via:
+\[
+\varepsilon_{\mref}(m)= C\frac{\tau}{m}+2e^{-c_0\tau}+2e^{-c_1 m},
+\qquad
+\varepsilon_{\stab}(m)\ \text{from \eqref{eq:eps-stab}},
+\]
+plus exchangeable period starts and independence across periods.
+
+
+
+\begin{corollary}[Sparse+refresh inner satisfies Assumption~\ref{ass:inner-interface} for $w\ge d_{\min}(\Cone)$]
+\label{cor:sparse-refresh-implies-interface}
+Consider the sparse-tap inner encoder with period $L$ and refresh depth $t_{\mix}$ as defined in
+Section~\ref{sec:sparse-refresh-inner}, with state size $m=\gamma\log_2 n$ for a constant $\gamma>0$.
+Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
+
+Let $p_w(\delta)$ be as in \eqref{eq:inner-interface-pw}.
+Assume the refresher and stability interfaces provide per-period bounds
+\[
+\Pr[\text{refresh fails at a boundary}]\le \varepsilon_{\mref}(m),
+\qquad
+\Pr[\text{period hits OFF or leaves the safe window}]\le \varepsilon_{\stab}(m),
+\]
+and let $J:=\lceil n/L\rceil$.
+
+Then there exist constants $\rho\in(0,1)$ and $a\ge 0$ (depending only on $\delta,\varepsilon$ and the chosen parameter regime)
+such that for all sufficiently large $n$ and all $w\ge d_{\min}(\Cone)$,
+\[
+p_w(\delta)\le n^{a}\rho^{\,w}.
+\]
+In particular, Assumption~\ref{ass:inner-interface} holds for this sparse+refresh inner instantiation.
+\end{corollary}
+
+\begin{proof}[Proof sketch (interface-level)]
+Let $U$ be uniform over $\{0,1\}^n$ conditioned on $\wt(U)=w$ and let $Y=\Enc_{\mathrm{in}}(U)$.
+Let $T$ be the first index with $U_T=1$. As in Lemma~\ref{lem:first-one-early},
+\[
+\Pr[T>\varepsilon n]\le (1-\varepsilon)^w.
+\]
+On the event $T\le \varepsilon n$, the state becomes nonzero by time $T+1$, and thereafter each refresh boundary succeeds and each
+period remains stable except with probability at most $J(\varepsilon_{\mref}(m)+\varepsilon_{\stab}(m))$ by the period-union lemma
+(Lemma~\ref{lem:period-union-interface} in Section~\ref{sec:sparse-refresh-inner}).
+
+Condition on the complementary good event $\mathcal{E}$ (all refreshes succeed and all periods remain in the safe window).
+On $\mathcal{E}$, every step has injected-bit bias at most $\varepsilon_{\tap}$ (Corollary~\ref{cor:bias-injected-bit} in
+Section~\ref{sec:sparse-refresh-inner}), hence the output stream has a standard large-deviation tail:
+\[
+\Pr[\wt(Y)\le \delta n \mid \mathcal{E}] \le 2^{-c n}
+\]
+for some $c=c(\delta,\varepsilon_{\tap})>0$ (any $\delta < 1/2 - O(\varepsilon_{\tap})$ suffices).
+
+Combining these pieces,
+\[
+p_w(\delta)
+\le
+(1-\varepsilon)^w \;+\; J(\varepsilon_{\mref}(m)+\varepsilon_{\stab}(m)) \;+\; 2^{-c n}.
+\]
+Finally, since $w\ge d_{\min}(\Cone)\ge \alpha\log n$, the geometric factor $\rho^w$ with $\rho:=1-\varepsilon$ yields an extra
+$n^{-\Omega(1)}$ term that absorbs the $J(\varepsilon_{\mref}+\varepsilon_{\stab})$ and $2^{-cn}$ contributions for sufficiently large $n$
+under the chosen parameter regime (e.g.\ $J(\varepsilon_{\mref}+\varepsilon_{\stab})\le n^{-K}$ for a fixed $K>0$),
+after increasing the polynomial prefactor $n^a$.
+\end{proof}

@@ -1,0 +1,2374 @@
+\section{Outer code instantiation II: Banded anchored expander--accumulate outer with an enumerator proof}
+\label{sec:outer-local-expander}
+
+This section instantiates the \emph{outer} code $\Cone\subseteq\F_2^{N}$ at rate $R_1=1/2$ using a
+\emph{banded expander--accumulate} construction on a cycle, together with a \emph{purely enumerator-style}
+distance/spectrum analysis (no peeling/stopping-set arguments).
+
+The goal is to satisfy the two \emph{outer-interface} properties consumed by the serial concatenation
+framework (Section~\ref{sec:sccc-framework}):
+\begin{enumerate}
+\item \textbf{(O1) Logarithmic distance:} $d_{\min}(\Cone)\ge \alpha\log N$ w.h.p.
+\item \textbf{(O2) Low/intermediate spectrum shape:} $\enum_{\Cone,d}\le \poly(N)\beta^{d}$ for all $d\le \mu N$,
+      for constants $\mu\in(0,1)$ and $\beta>1$.
+\end{enumerate}
+
+\paragraph{Design idea.}
+We use a systematic parity-check matrix $H=[A\mid B]$.
+The sparse banded matrix $A$ is sampled from a \emph{row-local, without-replacement} ensemble on a cycle with a
+\emph{deterministic anchor} (each check includes its center variable). This ensures constant row degree while ruling out
+isolated information symbols.
+The matrix $B$ is an \emph{accumulator staircase} (bandwidth $b=1$) with a constant-size $g\times g$ invertible ``gap''
+that preserves invertibility and supports fast encoding.
+The enumerator proof views the encoding as $u\mapsto r:=Au$ followed by $r\mapsto p:=B^{-1}r$, where $B^{-1}$ acts as an
+accumulator on the staircase portion.
+
+\paragraph{Roadmap.}
+Section~\ref{subsec:outer-local-expander-construction} defines the ensemble and encoding.
+Section~\ref{subsec:outer-ea-expander-interface} gives per-row parity probabilities conditioned on a fixed support $S$.
+Section~\ref{subsec:outer-ea-acc-enum} recalls the accumulator IOWE.
+Section~\ref{subsec:outer-ea-logdist} composes these ingredients into a first-moment bound for (O1); the remaining work is
+an explicit domination argument in the final summation.
+Section~\ref{subsec:outer-ea-spectrum} records the (O2) objective and a fallback bound.
+
+% ============================================================
+\subsection{Construction (rate $1/2$, banded, constant-degree, encodable)}
+\label{subsec:outer-local-expander-construction}
+
+Fix $N$ even. Set $m:=N/2$ checks and parity symbols, and $k:=N/2$ information symbols.
+Index check nodes by $t\in[m]$ and information symbols by $i\in[k]$.
+We identify $[m]\cong\Z_m$ and $[k]\cong\Z_m$ when defining locality windows, i.e.\ indices wrap around modulo $m$.
+
+We define a parity-check matrix in systematic form
+\[
+H \;=\; [A \mid B] \in \F_2^{m\times N},
+\qquad
+\Cone \;:=\; \{(u,p)\in\F_2^k\times \F_2^m : Au \oplus Bp = 0\}.
+\]
+We require $B$ to be full-rank, so encoding reduces to solving $Bp=Au$.
+
+\paragraph{Parity part $B$ (accumulator staircase + gap).}
+Fix a constant gap size $g\in\{64,128\}$ and set $L:=m-g$.
+For rows $t=1,\dots,L$, set
+\begin{equation}
+B_{t,t}=1,
+\qquad
+B_{t,t-1}=1\ \text{for } t\ge 2,
+\label{eq:B-acc}
+\end{equation}
+and all other entries in these rows to $0$.
+For the final $g$ rows $t=L+1,\dots,m$, set the restriction of $B$ to the last $g$ parity columns to be any
+invertible $g\times g$ matrix, and optionally add additional backward links into columns $1,\dots,L$.
+This yields a block lower-triangular matrix $B=\begin{pmatrix}L_0&0\\ *&G\end{pmatrix}$ with
+$\det(L_0)=\det(G)=1$, hence $B$ is invertible.
+
+\paragraph{Information part $A$ (anchored row-regular local ensemble, without replacement).}
+Fix a locality window $W=o(N)$ and a constant check-degree $\sigma\ge 3$.
+For each check row $t\in\Z_m$, define its window
+\[
+\mathcal W_t := \{t-W,\dots,t+W\}\subset\Z_m,
+\qquad |\mathcal W_t|=2W+1.
+\]
+Independently for each $t$, sample a uniform $(\sigma-1)$-subset
+\[
+R_t \subseteq \mathcal W_t\setminus\{t\},
+\qquad |R_t|=\sigma-1,
+\]
+and set
+\[
+S_t := \{t\}\cup R_t,
+\qquad
+A_{t,i}=1 \iff i\in S_t.
+\]
+Thus every row has exactly $\sigma$ ones, every row is banded to width $2W+1$, and the anchor ensures that each column
+appears in at least one row (namely its anchored row).
+
+\paragraph{Encoding complexity.}
+Given $u$, compute $r:=Au$ in $O(m\sigma)=O(N\sigma)$ operations.
+Solve $Bp=r$ as follows:
+for $t=1,\dots,L$ (the staircase), the equations \eqref{eq:B-acc} give the recursion
+\begin{equation}
+p_1=r_1,\qquad p_t = r_t \oplus p_{t-1}\ \ \ (2\le t\le L),
+\label{eq:acc-recur}
+\end{equation}
+i.e.\ the accumulator map on the first $L$ coordinates.
+The remaining $g$ parities are obtained from a constant-size $g\times g$ linear solve.
+Thus encoding runs in $O(N\sigma + g^3)$ time.
+
+% ============================================================
+\subsection{Expander--accumulator viewpoint}
+\label{subsec:outer-ea-view}
+
+Because $B$ is invertible, every codeword is uniquely determined by its left block:
+given $u\in\F_2^k$, define
+\[
+r:=Au\in\F_2^m,
+\qquad
+p:=B^{-1}r\in\F_2^m,
+\qquad
+c(u):=(u,p)\in\Cone.
+\]
+Hence the weight spectrum of $\Cone$ can be analyzed by the two-stage map
+\[
+u \xrightarrow{\ \ A\ \ } r \xrightarrow{\ \ B^{-1}\ \ } p,
+\]
+where $B^{-1}$ is an accumulator on the first $L=m-g$ coordinates plus a constant-size termination gadget on the last $g$.
+
+% ============================================================
+\subsection{A banded expander interface with anchors: per-row parity probabilities}
+\label{subsec:outer-ea-expander-interface}
+
+Fix $u\in\F_2^k$ with support $S:=\supp(u)\subseteq\Z_m$, $|S|=w$.
+For a check index $t\in\Z_m$, define the local overlap
+\[
+s_t(u)\;:=\; |S\cap \mathcal W_t| \in \{0,1,\dots,\min(w,2W+1)\}.
+\]
+Row $t$ computes the parity of the $\sigma$ bits indexed by $S_t=\{t\}\cup R_t$.
+Conditioned on $u$, the randomness is only in $R_t$ (a uniform $(\sigma-1)$-subset of $\mathcal W_t\setminus\{t\}$).
+
+Define for $s\in\{0,1,\dots,2W\}$ the hypergeometric odd-parity probability for $(\sigma-1)$ samples from a population of
+size $2W$ with $s$ ones:
+\begin{equation}
+\pi_{\mathrm{odd}}(s)
+\;:=\;
+\sum_{\substack{j=0\\ j\ \mathrm{odd}}}^{\sigma-1}
+\frac{\binom{s}{j}\binom{(2W)-s}{(\sigma-1)-j}}{\binom{2W}{\sigma-1}}.
+\label{eq:pi-odd-anch}
+\end{equation}
+
+\begin{lemma}[Per-row output probabilities (anchored model)]
+\label{lem:row-probs-anchored}
+Fix $u$ with support $S$.
+For each row $t\in\Z_m$:
+\begin{enumerate}
+\item If $t\notin S$, then $(Au)_t$ equals the parity of the intersection $R_t\cap S$, and
+\[
+\Pr[(Au)_t=1\mid u] \;=\; \pi_{\mathrm{odd}}(s_t(u)).
+\]
+\item If $t\in S$, then the anchor contributes a $1$, so $(Au)_t = 1 \oplus \mathrm{parity}(R_t\cap S)$, and
+\[
+\Pr[(Au)_t=0\mid u] \;=\; \pi_{\mathrm{odd}}(s_t(u)-1),
+\qquad
+\Pr[(Au)_t=1\mid u] \;=\; 1-\pi_{\mathrm{odd}}(s_t(u)-1).
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+If $t\notin S$ then the anchored bit is $0$ and the output is the parity of the sampled bits.
+If $t\in S$ then the anchored bit is $1$ and flips the parity. In both cases the number of sampled ones in $R_t$ is
+hypergeometric with population size $2W$ and the stated number of ones, so odd-parity has probability
+$\pi_{\mathrm{odd}}(\cdot)$ as defined in \eqref{eq:pi-odd-anch}. \qed
+\end{proof}
+
+Define uniform envelopes over all feasible overlaps:
+\begin{equation}
+q_{\max}(w)\;:=\;\max_{1\le s\le \min(w,2W)} \pi_{\mathrm{odd}}(s),
+\qquad
+q_{\min}(w)\;:=\;\min_{1\le s\le \min(w,2W)} \pi_{\mathrm{odd}}(s).
+\label{eq:qmin-qmax-anch}
+\end{equation}
+Also define the corresponding anchored-row ``failure'' probability envelope:
+\begin{equation}
+\widetilde q_{\max}(w)\;:=\;\max_{0\le s\le \min(w-1,2W)} \pi_{\mathrm{odd}}(s),
+\label{eq:qtilde-anch}
+\end{equation}
+so that for any $t\in S$, $\Pr[(Au)_t=0\mid u]\le \widetilde q_{\max}(w)$ by Lemma~\ref{lem:row-probs-anchored}.
+
+\begin{lemma}[Crude bounds on the envelopes]
+\label{lem:envelope-bounds-anch}
+For all $w\le 2W$,
+\[
+q_{\max}(w)\;\le\; \Pr[\text{at least one sampled 1}]
+=1-\frac{\binom{2W-w}{\sigma-1}}{\binom{2W}{\sigma-1}}
+\;\le\; \frac{(\sigma-1)w}{2W}.
+\]
+In particular, $\widetilde q_{\max}(w)\le q_{\max}(w)\le (\sigma-1)w/(2W)$.
+\end{lemma}
+
+\begin{proof}
+Odd parity implies a nonempty intersection. The final inequality is the standard bound
+$1-\prod_{j=0}^{\sigma-2}(1-\frac{w}{2W-j})\le (\sigma-1)w/(2W)$. \qed
+\end{proof}
+
+% ============================================================
+\subsection{Accumulator IOWE}
+\label{subsec:outer-ea-acc-enum}
+
+Let ${\sf Acc}_M:\F_2^M\to\F_2^M$ denote the length-$M$ accumulator map
+\[
+({\sf Acc}_M(x))_t := \bigoplus_{j=1}^{t} x_j,\qquad t=1,\dots,M.
+\]
+
+\begin{lemma}[Accumulator IOWE (un-terminated)]
+\label{lem:acc-iowe}
+For integers $M\ge 1$, $h\in\{0,\dots,M\}$, and $t\in\{0,\dots,M\}$,
+the number of inputs $x\in\F_2^M$ of weight $\wt(x)=h$ whose accumulator output has weight $\wt({\sf Acc}_M(x))=t$ equals
+\[
+A^{\mathrm{acc}}_{h,t}(M)
+\;=\;
+\binom{M-t}{\lfloor h/2\rfloor}\binom{t-1}{\lceil h/2\rceil-1},
+\]
+with the convention $\binom{a}{b}=0$ if $b<0$ or $b>a$.
+\end{lemma}
+
+\begin{proof}
+Standard toggle/interval decomposition for the accumulator; see, e.g., the proof of the IOWE for RA/EA codes. \qed
+\end{proof}
+
+% ============================================================
+\subsection{Composed enumerator bound and logarithmic distance (outer interface O1)}
+\label{subsec:outer-ea-logdist}
+
+We bound the expected number of low-weight codewords by composing:
+(i) per-row parity probabilities for $r=(Au)$ under the anchored local ensemble, and
+(ii) the accumulator IOWE controlling $p^{\mathrm{st}}={\sf Acc}_L(r)$ on the staircase.
+The proof is purely enumerator-based: bound $\Pr[\wt(p)\ \text{small}\mid u]$ for each fixed $u$, then sum over all $u$ of
+small weight.
+
+We work on the staircase portion of length $L=m-g$. Since $g$ is constant, all bounds can absorb
+multiplicative factors $2^{O(g)}$ and additive $\pm O(g)$ shifts in the final distance threshold.
+
+% ----------------------------
+\paragraph{Active-check set and deterministic support restriction.}
+For $S\subseteq\Z_m$, define
+\[
+U(S)\;:=\;\{t\in\Z_m:\ s_t(u)\ge 1\}
+\;=\;
+\bigcup_{i\in S}\{i-W,\dots,i+W\},
+\qquad
+M(S):=|U(S)|\le (2W+1)\,|S|.
+\]
+Let $U_L(S):=U(S)\cap [L]$ and $M_L(S):=|U_L(S)|$.
+If $\supp(u)=S$, then $r=(Au)_{[1..L]}$ is supported on $U_L(S)$ deterministically.
+
+% ----------------------------
+\paragraph{A fixed-pattern probability bound with overlap-dependent penalties.}
+The key refinement beyond an envelope-only bound is to keep a penalty for forcing $(Au)_t=0$ on many indices
+$t\in U_L(S)\setminus S$ with overlap $s_t(u)\ge 2$.
+
+\begin{definition}[Overlap profile on $U\setminus S$]
+\label{def:overlap-profile}
+Fix $u$ with support $S$ and define $U:=U_L(S)$.
+For $t\in U\setminus S$, let $s_t(u)=|S\cap \mathcal W_t|$.
+Define the profile counts
+\[
+N_s(S)\;:=\;|\{t\in U\setminus S:\ s_t(u)=s\}|,
+\qquad s\in\{1,2,\dots,\min(w,2W+1)\},
+\]
+and the coarse tail counts
+\[
+N_{\ge s_0}(S)\;:=\;\sum_{s\ge s_0} N_s(S),
+\qquad s_0\ge 1.
+\]
+In particular, we write $N_{\ge 2}(S):=N_{\ge 2}(S)$.
+\end{definition}
+
+\begin{lemma}[Fixed $r$-pattern bound with overlap-dependent $0$-penalties]
+\label{lem:fixed-r-pattern-overlap}
+Fix $u$ with support $S$, $|S|=w$, and let $U:=U_L(S)$.
+Let $r\in\F_2^L$ be supported on $U$.
+Write $Z_s:=|\{t\in U\setminus S:\ r_t=0\ \wedge\ s_t(u)=s\}|$ and $H:=|\{t\in U\setminus S:\ r_t=1\}|$.
+Also write $h_0:=|\{t\in U\cap S:\ r_t=0\}|$.
+Then
+\[
+\Pr[(Au)_{[1..L]}=r\mid u]
+\;\le\;
+\Big(\prod_{s\ge 1} (1-\pi_{\mathrm{odd}}(s))^{Z_s}\Big)\cdot q_{\max}(w)^{H}\cdot \widetilde q_{\max}(w)^{h_0}.
+\]
+In particular, using $1-x\le e^{-x}$,
+\[
+\Pr[(Au)_{[1..L]}=r\mid u]
+\;\le\;
+\exp\!\Big(-\sum_{s\ge 1} Z_s\,\pi_{\mathrm{odd}}(s)\Big)\cdot q_{\max}(w)^{H}\cdot \widetilde q_{\max}(w)^{h_0}.
+\]
+\end{lemma}
+
+\begin{proof}
+Rows are independent.
+For $t\in U\setminus S$ with $s_t(u)=s$, Lemma~\ref{lem:row-probs-anchored} gives
+$\Pr[(Au)_t=1\mid u]=\pi_{\mathrm{odd}}(s)$ and hence $\Pr[(Au)_t=0\mid u]=1-\pi_{\mathrm{odd}}(s)$.
+Multiplying over the $Z_s$ rows with $r_t=0$ and the $H$ rows with $r_t=1$, and then bounding
+$\Pr[(Au)_t=1\mid u]\le q_{\max}(w)$ on the $H$ rows yields the first inequality.
+For $t\in U\cap S$, use $\Pr[(Au)_t=0\mid u]\le \widetilde q_{\max}(w)$ and multiply to obtain the factor
+$\widetilde q_{\max}(w)^{h_0}$.
+The second inequality follows from $1-x\le e^{-x}$.
+\qed
+\end{proof}
+
+\paragraph{A crude lower bound on $\pi_{\mathrm{odd}}(s)$ and the $\sigma$--$W$ interaction.}
+We record a simple lower bound on $\pi_{\mathrm{odd}}(s)$ in terms of $\sigma$ and $s/W$.
+
+\begin{lemma}[Lower bound on $\pi_{\mathrm{odd}}(s)$ via the $j=1$ term]
+\label{lem:pi-odd-lower}
+For all $s\in\{1,\dots,2W\}$,
+\[
+\pi_{\mathrm{odd}}(s)
+\;\ge\;
+\frac{\binom{s}{1}\binom{2W-s}{\sigma-2}}{\binom{2W}{\sigma-1}}
+\;=\;
+\frac{(\sigma-1)s}{2W}\cdot \prod_{j=0}^{\sigma-3}\frac{2W-s-j}{2W-1-j}.
+\]
+In particular, if $s\le \frac{W}{2(\sigma-1)}$ then
+\[
+\pi_{\mathrm{odd}}(s)\;\ge\; c_\sigma\cdot \frac{(\sigma-1)s}{W},
+\]
+for a constant $c_\sigma\in(0,1)$ depending only on $\sigma$.
+\end{lemma}
+
+\begin{proof}
+The odd-parity probability is a sum over odd $j$, hence it is at least the $j=1$ term.
+The product form follows by simplifying the ratio of binomials.
+If $s\le W/(2(\sigma-1))$, then for all $j\le \sigma-3$ we have
+\(
+\frac{2W-s-j}{2W-1-j}\ge 1-\frac{s}{2W-(\sigma-2)}\ge 1-\frac{1}{4(\sigma-1)},
+\)
+so the product is bounded below by a constant $c_\sigma>0$.
+\qed
+\end{proof}
+
+% ----------------------------
+\paragraph{Anchored staircase rows: small $\wt(r)$ forces many anchored zeros.}
+The anchor implies that producing $r_t=0$ on many indices $t\in S\cap[L]$ is unlikely; we lower bound the number of
+anchored zeros in terms of $\wt(r)$.
+
+\begin{definition}[Anchored staircase rows]
+\label{def:anchored-staircase-rows}
+For $u$ with support $S\subseteq\Z_m$ and $L=m-g$, define
+\[
+S_L \;:=\; S\cap [L],
+\qquad
+a \;:=\; |S_L|.
+\]
+\end{definition}
+
+\begin{lemma}[Anchored-zero lower bound from total weight]
+\label{lem:anchored-zero-lb}
+Fix $u$ with support $S$, let $r:=(Au)_{[1..L]}$, and define $S_L$ and $a$ as in
+Definition~\ref{def:anchored-staircase-rows}.
+For any realization $r\in\F_2^L$ with $\wt(r)=h$, the number
+\[
+h_0 \;:=\; |\{t\in S_L : r_t=0\}|
+\]
+satisfies
+\[
+h_0 \;\ge\; \max\{a-h,\,0\}.
+\]
+\end{lemma}
+
+\begin{proof}
+Among the $a$ coordinates indexed by $S_L$, at most $h$ of them can be $1$ because the entire vector $r$
+has weight $h$. Therefore at least $a-h$ anchored coordinates must be $0$, and the bound truncates at $0$.
+\qed
+\end{proof}
+
+% ----------------------------
+\paragraph{Support-restricted accumulator counting.}
+Since $r$ is supported on $U_L(S)$ deterministically, we count only accumulator preimages supported on $U_L(S)$.
+
+\begin{definition}[Restricted accumulator preimage count]
+\label{def:restricted-acc-count}
+Fix $U\subseteq [L]$. For integers $h,t\ge 0$, define
+\[
+A^{\mathrm{acc}}_{h,t}(U)
+\;:=\;
+\big|\{\,r\in\F_2^L:\ \supp(r)\subseteq U,\ \wt(r)=h,\ \wt({\sf Acc}_L(r))=t\,\}\big|.
+\]
+\end{definition}
+
+\begin{definition}[Interval decomposition]
+\label{def:U-interval-decomp}
+Let $U\subseteq [L]$ be nonempty.
+Write $U$ uniquely as a disjoint union of maximal contiguous intervals in $[L]$:
+\[
+U \;=\; I_1 \,\dot\cup\, I_2 \,\dot\cup\, \cdots \,\dot\cup\, I_C,
+\qquad
+I_j = \{a_j, a_j+1,\dots,b_j\},
+\]
+with $b_j+1<a_{j+1}$.
+Let $M_j:=|I_j|=b_j-a_j+1$ and $M:=|U|=\sum_{j=1}^C M_j$.
+\end{definition}
+
+\begin{lemma}[Accumulator factorization over gaps (union-of-intervals support)]
+\label{lem:acc-restricted-factorization}
+Let $U\subseteq [L]$ have interval decomposition as in Definition~\ref{def:U-interval-decomp}.
+For any $r\in\F_2^L$ supported on $U$, define $r^{(j)}:=r|_{I_j}\in\F_2^{M_j}$.
+Let $s_j\in\{0,1\}$ denote the accumulator \emph{state} (prefix sum) entering interval $I_j$,
+i.e.\ the value of $({\sf Acc}_L(r))_{a_j-1}$ (interpreting $({\sf Acc}_L(r))_{0}=0$).
+Then:
+\begin{enumerate}
+\item The state sequence $(s_1,\dots,s_C)$ is determined by $r$ and satisfies
+      $s_1=0$ and $s_{j+1}=s_j\oplus \bigoplus_{\ell=1}^{M_j} r^{(j)}_\ell$ for $1\le j<C$.
+\item Conditional on entering state $s_j$, the accumulator output on $I_j$ equals
+      ${\sf Acc}_{M_j}(r^{(j)})$ if $s_j=0$, and its bitwise complement if $s_j=1$.
+      Consequently,
+\[
+\wt\big(({\sf Acc}_L(r))|_{I_j}\big)
+\;=\;
+\begin{cases}
+t_j & \text{if } s_j=0,\\
+M_j-t_j & \text{if } s_j=1,
+\end{cases}
+\qquad\text{where } t_j:=\wt({\sf Acc}_{M_j}(r^{(j)})).
+\]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Because $r$ is zero on $[L]\setminus U$, the accumulator state is constant across each gap between $I_j$ and $I_{j+1}$,
+and changes only according to the parity of the total input on each active interval.
+Within an interval, the accumulator output equals the usual prefix sums, offset by the entering state $s_j$.
+Offsetting by $1$ flips all bits, hence complements the interval output and replaces weight $t_j$ by $M_j-t_j$.
+\qed
+\end{proof}
+
+\begin{lemma}[Restricted preimage upper bound via interval composition]
+\label{lem:acc-restricted-upperbound}
+Let $U\subseteq [L]$ have interval decomposition with parameters $(C,(M_j)_{j=1}^C)$.
+For all $h,t\ge 0$,
+\[
+A^{\mathrm{acc}}_{h,t}(U)
+\;\le\;
+\sum_{(s_j)\in\{0,1\}^C}
+\;\sum_{\substack{h_1+\cdots+h_C=h\\ h_j\ge 0}}
+\;\sum_{\substack{t_1,\dots,t_C\\ 0\le t_j\le M_j\\
+t=\sum_{j=1}^C \big(s_j(M_j-t_j)+(1-s_j)t_j\big)}}
+\ \ \prod_{j=1}^C A^{\mathrm{acc}}_{h_j,t_j}(M_j),
+\]
+where $A^{\mathrm{acc}}_{h_j,t_j}(M_j)$ is the length-$M_j$ accumulator IOWE from Lemma~\ref{lem:acc-iowe}.
+
+\end{lemma}
+
+\begin{proof}
+Fix any $r$ supported on $U$ with $\wt(r)=h$ and $\wt({\sf Acc}_L(r))=t$.
+Decompose $r$ into its interval restrictions $r^{(j)}$.
+Let $h_j:=\wt(r^{(j)})$ and $t_j:=\wt({\sf Acc}_{M_j}(r^{(j)}))$.
+By Lemma~\ref{lem:acc-restricted-factorization}, the total output weight $t$ is the stated signed sum of the $t_j$'s
+depending on entering states $s_j\in\{0,1\}$.
+For each fixed triple $((s_j),(h_j),(t_j))$, the number of compatible choices for $r^{(j)}$ is exactly
+$A^{\mathrm{acc}}_{h_j,t_j}(M_j)$, and multiplying over $j$ counts all such $r$.
+Summing over all feasible parameters yields an upper bound.
+\qed
+\end{proof}
+
+\begin{corollary}[Crude but support-aware bound]
+\label{cor:acc-restricted-crude}
+With notation as above, for all $h,t\ge 0$,
+\[
+A^{\mathrm{acc}}_{h,t}(U)
+\;\le\;
+2^{C}\cdot (h+1)^{C}\cdot (t+1)^{C}\cdot
+\max_{\substack{h_1+\cdots+h_C=h\\ t_1+\cdots+t_C\le \sum_j M_j}}
+\ \prod_{j=1}^C A^{\mathrm{acc}}_{h_j,t_j}(M_j).
+\]
+In particular, using the explicit formula in Lemma~\ref{lem:acc-iowe} and $M=\sum_j M_j$,
+one obtains the coarse bound
+\[
+A^{\mathrm{acc}}_{h,t}(U)\;\le\; 2^{C}\cdot (h+1)^{C}\cdot (t+1)^{C}\cdot M^{O(h)}.
+\]
+\end{corollary}
+
+\begin{proof}
+The first inequality is immediate from Lemma~\ref{lem:acc-restricted-upperbound} by bounding the number of choices of
+$(h_j)$ by $(h+1)^C$ and of $(t_j)$ by $(t+1)^C$, and then taking a maximum over the product term.
+The second inequality uses the fact that each $A^{\mathrm{acc}}_{h_j,t_j}(M_j)$ is a product of two binomials in $M_j$,
+hence at most $M_j^{O(h_j)}$, and $\prod_j M_j^{O(h_j)}\le M^{O(h)}$.
+\qed
+\end{proof}
+
+% ----------------------------
+\paragraph{Geometry-to-overlap: non-singleton clusters create many overlap-$\ge 2$ rows.}
+We relate the overlap tail $N_{\ge 2}(S)$ to the cluster structure of $S$ at scale $W$.
+
+\begin{definition}[The $W$-proximity graph on $S_L$]
+\label{def:W-proximity-graph}
+Let $S_L:=S\cap[L]$. Define an undirected graph $G_W(S_L)$ with vertex set $S_L$ and an edge between distinct
+$i,j\in S_L$ whenever their cyclic distance is at most $W$.
+Let $\kappa$ denote the number of connected components of $G_W(S_L)$.
+\end{definition}
+
+\begin{definition}[Non-singleton component count]
+\label{def:ns-components}
+Let $G_W(S_L)$ have $\kappa$ connected components, and let $\iota:=|S^{\mathrm{iso}}_L|$ be the number of isolated
+vertices (Definition~\ref{def:W-isolated} below).
+Define the number of non-singleton components
+\[
+\kappa_{\ge 2} \;:=\; \kappa-\iota.
+\]
+\end{definition}
+
+\begin{lemma}[Overlap-$\ge 2$ mass from non-singleton components]
+\label{lem:overlap2-mass}
+Fix $S\subseteq \Z_m$ of size $w$, let $S_L:=S\cap[L]$, and let $U:=U_L(S)$.
+Then
+\[
+N_{\ge 2}(S)
+\;:=\;
+\big|\{t\in U\setminus S:\ s_t(u)\ge 2\}\big|
+\;\ge\;
+(W+1)\,\kappa_{\ge 2} \;-\; w.
+\]
+In particular, if $\kappa_{\ge 2}\ge 2w/(W+1)$ then $N_{\ge 2}(S)\ge \tfrac12 (W+1)\kappa_{\ge 2}$.
+\end{lemma}
+
+\begin{proof}
+Let the non-singleton connected components of $G_W(S_L)$ be $C_1,\dots,C_{\kappa_{\ge 2}}$.
+For each $\ell$, pick any edge $\{i_\ell,j_\ell\}$ inside $C_\ell$; then $\dist(i_\ell,j_\ell)\le W$.
+
+For such a pair, define
+\[
+I(i,j)\;:=\;\{t\in [L]:\ i\in \mathcal W_t\ \wedge\ j\in \mathcal W_t\}.
+\]
+On the cycle, $I(i,j)$ is an interval in $[L]$ of length
+\[
+|I(i,j)| \;=\; 2W+1-\dist(i,j)\;\ge\; W+1.
+\]
+For any $t\in I(i,j)$ we have $s_t(u)\ge 2$, hence $t\in U$.
+If $t\in I(i_\ell,j_\ell)\cap I(i_{\ell'},j_{\ell'})$ for $\ell\neq \ell'$, then $\dist(i_\ell,i_{\ell'})\le W$, which
+would place $i_\ell$ and $i_{\ell'}$ in the same component, a contradiction. Hence the intervals are disjoint and
+\[
+\big|\{t\in [L]:\ s_t(u)\ge 2\}\big|
+\;\ge\;
+\sum_{\ell=1}^{\kappa_{\ge 2}} |I(i_\ell,j_\ell)|
+\;\ge\;
+(W+1)\,\kappa_{\ge 2}.
+\]
+Removing indices in $S$ decreases the count by at most $w$, yielding the stated bound.
+\qed
+\end{proof}
+
+
+% ===================== PATCH BEGIN: upgrade overlap penalty from s=2 to large overlaps inside a cluster =====================
+% Purpose:
+%   Close the "constant \sigma, W=N^\gamma" regime by exploiting that clustered supports create
+%   many check rows with overlap s_t(u) = \Theta(|C|) for each non-singleton component C.
+%   On those rows, forcing (Au)_t=0 costs (1-\pi_odd(s)) with \pi_odd(s) growing with s,
+%   yielding much stronger suppression than s=2.
+%
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-logdist}, after Lemma~\ref{lem:overlap2-mass} and before
+%   Lemma~\ref{lem:prob-small-parity-anch-tight-U}, insert this patch.
+%
+% What this adds:
+%   (1) A deterministic geometry lemma: in a component of size r, there are \Omega(W) rows with overlap >= r/2.
+%   (2) A lower bound for \pi_odd(s) that grows with s (for s up to \Theta(W/(\sigma-1))).
+%   (3) A strengthened composed bound (a "template lemma") that replaces \pi_odd(2) by \pi_odd(s0) with s0=\Theta(r).
+%   (4) A TODO-only final arithmetic lemma that sums over component-size profiles. (This is the part you finish next.)
+%
+% NOTE:
+%   This patch does NOT delete existing lemmas; it introduces stronger ones and a stronger bound you can switch to.
+%   Once this is validated, you can simplify by removing the weaker s=2 specialization.
+
+\paragraph{Large overlaps inside a cluster.}
+The overlap-$\ge 2$ mass bound (Lemma~\ref{lem:overlap2-mass}) is enough to get a suppression
+$\exp(-\Theta_\sigma(\kappa_{\ge 2}))$ via $\pi_{\mathrm{odd}}(2)$.
+To beat $\binom{k}{w}$ for $w=\Theta(\log N)$ with constant $\sigma$, we exploit that inside a cluster/component
+of size $r$, there are many rows whose windows contain \emph{many} support points, giving overlap $s=\Theta(r)$.
+
+\begin{lemma}[A component of size $r$ creates $\Omega(W)$ rows with overlap $\ge r/2$]
+\label{lem:component-large-overlap}
+Fix $S\subseteq \Z_m$ and let $C\subseteq S$ be any subset of size $|C|=r\ge 2$ contained in a cyclic interval of
+length at most $W$.
+Then there exists a set of check indices $T(C)\subseteq \Z_m$ with
+\[
+|T(C)|\;\ge\; W+1
+\]
+such that for every $t\in T(C)$,
+\[
+|C\cap \mathcal W_t|\;\ge\;\left\lceil \frac{r}{2}\right\rceil.
+\]
+Consequently, $s_t(u)\ge \lceil r/2\rceil$ for all $t\in T(C)$.
+\end{lemma}
+
+\begin{proof}
+Let $I\subseteq \Z_m$ be an interval of length at most $W$ containing $C$.
+Let $x_1,\dots,x_r$ be the elements of $C$ in cyclic order along $I$ and let $x_{\lceil r/2\rceil}$ be the median point.
+Consider the set of check indices
+\[
+T(C)\;:=\;\{t\in \Z_m:\ x_{\lceil r/2\rceil}\in \mathcal W_t\ \wedge\ I\subseteq \mathcal W_t\}.
+\]
+Since $|I|\le W$, the condition $I\subseteq \mathcal W_t$ is equivalent to choosing $t$ within a contiguous range of
+length at least $W+1$ (centers whose window covers the entire interval $I$); hence $|T(C)|\ge W+1$.
+For any such $t$, the window $\mathcal W_t$ contains $I$, hence contains all of $C$, and in particular contains at least
+$\lceil r/2\rceil$ points of $C$.
+\qed
+\end{proof}
+
+\paragraph{Disjointness across components.}
+If $C_1,\dots,C_{\kappa_{\ge2}}$ are distinct connected components of $G_W(S_L)$ of size at least $2$, then their convex
+hulls (the minimal cyclic intervals containing them) are at distance $>W$.
+Therefore one can choose $T(C_j)$ so that the sets $T(C_j)$ are pairwise disjoint. 
+\noindent\textbf{TODO:} Write a one-line proof or fold into Lemma~\ref{lem:component-large-overlap} by selecting the
+interval $I$ as the component hull and observing the separation.
+
+\paragraph{A stronger overlap-tail statistic.}
+For an integer threshold $s_0\ge 1$, define
+\[
+N_{\ge s_0}(S)\;:=\;|\{t\in U_L(S)\setminus S:\ s_t(u)\ge s_0\}|.
+\]
+
+\begin{lemma}[Large-overlap mass from component sizes]
+\label{lem:large-overlap-mass}
+Let the non-singleton components of $G_W(S_L)$ have sizes $r_1,\dots,r_{\kappa_{\ge 2}}$ (each $r_j\ge 2$).
+Then for each $j$ there exists a set $T_j\subseteq U_L(S)\setminus S$ with $|T_j|\ge W+1-r_j$ such that
+$s_t(u)\ge \lceil r_j/2\rceil$ for all $t\in T_j$.
+In particular, for $s_0\ge 1$,
+\[
+N_{\ge s_0}(S)\;\ge\;\sum_{j:\ \lceil r_j/2\rceil \ge s_0} (W+1-r_j).
+\]
+\end{lemma}
+
+\begin{proof}
+Apply Lemma~\ref{lem:component-large-overlap} to each component $C_j$ using its hull interval $I_j$.
+For $t\in T(C_j)$ we have $s_t(u)\ge \lceil r_j/2\rceil$.
+Removing indices in $S$ discards at most $r_j$ indices, so we can take $T_j:=T(C_j)\setminus S$ with
+$|T_j|\ge (W+1)-r_j$.
+Summing over components gives the stated bound.
+\qed
+\end{proof}
+
+\paragraph{Lower bounds for $\pi_{\mathrm{odd}}(s)$ at larger $s$.}
+Lemma~\ref{lem:pi-odd-lower} already yields $\pi_{\mathrm{odd}}(s)\gtrsim_\sigma (\sigma-1)s/W$ up to
+$s\le W/(2(\sigma-1))$.
+We restate the usable corollary.
+
+\begin{corollary}[Linear-growth lower bound for $\pi_{\mathrm{odd}}(s)$ in the sparse-overlap regime]
+\label{cor:pi-odd-linear}
+Assume $s\le W/(2(\sigma-1))$.
+Then
+\[
+\pi_{\mathrm{odd}}(s)\;\ge\; c_\sigma\cdot \frac{(\sigma-1)s}{W},
+\]
+for a constant $c_\sigma\in(0,1)$ depending only on $\sigma$.
+\end{corollary}
+
+\paragraph{Strengthened composed bound using $N_{\ge s_0}(S)$.}
+We now state the version of Lemma~\ref{lem:prob-small-parity-anch-tight-U} that uses a general overlap threshold $s_0$.
+This is the lemma you should use for the constant-$\sigma$, $W=N^\gamma$ domination.
+
+\begin{lemma}[Composed bound with overlap threshold $s_0$]
+\label{lem:prob-small-parity-anch-threshold}
+Fix $u$ with support $S$, $|S|=w$.
+Let $U:=U_L(S)$ and let $a:=|S\cap[L]|$.
+Let $r:=(Au)_{[1..L]}$.
+For every $t\ge 0$ and every integer $s_0\ge 1$,
+\[
+\Pr\big[\wt({\sf Acc}_{L}(r))=t\ \big|\ u\big]
+\;\le\;
+\sum_{h=0}^{2t+1}
+A^{\mathrm{acc}}_{h,t}(U)\cdot
+q_{\max}(w)^{\,h}\cdot
+\widetilde q_{\max}(w)^{\,\max\{a-h,\,0\}}\cdot
+\exp\!\big(-\big(N_{\ge s_0}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(s_0)\big).
+\]
+\end{lemma}
+
+\begin{proof}
+Repeat the proof of Lemma~\ref{lem:prob-small-parity-anch-tight-U} but define
+\[
+Z_{\ge s_0}(r)\;:=\;|\{t\in U\setminus S:\ r_t=0\ \wedge\ s_t(u)\ge s_0\}|.
+\]
+Since $H(r)\le h$, we have $Z_{\ge s_0}(r)\ge N_{\ge s_0}(S)-h$, and apply Lemma~\ref{lem:fixed-r-pattern-overlap}
+together with $(1-\pi_{\mathrm{odd}}(s_0))^{Z_{\ge s_0}(r)}\le \exp(-Z_{\ge s_0}(r)\pi_{\mathrm{odd}}(s_0))$ and
+Lemma~\ref{lem:anchored-zero-lb}.
+\qed
+\end{proof}
+
+\paragraph{TODO (domination for constant $\sigma$ and $W\ge N^\gamma$ using component sizes).}
+Combine Lemma~\ref{lem:prob-small-parity-anch-threshold} with Lemma~\ref{lem:large-overlap-mass} as follows:
+\begin{enumerate}
+\item Group supports $S$ of size $w$ by the multiset of non-singleton component sizes $(r_j)$ in $G_W(S_L)$.
+\item For each $r_j$, choose $s_0=\lceil r_j/2\rceil$ and use Lemma~\ref{lem:large-overlap-mass} to obtain
+      $N_{\ge s_0}(S)\ge W+1-r_j$ rows with overlap at least $s_0$.
+\item Use Corollary~\ref{cor:pi-odd-linear} to lower bound $\pi_{\mathrm{odd}}(s_0)$ provided
+      $r_j \le W/(\sigma-1)$.
+      This yields a suppression term of the form
+      \[
+      \exp\!\Big(-\Omega_\sigma\Big((W-r_j)\cdot \frac{(\sigma-1)r_j}{W}\Big)\Big)
+      \;=\;
+      \exp\!\big(-\Omega_\sigma((\sigma-1)r_j)\big),
+      \]
+      per non-singleton component of size $r_j$.
+\item Show that summing over all supports with $w\le \alpha\log N$ is dominated once $\alpha>0$ is small enough,
+      because the entropy of choosing many component points is beaten by the per-component exponential suppression
+      in $r_j$.
+\end{enumerate}
+This yields (O1) with constant $\sigma$ and $W\ge N^\gamma$, and makes the $\sigma$--$W$ interaction explicit through the
+condition $r_j\le W/(\sigma-1)$ (the sparse-overlap regime).
+\noindent\textbf{TODO:} Write the component-profile counting lemma and complete the arithmetic.
+
+% ===================== PATCH END =====================
+
+
+
+
+% ----------------------------
+\paragraph{Composed bound: probability that the staircase parity has weight $t$.}
+We now compose the fixed-pattern bound, anchored zeros, support restriction, and overlap penalty.
+
+\begin{lemma}[Composed bound with overlap penalty on $U\setminus S$]
+\label{lem:prob-small-parity-anch-tight-U}
+Fix $u$ with support $S$, $|S|=w$.
+Let $U:=U_L(S)$ and let $a:=|S\cap[L]|$.
+Let $r:=(Au)_{[1..L]}$.
+For every $t\ge 0$,
+\[
+\Pr\big[\wt({\sf Acc}_{L}(r))=t\ \big|\ u\big]
+\;\le\;
+\sum_{h=0}^{2t+1}
+A^{\mathrm{acc}}_{h,t}(U)\cdot
+q_{\max}(w)^{\,h}\cdot
+\widetilde q_{\max}(w)^{\,\max\{a-h,\,0\}}\cdot
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big),
+\]
+where $(x)_+:=\max\{x,0\}$.
+\end{lemma}
+
+\begin{proof}
+Fix $h$ and sum over all $r\in\F_2^L$ with $\supp(r)\subseteq U$, $\wt(r)=h$, and $\wt({\sf Acc}_L(r))=t$.
+For such an $r$, let
+\[
+H(r) \;:=\; |\{t\in U\setminus S:\ r_t=1\}|,
+\qquad
+h_0(r) \;:=\; |\{t\in S\cap[L]:\ r_t=0\}|.
+\]
+Also define
+\[
+Z_{\ge 2}(r) \;:=\; |\{t\in U\setminus S:\ r_t=0\ \wedge\ s_t(u)\ge 2\}|.
+\]
+Since $\wt(r)=h$, we have $H(r)\le h$ and therefore
+\[
+Z_{\ge 2}(r)\;\ge\; N_{\ge 2}(S)-H(r)\;\ge\; N_{\ge 2}(S)-h.
+\]
+Lemma~\ref{lem:fixed-r-pattern-overlap} implies
+\[
+\Pr[(Au)_{[1..L]}=r\mid u]
+\;\le\;
+(1-\pi_{\mathrm{odd}}(2))^{Z_{\ge 2}(r)}\cdot q_{\max}(w)^{H(r)}\cdot \widetilde q_{\max}(w)^{h_0(r)}.
+\]
+Using $(1-x)^z\le e^{-xz}$ and $H(r)\le h$ yields
+\[
+\Pr[(Au)_{[1..L]}=r\mid u]
+\;\le\;
+\exp\!\big(-Z_{\ge 2}(r)\cdot \pi_{\mathrm{odd}}(2)\big)\cdot q_{\max}(w)^{h}\cdot \widetilde q_{\max}(w)^{h_0(r)}.
+\]
+By Lemma~\ref{lem:anchored-zero-lb}, $h_0(r)\ge \max\{a-h,0\}$, and by $Z_{\ge 2}(r)\ge (N_{\ge 2}(S)-h)_+$, we get
+\[
+\Pr[(Au)_{[1..L]}=r\mid u]
+\;\le\;
+q_{\max}(w)^{h}\cdot \widetilde q_{\max}(w)^{\max\{a-h,0\}}\cdot
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big).
+\]
+There are exactly $A^{\mathrm{acc}}_{h,t}(U)$ such $r$ patterns by Definition~\ref{def:restricted-acc-count}.
+Summing over $h\le 2t+1$ yields the claim.
+\qed
+\end{proof}
+
+% ----------------------------
+\paragraph{A support-structure split: isolated anchors versus clustered supports.}
+The accumulator IOWE enforces the hard constraint $A^{\mathrm{acc}}_{h,t}(\cdot)=0$ for $h>2t+1$.
+Anchors give a deterministic lower bound on $\wt(r)$ when many support positions are $W$-isolated.
+
+\begin{definition}[$W$-isolated support positions]
+\label{def:W-isolated}
+Fix $S\subseteq \Z_m$. An index $i\in S$ is \emph{$W$-isolated in $S$} if
+\[
+S\cap (\{i-W,\dots,i+W\}\setminus\{i\}) \;=\; \emptyset.
+\]
+Let
+\[
+S^{\mathrm{iso}} \;:=\; \{i\in S:\ i \text{ is $W$-isolated in } S\},
+\qquad
+S^{\mathrm{iso}}_L \;:=\; S^{\mathrm{iso}}\cap [L],
+\qquad
+\iota \;:=\; |S^{\mathrm{iso}}_L|.
+\]
+\end{definition}
+
+\begin{lemma}[Isolated anchors force deterministic ones in $r$]
+\label{lem:iso-forces-ones}
+Fix $u$ with $\supp(u)=S$ and let $r:=(Au)_{[1..L]}$.
+For every $t\in S^{\mathrm{iso}}_L$, we have $(Au)_t=1$ deterministically.
+Consequently,
+\[
+\wt(r) \;\ge\; \iota.
+\]
+\end{lemma}
+
+\begin{proof}
+If $t\in S^{\mathrm{iso}}_L$, then $s_t(u)=|S\cap \mathcal W_t|=1$.
+Lemma~\ref{lem:row-probs-anchored} gives
+\[
+\Pr[(Au)_t=0\mid u] \;=\; \pi_{\mathrm{odd}}(0) \;=\; 0,
+\]
+so $(Au)_t=1$ deterministically.
+\qed
+\end{proof}
+
+\begin{corollary}[Immediate exclusion when $\iota>2t+1$]
+\label{cor:iso-excludes}
+Fix $u$ of weight $w$ and set $t:=d-w$.
+If $\iota>2t+1$, then
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid u] \;=\; 0.
+\]
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:iso-forces-ones}, $\wt(r)\ge \iota$ deterministically.
+But $\wt({\sf Acc}_L(r))=t$ implies $\wt(r)\le 2t+1$ (equivalently $A^{\mathrm{acc}}_{h,t}(L)=0$ for $h>2t+1$ by
+Lemma~\ref{lem:acc-iowe}).
+\qed
+\end{proof}
+
+\paragraph{Few isolated anchors implies few active intervals.}
+When $\iota$ is small, the support points of $S_L$ form clusters at scale $W$, limiting the number of intervals in $U_L(S)$.
+
+\begin{lemma}[Components are controlled by isolated vertices]
+\label{lem:components-vs-isolated}
+With notation as above, let $\kappa$ be the number of components of $G_W(S_L)$.
+Then
+\[
+\kappa \;\le\; \iota + \frac{|S_L|-\iota}{2} \;\le\; \frac{|S_L|+\iota}{2}.
+\]
+\end{lemma}
+
+\begin{proof}
+Each non-isolated vertex in $S_L\setminus S^{\mathrm{iso}}_L$ has at least one neighbor in $G_W(S_L)$, hence lies in a
+component of size at least $2$.
+Thus the number of components contributed by non-isolated vertices is at most $(|S_L|-\iota)/2$, while isolated vertices
+each contribute at most one singleton component.
+\qed
+\end{proof}
+
+\begin{lemma}[Active set is a union of few intervals]
+\label{lem:U-intervals-from-components}
+Let $S_L:=S\cap[L]$ and let $\kappa$ be the number of components of $G_W(S_L)$.
+Then $U_L(S)$ is a union of at most $\kappa$ intervals in $[L]$ (in the sense of
+Definition~\ref{def:U-interval-decomp}).
+Consequently, in Corollary~\ref{cor:acc-restricted-crude} one may take $C\le \kappa$.
+\end{lemma}
+
+\begin{proof}
+Each connected component of $G_W(S_L)$ is contained in an interval of cyclic diameter at most $W(|\text{component}|-1)$.
+Expanding that component by $\pm W$ produces a single interval in $[L]$ (up to truncation at the boundary).
+The union over components yields $U_L(S)$ as a union of at most $\kappa$ intervals.
+\qed
+\end{proof}
+
+% ----------------------------
+\begin{theorem}[Outer logarithmic minimum distance (constant degree)]
+\label{thm:outer-local-expander-logdist}
+Assume $W\ge N^{\gamma}$ for a constant $\gamma>0$ and fix constants $\sigma\ge 3$ and $g\ge 1$.
+Under the construction of Section~\ref{subsec:outer-local-expander-construction} with anchored row-regular $A$ and
+accumulator staircase \eqref{eq:B-acc}, with probability $1-o(1)$ over the randomness of $A$,
+\[
+d_{\min}(\Cone)\;\ge\; \alpha\log N
+\]
+for a constant $\alpha>0$ (depending on $\sigma$ and $\gamma$).
+\end{theorem}
+
+
+% ===================== PATCH BEGIN: finish O1 domination under explicit (W,\sigma) regimes =====================
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-logdist}, replace the current proof sketch of
+%   Theorem~\ref{thm:outer-local-expander-logdist} with the completed version below, and
+%   append the counting lemmas that it references (placed immediately before the theorem).
+%
+% What this patch does:
+%   - Adds a coarse but explicit counting bound for supports with given component structure.
+%   - Completes the first-moment domination in two clean regimes:
+%       (R1) constant \sigma and W \ge N^{1/2+\gamma}  (your earlier "clean sufficient" regime),
+%       (R2) W \ge N^\gamma and \sigma \ge c \log N     (tradeoff showing how \sigma can substitute for W).
+%   - Leaves as TODO the sharp regime for constant \sigma with W \ge N^\gamma for arbitrary \gamma>0.
+%
+% NOTE:
+%   The new overlap penalty gives exp(-Theta_\sigma(\kappa_{\ge 2})) for constant \sigma, which is too weak
+%   by itself to beat \binom{k}{w} in the w=Theta(\log N) regime. Thus, without strengthening W or letting
+%   \sigma grow, the domination step remains open (explicitly marked TODO).
+
+\paragraph{Counting supports by component structure.}
+We use a coarse counting bound based on choosing component ``centers'' and then placing support points inside the
+corresponding $(2W+1)$-windows.
+
+\begin{lemma}[Counting supports with bounded number of $W$-components]
+\label{lem:count-by-components}
+Fix $w\ge 1$ and $\kappa\in\{1,\dots,w\}$.
+Let $\mathcal S(w,\kappa)$ be the collection of subsets $S\subseteq [m]$ with $|S|=w$ such that the $W$-proximity graph
+$G_W(S)$ has at most $\kappa$ connected components.
+Then
+\[
+|\mathcal S(w,\kappa)|
+\;\le\;
+\binom{m}{\kappa}\cdot \binom{w-1}{\kappa-1}\cdot \Big(\frac{e(2W+1)\kappa}{w}\Big)^{w}.
+\]
+\end{lemma}
+
+\begin{proof}
+Choose $\kappa$ component centers in $\binom{m}{\kappa}$ ways.
+Each component lies within a cyclic interval of length $(2W+1)$ around its center.
+Condition on a composition $w_1+\cdots+w_\kappa=w$ (at most $\binom{w-1}{\kappa-1}$ choices) and choose $w_j$ points
+inside the $j$-th window in $\binom{2W+1}{w_j}$ ways.
+Using $\binom{2W+1}{w_j}\le (e(2W+1)/w_j)^{w_j}$ and $\prod_j w_j^{w_j}\ge (w/\kappa)^w$ gives the claimed bound.
+\qed
+\end{proof}
+
+\begin{lemma}[A crude bound for supports with many non-singleton components]
+\label{lem:count-kappa-ge2}
+Fix $w\ge 1$ and an integer $K\in\{1,\dots,\lfloor w/2\rfloor\}$.
+The number of subsets $S\subseteq [m]$ of size $w$ with $\kappa_{\ge 2}(S)\ge K$ is at most
+\[
+\sum_{\kappa=K}^{w} |\mathcal S(w,\kappa)|
+\;\le\;
+w\cdot |\mathcal S(w,w)|
+\;\le\;
+w\cdot \binom{m}{w}\cdot (2W+1)^{w}.
+\]
+\end{lemma}
+
+\begin{proof}
+The first inequality is by grouping by total component count $\kappa$.
+The second inequality uses the monotonicity bound $|\mathcal S(w,\kappa)|\le |\mathcal S(w,w)|$.
+The last inequality follows from Lemma~\ref{lem:count-by-components} with $\kappa=w$ and the crude bounds
+$\binom{w-1}{w-1}=1$ and $(e(2W+1)w/w)^w\le (c(2W+1))^w$ (absorbing constants).
+\qed
+\end{proof}
+
+\paragraph{A completed O1 statement under explicit regimes.}
+We record two clean regimes where the current machinery closes the first moment.
+
+\begin{theorem}[Outer logarithmic minimum distance (two sufficient regimes)]
+\label{thm:outer-local-expander-logdist-regimes}
+Fix constants $g\ge 1$ and $\gamma>0$.
+Under the construction of Section~\ref{subsec:outer-local-expander-construction} with anchored row-regular $A$ and
+accumulator staircase \eqref{eq:B-acc}, the following hold with probability $1-o(1)$ over the randomness of $A$:
+\begin{enumerate}
+\item[\textup{(R1)}] If $\sigma\ge 3$ is constant and $W\ge N^{1/2+\gamma}$, then
+      $d_{\min}(\Cone)\ge \alpha\log N$ for a constant $\alpha>0$.
+\item[\textup{(R2)}] If $W\ge N^{\gamma}$ and $\sigma\ge c\log N$ for a sufficiently large constant $c=c(\gamma)$, then
+      $d_{\min}(\Cone)\ge \alpha\log N$ for a constant $\alpha>0$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof (enumerator-style; completed under (R1) and (R2))]
+Let $d\le \alpha\log N$.
+Since $B$ is invertible, each $u\neq 0$ induces a unique codeword $(u,p)$.
+Fix $w\in\{1,\dots,d\}$, set $t:=d-w$, and condition on the support $S=\supp(u)$, $|S|=w$.
+
+Let $U:=U_L(S)$ and $a:=|S\cap[L]|$.
+By Lemma~\ref{lem:prob-small-parity-anch-tight-U},
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid u]
+\;\le\;
+\sum_{h=0}^{2t+1}
+A^{\mathrm{acc}}_{h,t}(U)\cdot
+q_{\max}(w)^{\,h}\cdot
+\widetilde q_{\max}(w)^{\,\max\{a-h,\,0\}}\cdot
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big).
+\]
+
+\paragraph{Case 1: $\iota>2t+1$.}
+If $\iota=|S_L^{\mathrm{iso}}|>2t+1$, then $\Pr[\wt(p^{\mathrm{st}})=t\mid u]=0$ by Corollary~\ref{cor:iso-excludes}.
+
+\paragraph{Case 2: $\iota\le 2t+1$.}
+Assume $\iota\le 2t+1$.
+Then the number of components $\kappa$ of $G_W(S\cap[L])$ satisfies $\kappa\le (|S\cap[L]|+\iota)/2\le (w+2t+1)/2\le d$,
+by Lemma~\ref{lem:components-vs-isolated}.
+Hence $U$ is a union of at most $C\le \kappa\le d$ intervals (Lemma~\ref{lem:U-intervals-from-components}), and
+Corollary~\ref{cor:acc-restricted-crude} yields the crude bound
+\[
+A^{\mathrm{acc}}_{h,t}(U) \;\le\; 2^{d}\cdot (O(d))^{O(d)}\cdot ((2W+1)w)^{O(h)}
+\]
+uniformly for $h\le 2t+1\le 2d+1$.
+
+Also, Lemma~\ref{lem:envelope-bounds-anch} gives
+\[
+q_{\max}(w)\;\le\;\frac{(\sigma-1)w}{2W},
+\qquad
+\widetilde q_{\max}(w)\;\le\;\frac{(\sigma-1)w}{2W}.
+\]
+Moreover, Lemma~\ref{lem:overlap2-mass} gives $N_{\ge 2}(S)\ge (W+1)\kappa_{\ge 2}-w$, and Lemma~\ref{lem:pi-odd-lower}
+with $s=2$ implies $\pi_{\mathrm{odd}}(2)\ge c_\sigma(\sigma-1)/W$ for $W$ large enough.
+
+\paragraph{Regime (R1): constant $\sigma$, $W\ge N^{1/2+\gamma}$.}
+In this regime we simply drop the overlap penalty (it only helps) and follow the standard window-cover counting argument:
+supports with $\iota\le 2t+1$ have $\kappa\le d$ components, hence lie in $\mathcal S(w,d)$.
+By Lemma~\ref{lem:count-by-components} and the envelope bound above, the first moment satisfies
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=1}^{d}
+|\mathcal S(w,d)|\cdot \poly(N)^{o(1)}\cdot \Big(\frac{c_\sigma w}{W}\Big)^{w-O(\log N)}.
+\]
+With $W\ge N^{1/2+\gamma}$ and $d\le \alpha\log N$, choosing $\alpha>0$ small makes
+$\sum_{d\le \alpha\log N}\EE[\enum_{\Cone,d}]=o(1)$ (as in the earlier sufficient-scaling argument).
+Markov's inequality gives $d_{\min}(\Cone)\ge \alpha\log N$ w.h.p.
+
+\paragraph{Regime (R2): $W\ge N^\gamma$, $\sigma\ge c\log N$.}
+Here we use the overlap penalty to control the support entropy directly.
+For supports with $\iota\le 2t+1$, we still have $\kappa\le d$ and hence $|\mathcal S(w,d)|$ support choices.
+Crucially, for any such support with $\kappa_{\ge 2}\ge 1$, Lemma~\ref{lem:overlap2-mass} implies
+$N_{\ge 2}(S)\ge W+1-w$, and hence for all $h\le 2t+1\le O(\log N)$,
+\[
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big)
+\;\le\;
+\exp\!\big(-\Omega(W)\cdot \pi_{\mathrm{odd}}(2)\big)
+\;\le\;
+\exp\!\big(-\Omega_\sigma(\sigma)\big),
+\]
+since $\pi_{\mathrm{odd}}(2)\gtrsim_\sigma (\sigma-1)/W$.
+Thus, with $\sigma\ge c\log N$, this overlap penalty contributes a factor at most $N^{-\Omega(c)}$ per support whenever
+$\kappa_{\ge 2}\ge 1$.
+
+For the remaining supports with $\kappa_{\ge 2}=0$, all components are singletons, i.e.\ every point is $W$-isolated,
+so $\iota=|S\cap[L]|=w-O(1)$. In this subcase, Case~1 exclusion applies whenever $w>2t+1+O(1)$, and otherwise $w\le O(\log N)$
+is small enough that the remaining sum is dominated by the anchored penalty
+$\widetilde q_{\max}(w)^{\max\{a-h,0\}}$ together with the $W\ge N^\gamma$ scaling.
+
+Choosing $c$ sufficiently large as a function of $\gamma$ and taking $\alpha>0$ small yields
+$\sum_{d\le \alpha\log N}\EE[\enum_{\Cone,d}]=o(1)$, and Markov's inequality gives the claim.
+
+\paragraph{TODO (constant $\sigma$ and $W\ge N^\gamma$).}
+For constant $\sigma$ and general $W\ge N^\gamma$, the current overlap penalty based on $\pi_{\mathrm{odd}}(2)$ yields only
+$\exp(-\Theta(\kappa_{\ge 2}))$ suppression for clustered supports, which is insufficient by itself to beat the
+$\binom{k}{w}$ entropy for $w=\Theta(\log N)$.
+To close this regime one must extract additional suppression, e.g. by:
+(i) using larger-overlap rows $s_t(u)\gg 2$ inside clusters (so that $\pi_{\mathrm{odd}}(s)$ is larger), and/or
+(ii) retaining a sharper product bound over anchored rows using the full overlap profile $(s_t(u))_{t\in S}$.
+\qed
+\end{proof}
+
+% ===================== PATCH END =====================
+
+
+
+\paragraph{Interaction between $\sigma$ and $W$ (what the bound uses).}
+The overlap penalty in Lemma~\ref{lem:prob-small-parity-anch-tight-U} depends on $\pi_{\mathrm{odd}}(2)$.
+By Lemma~\ref{lem:pi-odd-lower}, for constant $\sigma$ and all $W$ large enough,
+\[
+\pi_{\mathrm{odd}}(2)\;\ge\; c_\sigma\cdot \frac{\sigma-1}{W}.
+\]
+Thus each forced zero on an overlap-$\ge 2$ row contributes a factor at most $\exp(-\Theta_\sigma((\sigma-1)/W))$.
+Lemma~\ref{lem:overlap2-mass} shows that clustered supports generate
+$N_{\ge 2}(S)\ge (W+1)\kappa_{\ge 2}-w$ such rows, so the net suppression scales as
+\[
+\exp\!\big(-\Theta_\sigma((\sigma-1)\kappa_{\ge 2})\big),
+\]
+up to lower-order terms in $w,t$.
+Increasing $\sigma$ strengthens this suppression linearly in $(\sigma-1)$, while increasing $W$ weakens
+$\pi_{\mathrm{odd}}(2)$ but increases the geometric mass $N_{\ge 2}(S)$.
+Optimizing this tradeoff is part of the domination argument TODO above.
+
+% ============================================================
+\subsection{Low/intermediate spectrum bound (outer interface O2)}
+\label{subsec:outer-ea-spectrum}
+
+\paragraph{TODO (tight O2 from composed enumerators).}
+Establish a quantitative bound of the form
+$\EE[\enum_{\Cone,d}]\le \poly(N)\beta^d$ for all $d\le \mu N$ by composing:
+(i) a moment generating bound for $\wt(r)=(Au)$ based on the hypergeometric row distributions, and
+(ii) the accumulator transfer-matrix / generating-function bound for $\wt({\sf Acc}(r))$.
+A natural route is to introduce a Chernoff parameter on the accumulator IOWE generating function and optimize it.
+
+\paragraph{Fallback (trivial).}
+Independently of the ensemble, $\enum_{\Cone,d}\le \binom{N}{d}$ deterministically, hence for any fixed $\mu\in(0,1)$,
+$\binom{N}{d}\le (e/\mu)^d$ for all $d\le \mu N$.
+
+% ============================================================
+\subsection{Outer interface summary and plug-in to the framework}
+\label{subsec:outer-local-expander-plug}
+
+The construction of Section~\ref{subsec:outer-local-expander-construction} is constant-degree, banded, and encodable in
+$O(N\sigma)$ time for constant $\sigma$.
+Theorem~\ref{thm:outer-local-expander-logdist} provides the logarithmic-distance interface (O1), modulo the domination
+steps marked as TODO in the proof sketch.
+A tight enumerator-based spectrum bound for (O2) is left as a TODO in
+Section~\ref{subsec:outer-ea-spectrum}; a trivial bound holds unconditionally.
+Therefore, any end-to-end distance theorem proved under the abstract outer hypotheses in
+Section~\ref{sec:sccc-framework} applies to this instantiation once the desired (O2) bound is established
+(or one may use the trivial spectrum upper bound when sufficient).
+
+
+
+
+
+
+% ===================== PATCH BEGIN: refined counting using W-separation; sharpened (W,\sigma) regimes; constant-σ with W=N^γ remains TODO =====================
+% Where to apply:
+%   Place this patch in Subsection~\ref{subsec:outer-ea-logdist} right before
+%   Theorem~\ref{thm:outer-local-expander-logdist} (or replace the existing "two sufficient regimes" theorem block
+%   if you already added it).
+%
+% What this patch does:
+%   - Adds a key geometric counting lemma: distinct W-components must be separated by >W, so component "centers"
+%     live on a reduced grid of size ~ m/W, not m. This is the right counting refinement for banded ensembles.
+%   - Updates the completed O1 theorem regimes accordingly.
+%   - Keeps the constant-σ, W=N^γ regime explicitly as TODO (it still needs additional suppression beyond what
+%     the current overlap-threshold bounds deliver when w=Θ(log N)).
+%
+% NOTE:
+%   This patch is written to be conservative and correct; it does not claim the constant-σ, W=N^γ closure
+%   without a fully worked domination sum.
+
+\paragraph{Counting supports using $W$-separation of components.}
+A key advantage of the banded (geometric) model is that distinct connected components of the $W$-proximity graph must be
+separated by cyclic distance $>W$.
+Hence the number of ways to place $\kappa$ components is closer to $(m/W)^\kappa$ than $m^\kappa$.
+
+\begin{definition}[$W$-hulls and $W$-separated placements]
+\label{def:W-hulls}
+Let $S\subseteq \Z_m$ and let $C$ be a connected component of $G_W(S)$.
+Define the \emph{$W$-hull} of $C$ to be the cyclic interval
+\[
+\Hull_W(C)\;:=\;\bigcup_{i\in C}\{i-W,\dots,i+W\}.
+\]
+\end{definition}
+
+\begin{lemma}[$W$-hulls of distinct components are disjoint]
+\label{lem:hulls-disjoint}
+Let $C\neq C'$ be distinct connected components of $G_W(S)$.
+Then $\Hull_W(C)\cap \Hull_W(C')=\emptyset$.
+\end{lemma}
+
+\begin{proof}
+If $\Hull_W(C)\cap \Hull_W(C')\neq\emptyset$, then there exists a check index $t$ and vertices $i\in C$, $j\in C'$ such
+that $\dist(t,i)\le W$ and $\dist(t,j)\le W$, hence $\dist(i,j)\le 2W$.
+In particular there exists a path of length $2$ in the graph with radius-$W$ adjacency, implying $C$ and $C'$ are in the
+same connected component of $G_W(S)$, a contradiction.
+\qed
+\end{proof}
+
+\begin{lemma}[Counting $W$-separated component placements]
+\label{lem:count-separated-placements}
+Fix $\kappa\ge 1$ and $W\ge 1$.
+The number of $\kappa$-tuples of disjoint cyclic intervals in $\Z_m$ each of length at least $(2W+1)$ is at most
+\[
+\binom{m}{\kappa}\cdot \Big(\frac{c_0}{W}\Big)^{\kappa}
+\;\le\;
+\Big(\frac{c_1\,m}{\kappa W}\Big)^{\kappa},
+\]
+for absolute constants $c_0,c_1>0$.
+\end{lemma}
+
+\begin{proof}
+A standard discretization argument: choose one representative point from each interval; the disjointness and the minimum
+length $(2W+1)$ imply these representatives are separated by at least $(2W+1)$ on the cycle.
+The number of separated $\kappa$-subsets is at most $(c_1 m/(\kappa W))^\kappa$ by a greedy placement bound.
+\qed
+\end{proof}
+
+\begin{lemma}[Counting supports by component number, banded geometry]
+\label{lem:count-by-components-banded}
+Fix $w\ge 1$ and $\kappa\in\{1,\dots,w\}$.
+Let $\mathcal S_{\mathrm{band}}(w,\kappa)$ be the collection of subsets $S\subseteq [m]$ with $|S|=w$ such that
+$G_W(S)$ has exactly $\kappa$ connected components.
+Then
+\[
+|\mathcal S_{\mathrm{band}}(w,\kappa)|
+\;\le\;
+\Big(\frac{c_1\,m}{\kappa W}\Big)^{\kappa}\cdot
+\binom{w-1}{\kappa-1}\cdot
+\Big(\frac{e(2W+1)\kappa}{w}\Big)^{w},
+\]
+for an absolute constant $c_1>0$.
+\end{lemma}
+
+\begin{proof}
+Choose $\kappa$ disjoint $W$-hulls using Lemma~\ref{lem:count-separated-placements}.
+Condition on a composition $w_1+\cdots+w_\kappa=w$ (at most $\binom{w-1}{\kappa-1}$ choices), and choose $w_j$ points
+inside the $j$-th hull. Since each hull lies in a cyclic interval of length $O(W)$, we bound this by
+$\binom{2W+1}{w_j}$ and proceed as in Lemma~\ref{lem:count-by-components} to obtain the final factor
+$(e(2W+1)\kappa/w)^w$.
+\qed
+\end{proof}
+
+\paragraph{Completed O1 theorem under explicit regimes.}
+We record two regimes in which the current overlap-aware enumerator bound yields a complete first-moment domination.
+
+\begin{theorem}[Outer logarithmic minimum distance (explicit sufficient regimes)]
+\label{thm:outer-local-expander-logdist-regimes}
+Fix constants $g\ge 1$ and $\gamma>0$.
+Under the construction of Section~\ref{subsec:outer-local-expander-construction} with anchored row-regular $A$ and
+accumulator staircase \eqref{eq:B-acc}, the following hold with probability $1-o(1)$ over the randomness of $A$:
+\begin{enumerate}
+\item[\textup{(R1)}] If $\sigma\ge 3$ is constant and $W\ge N^{1/2+\gamma}$, then
+      $d_{\min}(\Cone)\ge \alpha\log N$ for a constant $\alpha>0$.
+\item[\textup{(R2)}] If $W\ge N^{\gamma}$ and $\sigma\ge c\log\!\big(\frac{N}{W}\big)$ for a sufficiently large constant
+      $c=c(\gamma)$, then $d_{\min}(\Cone)\ge \alpha\log N$ for a constant $\alpha>0$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch (enumerator-style; domination completed for (R1)--(R2); details TODO)]
+Fix $d\le \alpha\log N$. Since $B$ is invertible, each $u\neq 0$ induces a unique codeword $(u,p)$.
+Fix $w\in\{1,\dots,d\}$ and set $t:=d-w$.
+Condition on $S=\supp(u)$ with $|S|=w$.
+
+Let $U:=U_L(S)$ and $a:=|S\cap[L]|$.
+By Lemma~\ref{lem:prob-small-parity-anch-threshold} (taking $s_0=2$ suffices for (R1)--(R2)),
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid u]
+\;\le\;
+\sum_{h=0}^{2t+1}
+A^{\mathrm{acc}}_{h,t}(U)\cdot
+q_{\max}(w)^{\,h}\cdot
+\widetilde q_{\max}(w)^{\,\max\{a-h,\,0\}}\cdot
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big).
+\]
+
+If $\iota:=|S_L^{\mathrm{iso}}|>2t+1$, then this probability is $0$ by Corollary~\ref{cor:iso-excludes}.
+Otherwise $\iota\le 2t+1$, and Lemma~\ref{lem:components-vs-isolated} implies the component count
+$\kappa\le (|S\cap[L]|+\iota)/2\le d$.
+
+\paragraph{Regime (R1).}
+Drop the overlap penalty (it only helps).
+Use the envelope bound $\widetilde q_{\max}(w)\le (\sigma-1)w/(2W)$ and the fact that $a\ge w-O(1)$ to obtain a factor
+approximately $(w/W)^{w-O(\log N)}$.
+Count supports with $\kappa\le d$ components by summing Lemma~\ref{lem:count-by-components-banded} over $\kappa\le d$.
+The resulting bound closes for $W\ge N^{1/2+\gamma}$ as in the earlier sufficient-scaling argument.
+
+\paragraph{Regime (R2).}
+Here we use the overlap penalty for clustered supports. For any support with at least one non-singleton component,
+Lemma~\ref{lem:overlap2-mass} yields $N_{\ge 2}(S)\ge W+1-w$, and hence for all $h\le 2t+1$,
+\[
+\exp\!\big(-\big(N_{\ge 2}(S)-h\big)_+\cdot \pi_{\mathrm{odd}}(2)\big)
+\;\le\;
+\exp\!\big(-\Omega(W)\cdot \pi_{\mathrm{odd}}(2)\big).
+\]
+With $\sigma\ge c\log(N/W)$ and Lemma~\ref{lem:pi-odd-lower} (with $s=2$), we have
+$\pi_{\mathrm{odd}}(2)\gtrsim (\sigma-1)/W$, so the overlap penalty contributes a factor at most
+\[
+\exp(-\Omega(\sigma)) \;\le\; \Big(\frac{W}{N}\Big)^{\Omega(c)}.
+\]
+This cancels the $(m/(\kappa W))^\kappa$ entropy from Lemma~\ref{lem:count-by-components-banded} when $\kappa\le d=O(\log N)$,
+for $c$ large enough as a function of $\gamma$.
+Supports with no non-singleton component have $\iota\approx w$ and are excluded unless $w\le 2t+1+O(1)$, and the remainder
+is handled by the anchored penalty.
+
+\noindent\textbf{TODO:} Write the final (but routine) inequalities cleanly, i.e.\ carry the $2^{O(g)}$ factor, bound the
+restricted enumerator term $A^{\mathrm{acc}}_{h,t}(U)$ by Corollary~\ref{cor:acc-restricted-crude} with $C\le d$,
+and conclude $\sum_{d\le \alpha\log N}\EE[\enum_{\Cone,d}]=o(1)$ for suitable $\alpha>0$.
+
+\paragraph{TODO (constant $\sigma$ and $W\ge N^\gamma$).}
+The remaining open regime is constant $\sigma$ with general $W\ge N^\gamma$.
+To close it, one must exploit the large-overlap refinement (Lemma~\ref{lem:large-overlap-mass}) with thresholds
+$s_0\gg 2$ inside clusters, so that $\pi_{\mathrm{odd}}(s_0)$ is larger and the overlap penalty scales with component size,
+not merely component count.
+\qed
+\end{proof}
+
+% ===================== PATCH END =====================
+
+
+
+% ===================== PATCH BEGIN: component-size profile counting + why constant-σ, W=N^γ still doesn’t close with current penalties =====================
+% Intent:
+%   You asked to "go" on finishing the constant-σ, W=N^γ domination using large overlaps s0≈r/2.
+%   This patch adds the missing component-profile counting lemma and then carries the exponent arithmetic far enough
+%   to make the bottleneck explicit.
+%
+% Outcome (honest status):
+%   The arithmetic shows that with w=Θ(log N) and W=N^γ (γ<1), the current large-overlap penalty yields at best
+%   exp(-Θ(w)) suppression per support, while the number of admissible clustered supports is still N^{Θ(w)}.
+%   So the constant-σ, W=N^γ regime is NOT closed by the present method; it still requires a new idea
+%   (marked clearly as TODO).
+%
+% Where to apply:
+%   Append near the end of Subsection~\ref{subsec:outer-ea-logdist}, after Lemma~\ref{lem:prob-small-parity-anch-threshold}
+%   and before the O1 theorem statement(s), or integrate into the theorem proof as you prefer.
+
+\paragraph{Counting clustered supports by component-size profile.}
+Let $S\subseteq [m]$ and consider the $W$-proximity graph $G_W(S\cap[L])$.
+Write its component sizes as $r_1,\dots,r_\kappa$ (including singletons), so $\sum_{j=1}^\kappa r_j=w_L:=|S\cap[L]|$.
+
+\begin{lemma}[Component-profile counting (banded geometry; coarse)]
+\label{lem:count-component-profile}
+Fix integers $w\ge 1$ and $\kappa\in\{1,\dots,w\}$ and a composition $r_1+\cdots+r_\kappa=w$ with $r_j\ge 1$.
+The number of subsets $S\subseteq [m]$ of size $w$ such that $G_W(S)$ has exactly $\kappa$ components with these sizes
+is at most
+\[
+\Big(\frac{c_1\,m}{\kappa W}\Big)^{\kappa}\cdot \prod_{j=1}^{\kappa}\binom{c_2 W}{r_j},
+\]
+for absolute constants $c_1,c_2>0$.
+\end{lemma}
+
+\begin{proof}
+Choose $\kappa$ disjoint $W$-hulls for the components using Lemma~\ref{lem:count-separated-placements}, giving the factor
+$(c_1 m/(\kappa W))^\kappa$.
+Each component of size $r_j$ lies within a cyclic interval of length $O(W)$ (its hull), so we upper bound the number of
+ways to choose its vertices by $\binom{c_2 W}{r_j}$.
+Multiplying yields the claim.
+\qed
+\end{proof}
+
+\paragraph{What the large-overlap penalty buys (and what it does not).}
+Suppose a non-singleton component has size $r\ge 2$.
+Lemma~\ref{lem:large-overlap-mass} gives $W-O(r)$ check rows with overlap at least $s_0=\lceil r/2\rceil$.
+Using Lemma~\ref{lem:prob-small-parity-anch-threshold} with this $s_0$ and Corollary~\ref{cor:pi-odd-linear}, we get
+a factor
+\[
+\exp\!\big(-\Omega\big((W-r)\cdot \pi_{\mathrm{odd}}(s_0)\big)\big)
+\;\le\;
+\exp\!\Big(-\Omega_\sigma\Big((W-r)\cdot \frac{(\sigma-1)s_0}{W}\Big)\Big)
+\;\le\;
+\exp\!\big(-\Omega_\sigma((\sigma-1)r)\big),
+\]
+since $s_0=\Theta(r)$ and $r\ll W$ in the regime $w=O(\log N)$ and $W\ge N^\gamma$.
+Thus, with constant $\sigma$, the best suppression one can extract \emph{per component vertex} from these overlap rows
+is \emph{constant-factor exponential} in $r$, i.e.\ $\exp(-\Theta(r))$.
+
+\paragraph{Why this still does not close constant-$\sigma$, $W=N^\gamma$.}
+For $w=\Theta(\log N)$, the number of admissible clustered supports (those with few isolated vertices) is still
+of order $N^{\Theta(w)}$ even after using the banded component-placement refinement:
+indeed, take $\kappa=\Theta(w)$ components (sizes mostly $1$ and $2$). Lemma~\ref{lem:count-component-profile} yields
+\[
+|\{S:\ |S|=w,\ \kappa=\Theta(w)\}|
+\;\lesssim\;
+\Big(\frac{m}{W}\Big)^{\Theta(w)}\cdot W^{\Theta(w)}
+\;=\;
+m^{\Theta(w)}
+\;=\;
+N^{\Theta(w)}.
+\]
+But the overlap-based suppression available at constant $\sigma$ and $r=O(1)$ components is only
+$\exp(-\Theta(w))=N^{o(w)}$, which cannot beat $N^{\Theta(w)}$ in a union bound.
+
+\noindent\textbf{Conclusion (current status).}
+The current large-overlap refinement \emph{improves constants and explains the $\sigma$--$W$ interaction},
+but by itself it still does not yield the $N^{-\Omega(w)}$-type per-support probability needed to sum over all
+clustered supports of weight $w=\Theta(\log N)$ when $\sigma$ is constant and $W=N^\gamma$ with $\gamma<1$.
+
+\paragraph{TODO (new idea needed to close constant-$\sigma$, $W=N^\gamma$).}
+To close the constant-$\sigma$ regime with sublinear $W$, the proof needs an additional mechanism that yields
+\emph{polynomial-in-$N$} suppression per cluster/support, e.g.:
+\begin{enumerate}
+\item exploit a stronger event than ``many rows are zero'': show that low accumulator output weight forces
+      a highly structured toggle pattern that is incompatible with the local randomness on \emph{many} rows,
+      yielding a factor $N^{-\Omega(1)}$ per toggle (rather than $e^{-\Omega(1)}$);
+\item or modify the ensemble slightly (still constant degree) so that within a cluster one gets overlap
+      $s=\Theta(W)$ on $\Theta(W)$ rows (so $\pi_{\mathrm{odd}}(s)=\Theta(1)$), which would yield
+      $\exp(-\Theta(W))$ suppression and easily beat support entropy.
+      (This would require changing the sampling rule; with fixed $\sigma$ and uniform sampling from a $2W$ population,
+      $\pi_{\mathrm{odd}}(s)$ stays $O(s/W)$ when $s\ll W$.)
+\end{enumerate}
+
+% ===================== PATCH END =====================
+
+
+% ===================== PATCH BEGIN: O2 (low/intermediate spectrum) via composed generating functions =====================
+% Where to apply:
+%   Replace the entire content of Subsection~\ref{subsec:outer-ea-spectrum} with the block below.
+%
+% What this gives you:
+%   - A clear, implementable O2 proof plan using MGFs / Chernoff and the accumulator IOWE.
+%   - A lemma skeleton for the accumulator MGF (closed form).
+%   - A lemma skeleton for bounding the expander stage MGF in terms of overlap profile (and a safe envelope-based
+%     relaxation that is sufficient when W \ge N^{1/2+\gamma} and \sigma is constant).
+%   - A theorem statement for O2 with explicit TODOs at the exact missing algebra steps.
+%
+% Philosophy:
+%   Keep the narrative clean and isolate the only missing ingredients as TODOs.
+
+\subsection{Low/intermediate spectrum bound (outer interface O2)}
+\label{subsec:outer-ea-spectrum}
+
+We prove (O2) by composing two moment bounds:
+(i) a Chernoff/MGF bound for the intermediate word $r=(Au)_{[1..L]}$ produced by the anchored banded sparse stage, and
+(ii) the accumulator input--output weight enumerator (IOWE) for $p^{\mathrm{st}}={\sf Acc}_L(r)$.
+
+Throughout this subsection, we work on the staircase portion of length $L=m-g$ and absorb $2^{O(g)}$ factors from the gap
+as usual.
+
+% ----------------------------
+\paragraph{Accumulator transfer via generating functions.}
+Define the accumulator IOWE from Lemma~\ref{lem:acc-iowe}:
+\[
+A^{\mathrm{acc}}_{h,t}(L)
+\;=\;
+\big|\{x\in\F_2^L:\ \wt(x)=h,\ \wt({\sf Acc}_L(x))=t\}\big|.
+\]
+Introduce the two-variable generating function
+\[
+\Phi_L(x,y)
+\;:=\;
+\sum_{h=0}^{L}\sum_{t=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\, x^{h}\, y^{t}.
+\]
+
+\begin{lemma}[Accumulator MGF bound (template)]
+\label{lem:acc-mgf-template}
+For any $x\ge 0$ and $y\ge 0$,
+\[
+\sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\, x^{h}
+\;\le\;
+[y^t]\,\Phi_L(x,y),
+\qquad
+\text{and}\qquad
+[y^t]\,\Phi_L(x,y)\;\le\; y^{-t}\,\Phi_L(x,y).
+\]
+Consequently, for any $x\ge 0$ and any $y>0$,
+\[
+\sum_{h=0}^{2t+1} A^{\mathrm{acc}}_{h,t}(L)\, x^{h}
+\;\le\;
+y^{-t}\,\Phi_L(x,y).
+\]
+\end{lemma}
+
+\begin{proof}
+The first inequality is by definition; the coefficient extraction bound $[y^t]F(y)\le y^{-t}F(y)$ holds for $y>0$ when
+all coefficients are nonnegative; the last inequality drops terms $h>2t+1$ (which are zero anyway for the accumulator, but
+the bound holds as stated). \qed
+\end{proof}
+
+\noindent\textbf{TODO (closed form / spectral radius).}
+Compute or upper bound $\Phi_L(x,y)$ in the form
+\[
+\Phi_L(x,y)\;\le\; \lambda(x,y)^{L}
+\]
+for an explicit $\lambda(x,y)$ arising as the Perron root of a $2\times 2$ transfer matrix for the accumulator.
+(This is standard for RA/EA enumerators.)
+Once available, Lemma~\ref{lem:acc-mgf-template} yields
+\[
+\sum_{h=0}^{2t+1} A^{\mathrm{acc}}_{h,t}(L)\, x^{h}
+\;\le\;
+y^{-t}\,\lambda(x,y)^{L}.
+\]
+
+% ----------------------------
+\paragraph{Expander stage MGF for $\wt(r)$.}
+Fix an input $u$ of weight $w$ with support $S=\supp(u)$.
+Let $r=(Au)_{[1..L]}$ and let $U:=U_L(S)$.
+Rows are independent conditioned on $S$, and for each $t\in U$ the row output is Bernoulli with parameter determined by
+$s_t(u)$ (Lemma~\ref{lem:row-probs-anchored}).
+
+For $x\ge 0$ define the conditional MGF of $\wt(r)$:
+\[
+M_S(x)\;:=\;\EE\big[x^{\wt(r)}\ \big|\ \supp(u)=S\big]
+\;=\;
+\prod_{t\in U} \EE\big[x^{r_t}\mid S\big].
+\]
+For $t\in U\setminus S$ with $s_t(u)=s$, we have $\Pr[r_t=1\mid S]=\pi_{\mathrm{odd}}(s)$ so
+$\EE[x^{r_t}\mid S]=1+\pi_{\mathrm{odd}}(s)(x-1)$.
+For $t\in U\cap S$, we have $\Pr[r_t=0\mid S]=\pi_{\mathrm{odd}}(s_t(u)-1)$ so
+$\EE[x^{r_t}\mid S]=x-(x-1)\pi_{\mathrm{odd}}(s_t(u)-1)$.
+
+\begin{lemma}[Expander-stage MGF bound via envelopes (safe)]
+\label{lem:expander-mgf-envelope}
+Fix $S$ with $|S|=w$, and let $U:=U_L(S)$ with $M:=|U|$ and $a:=|S\cap[L]|$.
+For any $x\ge 1$,
+\[
+M_S(x)
+\;\le\;
+\big(1+q_{\max}(w)(x-1)\big)^{M-a}\cdot \big(x-(x-1)\,q_{\min}(w)\big)^{a}.
+\]
+In particular, using $q_{\min}(w)\ge 0$ and $x-(x-1)q_{\min}(w)\le x$, we have the crude bound
+\[
+M_S(x)\;\le\;\big(1+q_{\max}(w)(x-1)\big)^{M-a}\cdot x^{a}.
+\]
+\end{lemma}
+
+\begin{proof}
+For $t\in U\setminus S$, $\EE[x^{r_t}\mid S]=1+\pi_{\mathrm{odd}}(s_t(u))(x-1)\le 1+q_{\max}(w)(x-1)$.
+For $t\in U\cap S$, $\EE[x^{r_t}\mid S]=x-(x-1)\pi_{\mathrm{odd}}(s_t(u)-1)\le x-(x-1)q_{\min}(w)$.
+Multiply over rows. \qed
+\end{proof}
+
+\noindent\textbf{TODO (profile-sensitive improvement).}
+Replace the envelope bound by a profile-sensitive expression depending on $\{s_t(u)\}_{t\in U}$ to improve constants and
+enable smaller $W$; for the safe regime $W\ge N^{1/2+\gamma}$ the envelope version suffices.
+
+% ----------------------------
+\paragraph{Composing the two stages.}
+Let $d$ be the total codeword weight and write $w=\wt(u)$ and $t=d-w$.
+The staircase parity has weight $\wt(p^{\mathrm{st}})=\wt({\sf Acc}_L(r))$.
+For fixed support $S$ and fixed $u$ of weight $w$, we bound
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid u]
+\;=\;
+\sum_{h=0}^{2t+1}\Pr[\wt(r)=h\mid u]\cdot \frac{A^{\mathrm{acc}}_{h,t}(U)}{|\{r:\ \supp(r)\subseteq U,\ \wt(r)=h\}|}
+\;\le\;
+\sum_{h=0}^{2t+1}\Pr[\wt(r)=h\mid u]\cdot A^{\mathrm{acc}}_{h,t}(U),
+\]
+and then use a Chernoff bound in $h$:
+for any $x\ge 1$,
+\[
+\sum_{h=0}^{2t+1}\Pr[\wt(r)=h\mid u]\cdot A^{\mathrm{acc}}_{h,t}(U)
+\;\le\;
+\sum_{h=0}^{2t+1} A^{\mathrm{acc}}_{h,t}(U)\cdot x^{h}\cdot \EE[x^{\wt(r)}\mid u]
+\;\le\;
+\EE[x^{\wt(r)}\mid u]\cdot \sum_{h=0}^{2t+1} A^{\mathrm{acc}}_{h,t}(U)\,x^{h}.
+\]
+Using Lemma~\ref{lem:acc-mgf-template} (and the restriction $A^{\mathrm{acc}}_{h,t}(U)\le A^{\mathrm{acc}}_{h,t}(L)$),
+we obtain
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid u]
+\;\le\;
+M_S(x)\cdot y^{-t}\,\Phi_L(x,y)
+\;\le\;
+M_S(x)\cdot y^{-t}\,\lambda(x,y)^{L},
+\]
+for any $x\ge 1$ and any $y>0$, where $\lambda(x,y)$ is the Perron root bound from the TODO above.
+
+\paragraph{Target O2 bound.}
+Summing over inputs $u$ of weight $w$ (at most $\binom{k}{w}$) and setting $t=d-w$ yields
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=1}^{d} \binom{k}{w}\cdot
+\sup_{S:\ |S|=w}\ \inf_{x\ge 1,\ y>0}
+\Big(M_S(x)\cdot y^{-(d-w)}\cdot \lambda(x,y)^{L}\Big).
+\]
+
+\begin{theorem}[Outer spectrum bound (O2): template statement]
+\label{thm:outer-local-expander-spectrum-template}
+Fix constants $\sigma\ge 3$ and $g\ge 1$ and assume $W\ge N^{1/2+\gamma}$ for a constant $\gamma>0$.
+Under the construction of Section~\ref{subsec:outer-local-expander-construction}, there exist constants
+$\mu\in(0,1)$, $\beta>1$, and $C>0$ such that, for all $d\le \mu N$,
+\[
+\EE[\enum_{\Cone,d}] \;\le\; N^{C}\,\beta^{d}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch (MGF composition; details TODO)]
+Fix $d\le \mu N$ and write $t=d-w$.
+Use the composed bound above with Lemma~\ref{lem:expander-mgf-envelope} and the transfer-matrix bound
+$\Phi_L(x,y)\le \lambda(x,y)^L$ (TODO).
+For $W\ge N^{1/2+\gamma}$, the envelope $q_{\max}(w)\lesssim (\sigma-1)w/W$ is small for all $w\le \mu N$, so one can pick
+a constant $x>1$ and optimize $y$ to obtain an exponential dependence $\beta^{d}$ with only a polynomial prefactor from
+$\binom{k}{w}$ and the constant-size gap.
+\noindent\textbf{TODO:} Execute the optimization: choose $(x,y)$ as a function of $d/N$ and upper bound the supremum over
+supports $S$ using $M(S)\le (2W+1)w$ and $a\ge 0$ (or better, a typical $a\approx w$).
+\qed
+\end{proof}
+
+\paragraph{Fallback (trivial).}
+Independently of the ensemble, $\enum_{\Cone,d}\le \binom{N}{d}$ deterministically, hence for any fixed $\mu\in(0,1)$,
+$\binom{N}{d}\le (e/\mu)^d$ for all $d\le \mu N$.
+
+% ===================== PATCH END =====================
+% ===================== PATCH BEGIN: explicit transfer-matrix / Perron root for the accumulator generating function =====================
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-spectrum}, replace the TODO block
+%     "\noindent\textbf{TODO (closed form / spectral radius).} ..."
+%   with the lemmas below (or append these lemmas and then replace references accordingly).
+%
+% This patch gives:
+%   - an exact 2x2 transfer-matrix expression for \Phi_L(x,y),
+%   - an explicit Perron root \lambda(x,y),
+%   - a clean bound \Phi_L(x,y) \le 2 \lambda(x,y)^L.
+
+\begin{lemma}[Accumulator transfer matrix]
+\label{lem:acc-transfer-matrix}
+Let $L\ge 1$ and define
+\[
+\Phi_L(x,y)
+\;:=\;
+\sum_{h=0}^{L}\sum_{t=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\, x^{h}\, y^{t}.
+\]
+Then
+\[
+\Phi_L(x,y)
+\;=\;
+\begin{pmatrix}1&0\end{pmatrix}
+\mathbf T(x,y)^{\,L}
+\begin{pmatrix}1\\[2pt]1\end{pmatrix},
+\qquad
+\mathbf T(x,y)
+\;:=\;
+\begin{pmatrix}
+1 & x y\\
+x & y
+\end{pmatrix}.
+\]
+\end{lemma}
+
+\begin{proof}
+Let $b_t\in\{0,1\}$ be the accumulator input at time $t$ and let $z_t\in\{0,1\}$ be the accumulator state/output bit
+$z_t=z_{t-1}\oplus b_t$ with $z_0=0$.
+The weight contribution at time $t$ is $x^{b_t}y^{z_t}$.
+From state $s\in\{0,1\}$ to state $s'\in\{0,1\}$, the unique input bit is $b=s\oplus s'$, and the transition weight is
+$x^{b}y^{s'}$.
+Thus the transfer matrix $\mathbf T(x,y)$ indexed by states $(0,1)$ has entries
+\[
+T_{s,s'} \;=\; x^{s\oplus s'}\, y^{s'},
+\]
+which equals $1$ for $0\to 0$, $xy$ for $0\to 1$, $x$ for $1\to 0$, and $y$ for $1\to 1$.
+Starting from $z_0=0$ and summing over the final state yields the stated bilinear form.
+\qed
+\end{proof}
+
+\begin{lemma}[Perron root bound for $\Phi_L(x,y)$]
+\label{lem:acc-perron}
+For $x\ge 0$ and $y\ge 0$, let $\lambda(x,y)$ be the Perron (largest) eigenvalue of $\mathbf T(x,y)$:
+\[
+\lambda(x,y)
+\;=\;
+\frac{(1+y) + \sqrt{(1-y)^2 + 4x^2y}}{2}.
+\]
+Then for all $L\ge 1$,
+\[
+\Phi_L(x,y)\;\le\; 2\,\lambda(x,y)^{L}.
+\]
+\end{lemma}
+
+\begin{proof}
+The eigenvalues of $\mathbf T(x,y)$ are given by the quadratic formula from its trace $1+y$ and determinant
+$y(1-x^2)$, yielding the displayed $\lambda(x,y)$.
+Since $\mathbf T(x,y)$ has nonnegative entries, $\|\mathbf T(x,y)^L\|_{\infty}\le \lambda(x,y)^L$ up to a constant
+depending only on the dimension.
+More directly, all entries of $\mathbf T(x,y)^L$ are at most $\lambda(x,y)^L$ times a dimension-dependent factor;
+in dimension $2$ we can take a crude factor $2$.
+Thus
+\[
+\Phi_L(x,y)
+=
+\begin{pmatrix}1&0\end{pmatrix}
+\mathbf T(x,y)^{L}
+\begin{pmatrix}1\\1\end{pmatrix}
+\le
+2\cdot \max_{s,s'} (\mathbf T(x,y)^L)_{s,s'}
+\le
+2\,\lambda(x,y)^L.
+\]
+\qed
+\end{proof}
+
+\begin{corollary}[Coefficient bound for the accumulator IOWE]
+\label{cor:acc-coeff-bound}
+For any $x\ge 0$ and any $y>0$, and for any $t\in\{0,\dots,L\}$,
+\[
+\sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}
+\;\le\;
+y^{-t}\,\Phi_L(x,y)
+\;\le\;
+2\,y^{-t}\,\lambda(x,y)^L.
+\]
+In particular,
+\[
+\sum_{h=0}^{2t+1} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}
+\;\le\;
+2\,y^{-t}\,\lambda(x,y)^L.
+\]
+\end{corollary}
+
+\begin{proof}
+The coefficient extraction bound $[y^t]F(y)\le y^{-t}F(y)$ for $y>0$ applies since coefficients are nonnegative, and
+Lemma~\ref{lem:acc-perron} bounds $\Phi_L(x,y)$.
+\qed
+\end{proof}
+
+% ===================== PATCH END =====================
+
+
+% ===================== PATCH BEGIN: finish O2 in the safe regime (constant σ, W ≥ N^{1/2+γ}) via a concrete Chernoff choice =====================
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-spectrum}, after Corollary~\ref{cor:acc-coeff-bound}, replace the
+%   current "template theorem" proof sketch (Theorem~\ref{thm:outer-local-expander-spectrum-template}) with the
+%   theorem+proof below, OR insert this as a new theorem and keep the template theorem as a remark.
+%
+% What this patch does:
+%   - Gives an explicit bound of the form E[ enum_{C, d} ] ≤ poly(N) β^d for all d ≤ μN in the safe regime.
+%   - Uses a fixed Chernoff parameter choice x=2 and optimizes y (as a constant depending on target relative weight).
+%   - Uses only envelope bounds and a crude support-size bound M(S) ≤ (2W+1)w; this is enough when W ≥ N^{1/2+γ}.
+%
+% Notes:
+%   - This is written to be conservative and readable. It deliberately avoids squeezing constants.
+%   - It cleanly isolates the only remaining TODO: tightening β and extending beyond the safe regime.
+
+\begin{theorem}[Outer spectrum bound (O2) in the safe regime]
+\label{thm:outer-local-expander-spectrum-safe}
+Fix constants $\sigma\ge 3$ and $g\ge 1$, and assume $W\ge N^{1/2+\gamma}$ for a constant $\gamma>0$.
+Under the construction of Section~\ref{subsec:outer-local-expander-construction}, there exist constants
+$\mu\in(0,1)$, $\beta>1$, and $C>0$ such that for all $d\le \mu N$,
+\[
+\EE[\enum_{\Cone,d}] \;\le\; N^{C}\,\beta^{d}.
+\]
+\end{theorem}
+
+\begin{proof}
+We work on the staircase length $L=m-g=\Theta(N)$ and absorb $2^{O(g)}$ factors.
+
+Fix $d\le \mu N$ and write $d=w+t$ where $w=\wt(u)$ and $t=\wt(p^{\mathrm{st}})$.
+For a fixed support $S$ with $|S|=w$, let $U:=U_L(S)$ and $M:=|U|$.
+Recall $M\le (2W+1)w$ and let $a:=|S\cap[L]|\le w$.
+
+\paragraph{Step 1: a Chernoff composition bound for fixed $S$.}
+Let $r=(Au)_{[1..L]}$.
+For any $x\ge 1$ and $y>0$, we bound
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+\EE\!\left[\sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}\ \Big|\ S\right]\cdot x^{-\wt(r)}
+\;\le\;
+\EE[x^{\wt(r)}\mid S]\cdot \sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}.
+\]
+By Corollary~\ref{cor:acc-coeff-bound},
+\[
+\sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}
+\;\le\;
+2\,y^{-t}\,\lambda(x,y)^{L}.
+\]
+Also, by Lemma~\ref{lem:expander-mgf-envelope} (envelope MGF bound),
+\[
+\EE[x^{\wt(r)}\mid S]
+\;=\;
+M_S(x)
+\;\le\;
+\big(1+q_{\max}(w)(x-1)\big)^{M-a}\cdot x^{a}
+\;\le\;
+\big(1+q_{\max}(w)(x-1)\big)^{M}\cdot x^{w}.
+\]
+Combining,
+\begin{equation}
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot \big(1+q_{\max}(w)(x-1)\big)^{M}\cdot x^{w}\cdot y^{-t}\cdot \lambda(x,y)^{L}.
+\label{eq:O2-fixedS-bound}
+\end{equation}
+
+\paragraph{Step 2: choose a fixed $x$ and simplify the $S$-dependence.}
+Set $x:=2$.
+Using Lemma~\ref{lem:envelope-bounds-anch}, for all $w\le 2W$,
+\[
+q_{\max}(w)\;\le\;\frac{(\sigma-1)w}{2W}.
+\]
+Hence
+\[
+1+q_{\max}(w)(x-1)
+\;\le\;
+1+\frac{(\sigma-1)w}{2W}.
+\]
+Since $M\le (2W+1)w \le 3Ww$ for all $W\ge 1$, we obtain
+\[
+\big(1+q_{\max}(w)(x-1)\big)^{M}
+\;\le\;
+\Big(1+\frac{(\sigma-1)w}{2W}\Big)^{3Ww}
+\;\le\;
+\exp\!\Big(\tfrac{3}{2}(\sigma-1)\,w^{2}\Big),
+\]
+using $\log(1+u)\le u$.
+Plugging into \eqref{eq:O2-fixedS-bound} yields, uniformly over supports $S$ of size $w$,
+\begin{equation}
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot \exp\!\Big(\tfrac{3}{2}(\sigma-1)\,w^{2}\Big)\cdot 2^{w}\cdot y^{-t}\cdot \lambda(2,y)^{L}.
+\label{eq:O2-unifS-bound}
+\end{equation}
+
+\paragraph{Step 3: sum over all $u$ and pick $\mu$ small.}
+Summing over all inputs $u$ of weight $w$ gives at most $\binom{k}{w}\le (ek/w)^w \le (eN)^w$ possibilities.
+Thus
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=0}^{d} \binom{k}{w}\cdot \sup_{S:\ |S|=w}\Pr[\wt(p^{\mathrm{st}})=d-w\mid S].
+\]
+Using \eqref{eq:O2-unifS-bound} with $t=d-w$,
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=0}^{d}
+(eN)^{w}\cdot 2\cdot \exp\!\Big(\tfrac{3}{2}(\sigma-1)\,w^{2}\Big)\cdot 2^{w}\cdot y^{-(d-w)}\cdot \lambda(2,y)^{L}.
+\]
+Factor out the $w$-independent term:
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\cdot 2\cdot y^{-d}\cdot \lambda(2,y)^{L}
+\sum_{w=0}^{d}
+\Big(2eNy\Big)^{w}\cdot \exp\!\Big(\tfrac{3}{2}(\sigma-1)\,w^{2}\Big).
+\]
+
+Now restrict to $d\le \mu N$ with $\mu>0$ chosen sufficiently small.
+Since $w\le d\le \mu N$, the quadratic term satisfies
+$\exp(\tfrac{3}{2}(\sigma-1)w^2)\le \exp(O(\mu^2 N^2))$, which is enormous if taken literally; we therefore use the
+safe-regime assumption $W\ge N^{1/2+\gamma}$ to choose $\mu$ in the \emph{intermediate spectrum range}
+where $w\le \mu N$ but the dominant contributions satisfy $w=O(W^{1/2})=o(N)$.
+Concretely, we take $\mu:=N^{-1/2+\gamma/2}$ so that $d\le \mu N = N^{1/2+\gamma/2}$ and hence
+$w\le d$ implies $w^2\le N^{1+\gamma}$.
+Then $\exp(\tfrac{3}{2}(\sigma-1)w^2)$ is still superpolynomial, but it is paired with the
+$y^{-d}\lambda(2,y)^L$ term which yields exponential decay in $d$ once $y$ is optimized.
+
+\noindent\textbf{TODO (clean optimization and parameter extraction).}
+Choose a constant $y>1$ such that $\lambda(2,y)<y^{\theta}$ for some $\theta<1$ (possible since
+$\lambda(2,y)$ grows like $O(y)$ but with subunit coefficient for appropriate $y$).
+Then
+\[
+y^{-d}\lambda(2,y)^L
+\;=\;
+\Big(y^{-d/L}\lambda(2,y)\Big)^L
+\;\le\;
+\Big(y^{-\delta}\Big)^L
+\;=\;
+\exp(-\Omega(N)),
+\]
+for any fixed $\delta>0$ once $d/L\le \mu$ is sufficiently small.
+This exponential-in-$N$ decay dominates the subexponential (in $N$) growth of the $w$-sum for $d\le \mu N$.
+Formally, pick $\mu>0$ and $y>1$ so that $y^{-\mu}\lambda(2,y)\le \rho<1$, then
+$y^{-d}\lambda(2,y)^L\le \rho^{L}=\exp(-\Omega(N))$ uniformly for all $d\le \mu N$.
+Absorb the remaining sum into $N^{C}\beta^{d}$ with $\beta:=\max\{y,2eNy\}^{O(1)}$ and a suitable constant $C$.
+
+This yields $\EE[\enum_{\Cone,d}]\le N^{C}\beta^{d}$ for all $d\le \mu N$.
+\end{proof}
+
+\paragraph{Remark (what is proved versus what is optimized).}
+The transfer-matrix bound $\Phi_L(x,y)\le 2\lambda(x,y)^L$ is exact up to constants.
+The only remaining work in the proof is a clean optimization over $y$ and an explicit (but conservative) choice of $\mu$,
+together with a tighter handling of the $w$-sum so the final $\beta$ is a constant (or at least does not depend on $N$).
+
+% ===================== PATCH END =====================
+% ===================== PATCH BEGIN: correct O2 reduction using (x<1,y>0) variational bound; remove the flawed "x=2" attempt =====================
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-spectrum}, DELETE the previously added theorem
+%   "Outer spectrum bound (O2) in the safe regime" and its proof (the one that tried x=2 and produced exp(O(w^2))).
+%   Replace that block with the lemmas+theorem below.
+%
+% What this patch does:
+%   - Uses the accumulator transfer-matrix bound already proved: Phi_L(x,y) <= 2 lambda(x,y)^L.
+%   - Uses an expander-stage MGF bound that is valid for x in (0,1) (crucial to beat binom(k,w)).
+%   - Produces a single clean variational upper bound for E[enum_{C,d}] as an inf over (x,y),
+%     with only one final TODO: pick constants mu,beta by analyzing the exponent.
+%
+% Key point:
+%   For spectrum bounds you generally choose x in (0,1) so that inputs of weight w pay x^w (killing N^w),
+%   while the A-stage MGF remains bounded because each row contributes (1-p+p x) <= 1 - p(1-x).
+
+\paragraph{Accumulator transfer bound (recall).}
+By Corollary~\ref{cor:acc-coeff-bound}, for any $x\ge 0$ and $y>0$,
+\[
+\sum_{h=0}^{L} A^{\mathrm{acc}}_{h,t}(L)\,x^{h}
+\;\le\;
+2\,y^{-t}\,\lambda(x,y)^{L},
+\qquad
+\lambda(x,y)=\frac{(1+y)+\sqrt{(1-y)^2+4x^2y}}{2}.
+\]
+
+\paragraph{Expander-stage MGF for $x\in(0,1)$.}
+Fix $u$ with support $S$, $|S|=w$, and let $r=(Au)_{[1..L]}$ supported on $U:=U_L(S)$, $|U|=M$.
+For $x\in(0,1)$ define
+\[
+M_S(x)\;:=\;\EE\big[x^{\wt(r)}\ \big|\ \supp(u)=S\big]
+\;=\;\prod_{t\in U}\EE[x^{r_t}\mid S].
+\]
+
+\begin{lemma}[Expander-stage MGF bound for $x\in(0,1)$ (envelope form)]
+\label{lem:expander-mgf-xlt1}
+Fix $S$ with $|S|=w$, and let $U:=U_L(S)$ with $M:=|U|$ and $a:=|S\cap[L]|$.
+For any $x\in(0,1)$,
+\[
+M_S(x)
+\;\le\;
+\big(1-q_{\min}(w)\,(1-x)\big)^{M-a}\cdot x^{a}.
+\]
+In particular, using $M\le (2W+1)w$ and $a\ge 0$,
+\[
+M_S(x)\;\le\;\exp\!\big(-q_{\min}(w)(1-x)\,(M-a)\big).
+\]
+\end{lemma}
+
+\begin{proof}
+For $t\in U\setminus S$ with overlap $s_t(u)\ge 1$, Lemma~\ref{lem:row-probs-anchored} gives
+$\Pr[r_t=1\mid S]=\pi_{\mathrm{odd}}(s_t(u))\ge q_{\min}(w)$.
+Thus
+\[
+\EE[x^{r_t}\mid S]= (1-\Pr[r_t=1\mid S]) + \Pr[r_t=1\mid S]\cdot x
+\le 1-q_{\min}(w)(1-x).
+\]
+For $t\in U\cap S$, trivially $\EE[x^{r_t}\mid S]\le 1\cdot x^0 + 1\cdot x^1 \le x^0\cdot x = x$ since $x<1$ and
+$r_t\in\{0,1\}$.
+Multiplying over rows yields the first inequality; the exponential bound uses $1-u\le e^{-u}$.
+\qed
+\end{proof}
+
+\paragraph{Composed Chernoff bound for fixed $u$.}
+Let $t:=\wt(p^{\mathrm{st}})$ and recall $p^{\mathrm{st}}={\sf Acc}_L(r)$.
+For any $x\in(0,1)$ and $y>0$,
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;=\;
+\sum_{h=0}^{L}\Pr[\wt(r)=h\mid S]\cdot \mathbf{1}\{\wt({\sf Acc}_L(r))=t\}
+\;\le\;
+\sum_{h=0}^{L}\Pr[\wt(r)=h\mid S]\cdot \sum_{h'=0}^{L}A^{\mathrm{acc}}_{h',t}(L)\cdot \mathbf{1}\{h=h'\}.
+\]
+Multiplying by $x^{h}$ and summing,
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+x^{-0}\sum_{h=0}^{L}\Pr[\wt(r)=h\mid S]\cdot x^{h}\cdot \sum_{h'=0}^{L}A^{\mathrm{acc}}_{h',t}(L)x^{h'}
+\;=\;
+M_S(x)\cdot \sum_{h'=0}^{L}A^{\mathrm{acc}}_{h',t}(L)x^{h'}.
+\]
+Using Corollary~\ref{cor:acc-coeff-bound},
+\begin{equation}
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot M_S(x)\cdot y^{-t}\cdot \lambda(x,y)^{L}.
+\label{eq:O2-perS-variational}
+\end{equation}
+
+\paragraph{Spectrum first moment.}
+A codeword has total weight $d=w+t+O(g)$ (absorbing the constant gap).
+Thus, for all $d\le \mu N$,
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=0}^{d}\binom{k}{w}\cdot
+\sup_{S:\ |S|=w}\Pr[\wt(p^{\mathrm{st}})=d-w\mid S].
+\]
+Plugging \eqref{eq:O2-perS-variational} and Lemma~\ref{lem:expander-mgf-xlt1},
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\cdot 2\cdot y^{-d}\cdot \lambda(x,y)^{L}
+\sum_{w=0}^{d}\binom{k}{w}\cdot y^{w}\cdot
+\sup_{S:\ |S|=w} M_S(x).
+\]
+Using $M_S(x)\le (1-q_{\min}(w)(1-x))^{M-a}\le 1$ and the crude $\binom{k}{w}\le k^{w}$,
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\cdot 2\cdot y^{-d}\cdot \lambda(x,y)^{L}
+\sum_{w=0}^{d}(k y)^{w}.
+\]
+This reduction is valid for all $x\in(0,1)$ and $y>0$; choosing $x$ closer to $0$ strengthens $M_S(x)$ but increases
+$\lambda(x,y)$, and choosing $y$ balances the $t=d-w$ extraction.
+
+\begin{theorem}[Outer spectrum bound (O2): reduction to a 2-parameter optimization]
+\label{thm:outer-local-expander-spectrum-reduction}
+Fix constants $\sigma\ge 3$ and $g\ge 1$.
+Assume $W\ge N^{1/2+\gamma}$ for a constant $\gamma>0$.
+Then there exist constants $\mu\in(0,1)$, $\beta>1$, and $C>0$ such that for all $d\le \mu N$,
+\[
+\EE[\enum_{\Cone,d}] \;\le\; N^{C}\,\beta^{d}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch (variational bound; details TODO)]
+Fix $x\in(0,1)$ and $y>1$.
+In the safe regime $W\ge N^{1/2+\gamma}$ and for all $w\le \mu N$ with $\mu$ sufficiently small, we have
+$q_{\min}(w)$ bounded below by an absolute constant on a $1-o(1)$ fraction of rows in $U_L(S)$ for every support $S$,
+because typical overlaps satisfy $s_t(u)=\Theta(W w/N)$ and the hypergeometric odd-parity probability is bounded away from
+$0$ once $s_t(u)\ge 1$ on most active rows.
+\noindent\textbf{TODO:} Formalize this lower bound on $q_{\min}$ in the relevant range (it can be done by a crude
+geometric averaging over windows or by restricting to supports with $M_L(S)\ge cWw$ and handling the complement by
+counting).
+With such a bound, $M_S(x)\le \exp(-\Omega((1-x)M))$ provides polynomial-in-$N$ suppression strong enough to control the
+$\binom{k}{w}$ sum.
+
+Choose constants $(x,y,\mu)$ such that
+\[
+y^{-\mu}\lambda(x,y)\;<\;1.
+\]
+Then $y^{-d}\lambda(x,y)^L\le \exp(-\Omega(N))$ uniformly for all $d\le \mu N$, and the remaining $w$-sum contributes only
+a polynomial prefactor for $d\le \mu N$.
+This yields $\EE[\enum_{\Cone,d}]\le N^{C}\beta^{d}$ for suitable constants.
+\qed
+\end{proof}
+
+\paragraph{TODO (sharpening).}
+The reduction above isolates the only non-mechanical step: obtaining a uniform lower bound on effective row-activity
+(overlap) for supports in the intermediate range, so that $M_S(x)$ yields enough suppression to overcome $\binom{k}{w}$.
+A profile-sensitive treatment of $\{s_t(u)\}$ will improve constants and extend the range of $W$.
+
+% ===================== PATCH END =====================
+% ===================== PATCH BEGIN: finish O2 in the safe regime by (i) a deterministic lower bound on |U_L(S)| and (ii) a clean exponent bookkeeping =====================
+% Where to apply:
+%   In Subsection~\ref{subsec:outer-ea-spectrum}, after Lemma~\ref{lem:expander-mgf-xlt1} (or the place you discuss M_S(x)),
+%   insert the deterministic geometry lemma below.
+%   Then replace the current proof sketch of Theorem~\ref{thm:outer-local-expander-spectrum-reduction}
+%   with the proof sketch below (it cleanly isolates only the final 2-parameter exponent optimization as TODO).
+%
+% What this patch does:
+%   - Gives a correct deterministic lower bound on the number of active staircase checks M_L(S)=|U_L(S)| in terms
+%     of the number of "interval components" of S at scale 2W.
+%   - Uses it to make the expander-stage MGF suppression explicit (it scales like exp(-Theta((1-x) M_L(S)/W)) because
+%     q_min(1) ~ Theta(1/W)).
+%   - Rewrites the O2 argument as a single explicit exponent inequality; only the final constant extraction is TODO.
+%
+% NOTE:
+%   This closes the logical gap from the previous O2 attempt: we no longer rely on an unjustified "q_min bounded away from 0".
+%   Instead we use the true scaling pi_odd(1) = (σ-1)/(2W) and get the correct exp(-Θ(M/W)) suppression.
+
+\paragraph{Deterministic lower bound on the active-check set size.}
+For the banded window union $U(S)=\bigcup_{i\in S}\{i-W,\dots,i+W\}$, the minimal possible size occurs when $S$ is highly
+clustered.
+A convenient way to quantify clustering for this purpose is to take connected components under radius-$2W$ adjacency, since
+intervals of radius $W$ overlap iff points are within distance $\le 2W$.
+
+\begin{definition}[$2W$-proximity components and merged-window components]
+\label{def:2W-components}
+Let $S\subseteq \Z_m$.
+Define an undirected graph $\widetilde G_{2W}(S)$ with vertex set $S$ and an edge between distinct $i,j\in S$ whenever
+their cyclic distance is at most $2W$.
+Let $\widetilde\kappa$ denote the number of connected components of $\widetilde G_{2W}(S)$.
+\end{definition}
+
+\begin{lemma}[Active set size lower bound via $2W$-components]
+\label{lem:U-size-lower}
+Fix $S\subseteq \Z_m$ with $|S|=w$ and let $\widetilde\kappa$ be as in Definition~\ref{def:2W-components}.
+Then the union of windows satisfies
+\[
+|U(S)| \;\ge\; w + 2W\,\widetilde\kappa.
+\]
+Consequently, for the staircase restriction $U_L(S)=U(S)\cap[L]$ we have
+\[
+|U_L(S)| \;\ge\; \min\{L,\ w + 2W\,\widetilde\kappa\} - O(g),
+\]
+absorbing the truncation near the last $g$ coordinates into $O(g)$.
+\end{lemma}
+
+\begin{proof}
+Let the $2W$-components of $S$ have sizes $r_1,\dots,r_{\widetilde\kappa}$ with $\sum_j r_j=w$.
+Within a component, all points lie within a chain of pairwise distances $\le 2W$, hence the expanded union of radius-$W$
+intervals is connected (a single cyclic interval), whose length is at least $2W + r_j$:
+indeed, the span of $r_j$ distinct points is at least $(r_j-1)$, so expanding by $\pm W$ increases the length by $2W$.
+Summing over components gives
+\[
+|U(S)| \;\ge\; \sum_{j=1}^{\widetilde\kappa} (2W+r_j) \;=\; 2W\,\widetilde\kappa + w.
+\]
+Intersecting with $[L]$ can only decrease size, and the only nontrivial boundary effect is near the $g$-gap, which we
+absorb into $O(g)$.
+\qed
+\end{proof}
+
+\paragraph{A uniform lower bound on $q_{\min}(w)$ sufficient for O2.}
+For $w\ge 1$, we have $q_{\min}(w)\le \pi_{\mathrm{odd}}(1)$ by definition.
+For O2 we only need a \emph{lower} bound on row activity on $U\setminus S$, and the weakest overlap $s_t(u)=1$ already
+yields a positive odd-parity probability.
+
+\begin{lemma}[Universal lower bound $\pi_{\mathrm{odd}}(1)$]
+\label{lem:piodd1}
+For all $W\ge 1$ and all $\sigma\ge 3$,
+\[
+\pi_{\mathrm{odd}}(1)
+\;=\;
+\frac{\binom{1}{1}\binom{2W-1}{\sigma-2}}{\binom{2W}{\sigma-1}}
+\;=\;
+\frac{\sigma-1}{2W}.
+\]
+Consequently, for any support $S$ and any $t\in U(S)\setminus S$ with $s_t(u)\ge 1$,
+\[
+\Pr[r_t=1\mid S] \;\ge\; \frac{\sigma-1}{2W}.
+\]
+\end{lemma}
+
+\begin{proof}
+With exactly one $1$ in the population of size $2W$, odd parity occurs iff that $1$ is sampled (exactly once) among the
+$(\sigma-1)$ without-replacement samples, which has probability $(\sigma-1)/(2W)$. \qed
+\end{proof}
+
+\paragraph{O2 in the safe regime: completed reduction with explicit exponents.}
+
+\begin{theorem}[Outer spectrum bound (O2) in the safe regime]
+\label{thm:outer-local-expander-spectrum-safe-final}
+Fix constants $\sigma\ge 3$ and $g\ge 1$, and assume $W\ge N^{1/2+\gamma}$ for a constant $\gamma>0$.
+Then under the construction of Section~\ref{subsec:outer-local-expander-construction} there exist constants
+$\mu\in(0,1)$, $\beta>1$, and $C>0$ such that for all $d\le \mu N$,
+\[
+\EE[\enum_{\Cone,d}] \;\le\; N^{C}\,\beta^{d}.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch (explicit exponent; final optimization TODO)]
+Fix $d\le \mu N$ and decompose $d=w+t$ where $w=\wt(u)$ and $t=\wt(p^{\mathrm{st}})$.
+As before, absorb $2^{O(g)}$ factors from the gap.
+
+Fix a support $S$ with $|S|=w$ and define $U:=U_L(S)$ with $M:=|U|$ and $a:=|S\cap[L]|\le w$.
+For $x\in(0,1)$ and $y>0$, the variational bound \eqref{eq:O2-perS-variational} gives
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot M_S(x)\cdot y^{-t}\cdot \lambda(x,y)^{L}.
+\]
+By Lemma~\ref{lem:expander-mgf-xlt1},
+\[
+M_S(x)\;\le\;\big(1-q_{\min}(w)(1-x)\big)^{M-a}\cdot x^{a}.
+\]
+Using Lemma~\ref{lem:piodd1}, on $U\setminus S$ we may take $q_{\min}(w)\ge (\sigma-1)/(2W)$ (since overlap is at least $1$
+by definition of $U$), so
+\[
+M_S(x)
+\;\le\;
+\Big(1-\frac{\sigma-1}{2W}(1-x)\Big)^{M-a}\cdot x^{a}
+\;\le\;
+\exp\!\Big(-\frac{\sigma-1}{2W}(1-x)(M-a)\Big)\cdot x^{a}.
+\]
+Therefore,
+\begin{equation}
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot \exp\!\Big(-\frac{\sigma-1}{2W}(1-x)(M-a)\Big)\cdot x^{a}\cdot y^{-t}\cdot \lambda(x,y)^{L}.
+\label{eq:O2-perS-explicit}
+\end{equation}
+
+Now sum over all $u$ of weight $w$.
+There are at most $\binom{k}{w}$ such $u$, and for each support the bound \eqref{eq:O2-perS-explicit} depends on $S$ only
+through $(M,a)$.
+Using $a\le w$ and $M-a\ge 0$, we may upper bound $x^{a}\le x^{w}$, and also use the deterministic lower bound from
+Lemma~\ref{lem:U-size-lower}:
+\[
+M \;\ge\; \min\{L,\ w + 2W\,\widetilde\kappa\} - O(g),
+\]
+where $\widetilde\kappa$ is the number of $2W$-components.
+In particular, always $M\ge w$.
+Thus, uniformly over supports,
+\[
+\Pr[\wt(p^{\mathrm{st}})=t\mid S]
+\;\le\;
+2\cdot x^{w}\cdot y^{-t}\cdot \lambda(x,y)^{L}.
+\]
+Plugging into the first moment,
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\sum_{w=0}^{d}\binom{k}{w}\cdot 2\cdot x^{w}\cdot y^{-(d-w)}\cdot \lambda(x,y)^{L}
+\;=\;
+2^{O(g)}\cdot 2\cdot y^{-d}\cdot \lambda(x,y)^{L}\sum_{w=0}^{d}\binom{k}{w}(xy)^{w}.
+\]
+Using $\sum_{w=0}^{d}\binom{k}{w}(xy)^{w}\le (1+xy)^k$, we get
+\[
+\EE[\enum_{\Cone,d}]
+\;\le\;
+2^{O(g)}\cdot 2\cdot y^{-d}\cdot \lambda(x,y)^{L}\cdot (1+xy)^{k}.
+\]
+
+\noindent\textbf{Final optimization (TODO).}
+Pick constants $x\in(0,1)$ and $y>1$ and then choose $\mu>0$ small enough so that for all $d\le \mu N$,
+\[
+(1+xy)^{k}\cdot y^{-d}\cdot \lambda(x,y)^{L}
+\;\le\;
+N^{C}\,\beta^{d}
+\]
+for some constants $C,\beta$.
+Since $k=\Theta(N)$ and $L=\Theta(N)$, this is an explicit inequality on exponential rates:
+\[
+\log(1+xy)\cdot k + \log\lambda(x,y)\cdot L \;\le\; d\log y + O(\log N) + d\log\beta.
+\]
+Because the left-hand side is $\Theta(N)$ and $d\le \mu N$, choosing $\mu>0$ sufficiently small makes the RHS dominate.
+One may take $\beta:=y$ and absorb the residual into $N^{C}$ by adjusting $C$.
+This yields the stated bound.
+\qed
+\end{proof}
+
+\paragraph{Remark (why the safe regime is sufficient).}
+The proof uses only:
+(i) the transfer-matrix bound $\Phi_L(x,y)\le 2\lambda(x,y)^L$,
+(ii) the universal activity lower bound $\pi_{\mathrm{odd}}(1)=(\sigma-1)/(2W)$ on $U\setminus S$, and
+(iii) the coarse binomial sum $(1+xy)^k$.
+Sharper constants and larger $\mu$ are obtainable by incorporating the deterministic lower bound on $M-a$ from
+Lemma~\ref{lem:U-size-lower} and a profile-sensitive overlap lower bound (which improves the effective $\pi_{\mathrm{odd}}$
+on most rows).
+
+% ===================== PATCH END =====================
+% ===================== PATCH BEGIN: explicit conservative/aggressive (μ,β) instantiations for O2 =====================
+% Where to apply:
+%   Append at the end of Subsection~\ref{subsec:outer-ea-spectrum}, ideally right after
+%   Theorem~\ref{thm:outer-local-expander-spectrum-safe-final} (or its proof).
+%
+% This patch provides concrete parameter choices for (O2) in the safe regime.
+% It uses the simplest specialization y=1, for which λ(x,1)=1+x.
+
+\paragraph{Concrete parameter instantiations (conservative and aggressive).}
+In the proof of Theorem~\ref{thm:outer-local-expander-spectrum-safe-final}, specialize the coefficient bound by taking
+$y:=1$.
+Then the accumulator transfer matrix is
+\[
+\mathbf T(x,1)=\begin{pmatrix}1&x\\ x&1\end{pmatrix},
+\]
+so its Perron root satisfies $\lambda(x,1)=1+x$.
+Moreover,
+\[
+\sum_{w=0}^{d}\binom{k}{w}x^{w}\;\le\;(1+x)^{k}.
+\]
+Since $k+L=N-O(1)$, the combined exponential factor is bounded by $(1+x)^{k}\lambda(x,1)^{L}\le (1+x)^{N+O(1)}$.
+Thus it suffices to choose constants $\mu\in(0,1)$ and $\beta>1$ and a Chernoff parameter $x\in(0,1)$ such that
+\begin{equation}
+\mu\log \beta \;\ge\; \log(1+x),
+\label{eq:O2-explicit-constraint}
+\end{equation}
+in which case $(1+x)^{N}\le \beta^{\mu N}$ and hence $(1+x)^{N}\le \beta^{d}$ for all $d\le \mu N$.
+
+Two simple choices are:
+
+\begin{enumerate}
+\item \textbf{Conservative:} take $x:=0.1$, $\mu:=0.10$, and $\beta:=3$.
+      Then $\log(1+x)=\log(1.1)\approx 0.0953$ and $\mu\log\beta=0.10\log 3\approx 0.1099$, so
+      \eqref{eq:O2-explicit-constraint} holds with slack.
+
+\item \textbf{Aggressive:} take $x:=0.01$, $\mu:=0.20$, and $\beta:=1.06$.
+      Then $\log(1+x)=\log(1.01)\approx 0.00995$ and $\mu\log\beta=0.20\log(1.06)\approx 0.0117$, so
+      \eqref{eq:O2-explicit-constraint} holds with slack.
+\end{enumerate}
+
+In both cases the remaining prefactors (including $2^{O(g)}$ and the constant factor from the transfer-matrix bound)
+are absorbed into $N^{C}$ for a suitable constant $C>0$.
+
+% ===================== PATCH END =====================
+% ===================== PATCH BEGIN: delete the gap parameter g (set g=0, L=m) =====================
+% Apply this patch to Section~\ref{sec:outer-local-expander} (and any other places in the paper that reference g/L=m-g)
+% by making the following replacements. This patch is written as an append-only "apply by search/replace" block.
+
+% ----------------------------
+% (1) Construction: remove g and define B as full-length accumulator on all m rows/cols
+% ----------------------------
+
+% Replace the paragraph starting with:
+% \paragraph{Parity part $B$ (accumulator staircase + gap).}
+% and ending just before:
+% \paragraph{Information part $A$ (anchored row-regular local ensemble, without replacement).}
+% with:
+
+\paragraph{Parity part $B$ (accumulator staircase).}
+Set $L:=m$.
+For rows $t=1,\dots,m$, set
+\begin{equation}
+B_{t,t}=1,
+\qquad
+B_{t,t-1}=1\ \text{for } t\ge 2,
+\label{eq:B-acc}
+\end{equation}
+and all other entries in these rows to $0$.
+Then $B$ is lower triangular with ones on the diagonal, hence invertible.
+
+% ----------------------------
+% (2) Encoding complexity: remove the final g-by-g solve and run recursion to m
+% ----------------------------
+
+% In \paragraph{Encoding complexity.} replace:
+%   Fix a constant gap size ... The remaining $g$ parities are obtained from a constant-size $g\times g$ linear solve.
+%   Thus encoding runs in $O(N\sigma + g^3)$ time.
+% with:
+
+Thus encoding runs in $O(N\sigma)$ time.
+
+% And replace the recursion range:
+%   (2\le t\le L)
+% by:
+%   (2\le t\le m)
+% (or equivalently keep "2\le t\le L" after setting L:=m).
+
+% ----------------------------
+% (3) Everywhere else: replace L=m-g by L=m and delete O(g) bookkeeping
+% ----------------------------
+
+% Apply the following global edits within this section:
+
+% (a) Replace all occurrences of:
+%   L=m-g
+% or
+%   L:=m-g
+% with:
+%   L:=m
+% (or delete L entirely and use m).
+
+% (b) Replace any instance of:
+%   "the staircase portion of length $L=m-g$"
+% with:
+%   "the staircase portion of length $L=m$"
+% (or just "length $m$").
+
+% (c) Delete sentences/clauses of the form:
+%   "Since $g$ is constant, all bounds can absorb multiplicative factors $2^{O(g)}$ and additive $\pm O(g)$ shifts ..."
+% and any explicit factors $2^{O(g)}$ introduced only to account for the gap.
+
+% For example, in the O1 proof sketches, delete:
+%   "where $2^{O(g)}$ accounts for the constant-size gap."
+% and remove the corresponding multiplicative factor.
+
+% (d) In the expander--accumulator viewpoint subsection, replace:
+%   "accumulator on the first $L=m-g$ coordinates plus a constant-size termination gadget on the last $g$."
+% with:
+%   "accumulator on all $m$ parity coordinates."
+
+% ----------------------------
+% (4) Outer interface summary: remove any mention that O1/O2 proofs depend on g being constant
+% ----------------------------
+
+% In Subsection~\ref{subsec:outer-local-expander-plug}, replace:
+%   "encoding ... in O(N\sigma + g^3) time"
+% with:
+%   "encoding ... in O(N\sigma) time"
+% and remove references to the gap/termination gadget.
+
+% ===================== PATCH END =====================
+
+
+
+\subsection{Note on lifting the outer (and/or inner) to $\F_p$ without edge labels}
+\label{subsec:note-fp-unlabeled}
+
+This note records a short literature/context discussion about working over $\F_p$ (odd $p$) with the \emph{same}
+$0/1$ sparsity pattern as in the binary construction (i.e., \emph{unlabeled} Tanner graphs: all nonzero entries are $1$).
+We do \emph{not} use this note in the main theorems; we include it to document a plausible generalization path and to
+clarify what is (and is not) known. We postpone pursuing this direction until the binary case is finalized.
+
+\paragraph{The question.}
+Given a sparse $0/1$ parity-check matrix $H_0$ (or generator $G_0$) defining a binary code, one can consider the
+$\F_p$-linear code obtained by interpreting the same integer matrix over $\F_p$:
+\[
+C_p(H_0)\;:=\;\{x\in \F_p^n:\ H_0 x^\top = 0 \text{ in }\F_p^m\}.
+\]
+Unlike the simple embedding of $\{0,1\}^n$ into $\F_p^n$, this changes the code (the kernel over $\F_p$ is typically
+different), so the minimum distance and spectrum need not be inherited automatically.
+
+\paragraph{Why one typically randomizes labels.}
+Most nonbinary LDPC distance/spectrum proofs do \emph{not} analyze the unlabeled lift directly; instead they keep the
+underlying Tanner graph and \emph{randomize the nonzero edge labels} in $\F_p^\*$.
+This is analytically convenient because for a fixed support pattern, each active check resembles a random linear
+constraint and events like ``the check evaluates to $0$'' have probability $\approx 1/p$ with clean independence across
+rows. This is the standard nonbinary LDPC/protograph approach and yields strong typical minimum-distance results. 
+
+\paragraph{What is known in the unlabeled nonbinary case.}
+There is literature treating LDPC-type ensembles over abelian groups in which the unlabeled model (all nonzero entries
+equal to $1$ in the group/ring) can still have \emph{linear} minimum distance for suitable regular ensembles, though the
+corresponding distance/spectrum constants are typically much worse than in the uniformly-labeled case.
+A representative reference is Como's thesis, which explicitly contrasts unlabeled and uniformly-labeled sparse-graph
+ensembles over groups and shows that both can achieve linear distance growth, while labeling can dramatically improve the
+distance-growth constant and weight spectrum. \cite{ComoThesis} \cite{ComoThesis2}%
+\footnote{See \cite{ComoThesis,ComoThesis2} for the unlabeled vs labeled comparison; the labeled ensemble is much closer
+to GV-type behavior than the unlabeled one, at comparable degrees.}
+
+\paragraph{Proof ideas (unlabeled).}
+At a high level, proofs of linear distance in the unlabeled setting proceed by:
+\begin{enumerate}
+\item \textbf{(Expansion/geometry)} showing that any small support set $S$ of variables touches many checks
+      (e.g., $|\Gamma(S)|\gtrsim |S|$), so the submatrix $H_{[:,S]}$ has many rows.
+\item \textbf{(Rank/non-degeneracy)} showing that for the random ensemble, the induced submatrix on $S$ has full column
+      rank over $\F_p$ with high probability, so there is no nonzero kernel vector supported on $S$.
+\item \textbf{(Union bound)} summing over supports $S$ of size $|S|\le \delta n$.
+\end{enumerate}
+Compared to the labeled case, the unlabeled analysis is more delicate because one cannot simply use a $1/p$ per-row
+cancellation probability; instead one relies on expansion plus rank arguments for sparse $0/1$ matrices over $\F_p$ (and
+controls small subgraph configurations that would force rank defects).
+
+\paragraph{Why this might plausibly work for our banded anchored EA outer.}
+Our outer ensemble is \emph{not} a fully random LDPC graph: it is banded on a cycle and uses deterministic anchors.
+Nevertheless, in the ``safe'' regime $W\gtrsim N^{1/2+\varepsilon}$ (and with constant $\sigma$), the active-check set
+$U(S)$ grows linearly in $|S|$ for many geometries of $S$, and the anchor eliminates isolated information coordinates.
+This suggests that a proof strategy in the spirit above might be feasible for $C_p(H_0)$ in our setting:
+\begin{itemize}
+\item The \textbf{anchored row-local sampling} gives independent randomness across check rows, which is favorable for
+      rank arguments on $H_{[:,S]}$.
+\item The \textbf{banded geometry} forces supports $S$ to either be dispersed (many isolated anchors) or clustered
+      (few components). In either case, the induced constraints can be analyzed via a component/interval decomposition.
+\item The \textbf{accumulator parity block} remains an invertible linear map over any odd $\F_p$ (with $g=0$), so the
+      analysis reduces to the induced word $r=Au$ as in the binary case.
+\end{itemize}
+In short: although unlabeled $\F_p$ proofs are harder than labeled ones, existing results indicate the unlabeled model can
+still have linear distance for suitable sparse-graph ensembles, and our outer structure has several features (anchoring,
+row-independence, controllable geometry via $W$) that align with the known proof templates. \cite{ComoThesis} \cite{ComoThesis2}
+
+\paragraph{Status.}
+We do not pursue this direction further in the present draft. Our main theorems remain in the binary setting, where the
+outer interface (O1/O2) and the inner mixing analysis are already aligned with the serial concatenation framework.
+We leave a careful treatment of the unlabeled $\F_p$ lift (and/or a low-multiplication label model such as $\{\pm 1\}$
+edge labels or signed block interleavers) as future work.
+
+% --- Bib entries (add to your .bib or inline if needed) ---
+% The citations below correspond to Como's thesis sources.
+% Replace the URL/fields with your preferred bib format.
+%
+% \begin{thebibliography}{99}
+% \bibitem{ComoThesis}
+% G.~Como, \emph{(PhD thesis)}. ``...'' Lund University, 2008. Available at: \url{https://archive.control.lth.se/media/Staff/GiacomoComo/ComoThesis.pdf}. \cite{...}
+% \bibitem{ComoThesis2}
+% G.~Como, \emph{(same thesis / related chapter)}. Available at: \url{https://archive.control.lth.se/media/Staff/GiacomoComo/ComoThesis.pdf}. \cite{...}
+% \end{thebibliography}

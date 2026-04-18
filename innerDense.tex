@@ -1,0 +1,431 @@
+\section{Dense time-varying recursive inner convolution (log-memory baseline)}
+\label{sec:inner-dense}
+
+\paragraph{Role in the modular serial concatenation framework.}
+In Section~\ref{sec:framework} (the modular serial concatenation framework),
+we reduce minimum-distance analysis of the concatenated code
+\[
+\Csc \ :=\ \Ctwo \circ \Pi \circ \Cone \ \subseteq\ \{0,1\}^N
+\]
+to bounding, for each outer weight $w$, the inner tail probability
+\[
+p_w(\delta)\ :=\ 
+\PP\!\left[\ \wt\!\big(\Enc_{\mathrm{in}}(U)\big)\le \delta N \ \middle|\ \wt(U)=w\ \right],
+\]
+where $U$ is uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w$.
+(Equivalently: $\Pi$ is uniform, so $\Pi(\text{any fixed weight-}w\text{ word})$ is uniform on the weight-$w$ slice.)
+
+This section instantiates the inner code $\Ctwo$ as a \emph{time-varying dense-tap recursive convolutional encoder}
+with memory $m=\Theta(\log N)$, and proves two modular bounds on $p_w(\delta)$:
+\begin{enumerate}
+\item a \textbf{general three-term tail bound} (useful for large $w$ / large deviations), and
+\item a \textbf{forced-termination contraction bound} that converts the ``OFF mechanism'' into a \emph{geometric-in-$w$}
+term for small/intermediate $w$.
+\end{enumerate}
+These are the only inner facts later sections need.
+
+% ============================================================
+\subsection{Inner ensemble definition (dense taps, recursive, rate 1)}
+\label{subsec:inner-dense-def}
+
+Fix blocklength $N$ and a memory parameter
+\[
+m \ :=\ \gamma \log_2 N
+\qquad\text{for a constant }\gamma>0.
+\]
+The inner encoder is a streaming linear map $\Enc_{\mathrm{in}}:\F_2^N\to\F_2^N$ defined via a shift-register state.
+
+\paragraph{Streaming definition.}
+Initialize $s_1:=0^m\in\F_2^m$.
+For each time $t\in[N]$:
+\begin{enumerate}
+\item Sample a fresh dense tap vector $k_t \gets \Unif(\F_2^m)$, independently over $t$.
+\item Output
+\begin{equation}
+\label{eq:dense-inner-def}
+y_t \ :=\ u_t \oplus \langle k_t, s_t\rangle,
+\qquad
+s_{t+1}\ :=\ \Shift(s_t,y_t),
+\end{equation}
+where $\Shift$ drops the oldest state bit and appends $y_t$.
+\end{enumerate}
+Equivalently, for $t\ge 2$, the state stores the last $m$ outputs
+\[
+s_t \ =\ (y_{t-m},y_{t-m+1},\dots,y_{t-1})
+\quad\text{with zero padding for indices }\le 0.
+\]
+
+\paragraph{Linearity and generator matrix.}
+For a fixed draw of $(k_t)_{t=1}^N$, the map $u\mapsto y$ is $\F_2$-linear and systematic ($y_t$ contains $u_t$),
+hence it corresponds to multiplication by an invertible $N\times N$ binary matrix $\Gtwo$:
+\[
+y \ =\ u \cdot \Gtwo.
+\]
+We view $\Ctwo$ as the (rate-1) code induced by this random $\Gtwo$ ensemble.
+
+\paragraph{ON/OFF notation.}
+Define events
+\[
+\ON_t \ :=\ \{s_t\neq 0\},
+\qquad
+\OFF_t\ :=\ \{s_t=0\}.
+\]
+Intuitively: in \OFF, the encoder outputs $y_t=u_t$ deterministically; in \ON, the term $\langle k_t,s_t\rangle$
+is a fresh unbiased bit, so outputs behave like fair coins (up to the fixed $u_t$ mask).
+
+% ============================================================
+\subsection{Core ON/OFF lemmas}
+\label{subsec:inner-dense-onoff}
+
+Let $\mathcal{F}_{t-1}:=\sigma(u_1^t,k_1^{t-1},y_1^{t-1})$ be the natural past up to time $t-1$.
+
+\begin{lemma}[Fresh fair coin while ON]
+\label{lem:dense-fair-while-on}
+For every $t$, conditioned on $\mathcal{F}_{t-1}$ and on $\ON_t$, the output bit $y_t$ is uniform:
+\[
+\PP[y_t=0\mid \mathcal{F}_{t-1},\ON_t]=\PP[y_t=1\mid \mathcal{F}_{t-1},\ON_t]=\tfrac12.
+\]
+Moreover, for any interval $I=\{a,a+1,\dots,b\}$, conditioned on $\bigcap_{t\in I}\ON_t$,
+the bits $\{y_t\}_{t\in I}$ are i.i.d.\ $\mathrm{Bernoulli}(1/2)$.
+\end{lemma}
+
+\begin{proof}
+Fix $t$. On $\ON_t$, the state $s_t\neq 0$ is fixed given $\mathcal{F}_{t-1}$.
+Since $k_t\gets\Unif(\F_2^m)$ and is independent of $\mathcal{F}_{t-1}$,
+the dot product $\langle k_t,s_t\rangle$ is a nontrivial linear functional of a uniform vector, hence uniform in $\F_2$.
+Therefore $y_t=u_t\oplus \langle k_t,s_t\rangle$ is uniform.
+
+For the joint statement, apply the chain rule over $t=a,\dots,b$; conditioning on the past fixes $s_t$,
+and the fresh $k_t$ make each conditional bit uniform, so the joint law is $2^{-(b-a+1)}$.
+\end{proof}
+
+\begin{lemma}[ON$\to$OFF requires an $m$-run of zeros in the output]
+\label{lem:dense-off-requires-mzeros}
+If $\OFF_q$ holds at some time $q\ge 2$, then the preceding $m$ outputs are all zero:
+\[
+y_{q-m}=y_{q-m+1}=\cdots=y_{q-1}=0.
+\]
+Equivalently, every ON$\to$OFF transition is witnessed by a contiguous length-$m$ all-zero window in the output stream.
+\end{lemma}
+
+\begin{proof}
+By construction, $s_q$ is the vector of the last $m$ outputs before time $q$. Thus $s_q=0$ iff those $m$ outputs are all zero.
+\end{proof}
+
+% ============================================================
+\subsection{A general three-term tail bound for $p_w(\delta)$}
+\label{subsec:inner-dense-three-term}
+
+We first prove a bound that is convenient for large $w$ and for the linear-weight regime:
+it isolates three distinct mechanisms by which $\wt(Y)$ can be small.
+
+\begin{lemma}[First 1 occurs early for uniform weight-$w$ inputs]
+\label{lem:first-one-early}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$.
+Let $T:=\min\{t:U_t=1\}$ be the first index containing a $1$.
+Then for any $\varepsilon\in(0,1)$,
+\[
+\PP[T>\varepsilon N]\ \le\ (1-\varepsilon)^w.
+\]
+\end{lemma}
+
+\begin{proof}
+$T>\varepsilon N$ means the first $\lfloor \varepsilon N\rfloor$ coordinates contain no $1$.
+Under the uniform weight-$w$ model,
+\[
+\PP[T>\varepsilon N]
+=
+\frac{\binom{N-\lfloor\varepsilon N\rfloor}{w}}{\binom{N}{w}}
+=
+\prod_{i=0}^{w-1}\frac{N-\lfloor\varepsilon N\rfloor-i}{N-i}
+\le
+\left(\frac{N-\lfloor\varepsilon N\rfloor}{N}\right)^w
+\le
+(1-\varepsilon)^w.
+\]
+\end{proof}
+
+\begin{lemma}[Dense inner: three-term low-weight tail]
+\label{lem:dense-three-term-tail}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$, and let $Y=\Enc_{\mathrm{in}}(U)$ be produced by
+\eqref{eq:dense-inner-def}. Fix $\delta\in(0,1/2)$ and $\varepsilon\in(0,1)$. Then
+\begin{equation}
+\label{eq:dense-three-term}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=w]
+\ \le\
+(1-\varepsilon)^w\ +\ N\cdot 2^{-m}\ +\ q_{\delta,\varepsilon}(N),
+\end{equation}
+where
+\[
+q_{\delta,\varepsilon}(N)
+:=
+\PP\!\left[\ \mathrm{Binomial}(\lfloor(1-\varepsilon)N\rfloor,\tfrac12)\ \le\ \delta N\ \right]
+\ \le\
+2^{-(1-\varepsilon)N\cdot \big(1-H_2(\delta/(1-\varepsilon))\big)}
+\]
+whenever $\delta\le (1-\varepsilon)/2$.
+\end{lemma}
+
+\begin{proof}
+Let $T$ be the first index with $U_T=1$. By Lemma~\ref{lem:first-one-early},
+\[
+\PP[T>\varepsilon N]\le (1-\varepsilon)^w.
+\]
+On the event $\{T\le \varepsilon N\}$ we have $s_T=0$ (since $s_1=0$ and no earlier $1$ has occurred),
+hence $Y_T=U_T=1$, which implies $\ON_{T+1}$.
+
+If the encoder ever transitions from \ON to \OFF after time $T+1$, then by Lemma~\ref{lem:dense-off-requires-mzeros}
+there exists a length-$m$ all-zero window in $Y$ starting at some $r\in\{T+1,\dots,N-m+1\}$.
+For a fixed $r$, conditioning on $\ON_r$ and using Lemma~\ref{lem:dense-fair-while-on} gives
+\[
+\PP[Y_r=\cdots=Y_{r+m-1}=0 \mid \ON_r] = 2^{-m},
+\]
+hence $\PP[Y_r=\cdots=Y_{r+m-1}=0 \ \wedge\ \ON_r]\le 2^{-m}$.
+A union bound over all $r$ yields
+\[
+\PP[\exists\ \text{such window}] \ \le\ N\cdot 2^{-m}.
+\]
+
+On the complementary event that $T\le \varepsilon N$ and no ON$\to$OFF transition occurs after $T+1$,
+we have $\ON_t$ for all $t\in\{T+1,\dots,N\}$, so Lemma~\ref{lem:dense-fair-while-on} implies
+$(Y_{T+1},\dots,Y_N)$ are i.i.d.\ fair coins.
+Since $T\le \varepsilon N$ implies $N-T\ge (1-\varepsilon)N$, monotonicity of binomial tails yields the term
+$q_{\delta,\varepsilon}(N)$.
+
+Union bounding these three mechanisms proves \eqref{eq:dense-three-term}.
+\end{proof}
+
+\paragraph{Interpretation.}
+The three terms in \eqref{eq:dense-three-term} correspond to:
+(i) the first $1$ appears too late (probability $(1-\varepsilon)^w$),
+(ii) an ON$\to$OFF transition occurs (probability $\le N2^{-m}$),
+(iii) otherwise, the encoder stays ON for at least $(1-\varepsilon)N$ steps and outputs behave like fair coins, so
+$\wt(Y)$ has a large-deviation tail $q_{\delta,\varepsilon}(N)$.
+
+% ============================================================
+\subsection{Forced-termination contraction (tightening the small-$w$ regime)}
+\label{subsec:inner-dense-forced-termination}
+
+For small/intermediate weights, the pointwise polynomial term $N2^{-m}$ in Lemma~\ref{lem:dense-three-term-tail}
+is undesirable. We now exploit recursion plus the run structure of a sparse interleaved input to turn the OFF mechanism
+into a genuine geometric-in-$w$ contraction.
+
+\begin{definition}[Runs of ones]
+\label{def:runs}
+For $u\in\{0,1\}^N$, let $R(u)$ denote the number of runs of ones in $u$,
+i.e., the number of maximal contiguous substrings of $1$'s.
+\end{definition}
+
+\begin{lemma}[Forced-termination contraction]
+\label{lem:dense-forced-termination}
+Fix $\delta\in(0,1/2)$ and choose any $\xi>0$. Let
+\[
+L\ :=\ \left\lceil (2+\xi)\delta N \right\rceil.
+\]
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$, and let $Y=\Enc_{\mathrm{in}}(U)$ be produced by
+\eqref{eq:dense-inner-def}. Then for every integer $r\in\{1,\dots,w\}$,
+\begin{equation}
+\label{eq:dense-forced-termination}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=w]
+\ \le\
+\PP[R(U)<r]\ +\ (L2^{-m})^{r}\ +\ r\cdot \PP[\mathrm{Binomial}(L,\tfrac12)\le \delta N].
+\end{equation}
+Moreover,
+\begin{equation}
+\label{eq:runs-adjacent-bound}
+\PP[R(U)<w]\ \le\ \frac{w(w-1)}{N-1}.
+\end{equation}
+In particular, for $w\ll \sqrt{N}$ (e.g.\ $w=O(\log N)$), taking $r=w$ yields a geometric-in-$w$ term
+$(L2^{-m})^w$ up to a negligible $O(w^2/N)$ correction.
+\end{lemma}
+
+\begin{proof}
+\emph{Step 1 (runs initiate ON-episodes).}
+When the encoder is OFF ($s_t=0$), we have $y_t=u_t$.
+Therefore, at the first position of any run of ones in $u$, the encoder outputs $1$, and the next state becomes nonzero,
+so the encoder enters ON immediately after the run begins.
+Thus each run of ones initiates an ON-episode.
+
+\emph{Step 2 (small output weight forces fast termination or a binomial deviation).}
+Condition on the event $\{R(U)\ge r\}$ and select any $r$ distinct runs.
+Consider the corresponding $r$ ON-episodes (they occur on disjoint time intervals since the runs are disjoint).
+
+If any selected ON-episode has length at least $L$, then on the sub-interval where the encoder stays ON,
+Lemma~\ref{lem:dense-fair-while-on} gives fair-coin outputs.
+Since $L=(2+\xi)\delta N>2\delta N$, the probability that this single episode contributes at most $\delta N$ ones is
+upper bounded by $\PP[\mathrm{Binomial}(L,1/2)\le \delta N]$ (monotonicity).
+By a union bound over the $r$ selected episodes, the probability that some selected episode is long and still contributes
+$\le \delta N$ ones is at most
+\[
+r\cdot \PP[\mathrm{Binomial}(L,1/2)\le \delta N].
+\]
+
+Otherwise, all $r$ selected ON-episodes have length $<L$.
+An ON-episode ends only via an ON$\to$OFF transition, which by Lemma~\ref{lem:dense-off-requires-mzeros} requires a
+length-$m$ all-zero window in the output while ON.
+For a given ON-episode to terminate within $L$ steps, there are at most $L$ candidate start indices for such a window;
+for each fixed candidate, Lemma~\ref{lem:dense-fair-while-on} gives probability exactly $2^{-m}$ for an all-zero window.
+Thus, by a union bound, a fixed ON-episode terminates within $L$ steps with probability at most $L2^{-m}$.
+Since tap vectors are independent over time, the termination events for the $r$ disjoint ON-episodes are independent
+conditional on the input pattern. Hence the probability that all $r$ selected ON-episodes terminate within $L$ is
+at most $(L2^{-m})^r$.
+
+Finally, union bound over the complementary event $\{R(U)<r\}$ yields \eqref{eq:dense-forced-termination}.
+
+\emph{Step 3 (adjacent-ones bound).}
+We have $R(U)<w$ iff $U$ contains an adjacent pair of ones.
+Let
+\[
+A:=\sum_{i=1}^{N-1}\mathbf{1}\{U_i=U_{i+1}=1\}.
+\]
+Then $\{R(U)<w\}\subseteq\{A\ge 1\}$, so $\PP[R(U)<w]\le \EE[A]$.
+For uniform weight-$w$ vectors,
+\[
+\PP[U_i=U_{i+1}=1]=\frac{\binom{N-2}{w-2}}{\binom{N}{w}}=\frac{w(w-1)}{N(N-1)}.
+\]
+Therefore $\EE[A]=(N-1)\cdot \frac{w(w-1)}{N(N-1)}=\frac{w(w-1)}{N}$, which implies \eqref{eq:runs-adjacent-bound}
+(up to the minor $N$ vs.\ $N-1$ normalization).
+\end{proof}
+
+% ============================================================
+\subsection{Inner interface theorem (what the outer+interleaver proof consumes)}
+\label{subsec:inner-dense-interface}
+
+We package the previous lemmas into an explicit interface for Section~\ref{sec:framework}.
+
+\begin{theorem}[Dense inner interface for the framework]
+\label{thm:inner-dense-interface}
+Let $\Ctwo$ be the dense time-varying recursive inner encoder \eqref{eq:dense-inner-def} with memory $m$.
+Fix $\delta\in(0,1/2)$.
+For each $w\ge 1$, let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w$ and let $Y=\Enc_{\mathrm{in}}(U)$.
+
+Then:
+\begin{enumerate}
+\item (\textbf{General tail, all $w$}) For every $\varepsilon\in(0,1)$,
+\[
+p_w(\delta)\ :=\ \PP[\wt(Y)\le \delta N\mid \wt(U)=w]
+\ \le\
+(1-\varepsilon)^w\ +\ N2^{-m}\ +\ q_{\delta,\varepsilon}(N),
+\]
+with $q_{\delta,\varepsilon}(N)$ as in Lemma~\ref{lem:dense-three-term-tail}.
+\item (\textbf{Forced-termination contraction, tunable in $r$}) For every $\xi>0$ and
+$L=\lceil(2+\xi)\delta N\rceil$, and for every $r\in\{1,\dots,w\}$,
+\[
+p_w(\delta)
+\ \le\
+\PP[R(U)<r]\ +\ (L2^{-m})^{r}\ +\ r\cdot \PP[\mathrm{Binomial}(L,\tfrac12)\le \delta N].
+\]
+\end{enumerate}
+\end{theorem}
+
+
+
+
+\begin{corollary}[Dense inner satisfies Assumption~\ref{ass:inner-interface} for $w\ge d_{\min}(\Cone)$]
+\label{cor:dense-inner-implies-interface}
+Consider the dense time-varying recursive inner encoder with memory
+\[
+m \;:=\; \gamma \log_2 n
+\qquad\text{for a constant }\gamma>1.
+\]
+Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
+Let $p_w(\delta)$ be defined as in \eqref{eq:inner-interface-pw}.
+Assume the dense-inner tail bound (proved earlier in this section) gives
+\begin{equation}
+\label{eq:dense-three-term-recall}
+p_w(\delta)
+\;\le\;
+(1-\varepsilon)^w \;+\; n\,2^{-m} \;+\; q_{\delta,\varepsilon}(n),
+\end{equation}
+where $q_{\delta,\varepsilon}(n)\le 2^{-c n}$ for some $c=c(\delta,\varepsilon)>0$.
+
+Then there exist constants $\rho\in(0,1)$ and $a\ge 0$ (depending only on $\delta,\varepsilon,\gamma$) such that
+for all sufficiently large $n$ and all $w\ge d_{\min}(\Cone)$,
+\[
+p_w(\delta)\;\le\; n^{a}\,\rho^{\,w}.
+\]
+In particular, Assumption~\ref{ass:inner-interface} holds for this dense inner instantiation.
+\end{corollary}
+
+\begin{proof}
+Let $\rho:=1-\varepsilon\in(0,1)$.
+We bound each term in \eqref{eq:dense-three-term-recall} by a common expression $n^a\rho^w$ for all
+$w\ge d_{\min}(\Cone)$.
+
+\paragraph{Term 1.}
+$(1-\varepsilon)^w=\rho^w\le n^a\rho^w$ for any $a\ge 0$.
+
+\paragraph{Term 2.}
+Since $m=\gamma\log_2 n$, we have $n\,2^{-m}=n\cdot n^{-\gamma}=n^{1-\gamma}$.
+Let $\alpha>0$ satisfy $d_{\min}(\Cone)\ge \alpha\log_2 n$ (from the outer interface).
+Then for all $w\ge d_{\min}(\Cone)$,
+\[
+\rho^{\,w}\ \le\ \rho^{\,\alpha\log_2 n}
+\ =\ n^{-\alpha\log_2(1/\rho)}.
+\]
+Choose any constant $a$ such that
+\[
+a - \alpha\log_2(1/\rho)\ \ge\ 1-\gamma.
+\]
+Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge d_{\min}(\Cone)$.
+
+\paragraph{Term 3.}
+Since $q_{\delta,\varepsilon}(n)\le 2^{-cn}$ and $\rho^w\ge \rho^n$ is exponentially small in $n$ as well,
+we have $q_{\delta,\varepsilon}(n)\le n^{a}\rho^{\,w}$ for all sufficiently large $n$ after increasing $a$ by an absolute constant if needed.
+
+Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge d_{\min}(\Cone)$.
+\end{proof}
+
+
+
+
+\begin{remark}[The ON$\to$OFF term and why it is harmless in the framework]
+\label{rem:dense-off-harmless}
+The term $n2^{-m}$ in \eqref{eq:dense-three-term-recall} corresponds to the event that, while ON, the output stream
+contains a length-$m$ all-zero window, causing an ON$\to$OFF transition.
+For dense taps the expected ON lifetime under zero input is $\Theta(2^m)$, hence this term is unavoidable in a pointwise bound.
+However, the serial concatenation framework never uses $p_w(\delta)$ for $w<d_{\min}(\Cone)$,
+and for $w\ge d_{\min}(\Cone)=\Omega(\log n)$ the geometric factor $\rho^w$ yields an additional $n^{-\Omega(1)}$
+that easily absorbs $n2^{-m}=n^{1-\gamma}$ as soon as $\gamma>1$.
+Thus the dense inner conforms to the single inner interface without weakening the end-to-end guarantee.
+\end{remark}
+
+
+
+
+\paragraph{Work complexity (why this is the ``dense'' baseline).}
+Each step computes $\langle k_t,s_t\rangle$ with a \emph{dense} $m$-bit mask, i.e.\ $\Theta(m)$ taps per symbol.
+Thus total inner work is $\Theta(Nm)=\Theta(N\log N)$ for $m=\gamma\log N$.
+
+\paragraph{Design notes (how the parameters are meant to be used later).}
+\begin{itemize}
+\item The term $(1-\varepsilon)^w$ is the clean exponential-in-$w$ contraction for intermediate weights.
+\item The term $N2^{-m}$ is the rare ON$\to$OFF event. In tight finite-$N$ bounds, it is better to \emph{budget}
+its cumulative contribution in the weight sum (rather than carry it pointwise for every $w$).
+\item The binomial tail $q_{\delta,\varepsilon}(N)$ provides the exponentially small-in-$N$ large-deviation behavior
+needed for the linear-weight regime when union bounding over exponentially many outer codewords.
+\item Lemma~\ref{lem:dense-forced-termination} replaces the pointwise $N2^{-m}$ by $(L2^{-m})^r$ for small $w$,
+using the fact that a random interleaver typically spreads $w$ ones into $\approx w$ runs when $w\ll \sqrt N$.
+\end{itemize}
+
+% ============================================================
+\subsection{TODOs for this dense-inner module}
+\label{subsec:inner-dense-todos}
+
+\begin{enumerate}
+\item \textbf{Sharper run-count tails for $R(U)<r$ beyond the $r=w$ case.}
+For $w$ up to, say, $N^{2/3}$ it may be useful to take $r=(1-\tau)w$ and prove
+$\PP[R(U)<(1-\tau)w]\le \exp(-\Omega(\tau^2 w))$ under the uniform weight-$w$ model.
+
+\item \textbf{Explicit constants in the binomial tail.}
+If we want explicit finite-$N$ numerics, replace the entropy bound by an explicit Chernoff/Bennett form
+with stated constants.
+
+\item \textbf{Budgeting the $N2^{-m}$ term.}
+In the global sum over $w$, it is typically better to choose a cutoff $W_2$ and show
+$\sum_{w\le W_2} A_w^o \cdot N2^{-m}$ is below a chosen budget $\eta$; this removes a nuisance polynomial term.
+
+\item \textbf{Unify notation with the sparse+refresh inner.}
+Both the dense and sparse-refresh inners use the same ON/OFF narrative; we should unify the definitions
+(episodes, termination windows, and ``fair coin while ON'') so the sparse-refresh section reuses this scaffolding.
+\end{enumerate}

@@ -1,0 +1,203 @@
+\section{Outer code instantiation I: a dense log-memory convolutional outer}
+\label{sec:outer-dense-logmem}
+
+This section instantiates the outer code \(\Cone\) by a simple, fully explicit ensemble:
+a terminated, feedforward convolutional encoder with memory \(M=\Theta(\log n)\) and dense taps
+within the memory window. We prove the only two outer properties used by the serial concatenation
+framework:
+\begin{enumerate}
+\item \textbf{(O1) Logarithmic distance:} \(d_{\min}(\Cone)\ge \alpha\log n\) with high probability over the encoder design.
+\item \textbf{(O2) Spectral growth:} \(\enum_{\Cone,w}\le \poly(n)\,\beta^w\) for a constant \(\beta>1\) (independent of \(n\))
+      on the weight range used later in the first-moment bound.
+\end{enumerate}
+The construction is encoding-friendly in the sense that it is a single banded (width \(M+1\)) generator
+with no feedback; its work is \(O(nM)=O(n\log n)\).
+
+\subsection{Construction (banded diagonal feedforward convolution)}
+\label{sec:outer-dense-construction}
+
+Fix an outer rate \(R_o\in(0,1)\). Let \(k:=\lfloor R_o n\rfloor\) and let \(r:=1/R_o\) be the number of output streams
+(so \(n=rk\), up to rounding).
+Let \(M:=\lceil c\log_2 n\rceil\) for a constant \(c\ge 1\) chosen later.
+
+Given information bits \(x_1,\dots,x_k\in\F_2\), we use standard zero-termination:
+append \(M\) zeros \(x_{k+1}=\cdots=x_{k+M}=0\) and define \(x_t:=0\) for all \(t\le 0\).
+
+For each time \(t\in[k]\) and stream \(j\in[r]\), sample an independent uniform tap vector
+\(g_t^{(j)}\leftarrow \F_2^{M+1}\), and output
+\begin{equation}
+\label{eq:outer-dense-encoder}
+y_t^{(j)} \;:=\; \big\langle g_t^{(j)},\, (x_t,x_{t-1},\dots,x_{t-M})\big\rangle \in \F_2.
+\end{equation}
+Flatten \(\bigl(y_t^{(1)},\dots,y_t^{(r)}\bigr)_{t=1}^k\) into a length-\(n\) outer codeword \(y\in\F_2^n\).
+This defines a linear outer code \(\Cone\subseteq\F_2^n\) with generator matrix \(\Gone\in\F_2^{k\times n}\)
+that is banded diagonal with bandwidth \(M+1\) (dense within the band, no feedback).
+
+\paragraph{Outer spectrum notation.}
+For \(w\in\{0,1,\dots,n\}\), let
+\[
+\enum_{\Cone,w} \;:=\; \bigl|\{c\in\Cone:\ \wt(c)=w\}\bigr|
+\]
+denote the (outer) weight spectrum.
+
+\subsection{Spectrum bound (O2) via a trellis transfer matrix}
+\label{sec:outer-dense-spectrum}
+
+The encoder admits a standard trellis with \(2^M\) states (the last \(M\) input bits),
+and constant out-degree \(2\) (the next input bit is \(0\) or \(1\)).
+Each trellis edge produces \(r\) output bits, hence has Hamming weight in \(\{0,1,\dots,r\}\).
+
+\begin{lemma}[Outer spectrum bound (trellis form)]
+\label{lem:outer-dense-spectrum}
+There exists a constant \(\beta>1\) (depending only on \(r\) and \(c/\alpha\) as folded below) such that
+\[
+\enum_{\Cone,w} \;\le\; \poly(n)\,\beta^w
+\]
+for all \(w\ge \alpha\log n\). (This is the range used by the framework, since \(d_{\min}(\Cone)\ge \alpha\log n\).)
+\end{lemma}
+
+\begin{proof}
+Let \(T(z)\in\R[z]^{2^M\times 2^M}\) be the weighted adjacency matrix of the trellis, defined by
+\[
+T(z)_{s,s'} \;:=\; \sum_{e:s\to s'} z^{\wt(e)},
+\]
+where the sum is over edges \(e\) from state \(s\) to \(s'\) and \(\wt(e)\in\{0,\dots,r\}\) is the edge output weight.
+Each state has exactly two outgoing edges, and each edge contributes at most \(z^r\), so every row-sum is bounded by
+\(1+z^r\). Hence for all \(z\ge 0\),
+\[
+\rho\!\bigl(T(z)\bigr)\le 1+z^r
+\]
+by the maximum row-sum bound on the spectral radius.
+
+Let \(W(z):=\sum_{w\ge 0}\enum_{\Cone,w} z^w\) be the (ordinary) weight enumerator.
+Standard transfer-matrix reasoning gives
+\[
+W(z)\;\le\; \mathbf{1}^\top T(z)^k \mathbf{1} \;\le\; 2^M\cdot (1+z^r)^k
+\]
+for all \(z\ge 0\), where \(2^M\) accounts for the number of possible start/end states (termination only helps).
+
+Extract coefficients using \(\enum_{\Cone,w}\le W(z)/z^w\) for any \(z>0\):
+\[
+\enum_{\Cone,w}\le 2^M\cdot \frac{(1+z^r)^k}{z^w}.
+\]
+Choose \(z\) so that \(z^r = w/n\) (i.e., \(z=(w/n)^{1/r}\)). Then \((1+z^r)^k=(1+w/n)^k\le (1+w/n)^n\le e^w\),
+and thus
+\[
+\enum_{\Cone,w}\le 2^M\cdot e^w \cdot \Big(\frac{n}{w}\Big)^{w/r}.
+\]
+Since \(w\ge 1\) implies \((n/w)^{w/r}\le n^{w/r}\), we get
+\[
+\enum_{\Cone,w}\le 2^M\cdot \bigl(e\,n^{1/r}\bigr)^w.
+\]
+Now \(2^M = 2^{c\log_2 n}=n^c\). For the framework we only use \(w\ge d_{\min}(\Cone)\ge \alpha\log n\), hence
+\(n^c \le (2^{c/\alpha})^w\). Folding this polynomial prefactor into the exponential base gives
+\[
+\enum_{\Cone,w}\le \poly(n)\,\beta^w
+\]
+for a constant \(\beta>1\) depending only on \(r\) and \(c/\alpha\).
+\end{proof}
+
+\paragraph{Remark (stronger forms).}
+If one wants the stronger shape \(\enum_{\Cone,w}\le n\,\beta^w\) for all \(w\ge 1\), one can refine the coefficient extraction
+and avoid folding \(2^M\) into the base. For our distance proof, the trellis form in Lemma~\ref{lem:outer-dense-spectrum} suffices.
+
+\subsection{Logarithmic minimum distance (O1) via span grouping}
+\label{sec:outer-dense-distance}
+
+We now show that a random draw of the taps \(g_t^{(j)}\) yields \(d_{\min}(\Cone)=\Omega(M)=\Omega(\log n)\) with high probability.
+
+\begin{definition}[Span]
+Fix a nonzero input \(x\in\F_2^k\). Let \(a\) be the first index with \(x_a=1\) and \(b\) the last index with \(x_b=1\).
+Define the span \(\ell:=b-a+1\).
+\end{definition}
+
+\begin{lemma}[Weight tail for a fixed span]
+\label{lem:outer-span-binomial}
+Fix a nonzero input \(x\) of span \(\ell\). Let \(y=\Enc_{\Cone}(x)\) be the outer output under \eqref{eq:outer-dense-encoder}.
+Then for each stream \(j\in[r]\), exactly \(\ell+M\) output positions have a nonzero window \((x_t,\dots,x_{t-M})\),
+and on those positions \(y_t^{(j)}\) is a uniform bit (independent across \(t\) and across streams).
+Consequently,
+\[
+\wt(y) \;\sim\; \Binomial\bigl(r(\ell+M),\,1/2\bigr),
+\]
+and for any \(d\ge 1\),
+\[
+\Pr[\wt(y)\le d]\le (d+1)\binom{r(\ell+M)}{d}\,2^{-r(\ell+M)}
+\;\le\;
+(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
+\]
+\end{lemma}
+
+\begin{proof}
+If the window \((x_t,\dots,x_{t-M})\) is nonzero, then \(\langle g_t^{(j)},(x_t,\dots,x_{t-M})\rangle\) is a nontrivial linear
+functional of a uniform vector \(g_t^{(j)}\), hence uniform in \(\F_2\). Independence follows from independence of the tap vectors over
+\((t,j)\). The binomial tail bound is a standard union bound over weights \(0,\dots,d\) and \(\binom{L}{d}\le (eL/d)^d\).
+\end{proof}
+
+\begin{theorem}[Outer logarithmic minimum distance]
+\label{thm:outer-dense-logdistance}
+There exists an absolute constant \(\alpha>0\) such that for any choice \(M=\lceil c\log_2 n\rceil\) with \(c\) sufficiently large,
+\[
+\Pr\bigl[d_{\min}(\Cone)\le \alpha\log_2 n\bigr] = o(1),
+\]
+where the probability is over the randomness of the taps \(g_t^{(j)}\).
+In particular, with high probability \(d_{\min}(\Cone)\ge \alpha\log n\).
+\end{theorem}
+
+\begin{proof}
+Let \(d:=\alpha\log_2 n\). Union bound over all nonzero inputs \(x\).
+Group inputs by span \(\ell\in\{1,\dots,k\}\). For a fixed \(\ell\), there are at most \(k\cdot 2^\ell\le n\cdot 2^\ell\)
+nonzero inputs of span \(\ell\) (choose the start position and the \(\ell\)-bit pattern with endpoints \(1\)).
+By Lemma~\ref{lem:outer-span-binomial},
+\[
+\Pr[\wt(\Enc_{\Cone}(x))\le d \mid \text{span}=\ell]
+\;\le\;
+(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
+\]
+Hence
+\[
+\Pr[d_{\min}(\Cone)\le d]
+\;\le\;
+\sum_{\ell=1}^{k} n\,2^\ell\cdot (d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
+\]
+Split the sum into two ranges.
+
+\emph{Range A: \(\ell\ge 4d\).}
+Here \(\ell+M\ge 4d\), so the factor \(2^\ell\cdot 2^{-r(\ell+M)} \le 2^{-(r-1)\ell}\cdot 2^{-rM}\) decays geometrically in \(\ell\)
+(since \(r\ge 2\)). Summing over \(\ell\ge 4d\) contributes at most
+\[
+n\,(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-rM}\cdot \sum_{\ell\ge 4d} 2^{-(r-1)\ell}
+\;\le\;
+\poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}.
+\]
+
+\emph{Range B: \(1\le \ell<4d\).}
+Here \(\ell+M\le 4d+M\), so we can bound
+\[
+\Big(\frac{e\,r(\ell+M)}{d}\Big)^d \le \Big(e\,r(4+M/d)\Big)^d = n^{O(\alpha)}
+\]
+since \(M/d=(c/\alpha)\) is constant.
+Also \(\sum_{\ell<4d} 2^\ell \le 2^{4d}=n^{4\alpha}\).
+Thus Range B contributes at most
+\[
+n\cdot 2^{4d}\cdot \poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}
+\;=\;
+\poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}.
+\]
+
+Combining, \(\Pr[d_{\min}(\Cone)\le d]\le \poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}\).
+With \(M=c\log_2 n\), we have \(2^{-rM}=n^{-rc}\).
+Choosing \(c\) sufficiently larger than the constant exponents induced by \(\alpha\) makes the bound \(o(1)\),
+proving the theorem.
+\end{proof}
+
+\subsection{Outer interface summary (dense log-memory outer)}
+\label{sec:outer-dense-summary}
+
+Combining Theorem~\ref{thm:outer-dense-logdistance} and Lemma~\ref{lem:outer-dense-spectrum}, the dense log-memory outer
+satisfies the outer interface used by the serial concatenation framework:
+\[
+d_{\min}(\Cone)\ge \alpha\log n
+\qquad\text{and}\qquad
+\enum_{\Cone,w}\le \poly(n)\,\beta^w\ \text{for the relevant weight regime.}
+\]
