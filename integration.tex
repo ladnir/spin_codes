@@ -151,3 +151,98 @@ the dense+dense proof problem is to make the right-hand side of
 \end{itemize}
 This formulation is the bridge from the current asymptotic proof to concrete finite-length questions such as
 \(n=2^{16},2^{20},\dots,2^{30}\) and to benchmark targets such as the binary Gilbert--Varshamov distance at rate \(1/2\).
+
+\begin{corollary}[Dense+dense run-aware reduction]
+\label{cor:dense-dense-run-aware}
+Fix \(\delta\in(0,1/2)\), choose \(\varepsilon\in(0,1)\) and \(\xi>0\), and define
+\[
+L:=\lceil(2+\xi)\delta n\rceil,
+\]
+\[
+q_{\delta,\varepsilon}(n)
+:=
+\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)n\rfloor,\tfrac12)\le \delta n\ \right],
+\]
+\[
+b_{\delta,\xi}(n)
+:=
+\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta n\ \right].
+\]
+For \(1\le r\le w\), define
+\[
+\mathrm{RunTail}_n(w,r)
+\;:=\;
+\frac{1}{\binom{n}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{n-w+1}{s},
+\]
+and define the dense-inner optimization profile
+\begin{equation}
+\label{eq:dense-inner-Bw}
+B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
+\;:=\;
+\min\!\left\{
+(1-\varepsilon)^w + n2^{-m} + q_{\delta,\varepsilon}(n),\ 
+\min_{1\le r\le w}
+\Bigl(
+\mathrm{RunTail}_n(w,r) + (L2^{-m})^r + r\,b_{\delta,\xi}(n)
+\Bigr)
+\right\}.
+\end{equation}
+Suppose the outer code satisfies an outer cutoff
+\[
+\Pr[d_{\min}(\Cone)<w_0]\le \varepsilon_{\mathrm{out}}(n),
+\]
+and admits expected-spectrum envelopes
+\[
+\EE[\enum_{\Cone,w}] \le A_w
+\qquad (w_0\le w\le n).
+\]
+Then the dense outer + dense inner serial concatenation satisfies
+\begin{equation}
+\label{eq:dense-dense-run-aware-objective}
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\varepsilon_{\mathrm{out}}(n)
+\;+\;
+\sum_{w=w_0}^{n}
+A_w\,B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Apply Corollary~\ref{cor:framework-envelope} with the outer envelopes \(A_w\) and the inner envelopes
+\(B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)\).
+The validity of the latter follows from Corollary~\ref{cor:dense-inner-piecewise}, specifically from
+\eqref{eq:dense-inner-best-envelope}, together with the exact run-tail formula \eqref{eq:run-lower-tail-exact}.
+\end{proof}
+
+\paragraph{Why this dominates the earlier split-threshold reduction.}
+The piecewise bound \eqref{eq:dense-dense-piecewise-objective} is still useful for quick asymptotic arguments,
+but \eqref{eq:dense-dense-run-aware-objective} is the tighter quantity for actual optimization:
+it no longer hard-codes a single threshold \(W_\star\),
+and it lets the inner proof choose the best run target \(r\) separately at every weight \(w\).
+This is exactly what we need once the outer spectrum is exponential on linear-weight scales.
+
+\paragraph{Dense outer specialization.}
+For the dense outer, Corollary~\ref{cor:outer-dense-spectrum-piecewise} supplies the exact expected spectrum
+\[
+\EE[\enum_{\Cone,w}] = A_w^{\mathrm{dense}}
+:=
+\sum_{\ell=1}^{k} N_\ell\,
+\binom{r(\ell+M)}{w}\,2^{-r(\ell+M)},
+\]
+with \(N_1=k\) and \(N_\ell=(k-\ell+1)2^{\ell-2}\) for \(\ell\ge 2\).
+Therefore the dense+dense optimization target becomes
+\begin{equation}
+\label{eq:dense-dense-explicit-objective}
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\varepsilon_{\mathrm{out}}(n)
+\;+\;
+\sum_{w=w_0}^{n}
+A_w^{\mathrm{dense}}\,B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
+\end{equation}
+The remaining task is to understand this bound numerically and asymptotically at rate \(1/2\),
+and then to decide what memory sizes \(M\) and \(m\) are required to push the certified \(\delta\)
+toward the Gilbert--Varshamov benchmark.

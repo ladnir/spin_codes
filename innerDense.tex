@@ -216,6 +216,43 @@ For $u\in\{0,1\}^N$, let $R(u)$ denote the number of runs of ones in $u$,
 i.e., the number of maximal contiguous substrings of $1$'s.
 \end{definition}
 
+\begin{lemma}[Exact run-count distribution under the uniform weight-$w$ model]
+\label{lem:run-count-distribution}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$.
+Then for every $s\in\{1,\dots,w\}$,
+\[
+\PP[R(U)=s]
+\;=\;
+\frac{\binom{w-1}{s-1}\binom{N-w+1}{s}}{\binom{N}{w}}.
+\]
+Consequently, for every $r\in\{1,\dots,w\}$,
+\begin{equation}
+\label{eq:run-lower-tail-exact}
+\PP[R(U)<r]
+\;=\;
+\frac{1}{\binom{N}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+A binary word of length $N$ with weight $w$ and exactly $s$ runs of ones is described by two independent choices.
+First choose the $s$ positive run lengths whose sum is $w$, which gives $\binom{w-1}{s-1}$ possibilities.
+Next place the $N-w$ zeros into the $s+1$ zero-gaps around those runs, with the $s-1$ internal gaps required to
+receive at least one zero so that adjacent runs remain distinct.
+After reserving one zero for each internal gap, the remaining $N-w-(s-1)$ zeros are distributed freely over the
+$s+1$ gaps, giving
+\[
+\binom{N-w-(s-1)+s}{s}
+\;=\;
+\binom{N-w+1}{s}
+\]
+choices.
+Dividing by the total number $\binom{N}{w}$ of weight-$w$ words yields the stated probability formula,
+and summing over $s<r$ gives \eqref{eq:run-lower-tail-exact}.
+\end{proof}
+
 \begin{lemma}[Forced-termination contraction]
 \label{lem:dense-forced-termination}
 Fix $\delta\in(0,1/2)$ and choose any $\xi>0$. Let
@@ -335,12 +372,39 @@ b_{\delta,\xi}(N)
 :=
 \PP\!\left[\ \Binomial(L,\tfrac12)\le \delta N\ \right].
 \]
+For $1\le r\le w$, define the exact run lower-tail
+\[
+\mathrm{RunTail}_N(w,r)
+\;:=\;
+\frac{1}{\binom{N}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
 Then for every $w\ge 1$,
 \begin{equation}
 \label{eq:dense-inner-global-envelope}
 p_w(\delta)
 \;\le\;
 (1-\varepsilon)^w + N2^{-m} + q_{\delta,\varepsilon}(N),
+\end{equation}
+and for every $r\in\{1,\dots,w\}$,
+\begin{equation}
+\label{eq:dense-inner-run-envelope}
+p_w(\delta)
+\;\le\;
+\mathrm{RunTail}_N(w,r) + (L2^{-m})^r + r\,b_{\delta,\xi}(N).
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:dense-inner-run-opt-envelope}
+p_w(\delta)
+\;\le\;
+B_w^{\mathrm{run}}(\delta;\xi,m)
+\;:=\;
+\min_{1\le r\le w}
+\left(
+\mathrm{RunTail}_N(w,r) + (L2^{-m})^r + r\,b_{\delta,\xi}(N)
+\right),
 \end{equation}
 and also
 \begin{equation}
@@ -349,41 +413,45 @@ p_w(\delta)
 \;\le\;
 \frac{w(w-1)}{N-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(N).
 \end{equation}
-Consequently, for every threshold $W_\star\in\{1,\dots,N\}$,
+Consequently,
 \begin{equation}
-\label{eq:dense-inner-piecewise-threshold}
+\label{eq:dense-inner-best-envelope}
 p_w(\delta)
 \;\le\;
-\begin{cases}
-\displaystyle \frac{w(w-1)}{N-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(N),
-& 1\le w\le W_\star,\\[1.2ex]
-\displaystyle (1-\varepsilon)^w + N2^{-m} + q_{\delta,\varepsilon}(N),
-& W_\star < w\le N.
-\end{cases}
+\min\!\left\{
+B_w^{\mathrm{run}}(\delta;\xi,m),\ 
+(1-\varepsilon)^w + N2^{-m} + q_{\delta,\varepsilon}(N)
+\right\}.
 \end{equation}
 \end{corollary}
 
 \begin{proof}
 The global bound \eqref{eq:dense-inner-global-envelope} is exactly the first part of
 Theorem~\ref{thm:inner-dense-interface}.
-For the second bound, apply the second part of Theorem~\ref{thm:inner-dense-interface}
-with the choice $r=w$.
+The bound \eqref{eq:dense-inner-run-envelope} is the second part of
+Theorem~\ref{thm:inner-dense-interface}, together with the exact run-tail identity
+\eqref{eq:run-lower-tail-exact}.
+The optimized form \eqref{eq:dense-inner-run-opt-envelope} is immediate by minimizing over $r$.
+For the specialization \eqref{eq:dense-inner-smallw-envelope}, apply
+\eqref{eq:dense-inner-run-envelope} with the choice $r=w$.
 Then use \eqref{eq:runs-adjacent-bound} to bound
 \[
 \PP[R(U)<w]\le \frac{w(w-1)}{N-1},
 \]
 which yields \eqref{eq:dense-inner-smallw-envelope}.
-The thresholded form \eqref{eq:dense-inner-piecewise-threshold} is immediate.
+The best-envelope form \eqref{eq:dense-inner-best-envelope} is then immediate.
 \end{proof}
 
 \paragraph{Why these are the right envelopes to optimize.}
 The bound \eqref{eq:dense-inner-global-envelope} is designed for the linear-weight regime:
 its first term decays exponentially in $w$, its second term exposes the ON$\to$OFF memory penalty $N2^{-m}$,
 and its third term is a pure large-deviation term in $N$.
-The bound \eqref{eq:dense-inner-smallw-envelope} is designed for small/intermediate weights:
-the adjacency correction $w(w-1)/(N-1)$ captures the run-count defect,
-the term $(L2^{-m})^w$ exposes the effect of state size $m$ directly,
-and the residual binomial tail is exponentially small in $N$ for fixed $(\delta,\xi)$.
+The run-aware bound \eqref{eq:dense-inner-run-opt-envelope} is the sharper tool for finite-length optimization:
+it keeps the exact combinatorics of the interleaved run count,
+it turns the OFF mechanism into the genuinely multiplicative term $(L2^{-m})^r$,
+and it can be optimized over $r$ separately for each weight $w$.
+The simpler bound \eqref{eq:dense-inner-smallw-envelope} is a convenient specialization for
+the regime where random interleaving typically creates nearly $w$ runs.
 
 
 
@@ -481,8 +549,9 @@ using the fact that a random interleaver typically spreads $w$ ones into $\appro
 
 \begin{enumerate}
 \item \textbf{Sharper run-count tails for $R(U)<r$ beyond the $r=w$ case.}
-For $w$ up to, say, $N^{2/3}$ it may be useful to take $r=(1-\tau)w$ and prove
-$\PP[R(U)<(1-\tau)w]\le \exp(-\Omega(\tau^2 w))$ under the uniform weight-$w$ model.
+We now have the exact finite-$N$ formula \eqref{eq:run-lower-tail-exact}. The next sharpening is to convert it into a
+clean entropy-style exponent for linear weights, so the integration section can optimize over $r$ analytically rather
+than numerically.
 
 \item \textbf{Explicit constants in the binomial tail.}
 If we want explicit finite-$N$ numerics, replace the entropy bound by an explicit Chernoff/Bennett form

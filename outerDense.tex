@@ -101,6 +101,95 @@ for a constant \(\beta>1\) depending only on \(r\) and \(c/\alpha\).
 If one wants the stronger shape \(\enum_{\Cone,w}\le n\,\beta^w\) for all \(w\ge 1\), one can refine the coefficient extraction
 and avoid folding \(2^M\) into the base. For our distance proof, the trellis form in Lemma~\ref{lem:outer-dense-spectrum} suffices.
 
+\paragraph{For optimization, the span decomposition is sharper than the trellis bound.}
+The trellis lemma is convenient for a one-line interface proof, but it is too coarse for quantitative optimization.
+Because the taps are independent across \((t,j)\), a fixed input of span \(\ell\) has an exact binomial output-weight law.
+This yields a much sharper expected-spectrum envelope for the dense outer, which is the form we will use in the
+end-to-end dense+dense optimization.
+
+\begin{lemma}[Exact expected dense-outer spectrum via span decomposition]
+\label{lem:outer-dense-spectrum-span}
+Let the outer code be drawn from the dense log-memory ensemble above, and let the expectation below be over the tap
+randomness. For each output weight \(h\in\{1,\dots,n\}\),
+\begin{equation}
+\label{eq:outer-dense-span-spectrum}
+\EE[\enum_{\Cone,h}]
+\;=\;
+\sum_{\ell=1}^{k} N_\ell\,
+\Pr\!\Big[\Binomial\big(r(\ell+M),\tfrac12\big)=h\Big],
+\end{equation}
+where
+\[
+N_1:=k,
+\qquad
+N_\ell := (k-\ell+1)2^{\ell-2}\quad (\ell\ge 2)
+\]
+is the number of nonzero inputs of span exactly \(\ell\).
+Equivalently,
+\[
+\EE[\enum_{\Cone,h}]
+\;=\;
+\sum_{\ell=1}^{k} N_\ell\,
+\binom{r(\ell+M)}{h}\,2^{-r(\ell+M)},
+\]
+with the convention that \(\binom{r(\ell+M)}{h}=0\) if \(h>r(\ell+M)\).
+\end{lemma}
+
+\begin{proof}
+For each nonzero input \(x\in\F_2^k\), let \(I_x\) be the indicator of the event that the corresponding outer output has
+weight \(h\). Then
+\[
+\enum_{\Cone,h}=\sum_{x\neq 0} I_x,
+\qquad
+\EE[\enum_{\Cone,h}] = \sum_{x\neq 0}\Pr[\wt(\Enc_{\Cone}(x))=h].
+\]
+Group the inputs by their span \(\ell\).
+There are exactly \(N_1=k\) inputs of span \(1\), and for \(\ell\ge 2\) there are
+\((k-\ell+1)2^{\ell-2}\) inputs of span \(\ell\): choose the start position and the \(\ell-2\) interior bits freely, while
+the endpoints are forced to be \(1\).
+By Lemma~\ref{lem:outer-span-binomial}, any input of span \(\ell\) has output weight distributed as
+\(\Binomial(r(\ell+M),1/2)\).
+Summing these exact probabilities over all span classes yields \eqref{eq:outer-dense-span-spectrum}.
+\end{proof}
+
+\begin{corollary}[Optimization-ready outer profile]
+\label{cor:outer-dense-spectrum-piecewise}
+Define
+\begin{equation}
+\label{eq:outer-dense-Ah}
+A_h^{\mathrm{dense}}
+\;:=\;
+\sum_{\ell=1}^{k} N_\ell\,
+\binom{r(\ell+M)}{h}\,2^{-r(\ell+M)}
+\qquad (1\le h\le n).
+\end{equation}
+Then
+\[
+\EE[\enum_{\Cone,h}] = A_h^{\mathrm{dense}}
+\qquad\text{for all }h\in\{1,\dots,n\}.
+\]
+More generally, for any interval \(I\subseteq\{1,\dots,n\}\),
+\[
+\sum_{h\in I}\EE[\enum_{\Cone,h}]
+\;=\;
+\sum_{\ell=1}^{k} N_\ell\,
+\Pr\!\Big[\Binomial\big(r(\ell+M),\tfrac12\big)\in I\Big].
+\]
+\end{corollary}
+
+\paragraph{Linear-weight exponent viewpoint.}
+For \(h=\omega n\) and \(\ell=\lambda n\), each summand in \eqref{eq:outer-dense-Ah} is governed by the exponent
+\[
+\lambda - r\lambda\Bigl(1-H_2\!\Bigl(\frac{\omega}{r\lambda}\Bigr)\Bigr),
+\]
+up to lower-order terms, whenever \(0<\omega<r\lambda\).
+At rate \(1/2\) (so \(r=2\)), this becomes
+\[
+\lambda\Bigl(2H_2\!\Bigl(\frac{\omega}{2\lambda}\Bigr)-1\Bigr).
+\]
+Thus the dense-outer optimization problem reduces to understanding which span fractions \(\lambda\) dominate a given
+target output weight fraction \(\omega\).
+
 \subsection{Logarithmic minimum distance (O1) via span grouping}
 \label{sec:outer-dense-distance}
 
