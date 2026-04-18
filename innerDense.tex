@@ -253,6 +253,105 @@ Dividing by the total number $\binom{N}{w}$ of weight-$w$ words yields the state
 and summing over $s<r$ gives \eqref{eq:run-lower-tail-exact}.
 \end{proof}
 
+\begin{lemma}[Entropy bound for the run lower tail]
+\label{lem:run-lower-tail-entropy}
+Fix constants \(0<\omega<1\) and \(0<\rho<\min(\omega,1-\omega)\), and let
+\[
+w=\lfloor \omega N\rfloor,
+\qquad
+r=\lfloor \rho N\rfloor.
+\]
+Assume \(\rho<\omega(1-\omega)\). Then
+\begin{equation}
+\label{eq:run-lower-tail-entropy}
+\PP[R(U)<r]
+\;\le\;
+N^{O(1)}\,2^{-N\Psi_{\mathrm{run}}(\omega,\rho)},
+\end{equation}
+where
+\begin{equation}
+\label{eq:run-rate-function}
+\Psi_{\mathrm{run}}(\omega,\rho)
+\;:=\;
+H_2(\omega)
+- \omega H_2\!\Bigl(\frac{\rho}{\omega}\Bigr)
+- (1-\omega)H_2\!\Bigl(\frac{\rho}{1-\omega}\Bigr).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+By \eqref{eq:run-lower-tail-exact},
+\[
+\PP[R(U)<r]
+\;=\;
+\frac{1}{\binom{N}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
+For \(s=\lfloor \sigma N\rfloor\) with \(0<\sigma<\rho\), Stirling's formula gives
+\[
+\log_2 \binom{w-1}{s-1}
+=
+\omega N\,H_2\!\Bigl(\frac{\sigma}{\omega}\Bigr) + O(\log N),
+\]
+\[
+\log_2 \binom{N-w+1}{s}
+=
+(1-\omega)N\,H_2\!\Bigl(\frac{\sigma}{1-\omega}\Bigr) + O(\log N),
+\]
+and
+\[
+\log_2 \binom{N}{w}
+=
+N H_2(\omega) + O(\log N).
+\]
+Thus each summand has the form
+\[
+N^{O(1)}\,2^{-N\Psi_{\mathrm{run}}(\omega,\sigma)}.
+\]
+Moreover,
+\[
+\frac{\partial}{\partial \sigma}\Psi_{\mathrm{run}}(\omega,\sigma)
+=
+\log_2\!\left(\frac{(\omega-\sigma)(1-\omega-\sigma)}{\sigma^2}\right),
+\]
+which is positive throughout the lower-tail regime \(\sigma<\omega(1-\omega)\).
+Hence \(\Psi_{\mathrm{run}}(\omega,\sigma)\) is increasing on \((0,\rho)\), so the largest summand occurs at the boundary
+\(\sigma\approx \rho\).
+Since the sum contains at most \(N\) terms, \eqref{eq:run-lower-tail-entropy} follows.
+\end{proof}
+
+\begin{corollary}[Run lower-tail exponent with \(r\) proportional to \(w\)]
+\label{cor:run-lower-tail-alpha}
+Fix constants \(0<\omega<1\) and \(0<\alpha<1-\omega\), and let
+\[
+w=\lfloor \omega N\rfloor,
+\qquad
+r=\lfloor \alpha w\rfloor.
+\]
+Then
+\begin{equation}
+\label{eq:run-lower-tail-alpha}
+\PP[R(U)<r]
+\;\le\;
+N^{O(1)}\,2^{-N\Psi_{\mathrm{run}}^{(w)}(\omega,\alpha)},
+\end{equation}
+where
+\begin{equation}
+\label{eq:run-rate-function-alpha}
+\Psi_{\mathrm{run}}^{(w)}(\omega,\alpha)
+\;:=\;
+H_2(\omega)
+- \omega H_2(\alpha)
+- (1-\omega)H_2\!\Bigl(\frac{\alpha\omega}{1-\omega}\Bigr).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:run-lower-tail-entropy} with \(\rho=\alpha\omega\).
+The condition \(\alpha<1-\omega\) is exactly \(\rho<\omega(1-\omega)\).
+\end{proof}
+
 \begin{lemma}[Forced-termination contraction]
 \label{lem:dense-forced-termination}
 Fix $\delta\in(0,1/2)$ and choose any $\xi>0$. Let

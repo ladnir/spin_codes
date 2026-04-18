@@ -246,3 +246,32 @@ A_w^{\mathrm{dense}}\,B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
 The remaining task is to understand this bound numerically and asymptotically at rate \(1/2\),
 and then to decide what memory sizes \(M\) and \(m\) are required to push the certified \(\delta\)
 toward the Gilbert--Varshamov benchmark.
+
+\paragraph{Rate-\(\tfrac12\) exponent picture.}
+The new inner and outer profiles now give a concrete asymptotic optimization problem.
+For linear weights \(w=\omega n\), Proposition~\ref{prop:outer-dense-rate-half-exponent} shows that the dense outer
+contributes roughly
+\[
+A_w^{\mathrm{dense}}
+\;\lesssim\;
+2^{n\Phi_{1/2}(\omega)},
+\]
+while Corollary~\ref{cor:run-lower-tail-alpha} shows that choosing \(r=\lfloor \alpha w\rfloor\) contributes the
+run-deficit exponent
+\[
+\Psi_{\mathrm{run}}^{(w)}(\omega,\alpha)
+=
+H_2(\omega)
+- \omega H_2(\alpha)
+- (1-\omega)H_2\!\Bigl(\frac{\alpha\omega}{1-\omega}\Bigr)
+\]
+for every \(0<\alpha<1-\omega\).
+Thus, in the linear-weight regime, the dense+dense problem reduces to making the inner exponent dominate
+\(\Phi_{1/2}(\omega)\) uniformly over the relevant \(\omega\)-range.
+
+\paragraph{Why this is the right next benchmark.}
+Near the rate-\(\tfrac12\) GV target, \(\omega\approx 0.11\), the dense outer lies on its linear branch
+\(\Phi_{1/2}(\omega)=\eta_2\omega\) with \(\eta_2\approx 1.2716\).
+So if the dense inner cannot beat that growth profile after optimizing over \(\alpha\), \(\varepsilon\), \(\xi\), and the
+state size \(m\), then the sparse flagship constructions will be under real pressure as well.
+This is exactly why the dense+dense pairing is the correct first quantitative stress test.

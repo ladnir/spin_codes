@@ -190,6 +190,110 @@ At rate \(1/2\) (so \(r=2\)), this becomes
 Thus the dense-outer optimization problem reduces to understanding which span fractions \(\lambda\) dominate a given
 target output weight fraction \(\omega\).
 
+\begin{theorem}[Rate-\(\tfrac12\) dense-outer exponent]
+\label{prop:outer-dense-rate-half-exponent}
+Assume the outer rate is \(R_o=\tfrac12\), so \(r=2\) and \(k=n/2+O(1)\), and take
+\[
+M=O(\log n).
+\]
+For a fixed weight fraction \(\omega\in(0,\tfrac12)\), let \(h=\lfloor \omega n\rfloor\).
+Then
+\begin{equation}
+\label{eq:outer-dense-rate-half-exponent}
+A_h^{\mathrm{dense}}
+\;\le\;
+n^{O(1)}\,2^{n\Phi_{1/2}(\omega)},
+\end{equation}
+where
+\begin{equation}
+\label{eq:phi-rate-half}
+\Phi_{1/2}(\omega)
+\;:=\;
+\sup_{\lambda\in[\omega/2,\;1/2]}
+\lambda\Bigl(2H_2\!\Bigl(\frac{\omega}{2\lambda}\Bigr)-1\Bigr)
+\;=\;
+\omega\sup_{p\in[\omega,\;1]}\frac{H_2(p)-1/2}{p}.
+\end{equation}
+Moreover, if
+\begin{equation}
+\label{eq:pstar-def}
+p_\star := 1-2^{-1/2},
+\end{equation}
+then for every \(\omega\le p_\star\),
+\begin{equation}
+\label{eq:phi-rate-half-linear}
+\Phi_{1/2}(\omega)=\eta_2\,\omega,
+\qquad
+\eta_2
+:=
+\frac{H_2(p_\star)-1/2}{p_\star},
+\end{equation}
+and the maximizing span fraction is
+\begin{equation}
+\label{eq:lambda-star-rate-half}
+\lambda_\star(\omega)
+\;=\;
+\frac{\omega}{2p_\star}
+\;=\;
+\Bigl(1+\frac{\sqrt2}{2}\Bigr)\omega.
+\end{equation}
+For \(\omega\ge p_\star\), the maximizer is the boundary value \(\lambda_\star=1/2\), giving
+\[
+\Phi_{1/2}(\omega)=H_2(\omega)-1/2.
+\]
+\end{theorem}
+
+\begin{proof}
+Starting from \eqref{eq:outer-dense-Ah}, write \(\ell=\lfloor \lambda n\rfloor\).
+For \(\ell\ge 2\), the multiplicity term satisfies
+\[
+N_\ell=(k-\ell+1)2^{\ell-2}=n^{O(1)}2^{\lambda n},
+\]
+uniformly for \(\lambda\in(0,1/2]\).
+Since \(M=O(\log n)=o(n)\), Stirling's formula gives
+\[
+\binom{2(\ell+M)}{h}\,2^{-2(\ell+M)}
+\;=\;
+n^{O(1)}\,2^{\,2\lambda n\left(H_2(\omega/(2\lambda))-1\right)}
+\]
+uniformly whenever \(\omega<2\lambda\).
+Hence each span class contributes at most
+\[
+n^{O(1)}\,2^{\,n\lambda\left(2H_2(\omega/(2\lambda))-1\right)}.
+\]
+Summing over the \(O(n)\) possible spans yields \eqref{eq:outer-dense-rate-half-exponent}.
+
+For the second identity in \eqref{eq:phi-rate-half}, substitute
+\[
+p=\frac{\omega}{2\lambda},
+\qquad
+\lambda=\frac{\omega}{2p}.
+\]
+The objective becomes \(\omega(H_2(p)-1/2)/p\).
+Differentiating,
+\[
+\frac{d}{dp}\left(\frac{H_2(p)-1/2}{p}\right)
+\;=\;
+\frac{\log_2(1-p)+1/2}{p^2},
+\]
+so the unique interior maximizer is \(p_\star\) from \eqref{eq:pstar-def}.
+When \(\omega\le p_\star\), this point is feasible and yields
+\eqref{eq:phi-rate-half-linear} and \eqref{eq:lambda-star-rate-half}.
+When \(\omega>p_\star\), the feasible interval is \(p\in[\omega,1]\), so the maximizer is the boundary point \(p=\omega\),
+equivalently \(\lambda=1/2\), which gives \(\Phi_{1/2}(\omega)=H_2(\omega)-1/2\).
+\end{proof}
+
+\paragraph{Interpretation at GV-relevant weights.}
+At rate \(1/2\), the binary Gilbert--Varshamov benchmark is near \(\omega\approx 0.11\), which lies well below
+\(p_\star\approx 0.2929\).
+Thus the GV-relevant branch of the dense outer is the linear one:
+\[
+\Phi_{1/2}(\omega)=\eta_2\,\omega
+\qquad
+(\eta_2\approx 1.2716),
+\]
+and the dominant contributing outer inputs have span about \(1.707\,\omega n\).
+
 \subsection{Logarithmic minimum distance (O1) via span grouping}
 \label{sec:outer-dense-distance}
 
