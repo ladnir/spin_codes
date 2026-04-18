@@ -1,5 +1,7 @@
 \section{A Modular Serial Concatenation Framework}
 \label{sec:sc-framework}
+\label{sec:framework}
+\label{sec:sccc-framework}
 
 % Uses notation/macros from the current Section 3:
 % \Cone,\Ctwo,\Gone,\Gtwo,\enum.
@@ -23,10 +25,14 @@ We follow the standard convention: \(\Cone\) is the outer code and \(\Ctwo\) is 
 
 \paragraph{Goal of this section.}
 This section factors the minimum-distance analysis into:
-(i) an outer interface (logarithmic distance + spectral growth), and
-(ii) an inner interface (a contraction bound for small output weight on a random interleaved input).
-Once these interfaces are established, the linear-distance conclusion follows by a one-page \stan{check it is one page} first-moment argument.
-All later instantiations (different outers and different inners) plug into this same framework.
+(i) an exact first-moment reduction, and
+(ii) reusable outer/inner interfaces that upper-bound the two quantities appearing in that reduction.
+The exact theorem communicates only through the outer spectrum \(\enum_{\Cone,w}\) and the inner slice-to-tail probabilities
+\(p_w(\delta)\).
+For some constructions, a single coarse envelope suffices; for others, we will use sharper weight-dependent envelopes on
+different weight ranges.
+The point is that the \emph{core theorem stays simple}, while the later instantiations are free to plug in whatever
+collection of bounds gives the best certified distance.
 
 % ============================================================
 \subsection{Outer interface: distance and spectrum}
@@ -39,10 +45,9 @@ For each weight \(w\in\{0,1,\dots,n\}\), define the (expected) outer weight spec
 \]
 where the expectation is over the randomness of \(\Cone\) (and is omitted if \(\Cone\) is deterministic).
 
-We will use the following two outer properties throughout the paper.
-
-
-
+The exact framework theorem below only uses the numbers \(\enum_{\Cone,w}\).
+In later sections we may upper-bound them by different expressions on different weight ranges.
+As a convenient coarse package, we record the following single-envelope interface.
 
 \begin{assumption}[Outer interface]
 \label{ass:outer-interface}
@@ -61,6 +66,8 @@ such that for all sufficiently large \(n\):
 \noindent
 Later sections instantiate \(\Cone\) by two different families:
 a log-memory dense terminated convolutional outer, and a sparse-memory (local-expander / banded LDPC) outer.
+When we want tighter end-to-end constants, we will work directly with more refined envelopes for \(\enum_{\Cone,w}\)
+rather than insist on one global \(n^c\beta^w\) bound.
 
 % ============================================================
 \subsection{Inner interface: contraction under a random interleaver}
@@ -88,11 +95,14 @@ p_w(\delta)
 \;:=\;
 \Pr\bigl[\wt(\Ctwo(U))\le \delta n\ \big|\ \wt(U)=w\bigr].
 \end{equation}
-If \(\Ctwo\) itself is drawn from a random inner ensemble (e.g. dense time-varying recursion \ref{...}, sparse recursion with refresh \ref{...}),
+If \(\Ctwo\) itself is drawn from a random inner ensemble
+(e.g. the dense time-varying recursion of Section~\ref{sec:inner-dense},
+or the sparse recursion with refresh of Section~\ref{sec:sparse-refresh-inner}),
 then the probability above is taken over both the inner randomness and \(U\).
 (Equivalently, one may interpret \(p_w(\delta)\) as the average slice-to-tail probability under the inner ensemble.)
-
-\stan{in 3.1 we say how C1 is instantiated (we give the 2 options). We should say here how C2 is?}
+For example, later sections analyze the accumulator inner (Section~\ref{sec:inner-accumulator}),
+the dense time-varying recursive inner (Section~\ref{sec:inner-dense}),
+and the sparse recursive inner with periodic refresh (Section~\ref{sec:sparse-refresh-inner}).
 
 \paragraph{Optional: an inner input--output enumerator viewpoint.}
 When \(\Ctwo\) is deterministic and linear, one can also define the (slice) enumerator
@@ -131,6 +141,8 @@ n^{a}\,\rho^{\,w}.
 This is the formal version of the ``interleaver gain'' / small-output contraction phenomenon:
 a random interleaved weight-\(w\) input produces an output below \(\delta n\) with probability exponentially small in \(w\),
 up to a polynomial prefactor.
+Again, this is only a coarse package: the exact theorem below can equally well consume any sharper weight-dependent upper
+envelope \(p_w(\delta)\le B_w(\delta)\).
 
 % ============================================================
 \subsection{The SC framework theorem (first-moment reduction)}
@@ -186,18 +198,97 @@ Equation \eqref{eq:first-moment-master} is a first-moment bound over codewords o
 organized by the outer spectrum \(\enum_{\Cone,w}\). This is the mechanism that prevents an explicit union bound over
 \(2^k\) messages in later minimum-distance arguments.
 
-============================================================
-\subsection{A convenient corollary under the outer/inner interfaces}
+\subsection{Flexible corollaries for later instantiations}
 \label{sec:framework-corollary}
 
-\begin{corollary}[Linear distance from outer spectrum + inner contraction]
+\begin{corollary}[Envelope corollary]
+\label{cor:framework-envelope}
+Fix \(\delta\in(0,1)\), and let \(w_0=w_0(n)\in\{1,\dots,n\}\).
+Assume the outer-code ensemble, the interleaver, and the inner-code ensemble are mutually independent.
+Suppose:
+\begin{enumerate}
+\item \textbf{Outer cutoff:} \(\Pr[d_{\min}(\Cone)< w_0]\le \varepsilon_{\mathrm{out}}(n)\).
+\item \textbf{Outer envelope:} for every \(w\in\{w_0,\dots,n\}\),
+\[
+\EE[\enum_{\Cone,w}] \;\le\; A_w.
+\]
+\item \textbf{Inner envelope:} for every \(w\in\{w_0,\dots,n\}\),
+\[
+p_w(\delta)\;\le\; B_w.
+\]
+\end{enumerate}
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\varepsilon_{\mathrm{out}}(n)\;+\;\sum_{w=w_0}^{n} A_w\,B_w.
+\]
+\end{corollary}
+
+\begin{proof}
+Let \(\mathcal{G}_{\mathrm{out}}\) be the event \(d_{\min}(\Cone)\ge w_0\).
+Split according to \(\mathcal{G}_{\mathrm{out}}\):
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\Pr[\mathcal{G}_{\mathrm{out}}^{c}]
+\;+\;
+\Pr[d_{\min}(\Csc)\le \delta n \,\wedge\, \mathcal{G}_{\mathrm{out}}].
+\]
+Condition on the realization of \(\Cone\) on the event \(\mathcal{G}_{\mathrm{out}}\).
+Since \(d_{\min}(\Cone)\ge w_0\), Theorem~\ref{thm:sc-framework} gives
+\[
+\Pr[d_{\min}(\Csc)\le \delta n \mid \Cone,\mathcal{G}_{\mathrm{out}}]
+\;\le\;
+\sum_{w=w_0}^{n}\enum_{\Cone,w}\,p_w(\delta).
+\]
+Take expectation over \(\Cone\) and use the assumed envelopes:
+\[
+\Pr[d_{\min}(\Csc)\le \delta n \,\wedge\, \mathcal{G}_{\mathrm{out}}]
+\;\le\;
+\sum_{w=w_0}^{n}\EE[\enum_{\Cone,w}]\,B_w
+\;\le\;
+\sum_{w=w_0}^{n}A_w\,B_w.
+\]
+Adding \(\Pr[\mathcal{G}_{\mathrm{out}}^{c}]\le \varepsilon_{\mathrm{out}}(n)\) proves the claim.
+\end{proof}
+
+\begin{corollary}[Piecewise evaluation of the framework sum]
+\label{cor:framework-piecewise}
+Under the hypotheses of Corollary~\ref{cor:framework-envelope}, let
+\[
+\{w_0,\dots,n\} \;=\; I_1 \sqcup I_2 \sqcup \cdots \sqcup I_J
+\]
+be any partition into weight ranges.
+Suppose that for each \(j\in[J]\), and each \(w\in I_j\), we have
+\[
+\EE[\enum_{\Cone,w}] \;\le\; A^{(j)}_w,
+\qquad
+p_w(\delta)\;\le\; B^{(j)}_w.
+\]
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\varepsilon_{\mathrm{out}}(n)
+\;+\;
+\sum_{j=1}^{J}\ \sum_{w\in I_j} A^{(j)}_w\,B^{(j)}_w.
+\]
+\end{corollary}
+
+\noindent
+This corollary is only bookkeeping, but it captures the intended use later in the paper:
+the framework theorem itself does \emph{not} need to know about ``low/intermediate/linear'' weight regimes;
+those regimes enter only through whichever outer and inner envelopes are most effective on the corresponding ranges.
+
+\begin{corollary}[Single-envelope specialization]
 \label{cor:linear-dist-from-interfaces}
 Assume the outer interface (Assumption~\ref{ass:outer-interface}) and the inner interface
 (Assumption~\ref{ass:inner-interface}) hold with parameters \((\alpha,c,\beta)\) and \((a,\rho)\), respectively.
 If \(\beta\rho<1\) and
 \begin{equation}
 \label{eq:poly-beating-condition}
-\alpha\cdot \log\Big(\frac{1}{\beta\rho}\Big) \;>\; a+c+2,
+\alpha\cdot \log\Big(\frac{1}{\beta\rho}\Big) \;>\; a+c,
 \end{equation}
 then
 \[
@@ -208,39 +299,43 @@ In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability (over the inte
 \end{corollary}
 
 \begin{proof}
-By Theorem~\ref{thm:sc-framework},
+Apply Corollary~\ref{cor:framework-envelope} with
 \[
-\EE[X_\delta]
-\;=\;
-\sum_{w\ge d_{\min}(\Cone)} \enum_{\Cone,w}\cdot p_w(\delta).
+w_0:=\lceil \alpha\log n\rceil,
+\qquad
+\varepsilon_{\mathrm{out}}(n):=\Pr[d_{\min}(\Cone)<\alpha\log n]=o(1),
 \]
-Using Assumption~\ref{ass:outer-interface} (spectrum bound) and Assumption~\ref{ass:inner-interface}
-(which applies for all \(w\ge d_{\min}(\Cone)\)),
+and envelopes
 \[
-\EE[X_\delta]
+A_w:=n^c\beta^w,
+\qquad
+B_w:=n^a\rho^w.
+\]
+This gives
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
 \;\le\;
-\sum_{w\ge d_{\min}(\Cone)} (n^c\beta^w)\cdot(n^a\rho^w)
-\;=\;
-n^{a+c}\sum_{w\ge d_{\min}(\Cone)} (\beta\rho)^w.
+o(1)\;+\;n^{a+c}\sum_{w=w_0}^{n} (\beta\rho)^w.
 \]
 Since \(\beta\rho<1\), the geometric series is bounded by
 \[
-\sum_{w\ge d_{\min}(\Cone)}(\beta\rho)^w
+\sum_{w=w_0}^{n}(\beta\rho)^w
 \;\le\;
-\frac{(\beta\rho)^{d_{\min}(\Cone)}}{1-\beta\rho}
+\frac{(\beta\rho)^{w_0}}{1-\beta\rho}
 \;\le\;
 O(1)\cdot (\beta\rho)^{\alpha\log n}
 \;=\;
 O(1)\cdot n^{-\alpha\log(1/(\beta\rho))},
 \]
-using \(d_{\min}(\Cone)\ge \alpha\log n\).
+using \(w_0\ge \alpha\log n\).
 Thus
 \[
-\EE[X_\delta]
+\Pr[d_{\min}(\Csc)\le \delta n]
 \;\le\;
 O(1)\cdot n^{a+c-\alpha\log(1/(\beta\rho))},
 \]
-which is \(o(1)\) exactly under \eqref{eq:poly-beating-condition}. The claim follows by Markov. \(\square\)
+plus an additional \(o(1)\) term from the outer cutoff event.
+This tends to \(0\) exactly under \eqref{eq:poly-beating-condition}.
 \end{proof}
 
 
@@ -252,9 +347,12 @@ which is \(o(1)\) exactly under \eqref{eq:poly-beating-condition}. The claim fol
 From this point on, the paper decomposes into independent tasks:
 \begin{itemize}
 \item \textbf{Outer instantiation(s):} construct outer ensembles satisfying Assumption~\ref{ass:outer-interface}
-(logarithmic distance and spectral growth), either with log memory (dense) or sparse memory (LDPC/local-expander).
-\item \textbf{Inner instantiation(s):} prove contraction bounds of the form \eqref{eq:inner-contraction-template}
-for each candidate inner (accumulator; dense time-varying recursion; sparse recursion with periodic refresh).
+(logarithmic distance and spectral growth), or more sharply, produce explicit envelopes for \(\EE[\enum_{\Cone,w}]\)
+on the weight ranges of interest.
+\item \textbf{Inner instantiation(s):} prove bounds of the form \eqref{eq:inner-interface-pw}, or more sharply,
+weight-dependent upper envelopes for \(p_w(\delta)\), for each candidate inner
+(accumulator; dense time-varying recursion; sparse recursion with periodic refresh).
 \end{itemize}
 Each combination of a valid outer and a valid inner yields a linear-distance SC ensemble via
-Corollary~\ref{cor:linear-dist-from-interfaces}.
+Corollary~\ref{cor:framework-envelope}; the single-envelope criterion in
+Corollary~\ref{cor:linear-dist-from-interfaces} is just the simplest special case.
