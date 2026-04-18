@@ -1,0 +1,75 @@
+\section{End-to-End Integrations}
+\label{sec:integrations}
+
+This section starts the end-to-end synthesis stage of the paper.
+The goal is to show how the abstract framework of Section~\ref{sec:sc-framework}
+is actually consumed by concrete outer/inner pairs.
+We begin with the dense outer + dense inner pairing because it is the cleanest full
+validation of the framework, even though it is not the eventual linear-time flagship.
+
+\subsection{Validation pair: dense outer + dense inner}
+\label{sec:integration-dense-dense}
+
+Take as outer code the dense log-memory construction of Section~\ref{sec:outer-dense-logmem},
+with memory
+\[
+M=\lceil c_{\mathrm{out}}\log_2 n\rceil,
+\]
+and as inner code the dense time-varying recursive construction of Section~\ref{sec:inner-dense},
+with memory
+\[
+m=\lceil \gamma \log_2 n\rceil.
+\]
+The resulting serial concatenation has one random interleaver and \(O(\log n)\) taps per symbol
+in both the outer and inner encoders, hence \(O(n\log n)\) total encoding work.
+
+\begin{theorem}[Dense outer + dense inner]
+\label{thm:dense-dense-integration}
+Fix \(\delta\in(0,1/2)\) and choose \(\varepsilon\in(0,1)\).
+Assume the dense-inner tail bound of Section~\ref{sec:inner-dense} holds at \((\delta,\varepsilon)\), and let
+\[
+\rho:=1-\varepsilon.
+\]
+Let \(\alpha>0\), \(c\ge 0\), and \(\beta>1\) be the constants supplied by the dense-outer interface
+(Section~\ref{sec:outer-dense-logmem}), and let \(a\ge 0\) be the constant supplied by the dense-inner interface
+(Corollary~\ref{cor:dense-inner-implies-interface}).
+
+If
+\begin{equation}
+\label{eq:dense-dense-compatibility}
+\beta\rho<1
+\qquad\text{and}\qquad
+\alpha\log\Big(\frac{1}{\beta\rho}\Big) > a+c,
+\end{equation}
+then the dense outer + dense inner serial concatenation \(\Csc=\Ctwo\circ \Pi \circ \Cone\) satisfies
+\[
+\Pr\bigl[d_{\min}(\Csc)\le \delta n\bigr]=o(1).
+\]
+In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability over the outer randomness,
+the interleaver, and the inner randomness.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:outer-dense-logdistance} and Lemma~\ref{lem:outer-dense-spectrum},
+the dense outer satisfies Assumption~\ref{ass:outer-interface} for some constants
+\(\alpha>0\), \(c\ge 0\), and \(\beta>1\).
+By Corollary~\ref{cor:dense-inner-implies-interface}, the dense inner satisfies
+Assumption~\ref{ass:inner-interface} with parameters \((a,\rho)\), where \(\rho=1-\varepsilon\).
+Therefore Corollary~\ref{cor:linear-dist-from-interfaces} applies directly, and the conclusion follows
+under the compatibility condition \eqref{eq:dense-dense-compatibility}.
+\end{proof}
+
+\paragraph{What this theorem is for.}
+The dense+dense pairing is not meant to be the final flagship construction.
+Its role is to validate that the framework can carry a complete minimum-distance proof from explicit outer and inner
+ingredients all the way to an end-to-end linear-distance theorem.
+It also isolates the key quantitative bottleneck:
+for any proposed target distance \(\delta\), we must certify constants on the outer side
+\((\alpha,c,\beta)\) and on the inner side \((a,\rho)\) that make
+\(\alpha\log(1/(\beta\rho))\) dominate the polynomial loss.
+
+\paragraph{Next synthesis step.}
+The next integration target is to sharpen this theorem using the piecewise framework corollary
+(Corollary~\ref{cor:framework-piecewise}) rather than the single-envelope specialization.
+That will let us use the strongest dense-inner bound in each weight range and will serve as the template for the
+eventual sparse outer + sparse inner flagship construction.
