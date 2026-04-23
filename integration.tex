@@ -1,13 +1,13 @@
 \section{End-to-End Integrations}
 \label{sec:integrations}
 
-This section starts the end-to-end synthesis stage of the paper.
-The goal is to show how the abstract framework of Section~\ref{sec:sc-framework}
-is actually consumed by concrete outer/inner pairs.
-We begin with the dense outer + dense inner pairing because it is the cleanest full
-validation of the framework, even though it is not the eventual linear-time flagship.
+This section now focuses only on the dense validation pair.
+The goal is not to route the argument through the most abstract framework interface,
+but to write down the dense+dense first-moment bound directly and then plug in the
+analytic outer and inner estimates proved in Sections~\ref{sec:outer-dense-logmem}
+and~\ref{sec:inner-dense}.
 
-\subsection{Validation pair: dense outer + dense inner}
+\subsection{Direct dense+dense first-moment bound}
 \label{sec:integration-dense-dense}
 
 Take as outer code the dense log-memory construction of Section~\ref{sec:outer-dense-logmem},
@@ -23,255 +23,374 @@ m=\lceil \gamma \log_2 n\rceil.
 The resulting serial concatenation has one random interleaver and \(O(\log n)\) taps per symbol
 in both the outer and inner encoders, hence \(O(n\log n)\) total encoding work.
 
-\begin{theorem}[Dense outer + dense inner]
-\label{thm:dense-dense-integration}
-Fix \(\delta\in(0,1/2)\) and choose \(\varepsilon\in(0,1)\).
-Assume the dense-inner tail bound of Section~\ref{sec:inner-dense} holds at \((\delta,\varepsilon)\), and let
+\begin{theorem}[Direct dense+dense first-moment reduction]
+\label{thm:dense-dense-direct-first-moment}
+Fix \(\delta\in(0,1/2)\).
+Let \(w_0=w_0(n)\in\{1,\dots,n\}\), and assume:
+\begin{enumerate}
+\item the outer code satisfies the cutoff event
 \[
-\rho:=1-\varepsilon.
+\Pr[d_{\min}(\Cone)<w_0]\le \varepsilon_{\mathrm{out}}(n);
 \]
-Let \(\alpha>0\), \(c\ge 0\), and \(\beta>1\) be the constants supplied by the dense-outer interface
-(Section~\ref{sec:outer-dense-logmem}), and let \(a\ge 0\) be the constant supplied by the dense-inner interface
-(Corollary~\ref{cor:dense-inner-implies-interface}).
-
-If
+\item for every \(h\in\{w_0,\dots,n\}\),
+\[
+\EE[\enum_{\Cone,h}] \le A_h;
+\]
+\item for every \(h\in\{w_0,\dots,n\}\), if \(U\) is uniform on the Hamming slice
+\(\{u\in\{0,1\}^n:\wt(u)=h\}\), then
+\[
+p_h(\delta)
+:=
+\Pr[\wt(\Enc_{\mathrm{in}}(U))\le \delta n\mid \wt(U)=h]
+\le B_h.
+\]
+\end{enumerate}
+Then the dense serial concatenation \(\Csc=\Ctwo\circ \Pi \circ \Cone\) satisfies
 \begin{equation}
-\label{eq:dense-dense-compatibility}
-\beta\rho<1
-\qquad\text{and}\qquad
-\alpha\log\Big(\frac{1}{\beta\rho}\Big) > a+c,
-\end{equation}
-then the dense outer + dense inner serial concatenation \(\Csc=\Ctwo\circ \Pi \circ \Cone\) satisfies
-\[
-\Pr\bigl[d_{\min}(\Csc)\le \delta n\bigr]=o(1).
-\]
-In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability over the outer randomness,
-the interleaver, and the inner randomness.
-\end{theorem}
-
-\begin{proof}
-By Theorem~\ref{thm:outer-dense-logdistance} and Lemma~\ref{lem:outer-dense-spectrum},
-the dense outer satisfies Assumption~\ref{ass:outer-interface} for some constants
-\(\alpha>0\), \(c\ge 0\), and \(\beta>1\).
-By Corollary~\ref{cor:dense-inner-implies-interface}, the dense inner satisfies
-Assumption~\ref{ass:inner-interface} with parameters \((a,\rho)\), where \(\rho=1-\varepsilon\).
-Therefore Corollary~\ref{cor:linear-dist-from-interfaces} applies directly, and the conclusion follows
-under the compatibility condition \eqref{eq:dense-dense-compatibility}.
-\end{proof}
-
-\paragraph{What this theorem is for.}
-The dense+dense pairing is not meant to be the final flagship construction.
-Its role is to validate that the framework can carry a complete minimum-distance proof from explicit outer and inner
-ingredients all the way to an end-to-end linear-distance theorem.
-It also isolates the key quantitative bottleneck:
-for any proposed target distance \(\delta\), we must certify constants on the outer side
-\((\alpha,c,\beta)\) and on the inner side \((a,\rho)\) that make
-\(\alpha\log(1/(\beta\rho))\) dominate the polynomial loss.
-
-\subsection{Dense+dense optimization target}
-\label{sec:integration-dense-dense-piecewise}
-
-To approach practically meaningful distances, especially at rate \(1/2\), the single-envelope theorem above is too coarse.
-The dense inner already provides two different bounds that are useful on different weight ranges
-(Corollary~\ref{cor:dense-inner-piecewise}), so the next step is to combine those with comparably sharp outer spectrum
-envelopes via the piecewise framework corollary.
-
-\begin{corollary}[Dense+dense piecewise reduction]
-\label{cor:dense-dense-piecewise-reduction}
-Fix \(\delta\in(0,1/2)\), choose \(\varepsilon\in(0,1)\), \(\xi>0\), and a threshold \(W_\star\in[n]\).
-Let
-\[
-L:=\lceil(2+\xi)\delta n\rceil,
-\qquad
-q_{\delta,\varepsilon}(n)
-:=
-\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)n\rfloor,\tfrac12)\le \delta n\ \right],
-\]
-\[
-b_{\delta,\xi}(n)
-:=
-\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta n\ \right].
-\]
-Suppose the dense outer satisfies an outer cutoff
-\[
-\Pr[d_{\min}(\Cone)<w_0]\le \varepsilon_{\mathrm{out}}(n),
-\]
-and admits expected-spectrum envelopes
-\[
-\EE[\enum_{\Cone,w}] \le A_w^{\mathrm{sm}}
-\qquad (w_0\le w\le W_\star),
-\]
-\[
-\EE[\enum_{\Cone,w}] \le A_w^{\mathrm{lg}}
-\qquad (W_\star < w\le n).
-\]
-Then the dense outer + dense inner serial concatenation satisfies
-\begin{align}
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;&\le\;
-\varepsilon_{\mathrm{out}}(n)
-\;+\;
-\sum_{w=w_0}^{W_\star}
-A_w^{\mathrm{sm}}
-\left(
-\frac{w(w-1)}{n-1} + (L2^{-m})^w + w\,b_{\delta,\xi}(n)
-\right) \notag\\
-&\qquad\qquad
-+\sum_{w=W_\star+1}^{n}
-A_w^{\mathrm{lg}}
-\left(
-(1-\varepsilon)^w + n2^{-m} + q_{\delta,\varepsilon}(n)
-\right).
-\label{eq:dense-dense-piecewise-objective}
-\end{align}
-\end{corollary}
-
-\begin{proof}
-Apply Corollary~\ref{cor:framework-piecewise} with the two weight ranges
-\[
-I_1:=\{w_0,\dots,W_\star\},
-\qquad
-I_2:=\{W_\star+1,\dots,n\},
-\]
-the prescribed outer envelopes on those two ranges,
-and the dense-inner envelopes from Corollary~\ref{cor:dense-inner-piecewise}:
-use \eqref{eq:dense-inner-smallw-envelope} on \(I_1\) and
-\eqref{eq:dense-inner-global-envelope} on \(I_2\).
-This yields \eqref{eq:dense-dense-piecewise-objective}.
-\end{proof}
-
-\paragraph{This is the optimization problem we now care about.}
-For a given blocklength \(n\), target distance \(\delta\), and inner memory \(m\),
-the dense+dense proof problem is to make the right-hand side of
-\eqref{eq:dense-dense-piecewise-objective} small by choosing:
-\begin{itemize}
-\item the outer memory / tap parameter (which controls the outer envelopes \(A_w^{\mathrm{sm}},A_w^{\mathrm{lg}}\)),
-\item the split point \(W_\star\),
-\item the dense-inner parameters \(\varepsilon\) and \(\xi\).
-\end{itemize}
-This formulation is the bridge from the current asymptotic proof to concrete finite-length questions such as
-\(n=2^{16},2^{20},\dots,2^{30}\) and to benchmark targets such as the binary Gilbert--Varshamov distance at rate \(1/2\).
-
-\begin{corollary}[Dense+dense run-aware reduction]
-\label{cor:dense-dense-run-aware}
-Fix \(\delta\in(0,1/2)\), choose \(\varepsilon\in(0,1)\) and \(\xi>0\), and define
-\[
-L:=\lceil(2+\xi)\delta n\rceil,
-\]
-\[
-q_{\delta,\varepsilon}(n)
-:=
-\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)n\rfloor,\tfrac12)\le \delta n\ \right],
-\]
-\[
-b_{\delta,\xi}(n)
-:=
-\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta n\ \right].
-\]
-For \(1\le r\le w\), define
-\[
-\mathrm{RunTail}_n(w,r)
-\;:=\;
-\frac{1}{\binom{n}{w}}
-\sum_{s=1}^{r-1}
-\binom{w-1}{s-1}\binom{n-w+1}{s},
-\]
-and define the dense-inner optimization profile
-\begin{equation}
-\label{eq:dense-inner-Bw}
-B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
-\;:=\;
-\min\!\left\{
-(1-\varepsilon)^w + n2^{-m} + q_{\delta,\varepsilon}(n),\ 
-\min_{1\le r\le w}
-\Bigl(
-\mathrm{RunTail}_n(w,r) + (L2^{-m})^r + r\,b_{\delta,\xi}(n)
-\Bigr)
-\right\}.
-\end{equation}
-Suppose the outer code satisfies an outer cutoff
-\[
-\Pr[d_{\min}(\Cone)<w_0]\le \varepsilon_{\mathrm{out}}(n),
-\]
-and admits expected-spectrum envelopes
-\[
-\EE[\enum_{\Cone,w}] \le A_w
-\qquad (w_0\le w\le n).
-\]
-Then the dense outer + dense inner serial concatenation satisfies
-\begin{equation}
-\label{eq:dense-dense-run-aware-objective}
+\label{eq:dense-dense-direct-first-moment}
 \Pr[d_{\min}(\Csc)\le \delta n]
 \;\le\;
 \varepsilon_{\mathrm{out}}(n)
 \;+\;
-\sum_{w=w_0}^{n}
-A_w\,B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
+\sum_{h=w_0}^{n} A_h\,B_h.
 \end{equation}
-\end{corollary}
+\end{theorem}
 
 \begin{proof}
-Apply Corollary~\ref{cor:framework-envelope} with the outer envelopes \(A_w\) and the inner envelopes
-\(B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)\).
-The validity of the latter follows from Corollary~\ref{cor:dense-inner-piecewise}, specifically from
-\eqref{eq:dense-inner-best-envelope}, together with the exact run-tail formula \eqref{eq:run-lower-tail-exact}.
+Let \(\mathcal{G}_{\mathrm{out}}\) denote the event \(d_{\min}(\Cone)\ge w_0\).
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\le
+\Pr[\mathcal{G}_{\mathrm{out}}^c]
+\;+\;
+\Pr[d_{\min}(\Csc)\le \delta n\wedge \mathcal{G}_{\mathrm{out}}].
+\]
+The first term is \(\le \varepsilon_{\mathrm{out}}(n)\) by assumption.
+
+Condition now on a realization of the outer code inside \(\mathcal{G}_{\mathrm{out}}\).
+For each nonzero outer codeword \(c\in\Cone\) of weight \(h\), the random interleaver makes
+\(\Pi(c)\) uniform on the weight-\(h\) slice, so
+\[
+\Pr[\wt(\Ctwo(\Pi(c)))\le \delta n\mid \wt(c)=h]
+=
+p_h(\delta).
+\]
+Applying Markov's inequality to the random variable counting low-weight nonzero concatenated codewords gives
+\[
+\Pr[d_{\min}(\Csc)\le \delta n\mid \Cone,\mathcal{G}_{\mathrm{out}}]
+\le
+\sum_{h=w_0}^{n}\enum_{\Cone,h}\,p_h(\delta).
+\]
+Taking expectation over the outer randomness and using the envelopes
+\(\EE[\enum_{\Cone,h}]\le A_h\) and \(p_h(\delta)\le B_h\) yields
+\eqref{eq:dense-dense-direct-first-moment}.
 \end{proof}
 
-\paragraph{Why this dominates the earlier split-threshold reduction.}
-The piecewise bound \eqref{eq:dense-dense-piecewise-objective} is still useful for quick asymptotic arguments,
-but \eqref{eq:dense-dense-run-aware-objective} is the tighter quantity for actual optimization:
-it no longer hard-codes a single threshold \(W_\star\),
-and it lets the inner proof choose the best run target \(r\) separately at every weight \(w\).
-This is exactly what we need once the outer spectrum is exponential on linear-weight scales.
+\subsection{A complete coarse dense+dense theorem}
+\label{sec:integration-dense-dense-coarse}
 
-\paragraph{Dense outer specialization.}
-For the dense outer, Corollary~\ref{cor:outer-dense-spectrum-piecewise} supplies the exact expected spectrum
+The dense sections already provide a complete analytic proof of linear distance if we are willing to use
+their coarse geometric envelopes.
+This gives a closed dense+dense theorem, even though it is not yet the sharp quantitative story.
+
+\begin{theorem}[Dense outer + dense inner]
+\label{thm:dense-dense-integration}
+Fix \(\delta\in(0,1/2)\) and a geometric factor \(\rho\in(0,1)\) satisfying \(2\delta<\rho\).
+Assume the dense outer supplies constants \(\alpha_{\mathrm{out}}>0\) and \(\beta_{\mathrm{out}}>1\)
+such that, for all sufficiently large \(n\),
 \[
-\EE[\enum_{\Cone,w}] = A_w^{\mathrm{dense}}
+\Pr[d_{\min}(\Cone)<\alpha_{\mathrm{out}}\log_2 n]=o(1)
+\]
+and
+\[
+\EE[\enum_{\Cone,h}] \le \beta_{\mathrm{out}}^{\,h}
+\qquad
+\bigl(h\ge \kappa_{\mathrm{cut}}\log_2 n\bigr),
+\]
+for some cutoff constant \(\kappa_{\mathrm{cut}}\in(0,\alpha_{\mathrm{out}}]\),
+and assume the dense inner satisfies
+\[
+p_h(\delta)\le 3\rho^h
+\qquad
+\bigl(h\ge \kappa_{\mathrm{cut}}\log_2 n\bigr).
+\]
+If
+\begin{equation}
+\label{eq:dense-dense-coarse-compatibility}
+\beta_{\mathrm{out}}\rho<1
+\end{equation}
+then
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability.
+\end{theorem}
+
+\begin{proof}
+Set
+\[
+w_0:=\left\lceil \alpha_{\mathrm{out}}\log_2 n\right\rceil.
+\]
+By Theorem~\ref{thm:outer-dense-logdistance},
+\[
+\Pr[d_{\min}(\Cone)<w_0]=o(1).
+\]
+By Lemma~\ref{lem:outer-dense-spectrum},
+\[
+\EE[\enum_{\Cone,h}] \le \beta_{\mathrm{out}}^{\,h}
+\qquad (h\ge w_0),
+\]
+and by Corollary~\ref{cor:dense-inner-constant-geometric},
+\[
+p_h(\delta)\le 3\rho^h
+\qquad (h\ge w_0).
+\]
+Applying Theorem~\ref{thm:dense-dense-direct-first-moment},
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\le
+o(1)
+\;+\;
+3\sum_{h=w_0}^{n} (\beta_{\mathrm{out}}\rho)^h.
+\]
+Because \(\beta_{\mathrm{out}}\rho<1\), the geometric tail is
+\[
+\sum_{h=w_0}^{n} (\beta_{\mathrm{out}}\rho)^h
+\le
+O(1)\,(\beta_{\mathrm{out}}\rho)^{w_0}
+=
+n^{-\alpha_{\mathrm{out}}
+\log_2(1/(\beta_{\mathrm{out}}\rho)) + o(1)}.
+\]
+Since \(\beta_{\mathrm{out}}\rho<1\), the exponent above is strictly negative, so the second term is \(o(1)\).
+\end{proof}
+
+\paragraph{What this theorem does and does not say.}
+Theorem~\ref{thm:dense-dense-integration} is the cleanest fully analytic dense+dense result available from the current
+lemmas.
+It proves linear distance, but it is quantitatively crude because it compresses the outer and inner into global geometric
+envelopes.
+The remainder of this section keeps the same first-moment structure while exposing the sharper analytic profiles that the
+dense outer and dense inner actually provide.
+
+\begin{theorem}[Existence of a fully analytic dense+dense linear-distance regime]
+\label{thm:dense-dense-existence}
+Assume \(R_o=\tfrac12\), take \(M=\lceil c\log_2 n\rceil\) with \(c\ge 1\), and let \(\alpha_{\mathrm{out}}>0\) be the
+constant from Theorem~\ref{thm:outer-dense-logdistance}.
+Fix
+\[
+\kappa_{\mathrm{cut}}:=\alpha_{\mathrm{out}},
+\]
+and let \(\beta_{\mathrm{out}}=\beta_{\mathrm{out}}(c/\alpha_{\mathrm{out}})\) be the constant from
+Lemma~\ref{lem:outer-dense-spectrum}.
+Choose any \(\rho\in(0,1/\beta_{\mathrm{out}})\), then choose any
+\[
+\delta\in\Bigl(0,\frac{\rho}{2}\Bigr),
+\]
+and choose the dense-inner memory parameter \(\gamma\) so that
+\[
+\gamma>1+\alpha_{\mathrm{out}}\log_2\!\Bigl(\frac{1}{\rho}\Bigr).
+\]
+Then the resulting dense outer + dense inner concatenation satisfies
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+In particular, the dense+dense ensemble has linear minimum distance with high probability for some positive constant
+\(\delta\).
+\end{theorem}
+
+\begin{proof}
+Apply Theorem~\ref{thm:dense-dense-integration}.
+Lemma~\ref{lem:outer-dense-spectrum} supplies the outer envelope above the cutoff
+\(\kappa_{\mathrm{cut}}\log_2 n=\alpha_{\mathrm{out}}\log_2 n\).
+Because \(\delta<\rho/2\) and \(\gamma>1+\alpha_{\mathrm{out}}\log_2(1/\rho)\),
+Corollary~\ref{cor:dense-inner-constant-geometric} supplies
+\[
+p_h(\delta)\le 3\rho^h
+\qquad
+(h\ge \alpha_{\mathrm{out}}\log_2 n).
+\]
+Finally, \(\rho<1/\beta_{\mathrm{out}}\) is exactly the compatibility condition
+\eqref{eq:dense-dense-coarse-compatibility}.
+\end{proof}
+
+\subsection{The sharp dense+dense objective}
+\label{sec:integration-dense-dense-piecewise}
+
+For the dense outer, Corollary~\ref{cor:outer-dense-spectrum-piecewise} gives the exact expected spectrum
+\[
+A_h^{\mathrm{dense}}
 :=
 \sum_{\ell=1}^{k} N_\ell\,
-\binom{r(\ell+M)}{w}\,2^{-r(\ell+M)},
+\binom{r(\ell+M)}{h}\,2^{-r(\ell+M)}
+\qquad (1\le h\le n),
 \]
 with \(N_1=k\) and \(N_\ell=(k-\ell+1)2^{\ell-2}\) for \(\ell\ge 2\).
-Therefore the dense+dense optimization target becomes
+
+For the dense inner, Corollary~\ref{cor:dense-inner-piecewise} gives the envelope
+\begin{equation}
+\label{eq:dense-dense-inner-profile}
+B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
+\;:=\;
+\min\!\left\{
+(1-\varepsilon)^h + n2^{-m} + q_{\delta,\varepsilon}(n),\ 
+\min_{1\le r\le h}
+\Bigl(
+\mathrm{RunTail}_n(h,r) + (L2^{-m})^r + r\,b_{\delta,\xi}(n)
+\Bigr)
+\right\},
+\end{equation}
+where
+\[
+L=\lceil(2+\xi)\delta n\rceil,
+\quad
+q_{\delta,\varepsilon}(n)
+:=
+\PP\!\left[\ \Binomial(\lfloor(1-\varepsilon)n\rfloor,\tfrac12)\le \delta n\ \right],
+\]
+\[
+b_{\delta,\xi}(n)
+:=
+\PP\!\left[\ \Binomial(L,\tfrac12)\le \delta n\ \right].
+\]
+
+\begin{theorem}[Explicit dense+dense first-moment objective]
+\label{thm:dense-dense-explicit}
+Fix \(\delta\in(0,1/2)\), \(\varepsilon\in(0,1)\), and \(\xi>0\).
+Let
+\[
+w_0:=\left\lceil \alpha_{\mathrm{out}}\log_2 n\right\rceil,
+\]
+where \(\alpha_{\mathrm{out}}\) is the logarithmic-distance constant from
+Theorem~\ref{thm:outer-dense-logdistance}.
+Then
 \begin{equation}
 \label{eq:dense-dense-explicit-objective}
 \Pr[d_{\min}(\Csc)\le \delta n]
 \;\le\;
-\varepsilon_{\mathrm{out}}(n)
+\Pr[d_{\min}(\Cone)<w_0]
 \;+\;
-\sum_{w=w_0}^{n}
-A_w^{\mathrm{dense}}\,B_w^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
+\sum_{h=w_0}^{n}
+A_h^{\mathrm{dense}}\,
+B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m).
 \end{equation}
-The remaining task is to understand this bound numerically and asymptotically at rate \(1/2\),
-and then to decide what memory sizes \(M\) and \(m\) are required to push the certified \(\delta\)
-toward the Gilbert--Varshamov benchmark.
+\end{theorem}
 
-\paragraph{Rate-\(\tfrac12\) exponent picture.}
-The new inner and outer profiles now give a concrete asymptotic optimization problem.
-For linear weights \(w=\omega n\), Proposition~\ref{prop:outer-dense-rate-half-exponent} shows that the dense outer
-contributes roughly
+\begin{proof}
+Apply Theorem~\ref{thm:dense-dense-direct-first-moment} with
 \[
-A_w^{\mathrm{dense}}
-\;\lesssim\;
-2^{n\Phi_{1/2}(\omega)},
+A_h=A_h^{\mathrm{dense}}
 \]
-while Corollary~\ref{cor:run-lower-tail-alpha} shows that choosing \(r=\lfloor \alpha w\rfloor\) contributes the
-run-deficit exponent
+from Corollary~\ref{cor:outer-dense-spectrum-piecewise} and
 \[
-\Psi_{\mathrm{run}}^{(w)}(\omega,\alpha)
-=
-H_2(\omega)
-- \omega H_2(\alpha)
-- (1-\omega)H_2\!\Bigl(\frac{\alpha\omega}{1-\omega}\Bigr)
+B_h=B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
 \]
-for every \(0<\alpha<1-\omega\).
-Thus, in the linear-weight regime, the dense+dense problem reduces to making the inner exponent dominate
-\(\Phi_{1/2}(\omega)\) uniformly over the relevant \(\omega\)-range.
+from Corollary~\ref{cor:dense-inner-piecewise}.
+\end{proof}
 
-\paragraph{Why this is the right next benchmark.}
-Near the rate-\(\tfrac12\) GV target, \(\omega\approx 0.11\), the dense outer lies on its linear branch
-\(\Phi_{1/2}(\omega)=\eta_2\omega\) with \(\eta_2\approx 1.2716\).
-So if the dense inner cannot beat that growth profile after optimizing over \(\alpha\), \(\varepsilon\), \(\xi\), and the
-state size \(m\), then the sparse flagship constructions will be under real pressure as well.
-This is exactly why the dense+dense pairing is the correct first quantitative stress test.
+\paragraph{This is the dense+dense optimization target.}
+Equation~\eqref{eq:dense-dense-explicit-objective} is the quantity that the dense lemmas now support directly.
+It is still a pure first-moment argument, but it no longer hides the actual outer and inner analytic profiles behind
+one global envelope.
+This is the right bridge between the proof and the enumerator-guided finite-length experiments.
+
+\subsection{Linear-weight exponent criterion}
+\label{sec:integration-dense-dense-linear}
+
+The explicit objective above is still a finite-\(n\) sum.
+At rate \(1/2\), the linear-weight terms can be controlled analytically by pairing the dense-outer exponent
+\(\Phi_{1/2}\) with the dense-inner linear-weight exponent from
+Proposition~\ref{prop:dense-inner-linear-exponent}.
+
+\begin{theorem}[Linear-weight dense+dense criterion at rate \(\tfrac12\)]
+\label{prop:dense-dense-linear-window}
+Assume the outer rate is \(R_o=\tfrac12\), so \(r=2\).
+Fix constants
+\[
+\delta\in(0,1/2),
+\qquad
+\omega_0\in(0,1/2),
+\qquad
+\xi>0,
+\qquad
+\theta\in(0,1-\omega_0),
+\]
+and let
+\[
+M=\Theta(\log n),
+\qquad
+m=\gamma\log_2 n
+\]
+with \(\gamma>1\).
+Define
+\[
+E_{\mathrm{bin}}(\delta,\xi)
+\;:=\;
+(2+\xi)\delta\left(1-H_2\!\Bigl(\frac{1}{2+\xi}\Bigr)\right)
+\]
+and
+\[
+E_{\mathrm{in}}(\omega;\theta,\delta,\xi)
+\;:=\;
+\min\!\left\{
+\Psi_{\mathrm{run}}^{(w)}(\omega,\theta),\
+E_{\mathrm{bin}}(\delta,\xi)
+\right\}.
+\]
+If
+\begin{equation}
+\label{eq:dense-dense-linear-gap}
+\eta_{\mathrm{gap}}
+\;:=\;
+\inf_{\omega\in[\omega_0,\;1/2]}
+\left(
+E_{\mathrm{in}}(\omega;\theta,\delta,\xi)-\Phi_{1/2}(\omega)
+\right)
+>0,
+\end{equation}
+then
+\begin{equation}
+\label{eq:dense-dense-linear-sum}
+\sum_{h=\lceil \omega_0 n\rceil}^{\lfloor n/2\rfloor}
+A_h^{\mathrm{dense}}\,
+B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
+\;=\;
+o(1).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Fix \(h=\lfloor \omega n\rfloor\) with \(\omega\in[\omega_0,1/2]\).
+By Proposition~\ref{prop:outer-dense-rate-half-exponent},
+\[
+A_h^{\mathrm{dense}}
+\;\le\;
+n^{O(1)}\,2^{n\Phi_{1/2}(\omega)}.
+\]
+By Proposition~\ref{prop:dense-inner-linear-exponent}, with the choice \(r=\lfloor \theta h\rfloor\),
+\[
+B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
+\;\le\;
+n^{O(1)}\,2^{-nE_{\mathrm{in}}(\omega;\theta,\delta,\xi)}.
+\]
+Hence
+\[
+A_h^{\mathrm{dense}}\,B_h^{\mathrm{dense}}(\delta;\varepsilon,\xi,m)
+\;\le\;
+n^{O(1)}\,2^{-n\left(E_{\mathrm{in}}(\omega;\theta,\delta,\xi)-\Phi_{1/2}(\omega)\right)}.
+\]
+Under \eqref{eq:dense-dense-linear-gap}, every summand is at most
+\[
+n^{O(1)}\,2^{-n\eta_{\mathrm{gap}}}.
+\]
+There are only \(O(n)\) values of \(h\) in the range \([\omega_0 n,n/2]\), so the sum in
+\eqref{eq:dense-dense-linear-sum} is \(o(1)\).
+\end{proof}
+
+\paragraph{What remains after the linear-weight window.}
+The linear-window criterion isolates the dense+dense question that matters for quantitatively meaningful distances:
+can the dense-inner exponent beat the dense-outer exponent on the entire weight interval relevant to the target \(\delta\)?
+The low and intermediate weights remain controlled by the coarse theorem
+\ref{thm:dense-dense-integration}, while Proposition~\ref{prop:dense-dense-linear-window}
+is the sharper tool for the GV-relevant range.

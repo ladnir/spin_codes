@@ -552,18 +552,106 @@ and it can be optimized over $r$ separately for each weight $w$.
 The simpler bound \eqref{eq:dense-inner-smallw-envelope} is a convenient specialization for
 the regime where random interleaving typically creates nearly $w$ runs.
 
+\begin{theorem}[Dense-inner linear-weight exponent]
+\label{prop:dense-inner-linear-exponent}
+Fix constants $\delta\in(0,1/2)$, $\xi>0$, and $\theta\in(0,1)$.
+Let
+\[
+L:=\lceil(2+\xi)\delta N\rceil,
+\qquad
+m=\gamma\log_2 N
+\]
+with $\gamma>1$, and define
+\begin{equation}
+\label{eq:dense-inner-binomial-exponent}
+E_{\mathrm{bin}}(\delta,\xi)
+\;:=\;
+(2+\xi)\delta\left(1-H_2\!\Bigl(\frac{1}{2+\xi}\Bigr)\right).
+\end{equation}
+For a fixed weight fraction $\omega\in(0,1)$ satisfying $\theta<1-\omega$, let
+\[
+w=\lfloor \omega N\rfloor,
+\qquad
+r=\lfloor \theta w\rfloor.
+\]
+Then the dense inner satisfies
+\begin{equation}
+\label{eq:dense-inner-linear-exponent}
+p_w(\delta)
+\;\le\;
+N^{O(1)}\,
+2^{-N E_{\mathrm{in}}(\omega;\theta,\delta,\xi)},
+\end{equation}
+where
+\begin{equation}
+\label{eq:dense-inner-linear-rate-function}
+E_{\mathrm{in}}(\omega;\theta,\delta,\xi)
+\;:=\;
+\min\!\left\{
+\Psi_{\mathrm{run}}^{(w)}(\omega,\theta),\
+E_{\mathrm{bin}}(\delta,\xi)
+\right\},
+\end{equation}
+and $\Psi_{\mathrm{run}}^{(w)}(\omega,\theta)$ is defined in
+\eqref{eq:run-rate-function-alpha}.
+\end{theorem}
+
+\begin{proof}
+Apply \eqref{eq:dense-inner-run-envelope} with the choice $r=\lfloor \theta w\rfloor$.
+The run-deficit term is controlled by Corollary~\ref{cor:run-lower-tail-alpha}:
+\[
+\mathrm{RunTail}_N(w,r)
+\;\le\;
+N^{O(1)}\,2^{-N\Psi_{\mathrm{run}}^{(w)}(\omega,\theta)}.
+\]
+
+Next,
+\[
+L2^{-m}
+\;=\;
+\Theta(N)\cdot N^{-\gamma}
+\;=\;
+N^{1-\gamma+o(1)},
+\]
+so since $r=\Theta(N)$ and $\gamma>1$,
+\[
+(L2^{-m})^r
+\;=\;
+2^{-\Omega(N\log N)}.
+\]
+
+For the binomial term, note that
+\[
+\frac{\delta N}{L}
+\;=\;
+\frac{1}{2+\xi}+O\!\left(\frac{1}{N}\right).
+\]
+Since $1/(2+\xi)<1/2$, a standard Stirling/Chernoff bound gives
+\[
+\PP[\Binomial(L,\tfrac12)\le \delta N]
+\;\le\;
+N^{O(1)}\,2^{-L\left(1-H_2(1/(2+\xi))\right)}
+\;\le\;
+N^{O(1)}\,2^{-N E_{\mathrm{bin}}(\delta,\xi)}.
+\]
+Multiplying by $r=O(N)$ only changes the polynomial prefactor.
+
+Combining the three terms in \eqref{eq:dense-inner-run-envelope} yields
+\eqref{eq:dense-inner-linear-exponent}.
+\end{proof}
 
 
 
-\begin{corollary}[Dense inner satisfies Assumption~\ref{ass:inner-interface} for $w\ge d_{\min}(\Cone)$]
-\label{cor:dense-inner-implies-interface}
+
+\begin{corollary}[Geometric dense-inner envelope above a logarithmic cutoff]
+\label{cor:dense-inner-geometric-cutoff}
 Consider the dense time-varying recursive inner encoder with memory
 \[
 m \;:=\; \gamma \log_2 n
 \qquad\text{for a constant }\gamma>1.
 \]
 Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
-Let $p_w(\delta)$ be defined as in \eqref{eq:inner-interface-pw}.
+Let $p_w(\delta)$ denote the slice-to-tail probability from \eqref{eq:dense-inner-global-envelope}.
 Assume the dense-inner tail bound (proved earlier in this section) gives
 \begin{equation}
 \label{eq:dense-three-term-recall}
@@ -573,45 +661,80 @@ p_w(\delta)
 \end{equation}
 where $q_{\delta,\varepsilon}(n)\le 2^{-c n}$ for some $c=c(\delta,\varepsilon)>0$.
 
-Then there exist constants $\rho\in(0,1)$ and $a\ge 0$ (depending only on $\delta,\varepsilon,\gamma$) such that
-for all sufficiently large $n$ and all $w\ge d_{\min}(\Cone)$,
+Then there exist constants $\rho\in(0,1)$, $a\ge 0$, and $\kappa>0$
+(depending only on $\delta,\varepsilon,\gamma$) such that
+for every fixed cutoff $w_0(n)\ge \kappa\log_2 n$,
+for all sufficiently large $n$, and for all $w\ge w_0(n)$,
 \[
 p_w(\delta)\;\le\; n^{a}\,\rho^{\,w}.
 \]
-In particular, Assumption~\ref{ass:inner-interface} holds for this dense inner instantiation.
 \end{corollary}
 
 \begin{proof}
 Let $\rho:=1-\varepsilon\in(0,1)$.
 We bound each term in \eqref{eq:dense-three-term-recall} by a common expression $n^a\rho^w$ for all
-$w\ge d_{\min}(\Cone)$.
+$w\ge w_0(n)\ge \kappa\log_2 n$.
 
 \paragraph{Term 1.}
 $(1-\varepsilon)^w=\rho^w\le n^a\rho^w$ for any $a\ge 0$.
 
 \paragraph{Term 2.}
 Since $m=\gamma\log_2 n$, we have $n\,2^{-m}=n\cdot n^{-\gamma}=n^{1-\gamma}$.
-Let $\alpha>0$ satisfy $d_{\min}(\Cone)\ge \alpha\log_2 n$ (from the outer interface).
-Then for all $w\ge d_{\min}(\Cone)$,
+Then for all $w\ge w_0(n)\ge \kappa\log_2 n$,
 \[
-\rho^{\,w}\ \le\ \rho^{\,\alpha\log_2 n}
-\ =\ n^{-\alpha\log_2(1/\rho)}.
+\rho^{\,w}\ \le\ \rho^{\,\kappa\log_2 n}
+\ =\ n^{-\kappa\log_2(1/\rho)}.
 \]
 Choose any constant $a$ such that
 \[
-a - \alpha\log_2(1/\rho)\ \ge\ 1-\gamma.
+a - \kappa\log_2(1/\rho)\ \ge\ 1-\gamma.
 \]
-Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge d_{\min}(\Cone)$.
+Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge w_0(n)$.
 
 \paragraph{Term 3.}
 Since $q_{\delta,\varepsilon}(n)\le 2^{-cn}$ and $\rho^w\ge \rho^n$ is exponentially small in $n$ as well,
 we have $q_{\delta,\varepsilon}(n)\le n^{a}\rho^{\,w}$ for all sufficiently large $n$ after increasing $a$ by an absolute constant if needed.
 
-Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge d_{\min}(\Cone)$.
+Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge w_0(n)$.
 \end{proof}
 
+\begin{corollary}[Constant-factor geometric envelope]
+\label{cor:dense-inner-constant-geometric}
+Fix \(\delta\in(0,1/2)\) and choose \(\rho\in(0,1)\) with \(2\delta<\rho\).
+Let \(m=\gamma\log_2 n\), and fix any logarithmic cutoff \(w_0(n)\ge \kappa\log_2 n\).
+If
+\[
+\gamma \;>\; 1+\kappa\log_2\!\Bigl(\frac{1}{\rho}\Bigr),
+\]
+then for all sufficiently large \(n\) and all \(w\ge w_0(n)\),
+\[
+p_w(\delta)\le 3\rho^w.
+\]
+\end{corollary}
 
-
+\begin{proof}
+Apply Lemma~\ref{lem:dense-three-term-tail} with \(\varepsilon=1-\rho\).
+The first term is exactly \(\rho^w\).
+Since \(2\delta<\rho\), the binomial tail
+\[
+q_{\delta,1-\rho}(n)
+=
+\PP\!\left[\Binomial(\lfloor \rho n\rfloor,\tfrac12)\le \delta n\right]
+\]
+is exponentially small in \(n\), hence \(q_{\delta,1-\rho}(n)\le \rho^w\) for all sufficiently large \(n\) and all
+\(w\ge \kappa\log_2 n\).
+Also,
+\[
+n2^{-m}=n^{1-\gamma}
+\le
+n^{-\kappa\log_2(1/\rho)}
+\le
+\rho^w
+\]
+for all \(w\ge w_0(n)\), where the first inequality uses
+\(\gamma>1+\kappa\log_2(1/\rho)\).
+Summing the three terms proves the claim.
+\end{proof}
 
 \begin{remark}[The ON$\to$OFF term and why it is harmless in the framework]
 \label{rem:dense-off-harmless}

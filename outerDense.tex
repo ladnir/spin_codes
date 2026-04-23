@@ -3,12 +3,13 @@
 
 This section instantiates the outer code \(\Cone\) by a simple, fully explicit ensemble:
 a terminated, feedforward convolutional encoder with memory \(M=\Theta(\log n)\) and dense taps
-within the memory window. We prove the only two outer properties used by the serial concatenation
-framework:
+within the memory window. For the dense+dense analysis later in the paper, we need two kinds of
+analytic information about this outer ensemble:
 \begin{enumerate}
-\item \textbf{(O1) Logarithmic distance:} \(d_{\min}(\Cone)\ge \alpha\log n\) with high probability over the encoder design.
-\item \textbf{(O2) Spectral growth:} \(\enum_{\Cone,w}\le \poly(n)\,\beta^w\) for a constant \(\beta>1\) (independent of \(n\))
-      on the weight range used later in the first-moment bound.
+\item \textbf{A coarse low-weight cutoff:} \(d_{\min}(\Cone)\ge \alpha\log n\) with high probability over the encoder design,
+      together with a geometric spectrum envelope \(\enum_{\Cone,w}\le \poly(n)\,\beta^w\) above that cutoff.
+\item \textbf{A sharp expected spectrum profile:} an exact span decomposition for \(\EE[\enum_{\Cone,w}]\), and the
+      resulting linear-weight exponent at rate \(1/2\).
 \end{enumerate}
 The construction is encoding-friendly in the sense that it is a single banded (width \(M+1\)) generator
 with no feedback; its work is \(O(nM)=O(n\log n)\).
@@ -40,66 +41,108 @@ For \(w\in\{0,1,\dots,n\}\), let
 \]
 denote the (outer) weight spectrum.
 
-\subsection{Spectrum bound (O2) via a trellis transfer matrix}
+\subsection{Spectrum bound (O2) from the span decomposition}
 \label{sec:outer-dense-spectrum}
 
-The encoder admits a standard trellis with \(2^M\) states (the last \(M\) input bits),
-and constant out-degree \(2\) (the next input bit is \(0\) or \(1\)).
-Each trellis edge produces \(r\) output bits, hence has Hamming weight in \(\{0,1,\dots,r\}\).
-
-\begin{lemma}[Outer spectrum bound (trellis form)]
+\begin{lemma}[Dense-outer expected spectrum above a logarithmic cutoff]
 \label{lem:outer-dense-spectrum}
-There exists a constant \(\beta>1\) (depending only on \(r\) and \(c/\alpha\) as folded below) such that
+Assume \(R_o=\tfrac12\), so \(r=2\), and let \(M=\lceil c\log_2 n\rceil\) with \(c\ge 1\).
+Fix any constant \(\kappa>0\), and consider weights \(h\ge \kappa\log_2 n\).
+Then there exists a constant \(\beta_{\mathrm{out}}=\beta_{\mathrm{out}}(c/\kappa)>1\) such that
 \[
-\enum_{\Cone,w} \;\le\; \poly(n)\,\beta^w
+\EE[\enum_{\Cone,h}] \;\le\; \beta_{\mathrm{out}}^{\,h}
 \]
-for all \(w\ge \alpha\log n\). (This is the range used by the framework, since \(d_{\min}(\Cone)\ge \alpha\log n\).)
+for all sufficiently large \(n\).
 \end{lemma}
 
 \begin{proof}
-Let \(T(z)\in\R[z]^{2^M\times 2^M}\) be the weighted adjacency matrix of the trellis, defined by
+By Corollary~\ref{cor:outer-dense-spectrum-piecewise},
 \[
-T(z)_{s,s'} \;:=\; \sum_{e:s\to s'} z^{\wt(e)},
+\EE[\enum_{\Cone,h}]
+=
+\sum_{\ell=1}^{k} N_\ell
+\binom{2(\ell+M)}{h}2^{-2(\ell+M)}.
 \]
-where the sum is over edges \(e\) from state \(s\) to \(s'\) and \(\wt(e)\in\{0,\dots,r\}\) is the edge output weight.
-Each state has exactly two outgoing edges, and each edge contributes at most \(z^r\), so every row-sum is bounded by
-\(1+z^r\). Hence for all \(z\ge 0\),
+For every \(\ell\), we have \(N_1=k\le n\) and \(N_\ell=(k-\ell+1)2^{\ell-2}\le n2^\ell\) for \(\ell\ge 2\), hence
 \[
-\rho\!\bigl(T(z)\bigr)\le 1+z^r
+\EE[\enum_{\Cone,h}]
+\le
+n2^{-2M}
+\sum_{\ell=1}^{k}
+2^{-\ell}\binom{2(\ell+M)}{h}.
 \]
-by the maximum row-sum bound on the spectral radius.
+Using \(\binom{L}{h}\le (eL/h)^h\),
+\[
+\EE[\enum_{\Cone,h}]
+\le
+n2^{-2M}
+\sum_{\ell=1}^{k}
+2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h.
+\]
+Since \(h\ge \kappa\log_2 n\) and \(M=\lceil c\log_2 n\rceil\), we have
+\[
+\eta:=\frac{M}{h}\le \frac{c}{\kappa}+o(1).
+\]
+Split the sum into \(\ell\le h\) and \(\ell>h\).
 
-Let \(W(z):=\sum_{w\ge 0}\enum_{\Cone,w} z^w\) be the (ordinary) weight enumerator.
-Standard transfer-matrix reasoning gives
+\emph{Range 1: \(\ell\le h\).}
+Then \((\ell+M)/h \le 1+\eta\), so
 \[
-W(z)\;\le\; \mathbf{1}^\top T(z)^k \mathbf{1} \;\le\; 2^M\cdot (1+z^r)^k
+2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
+\le
+2^{-\ell}\bigl(2e(1+\eta)\bigr)^h.
 \]
-for all \(z\ge 0\), where \(2^M\) accounts for the number of possible start/end states (termination only helps).
+Summing over \(\ell\le h\) gives
+\[
+\sum_{\ell\le h}
+2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
+\le
+\bigl(2e(1+\eta)\bigr)^h.
+\]
 
-Extract coefficients using \(\enum_{\Cone,w}\le W(z)/z^w\) for any \(z>0\):
+\emph{Range 2: \(\ell>h\).}
+Write \(u=\ell/h>1\). Then
 \[
-\enum_{\Cone,w}\le 2^M\cdot \frac{(1+z^r)^k}{z^w}.
+2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
+=
+\left(2^{-u}\,2e(u+\eta)\right)^h.
 \]
-Choose \(z\) so that \(z^r = w/n\) (i.e., \(z=(w/n)^{1/r}\)). Then \((1+z^r)^k=(1+w/n)^k\le (1+w/n)^n\le e^w\),
-and thus
+The function \(u\mapsto 2^{-u}(u+\eta)\) is continuous on \([1,\infty)\) and tends to \(0\) as \(u\to\infty\), so
 \[
-\enum_{\Cone,w}\le 2^M\cdot e^w \cdot \Big(\frac{n}{w}\Big)^{w/r}.
+C_2(\eta):=\sup_{u\ge 1}2e\,2^{-u}(u+\eta)<\infty.
 \]
-Since \(w\ge 1\) implies \((n/w)^{w/r}\le n^{w/r}\), we get
+Hence every term in the range \(\ell>h\) is at most \(C_2(\eta)^h\), and since there are at most \(n\) such terms,
 \[
-\enum_{\Cone,w}\le 2^M\cdot \bigl(e\,n^{1/r}\bigr)^w.
+\sum_{\ell>h}
+2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
+\le
+n\,C_2(\eta)^h.
 \]
-Now \(2^M = 2^{c\log_2 n}=n^c\). For the framework we only use \(w\ge d_{\min}(\Cone)\ge \alpha\log n\), hence
-\(n^c \le (2^{c/\alpha})^w\). Folding this polynomial prefactor into the exponential base gives
+
+Therefore
 \[
-\enum_{\Cone,w}\le \poly(n)\,\beta^w
+\EE[\enum_{\Cone,h}]
+\le
+n^{1-2c}\Bigl(C_1(\eta)^h+n\,C_2(\eta)^h\Bigr),
+\qquad
+C_1(\eta):=2e(1+\eta).
 \]
-for a constant \(\beta>1\) depending only on \(r\) and \(c/\alpha\).
+Since \(c\ge 1\), the prefactor \(n^{1-2c}\cdot n\le 1\) for all sufficiently large \(n\).
+Thus
+\[
+\EE[\enum_{\Cone,h}]
+\le
+\bigl(C_1(\eta)+C_2(\eta)\bigr)^h
+\]
+for all sufficiently large \(n\).
+Because \(\eta\le c/\kappa+o(1)\), the right-hand side is bounded by \(\beta_{\mathrm{out}}^h\) for a constant
+\(\beta_{\mathrm{out}}=\beta_{\mathrm{out}}(c/\kappa)>1\).
 \end{proof}
 
 \paragraph{Remark (stronger forms).}
-If one wants the stronger shape \(\enum_{\Cone,w}\le n\,\beta^w\) for all \(w\ge 1\), one can refine the coefficient extraction
-and avoid folding \(2^M\) into the base. For our distance proof, the trellis form in Lemma~\ref{lem:outer-dense-spectrum} suffices.
+Lemma~\ref{lem:outer-dense-spectrum} is only a coarse logarithmic-cutoff envelope.
+For the linear-weight regime the exact profile \eqref{eq:outer-dense-Ah} and the exponent
+\eqref{eq:outer-dense-rate-half-exponent} are the relevant bounds.
 
 \paragraph{For optimization, the span decomposition is sharper than the trellis bound.}
 The trellis lemma is convenient for a one-line interface proof, but it is too coarse for quantitative optimization.
@@ -384,13 +427,15 @@ Choosing \(c\) sufficiently larger than the constant exponents induced by \(\alp
 proving the theorem.
 \end{proof}
 
-\subsection{Outer interface summary (dense log-memory outer)}
+\subsection{Dense-outer summary}
 \label{sec:outer-dense-summary}
 
 Combining Theorem~\ref{thm:outer-dense-logdistance} and Lemma~\ref{lem:outer-dense-spectrum}, the dense log-memory outer
-satisfies the outer interface used by the serial concatenation framework:
+satisfies the coarse geometric bounds needed for the low/intermediate-weight part of the dense+dense proof:
 \[
 d_{\min}(\Cone)\ge \alpha\log n
 \qquad\text{and}\qquad
 \enum_{\Cone,w}\le \poly(n)\,\beta^w\ \text{for the relevant weight regime.}
 \]
+For the linear-weight regime, the sharper expected-spectrum quantities are
+\eqref{eq:outer-dense-Ah} and \eqref{eq:outer-dense-rate-half-exponent}.
