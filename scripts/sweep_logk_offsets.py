@@ -11,10 +11,13 @@ from pathlib import Path
 from dense_largek_eval import (
     ETA_CRIT,
     GapResult,
+    exact_smallw_inner_bound,
     geometric_window_bound,
     linear_window_gap,
     outer_generating_bound,
+    outer_small_h_exact_log2,
     small_h_heuristic_log2,
+    total_length,
     tiny_window_bound,
 )
 
@@ -36,8 +39,9 @@ def evaluate_point(
     eta_hi: float,
     gap_step: float,
     heuristic_h_cap: int,
+    n_mode: str,
 ) -> dict[str, float]:
-    n = 2 * k_msg
+    n = total_length(k_msg, sigma, n_mode)
     w_out = outer_generating_bound(k_msg, sigma, z)
     h0, s_tiny = tiny_window_bound(n, sigma, delta, z, xi, kappa, w_out)
     h_mid_hi = int(math.floor(ETA_CRIT * n))
@@ -87,6 +91,19 @@ def evaluate_point(
         h_hi=h_cap,
         theta=theta,
     )
+    log2_r_small = float("-inf")
+    for h in range(1, h_cap + 1):
+        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+        if inn <= 0.0:
+            continue
+        term = out + math.log2(inn)
+        if log2_r_small == float("-inf"):
+            log2_r_small = term
+        else:
+            hi = max(log2_r_small, term)
+            lo = min(log2_r_small, term)
+            log2_r_small = hi + math.log2(1.0 + 2.0 ** (lo - hi))
     h_resid = geometric_window_bound(
         n=n,
         h_lo=h_cap + 1,
@@ -105,6 +122,15 @@ def evaluate_point(
         lo = min(log2_h_small, log2_h_resid)
         log2_h_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
 
+    if log2_r_small == float("-inf"):
+        log2_r_total = log2_h_resid
+    elif log2_h_resid == float("-inf"):
+        log2_r_total = log2_r_small
+    else:
+        hi = max(log2_r_small, log2_h_resid)
+        lo = min(log2_r_small, log2_h_resid)
+        log2_r_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
     return {
         "n": float(n),
         "w_out_log2": math.log2(w_out) if w_out > 0.0 else float("-inf"),
@@ -120,6 +146,8 @@ def evaluate_point(
         "h_small_log2": log2_h_small,
         "h_tail_log2": log2_h_resid,
         "h_total_log2": log2_h_total,
+        "r_small_log2": log2_r_small,
+        "r_total_log2": log2_r_total,
     }
 
 
@@ -139,6 +167,7 @@ def main() -> int:
     parser.add_argument("--eta-hi", type=float, default=0.99)
     parser.add_argument("--gap-step", type=float, default=1e-5)
     parser.add_argument("--heuristic-h-cap", type=int, default=64)
+    parser.add_argument("--n-mode", choices=("paper", "extended"), default="paper")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -172,6 +201,8 @@ def main() -> int:
                 "h_small_log2",
                 "h_tail_log2",
                 "h_total_log2",
+                "r_small_log2",
+                "r_total_log2",
             ],
         )
         writer.writeheader()
@@ -195,6 +226,7 @@ def main() -> int:
                         eta_hi=args.eta_hi,
                         gap_step=args.gap_step,
                         heuristic_h_cap=args.heuristic_h_cap,
+                        n_mode=args.n_mode,
                     )
                     row.update(
                         {

@@ -141,6 +141,20 @@ def outer_small_h_exact_log2(k_msg: int, sigma: int, h: int) -> float:
     return total
 
 
+def run_tail_exact_log2(n: int, w: int, r: int) -> float:
+    if r <= 1:
+        return float("-inf")
+    if r > w:
+        r = w
+
+    denom = log2_binom(n, w)
+    total = float("-inf")
+    for s in range(1, r):
+        term = log2_binom(w - 1, s - 1) + log2_binom(n - w + 1, s) - denom
+        total = log2add(total, term)
+    return total
+
+
 def tiny_window_bound(n: int, sigma: int, delta: float, z: float, xi: float, kappa: float, w_out: float) -> tuple[int, float]:
     h0 = int(math.floor(kappa * math.log2(n)))
     if h0 < 1:
@@ -153,6 +167,46 @@ def tiny_window_bound(n: int, sigma: int, delta: float, z: float, xi: float, kap
         inner = (h * (h - 1)) / (n - 1) + ((L * (2.0 ** (-sigma))) ** h) + h * b
         total += outer * inner
     return h0, total
+
+
+def exact_smallw_inner_bound(n: int, w: int, sigma: int, delta: float, xi: float) -> float:
+    if w <= 0:
+        return 0.0
+
+    L = int(math.ceil((2.0 + xi) * delta * n))
+    b = binom_cdf_half_upper(L, int(math.floor(delta * n)))
+    base = L * (2.0 ** (-sigma))
+
+    best = 1.0
+    for r in range(1, w + 1):
+        log2_run = run_tail_exact_log2(n, w, r)
+        run_term = 0.0 if log2_run == float("-inf") else 2.0 ** log2_run
+        off_term = min(1.0, base ** r)
+        bin_term = min(1.0, r * b)
+        val = min(1.0, run_term + off_term + bin_term)
+        if val < best:
+            best = val
+    return best
+
+
+def small_h_rigorous_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    xi: float,
+    h_lo: int,
+    h_hi: int,
+) -> float:
+    total = float("-inf")
+    for h in range(h_lo, h_hi + 1):
+        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+        if inn <= 0.0:
+            continue
+        total = log2add(total, out + math.log2(inn))
+    return total
 
 
 def small_h_heuristic_log2(
@@ -262,6 +316,14 @@ def sigma_values(args: argparse.Namespace) -> Iterable[int]:
     return range(args.sigma_min, args.sigma_max + 1, args.sigma_step)
 
 
+def total_length(k_msg: int, sigma: int, n_mode: str) -> int:
+    if n_mode == "paper":
+        return 2 * k_msg
+    if n_mode == "extended":
+        return 2 * k_msg + sigma
+    raise ValueError(f"Unknown n_mode: {n_mode}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--k", type=int, required=True, help="Message length k (current dense paper uses n=2k).")
@@ -269,6 +331,12 @@ def main() -> int:
     parser.add_argument("--sigma-min", type=int, default=None)
     parser.add_argument("--sigma-max", type=int, default=None)
     parser.add_argument("--sigma-step", type=int, default=1)
+    parser.add_argument(
+        "--n-mode",
+        choices=("paper", "extended"),
+        default="paper",
+        help="Use n=2k ('paper') or n=2k+sigma ('extended', matching the enumerated sysBand line).",
+    )
     parser.add_argument("--delta", type=float, default=0.12)
     parser.add_argument("--z", type=float, default=1.0 / 3.0)
     parser.add_argument("--rho", type=float, default=1.0 / 4.0)
@@ -289,12 +357,16 @@ def main() -> int:
         action="store_true",
         help="Also report heuristic small-h and total values using exact small-h outer counts plus the asymptotic run exponent.",
     )
+    parser.add_argument(
+        "--show-exact-smallw",
+        action="store_true",
+        help="Also report a stronger finite-n small-weight bound using exact outer counts and the exact run-tail inner formula up to h_cap.",
+    )
     args = parser.parse_args()
 
-    n = 2 * args.k
     print(f"Concrete dense+dense large-k evaluator")
     print(f"  message length k : {args.k}")
-    print(f"  total length n   : {n}")
+    print(f"  n mode           : {args.n_mode}")
     print(f"  delta            : {args.delta}")
     print(f"  z                : {args.z}")
     print(f"  rho              : {args.rho}")
@@ -304,6 +376,7 @@ def main() -> int:
     print()
 
     for sigma in sigma_values(args):
+        n = total_length(args.k, sigma, args.n_mode)
         w_out = outer_generating_bound(args.k, sigma, args.z)
         h0, s_tiny = tiny_window_bound(n, sigma, args.delta, args.z, args.xi, args.kappa, w_out)
         h1 = h0 + 1
@@ -349,6 +422,23 @@ def main() -> int:
         if log2_s_top != float("-inf"):
             log2_h_total = log2add(log2_h_total, log2_s_top)
 
+        log2_r_small = small_h_rigorous_log2(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            delta=args.delta,
+            xi=args.xi,
+            h_lo=1,
+            h_hi=h_cap,
+        )
+        log2_r_total = log2_r_small
+        if h_resid > 0.0:
+            log2_r_total = log2add(log2_r_total, math.log2(h_resid))
+        if log2_s_lin != float("-inf"):
+            log2_r_total = log2add(log2_r_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_r_total = log2add(log2_r_total, log2_s_top)
+
         print(f"sigma = {sigma}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
         print(f"  outer generating bound W(z)   : {format_prob(w_out)}")
@@ -363,6 +453,9 @@ def main() -> int:
             print(f"  H_small (exact outer + asym inner, h<= {h_cap}) : {format_log2(log2_h_small)}")
             print(f"  H_tail  (explicit geometric residual)           : {format_prob(h_resid)}")
             print(f"  H_total (heuristic mixed)                       : {format_log2(log2_h_total)}")
+        if args.show_exact_smallw:
+            print(f"  R_small (exact outer + exact run-tail inner, h<= {h_cap}) : {format_log2(log2_r_small)}")
+            print(f"  R_total (stronger finite-n mixed)                         : {format_log2(log2_r_total)}")
         if args.lambda_target is not None:
             target = -args.lambda_target
             ok = lg <= target
