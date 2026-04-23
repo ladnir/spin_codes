@@ -1,441 +1,432 @@
-\section{Outer code instantiation I: a dense log-memory convolutional outer}
+\section{Outer code instantiation I: a systematic dense log-memory convolutional outer}
 \label{sec:outer-dense-logmem}
 
-This section instantiates the outer code \(\Cone\) by a simple, fully explicit ensemble:
-a terminated, feedforward convolutional encoder with memory \(M=\Theta(\log n)\) and dense taps
-within the memory window. For the dense+dense analysis later in the paper, we need two kinds of
-analytic information about this outer ensemble:
-\begin{enumerate}
-\item \textbf{A coarse low-weight cutoff:} \(d_{\min}(\Cone)\ge \alpha\log n\) with high probability over the encoder design,
-      together with a geometric spectrum envelope \(\enum_{\Cone,w}\le \poly(n)\,\beta^w\) above that cutoff.
-\item \textbf{A sharp expected spectrum profile:} an exact span decomposition for \(\EE[\enum_{\Cone,w}]\), and the
-      resulting linear-weight exponent at rate \(1/2\).
-\end{enumerate}
-The construction is encoding-friendly in the sense that it is a single banded (width \(M+1\)) generator
-with no feedback; its work is \(O(nM)=O(n\log n)\).
+For the dense validation pair, the outer code is now taken to be a \emph{systematic}
+banded convolutional map.
+This is the analytically natural object suggested by the enumerator experiments:
+the systematic stream prevents the dangerous collapse of a moderate message weight into a tiny
+intermediate weight, while the parity stream retains the same local dense-tap structure.
 
-\subsection{Construction (banded diagonal feedforward convolution)}
+\subsection{Construction}
 \label{sec:outer-dense-construction}
 
-Fix an outer rate \(R_o\in(0,1)\). Let \(k:=\lfloor R_o n\rfloor\) and let \(r:=1/R_o\) be the number of output streams
-(so \(n=rk\), up to rounding).
-Let \(M:=\lceil c\log_2 n\rceil\) for a constant \(c\ge 1\) chosen later.
+We work at outer rate \(R_o=\tfrac12\).
+Let \(k=n/2\) and let \(M=\lceil c\log_2 n\rceil\) for a constant \(c\ge 1\).
 
-Given information bits \(x_1,\dots,x_k\in\F_2\), we use standard zero-termination:
-append \(M\) zeros \(x_{k+1}=\cdots=x_{k+M}=0\) and define \(x_t:=0\) for all \(t\le 0\).
-
-For each time \(t\in[k]\) and stream \(j\in[r]\), sample an independent uniform tap vector
-\(g_t^{(j)}\leftarrow \F_2^{M+1}\), and output
+Given information bits \(x_1,\dots,x_k\in\F_2\), append zero-termination
+\[
+x_{k+1}=\cdots=x_{k+M}=0
+\qquad\text{and}\qquad
+x_t=0\ \text{for }t\le 0.
+\]
+For each time \(t\in[k]\), sample an independent uniform tap vector
+\[
+g_t\gets \F_2^{M+1},
+\]
+and define the parity output
 \begin{equation}
-\label{eq:outer-dense-encoder}
-y_t^{(j)} \;:=\; \big\langle g_t^{(j)},\, (x_t,x_{t-1},\dots,x_{t-M})\big\rangle \in \F_2.
+\label{eq:outer-dense-parity}
+p_t \;:=\; \big\langle g_t,\,(x_t,x_{t-1},\dots,x_{t-M})\big\rangle.
 \end{equation}
-Flatten \(\bigl(y_t^{(1)},\dots,y_t^{(r)}\bigr)_{t=1}^k\) into a length-\(n\) outer codeword \(y\in\F_2^n\).
-This defines a linear outer code \(\Cone\subseteq\F_2^n\) with generator matrix \(\Gone\in\F_2^{k\times n}\)
-that is banded diagonal with bandwidth \(M+1\) (dense within the band, no feedback).
-
-\paragraph{Outer spectrum notation.}
-For \(w\in\{0,1,\dots,n\}\), let
+The length-\(n\) outer codeword is the systematic-parity concatenation
 \[
-\enum_{\Cone,w} \;:=\; \bigl|\{c\in\Cone:\ \wt(c)=w\}\bigr|
-\]
-denote the (outer) weight spectrum.
-
-\subsection{Spectrum bound (O2) from the span decomposition}
-\label{sec:outer-dense-spectrum}
-
-\begin{lemma}[Dense-outer expected spectrum above a logarithmic cutoff]
-\label{lem:outer-dense-spectrum}
-Assume \(R_o=\tfrac12\), so \(r=2\), and let \(M=\lceil c\log_2 n\rceil\) with \(c\ge 1\).
-Fix any constant \(\kappa>0\), and consider weights \(h\ge \kappa\log_2 n\).
-Then there exists a constant \(\beta_{\mathrm{out}}=\beta_{\mathrm{out}}(c/\kappa)>1\) such that
-\[
-\EE[\enum_{\Cone,h}] \;\le\; \beta_{\mathrm{out}}^{\,h}
-\]
-for all sufficiently large \(n\).
-\end{lemma}
-
-\begin{proof}
-By Corollary~\ref{cor:outer-dense-spectrum-piecewise},
-\[
-\EE[\enum_{\Cone,h}]
-=
-\sum_{\ell=1}^{k} N_\ell
-\binom{2(\ell+M)}{h}2^{-2(\ell+M)}.
-\]
-For every \(\ell\), we have \(N_1=k\le n\) and \(N_\ell=(k-\ell+1)2^{\ell-2}\le n2^\ell\) for \(\ell\ge 2\), hence
-\[
-\EE[\enum_{\Cone,h}]
-\le
-n2^{-2M}
-\sum_{\ell=1}^{k}
-2^{-\ell}\binom{2(\ell+M)}{h}.
-\]
-Using \(\binom{L}{h}\le (eL/h)^h\),
-\[
-\EE[\enum_{\Cone,h}]
-\le
-n2^{-2M}
-\sum_{\ell=1}^{k}
-2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h.
-\]
-Since \(h\ge \kappa\log_2 n\) and \(M=\lceil c\log_2 n\rceil\), we have
-\[
-\eta:=\frac{M}{h}\le \frac{c}{\kappa}+o(1).
-\]
-Split the sum into \(\ell\le h\) and \(\ell>h\).
-
-\emph{Range 1: \(\ell\le h\).}
-Then \((\ell+M)/h \le 1+\eta\), so
-\[
-2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
-\le
-2^{-\ell}\bigl(2e(1+\eta)\bigr)^h.
-\]
-Summing over \(\ell\le h\) gives
-\[
-\sum_{\ell\le h}
-2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
-\le
-\bigl(2e(1+\eta)\bigr)^h.
-\]
-
-\emph{Range 2: \(\ell>h\).}
-Write \(u=\ell/h>1\). Then
-\[
-2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
-=
-\left(2^{-u}\,2e(u+\eta)\right)^h.
-\]
-The function \(u\mapsto 2^{-u}(u+\eta)\) is continuous on \([1,\infty)\) and tends to \(0\) as \(u\to\infty\), so
-\[
-C_2(\eta):=\sup_{u\ge 1}2e\,2^{-u}(u+\eta)<\infty.
-\]
-Hence every term in the range \(\ell>h\) is at most \(C_2(\eta)^h\), and since there are at most \(n\) such terms,
-\[
-\sum_{\ell>h}
-2^{-\ell}\left(\frac{2e(\ell+M)}{h}\right)^h
-\le
-n\,C_2(\eta)^h.
-\]
-
-Therefore
-\[
-\EE[\enum_{\Cone,h}]
-\le
-n^{1-2c}\Bigl(C_1(\eta)^h+n\,C_2(\eta)^h\Bigr),
-\qquad
-C_1(\eta):=2e(1+\eta).
-\]
-Since \(c\ge 1\), the prefactor \(n^{1-2c}\cdot n\le 1\) for all sufficiently large \(n\).
-Thus
-\[
-\EE[\enum_{\Cone,h}]
-\le
-\bigl(C_1(\eta)+C_2(\eta)\bigr)^h
-\]
-for all sufficiently large \(n\).
-Because \(\eta\le c/\kappa+o(1)\), the right-hand side is bounded by \(\beta_{\mathrm{out}}^h\) for a constant
-\(\beta_{\mathrm{out}}=\beta_{\mathrm{out}}(c/\kappa)>1\).
-\end{proof}
-
-\paragraph{Remark (stronger forms).}
-Lemma~\ref{lem:outer-dense-spectrum} is only a coarse logarithmic-cutoff envelope.
-For the linear-weight regime the exact profile \eqref{eq:outer-dense-Ah} and the exponent
-\eqref{eq:outer-dense-rate-half-exponent} are the relevant bounds.
-
-\paragraph{For optimization, the span decomposition is sharper than the trellis bound.}
-The trellis lemma is convenient for a one-line interface proof, but it is too coarse for quantitative optimization.
-Because the taps are independent across \((t,j)\), a fixed input of span \(\ell\) has an exact binomial output-weight law.
-This yields a much sharper expected-spectrum envelope for the dense outer, which is the form we will use in the
-end-to-end dense+dense optimization.
-
-\begin{lemma}[Exact expected dense-outer spectrum via span decomposition]
-\label{lem:outer-dense-spectrum-span}
-Let the outer code be drawn from the dense log-memory ensemble above, and let the expectation below be over the tap
-randomness. For each output weight \(h\in\{1,\dots,n\}\),
-\begin{equation}
-\label{eq:outer-dense-span-spectrum}
-\EE[\enum_{\Cone,h}]
-\;=\;
-\sum_{\ell=1}^{k} N_\ell\,
-\Pr\!\Big[\Binomial\big(r(\ell+M),\tfrac12\big)=h\Big],
-\end{equation}
-where
-\[
-N_1:=k,
-\qquad
-N_\ell := (k-\ell+1)2^{\ell-2}\quad (\ell\ge 2)
-\]
-is the number of nonzero inputs of span exactly \(\ell\).
-Equivalently,
-\[
-\EE[\enum_{\Cone,h}]
-\;=\;
-\sum_{\ell=1}^{k} N_\ell\,
-\binom{r(\ell+M)}{h}\,2^{-r(\ell+M)},
-\]
-with the convention that \(\binom{r(\ell+M)}{h}=0\) if \(h>r(\ell+M)\).
-\end{lemma}
-
-\begin{proof}
-For each nonzero input \(x\in\F_2^k\), let \(I_x\) be the indicator of the event that the corresponding outer output has
-weight \(h\). Then
-\[
-\enum_{\Cone,h}=\sum_{x\neq 0} I_x,
-\qquad
-\EE[\enum_{\Cone,h}] = \sum_{x\neq 0}\Pr[\wt(\Enc_{\Cone}(x))=h].
-\]
-Group the inputs by their span \(\ell\).
-There are exactly \(N_1=k\) inputs of span \(1\), and for \(\ell\ge 2\) there are
-\((k-\ell+1)2^{\ell-2}\) inputs of span \(\ell\): choose the start position and the \(\ell-2\) interior bits freely, while
-the endpoints are forced to be \(1\).
-By Lemma~\ref{lem:outer-span-binomial}, any input of span \(\ell\) has output weight distributed as
-\(\Binomial(r(\ell+M),1/2)\).
-Summing these exact probabilities over all span classes yields \eqref{eq:outer-dense-span-spectrum}.
-\end{proof}
-
-\begin{corollary}[Optimization-ready outer profile]
-\label{cor:outer-dense-spectrum-piecewise}
-Define
-\begin{equation}
-\label{eq:outer-dense-Ah}
-A_h^{\mathrm{dense}}
-\;:=\;
-\sum_{\ell=1}^{k} N_\ell\,
-\binom{r(\ell+M)}{h}\,2^{-r(\ell+M)}
-\qquad (1\le h\le n).
-\end{equation}
-Then
-\[
-\EE[\enum_{\Cone,h}] = A_h^{\mathrm{dense}}
-\qquad\text{for all }h\in\{1,\dots,n\}.
-\]
-More generally, for any interval \(I\subseteq\{1,\dots,n\}\),
-\[
-\sum_{h\in I}\EE[\enum_{\Cone,h}]
-\;=\;
-\sum_{\ell=1}^{k} N_\ell\,
-\Pr\!\Big[\Binomial\big(r(\ell+M),\tfrac12\big)\in I\Big].
-\]
-\end{corollary}
-
-\paragraph{Linear-weight exponent viewpoint.}
-For \(h=\omega n\) and \(\ell=\lambda n\), each summand in \eqref{eq:outer-dense-Ah} is governed by the exponent
-\[
-\lambda - r\lambda\Bigl(1-H_2\!\Bigl(\frac{\omega}{r\lambda}\Bigr)\Bigr),
-\]
-up to lower-order terms, whenever \(0<\omega<r\lambda\).
-At rate \(1/2\) (so \(r=2\)), this becomes
-\[
-\lambda\Bigl(2H_2\!\Bigl(\frac{\omega}{2\lambda}\Bigr)-1\Bigr).
-\]
-Thus the dense-outer optimization problem reduces to understanding which span fractions \(\lambda\) dominate a given
-target output weight fraction \(\omega\).
-
-\begin{theorem}[Rate-\(\tfrac12\) dense-outer exponent]
-\label{prop:outer-dense-rate-half-exponent}
-Assume the outer rate is \(R_o=\tfrac12\), so \(r=2\) and \(k=n/2+O(1)\), and take
-\[
-M=O(\log n).
-\]
-For a fixed weight fraction \(\omega\in(0,\tfrac12)\), let \(h=\lfloor \omega n\rfloor\).
-Then
-\begin{equation}
-\label{eq:outer-dense-rate-half-exponent}
-A_h^{\mathrm{dense}}
-\;\le\;
-n^{O(1)}\,2^{n\Phi_{1/2}(\omega)},
-\end{equation}
-where
-\begin{equation}
-\label{eq:phi-rate-half}
-\Phi_{1/2}(\omega)
-\;:=\;
-\sup_{\lambda\in[\omega/2,\;1/2]}
-\lambda\Bigl(2H_2\!\Bigl(\frac{\omega}{2\lambda}\Bigr)-1\Bigr)
-\;=\;
-\omega\sup_{p\in[\omega,\;1]}\frac{H_2(p)-1/2}{p}.
-\end{equation}
-Moreover, if
-\begin{equation}
-\label{eq:pstar-def}
-p_\star := 1-2^{-1/2},
-\end{equation}
-then for every \(\omega\le p_\star\),
-\begin{equation}
-\label{eq:phi-rate-half-linear}
-\Phi_{1/2}(\omega)=\eta_2\,\omega,
-\qquad
-\eta_2
+\Enc_{\Cone}(x)
 :=
-\frac{H_2(p_\star)-1/2}{p_\star},
-\end{equation}
-and the maximizing span fraction is
-\begin{equation}
-\label{eq:lambda-star-rate-half}
-\lambda_\star(\omega)
-\;=\;
-\frac{\omega}{2p_\star}
-\;=\;
-\Bigl(1+\frac{\sqrt2}{2}\Bigr)\omega.
-\end{equation}
-For \(\omega\ge p_\star\), the maximizer is the boundary value \(\lambda_\star=1/2\), giving
-\[
-\Phi_{1/2}(\omega)=H_2(\omega)-1/2.
+(x_1,p_1,\dots,x_k,p_k)\in\F_2^{2k}.
 \]
-\end{theorem}
+Encoding cost is \(O(kM)=O(n\log n)\).
 
-\begin{proof}
-Starting from \eqref{eq:outer-dense-Ah}, write \(\ell=\lfloor \lambda n\rfloor\).
-For \(\ell\ge 2\), the multiplicity term satisfies
+\paragraph{Spectrum notation.}
+For \(h\in\{0,\dots,n\}\), write
 \[
-N_\ell=(k-\ell+1)2^{\ell-2}=n^{O(1)}2^{\lambda n},
+\enum_{\Cone,h}
+:=
+\bigl|\{c\in\Cone:\wt(c)=h\}\bigr|.
 \]
-uniformly for \(\lambda\in(0,1/2]\).
-Since \(M=O(\log n)=o(n)\), Stirling's formula gives
-\[
-\binom{2(\ell+M)}{h}\,2^{-2(\ell+M)}
-\;=\;
-n^{O(1)}\,2^{\,2\lambda n\left(H_2(\omega/(2\lambda))-1\right)}
-\]
-uniformly whenever \(\omega<2\lambda\).
-Hence each span class contributes at most
-\[
-n^{O(1)}\,2^{\,n\lambda\left(2H_2(\omega/(2\lambda))-1\right)}.
-\]
-Summing over the \(O(n)\) possible spans yields \eqref{eq:outer-dense-rate-half-exponent}.
+As in the framework, \(\EE[\enum_{\Cone,h}]\) denotes expectation over the random taps.
 
-For the second identity in \eqref{eq:phi-rate-half}, substitute
-\[
-p=\frac{\omega}{2\lambda},
-\qquad
-\lambda=\frac{\omega}{2p}.
-\]
-The objective becomes \(\omega(H_2(p)-1/2)/p\).
-Differentiating,
-\[
-\frac{d}{dp}\left(\frac{H_2(p)-1/2}{p}\right)
-\;=\;
-\frac{\log_2(1-p)+1/2}{p^2},
-\]
-so the unique interior maximizer is \(p_\star\) from \eqref{eq:pstar-def}.
-When \(\omega\le p_\star\), this point is feasible and yields
-\eqref{eq:phi-rate-half-linear} and \eqref{eq:lambda-star-rate-half}.
-When \(\omega>p_\star\), the feasible interval is \(p\in[\omega,1]\), so the maximizer is the boundary point \(p=\omega\),
-equivalently \(\lambda=1/2\), which gives \(\Phi_{1/2}(\omega)=H_2(\omega)-1/2\).
-\end{proof}
-
-\paragraph{Interpretation at GV-relevant weights.}
-At rate \(1/2\), the binary Gilbert--Varshamov benchmark is near \(\omega\approx 0.11\), which lies well below
-\(p_\star\approx 0.2929\).
-Thus the GV-relevant branch of the dense outer is the linear one:
-\[
-\Phi_{1/2}(\omega)=\eta_2\,\omega
-\qquad
-(\eta_2\approx 1.2716),
-\]
-and the dominant contributing outer inputs have span about \(1.707\,\omega n\).
-
-\subsection{Logarithmic minimum distance (O1) via span grouping}
-\label{sec:outer-dense-distance}
-
-We now show that a random draw of the taps \(g_t^{(j)}\) yields \(d_{\min}(\Cone)=\Omega(M)=\Omega(\log n)\) with high probability.
+\subsection{A fixed-word parity law}
+\label{sec:outer-dense-fixedword}
 
 \begin{definition}[Span]
-Fix a nonzero input \(x\in\F_2^k\). Let \(a\) be the first index with \(x_a=1\) and \(b\) the last index with \(x_b=1\).
-Define the span \(\ell:=b-a+1\).
+For a nonzero input \(x\in\F_2^k\), let \(a\) be the first index with \(x_a=1\) and \(b\) the last index with \(x_b=1\).
+The span of \(x\) is \(\ell:=b-a+1\).
 \end{definition}
 
-\begin{lemma}[Weight tail for a fixed span]
+\begin{lemma}[Parity law for a fixed span]
 \label{lem:outer-span-binomial}
-Fix a nonzero input \(x\) of span \(\ell\). Let \(y=\Enc_{\Cone}(x)\) be the outer output under \eqref{eq:outer-dense-encoder}.
-Then for each stream \(j\in[r]\), exactly \(\ell+M\) output positions have a nonzero window \((x_t,\dots,x_{t-M})\),
-and on those positions \(y_t^{(j)}\) is a uniform bit (independent across \(t\) and across streams).
+Fix a nonzero input \(x\in\F_2^k\) of span \(\ell\) and weight \(w\).
+Then exactly \(\ell+M\) parity positions have a nonzero window
+\((x_t,\dots,x_{t-M})\), and on those positions \(p_t\) is a uniform bit.
 Consequently,
 \[
-\wt(y) \;\sim\; \Binomial\bigl(r(\ell+M),\,1/2\bigr),
-\]
-and for any \(d\ge 1\),
-\[
-\Pr[\wt(y)\le d]\le (d+1)\binom{r(\ell+M)}{d}\,2^{-r(\ell+M)}
-\;\le\;
-(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
+\wt(\Enc_{\Cone}(x))
+\;\sim\;
+w+\Binomial(\ell+M,\tfrac12).
 \]
 \end{lemma}
 
 \begin{proof}
-If the window \((x_t,\dots,x_{t-M})\) is nonzero, then \(\langle g_t^{(j)},(x_t,\dots,x_{t-M})\rangle\) is a nontrivial linear
-functional of a uniform vector \(g_t^{(j)}\), hence uniform in \(\F_2\). Independence follows from independence of the tap vectors over
-\((t,j)\). The binomial tail bound is a standard union bound over weights \(0,\dots,d\) and \(\binom{L}{d}\le (eL/d)^d\).
+If the window \((x_t,\dots,x_{t-M})\) is nonzero, then
+\(\langle g_t,(x_t,\dots,x_{t-M})\rangle\) is a nontrivial linear functional of a uniform vector, hence uniform in \(\F_2\).
+Independence across \(t\) follows from independence of the tap vectors \(g_t\).
+Because the code is systematic, the total output weight is the message weight \(w\) plus the parity weight.
 \end{proof}
 
-\begin{theorem}[Outer logarithmic minimum distance]
-\label{thm:outer-dense-logdistance}
-There exists an absolute constant \(\alpha>0\) such that for any choice \(M=\lceil c\log_2 n\rceil\) with \(c\) sufficiently large,
+\subsection{A global geometric spectrum envelope}
+\label{sec:outer-dense-spectrum}
+
+The systematic structure makes it possible to control the \emph{entire} expected outer spectrum by a single geometric
+bound.
+The proof is a weighted generating-function argument over message spans.
+
+\begin{theorem}[Systematic dense-outer generating-function bound]
+\label{thm:outer-dense-generating}
+Let
 \[
-\Pr\bigl[d_{\min}(\Cone)\le \alpha\log_2 n\bigr] = o(1),
+A_h := \EE[\enum_{\Cone,h}],
+\qquad
+W_{\mathrm{out}}(z):=\sum_{h\ge 1} A_h z^h.
 \]
-where the probability is over the randomness of the taps \(g_t^{(j)}\).
-In particular, with high probability \(d_{\min}(\Cone)\ge \alpha\log n\).
+Fix any \(z\in(0,\sqrt2-1)\), and define
+\[
+a(z):=\frac{1+z}{2},
+\qquad
+q(z):=\frac{(1+z)^2}{2}.
+\]
+Then \(q(z)<1\), and there exists a constant \(C_{\mathrm{out}}(z)>0\) such that
+\begin{equation}
+\label{eq:outer-dense-gf-bound}
+W_{\mathrm{out}}(z)
+\;\le\;
+C_{\mathrm{out}}(z)\, k\, a(z)^M.
+\end{equation}
 \end{theorem}
 
 \begin{proof}
-Let \(d:=\alpha\log_2 n\). Union bound over all nonzero inputs \(x\).
-Group inputs by span \(\ell\in\{1,\dots,k\}\). For a fixed \(\ell\), there are at most \(k\cdot 2^\ell\le n\cdot 2^\ell\)
-nonzero inputs of span \(\ell\) (choose the start position and the \(\ell\)-bit pattern with endpoints \(1\)).
-By Lemma~\ref{lem:outer-span-binomial},
+For a fixed nonzero input \(x\), Lemma~\ref{lem:outer-span-binomial} gives
 \[
-\Pr[\wt(\Enc_{\Cone}(x))\le d \mid \text{span}=\ell]
+\EE\!\left[z^{\wt(\Enc_{\Cone}(x))}\right]
+=
+z^{\wt(x)}\left(\frac{1+z}{2}\right)^{\operatorname{span}(x)+M}.
+\]
+Summing over all nonzero inputs,
+\[
+W_{\mathrm{out}}(z)
+=
+\sum_{x\neq 0}
+z^{\wt(x)}a(z)^{\operatorname{span}(x)+M}.
+\]
+
+Group the inputs by span.
+For span \(1\), there are exactly \(k\) inputs, each of weight \(1\), so the total contribution is
+\[
+k\,z\,a(z)^{M+1}.
+\]
+
+For span \(\ell\ge 2\), choose the start position in \(k-\ell+1\) ways.
+The two endpoints of the span are forced to be \(1\), while the \(\ell-2\) interior bits are arbitrary.
+Hence the sum of \(z^{\wt(x)}\) over all inputs of span \(\ell\) is
+\[
+(k-\ell+1)\,z^2(1+z)^{\ell-2}.
+\]
+Therefore
+\[
+W_{\mathrm{out}}(z)
+\le
+kza(z)^{M+1}
+\sum_{\ell=2}^{k}
+(k-\ell+1)\,z^2(1+z)^{\ell-2}a(z)^{\ell+M}.
+\]
+Using
+\[
+(1+z)^{\ell-2}a(z)^\ell
+=(1+z)^{-2}\left(\frac{(1+z)^2}{2}\right)^\ell
+=(1+z)^{-2}q(z)^\ell,
+\]
+we get
+\[
+W_{\mathrm{out}}(z)
+\le
+kza(z)^{M+1}
+z^2a(z)^M(1+z)^{-2}
+\sum_{\ell=2}^{k}(k-\ell+1)q(z)^\ell.
+\]
+Since \(k-\ell+1\le k\) and \(q(z)<1\),
+\[
+\sum_{\ell=2}^{k}(k-\ell+1)q(z)^\ell
+\le
+k\sum_{\ell=2}^{\infty}q(z)^\ell.
+\]
+The geometric series converges, so both terms are \(O_z(k a(z)^M)\), proving \eqref{eq:outer-dense-gf-bound}.
+\end{proof}
+
+\begin{corollary}[Global geometric spectrum envelope]
+\label{lem:outer-dense-spectrum}
+Fix any \(z\in(0,\sqrt2-1)\) and choose
+\[
+c>\frac{1}{\log_2(1/a(z))}
+=
+\frac{1}{\log_2(2/(1+z))}.
+\]
+Then for all sufficiently large \(n\),
+\[
+\EE[\enum_{\Cone,h}] \le z^{-h}
+\qquad\text{for all }h\in\{1,\dots,n\}
+\]
+In particular, one may take \(\beta_{\mathrm{out}}=z^{-1}\) in the dense+dense integration theorem.
+\end{corollary}
+
+\begin{proof}
+By Theorem~\ref{thm:outer-dense-generating},
+\[
+W_{\mathrm{out}}(z)\le C_{\mathrm{out}}(z)\,k\,a(z)^M.
+\]
+Since \(k=n/2\) and \(M=\lceil c\log_2 n\rceil\),
+\[
+k\,a(z)^M
+\le
+n^{1-c\log_2(1/a(z))}.
+\]
+The assumption on \(c\) makes the exponent negative, so in fact \(W_{\mathrm{out}}(z)\to 0\) as \(n\to\infty\).
+Hence \(W_{\mathrm{out}}(z)\le 1\) for all sufficiently large \(n\).
+Now coefficient extraction gives
+\[
+A_h \le \frac{W_{\mathrm{out}}(z)}{z^h}\le z^{-h}.
+\]
+\end{proof}
+
+\paragraph{Interpretation.}
+The parameter \(z\) is the spectrum-control knob.
+Choosing \(z\) closer to \(\sqrt2-1\) improves the exponential base \(\beta_{\mathrm{out}}=O(1/z)\), but requires a larger
+memory constant \(c\) to make \(ka(z)^M\) decay.
+This tradeoff is exactly what later dense+dense proofs optimize against the inner contraction factor.
+
+\subsection{A linear-weight outer exponent}
+\label{sec:outer-dense-linear-exponent}
+
+The global geometric envelope is enough for the baseline theorem, but for sharper dense+dense claims we also want
+the linear-weight exponent suggested by the exact span decomposition.
+
+\begin{theorem}[Systematic dense outer: linear-weight spectrum exponent]
+\label{thm:outer-dense-linear-exponent}
+Let \(h=\lfloor \eta n\rfloor\) with \(\eta\in(0,1)\), and write
+\[
+A_h:=\EE[\enum_{\Cone,h}].
+\]
+Define
+\begin{equation}
+\label{eq:outer-dense-linear-rate-function}
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+\;:=\;
+\sup_{\eta/2\le \lambda\le 1/2}
+\lambda
+\left[
+2H_2\!\Bigl(\frac{\eta}{2\lambda}\Bigr)
+-1
+\right].
+\end{equation}
+Then
+\begin{equation}
+\label{eq:outer-dense-linear-exponent}
+A_h
 \;\le\;
-(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
+n^{O(1)}\,2^{\,n\,\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For \(w\ge 2\) and span \(\ell\ge w\), the number of message words of weight \(w\) and span \(\ell\) is
+\[
+(k-\ell+1)\binom{\ell-2}{w-2}.
+\]
+By Lemma~\ref{lem:outer-span-binomial}, each such word contributes
+\[
+2^{-(\ell+M)}\binom{\ell+M}{h-w}
+\]
+in expectation to \(A_h\).
+Thus
+\[
+A_h
+\le
+\sum_{w=2}^{k}\sum_{\ell=w}^{k}
+(k-\ell+1)\binom{\ell-2}{w-2}\,
+2^{-(\ell+M)}\binom{\ell+M}{h-w}
+\;+\;k\,2^{-M}\binom{M+1}{h-1},
+\]
+where the final term is the special case \(w=\ell=1\).
+
+The \(w=1\) term is at most \(n^{O(1)}2^{o(n)}\), so it is negligible on the exponential scale.
+For the double sum, group first by span \(\ell\).
+For each fixed \(\ell\ge 2\), Vandermonde's identity gives
+\[
+\sum_{w=2}^{\min\{h,\ell\}}
+\binom{\ell-2}{w-2}\binom{\ell+M}{h-w}
+=
+\binom{2\ell+M-2}{h-2}.
 \]
 Hence
 \[
-\Pr[d_{\min}(\Cone)\le d]
-\;\le\;
-\sum_{\ell=1}^{k} n\,2^\ell\cdot (d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-r(\ell+M)}.
-\]
-Split the sum into two ranges.
-
-\emph{Range A: \(\ell\ge 4d\).}
-Here \(\ell+M\ge 4d\), so the factor \(2^\ell\cdot 2^{-r(\ell+M)} \le 2^{-(r-1)\ell}\cdot 2^{-rM}\) decays geometrically in \(\ell\)
-(since \(r\ge 2\)). Summing over \(\ell\ge 4d\) contributes at most
-\[
-n\,(d+1)\Big(\frac{e\,r(\ell+M)}{d}\Big)^d 2^{-rM}\cdot \sum_{\ell\ge 4d} 2^{-(r-1)\ell}
-\;\le\;
-\poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}.
+A_h
+\le
+\sum_{\ell=2}^{k}
+(k-\ell+1)\,2^{-(\ell+M)}\binom{2\ell+M-2}{h-2}
+\;+\;n^{O(1)}2^{o(n)}.
 \]
 
-\emph{Range B: \(1\le \ell<4d\).}
-Here \(\ell+M\le 4d+M\), so we can bound
+Now write
 \[
-\Big(\frac{e\,r(\ell+M)}{d}\Big)^d \le \Big(e\,r(4+M/d)\Big)^d = n^{O(\alpha)}
+\ell=\lfloor \lambda n\rfloor,
+\qquad
+h=\lfloor \eta n\rfloor.
 \]
-since \(M/d=(c/\alpha)\) is constant.
-Also \(\sum_{\ell<4d} 2^\ell \le 2^{4d}=n^{4\alpha}\).
-Thus Range B contributes at most
+If \(h>2\ell+M-2\), the binomial coefficient vanishes, so asymptotically we must have
 \[
-n\cdot 2^{4d}\cdot \poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}
-\;=\;
-\poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}.
+\eta/2\le \lambda\le 1/2.
 \]
+Using Stirling bounds and \(M=O(\log n)=o(n)\),
+\[
+\binom{2\ell+M-2}{h-2}
+\le
+n^{O(1)}\,2^{(2\ell+M-2)H_2((h-2)/(2\ell+M-2))}
+\le
+n^{O(1)}\,2^{2\lambda n\,H_2(\eta/(2\lambda))+o(n)}.
+\]
+Multiplying by \(2^{-(\ell+M)}\) gives
+\[
+n^{O(1)}\,
+2^{\,n\lambda\left[
+2H_2(\eta/(2\lambda))-1
+\right]+o(n)}.
+\]
+Summing over the at most \(n\) admissible spans \(\ell\) only changes the polynomial prefactor, yielding
+\eqref{eq:outer-dense-linear-exponent}.
+\end{proof}
 
-Combining, \(\Pr[d_{\min}(\Cone)\le d]\le \poly(\log n)\cdot n^{O(\alpha)}\cdot 2^{-rM}\).
-With \(M=c\log_2 n\), we have \(2^{-rM}=n^{-rc}\).
-Choosing \(c\) sufficiently larger than the constant exponents induced by \(\alpha\) makes the bound \(o(1)\),
-proving the theorem.
+\paragraph{Why this matters.}
+The baseline theorem only needs the crude global envelope \(A_h\le z^{-h}\).
+Theorem~\ref{thm:outer-dense-linear-exponent} is the sharper object that interfaces naturally with the dense-inner
+linear-weight exponent, and it is the right analytic substitute for the guidance coming from the exact enumerator.
+
+\begin{corollary}[Explicit formula for the outer exponent]
+\label{cor:outer-dense-highweight-exponent}
+Let
+\[
+\eta_{\mathrm{crit}}:=1-\frac{1}{\sqrt2}.
+\]
+Then for every \(\eta\in(0,1)\),
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+=
+\begin{cases}
+\eta \log_2(1+\sqrt2), & 0<\eta\le \eta_{\mathrm{crit}},\\[1ex]
+H_2(\eta)-\frac12, & \eta_{\mathrm{crit}}\le \eta<1.
+\end{cases}
+\]
+\end{corollary}
+
+\begin{proof}
+Fix \(\eta\in(0,1)\).
+Set
+\[
+t:=\frac{\eta}{2\lambda},
+\qquad
+g(t):=\frac{H_2(t)-1/2}{t}.
+\]
+Then \(t\in[\eta,1]\) and
+\[
+\lambda\left[
+2H_2\!\Bigl(\frac{\eta}{2\lambda}\Bigr)-1
+\right]
+=
+\eta\,g(t).
+\]
+A direct derivative computation gives
+\[
+g'(t)
+=
+\frac{\log_2(1-t)+1/2}{t^2}.
+\]
+Thus \(g\) is increasing on \((0,\eta_{\mathrm{crit}}]\) and decreasing on \([\eta_{\mathrm{crit}},1)\).
+
+If \(\eta\le \eta_{\mathrm{crit}}\), then the feasible interval \([\eta,1]\) contains \(\eta_{\mathrm{crit}}\), so the supremum
+is attained at \(t=\eta_{\mathrm{crit}}\). Hence
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+=
+\eta\,g(\eta_{\mathrm{crit}}).
+\]
+Since \(\log_2(1-\eta_{\mathrm{crit}})=-1/2\),
+\[
+H_2(\eta_{\mathrm{crit}})-\frac12
+=
+-\eta_{\mathrm{crit}}\log_2(\eta_{\mathrm{crit}})
+-(1-\eta_{\mathrm{crit}})\log_2(1-\eta_{\mathrm{crit}})
+-\frac12
+=
+\eta_{\mathrm{crit}}\!\left(-\log_2(\eta_{\mathrm{crit}})-\frac12\right).
+\]
+Therefore
+\[
+g(\eta_{\mathrm{crit}})
+=
+-\log_2(\eta_{\mathrm{crit}})-\frac12
+=
+-\log_2\!\Bigl(\frac{\sqrt2-1}{\sqrt2}\Bigr)-\frac12
+=
+-\log_2(\sqrt2-1)
+=
+\log_2(1+\sqrt2),
+\]
+which proves the first branch.
+
+If \(\eta\ge \eta_{\mathrm{crit}}\), then every admissible \(t\) lies in \([\eta,1]\subseteq [\eta_{\mathrm{crit}},1]\),
+so \(g\) is decreasing throughout the feasible interval.
+Therefore the supremum is attained at the smallest admissible \(t\), namely \(t=\eta\), which corresponds to
+\(\lambda=1/2\).
+Substituting \(\lambda=1/2\) gives
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+=
+\frac12\left[2H_2(\eta)-1\right]
+=
+H_2(\eta)-\frac12.
+\qedhere
+\]
+\end{proof}
+
+\begin{corollary}[Low-linear-weight outer envelope]
+\label{cor:outer-dense-lowlinear-envelope}
+For every \(h\le \eta_{\mathrm{crit}}n\),
+\[
+\EE[\enum_{\Cone,h}]
+\le
+n^{O(1)}(1+\sqrt2)^h.
+\]
+\end{corollary}
+
+\begin{proof}
+Write \(h=\lfloor \eta n\rfloor\) with \(\eta\le \eta_{\mathrm{crit}}\).
+Theorem~\ref{thm:outer-dense-linear-exponent} and Corollary~\ref{cor:outer-dense-highweight-exponent} give
+\[
+\EE[\enum_{\Cone,h}]
+\le
+n^{O(1)}2^{n\eta\log_2(1+\sqrt2)}
+\le
+n^{O(1)}(1+\sqrt2)^h,
+\]
+after absorbing the floor/ceiling discrepancy into the polynomial factor.
 \end{proof}
 
 \subsection{Dense-outer summary}
 \label{sec:outer-dense-summary}
 
-Combining Theorem~\ref{thm:outer-dense-logdistance} and Lemma~\ref{lem:outer-dense-spectrum}, the dense log-memory outer
-satisfies the coarse geometric bounds needed for the low/intermediate-weight part of the dense+dense proof:
-\[
-d_{\min}(\Cone)\ge \alpha\log n
-\qquad\text{and}\qquad
-\enum_{\Cone,w}\le \poly(n)\,\beta^w\ \text{for the relevant weight regime.}
-\]
-For the linear-weight regime, the sharper expected-spectrum quantities are
-\eqref{eq:outer-dense-Ah} and \eqref{eq:outer-dense-rate-half-exponent}.
+For the systematic dense outer we now have:
+\begin{enumerate}
+\item a fixed-word law from Lemma~\ref{lem:outer-span-binomial},
+\item a global generating-function bound from Theorem~\ref{thm:outer-dense-generating},
+\item the resulting geometric expected-spectrum envelope from Corollary~\ref{lem:outer-dense-spectrum},
+\item the explicit linear-weight spectrum exponent from Theorem~\ref{thm:outer-dense-linear-exponent} and Corollary~\ref{cor:outer-dense-highweight-exponent},
+\item and the low-linear-weight envelope from Corollary~\ref{cor:outer-dense-lowlinear-envelope}.
+\end{enumerate}
+These are the only outer ingredients needed for the baseline dense+dense linear-distance proof.
