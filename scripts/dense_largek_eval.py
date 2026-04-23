@@ -34,6 +34,26 @@ def h2(x: float) -> float:
     return -x * math.log2(x) - (1.0 - x) * math.log2(1.0 - x)
 
 
+def log2add(x: float, y: float) -> float:
+    if x == float("-inf"):
+        return y
+    if y == float("-inf"):
+        return x
+    hi = max(x, y)
+    lo = min(x, y)
+    return hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
+
+def log2_binom(n: int, k: int) -> float:
+    if k < 0 or k > n:
+        return float("-inf")
+    return (
+        math.lgamma(n + 1.0)
+        - math.lgamma(k + 1.0)
+        - math.lgamma(n - k + 1.0)
+    ) / math.log(2.0)
+
+
 def binom_cdf_half_upper(n: int, k: int, *, exact_limit: int = 2000, tail_terms: int = 128) -> float:
     if k < 0:
         return 0.0
@@ -103,6 +123,24 @@ def outer_generating_bound(k_msg: int, sigma: int, z: float) -> float:
     return span1 + span_ge_2
 
 
+def outer_small_h_exact_log2(k_msg: int, sigma: int, h: int) -> float:
+    total = float("-inf")
+
+    first = math.log2(k_msg) + log2_binom(sigma + 1, h - 1) - (sigma + 1)
+    total = log2add(total, first)
+
+    for ell in range(2, k_msg + 1):
+        mult = k_msg - ell + 1
+        term = (
+            math.log2(mult)
+            + log2_binom(2 * ell + sigma - 2, h - 2)
+            - (ell + sigma)
+        )
+        total = log2add(total, term)
+
+    return total
+
+
 def tiny_window_bound(n: int, sigma: int, delta: float, z: float, xi: float, kappa: float, w_out: float) -> tuple[int, float]:
     h0 = int(math.floor(kappa * math.log2(n)))
     if h0 < 1:
@@ -115,6 +153,24 @@ def tiny_window_bound(n: int, sigma: int, delta: float, z: float, xi: float, kap
         inner = (h * (h - 1)) / (n - 1) + ((L * (2.0 ** (-sigma))) ** h) + h * b
         total += outer * inner
     return h0, total
+
+
+def small_h_heuristic_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    theta: float,
+) -> float:
+    total = float("-inf")
+    for h in range(h_lo, h_hi + 1):
+        eta = h / n
+        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        inn = psi_run(eta, theta)
+        total = log2add(total, out - n * inn)
+    return total
 
 
 def geometric_window_bound(
@@ -222,6 +278,17 @@ def main() -> int:
     parser.add_argument("--eta-hi", type=float, default=0.99)
     parser.add_argument("--gap-step", type=float, default=1e-5)
     parser.add_argument("--lambda-target", type=float, default=None, help="Optional target z <= 2^-lambda.")
+    parser.add_argument(
+        "--heuristic-h-cap",
+        type=int,
+        default=64,
+        help="Highest weight h included in the exact-outer/asymptotic-inner heuristic splice.",
+    )
+    parser.add_argument(
+        "--show-heuristic",
+        action="store_true",
+        help="Also report heuristic small-h and total values using exact small-h outer counts plus the asymptotic run exponent.",
+    )
     args = parser.parse_args()
 
     n = 2 * args.k
@@ -256,6 +323,32 @@ def main() -> int:
         total = s_tiny + s_low + s_lin + s_top
         lg = math.log2(total) if total > 0.0 else float("-inf")
 
+        h_cap = min(args.heuristic_h_cap, h_mid_hi)
+        log2_h_small = small_h_heuristic_log2(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            h_lo=1,
+            h_hi=h_cap,
+            theta=args.theta,
+        )
+        h_resid_lo = h_cap + 1
+        h_resid = geometric_window_bound(
+            n=n,
+            h_lo=h_resid_lo,
+            h_hi=h_mid_hi,
+            z=args.z,
+            rho=args.rho,
+            w_out=w_out,
+        )
+        log2_h_total = log2_h_small
+        if h_resid > 0.0:
+            log2_h_total = log2add(log2_h_total, math.log2(h_resid))
+        if log2_s_lin != float("-inf"):
+            log2_h_total = log2add(log2_h_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_h_total = log2add(log2_h_total, log2_s_top)
+
         print(f"sigma = {sigma}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
         print(f"  outer generating bound W(z)   : {format_prob(w_out)}")
@@ -266,6 +359,10 @@ def main() -> int:
         print(f"  S_lin   (exponent-mode)       : {format_log2(log2_s_lin)}")
         print(f"  S_top   (outer-only exponent) : {format_log2(log2_s_top)}")
         print(f"  TOTAL   (mixed bound/proxy)   : {format_prob(total)}")
+        if args.show_heuristic:
+            print(f"  H_small (exact outer + asym inner, h<= {h_cap}) : {format_log2(log2_h_small)}")
+            print(f"  H_tail  (explicit geometric residual)           : {format_prob(h_resid)}")
+            print(f"  H_total (heuristic mixed)                       : {format_log2(log2_h_total)}")
         if args.lambda_target is not None:
             target = -args.lambda_target
             ok = lg <= target
