@@ -640,3 +640,125 @@ it suggests which \((\sigma,k)\) regimes are promising, which low-weight windows
 and where the analytic proof is losing the most.
 In the main body we only use analytic bounds, but the exact enumerator can be recorded in an appendix and used to guide
 the sharpening of \eqref{eq:dense-dense-parameter-conditions}.
+
+\subsection{Dense+dense estimates (working save point)}
+\label{sec:integration-dense-dense-estimates}
+
+This subsection is a \emph{working estimates section}, not a theorem section.
+Its purpose is to record the current model we use to think about the dense+dense regime before the corresponding
+finite-length statements are turned into fully rigorous propositions.
+The guiding principle is still the first moment:
+\begin{equation}
+\label{eq:dense-dense-working-mu}
+\mu_{n,\sigma}(\delta)
+\;:=\;
+\EE\!\left[\#\{c\neq 0:\ \wt(c)\le \delta n\}\right]
+\;\approx\;
+\sum_{h=1}^{n}
+A_h^{\mathrm{out}}\,
+p_h^{\mathrm{in}}(\delta),
+\end{equation}
+where \(A_h^{\mathrm{out}}\) is the expected number of outer codewords of intermediate weight \(h\), and
+\(p_h^{\mathrm{in}}(\delta)\) is the inner low-tail probability from a uniformly random weight-\(h\) slice input.
+Whenever \(\mu_{n,\sigma}(\delta)<1\), Markov's inequality gives the useful surrogate
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]\le \mu_{n,\sigma}(\delta).
+\]
+
+\paragraph{Why we reparameterize by \(\sigma=\lceil \log_2 k\rceil+c\).}
+For the finite-length construction suggested by the enumerator, the natural design parameter is not raw \(\sigma\), but
+the offset
+\[
+\sigma=\lceil \log_2 k\rceil+c,
+\qquad c\in\{0,1,2,\dots\}.
+\]
+This is motivated by the small-weight formulas themselves.
+For fixed small \(h\), the exact outer low-weight contribution behaves like a polynomial in \(\sigma\) times
+\(k2^{-\sigma}\), hence mainly as a function of the offset \(c\).
+Likewise, in the inner small-weight bound the OFF term appears through \(L2^{-m}\), and when \(m\) is identified with
+\(\sigma\) and \(L\asymp n\asymp k\), this again behaves roughly like a constant times \(2^{-c}\).
+So the first-order question is:
+\emph{for a target \(\delta\), which offset \(c\) is enough?}
+
+\paragraph{The current finite-\(n\) model.}
+The working evaluator splits \eqref{eq:dense-dense-working-mu} into three windows.
+
+\medskip
+\noindent
+\textbf{1. Small weights.}
+For \(1\le h\le H\) (currently \(H\) is a small fixed cutoff such as \(64\)), we use the exact low-weight outer count
+\begin{equation}
+\label{eq:dense-dense-working-outer-small}
+A_h^{\mathrm{out,exact}}
+\;=\;
+k\cdot \frac{\binom{\sigma+1}{h-1}}{2^{\sigma+1}}
+\;+\;
+\sum_{\ell=2}^{k}(k-\ell+1)\frac{\binom{2\ell+\sigma-2}{h-2}}{2^{\ell+\sigma}},
+\end{equation}
+and pair it with the exact run-tail inner bound from
+\eqref{eq:dense-inner-run-opt-envelope}.
+Concretely, for each small \(h\) we optimize over \(r\in\{1,\dots,h\}\):
+\begin{equation}
+\label{eq:dense-dense-working-small-inner}
+p_h^{\mathrm{in}}(\delta)
+\;\lesssim\;
+\min_{1\le r\le h}
+\left(
+\mathrm{RunTail}_n(h,r)+(L2^{-\sigma})^r+r\,b_{\delta,\xi}(n)
+\right),
+\end{equation}
+with \(L=\lceil(2+\xi)\delta n\rceil\).
+This is the most informative part of the present model.
+
+\medskip
+\noindent
+\textbf{2. Intermediate weights.}
+For \(H<h<\eta_{\mathrm{crit}}n\), the current model still falls back to a geometric residual of the form
+\[
+A_h^{\mathrm{out}}\cdot p_h^{\mathrm{in}}(\delta)
+\;\lesssim\;
+\text{const}\cdot
+\left(\frac{\rho}{z}\right)^h,
+\]
+with the same \(z\) and \(\rho\) as in the analytic proof.
+This is the weakest part of the finite-length model and remains the main source of conservatism.
+
+\medskip
+\noindent
+\textbf{3. Linear weights.}
+For \(h=\eta n\) with \(\eta\ge \eta_{\mathrm{crit}}\), we use the explicit exponent comparison already proved in the
+main text:
+\[
+A_h^{\mathrm{out}}\,p_h^{\mathrm{in}}(\delta)
+\;\lesssim\;
+n^{O(1)}\,2^{n(\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;\theta,\delta,\xi))}.
+\]
+At the moment, this window is \emph{not} the dominant obstruction in the parameter ranges suggested by the enumerator.
+
+\paragraph{What this model is trying to capture.}
+The working hypothesis is that, after one separates the low-weight outer combinatorics from the low-weight inner
+run-count mechanism, the threshold behavior is controlled primarily by the offset \(c\).
+In that sense the model is intended to be more principled than a raw empirical fit:
+it is a finite-\(n\) approximation assembled directly from the same exact combinatorial quantities that appear in the
+proof, with only the residual window treated more coarsely.
+
+\paragraph{Current save point.}
+At the time of writing, the strongest finite-\(n\) working estimate suggests the following picture for the
+construction tracked by the enumerator:
+\begin{itemize}
+\item the raw asymptotic heuristic is too optimistic and cannot be used by itself;
+\item replacing the tiny-weight window by the exact outer small-\(h\) counts plus the exact run-tail inner bound gives a
+substantially more stable picture;
+\item in the parameterization \(\sigma=\lceil\log_2 k\rceil+c\), the present working model suggests that the
+transition occurs near a fixed offset \(c\), rather than at a fixed absolute \(\sigma\);
+\item more specifically, in the current calculations \(c=3\) still looks too small while \(c=4\) is the first offset
+that becomes plausible for the target distances suggested by the enumerator.
+\end{itemize}
+This should be read only as the current state of the model, not as a proved theorem.
+Its role is to tell us where further analytic work is most likely to pay off.
+
+\paragraph{What must be improved next.}
+The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} is already explicit and usable.
+The remaining gap is therefore mostly on the inner side:
+to turn this working model into a theorem-level finite-length estimate, one needs a sharper and still explicit control
+of the intermediate window between the exact small-\(h\) regime and the linear-weight exponent regime.

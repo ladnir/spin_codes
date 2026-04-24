@@ -11,6 +11,7 @@ from pathlib import Path
 from dense_largek_eval import (
     ETA_CRIT,
     GapResult,
+    adaptive_small_h_rigorous,
     exact_smallw_inner_bound,
     geometric_window_bound,
     linear_window_gap,
@@ -131,6 +132,32 @@ def evaluate_point(
         lo = min(log2_r_small, log2_h_resid)
         log2_r_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
 
+    log2_a_small, a_stop_h, a_peak_h, a_peak_log2 = adaptive_small_h_rigorous(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        delta=delta,
+        xi=xi,
+        h_hi=h_mid_hi,
+    )
+    a_resid = geometric_window_bound(
+        n=n,
+        h_lo=a_stop_h + 1,
+        h_hi=h_mid_hi,
+        z=z,
+        rho=rho,
+        w_out=w_out,
+    )
+    log2_a_resid = math.log2(a_resid) if a_resid > 0.0 else float("-inf")
+    if log2_a_small == float("-inf"):
+        log2_a_total = log2_a_resid
+    elif log2_a_resid == float("-inf"):
+        log2_a_total = log2_a_small
+    else:
+        hi = max(log2_a_small, log2_a_resid)
+        lo = min(log2_a_small, log2_a_resid)
+        log2_a_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
     return {
         "n": float(n),
         "w_out_log2": math.log2(w_out) if w_out > 0.0 else float("-inf"),
@@ -148,6 +175,12 @@ def evaluate_point(
         "h_total_log2": log2_h_total,
         "r_small_log2": log2_r_small,
         "r_total_log2": log2_r_total,
+        "a_stop_h": float(a_stop_h),
+        "a_peak_h": float(a_peak_h),
+        "a_peak_log2": a_peak_log2,
+        "a_small_log2": log2_a_small,
+        "a_tail_log2": log2_a_resid,
+        "a_total_log2": log2_a_total,
     }
 
 
@@ -203,6 +236,12 @@ def main() -> int:
                 "h_total_log2",
                 "r_small_log2",
                 "r_total_log2",
+                "a_stop_h",
+                "a_peak_h",
+                "a_peak_log2",
+                "a_small_log2",
+                "a_tail_log2",
+                "a_total_log2",
             ],
         )
         writer.writeheader()

@@ -209,6 +209,46 @@ def small_h_rigorous_log2(
     return total
 
 
+def adaptive_small_h_rigorous(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    xi: float,
+    h_hi: int,
+    stop_gap_bits: float = 20.0,
+    tail_confirm: int = 8,
+) -> tuple[float, int, int, float]:
+    total = float("-inf")
+    best_term = float("-inf")
+    best_h = 0
+    last_h = 0
+    decay_count = 0
+
+    for h in range(1, h_hi + 1):
+        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+        if inn <= 0.0:
+            continue
+        term = out + math.log2(inn)
+        total = term if total == float("-inf") else log2add(total, term)
+        last_h = h
+
+        if term > best_term:
+            best_term = term
+            best_h = h
+            decay_count = 0
+        elif term <= best_term - stop_gap_bits:
+            decay_count += 1
+            if decay_count >= tail_confirm:
+                break
+        else:
+            decay_count = 0
+
+    return total, last_h, best_h, best_term
+
+
 def small_h_heuristic_log2(
     *,
     n: int,
@@ -362,6 +402,13 @@ def main() -> int:
         action="store_true",
         help="Also report a stronger finite-n small-weight bound using exact outer counts and the exact run-tail inner formula up to h_cap.",
     )
+    parser.add_argument(
+        "--show-adaptive-smallw",
+        action="store_true",
+        help="Also report an adaptive exact small-weight finite-n bound and the stopping point used before the rigorous residual tail.",
+    )
+    parser.add_argument("--adaptive-stop-gap", type=float, default=20.0)
+    parser.add_argument("--adaptive-tail-confirm", type=int, default=8)
     args = parser.parse_args()
 
     print(f"Concrete dense+dense large-k evaluator")
@@ -439,6 +486,32 @@ def main() -> int:
         if log2_s_top != float("-inf"):
             log2_r_total = log2add(log2_r_total, log2_s_top)
 
+        log2_a_small, h_stop, h_peak, h_peak_log2 = adaptive_small_h_rigorous(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            delta=args.delta,
+            xi=args.xi,
+            h_hi=h_mid_hi,
+            stop_gap_bits=args.adaptive_stop_gap,
+            tail_confirm=args.adaptive_tail_confirm,
+        )
+        a_resid = geometric_window_bound(
+            n=n,
+            h_lo=h_stop + 1,
+            h_hi=h_mid_hi,
+            z=args.z,
+            rho=args.rho,
+            w_out=w_out,
+        )
+        log2_a_total = log2_a_small
+        if a_resid > 0.0:
+            log2_a_total = log2add(log2_a_total, math.log2(a_resid))
+        if log2_s_lin != float("-inf"):
+            log2_a_total = log2add(log2_a_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_a_total = log2add(log2_a_total, log2_s_top)
+
         print(f"sigma = {sigma}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
         print(f"  outer generating bound W(z)   : {format_prob(w_out)}")
@@ -456,6 +529,12 @@ def main() -> int:
         if args.show_exact_smallw:
             print(f"  R_small (exact outer + exact run-tail inner, h<= {h_cap}) : {format_log2(log2_r_small)}")
             print(f"  R_total (stronger finite-n mixed)                         : {format_log2(log2_r_total)}")
+        if args.show_adaptive_smallw:
+            print(f"  A_small (adaptive exact small-weight sum)                : {format_log2(log2_a_small)}")
+            print(f"  A_tail  (rigorous residual after adaptive stop)          : {format_prob(a_resid)}")
+            print(f"  A_total (adaptive finite-n mixed)                        : {format_log2(log2_a_total)}")
+            print(f"  A_peak  (dominant h, log2 contribution)                  : h={h_peak}, log2={h_peak_log2:.3f}")
+            print(f"  A_stop  (last exact h included)                          : {h_stop}")
         if args.lambda_target is not None:
             target = -args.lambda_target
             ok = lg <= target
