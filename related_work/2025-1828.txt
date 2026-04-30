@@ -1,0 +1,4793 @@
+Block-Accumulate Codes: Accelerated Linear
+Codes for PCGs and ZK
+Vladimir Kolesnikov1 , Stanislav Peceny2⋆ , Rahul Rachuri3 ,
+Srinivasan Raghuraman4 , Peter Rindal5 , and Harshal Shah3
+1
+2
+
+Georgia Institute of Technology
+Stealth Software Technologies, Inc.
+3
+Visa Research
+4
+Visa Research and MIT
+5
+Category Labs
+
+Abstract. Linear error-correcting codes with fast encoding and high
+minimum distance are a central primitive across modern cryptography.
+They appear prominently in at least two domains: (1) pseudorandom
+correlation generators (PCGs), which enable sublinear-communication
+generation of correlations such as oblivious transfer and vector oblivious
+linear evaluation, and (2) zero-knowledge proof systems, where lineartime encoders underpin proof soundness and scalability. In both settings,
+the prover or sender must multiply by a large generator matrix G, often
+with dimensions in the millions, making computational efficiency the
+dominant bottleneck.
+We propose a generalized paradigm for building crypto-friendly codes
+with provable minimum distance. Roughly speaking, these codes are
+based on the idea of randomized turbo codes such as repeat accumulate codes. We prove that their asymptotic minimum distance is linear
+and compute the exact expected weight spectrum of the codes for concrete sizes. We observe that our codes achieve full Gilbert-Varshamov
+minimum distance and outperform all prior constructions.
+We construct several novel codes, the most promising of which we
+call Block-Accumulate codes. Our codes are the fastest on both GPUs
+and CPUs. If we restrict our attention to codes with provable distance,
+our code is 8× faster than state of the art on a CPU and 50× faster on
+a GPU. Even if we use aggressive parameters with conjectured distance,
+our code is 3× and 20× faster, respectively. Under these parameters, this
+yields overall PCG speedups of 2.5× on the CPU and 15× on the GPU,
+achieving about 200 million OTs or binary Beaver triples per second on
+the GPU (excluding the one-time 10 ms GGM seed expansion). We also
+observe a 3× speedup and half the peak memory consumption of the
+Blaze zero-knowledge (PCS) scheme of Brehm et al. (Eurocrypt 25).
+
+1
+
+Introduction
+
+Linear error-correcting codes with fast encoding and provable minimum distance
+are a fundamental primitive in cryptography. Beyond their classical role in com⋆
+
+Part of this work was done while the author was at Visa Research and Georgia Tech.
+
+munication, such codes increasingly appear as computational building blocks
+inside larger cryptographic protocols, where encoding must be performed on
+vectors of size ranging from millions to billions of symbols. In these settings, the
+asymptotic encoding complexity and concrete constant factors of the generator
+matrix dominate performance, often outweighing all other cryptographic costs.
+Coding-Theoretic Codes vs. Cryptographic Codes. As discussed in greater detail below, we require G to support fast matrix multiplication, i.e., computing
+G · a′ , and to have a high minimum distance. These requirements align with
+those of a generator matrix for an error-correcting code. Thus, one might simply
+consult the coding theory literature and select a state-of-the-art code. However,
+this would result in suboptimal performance. Indeed, typical coding-theoretic
+constructions optimize for fast encoding of moderately sized codes (on the order
+of thousands), whereas we are interested in code lengths on the order of millions.
+More importantly, coding-theoretic constructions have traditionally required an
+efficient decoder; that is, given c′ = xG + e for sparse e, one must decode c′
+to recover x. In contrast, codes used in cryptography typically never rely on a
+decoder and therefore are not subject to this constraint. Instead, we require G
+to have a concretely high minimum distance and efficient encoding. While the
+minimum distance upper-bounds the decodability of a code, codes with high
+minimum distance often do not admit efficient decoding algorithms.
+Prior cryptographic code constructions, such as [CRR21,BCG+ 22,RRT23],
+have leveraged this fact by adapting constructions from coding theory to amplify
+minimum distance, albeit at the expense of worse decodability. One can view our
+work as continuing this trend, but with the added criterion that our codes should
+be GPU-friendly.
+1.1
+
+Applications
+
+Correlated Randomness and MPC. Correlated randomness is the de facto foundation for realizing efficient multiparty computation (MPC). Primary examples are oblivious transfer (OT), vector-oblivious linear evaluation (VOLE), and
+Beaver triple correlations, which drive a large portion of today’s MPC constructions. Consequently, the ability to generate such correlated randomness with low
+overhead is crucial for practical deployment. The development of pseudorandom
+correlation generators (PCGs) [BCG+ 19a,BCG+ 19b] based on linear codes with
+high minimum distance has been proposed as a promising direction: they offer
+sublinear communication complexity and compelling computational overheads.
+However, more research is needed to fully harness these benefits, including a
+deeper understanding of the underlying security assumptions and improvements
+in computational performance.
+Interactive Zero-Knowledge Proofs and Linear Codes. The same code-based
+transformation central to PCGs also arises in state-of-the-art zero-knowledge
+(ZK) protocols. Many modern interactive proof systems, especially those built
+from linear-time interactive proofs and VOLE-based proof compilers [WYKW21]
+2
+
+[YWL+ 20], require the prover to encode vectors using a linear error-correcting
+code with high minimum distance. This encoding step serves the dual purpose of
+ensuring soundness (via distance properties) and enabling linear-time arithmetic
+checks. In these settings, the prover’s bottleneck is the cost of multiplying by a
+large generator matrix G, often of size in the millions. Thus, the ZK literature
+has emphasized the need for fast, linear-time encoders for codes with strong
+distance guarantees. Our constructions directly satisfy this need: they drop into
+existing interactive ZK frameworks, replacing generic coding-theory choices with
+GPU-friendly codes that deliver linear-time encoding.
+Codes in SNARKs and IOPs. Beyond interactive proofs, linear codes with efficient encoding are also a cornerstone of SNARK and STARK systems. Examples include the FRI protocol and its descendants in STARKs [BSBHR19],
+Ligero [AHIV17], Aurora [BSCR+ 19], and more recent transparent SNARKs
+such as Brakedown [GLS+ 23], Plonkish systems [GWC19], and Spartan [Set20].
+In all of these schemes, prover efficiency is tied to encoding large vectors under
+a code with strong distance guarantees, often with dimensions in the millions.
+Recently, several works have pursued designing or applying similar linear codes
+for this setting [BFK+ 24,LZ25,BMMS25], notably Blaze [BCF+ 25], whose efficiency we improve upon in this work. As in the interactive setting, the dominant
+cost is multiplying by a generator matrix G, and thus these systems explicitly
+benefit from linear-time encoders. Our codes can drop directly into such SNARK
+frameworks, offering provable distance and substantial speedups.
+See Appendix A for a more detailed handling of these applications.
+1.2
+
+Contribution
+
+We make the following contributions:
+– New state-of-the-art linear codes for PCGs and zero knowledge that are
+several times faster than prior art at rate 1/2. On a CPU, our codes require
+20 ms for k = 220 correlations and are between 3× to 8× faster than prior
+art, depending on the parameterization.
+– GPU-accelerated implementation that takes advantage of the parallel structure of our codes. On a GPU, our code requires just 3.2 ms for k = 220 correlations and is approximately 50× faster than prior art. This corresponds to a
+throughput of roughly 200 million OTs or binary Beaver triples per second.
+– We integrate our new codes into the binary zero knowledge system Blaze
+[BCF+ 25]. As a proof of concept, we replace their use of rate 0.25 repeataccumulate-accumulate (RAA) codes with our new construction and observe
+a 2× speed up in encoding time and a halving of total memory usage.
+– A flexible and extensible framework for proving the minimum distance of
+codes. In addition to our codes, we anticipate that this framework can be
+used to prove the minimum distance of a wide variety of codes, possibly
+resulting in further improvements.
+3
+
+– Improved minimum distance compared to prior work. This means that when
+deployed in a PCG protocol, smaller-weight noise vectors can be used to
+achieve the same security, resulting in less communication.
+– Resolving a longstanding open question [BMS03,BGT93] on the existence of
+depth t = 2 turbo codes with sublinear state and linear minimum distance.
+
+2
+
+Related Work
+
+We now review techniques aimed at optimizing PCGs. Excluding recent works
+based on Ring LPN [BCG+ 20,BBC+ 24,LXYY25], most PCGs rely on essentially
+the same protocols [BCGI18,BCG+ 19a,BCG+ 19b,BCG+ 20,CRR21,BCG+ 22]
+[RRT23,KPRR25]: they generate a secret sharing of the product [[∆a′ ]], where
+a′ ∈ Fn is a sparse vector and ∆ ∈ F is a scalar. This corresponds to the
+interactive setup c′ − b′ = ∆a′ (see Section 1). The resulting shared vector
+is then compressed using a linear function G. Consequently, improving PCG
+performance centers on two tasks: (1) generating the shared sparse vector [[∆a′ ]]
+efficiently, and speeding up the subsequent multiplication by G.
+Two major optimizations have emerged for generating the secret sharing of
+∆a′ . The first is the concept of a regular distribution for a′ [AFS05], where a′ is
+the concatenation of t unit vectors of length n/t. That is, n is the length of a′ and
+t is its Hamming weight. Regular noise replaced the more traditional Bernoulli
+and exact distributions [AFS05,HOSS18,Ds17,BCGI18,SGRR19,BCG+ 19a]
+[BCG+ 19b,BCG+ 20,BCG+ 22]. In the context of secure computation, this approach was first used by TinyKeys [HOSS18] and subsequently by [BCGI18] for
+PCGs. The regular noise distribution is advantageous because it allows generating [[∆a′ ]] with only O(n) AES calls, spread across t distributed point functions.
+This is in contrast with the other noise distributions, which typically require O(t)
+distributed point functions, each of size n, resulting in O(tn) AES calls. Alternatively, one can use more complex techniques such as cuckoo hashing [SGRR19],
+but these also impose additional overheads.
+More recently, [KPRR25] presented a new assumption that allows the cost of
+generating [[∆a′ ]] to be amortized across q instances by fixing the noisy locations
+of a′ . This allows for many correlated noise vectors a′(1) , ..., a′(q) ∈ Fn to be
+generated more efficiently. As long as the sparse noise elements in each a′(i)
+are sampled uniformly at random, the resulting a(i) := Ga′(i) ∈ Fk will be
+pseudorandom by the stationary LPN assumption [KPRR25]. This leads to a
+concrete 6–18× reduction in communication along with compelling performance
+improvements for our GPU implementation.
+Another line of research, which constitutes the principal runtime bottleneck
+for PCGs and is the focus of this work, aims to reduce the cost of multiplying
+G by [[∆a′ ]] [BCGI18,BCG+ 19a,BCG+ 19b,BCG+ 20,CRR21,BCG+ 22,RRT23].
+In the original formulation of Syndrome Decoding and LPN, G is taken to be
+uniform, so computing G · [[∆a′ ]] requires O(n2 ) time. However, there is good
+evidence that one may replace G with the generator matrix of a code that has
+high minimum distance, unless that code exhibits a strong algebraic structure
+4
+
+(e.g., a Reed–Solomon code with efficient Syndrome Decoding via Berlekamp–
+Massey [Ber68]). Switching G to a generator matrix of a linear-time code makes
+it theoretically possible to evaluate G · v in O(n) time for any v. In practice,
+however, performance often degrades to O(cn), where c is typically related to
+log n or the security parameter. Several works [BCGI18,BCG+ 19a,BCG+ 19b]
+propose using LDPC or quasi-cyclic codes, which offer well-studied security and
+reasonable performance. Subsequently, [BCG+ 22] introduced a turbo-like code,
+called Expand-Accumulate, which significantly reduces costs and can be parameterized to achieve a provably high minimum distance. Further improvements
+were proposed by [RRT23], who replaced [BCG+ 22]’s accumulation step with a
+convolution, thereby boosting minimum distance and enabling more favorable
+parameters. However, none of these existing designs focus on codes suitable for
+efficient GPU acceleration. Moreover, existing proof techniques do not result
+in codes with optimal minimum distance. When translated into the context of
+PCGs, low minimum distance means that the setup phase must be more expensive to maintain security. Our primary objective, therefore, is to develop a code
+with extremely high minimum distance that can be implemented efficiently on
+both CPUs and GPUs.
+In the ZK literature, some additional works such as [BFK+ 24,BCF+ 25] generalize RA codes [BMS03] to work over larger fields. We note that our codes
+could be generalized to the non-binary case using our core techniques.
+
+3
+
+Technical Overview
+
+We now provide a high-level overview of our key techniques and improvements.
+In Section 5, we formally introduce our enumeration framework, which enables
+flexible analysis of the minimum distance of various turbo-like codes and their
+concatenations. This framework makes it easy to evaluate new code constructions and identify suitable candidates for PCGs. We believe the codes we propose
+are only a starting point and that further improvements are likely. In Section 6 9, we observe that existing state-of-the-art codes for PCGs are neither constant
+depth nor amenable to parallel implementations, which limits their ability to
+exploit modern GPU architectures. Guided by our enumeration framework, we
+introduce and analyze a novel Block-Diagonal code (Section 6) that is constant
+depth, highly parallelizable, and therefore well suited for efficient GPU execution. In Section 7, we then combine Block-Diagonal codes with Accumulators,
+again using our framework, to obtain our final construction, which outperforms
+previous schemes on both CPUs and GPUs. In Section 9, we discuss a potential
+alternative to the Block-Diagonal code, called the Banded-Diagonal code, which
+offers several potential advantages. Finally, in Section 10, we experimentally
+evaluate the performance of our newly proposed codes.
+More specifically:
+– Turbo-like Codes. Our work considers turbo-like codes [BGT93,BMS03].
+Turbo codes can take many forms in general, but we focus on the serial
+5
+
+concatenation of subcodes G1 , . . . , Gt , where the input x is first multiplied
+by the matrix G1 , then permuted by a random permutation π1 , and subsequently multiplied by the next subcode G2 , and so on. I.e., our overall code
+can be expressed as
+G := G1 · π1 · G2 · ... · πt−1 · Gt .
+This genre of code is called a serially-concatenated turbo code of depth
+t. Conditioned on each Gi satisfying certain properties, we next present a
+generic method for proving the expected minimum distance. Our approach
+can be viewed as a generalization of [BMS03].
+– Enumeration Framework. To prove that our codes have linear minimum
+distance, we present a flexible enumeration framework. We generalize the
+idea of an enumerator [KU98,BMS03], a technique that has been used to
+prove the distance of various codes. In particular, we introduce new combinatorial techniques to compute the expected minimum distance for families
+of structured random codes.
+Essentially, for each step of our code, i.e. for each multiplication by Gi ,
+we track the current expected distribution of {xG1 π1 G2 ...πi−1 Gi | x ∈ Fk }
+with respect to some property. Typically, this will be the expected number of
+codewords with each Hamming weight. However, at times we consider other
+properties as well. We believe this paradigm is likely to be useful for proving
+tighter bounds on minimum distance for other codes as well, such as the prior
+Expand-Accumulate [BCG+ 22] and Expand-Convolute codes [RRT23].
+– Enumerator Implementation. Unlike the prior work of [BMS03], we do
+not use approximations to bound the minimum distance. Instead, we implement that actual enumerator for each component of our codes and directly
+compute the expected minimum distance. More generally, we compute the
+whole weight distribution of the codewords in a fine-grained manner, not just
+the expected minimum distance. This in turn allows us to more accurately
+compute the security level of LPN in the linear test framework. However, this
+fine-grained process can be computationally intensive, which required implementing low-level optimizations and a new formulation for how to compose
+the enumerators from each step.
+– Block-Diagonal Codes. We give concrete instantiations for the Gi matrices. The first is referred to as the Block-Diagonal code and is presented in
+Section 6. Each Gi is sampled with q uniformly random submatrices along
+the diagonal, each having σ := O(n/q) rows and columns. I.e.,
+
+
+Gi,1 O . . . O
+ O Gi,2 . . . O 
+
+
+Gi =  .
+.. . .
+. ,
+ ..
+. .. 
+.
+O
+
+O . . . Gi,q
+
+where Gi,j ∈ FO(σ)×O(σ) . We show that this construction achieves linear
+minimum distance with good constants with sublinear σ and small t. Moreover, our construction differs from most turbo codes in that it is based on
+6
+
+a “stateless” non-recursive convolution. For our purposes, this essentially
+means that the Block-Diagonal construction is easily implemented on a GPU
+in a highly parallel manner.
+For constant t we show that this code achieves linear minimum distance
+using bounding techniques. Via our enumeration
+techniques we observe that
+√
+t iterations and a memory size of σ = t n is sufficient for full GV distance.
+For the asymptotic case of n √
+→ ∞ and constant t we show linear minimum
+distance. We conjecture σ = t n is a general trend for non-constant t given
+that the distance of Gi does not collapse to 0. However, this case remains
+open.
+– Banded-Diagonal Codes. We give a second code referred to as the BandedDiagonal construction, where Gi consists of a band of random values along
+the diagonal, i.e. no square submatrices. We believe that this construction
+could offer certain advantages compared to the Block-Diagonal construction
+and also achieves linear minimum distance. We present this construction at
+a high level in Section 9 (and its enumerator in Appendix G).
+– Block-Accumulate Codes. Our most promising code can be viewed as
+a hybrid code between our new Block-Diagonal code and the well-known
+Repeat-Accumulate code [BGT93]. We refer to this code as Block-Accumulate
+and it achieves both extremely good performance on a CPU and GPU as
+well as very high minimum distance, essentially the same as a random linear
+code. This code can be described as
+G = G1 π1 A...πt−1 A
+where G1 is a Block-Diagonal subcode and A is an accumulator that performs a prefix sum of the input.
+[BMS03] proved that when each Gi has “constant recursive memory” such as
+the accumulator, then a turbo code with a single permutation (t = 2) must
+have sublinear minimum distance. On the other hand, two permutations
+(t = 3) are sufficient. They focused on the RAA code with rate 1/4. However,
+our Block-Accumulate codes can achieve full GV minimum distance at rate
+1/2 while still being linear time. We demonstrate for concrete parameters
+we achieve the GV bound while asymptotically we show linear minimum
+distance assuming G1 is instantiated with at least constant distance of 5.
+– Code Implementation. We implement several variants of our codes in
+CUDA and our Block-Accumulate Codes on the CPU. We observe significant
+speedups over prior art in both settings. We perform benchmarking on a
+laptop equipped with a cost-effective NVIDIA GeForce RTX 4060 GPU. For
+k = 220 , our method compresses data in ≈ 3ms on a GPU and ≈ 21ms
+on a CPU, achieving a ≈ 47× speedup over the state-of-the-art ExpandAccumulate code [BCG+ 22] on the GPU and ≈ 7.8× speedup over the stateof-the-art Expand-Convolute code [RRT23] on the CPU.
+A note on generalization. Over Fp , our enumerator generalizes essentially “for
+free” for the same reason it works in the binary case: once each stage is sufficiently randomized, weight propagation depends only on whether symbols are
+7
+
+zero or nonzero, not on their specific values. Concretely, we replace binary mixing
+with Fp -linear mixing using uniformly random coefficients (and, where structured components appear, most notably accumulators, we insert inexpensive
+random weighters, i.e., random diagonal scalings in F∗p , before/after the accumulator, see Rosnes et al. [RGiA11]). This standard symmetrization prevents
+value-dependent cancellations and ensures that, conditioned on the input support, nonzero symbols are close to uniformly distributed in F∗p . With this in
+place, the analysis carries over by the same composition rules as in the binary
+setting, with the only quantitative change being the replacement of “1/2” effects
+by the corresponding Fp constants (e.g., uniformity gives Pr[symbol = 0] = 1/p
+and Pr[symbol ̸= 0] = 1 − 1/p). However, we do not analyze this setting in detail
+nor prove its linear distance. We leave it to future work.
+
+4
+
+Preliminaries
+
+4.1
+
+Notation
+
+Let Z≥0 := {0, 1, 2, ...} and N := {1, 2, 3, ...}. For any n ∈ Z≥0 , [n] := {1, 2, . . . , n}
+denotes the set of natural numbers 1, . . . , n (both inclusive). [0] is defined to be
+the empty set ∅. For any a ≤ b ∈ Z≥0 , [a, b] denotes the set of integers a, . . . , b
+(both inclusive). For any a > b ∈ Z≥0 , [a, b] is defined to be the empty set ∅.
+For any vector x ∈ {0, 1}k , where k ∈ N ∪ {0}, let xi ∈ {0, 1} denote the ith
+element of x for i ∈ [k], and let |x| := k denote its length. For any S ⊆ N, let
+xS = {xi : i ∈ S ∩ [k]} denote the subvector of x indexed by the indices that
+belong to S. For any vector x, we define |x|H := |{i : xi ̸= 0}| as the number of
+nonzero elements of x.
+4.2
+
+Combinatorial Functions.
+
+Balls in bins. There are
+
+B(n, k) =
+
+n+k−1
+k−1
+
+(
+
+
+=
+
+x ∈ Nk |
+
+)
+X
+
+xi = n
+
+i
+
+ways to assign n ∈ N identical balls into k ∈ N labeled bins. This can be easily
+seen from the following argument. Consider a binary vector b ∈ {0, 1}n+k−1
+where each position represents a “slot.” Suppose we designate k − 1 of them as
+“demarcators” with value 1, partitioning the remaining n slots into k groups,
+where each group is a sequence of zeros. The size of each group represents the
+number of balls (out of n) allocated to each of the k bins. Each choice of demarcators results in a unique way
+ of assigning the n identical balls into k labeled
+bins. Since there are n+k−1
+ways to choose the demarcators, i.e. a binary string
+k−1
+b with weight k − 1, the
+claim
+follows. The very same argument
+also shows that
+
+P
+the number of x s.t. i∈[k] xi = n is B(n, k) = n+k−1
+.
+k−1
+
+8
+
+Balls in bins w/ capacity. There are
+k
+X
+
+ 
+
+k
+n + k − i(c + 1) − 1
+C(n, k, c) =
+(−1)
+i
+k−1
+i=0
+(
+)
+X
+k
+= x∈N |
+xi = n ∧ xi ≤ c
+i
+
+i
+
+ways to assign n identical balls into k labeled bins each having a maximum
+capacity of c. A proof of this result can be found in [Bro19].
+Balls in slotted bins. There are
+k
+X
+
+ 
+
+k
+c(k − i)
+S(n, k, c) =
+(−1)
+i
+n
+i=0
+
+
+
+
+X
+X
+=
+x ∈ {0, 1}k×c | ∀i ∈ [k], 0 <
+xi,j ≤ c ∧
+xi,j = n
+
+
+i
+
+j
+
+i,j
+
+ways to assign n identical balls into k × c labeled slots such that each set of c
+consecutive slots (i.e. each xi , called a “slotted bin” of size c) has at least one
+ball. This can be proven using an inclusion-exclusion style counting argument.
+See Appendix C.
+4.3
+
+Coding Theory
+
+Generator Matrix. Let k < n, where n, k ∈ N, and let G ∈ Fk×n be a matrix
+over the field F. The matrix G is called the generator matrix of the linear code
+C, which is defined as C := {c = xG | x ∈ Fk }. Here, x represents an arbitrary
+message vector of length k, and c is the corresponding codeword in C.
+Systematic Form. A common representation
+for the generator matrix is its sys
+
+tematic form, expressed as G = Ik ||P , where Ik is the k × k identity matrix
+and P is a k × (n − k) matrix. When G is in systematic form, the code C is
+said to be systematic since the original message
+appears directly in the first k
+
+positions of the codeword c = xG = x||p , with p ∈ Fn−k representing the
+parity information. Any generator matrix G′ can be transformed into systematic form by performing elementary row operations and, if necessary, column
+permutations. This preserves the structural properties of the code, such as the
+minimum distance.
+Parity Check Matrix. A matrix H ∈ F(n−k)×n is called a parity check matrix
+of C if it represents a linear function φ : Fn → Fn−k whose kernel is exactly C.
+Equivalently, we have C = {c ∈ Fn | HcT = 0}. It follows that H has dimensions
+(n − k) × n. The code defined by H is known as the dual code of C.
+9
+
+Minimum Distance. The minimum distance d of a linear code C is defined as
+the smallest number of positions in which any two distinct codewords differ.
+Equivalently, since C is a linear code, d is equal to the minimum weight (i.e., the
+number of nonzero entries) of any nonzero codeword in C. Another equivalent
+definition is that d is the minimum number of linearly dependent columns of the
+parity check matrix H. It is known that computing the minimum distance for
+an arbitrary linear code is an NP-complete problem.
+Relationship Between Generator and Parity Check Matrices. There is a direct
+connection between the generator matrix and the parity check
+matrix.
+In par
+
+ticular, if the generator matrix is in systematic form, G = Ik ||P , then a cor
+responding parity check matrix for C can be constructed as H = −PT ||In−k ,
+where PT denotes the transpose of P, and In−k is the (n − k) × (n − k) identity
+matrix.
+
+5
+
+The Enumeration Framework
+
+Parallel Turbo Codes. Turbo codes are an extremely successful class of linear
+error-correcting codes [BGT93,VY12], known for their low encoding complexity and ability to correct errors near the channel capacity. Typical turbo code
+constructions use parallel concatenation of independent recursive convolutional
+subcodes, separated by random permutations (also known as interleavers). More
+specifically, a message x ∈ Fk is encoded to a codeword c = (c1 ||...||ct ), where
+the subcodeword ci ∈ Fσ for σ := n/t is computed as
+ci := xπi Gi ,
+where πi is a random permutation matrix, and Gi ∈ Fk×σ is a recursive convolution. Gi is typically a structured upper triangular matrix known as a convolution.
+In particular, for each x ∈ Fk , c := xGi can be computed iteratively: at the j-th
+iteration, cj is computed as a linear combination of xj and some internal state
+vector sj ∈ Fm . Typically, one defines sj := (cj−1 , . . . , cj−m ) as the vector of
+the previous m outputs. m is referred to as the state size or memory size of the
+convolution. These codes are called recursive convolutional codes because each
+output bit is computed as a linear combination of the current input bit and the
+previous m output bits.
+While turbo codes with parallel recursive convolutions achieve good encodedecode performance in practice, it has been proven that they cannot achieve constant rate and linear minimum distance unless m is linear in n [KU98,BMS03].
+This parallel structure is often preferred because it facilitates efficient decoding.
+Serial Turbo Codes. An alternative to parallel codes are serially concatenated
+codes [KU98,BDMP98], where the output of the previous subcode is the input
+to the next. I.e., c1 := x and ci := ci−1 πi Gi for i ∈ [2, t]. [KU98,BMS03] proved
+that for t = 3 and a particularly simple convolution known as an accumulator
+(defined in Section 5.1), the code achieves a concretely high linear minimum
+10
+
+distance at rate 1/4. Unfortunately, for efficiency reasons we are interested in
+rate 1/2, where the asymptotic guarantees are unclear and the concrete minimum
+distance is low. In the coding theory literature, all ci are typically included in the
+final output to facilitate decoding, where ci are the parity bits of ci−1 . However,
+it is the last subcodeword ct that contributes the most to minimum distance.
+Indeed, this is implicit in [BMS03], which considers only ct in the proof and
+writes c := xG1 π1 G2 · · · πt−1 Gt .
+5.1
+
+Repeat-Accumulate Codes
+
+The most prominent serial turbo code is the repeat-accumulate (RA) code. Introduced in [DJM98,KU98], the RA code was later generalized from t = 2 to
+greater depths t, yielding variants such as the repeat-accumulate-accumulate
+(RAA) code or, more generally, the repeat-accumulate-t (RA-t) code. The RA
+code construction is conceptually simple and follows the outline above. Let r
+denote the code rate. The matrix G1 is defined to repeat the input x exactly
+e := 1/r times; that is, G1 := R := (Ik || · · · || Ik ), where Ik ∈ {0, 1}k×k is the
+identity matrix. For i ∈ [2, t], the convolution matrix Gi := A, where A is an
+accumulator, an upper triangular matrix with all ones on and above the diagonal. Multiplication by A is a straightforward prefix sum on the input vector,
+i.e. (xA)i = x1 + x2 + ... + xi . The encoding of a message x into a codeword c
+is defined by
+c = xRπ1 A...πt−1 A
+As shown in [BMS03], when t = 3, e = 4, and the permutations π1 , π2 are chosen
+uniformly at random, the resulting RAA code achieves a concretely high linear
+minimum distance with good probability. We will discuss this approach later.
+5.2
+
+Expected Enumerators
+
+Let G ∈ {0, 1}k×n be the generator matrix of a code mapping k-bit input words
+into n-bit output codewords, where k ≤ n. Let D denote a distribution over
+{0, 1}k×n and suppose we sample G according to D. Then we define the inputoutput Hamming weight enumerator as:
+
+ED
+x ∈ Fk | |x|H = w, |xG|H = h .
+w,h := EG←D
+k
+That is, ED
+w,h is the expected number of input words x ∈ {0, 1} with |x|H = w
+and the corresponding codeword c = xG with |c|H = h. It will be useful to let
+E D be the random variable that ED is the expectation of, i.e.
+
+D
+Ew,h
+:= x ∈ Fk | |x|H = w, |xG|H = h
+where G ← D.
+D
+Hence, ED
+w,h = EG←D [Ew,h ]. Let Xx,G,h be the indicator random variable that
+equals 1 if the codeword c = xG, corresponding to the input x ∈ {0, 1}k , has
+
+11
+
+Hamming weight |c|H = h, and 0 otherwise. We have
+ED
+w,h =
+
+X
+
+Pr [Xx,G,h = 1] .
+
+k
+
+G←D
+
+x∈{0,1} ,
+|x|H =w
+
+Similarly, let Xx,G,y be the indicator random variable that equals 1 if y =
+xG, and 0 otherwise. We have
+Xx,G,h =
+
+X
+
+Xx,G,y ,
+
+y∈{0,1}n
+|y|H =h
+
+and therefore
+X
+
+ED
+w,h =
+
+Pr [Xx,G,y = 1] .
+
+k
+
+n
+
+G←D
+
+x∈{0,1} ,y∈{0,1} ,
+|x|H =w,|y|H =h
+
+5.3
+
+Serially Concatenated Enumerators
+
+Let G1 ∈ {0, 1}k×n1 , G2 ∈ {0, 1}n1 ×n be generator matrices of a code that maps
+a k-bit word to an n1 -bit intermediate encoding, and then to an n-bit codeword.
+Let D1 , D2 denote the distributions from which G1 , G2 are sampled, respectively.
+Let π ∈ {0, 1}n1 ×n1 be a permutation matrix acting on n1 -bit words, and let
+Dπ denote the uniform distribution over all such permutation matrices. We now
+consider the generator matrix G ∈ {0, 1}k×n sampled as
+G := G1 πG2 ,
+
+where
+
+G1 ← D1 , G2 ← D2 , π ← Dπ ,
+
+to be the generator matrix of a code mapping k-bit input words into n-bit output
+codewords. Let D := [G1 πG2 | G1 ← D1 , π ← Dπ , G2 ← D2 ].
+D1
+D2
+We seek to express ED
+w,h as a composition of Ew,h1 and Eh1 ,h for h1 ∈ [n1 ].
+Consider the set of input words x ∈ {0, 1}k with |x|H = w. Then the expected
+1
+number of codewords c1 = xG1 , for G1 ← D1 , with |c1 |H = h1 , is EG
+w,h1 . Note
+that over the choice of π ← Dπ , c̃1 = c1 π is a random word with |c̃1 |H = |c1 |H .
+Thus, consider a uniformly random input word c′ ∈ {0, 1}n1 with |c′ |H = h1 . The
+probability (over the choice of c′ ) that the corresponding codeword c = c′ G2
+has |c|H = h is
+EhD12,h
+Pr [|c G2 |H = h | |c |H = h1 ] = p = n1  .
+′
+
+′
+
+G2 ,π
+
+h1
+
+12
+
+Therefore,
+h
+i
+X
+D1 πD2
+Eπ←Dπ Ew,h
+=
+v∈Z≥0
+
+=
+
+Pr
+
+π←Dπ
+
+X
+
+Pr
+
+v∈Z≥0 ,x,c′ ,c
+
+=
+
+h
+i
+D1 πD2
+Ew,h
+=v ∗v
+
+G1 ←D1
+
+D1
+n1
+X
+Ew,h
+1
+n1
+h1 =0
+
+h1
+
+[xG1 = c′ ] Pr[c′ πG2 = c | |c|H = v] ∗ v
+G2
+
+X
+
+Pr[c′ πG2 = c | |c|H = v] ∗ v
+
+v,c′ s.t. |c′ |H =h1 ,c
+
+G2
+
+G1
+Ew,h
+· EhG12,h
+1
+
+=
+.
+n1
+h
+1
+h1 =0
+n1
+X
+
+Finally, since G1 and G2 are sampled independently,
+h
+i
+h
+i
+G1
+G2
+n1 E
+X
+G1 ←D1 Ew,h1 · EG2 ←D2 Eh1 ,h
+ G 
+
+,
+EG←D Ew,h =
+n1
+h1
+
+h1 =0
+D
+
+and therefore we have ED
+w,h =
+
+Pn1
+
+D
+
+1 E 2
+Ew,h
+h ,h
+
+1
+.
+( )
+We first formalize the full depth-t serial ensemble as follows.
+1
+n1
+h1
+
+h1 =0
+
+Definition 1 (Depth-t Serially Concatenated Ensemble). Fix t ≥ 1 and
+dimensions n0 := k, n1 , . . . , nt := n. For each i ∈ [t], let Di be a distribution
+over matrices {0, 1}ni−1 ×ni and sample subcodes independently as Gi ← Di . For
+each i ∈ [t − 1], let πi ∈ {0, 1}ni ×ni be a uniform random permutation matrix
+sampled independently. The depth-t generator matrix G ∈ {0, 1}k×n is:
+G := G1 π1 G2 · · · πt−1 Gt .
+We write D1:t for the induced distribution of G.
+Iterative Enumeration. Consider the case of computing an enumerator over
+larger depth t. E.g., for t = 3, we have G = G1 π1 G2 π2 G3 . The template above
+would then suggest that
+ED
+w,h =
+
+D2
+D2
+n1 X
+n2
+1
+X
+ED
+w,h1 Eh1 ,h2 Eh2 ,h
+
+
+.
+n1 n2
+h1 =0 h2 =0
+
+h1
+
+h2
+
+Calculating this sum as is requires O(nt−1 ) iterations. For any value of t that is
+not a very small constant, the runtime of computing the enumeration becomes
+intractable. Since we are interested in computing the values of ED for large
+n and moderate t, we require a different strategy. Fortunately, the solution is
+straightforward.
+The weight distribution of the input set {0, 1}k is a vector of rational
+numbers
+
+k
+δ ∈ Q[0,k] and is easy to compute. For w ∈ [0, k], there are δw := w
+inputs with
+13
+
+Hamming weight w. The output weight distribution δ ′ ∈ Q[0,n] for an enumerator
+ED can then be computed as
+δh′ =
+
+k
+X
+δw D
+ Ew,h
+k
+w=0
+
+w
+
+for h ∈ [0, n]. Here, one can think of δkw as a fraction denoting the probability
+(w)
+that any given input string is present in the input. Given that δ corresponds
+to the set of all input strings, we have δkw = 1. However, this observation
+(w)
+can be used to compute the final weight distribution iteratively.
+Concretely, if
+
+k
+G := G1 π1 G2 ...πt−1 Gt , then we can initialize δ1,w := w
+and compute
+ni
+X
+δi,w Di
+
+δi+1,h :=
+ni Ew,h .
+w=0
+
+w
+
+for i ∈ [t−1] and h ∈ [0, ni+1 ]. The final weight distribution is therefore δt . Again,
+δ
+can be thought of as the probability that any given length-ni
+the fraction ni,w
+( wi )
+input string is currently in the weight distribution. In summary, approach results
+in a total of O((t − 1)n2 ) iterations instead of the O(nt ) iterations and is purely
+a better way to group “common terms.”
+5.4
+
+Systematic Enumerator
+
+We consider a special type of parallel concatenation of the identity matrix I ∈
+{0, 1}k×k and an arbitrary G1 ← D1 . Let G := (I||G1 ) ∈ {0, 1}k×n be the
+concatenated code with distribution D. Then, the enumerator is
+D1
+ED
+w,h = Ew,h−w .
+
+Since I will contribute exact weight w to the output, the overall enumerator is
+just the number of ways to map weight w to h − w via G1 ∈ {0, 1}k×n−k .
+Iterative Enumeration. At times, we will be interested in the case of G1 :=
+G1,1 π1 G1,2 ...πt−1 G1,t being a serially concatenated code, and therefore
+1
+ED
+w,h =
+
+D1,t
+1,1
+X ED
+w,h1 ...Eht ,h
+ nt−1 
+...
+n1
+... ht−1
+h =0
+h
+=0 h1
+n1
+X
+
+nt−1
+
+1
+
+t−1
+
+where w ∈ [0, k] and h ∈ [0, n − k]. The systematic enumerator can then be
+expressed as
+D1,t
+nt−1
+1,1
+n1
+X
+X ED
+w,h1 ...Eht ,h−w
+
+
+ED
+=
+...
+w,h
+nt−1
+n1
+h1 ... ht−1
+h =0
+h
+=0
+1
+
+t−1
+
+and evaluated iteratively as before, where the last iteration uses h′ := h − w in
+place of h.
+14
+
+Unfortunately, this prevents iterative enumeration as described above, since
+the input weight must be known when enumerating the final subcode. The limitation can be partially resolved by first building ED
+w,h in an iterative way by first
+combining ED1,1 and ED1,2 before combining that enumerator with ED1,3 , etc.
+Compared to the iterative enumeration described above, this approach requires
+O(n) times more work, which significantly limits the parameters that can be
+considered.
+
+6
+
+Block-Diagonal Subcode
+
+This section studies Block-Diagonal subcodes in isolation to expose their structure and limitations. These subcodes will serve as the outer layer of our final
+Block-Accumulate construction in Section 7 and serial Block-Diagonal codes in
+Section 8. The generator matrix G ∈ {0, 1}k×n of the subcode can be written
+in Block-Diagonal form; i.e., it can be decomposed into submatrices (which we
+refer to as blocks) Gi ∈ {0, 1}σ×eσ , i ∈ [k/σ], placed along the diagonal:
+
+
+G1 O . . . O
+ O G2 . . . O 
+
+
+G= . . .
+. ,
+ .. .. . . .. 
+O O . . . Gk/σ
+where O is the σ × eσ zero matrix and e := nk is the expansion ratio. Our
+instantiations will only consider e ∈ {1, 2}, but other values can also be used.
+Each Gi is sampled independently and uniformly at random from {0, 1}σ×eσ .
+6.1
+
+Block-Diagonal Enumerator
+
+Let x ∈ {0, 1}k be an input word and denote the subwords as
+
+x = x1 x2 . . . xk/σ ,
+where xi ∈ {0, 1}σ , i ∈ [k/σ]. Then, the codeword c = xG corresponding to x
+is given by c = c1 c2 . . . ck/σ , where ci = xi Gi ∈ {0, 1}eσ , i ∈ [k/σ].
+Our goal is to construct the enumerator ED
+w,h , which counts the number of
+input-output pairs (x, y), such that |x|H = w and y := xG with |y|H = h.
+However, given that G ← D is essentially a random variable, there will not
+be a concrete number of such pairs. Moreover, for an arbitrary G, it appears
+intractable to compute the enumerator for it. Instead, as discussed in Section 5.2,
+we will compute the expectation of the enumerator for the random variable
+G ← D.
+We will achieve this in two phases by decomposing the main enumerator ED
+into two subenumerators for related properties. Given a weight w input x, we will
+count the number of ways it could result in q subwords xi being non-zero. This is
+a type of enumerator except that it does not count the binary Hamming weight,
+15
+
+but the Hamming weight with elements in {0, 1}σ . One can then construct a
+second enumerator that counts the number of ways to map q non-zero subwords
+to and output word c with Hamming weight h.
+In more detail, let us define Q : {0, 1}k → 2[k/σ] , where Q(x) ⊆ [k/σ] is the
+set of i such that xi is non-zero. Additionally, define q : {0, 1}k → [0, k/σ], where
+q(x) = |Q(x)|. We slightly abuse notation by also defining Q : {0, 1}n → 2[k/σ] ,
+where Q(c) ⊆ [k/σ] is the set of i such that ci is non-zero. We now have the
+following lemma.
+Lemma 1. For any x ∈ {0, 1}k and y ∈ {0, 1}n ,
+(
+2−eσ·q(x) if Q(y) ⊆ Q(x)
+.
+Pr [Xx,G,y = 1] =
+0
+otherwise
+Proof. Clearly, if xi = 0σ , then ci = 0eσ . Thus, Q(c) ⊆ Q(x). In other words, if
+Q(y) ̸⊆ Q(x), then Pr [Xx,G,y = 1] = 0.
+n
+Consider any x ∈ {0, 1}k and y ∈ {0, 1}
+For
+ such that Q(y) ⊆ Q(x).
+all i ∈ [k/σ], let Gi = Gi,1 Gi,2 . . . Gi,eσ , where Gi,j ∈ {0, 1}σ are the
+columns of Gi for j ∈ [eσ]. Let y = y1y2 . . . yk/σ , where yi ∈ {0, 1}eσ ,
+i ∈ [k/σ], and let yi = yi,1 yi,2 . . . yi,eσ , where yi,j ∈ {0, 1} are the bits
+of yi for j ∈ [eσ]. Consider i ∈ Q(x), i.e., xi ̸= 0σ . Then, for j ∈ [eσ],
+Pr [yi,j = xi Gi,j ] = 12 . Therefore, Pr [∀i ∈ Q(x) : yi = xi Gi ] = 2−eσ·q(x) . Since
+Q(y) ⊆ Q(x), Pr [∀i ̸∈ Q(x) : yi = xi Gi ] = 1. Therefore,
+Pr [Xx,G,y = 1] = 2−eσ·q(x) .
+
+We now have
+X
+
+ G 
+EG←D Ew,h
+=
+
+2−eσ·q(x) ,
+
+x∈{0,1}k ,y∈{0,1}n
+Q(y)⊆Q(x)
+|x|H =w,|y|H =h
+
+i.e., we need to count the number of x ∈ {0, 1}k , y ∈ {0, 1}n with Q(y) ⊆ Q(x),
+|x|H = w, and |y|H = h. We perform this count using the intermediate variable
+q = q(x). We first compute the number of x ∈ {0, 1}k such that |x|H = w and
+q(x) = q. This is equal to the number of x ∈ {0, 1}k such that |x|H = w and
+Q(x) = Q summed over all Q ⊆ [k/σ] with |Q| = q. For any fixed Q ⊆ [k/σ]
+with |Q| = q, the number of x ∈ {0, 1}k such that |x|H = w and Q(x) = Q is
+equivalent to the number of ways in which we can assign w identical balls into
+q labeled slotted bins each having a capacity of σ such that none of the bins
+
+are empty, which is S(w, q, σ). The number of Q ⊆ [k/σ] with |Q| = q is k/σ
+q .
+Therefore, the number of x ∈ {0, 1}k such that |x|H = w and q(x) = q is
+Ew,q :=
+
+
+
+
+ q
+ 
+
+k/σ
+k/σ X
+q
+σ(q − i)
+· S(w, q, σ) =
+·
+(−1)i
+.
+q
+q
+i
+w
+i=0
+16
+
+Now, consider any x ∈ {0, 1}k such that |x|H = w and q(x) = q. We will count
+the number of y ∈ {0, 1}n such that |y|H = h and Q(y) ⊆ Q(x). This is simply
+equal to the number of ways of choosing h bits among the eσq bits of yi for
+
+i ∈ Q(x) to set to 1. The number of ways to do this is thus Eq,h := eσq
+h .
+Putting everything together, we have
+X
+
+ G 
+EG←D Ew,h
+=
+
+2−eσ·q(x) =
+
+=
+
+q=0
+
+"
+−eσq
+
+2
+
+
+
+k/σ
+·
+q
+
+2−eσq · Ew,q · Eq,h
+
+q=0
+
+x∈{0,1}k ,y∈{0,1}n
+Q(y)⊆Q(x)
+|x|H =w,|y|H =h
+k/σ
+X
+
+k/σ
+X
+
+
+
+ q
+ 
+#
+eσq X
+σ(q − i)
+i q
+·
+(−1)
+.
+h
+i
+w
+i=0
+
+Optimization. We remark that it is possible to precompute some of the terms
+Di
+used across the iterations. The scaling factor kw is only a function of w but
+(w )
+appears in kn different terms. Therefore
+one can cache these values. Similarly, one
+
+can precompute vq = 2−eσq · k/σ
+for each value of q ∈ [0, n/σ]. The distribution
+q
+is then computed as:
+
+
+ 
+
+q
+X
+Dw
+k/σ
+σ(q − i)
+−eσq
+i q
+Fw := k  , vq := 2
+·
+, S(w, q, σ) = cq,w := vq ·
+(−1)
+,
+q
+i
+w
+w
+i=0
+
+
+
+
+X
+X
+X
+eσq
+eσq
+Ew,h :=
+vq cq,w
+, δh :=
+Fw ·
+cq,w
+h
+h
+q
+w
+q
+Systematic Ensembles. An optimized version of our subcode instantiates G in
+systematic form: G := (I ∥ G′ ). Here, G′ ∈ {0, 1}k×(n−k) is a Block-Diagonal
+matrix as defined in Section 7 and 8. This provides two primary benefits:
+– Computational Efficiency: For a rate 1/2 code, the cost of the first matrix
+multiplication is reduced by 2×.
+– Guaranteed Invertibility: Defining G in systematic form ensures it is always
+invertible which ensures that the distance does not collapse to 0.
+6.2
+
+Empirical Weight Distribution
+
+In this section, we examine the weight distribution of a non-systematic single
+Block-Diagonal matrix and the effect σ has on it. We present the enumerator
+as a contour plot in Figure 1 along with the plot of the final distribution of
+codewords δh .
+The z-axis of the contour plot is the log2 expected number of weight-w inputs
+mapping to weight-h outputs. We place a colored gradient on the contour plot:
+green indicates that fewer than one codeword is expected, yellow indicates approximately one expected codeword, and red denotes that many codewords are
+17
+
+250
+
+−2
+
+00
+
+100
+
+−15
+0
+
+−100
+
+100
+
+−5
+0
+
+50
+
+−50
+
+150
+
+0
+
+100
+
+00
+
+200
+
+50
+
+−2
+
+00
+
+−1
+
+0
+
+20
+
+50
+
+0
+
+150
+
+50
+
+−250
+
+−150
+
+0
+
+0
+
+−50
+
+200
+0
+
+−100
+
+−200
+0
+
+100
+
+200
+
+300
+
+400
+
+500
+
+Fig.
+1.[MathJax]/extensions/MathMenu.js
+Depictions of the Block-Diagonal enumerator ED with (t, k, n, σ) =
+Loading
+(1, 256, 512, 16). The x-axis is the output weight h ∈ [0, n], y-axis of the plot is the
+input weight w ∈ [0, k] and the z value of the contour
+plot is the value log2 (Ew,h ). The
+P
+bottom plot has the output distribution δh = kw=0 Ew,h .
+
+expected. Unsurprisingly, this code does not achieve linear minimum distance
+as there must exist codewords with distance at most σ. This can easily be seen
+from the fact that the lower scatter plot does not go below log δh = 0 in Figure 1
+near h = 0. However, we believe that it is instructive to examine the distribution
+before generalizing to t > 1.
+Compared to a random linear code of the same size, the enumerator is very
+similar except in the low-weight regime where w, h are small. In this regime,
+we observe a large skewing of the distribution towards the origin. Moreover,
+one can also observe a rippling pattern in the distribution. This is apparent
+when inspecting the Ew,h = 0 and Ew,h = 10 contour lines near the origin. These
+ripples are due to the distribution of when a single input chunk xi ∈ (x1 , ..., xk/σ )
+has a non-zero value. In this case, having weight w = σ/2 results in the largest
+number of such codewords, with each essentially being distributed uniformly
+over {0, 1}2σ . Therefore, at such values of w, we expect codewords with small h
+to exist. This phenomenon repeats when two, three, or more chunks of x have
+non-zero values.
+When σ becomes sufficiently small, e.g. σ ≤ 4, we observe that the code
+begins to break down. We believe this is primarily due to the high probability of
+sampling a block that is not invertible, e.g., when a row of Gi is zero or contains
+duplicate rows. Figure 2 contains the distribution for the case of σ = 2. Indeed,
+this becomes apparent because all weights up to approximately w ≤ 60 have at
+least one output with expected weight 0. To mitigate this, one could restrict the
+18
+
+distribution to only sampling invertible matrices. However, this complicates the
+sampling algorithm and will not be needed in our final constructions. We leave
+investigating this for future work.
+Additionally, with such a small value of σ, an input of weight w has its output
+weight h bounded above by wσ. As seen in Figure 2, this essentially squashes the
+higher weight codewords into smaller values of h, hurting the overall distance.
+250
+
+50
+
+−5
+
+100
+
+−1
+
+00
+
+0
+
+50
+
+100
+
+−2
+
+−50
+
+50
+
+−1
+
+200
+
+50
+
+50
+
+−2
+
+00
+
+−1
+
+0
+
+−150
+
+100
+
+150
+
+−350
+
+100
+
+00
+
+−3
+
+00
+
+0
+
+0
+20
+
+150
+
+0
+50
+
+0
+−50
+
+200
+0
+−200
+0
+
+−100
+100
+
+200
+
+300
+
+400
+
+Loading [MathJax]/extensions/MathMenu.js
+
+500
+
+Fig. 2. Depictions of the Block-Diagonal enumerator ED with (t, k, n, σ)
+(1, 256, 512, 2). See Figure 1 for details.
+
+7
+
+=
+
+Block-Accumulate Codes
+
+We explore the possibility of combining Block-Diagonal subcodes with Accumulators. While Block-Diagonal codes alone do not achieve linear minimum
+distance, the addition of accumulator layers induces a strong contraction effect that dramatically improves distance. Given the flexibility of our framework,
+combining different subcodes is straightforward, and this is the construction we
+recommend for practical PCGs and ZK systems.
+The key additional ingredient is the accumulator, which is a simple recursive
+convolution. Although an accumulator has free distance one and therefore can
+be trivially “turned off” by structured inputs, its recursive structure causes even
+moderately sized inputs, once randomized by the BD subcode and interleavers,
+to expand into outputs of large Hamming weight. This amplification effect is
+precisely why accumulators play a central role in turbo and serial codes.
+We tested variants that alternate between Block-Diagonal subcodes and Accumulators, as well as constructions consisting of a single Block-Diagonal subcode followed by t − 1 Accumulators. The latter exhibits significantly better
+minimum distance and is the code we focus on in this section. Specifically, we
+define Block-Accumulate (BA-t) codes with state size σ and depth t as
+G := Bπ1 A · · · πt−1 A,
+19
+
+where A ∈ {0, 1}n×n is an Accumulator and B ∈ {0, 1}k×n is sampled from the
+systematic Block-Diagonal distribution with state size σ. It is known that for
+t = 2 such constructions must have sublinear minimum distance [BMS03]. We
+therefore focus on t = 3, for which we show that the resulting code achieves
+linear minimum distance with strong concrete parameters.
+250
+
+100
+
+−5
+
+0
+
+100
+
+0
+
+−5
+
+200
+
+0
+20
+150
+
+50
+
+100
+0
+
+50
+
+150
+
+0
+
+50
+
+0
+−50
+
+20
+
+0
+−100
+−20
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+Loading
+[MathJax]/extensions/MathMenu.js
+Fig.
+3. Depictions
+of the Block-Accumulate enumerator ED with (t, k, n, σ) =
+(3, 256, 512, 16). See Figure 1 for details.
+
+7.1
+
+Enumeration
+
+Figure 3 contains the enumerator distribution for the case of k = 256 and σ = 16.
+With the exception of some low-weight inputs, we observe that the distribution
+is extremely close to that of a random code. In particular, we observe that the
+probability of codewords with substantially smaller weight than a random code is
+≈ 2−σ . This is more clearly illustrated in Figure 11, which plots the final weight
+distribution for σ ∈ {4, 8, 16, 32}, along with Repeat-Accumulate code (RA-3)
+and a random linear code. As with Block-Diagonal codes, we again observe a
+phase transition where the probability of low-weight codewords decreases slowly
+for small values of h. However, this phase transition happens below log δh = 0,
+even for small values of σ.
+Moreover, unlike Block-Diagonal codes, as k increases there is no need to
+increase σ. We instead see the opposite behavior in that the distance slightly improves as k increases. This can be seen in Figure 5, which plots the cumulative log
+weight distribution for a fixed σ = 16 and k ∈ {128, 256, 512, 1024, 2048, 4096}.
+We also observe that the phase transition becomes more acute and approximately occurs at log2 δh = −12 and h/n = .105. We investigate various values of
+σ, k and conclude that the general trend is that the cumulative phase transition
+20
+
+occurs at − σ3
+4 and relative minimum distance 0.105. This immediately gives a
+simple parameterization of setting σ = 4/3λ for a guarantee that the relative
+minimum distance is 0.1 except with probability 2−λ .
+60
+
+60
+
+40
+
+40
+
+20
+
+20
+
+0
+
+0
+
+−20
+
+−20
+
+−40
+0
+
+0.05
+
+0.1
+
+0.15
+
+−40
+0
+
+0.2
+
+Loading [MathJax]/extensions/MathMenu.js
+
+0.1
+
+0.15
+
+0.2
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 4. Depictions of the BlockAccumulate log weight distribution.
+The dashed lines denote the cumulative
+log weight distribution.
+
+7.2
+
+0.05
+
+Fig. 5. Depictions of the BlockAccumulate cumulative log weight
+distribution for σ = 16 and various k.
+
+Asymptotic Analysis of Block-Accumulate Codes
+
+To prove the asymptotic behavior of our construction we will follow the structure
+of [BMS03]. We will fix the values of B and will not require it to be sampled
+uniformly, unlike the prior enumeration sections. Instead, we will only condition
+on B having minimum distance of some constant d′ > 4. In the construction,
+this condition can be enforced via rejection sampling. More practically, one can
+select a subcode with good distance and repeat it across all blocks of B. This
+analysis will demonstrate that the code will have linear minimum distance and we
+conjecture it will give concrete distance at least as good as the bounds obtained
+from the enumeration. The full proof is found in Appendix B and below is a
+summary of the core argument.
+Proof Sketch (Linear Minimum Distance). Let G = Bπ1 Aπ2 A, where π1 , π2 are
+uniform interleavers and A is the standard length-n accumulator. We show that
+for a sufficiently small constant ε > 0, the expected number E≤εn of nonzero
+codewords of weight ≤ εn tends to zero, and conclude by Markov.
+Fix a nonzero input x and define intermediate weights u := |xB|H , h1 :=
+|xBπ1 A|H , and h := |xBπ1 Aπ2 A|H . Random interleavers imply that conditioned on weight, the vector entering each accumulator stage is uniform over all
+vectors of that weight; thus each stage is governed by the accumulator inputoutput enumerator. The key analytic estimate is the accumulator small-output
+contraction (Lemma 2): for t ≤ 2εn,
+
+s/2
+,
+Pr[|zA|H = t | |z|H = s] ≤ 4e2 · nt
+21
+
+and summing over 1 ≤ h ≤ εn gives
+Pr[h ≤ εn | h1 ] ≤ (εn) (4e2 ε)h1 /2 .
+Thus achieving h ≤ εn forces h1 to be small, and is strongly suppressed in h1 .
+We now exploit the block structure of B. Let b = b(x) be the number of active
+σ-bit input blocks. Assumption (1) implies u = |xB|H ≥ d′ b, and the number
+ σ
+b
+of inputs with exactly b active blocks is at most k/σ
+b (2 − 1) . Summing over
+inputs grouped by b, and using the first-accumulator contraction with u ≥ d′ b
+together with the second-accumulator tail bound above, yields an upper bound
+of the form
+E≤εn ≤ (εn) C0
+
+⌊4εn/d′ ⌋ h
+
+X
+
+ib
+′
+′
+K(σ, R, d′ , ε) · bd /2−1 · n 1−d /2 ,
+
+b=1
+
+for an explicit constant K(σ, R, d′ , ε).
+The bottleneck is the b = 1 term:
+′
+
+′
+
+Eb=1 ≤ (εn) · O(n1−d /2 ) = O(n2−d /2 ),
+so we require 2 − d′ /2 < 0, i.e., d′ > 4. Under d′ > 4 and sufficiently small
+constant ε, the√remaining terms b ≥ 2 are o(1) even after the outer factor (εn):
+′
+d′ /2−1
+≤ n−(d /2−1)/2 so the sum contributes
+for 2 ≤ b ≤ n we have (b/n)
+√
+′
+O(n−(d /2−1) ), while
+for b ≥ n the truncated tail is geometrically small in b
+√
+and hence O(ρ n ) for some ρ < 1. Therefore E≤εn → 0, and Markov gives
+Pr[dmin (G) ≥ εn] → 1. The full proof (including constant choices and all intermediate bounds) appears in Appendix B.
+7.3
+
+Discussion
+
+The Appendix B proof establishes linear minimum distance with high probability
+under the mild structural condition d′ > 4 on B. The goal of this discussion is
+to connect that asymptotic guarantee to the finite-n enumerator computations
+in Section 7.1, and to clarify what we do and do not claim about extrapolation.
+Main Failure Mode (Single Active Block). Both the proof and the numerics
+indicate that the dominant mechanism by which very low-weight codewords can
+arise is via inputs that activate only a single σ-bit block of B. In the proof, this
+corresponds to the b = 1 term in the block-counting sum, and it is precisely this
+term that forces the condition d′ > 4 once one accounts for the outer (εn) factor
+coming from the second accumulator tail bound. Conceptually, b ≥ 2 inputs are
+strongly suppressed: the accumulator contraction acts on an input weight of at
+least u ≥ d′ b, and the suppression is raised to the bth power, so multi-block
+inputs become negligible quickly. Thus, asymptotically, the probability of a lowweight codeword is governed by the tension between (i) how many single-block
+inputs exist and (ii) how effectively the two accumulators randomize and spread
+their mass.
+22
+
+Why the theorem assumes d′ > 4, while the enumerator models B as systematic random. The asymptotic proof fixes B and conditions only on a per-block
+minimum-distance lower bound d′ > 4. This is a conservative way to remove rare
+but adversarially bad local behavior in B, and it cleanly isolates the accumulator/interleaver phenomenon that drives the asymptotic argument. In contrast,
+our enumerator computations treat B as coming from the natural systematicrandom design described earlier in the paper, and therefore average over the
+(small) probability that a block outputs very low weight. This difference matters for proofs because union bounds can be sensitive to rare events; however,
+it appears to matter much less at the parameter sizes we care about because
+the dominant failure mode already behaves like a single-block event, and the
+enumerator mass in the extreme low weights is small.
+Why enforcing d′ > 4 barely changes the enumerator curves at practical sizes. A
+potential concern is that the theorem’s d′ > 4 assumption might correspond to
+a qualitatively different ensemble than the one used in our numerics, and that
+enforcing d′ > 4 might cause a noticeable jump in the predicted distance. Empirically, we do not see such a jump: even if we artificially “repair” the enumerator
+by moving the probability mass of per-block outputs of weight 1, 2, . . . , d′ up to
+weight d′ + 1, the predicted distance threshold changes little at the sizes we plot.
+The natural interpretation is that, at these block sizes, the overall low-weight
+behavior is not dominated by the exact placement of a tiny amount of mass at
+weights below d′ , but rather by the aggregate effect of the interleavers and the
+two accumulator stages on the typical single-block contribution. In other words,
+conditioning away the extremely low local weights is primarily a proof device to
+obtain a clean asymptotic bound; it does not appear to be the factor that drives
+the finite-n distance threshold we observe.
+What we can (and cannot) claim about extrapolating the concrete bounds. Our
+appendix theorem proves that the minimum distance is linear, but it is not optimized to deliver a tight asymptotic distance constant: the argument intentionally
+works in a “small-ε” regime and uses several conservative inequalities to ensure
+geometric decay. Consequently, the proof should not be read as pinning down the
+limiting relative distance (nor proving monotonic improvement in n). That said,
+the theorem does identify the correct mechanism controlling the low-weight tail
+(the b = 1 term), and it shows that once d′ > 4 this mechanism is polynomially
+suppressed in n while all multi-block terms are even more strongly suppressed.
+This is qualitatively consistent with what we observe numerically: as n increases,
+the enumerator-based curves evolve smoothly and appear to approach a stable
+threshold (around δ ≈ 0.11 for our plotted parameters). While no theorem implies that the finite-n threshold must be monotone in n, the combination of (i)
+an explicit asymptotic failure mechanism and (ii) the smooth finite-n convergence across multiple orders of magnitude provides strong evidence that, for the
+practical range of lengths of interest (e.g., n ≪ 230 ), the true typical distance
+will not diverge dramatically from the observed threshold.
+23
+
+Explaining the observed “floor” in failure probability and its dependence on σ.
+Our numerics also reveal a characteristic floor: even below the apparent distance threshold, the predicted failure probability does not drop indefinitely, but
+appears to stabilize (e.g., around 2−16 for block size σ = 16 in the plotted
+regime). This behavior is also consistent with the proof’s perspective. The dominant failure mode is b = 1, and the number of single-block inputs scales like
+k/σ
+σ
+σ
+1 (2 − 1) ≈ (k/σ) · 2 , so increasing σ increases the number of potentially
+dangerous single-block patterns exponentially. Meanwhile, the probability that
+a fixed single-block input yields an anomalously low final weight is governed primarily by the accumulator/interleaver mixing, which depends on relative weights
+and n rather than directly on σ. Thus, at fixed n and rate, the leading-order
+dependence of the low-weight tail on σ is driven by the multiplicity of b = 1
+candidates, which naturally produces a tight empirical relationship between σ
+and the residual failure level. In short: the observed floor is not evidence that
+the code stops improving; rather, it reflects the fact that there is a large (and
+σ-dependent) family of single-block inputs, and the aggregate probability that
+one of them produces a low-weight output can stabilize at a small level.
+Takeaway. The proof and the enumerator computations are aligned: the proof
+explains why the low-weight tail is controlled by single-block inputs and why
+the code has linear minimum distance when d′ > 4, while the enumerator plots
+suggest that the corresponding distance threshold is substantially larger in the
+practical regime. We view the observed smooth convergence of the finite-n curves,
+together with the mechanism identified by the proof, as strong evidence that the
+concrete distance behavior persists to larger lengths relevant in practice.
+
+8
+
+Serially Concatenated Block-Diagonal Codes
+
+Although the Block-Accumulate (BA-3) construction in Section 7 achieves stable relative minimum distance with a fixed state size σ, it is natural to ask what
+is achievable by pure serial, non-recursive architectures that do not use accumulators. In this section, we study the behavior of such constructions, focusing on
+block-diagonal serial codes as a theoretical baseline. This analysis clarifies the
+limitations of non-recursive designs and highlights why the BA-3 construction is
+able to surpass these bounds in the concrete regime.
+8.1
+
+Weight Distribution at t = 2
+
+Now consider the case of t serially concatenated Block-Diagonal subcodes.√
+Our
+high-level conclusion is that the code undergoes a phase transition at σ = Θ( t k),
+where for smaller values of σ, the code is expected to have sublinear minimum
+distance, while for larger values of σ, it has linear minimum distance in expectation. This result is intuitive given the structure of the code and tight, as smaller
+values of σ can be shown to have sublinear minimum distance.
+24
+
+√
+Indeed, consider the case of t = 2 and σ = O( k). It will be instructive
+to consider the case of what happens to a weight w = 1 input word. After the
+first multiplication,
+the weight of the intermediate word is upper bounded by
+√
+σ = O( k). This intermediate vector will be randomly permuted. The number
+of “on” blocks for the second
+√ iteration will be upper bounded by σ. However,
+there are only O(σ) = O( k) blocks, and therefore a constant fraction of the
+blocks will be on in expectation. As such, the
+√ resulting codeword should have
+linear Hamming weight. However, if σ = o( k), this argument starts to break
+down. After the first iteration, less than a constant fraction of the q = n/σ blocks
+will be on in expectation. Therefore, the resulting codeword must also have less
+than linear Hamming weight.
+In Figure 6, we present the enumerator
+√ for t = 2 and σ = 32. Concretely, we
+find that as one varies k, setting σ := 2 k results in the code achieving expected
+minimum distance approximately 0.1n = 0.2k. This matches the same minimum
+distance as a random code of the same size. This can be observed in the lower
+plot of Figure 6, showing the log2 δh values for the various values of h ∈ [0, 512].
+To more accurately depict the minimum distance, we have cropped the plot to
+only show values of log2 δh in the range [−50, 50].
+0
+
+−5
+
+100
+
+100
+
+0
+
+−2
+
+200
+
+00
+
+−1
+
+00
+−2
+
+00
+
+250
+
+200
+50
+
+−150
+
+−150
+
+100
+
+0
+
+0
+
+−5
+
+150
+
+50
+
+0
+10
+
+−
+
+0
+
+50
+
+50
+
+−2
+
+150
+
+0
+−50
+
+40
+20
+0
+−20
+
+−100
+
+−40
+0
+
+100
+
+200
+
+300
+
+400
+
+500
+
+Loading
+Fig.
+6. [MathJax]/extensions/MathMenu.js
+Depictions of the Block-Diagonal enumerator ED with (t, k, n, σ)
+(2, 256, 512, 32). See Figure 1 for details.
+
+=
+
+As can be observed, there is a phase transition of this graph at approximately
+log2 δh = 0 and h = 56. As h approaches this phase transition from zero, we
+observe a slow growth rate of log2 δh ; beyond the transition, the growth becomes
+rapid. The weight distribution above this phase transition is identical to that of
+a random code and therefore the best that can be achieved. However, below
+the phase transition, there is a significant difference between the Block-Diagonal
+codes and random codes. For random codes, we observe the expected number
+25
+
+of codewords with a given h value to continue to decrease at a rapid rate. The
+exact location
+√ of the phase transition is a function of σ as seen in Figure 7.
+For σ = o( k), the phase transition happens above the log2 δh = 0 line, and
+therefore, in expectation, we would see codewords with smaller h than a random
+code. For small values of σ, such as 2 and 4, the code degenerates without
+exhibiting a phase transition, and numerous low-weight codewords appear. We
+believe the lack of phase transition is largely due to having too many submatrices
+that are relatively far from being invertible. As such, when multiplying by such
+a matrix, information is lost, resulting in poor distance. We suspect that if one
+was able to define the enumerator for Block-Diagonal codes with only invertible
+submatrices, the code would behave better in this
+√ regime.
+As σ increases beyond the phase transition 2 k, we observe an exponential
+drop in the expected number of low-weight codewords as compared to a random
+code. For example, at σ = 64 there is less than a 2−30 probability of having a
+codeword with small weight compared to a random code.
+
+200
+
+200
+
+100
+
+100
+
+0
+
+0
+
+−100
+
+−100
+
+−200
+
+−300
+0
+
+−200
+
+100
+
+200
+
+300
+
+400
+
+500
+
+Loading [MathJax]/extensions/MathMenu.js
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 7. Depictions of the BlockDiagonal weight distribution with
+(t, k, n)
+=
+(2, 256, 512), various
+σ
+∈ {2, 4, 8, 16, 32, 64, 125} and a
+random linear code.
+
+Fig. 8. Depictions of the Block-Diagonal
+weight distribution with various k ∈
+{128, 506,√1025, 2047, 4096, 8170}, n
+=
+2k, σ = 2 k.
+
+Thus far, we have focused on the case of k = 256. However, we are also
+interested in general values of k such as k ∈ [128, 220 ]. In Figure
+√ 8, we plot the
+expected weight distribution for various values of k and σ = 2 k. The general
+trend is that for larger values of k, the probability of small weight codewords
+decreases. For example, at k = 8170 there is less than a 2−20 probability of being
+a codeword with h ≤ 0.11n and 2−100 probability of a codeword with h ≤ 0.05n.
+While such bounds are more than sufficient for most applications, increasing σ
+further can reduce the probability of low-weight codewords, as shown in Figure 7.
+8.2
+
+Partially Systematic
+
+We optimize the depth-t serial ensemble by making only the first subcode systematic: G1 := (I ∥ G′1 ), where G′1 ∈ {0, 1}k×(n−k) is Block-Diagonal. This
+reduces the first multiplication cost by 2× at rate 1/2 and ensures G1 is invertible, preventing scenarios where non-invertible diagonal blocks collapse the
+26
+
+minimum distance. As shown in Figure 9, this partial systematization smooths
+the weight distribution and significantly reduces the probability of low-weight
+codewords near h = 0 compared to the non-systematic version. While the phase
+transition point remains largely unchanged, the smoother contour lines suggest
+that avoiding non-invertible matrices at the first layer stabilizes the code’s distance properties.
+250
+50
+
+200
+
+20
+
+0
+
+0
+
+−200
+
+−150
+
+50
+
+−5
+
+0
+
+50
+
+0
+−1
+
+0
+
+0
+
+0
+
+150
+
+0
+
+50
+
+−150
+
+100
+
+−2
+5
+
+150
+
+100
+
+00
+
+−2
+
+−5
+0
+
+100
+
+−2
+
+00
+
+−1
+
+0
+60
+40
+20
+0
+−20
+−40
+0
+
+−50
+
+−100
+100
+
+200
+
+300
+
+400
+
+500
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 9. Depictions of the systematic Block-Diagonal enumerator ED with (t, k, n, σ) =
+(2, 256, 512, 32). See Figure 1 for details.
+
+8.3
+
+Linear Minimum Distance of Pure Block-Diagonal Code
+
+Theorem 1 (Linear minimum distance, all constant t ≥ 3, rate 1/2).
+Fix any constant t ≥ 3 and rate R = 1/2. There exist constants c > 0, δ > 0,
+and γ > 0 such that the following holds. Let σ := ⌈c n1/t ⌉ rounded so that σ | n
+and σ | k = n/2, and sample G from the pure block-diagonal serial ensemble
+above. Then for all sufficiently large n,
+
+
+Pr dmin (G) ≤ δn ≤ exp(−γσ 2 ).
+See Appendix F for the full proof.
+
+9
+
+Banded-Diagonal Codes
+
+We consider an alternative formulation of our Block-Diagonal code, called the
+Banded-Diagonal code, where the diagonal submatrices are replaced by a diagonal band of random entries of width σ. We expect similar asymptotic performance, but conceptually this formulation offers some advantages. See Appendix G for details. In the Block-Diagonal case, 1s in the input x that fall
+within the same block do not change the weight distribution of the output xG.
+That is, once a block is “on”, additional 1s in the input x of this block do not
+27
+
+change the Hamming weight, since the output distribution of this block is already uniform. The idea of the banded construction is to offset each row so that
+there is some non-overlapping portion. That is, the generator of this subcode
+can be described as
+
+
+α1,1 α1,2 ... α1,σ
+O
+
+
+α2,1 α2,2 ... α2,σ
+
+
+G=
+.
+.. ..
+..
+
+
+.
+.
+.
+O
+
+αk,1 αk,2 ... αk,σ
+
+More generally, each row will be offset from the previous by (n − σ)/k, which we
+assume to be an integer. We present the enumerator for this code in Appendix G.
+The computational cost of computing the enumerator proved to be higher than
+that of the Block-Diagonal codes, and therefore we chose not to implement it.
+However, we believe it could offer better concrete
+performance. Indeed, it is not
+√
+hard to show that it too must have σ ≥ O( t k). We leave further investigation
+of this approach to future work. See Appendix G for more details.
+
+10
+
+Experimental Evaluation
+
+We present concrete experimental results from our implementation. Section 10.1
+reports general code performance, Section 10.2 evaluates its use in PCGs, and
+Section 10.3 covers its use in zero-knowledge protocols.
+Implementation. We implement our framework on both CPU and GPU. Its modular design enables easy integration of various code architectures (e.g., BDA-t,
+RA-t, Expand-Accumulate codes [BCG+ 22], etc.). Our implementation is incorporated into the libOTe C++ library [RR] as well as a fork of Rust libray
+Plonkish [ZH]. On the GPU, we use custom CUDA kernels alongside the Thrust
+C++ parallel algorithms library. For the permutation step, we rely on Thrust’s
+shuffle(), which employs a Feistel-based bijection. For the Block-Diagonal
+code, we provide a dedicated CUDA kernel that assigns each block column to
+a separate thread. Since our initial goal was to use these codes for improved
+PCGs, we compress by G (from n to k) rather than expand by it (from k to n).
+Although G operates in F2 , for PCG purposes we compress a vector of 128-bit
+elements by G. For the PCG interactive setup, we use the GPU-optimized AES
+implementation described in [Tez21]. The code will be open-sourced.
+Experimental Setting. We conduct our experiments on a commodity laptop,
+equipped with an upper mid-range 13th Gen Intel Core i7-13700H CPU running
+at 2.40 GHz, and with 32 GB of RAM. The laptop features a consumer-grade
+NVIDIA GeForce RTX 4060 GPU with 3072 CUDA cores and 8 GB of GDDR6.
+Codes and Parameters. We present our recommended code parameters in Figure 10 along with their running times and compare them with the state of the art.
+28
+
+As discussed before, our most promising code is the Block-Accumulate-t code
+with t = 3 iterations, i.e. BA-3. We also present our Block-Diagonal code with
+t = 2 and t = 3 iterations (BD-t). We compare them to Expand-Accumulate
+(EA) [BCG+ 22] and Expand-Convolute (EC) [RRT23]. These codes have distance bounds that are either via a Markov chain analysis (no enumerator is
+given) or by conjecture. It is believed that the analytically bounds are not extremely tight and therefore these works [BCG+ 22,RRT23] conjecture plausibly
+tight parameters. We do not implement BD codes on the CPU, as their computational cost makes them unlikely to be competitive on this platform. We also
+do not implement EC codes on the GPU due to the need to implement iterative
+kernels that perform a two-pass convolution. See below for discussion.
+Figure 10 includes the bounds on the minimum distance that the respective
+analysis gives. Due to the probabilistic nature of these bounds, we report the
+relative minimum distance, i.e. d ∈ [0, 1], such that the minimum distance is dn,
+and the bit security of obtaining this bound, i.e. λ, such that with probability
+at least 1 − 2−λ the code achieves minimum distance dn. A good code will have
+high minimum distance with probability close to 1. We note that the LPN and
+Syndrome Decoding do not immediately become insecure if lower than expected
+minimum distance is obtained. Instead, the attacker must be able to find these
+low-weight codewords and potentially in large numbers. It is therefore common
+not to use a large security parameter when bounding the minimum distance.
+Our recommendation is to set these bounds to a small value. For our aggressive
+parameters, we choose λ = 4 with σ = 8, while our conservative parameters use
+λ = 20 with σ = 32 which gives full distance of 0.11. However, for σ = 32 if we
+decrease the required distance to 0.03 we obtain approximately λ = 28 bits of
+security. This is a one time failure event when the code is sampled, not a per use
+failure and therefore lower bit security levels are commonly used. In addition,
+prior works [BCG+ 22,RRT23] have chosen to be far more aggressive and chosen
+parameters that give no bounds on the minimum distance. In Figure 10, we mark
+the EC code with these parameters with a *.
+10.1
+
+Code Performance
+
+We present the results of our experiments in Figure 10. We show that on both
+the CPU and GPU, our BA-3 code achieves the best performance. On the CPU,
+BA-3 improves over state-of-the-art EC [RRT23] ≈ 8× (or ≈ 3× when EC and
+our code use aggressive parameters). On the GPU, BA-3 improves over EA
+≈ 50× (≈ 20× with more conservative parameters).
+10.2
+
+Pseudorandom Correlation Generators
+
+As described in Appendix A, a complete PCG protocol consists of (1) an interactive setup phase that yields the initial correlation, and (2) a local encoding by
+G. Both steps incur nontrivial cost, though the encoding by G is typically the
+dominant factor. This is particularly true when applying the recent Stationary
+Syndrome Decoding optimization of [KPRR25], where the setup is performed
+29
+
+Code
+Min. Dist. Bit Sec. CPU (ms) GPU (ms)
+[This] BA-3
+σ=8
+0.10
+4
+21.4
+3.2
+[This] BA-3
+σ = 32
+0.10
+20
+30.2
+3.3
+[This] BD-3
+σ = 256
+0.05
+10
+–
+14.3
+[This] BD-2
+σ = 2048
+0.05
+10
+–
+40.0
+[BCG+ 22] EA∗ w = 36
+0.05
+10
+598.0
+73.0
+[BCG+ 22] EA w = 78
+0.05
+20
+1,211.0
+156.0
+[RRT23] EC∗ w = 7, m = 25
+–
+–
+67.1
+–
+[RRT23] EC
+w = 33, m = 25
+0.05
+20
+235.6
+–
+Fig. 10. Comparison of our codes, constructed via various concatenations of BlockDiagonal codes and Accumulators, with state-of-the-art Expand-Accumulate (EA)
+[BCG+ 22] and Expand-Convolute (EC) [RRT23] codes on both CPU and GPU, for
+dimension k = 220 . Some uncompetitive configurations are omitted and marked with
+–. The Block-Diagonal code B is parameterized by state size σ, the Expander E is parameterized by column Hamming weight w, and the Convolution C is parameterized
+by memory m. For each of BA-3, EA, and EC, we present two parameter sets in the
+table, where ones with conjectured distance labled with a *.
+
+once and subsequent vectors are derived via local PRG calls. Our implementation shows that the one-time cost of generating the GGM tree is approximately
+10 ms (amortized across many invocations), with each subsequent expand costing about 2 ms on the GPU (8 ms on the CPU), consisting of n calls to AES.
+In the GPU-optimized interactive setup, over 97% of runtime is spent in GPUaccelerated AES evaluations [Tez21]. While [Tez21] reports throughput of 100
+GB/s, our laptop achieved only about 6 GB/s, suggesting that the 2 ms expand
+cost could be reduced significantly on higher-end hardware. In our benchmarks,
+encoding remains the main bottleneck, taking roughly 3 ms compared to 2 ms for
+AES (versus 21ms and 8ms on the CPU). Overall, this translates to a sustained
+throughput of about 200 million OTs or binary Beaver triples per second on the
+GPU, excluding the one-time 10 ms GGM seed expansion.
+10.3
+
+Integration: BA vs. RAA in Blaze
+
+To evaluate the impact of our new codes, we integrated BA-3 into the binary
+zero knowledge Blaze system [BCF+ 25]. We modified the plonkish basefold
+repository [ZH] to replace the RAA encoder with our BA-3 code. For an overview
+of the Blaze system, see Appendix A. We compared our BA-3 (rate 1/2) construction against the baseline RAA (rate 1/4) implementation for a polynomial
+of size k = 220 . The results demonstrate significant improvements in both time
+and memory. Notably, because BA-3 provides a better native rate, we achieve a
+2x speedup in the encoding phase and a halving of total memory usage. We note
+that [BCF+ 25] suggests using puncturing to reduce the rate to 1/2, however, this
+does not speed up or reduce the memory of the encoding/checking proceedure,
+only compresses the codeword after encoding.
+While the total proof size is slightly larger (due to the increased query count
+of 800 in the BA-3 test to maintain the same security margins), the internal
+30
+
+Metric
+RAA BA-3 Improvement
+Encode
+2,572
+1,329
+∼1.93×
+Merkelize
+599
+319
+∼1.87×
+Batch Open 39,828 12,022
+∼3.31×
+Verify
+164
+102
+∼1.60×
+Proof Size
+1.2
+1.6
+∼0.75×
+Table 1. Performance comparison of RAA (rate 1/4, 400 queries) and BA-3 (rate
+1/2, 800 queries). All times are in milliseconds (ms). Proof size is in megabytes (MB).
+
+steps of the prover show dramatic gains. The Commit/Encoding time, which is
+the foundational cost of the commitment phase, is reduced by approximately 2x.
+In our current benchmarks, “Open/Batch Open” is the largest cost (≈ 12 s
+vs ≈ 1.3 s for encoding). However, this ratio is deceptive for future systems. If we
+apply PipFri-style optimizations to the opening phase, we can expect the opening
+time to drop significantly (potentially by 10x). In that future scenario, the 1.3s
+encoding time of BA-3 versus the 2.5s encoding time of RAA becomes a critical
+differentiator, representing a much larger percentage of the total proof generation
+latency. BA-3 provides these benefits natively, making it a more robust and
+efficient choice for scaling SNARKs to billions of constraints.
+
+31
+
+References
+AFS05.
+
+D. Augot, M. Finiasz, and N. Sendrier. A family of fast syndrome based
+cryptographic hash functions. In Mycrypt, 2005.
+AHIV17.
+Scott Ames, Carmit Hazay, Yuval Ishai, and Muthuramakrishnan Venkitasubramaniam. Ligero: Lightweight sublinear arguments without a trusted
+setup. In Proceedings of the 2017 acm sigsac conference on computer and
+communications security, pages 2087–2104, 2017.
+BBC+ 24. Maxime Bombar, Dung Bui, Geoffroy Couteau, Alain Couvreur, Clément
+Ducros, and Sacha Servan-Schreiber. FOLEAGE: F4 OLE-based multiparty computation for boolean circuits. In Kai-Min Chung and Yu Sasaki,
+editors, ASIACRYPT 2024, Part VI, volume 15489 of LNCS, pages 69–
+101. Springer, Singapore, December 2024.
+BCF+ 25. Martijn Brehm, Binyi Chen, Ben Fisch, Nicolas Resch, Ron D Rothblum,
+and Hadas Zeilberger. Blaze: Fast snarks from interleaved raa codes. In
+Annual International Conference on the Theory and Applications of Cryptographic Techniques, pages 123–152. Springer, 2025.
+BCG+ 19a. Elette Boyle, Geoffroy Couteau, Niv Gilboa, Yuval Ishai, Lisa Kohl, Peter
+Rindal, and Peter Scholl. Efficient two-round OT extension and silent noninteractive secure computation. In Lorenzo Cavallaro, Johannes Kinder,
+XiaoFeng Wang, and Jonathan Katz, editors, ACM CCS 2019, pages 291–
+308. ACM Press, November 2019.
+BCG+ 19b. Elette Boyle, Geoffroy Couteau, Niv Gilboa, Yuval Ishai, Lisa Kohl, and
+Peter Scholl. Efficient pseudorandom correlation generators: Silent OT
+extension and more. In Alexandra Boldyreva and Daniele Micciancio,
+editors, CRYPTO 2019, Part III, volume 11694 of LNCS, pages 489–518.
+Springer, Cham, August 2019.
+BCG+ 20. Elette Boyle, Geoffroy Couteau, Niv Gilboa, Yuval Ishai, Lisa Kohl,
+and Peter Scholl. Efficient pseudorandom correlation generators from
+ring-LPN.
+In Daniele Micciancio and Thomas Ristenpart, editors,
+CRYPTO 2020, Part II, volume 12171 of LNCS, pages 387–416. Springer,
+Cham, August 2020.
+BCG+ 22. Elette Boyle, Geoffroy Couteau, Niv Gilboa, Yuval Ishai, Lisa Kohl, Nicolas Resch, and Peter Scholl. Correlated pseudorandomness from expandaccumulate codes. In Yevgeniy Dodis and Thomas Shrimpton, editors,
+CRYPTO 2022, Part II, volume 13508 of LNCS, pages 603–633. Springer,
+Cham, August 2022.
+BCGI18.
+Elette Boyle, Geoffroy Couteau, Niv Gilboa, and Yuval Ishai. Compressing
+vector OLE. In David Lie, Mohammad Mannan, Michael Backes, and
+XiaoFeng Wang, editors, ACM CCS 2018, pages 896–912. ACM Press,
+October 2018.
+BDMP98. Sergio Benedetto, Dariush Divsalar, Guido Montorsi, and Fabrizio Pollara. Serial concatenation of interleaved codes: Performance analysis, design, and iterative decoding. IEEE Transactions on information Theory,
+44(3):909–926, 1998.
+Ber68.
+Elwyn R. Berlekamp. Algebraic coding theory. McGraw-Hill series in systems science. McGraw-Hill, 1968.
+BFK+ 24. Alexander R Block, Zhiyong Fang, Jonathan Katz, Justin Thaler, Hendrik Waldner, and Yupeng Zhang. Field-agnostic snarks from expandaccumulate codes. In Annual International Cryptology Conference, pages
+276–307. Springer, 2024.
+
+32
+
+BGT93.
+
+Claude Berrou, Alain Glavieux, and Punya Thitimajshima. Near shannon
+limit error-correcting coding and decoding: Turbo codes. In Proceedings
+of ICC ’93 - IEEE International Conference on Communications, pages
+1064–1070, 1993.
+BMMS25. Anubhav Baweja, Pratyush Mishra, Tushar Mopuri, and Matan Shtepel.
+Query-optimal iopps for linear-time encodable codes. Cryptology ePrint
+Archive, 2025.
+BMS03.
+Louay Bazzi, Mohammad Mahdian, and Daniel A. Spielman. The minimum distance of turbo-like codes. IEEE Transactions on Information
+Theory, 55(1):6–15, January 2003.
+Bro19.
+Kevin Brown.
+Probability and Combinatorics.
+2019.
+https://www.mathpages.com/home/kmath337/kmath337.htm.
+BSBHR19. Eli Ben-Sasson, Iddo Bentov, Yinon Horesh, and Michael Riabzev. Scalable
+zero knowledge with no trusted setup. In Annual international cryptology
+conference, pages 701–732. Springer, 2019.
+BSCR+ 19. Eli Ben-Sasson, Alessandro Chiesa, Michael Riabzev, Nicholas Spooner,
+Madars Virza, and Nicholas P Ward. Aurora: Transparent succinct arguments for r1cs. In Annual international conference on the theory and
+applications of cryptographic techniques, pages 103–128. Springer, 2019.
+CRR21.
+Geoffroy Couteau, Peter Rindal, and Srinivasan Raghuraman. Silver:
+Silent VOLE and oblivious transfer from hardness of decoding structured
+LDPC codes. In Tal Malkin and Chris Peikert, editors, CRYPTO 2021,
+Part III, volume 12827 of LNCS, pages 502–534, Virtual Event, August
+2021. Springer, Cham.
+DJM98.
+Dariush Divsalar, Hui Jin, and Robert J McEliece. Coding theorems for”
+turbo-like” codes. In Proceedings of the annual Allerton Conference on
+Communication control and Computing, volume 36, pages 201–210. University Of Illinois, 1998.
+Ds17.
+Jack Doerner and abhi shelat. Scaling ORAM for secure computation. In
+Bhavani M. Thuraisingham, David Evans, Tal Malkin, and Dongyan Xu,
+editors, ACM CCS 2017, pages 523–535. ACM Press, October / November
+2017.
+GLS+ 23.
+Alexander Golovnev, Jonathan Lee, Srinath Setty, Justin Thaler, and
+Riad S Wahby. Brakedown: Linear-time and field-agnostic snarks for r1cs.
+In Annual International Cryptology Conference, pages 193–226. Springer,
+2023.
+GWC19.
+Ariel Gabizon, Zachary J Williamson, and Oana Ciobotaru. Plonk: Permutations over lagrange-bases for oecumenical noninteractive arguments
+of knowledge. Cryptology ePrint Archive, 2019.
+HOSS18.
+Carmit Hazay, Emmanuela Orsini, Peter Scholl, and Eduardo SoriaVazquez. TinyKeys: A new approach to efficient multi-party computation.
+In Hovav Shacham and Alexandra Boldyreva, editors, CRYPTO 2018,
+Part III, volume 10993 of LNCS, pages 3–33, August 2018.
+KPRR25. Vladimir Kolesnikov, Stanislav Peceny, Srinivasan Raghuraman, and Peter Rindal. Stationary syndrome decoding for improved pcgs. In Yael
+Tauman Kalai and Seny F. Kamara, editors, Advances in Cryptology –
+CRYPTO 2025, pages 284–317, Cham, 2025. Springer Nature Switzerland.
+KU98.
+Nabil Kahale and Rüdiger Urbanke. On the minimum distance of parallel
+and serially concatenated codes. In Proceedings. 1998 IEEE International
+Symposium on Information Theory (Cat. No. 98CH36252), page 31. IEEE,
+1998.
+
+33
+
+LXYY25.
+
+Zhe Li, Chaoping Xing, Yizhou Yao, and Chen Yuan. Efficient pseudorandom correlation generators for any finite field. Cryptology ePrint Archive,
+Paper 2025/169, 2025.
+LZ25.
+Tianyi Liu and Yupeng Zhang. Efficient snarks for boolean circuits via
+sumcheck over tower fields. Cryptology ePrint Archive, 2025.
+RGiA11.
+Eirik Rosnes and Alexandre Graell i Amat.
+On the analysis of
+weighted nonbinary repeat multiple-accumulate codes. arXiv preprint
+arXiv:1101.5966, 2011.
+RR.
+Peter Rindal and Lawrence Roy. libOTe: an efficient, portable, and easy
+to use Oblivious Transfer Library. https://github.com/osu-crypto/
+libOTe.
+RR22.
+Srinivasan Raghuraman and Peter Rindal. Blazing fast PSI from improved
+OKVS and subfield VOLE. In Heng Yin, Angelos Stavrou, Cas Cremers,
+and Elaine Shi, editors, ACM CCS 2022, pages 2505–2517. ACM Press,
+November 2022.
+RRT23.
+Srinivasan Raghuraman, Peter Rindal, and Titouan Tanguy. Expandconvolute codes for pseudorandom correlation generators from LPN. In Helena Handschuh and Anna Lysyanskaya, editors, CRYPTO 2023, Part IV,
+volume 14084 of LNCS, pages 602–632. Springer, Cham, August 2023.
+RS21.
+Peter Rindal and Phillipp Schoppmann. VOLE-PSI: Fast OPRF and
+circuit-PSI from vector-OLE. In Anne Canteaut and François-Xavier Standaert, editors, EUROCRYPT 2021, Part II, volume 12697 of LNCS, pages
+901–930. Springer, Cham, October 2021.
+Set20.
+Srinath Setty. Spartan: Efficient and general-purpose zksnarks without
+trusted setup. In Annual International Cryptology Conference, pages 704–
+737. Springer, 2020.
+SGRR19. Phillipp Schoppmann, Adrià Gascón, Leonie Reichert, and Mariana
+Raykova. Distributed vector-OLE: Improved constructions and implementation. In Lorenzo Cavallaro, Johannes Kinder, XiaoFeng Wang, and
+Jonathan Katz, editors, ACM CCS 2019, pages 1055–1072. ACM Press,
+November 2019.
+Tez21.
+Cihangir Tezcan. Optimization of advanced encryption standard on graphics processing units. IEEE Access, 9:67315–67326, 2021.
+VY12.
+Branka Vucetic and Jinhong Yuan. Turbo codes: principles and applications, volume 559. Springer Science & Business Media, 2012.
+WYKW21. Chenkai Weng, Kang Yang, Jonathan Katz, and Xiao Wang. Wolverine: Fast, scalable, and communication-efficient zero-knowledge proofs for
+boolean and arithmetic circuits. In 2021 IEEE Symposium on Security
+and Privacy, pages 1074–1091. IEEE Computer Society Press, May 2021.
+YWL+ 20. Kang Yang, Chenkai Weng, Xiao Lan, Jiang Zhang, and Xiao Wang. Ferret: Fast extension for correlated OT with small communication. In Jay
+Ligatti, Xinming Ou, Jonathan Katz, and Giovanni Vigna, editors, ACM
+CCS 2020, pages 1607–1626. ACM Press, November 2020.
+ZH.
+Hadas Zeilberger and Ting Han. Plonkish. https://github.com/hadasz/
+plonkish_basefold.git.
+
+34
+
+Supplementary Material
+A
+
+Applications
+
+A.1
+
+Pseudorandom Correlation Generators
+
+PCG Overview. We focus on PCGs based on Syndrome Decoding (SD) / Learning Parity with Noise (LPN) for generating OT and VOLE correlations of size
+k [BCG+ 19b]. These protocols begin with the parties performing an interactive,
+efficient setup to produce random vectors a′ , b′ , c′ ∈ Fn and a scalar ∆ ∈ F
+satisfying
+c′ = b′ + ∆a′ ,
+where F is a large field, e.g. GF (2128 ), and n ≈ 2k. One party learns the values
+(b′ , ∆), while the other learns (a′ , c′ ). These vectors are uniformly distributed,
+except that a′ is extremely sparse. This sparsity allows for the setup to be performed with communication sublinear in the size of the vectors. In a subsequent
+phase, the protocol transforms a′ , b′ , c′ into uniformly random looking vectors
+a, b, c ∈ Fk , preserving the relation
+c = b + ∆a.
+In particular, the sparse vector a′ ∈ Fn is transformed into a pseudorandom
+vector a ∈ Fk . For our parameter regime, k is large (e.g., 220 ), while n = 2k,
+and therefore this transformation is compressing.
+This correlation, called vector oblivious linear evaluation (VOLE), underpins
+many state-of-the-art protocols for zero-knowledge proofs [WYKW21,YWL+ 20]
+and private set intersection [RS21,RR22]. Alternatively, one can locally convert
+this VOLE correlation into k instances of OT or binary Beaver triples [BCG+ 19a]
+[BCG+ 19b], which are employed in a wide range of cryptographic schemes.
+Multiplication by G. The core transformation step multiplies a′ , b′ , and c′ by a
+matrix G ∈ Fk×n , where G is the generator matrix of an error-correcting code
+with high minimum distance. Namely,
+a = G · a′ ,
+
+b = G · b′ ,
+
+c = G · c′ .
+
+A code G with high minimum distance6 ensures that an extremely sparse a′ is
+mapped to a slightly shorter but essentially uniform vector a. More formally,
+under the SD (a.k.a. dual LPN) assumption associated with G, the vector a is
+indistinguishable from a random vector given G.
+6
+
+There are some exceptions, such as the Reed-Solomon Code.
+
+35
+
+Improving Computational Efficiency. Two major avenues have been explored to
+optimize these protocols: (1) reducing the cost of multiplying by G, which is a
+local computation but often the main bottleneck; and (2) minimizing the interactive setup that yields the initial correlation a′ = b′ + ∆c′ . Our focus is on the
+first challenge: designing G so that multiplication is efficient. Although several
+codes have been proposed [BCG+ 19a,CRR21,BCG+ 22,RRT23], we show there
+is ample room for concrete improvement by constructing new high-minimumdistance codes that enable fast matrix-vector products.
+A.2
+
+Zero-Knowledge Proofs: The Blaze System
+
+The Blaze system [BCF+ 25] is a state-of-the-art multilinear polynomial commitment scheme (MLPCS) designed for high-efficiency provers over binary fields. A
+core component of Blaze’s performance is its use of linear-time encodable codes,
+specifically the Repeat-Accumulate-Accumulate (RAA) code [DJM98,KU98], as
+the underlying error-correcting primitive.
+Blaze Framework. Blaze operates as a compiler that combines two primary techniques:
+– Code Interleaving: To commit to a large multilinear polynomial of size
+N , the prover interprets the coefficients as a t × k matrix (where N = tk)
+and encodes each row separately using a base linear code.
+– IOPP for Multilinear Evaluation: Blaze lifts evaluation claims about the
+multilinear extension into claims about simple combinatorial extensions of
+the base code, utilizing an inner proof system (IOPP) to verify these smaller
+claims.
+In its standard instantiation, Blaze utilizes RAA codes at rate 1/4 to achieve
+the relative distance (approximately 0.19) required for soundness. While puncturing could theoretically achieve rate 1/2, it adds complexity and does not
+reduce the initial encoding work or memory footprint required to generate the
+full codeword before puncturing.
+Conceptual Advantages of Block-Accumulate Codes. Our Block-Accumulate (BA3) codes offer several conceptual and practical improvements when integrated
+into the Blaze framework:
+– Native Rate 1/2 Performance: Unlike RAA codes, which require rate
+1/4 for sufficient distance , BA-3 codes achieve high minimum distance (approximately 0.1) natively at rate 1/2.
+– Reduced Permutation Overhead: By operating at rate 1/2, the permutations πi within the code act on vectors that are half the size of those in
+a rate 1/4 RAA scheme. This directly reduces computational work for both
+the encoder and the prover.
+36
+
+– Memory Efficiency and Scalability: Blaze’s claim to fame is its ability to handle massive instances (> 225 variables). Because BA-3 produces
+codewords half the size of unpunctured RAA, the total memory overhead is
+halved, effectively doubling the maximum polynomial size Blaze can handle
+on the same hardware.
+Future-Proofing Prover Bottlenecks. Integrating highly optimized inner proof
+systems like PipFRI into Blaze highlights the critical need for faster encoding.
+– The Role of PipFRI: PipFRI utilizes a shred-to-shine methodology that
+decomposes polynomials into smaller chunks, drastically reducing the overhead of Fast Fourier Transforms (FFTs) and Merkle tree construction during
+the commitment and opening phases. This effectively slashes the O(N log N )
+bottleneck of standard FRI to near-linear time.
+– The Shift in Costs: The total prover time in Blaze is a sum of ”cryptographic work” (Merkle hashing, folding, handled by the inner system) and
+”coding work” (encoding via RAA/BA). As PipFRI reduces the cryptographic weight by orders of magnitude (e.g., 10x faster prover times), the
+static cost of the ”coding work” becomes the primary target for optimization.
+– The BA-3 Advantage: By providing a 2x speedup in encoding, BA-3
+lowers the static floor of the computation. This ensures that as the variable
+ceiling of cryptographic costs lowers with innovations like PipFRI, the encoding step does not become the new bottleneck stalling the entire pipeline.
+
+B
+
+Block Accumulate Minimum Distance Proof
+
+Proof overview. Fix a nonzero input x ∈ {0, 1}k and track Hamming weights
+through G = Bπ1 Aπ2 A:
+u := |xB|H ,
+
+h1 := |xBπ1 A|H ,
+
+h := |xBπ1 Aπ2 A|H .
+
+We upper bound the expected number of nonzero codewords with final weight
+h ≤ εn and then apply Markov’s inequality.
+1. Outer block-diagonal distance. By (1), any weight-w input activates at least
+⌈w/σ⌉ blocks, and each active block contributes at least d′ output weight.
+Hence u = |xB|H ≥ umin (w) = d′ ⌈w/σ⌉.
+2. Random interleavers give uniformity. Conditioned on |xB|H = u, the vector after π1 is uniform among all length-n vectors of weight u; similarly,
+conditioned on h1 , the vector after π2 is uniform among all weight-h1 vectors. Thus both accumulator stages are analyzed via the exact input-output
+enumerator Eu,h of the accumulator.
+3. Accumulators suppress very small outputs. Lemma 2 shows that for h1 ≤ 2εn,
+Pr[|zA|H = h1 | |z|H = u] ≤
+37
+
+u/2
+
+h1
+,
+4e2
+n
+
+and the RHS is monotone decreasing in u when ε is small. This lets us
+eliminate the (potentially complicated) distribution of u given x and upper
+bound by the worst case allowed by (1). Applying the same estimate to the
+second accumulator yields a strong tail bound on Pr[h ≤ εn | h1 ].
+4. Support constraints truncate the weight ranges. Since Ea,b = 0 unless ⌈a/2⌉ ≤
+b, any final weight h ≤ εn forces h1 ≤ 2εn and in turn forces u ≤ 2h1 .
+Combined with u ≥ umin (w), this restricts the relevant inputs to a lowweight regime.
+5. Re-index by the number of active blocks. The key counting step is to sum over
+inputs by the number b of active σ-bit blocks rather than by total Hamming
+weight w. For inputs with exactly b active blocks we have the sharp bound
+σ
+b
+u ≥ d′ b, and the number of such inputs is at most k/σ
+b (2 − 1) . This
+block-based counting aligns with the structure of B and yields a geometric
+decay in b once d′ > 4, implying that the expected number of codewords
+with h ≤ εn tends to zero.
+Assumption 1 (Outer block-diagonal distance). Assume B is block-diagonal
+with input-block size σ and that each activated block produces output Hamming
+weight at least some constant d′ > 4. Then for any x with w := |x|H ,
+lwm
+.
+(1)
+u := |xB|H ≥ umin (w) := d′
+σ
+Accumulator input-output enumerator. Using the standard accumulator from
+the preliminaries, we recall the (exact) input–output enumerator:
+
+
+
+n−h
+h−1
+A
+Eu,h =
+.
+(2)
+⌊u/2⌋ ⌈u/2⌉ − 1
+We will omit the superscript A in this section. In particular, for uniform z ∈
+{0, 1}n conditioned on |z|H = u,
+Pr[|zA|H = h | |z|H = u] =
+
+Eu,h
+
+n ,
+
+(3)
+
+u
+
+and Eu,h = 0 unless ⌈u/2⌉ ≤ h.
+Lemma 2 (Small-output contraction for the accumulator). Let A be
+the length-n accumulator with enumerator (2). There exists a constant ε0 > 0
+such that for all 0 < ε ≤ ε0 , all sufficiently large n, all 1 ≤ h1 ≤ 2εn, and all
+u ≥ 1,
+
+u/2
+
+ Eu,h
+h1
+Pr |zA|H = h1 | |z|H = u = n1 ≤ 4e2
+.
+(4)
+n
+u
+Moreover, if 8e2 ε < 1, then the RHS of (4) is decreasing in u.
+In addition, for each fixed h1 ≤ 2εn,
+⌊εn⌋
+
+X
+
+
+
+h1 /2
+Pr |zA|H = h | |z|H = h1 ≤ (εn) 4e2 ε
+.
+
+h=1
+
+38
+
+(5)
+
+Proof. We prove (4) first. Let s = ⌊u/2⌋ and
+ h1t−1= ⌈u/2⌉,
+ so s + t = uN and
+n h1
+1
+s, t ≥ u/2 − 1/2. Using (2), Eu,h1 = n−h
+≤
+. Apply r ≤
+s
+ s  t−1
+t
+n
+en s eh1 t
+r
+. Also use u ≥ (n/u)u . Then
+(eN/r) to both factors: Eu,h1 ≤ s
+t
+
+
+
+
+
+
+t
+t
+s
+u
+s
+t
+Eu,h1
+eh1
+h1
+u
+≤ en
+= e us
+e ut
+. If u = 1, then E1,h1 = 1 and
+s
+t
+n
+n
+(nu)
+n
+2
+1/2
+for all sufficiently
+1 = n, so Pr[|zA|H = h1 | |z|H = 1] = 1/n ≤ (4e (h1 /n))
+large n. Assume henceforth that u ≥ 2, so s, t ≥ 1. If u is even then s = t = u/2
+and (u/s)s (u/t)t = 2u . If u is odd, write u = 2m + 1 so s = m and t = m + 1,
+and observe that
+
+m 
+m+1
+ u s  u t
+1
+1
+u
+=2 1+
+1−
+≤ 2u ,
+s
+t
+2m
+2m + 2
+where the last inequality follows from log(1 + x) ≤ x and log(1 − x) ≤ −x − x2 /2.
+s u  t
+e t ≤ (2e)u , and hence
+Thus e us
+Eu,h1
+ ≤ (2e)u
+n
+
+
+
+u
+
+h1
+n
+
+t
+
+≤ (2e)u
+
+
+
+h1
+n
+
+u/2
+.
+
+Finally, (2e)u = (4e2 )u/2 gives (4). If h1 ≤ 2εn and 8e2 ε < 1, then 4e2 (h1 /n) ≤
+8e2 ε < 1, so the RHS of (4) is decreasing in u.
+For (5), apply (4) with u ← h1 to get, for each h, Pr[|zA|H = h | |z|H =
+h1 /2
+. Summing over 1 ≤ h ≤ εn and using h/n ≤ ε yields
+h1 ] ≤ 4e2 nh
+⌊εn⌋
+
+X
+
+Pr[|zA|H = h | |z|H = h1 ] ≤ (εn) 4e2 ε
+
+h1 /2
+
+.
+
+h=1
+
+Theorem 2 (Linear minimum distance for BA-3). Consider the BlockAccumulate code G := Bπ1 Aπ2 A of length n, where π1 , π2 are independent uniform interleavers on [n] and A is the standard length-n accumulator. Assume the
+outer block-diagonal distance lower bound (1) holds. If the outer block distance
+satisfies d′ > 4, then for some sufficiently small constant ε = ε(d′ , σ, R) > 0,
+Pr[dmin (G) ≥ εn] −−−−→ 1.
+n→∞
+
+Remark 1. We write R := k/n for the (constant) rate of the code. Here ε depends
+only on d′ , σ and the rate R, and not on n.
+Proof. Step 1: Expected number of low-weight codewords.
+Fix a constant 0 < ε ≤ ε0 sufficiently small so that 8e2 ε < 1, (4e2 ε)1/2 e < 1,
+and ρ < 1 (as defined later). Let E≤εn denote the expected number of nonzero
+codewords of weight at most εn. By linearity of expectation,
+E≤εn =
+
+k  
+X
+k
+w=1
+
+w
+
+
+
+Pr |xG|H ≤ εn ,
+
+39
+
+(6)
+
+where x is uniform over {x ∈ {0, 1}k : |x|H = w}.
+Introduce the intermediate weights
+u = |xB|H ,
+
+h1 = |xBπ1 A|H ,
+
+h = |xBπ1 Aπ2 A|H = |xG|H = |y|H .
+
+Conditioning on (u, h1 , h),
+E≤εn =
+
+k  X
+n X
+n ⌊εn⌋
+X
+X
+k
+w=1
+
+w
+
+Pr[u | w] Pr[h1 | u] Pr[h | h1 ].
+
+(7)
+
+u=0 h1 =0 h=1
+
+Uniformity under random interleavers. Conditioned on |xB|H = u, the
+vector xBπ1 is uniform over all weight-u vectors in {0, 1}n ; similarly, conditioned
+on h1 , the vector xBπ1 Aπ2 is uniform over all weight-h1 vectors in {0, 1}n . Thus
+(3) applies to both accumulator stages:
+Pr[h1 | u] =
+
+Eu,h1
+
+n ,
+
+Pr[h | h1 ] =
+
+u
+
+Eh1 ,h
+
+n .
+
+(8)
+
+h1
+
+Step 2: Remove the distribution of u using monotonicity.
+We only know u ≥ umin (w) from (1); the exact distribution Pr[u | w] may be
+complicated. We eliminate it using a one-sided bound.
+E
+1
+≤
+For h1 ≤ 2εn, Lemma 2(i) gives Pr[|zA|H = h1 | |z|H = u] = u,h
+(nu)
+
+u/2
+4e2 hn1
+. If 8e2 ε < 1, then 4e2 (h1 /n) ≤ 8e2 ε < 1 and the RHS is decreasing in u. Hence, for all u ≥ umin (w), Pr[|zA|H = h1 | |z|H = u] ≤
+umin (w)/2
+P
+. Therefore, using
+4e2 hn1
+that u ≥
+u Pr[u | w] = 1 and the fact P
+umin (w), we may upper bound the u-average by the worst case:
+u Pr[u |
+
+2 h1 umin (w)/2
+w] Pr[h1 | u] ≤ 4e n
+for (h1 ≤ 2εn).
+Substituting into (7) and using (8) for the second accumulator yields
+E≤εn ≤
+
+n ⌊εn⌋
+k   X
+X
+X
+k
+w=1
+
+w
+
+4e
+
+2 h1
+
+n
+
+h1 =0 h=1
+
+umin (w)/2
+·
+
+Eh1 ,h
+
+n .
+
+(9)
+
+h1
+
+Step 3: Truncation (support constraints).
+E
+From (2), Ea,b = 0 unless ⌈a/2⌉ ≤ b. Thus hn1 ,h = 0 unless h1 ≤ 2h. Since
+(h1 )
+h ≤ εn, we may restrict to
+1 ≤ h1 ≤ 2εn.
+(10)
+Also, the first stage has Eu,h
+u ≥ umin (w), we must
+l 1 m= 0 unless u ≤ 2h1 ; since
+ 2h1 
+≤
+2h
+⇒
+w
+≤
+σ
+. So (9) becomes
+have umin (w) ≤ 2h1 , i.e. d′ w
+1
+σ
+d′
+⌊2εn⌋ σ⌊2h1 /d′ ⌋ 
+
+E≤εn ≤
+
+X
+
+X
+
+h1 =1
+
+w=1
+
+k
+w
+
+
+u (w)/2 ⌊εn⌋
+X Eh ,h
+h1 min
+1
+
+4e2
+n .
+n
+h1
+h=1
+
+Step 4: Bound the second-stage tail
+40
+
+P
+
+h≤εn Pr[h | h1 ].
+
+(11)
+
+By Lemma 2(i) with u ← h1 ,
+
+
+Eh1 ,h
+ ≤
+n
+
+4e
+
+2h
+
+h1
+
+h1 /2
+.
+
+n
+
+Therefore,
+⌊εn⌋
+
+h /2
+⌊εn⌋ 
+X Eh ,h
+X
+h1 /2
+h 1
+1
+2
+ ≤
+≤ (εn) 4e2 ε
+4e
+,
+n
+n
+h1
+
+h=1
+
+(12)
+
+h=1
+
+where the last step uses monotonicity in h and h ≤ εn.
+Substitute (12) into (11):
+⌊2εn⌋
+
+E≤εn ≤ (εn)
+
+X
+
+2
+
+4e ε
+
+h1 /2
+
+σ⌊2h1 /d′ ⌋ 
+
+X
+
+w=1
+
+h1 =1
+
+k
+w
+
+
+u (w)/2
+h1 min
+4e2
+.
+n
+
+(13)
+
+Step 5: Re-indexing by active blocks.
+For an input x ∈ {0, 1}k , let b = b(x) ∈ {1, . . . , k/σ} denote the number of
+σ-bit input blocks on which x is nonzero. Since each active block contributes
+output weight at least d′ , we have
+u = |xB|H ≥ d′ b.
+
+(14)
+
+For fixed b, the number of inputs activating exactly b blocks is at most
+
+
+k/σ
+Nb ≤
+(2σ − 1)b ,
+(15)
+b
+since we choose the b active blocks and then choose any nonzero σ-bit pattern
+in each active block.
+We now bound E≤εn by summing over inputs grouped by the number b =
+b(x) of active σ-bit blocks (rather than by total Hamming weight). From (6),
+equivalently
+X
+
+
+E≤εn =
+Pr |xG|H ≤ εn .
+x∈{0,1}k \{0}
+
+Fix such an input x and let b = b(x). By (14) we have u = |xB|H ≥ d′ b. Using
+the support constraint Eu,h1 = 0 unless u ≤ 2h1 and applying (12), we obtain
+⌊2εn⌋
+
+X
+
+
+h1 /2
+Pr |xG|H ≤ εn ≤ (εn)
+4e2 ε
+Pr[h1 | u].
+h1 =1
+
+For each h1 ≤ 2εn, Lemma 2(i) gives
+Eu,h
+Pr[h1 | u] = n1 ≤
+u
+
+
+4e
+
+2 h1
+
+n
+
+41
+
+u/2
+
+
+≤
+
+4e
+
+2 h1
+
+n
+
+d′ b/2
+,
+
+where the last inequality uses u ≥ d′ b and 4e2 (h1 /n) ≤ 8e2 ε < 1. If d′ b > 2h1
+then Pr[h1 | u] = 0, so only b ≤ 2h1 /d′ contribute. Summing over all inputs with
+exactly b active blocks and using (15) gives
+⌊2h1 /d′ ⌋
+
+⌊2εn⌋
+
+h1 /2
+4e ε
+
+X
+
+E≤εn ≤ (εn)
+
+X
+
+2
+
+b=1
+
+h1 =1
+
+
+d′ b/2
+2 h1
+Nb 4e
+.
+n
+
+(16)
+
+(5b) Bounding the h1 -sum and geometric decay in b.
+We now swap the order of summation. Since b ≤ 2h1 /d′ if and only if h1 ≥
+′
+d b/2, (16) becomes
+⌊4εn/d′ ⌋
+
+⌊2εn⌋
+
+X
+
+X
+
+E≤εn ≤ (εn)
+
+Nb
+
+2
+
+4e ε
+
+h1 /2
+
+
+4e
+
+2 h1
+
+h1 =⌈d′ b/2⌉
+
+b=1
+
+d′ b/2
+.
+
+n
+
+(17)
+
+d′ b/2
+h1 /2
+. For h1 ≥ d′ b/2, we bound the ratio
+Define f (h1 ) := 4e2 ε
+4e2 hn1
+d′ b/2
+
+ ′ 
+f (h1 +1)
+1
+db
+2 1/2
+2 1/2
+≤ (4e2 ε)1/2 e, where
+=
+(4e
+ε)
+1
++
+≤
+(4e
+ε)
+exp
+f (h1 )
+h1
+2h1
+the last inequality uses h1 ≥ d′ b/2. Choosing ε > 0 sufficiently small so that
+(4e2 ε)1/2 e < 1, the inner sum is geometrically decreasing, and there exists a
+constant C0 (independent of n and b) such that
+⌊2εn⌋
+
+X
+
+f (h1 ) ≤ C0 f (⌈d′ b/2⌉).
+
+(18)
+
+h1 =⌈d′ b/2⌉
+
+Using ⌈d′ b/2⌉ ≤ d′ b and h1 /n ≤ d′ b/n at the lower limit, we obtain f (⌈d′ b/2⌉) ≤
+d′ b/4  2 d′ b d′ b/2
+4e2 ε
+4e n
+. Substituting into (17) yields
+⌊4εn/d′ ⌋
+
+E≤εn ≤ (εn) C0
+
+X
+
+2
+
+Nb 4e ε
+
+d′ b/4
+
+
+4e
+
+b=1
+k/σ
+b
+
+Finally, using (15) and
+⌊4εn/d′ ⌋ 
+
+E≤εn ≤ (εn) C0
+
+X
+b=1
+
+
+
+′
+2d b
+
+d′ b/2
+.
+
+n
+
+(19)
+
+≤ (ek/(σb))b with k = Rn, we obtain
+
+b
+ ′
+ ′
+eR(2σ − 1)
+2 d /4
+2 ′ d /2
+1−d′ /2
+· 4e ε
+· 4e d b
+·n
+.
+σb
+
+We now analyze the b-sum. Write the final bound as
+E≤εn ≤ (εn) C0
+
+⌊4εn/d′ ⌋ h
+
+X
+
+′
+
+′
+
+K(σ, R, d′ , ε) · bd /2−1 · n 1−d /2
+
+b=1
+
+where
+
+d′ /4
+d′ /2
+eR(2σ − 1)
+· 4e2 ε
+· 4e2 d′
+σ
+absorbs all factors independent of b and n.
+K(σ, R, d′ , ε) :=
+
+42
+
+ib
+
+,
+
+The bottleneck is b = 1. The b = 1 term contributes
+(b=1)
+
+E≤εn
+
+
+
+′
+′
+≤ (εn) C0 · K(σ, R, d′ , ε) · n 1−d /2 = O n 2−d /2 .
+
+Therefore, to ensure E≤εn → 0 as n → ∞, we require
+2−
+
+d′
+<0
+2
+
+⇐⇒
+
+d′ > 4.
+
+The terms with b ≥ 2 are negligible. Let α := d′ /2 − 1 > 1. The bth summand
+equals
+
+ α b
+b
+.
+K(σ, R, d′ , ε)
+n
+√
+′
+For
+√ large n (so that n ≤ 4εn/d ), split the range into 2 ≤ b ≤
+√ all sufficiently
+⌈ n⌉.
+⌊ n⌋ and b ≥√
+If 2 ≤ b ≤ n then b/n ≤ n−1/2 , so
+  α b 
+b
+b
+K
+≤ K n−α/2 ,
+n
+and hence, for all sufficiently large n (so that K n−α/2 < 1/2),
+√
+⌊ n⌋ 
+
+X
+b=2
+
+ α b X
+∞ 
+b
+
+b
+≤
+K n−α/2 = O n−α .
+K
+n
+b=2
+
+√
+
+n, use the truncation b ≤ ⌊4εn/d′ ⌋ to get b/n ≤ 4ε/d′ . Define
+ α
+4ε
+′
+,
+ρ := K(σ, R, d , ε)
+d′
+√
+and choose ε sufficiently small so that ρ < 1. Then for all b ≥ n,
+  α b
+√
+b
+≤ ρb ≤ ρ n ,
+K
+n
+For b ≥
+
+so
+
+√
+ α b
+b
+ρ n
+K
+≤
+= o(n−2 ).
+n
+1−ρ
+
+⌊4εn/d′ ⌋ 
+
+X
+
+√
+b=⌈ n⌉
+
+Multiplying by the outer factor (εn)C0 shows that the total contribution of
+b ≥ 2 is o(1). Together with the b = 1 estimate above, this implies E≤εn → 0 as
+n → ∞.
+Finally, by Markov’s inequality,
+Pr[dmin (G) ≤ εn] ≤ E≤εn −−−−→ 0,
+n→∞
+
+which proves the theorem.
+
+43
+
+C
+
+Balls in Bins with Slots
+
+The k labeled slotted bins,
+ each with a capacity of c, collectively provide a total
+of ck slots. There are ck
+n ways to assign n identical balls into ck slots. However,
+this includes assignments where bins may be empty. Let AY denote the set of
+assignments where the bins in Y ⊆ [k] are empty, i.e. xy = 0c for y ∈ Y . Note
+that by definition,
+ 
+[
+ck
+A{i} .
+S(n, k, c) =
+−
+n
+i∈[k]
+
+From the inclusion-exclusion principle,
+[
+
+A{i} =
+
+X
+
+|A{i} | −
+
+X
+
+|A{i,i′′ } | +
+
+i,i′ ∈[k]
+i̸=i′
+
+i∈[k]
+
+i∈[k]
+
+X
+
+|A{i,i′ ,i′′ } | − . . . ,
+
+i,i′ ,i′′ ∈[k]
+i̸=i′ ,i̸=i′′ ,i′ ̸=i′′
+
+or equivalently,
+[
+
+A{i} =
+
+k
+X
+X
+(−1)i−1
+|AY |.
+i=1
+
+i∈[k]
+
+Y ⊆[k]
+|Y |=i
+
+For any Y ⊆ [k],
+
+
+c(k − |Y |)
+|AY | =
+,
+n
+as if the bins in Y must be empty, the n balls must be assigned to the remaining
+c(k − |Y |) slots
+ in the k − |Y | bins. Furthermore, the number of Y ⊆ [k] with
+|Y | = i is ki . Therefore,
+[
+i∈[k]
+
+A{i} =
+
+k
+X
+
+i−1
+
+(−1)
+
+i=1
+
+ 
+
+k
+c(k − i)
+,
+i
+n
+
+and hence
+S(n, k, c) =
+
+ 
+
+ 
+ X
+  X
+k
+k
+k
+c(k − i)
+k
+c(k − i)
+ck
+(−1)i
+,
+−
+(−1)i−1
+=
+i
+n
+i
+n
+n
+i=1
+i=0
+
+as required.
+
+D
+
+Repeat-Accumulate Codes
+
+[BMS03] proved that t = 2 must result in sublinear minimum distance, while at
+t = 3 the code can achieve linear minimum distance. In fact, Repeat-Accumulate
+(RA-3) codes, where B is replaced by a repeater, achieve a concretely high linear
+minimum distance at rate 1/4. For efficiency reasons, we focus on rate 1/2 to
+44
+
+avoid the high cost of large permutations. We implement the code for rate 1/2
+and depict the result in Figure 11 for k ∈ {512, 1024, 2048}. As can be seen,
+the probability of having a weight-h = 1 codeword is approximately 1/k and
+increases with h until around h/n = 0.03, at which point we expect there to
+be a single codeword. While the asymptotic properties of rate-1/2 RA-3 codes
+remain unclear, our experiments show their concrete minimum distance is poor.
+
+60
+50
+40
+30
+20
+10
+0
+−10
+−20
+0
+
+0.02
+
+0.04
+
+0.06
+
+0.08
+
+0.1
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 11. Depictions of the Repeat-Accumulate enumerator. The dashed lines denote
+the log number of codewords with at most h/n relative minimum distance, as opposed
+to exactly h/n. See Figure 1 for details.
+
+E
+
+Fully Systematic Block-Diagonal
+
+A common technique in coding theory is to describe a systematic code where
+the generator G can be expressed as G := (I||G′ ). This approach can be more
+efficient because the codeword contains the input as its first part. Therefore, one
+needs only to compute the remaining part of the codeword. While any arbitrary
+code can be converted into systematic form, such a conversion is typically costly,
+as it requires Gaussian elimination and eliminates the possibility of fast encoding.
+[RRT23] and others have shown that it can be possible to instantiate codes
+already in systematic form such that the computation of xG′ retains the fast encoding structure. In particular, the idea is to simply instantiate G′ as an instance
+of the structured code, in our case a serially concatenated Block-Diagonal code.
+If we restrict our attention to rate 1/2 codes, this implies that G′ is a square
+k × k matrix that can be expressed as G′ := G′1 π1 G′2 ...πt−1 G′t , where each G′i
+is a Block-Diagonal matrix. We observe that one must approximately double
+the size of σ to maintain the same minimum distance behavior. This doubling
+results in four times the amount of work to multiply but halves the amount of
+45
+
+work to permute. Based on the current running time numbers we conclude this
+approach does not result in an overall reduction in running time.
+E.1
+
+Block-Diagonal Weight Distribution at t ≥ 2
+
+More generally, we observe that the phase transition occurs approximately at
+log(σ) =
+
+log(k)
++ 3/4,
+t
+
+√
+t
+σ = 23/4 k
+
+This implies that at t = log(k) a submatrix of size σ = O(1) is sufficient. The
+resulting weight distributions are largely similar to the case of t = 2 discussed in
+Section 8.1. We plot the measured values of where the phase transition√intersects
+log δh = 0 in Figure 12 for t ∈ [2, 5] along with the trend lines σ = 23/4 t k. While
+there is some variance between the trend lines and the measured phase transition,
+the overall fit is extremely tight. We conjecture that this general trend continues
+for larger values of t but leave the asymptotic analysis of the growth to future
+work. From a practical perspective, values beyond t = 4 do not offer compelling
+improvements given that the cost of t permutations dominates the cost of a block
+diagonal matrix multiply for such small values of σ.
+
+8
+7
+6
+5
+4
+3
+2
+1
+0
+
+2
+
+4
+
+6
+
+8
+
+10
+
+12
+
+14
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 12. Plot of the values of σ required for the√phase transition points to occur at
+log2 δh = 0, compared the the trend lines σ = 23/4 t k, equivalently log2 σ = logt2 k +3/4.
+
+√
+If we fix k ≈ 210 and set σ = 23/4 t k we obtain the plot in Figure 13. As can
+be see, the phase transition does occur at log2 δh = 0. Interestingly, as t increases
+and σ decrease, we observe the the phase transition happens at smaller values
+of h/n. It is not immediately clear why this occurs but we note that increasing
+σ does reduce this effect.
+More importantly, for larger values of t the probability of getting low weight
+codewords does not fall as quickly as the case of t = 2. This raises the possibility
+46
+
+of having significantly lower minimum distance than compared to where the
+weight distribution crosses log2 δh = 0. In particular, in Figure 13 the cumulative
+weight distribution is plotted as a dashed line where for each h/n value we plot
+the expected number of codewords with at most h/n relative Hamming weight.
+This more accurately represents the minimum distance, as where this line crosses
+the log δh = 0 denotes the expected minimum distance. Therefore, we would
+desire a formula for σ such that the relative minimum distance remains close
+to h/n√= 0.1. Figure 14 plots the cumulative weight distribution when setting
+σ = 2 t k which does obtains the desired effect at t ∈ {4, 5}. For t ∈ {2, 3}
+this parameterization overshoots and results in a cumulative phase transition
+√
+below log δh = 2. Regardless, the general trend is apparent, one can set σ = c t k
+for some constant c such that the desired security margin can be obtained. We
+believe t ∈ {2, 3} are the most interesting cases for which c = 3/4 and c = 2
+suffices in most applications, respectively.
+20
+
+20
+
+10
+
+10
+
+0
+
+0
+
+−10
+
+−10
+
+−20
+
+−20
+
+−30
+0
+
+0.05
+
+0.1
+
+0.15
+
+−30
+0
+
+0.2
+
+Loading [MathJax]/extensions/MathMenu.js
+
+0.1
+
+0.15
+
+0.2
+
+Loading [MathJax]/extensions/MathMenu.js
+
+Fig. 13. Weight distribution
+for t ∈ [2, 5],
+√
+k ≈ 210 and σ = 23/4 t k. Dashed lines denote the cumulative weight distribution.
+
+F
+
+0.05
+
+Fig. 14. Weight distribution
+for t ∈ [2, 5],
+√
+k ≈ 210 and σ = 2 t k. Dashed lines denote the cumulative weight distribution.
+
+Linear Minimum Distance of Pure Block-Diagonal
+
+This subsection provides a self-contained proof template showing that pure
+block-diagonal serial codes achieve linear minimum distance at rate R = 1/2
+when the block size σ grows as a suitable power of n. The argument is entirely
+elementary: it combines (i) binomial concentration for the weight growth across
+random linear blocks, (ii) an occupancy bound for how a random permutation
+spreads mass across σ-blocks, and (iii) a union bound organized by the message
+block-type a(x) (the number of nonzero message blocks).
+We give the full proof for depth t = 3, which is the most delicate constantdepth case: the analysis must explicitly handle the smallest block-types, which
+induce an inherent exp(−Θ(σ)) “floor” in the failure probability. For every constant depth t ≥ 4, the same steps go through with additional slack because the
+extra (πi , Gi+1 ) layers provide further amplification before the final binomial
+47
+
+tail; we summarize the necessary modifications after the t = 3 proof. Finally, we
+briefly comment on the borderline case t = 2, where the behavior is governed by
+a more sensitive single-permutation occupancy regime.
+F.1
+
+Notation and Conventions
+
+Throughout, log denotes the natural logarithm and log2 denotes base-2. Let
+H2 (p) := −p log2 p − (1 − p) log2 (1 − p) be the binary entropy (base 2), and let
+h(p) := −p log p − (1 − p) log(1 − p) be the natural entropy.
+Assume σ | n and σ | k and k = n/2. Write
+q :=
+
+n
+,
+σ
+
+b :=
+
+k
+q
+= .
+σ
+2
+
+Partition length-n vectors into q contiguous blocks of length σ and define A(z)
+to be the number of nonzero blocks of z. Partition x ∈ Fk2 into b message blocks
+of length σ and let a(x) be the number of nonzero message blocks.
+The depth-3 pure block-diagonal serial ensemble is
+G = G1 π1 G2 π2 G3 ∈ Fk×n
+,
+2
+where:
+– G1 is block-diagonal with b independent blocks, each uniform in Fσ×2σ
+;
+2
+– G2 , G3 are block-diagonal with q independent blocks, each uniform in Fσ×σ
+;
+2
+– π1 , π2 are independent uniform permutations of [n].
+For x ∈ Fk2 , define the intermediate vectors
+v1 := xG1 ,
+F.2
+
+u1 := v1 π1 ,
+
+v2 := u1 G2 ,
+
+u2 := v2 π2 ,
+
+y := u2 G3 = xG.
+
+Elementary Lemmas
+
+We use only the following standard facts.
+Lemma 3 (Uniform linear image). Let M ← Fr×m
+be uniform (i.i.d. en2
+tries) and fix any u ∈ Fr2 \ {0}. Then uM is uniform in Fm
+2 . In particular,
+|uM | ∼ Binomial(m, 1/2).
+Proof. The map ϕ : Fr×m
+→ Fm
+2 given by ϕ(M ) = uM is a surjective F2 -linear
+2
+map because u ̸= 0 implies there exists i with ui = 1, and by choosing the ith row
+of M arbitrarily one can obtain any output. A uniform input to a surjective linear
+map yields a uniform output. Each coordinate of uM is a nontrivial F2 -linear
+form in the entries of M , hence unbiased; independence follows because distinct
+coordinates depend on disjoint sets of column entries. Thus uM is uniform and
+its Hamming weight is Binomial(m, 1/2).
+Lemma 4 (Binomial lower tail via entropy). Let Z ∼ Binomial(M, 1/2).
+Then for every ρ ∈ (0, 1/2),
+Pr(Z ≤ ρM ) ≤ 2−M (1−H2 (ρ)) .
+48
+
+Proof. For ρ < 1/2,
+⌊ρM ⌋ 
+
+
+
+
+M −M
+M
+2
+≤ (⌊ρM ⌋ + 1)
+2−M .
+i
+⌊ρM
+⌋
+i=0
+
+M
+Using the standard bound ρM
+≤ 2M H2 (ρ) (for ρM ∈ Z; otherwise use floor/
+ceiling), we obtain Pr(Z ≤ ρM ) ≤ poly(M ) · 2−M (1−H2 (ρ)) . Absorbing the polynomial factor into a slightly weaker constant for large M yields the stated inequality. (If desired, one can remove poly(M ) by a slightly sharper counting
+argument; we do not need it.)
+Pr(Z ≤ ρM ) =
+
+X
+
+Lemma 5 (Type count). For each a ∈ {0, . . . , b},
+ 
+ a
+b
+eb
+#{x ∈ Fk2 : a(x) = a} =
+2σa .
+(2σ − 1)a ≤
+a
+a
+
+Proof. Choose which a message blocks are nonzero (at most ab choices), and
+for each chosen block
+choose any nonzero vector in Fσ2 (exactly 2σ − 1 choices).
+
+b
+Finally apply a ≤ (eb/a)a and 2σ − 1 ≤ 2σ .
+Lemma 6 (Occupancy bound for a uniform permutation). Let S ∈
+{0, 1, . . . , n} and let W ⊆ [n] be a uniformly random S-subset. Partition [n] into
+q blocks of size σ. Let B be the number of blocks that intersect W (equivalently,
+the number of nonzero blocks in the permuted vector). Then for every integer
+m ∈ {0, 1, . . . , q},
+   S
+
+
+q
+m
+Pr(B ≤ m) ≤
+≤ exp q h(m/q) − S log(q/m) .
+m
+q
+Proof. Fix a set T of m blocks. The union of these blocks has size mσ = (m/q)n.
+The event {W ⊆ ∪T } has probability
+ 
+ S
+mσ
+mσ S
+m
+S
+=
+,
+Pr(W ⊆ ∪T ) = n ≤
+n
+q
+S
+ B
+
+q
+S
+where we used A
+over all m
+S / S ≤ (A/B) for A ≤ B. Union bounding
+
+q
+choices of T yields the first inequality. For the second, use m
+≤ exp(qh(m/q)).
+
+F.3
+
+Theorem for t = 3
+
+Theorem 3 (Linear distance for t = 3, rate 1/2). Fix β := 0.9 and δ :=
+0.08 (so β · (1 − H2 (δ/β)) > 1/2). There exist constants c0 , γ > 0 such that the
+following holds.
+Let σ = ⌈cn1/3 ⌉ with some constant c ≥ c0 , rounded so that σ | n and
+σ | k = n/2. Let q = n/σ. For the depth-3 ensemble G = G1 π1 G2 π2 G3 defined
+above, for all sufficiently large n,
+
+
+Pr dmin (G) ≤ δn ≤ exp(−γσ).
+49
+
+Proof. Define the random variable
+N≤δn (G) := #{x ∈ Fk2 \ {0} : |xG| ≤ δn}.
+Then {dmin (G) ≤ δn} ⊆ {N≤δn (G) ≥ 1}, so by Markov,
+Pr(dmin (G) ≤ δn) ≤ E[N≤δn (G)].
+We bound the expectation by splitting over the type a = a(x):
+E[N≤δn (G)] =
+
+b
+X
+
+X
+
+Pr(|xG| ≤ δn).
+
+a=1 x: a(x)=a
+
+Step 0: two deterministic observations. For any intermediate vector z partitioned
+into q blocks, we have
+|z| ≥ A(z)
+
+and
+
+A(z) ≤ |z|.
+
+Moreover, for the block-diagonal maps G2 , G3 : conditional on A(ui ) = m, the
+output vi+1 = ui Gi+1 consists of m independent uniform σ-bit blocks (and q −m
+zero blocks), hence
+|vi+1 | (A(ui ) = m) ∼ Binomial(σm, 1/2).
+
+(20)
+
+This is exactly Lemma 3 applied blockwise, using independence of the random
+blocks.
+For G1 : conditional on a(x) = a, the vector v1 = xG1 is supported on a
+disjoint length-2σ segments, each uniform, hence
+S1 := |v1 | (a(x) = a) ∼ Binomial(2σa, 1/2).
+
+(21)
+
+Case I: Large types a ≥ a⋆ with a⋆ := Cσ. We will choose C (a constant) later,
+sufficiently large.
+Fix any x with a(x) = a ≥ Cσ. Let S1 = |v1 |. By (21), E[S1 ] = σa. Apply
+Lemma 4 with M = 2σa and ρ = 1/4:
+
+
+
+1
+σa 
+= Pr S1 ≤ · (2σa) ≤ 2−2σa (1−H2 (1/4)) .
+Pr S1 ≤
+2
+4
+In particular, since a ≥ Cσ, the RHS is at most exp(−Ω(σ 2 )).
+Now condition on the event
+n
+σa o
+E1 := S1 ≥
+.
+2
+Under E1 , we have S1 ≥ (C/2)σ 2 . Recall that σ = cn1/3 implies q = n/σ =
+Θ(σ 2 ), more precisely q = n/σ = (1/c)n2/3 and σ 2 = c2 n2/3 = c3 q. Thus
+S1 ≥ (C/2)c3 q.
+50
+
+Let B1 := A(u1 ) be the number of nonzero blocks after the permutation π1 .
+Conditional on S1 , the support of u1 is a uniformly random S1 -subset of [n].
+Apply Lemma 6 with m := ⌊ηq⌋ for some constant η ∈ (0, 1) (say η = 0.4):
+
+
+Pr B1 ≤ ηq S1 ≤ exp qh(η) − S1 log(1/η) .
+Under E1 , S1 ≥ θq where θ := (C/2)c3 . Therefore
+
+
+Pr B1 ≤ ηq E1 ≤ exp q(h(η) − θ log(1/η)) .
+Choose C (depending only on c and η) so that θ > h(η)/ log(1/η), hence the
+exponent is −Ω(q). Thus, for this case,
+Pr(B1 ≤ ηq) ≤ exp(−Ω(q)) + exp(−Ω(σ 2 )).
+
+(22)
+
+Next, conditional on B1 ≥ ηq, the block-diagonal multiplication by G2 yields
+S2 := |v2 | with S2 ∼ Binomial(σB1 , 1/2) by (20), and σB1 ≥ ησq = ηn. Applying Lemma 4 with M = σB1 ≥ ηn and ρ = 1/4 gives
+
+
+ηn
+B1 ≥ ηq ≤ 2−ηn (1−H2 (1/4)) = exp(−Ω(n)).
+(23)
+Pr S2 ≤
+4
+Now condition on the event E2 := {S2 ≥ αn} where α := η/4.
+Under E2 , consider B2 := A(u2 ) after the permutation π2 . Again by Lemma 6,
+with m := ⌊βq⌋ and recalling that S2 ≥ αn = ασq,
+
+Pr(B2 ≤ βq | S2 ) ≤ exp qh(β) − S2 log(1/β)
+
+≤ exp qh(β) − ασq log(1/β)
+= exp(−Ω(n)),
+since σ → ∞.
+Finally, conditional on B2 ≥ βq, the last layer G3 gives |y| = |u2 G3 | ∼
+Binomial(σB2 , 1/2) by (20), and σB2 ≥ βσq = βn. Thus |y| stochastically dominates Binomial(βn, 1/2), and
+Pr(|y| ≤ δn | B2 ≥ βq) ≤ 2−βn(1−H2 (δ/β)) .
+
+(24)
+
+Combining (22), (23), the bound on B2 , and (24), we obtain: for every fixed
+x with a(x) ≥ Cσ,
+Pr(|xG| ≤ δn) ≤ 2−βn(1−H2 (δ/β)) + exp(−Ω(n)) + exp(−Ω(q)).
+Summing over all such x (at most 2k = 2n/2 messages) gives total contribution
+X
+Pr(|xG| ≤ δn) ≤ 2n/2 · 2−βn(1−H2 (δ/β)) + exp(−Ω(n)) + exp(−Ω(q)).
+x: a(x)≥Cσ
+
+By our choice of (β, δ), β(1 − H2 (δ/β)) > 1/2, so the first term is 2−Ω(n) . Hence
+the entire large-type contribution is at most 2−Ω(n) + exp(−Ω(q)).
+51
+
+Case II: Medium types 2 ≤ a < Cσ. Fix any x with a(x) = a in this range. Let
+S1 = |v1 |. By (21) and Lemma 4 with M = 2σa and ρ = 1/4,
+
+σa 
+≤ 2−2σa (1−H2 (1/4)) .
+(25)
+Pr S1 ≤
+2
+Define the event F1 := {S1 ≥ σa/2}.
+Now consider B1 = A(u1 ). Conditional on S1 , apply Lemma 6 with
+ 
+S1
+m :=
+.
+4
+Then
+
+S1
+Pr B1 ≤
+4
+
+S1
+
+
+
+   S1
+
+
+q
+m
+≤
+≤ exp qh(m/q) − S1 log(q/m) .
+m
+q
+
+(26)
+
+On√F1 , we have S1 ≥ σa/2, and since a ≤ Cσ we also have S1 ≤ σa +
+O( σa) ≤ O(σ 2 ). Recalling q = Θ(σ 2 ), we have q/m = Θ(q/S1 ) = Θ(σ/a),
+hence log(q/m) = Ω(log(σ/a)). Thus the exponent in (26) is at most
+
+−q · 0 + −Ω(S1 log(σ/a)) ≤ −Ω(σa log(σ/a)),
+for all sufficiently large σ. Therefore, there exists an absolute constant c1 > 0
+such that
+
+
+
+S1
+Pr B1 ≤
+F1 ≤ exp −c1 σa log(σ/a) .
+(27)
+4
+Next, conditional on F1 and B1 ≥ S1 /4, we have B1 ≥ S1 /4 ≥ (σa/8). Then
+S2 = |v2 | satisfies, by (20),
+S2
+
+(B1 ) ∼ Binomial(σB1 , 1/2),
+
+σB1 ≥ σ ·
+
+σ2 a
+σa
+=
+.
+8
+8
+
+Applying Lemma 4 with M = σB1 and ρ = 1/4 gives
+
+σ2 a
+Pr S2 ≤
+64
+
+B1 ≥
+
+2
+σa 
+≤ 2−(σ a/8) (1−H2 (1/4)) = exp(−Ω(σ 2 a)).
+8
+
+(28)
+
+Since a ≥ 2, the RHS is at most exp(−Ω(σ 2 )) = exp(−Ω(q)).
+Now condition on F2 := {S2 ≥ α2 q} for some constant α2 > 0. Indeed, (28)
+implies Pr(¬F2 ) ≤ exp(−Ω(q)) by choosing α2 small enough, because σ 2 a =
+Θ(q) · a ≥ 2Θ(q).
+Under F2 , apply Lemma 6 to π2 with m := ⌊β0 q⌋, where we choose some constant β0 ∈ (0, 1) smaller than the typical occupancy at load α2 (for concreteness,
+take β0 := α2 /4; any fixed choice works). Since S2 ≥ α2 q, we obtain
+Pr(B2 ≤ β0 q | F2 ) ≤ exp(−Ω(q)).
+
+(29)
+
+Finally, conditional on B2 ≥ β0 q, the last layer gives |y| ∼ Binomial(σB2 , 1/2)
+with σB2 ≥ β0 σq = β0 n, so by (24) (with β0 in place of β),
+Pr(|y| ≤ δn | B2 ≥ β0 q) ≤ 2−β0 n(1−H2 (δ/β0 )) = exp(−Ω(n)).
+52
+
+Putting (25), (27), (28), (29) and the final binomial tail together, we get the
+following bound for each fixed x with 2 ≤ a(x) < Cσ:
+
+Pr(|xG| ≤ δn) ≤ 2−Ω(σa) + exp −Ω(σa log(σ/a)) + exp(−Ω(q)) + exp(−Ω(n)).
+Now sum over all such x using
+5. For each fixed a ≥ 2, the number of x
+a Lemma
+σa
+with a(x) = a is at most eb
+2
+≤
+exp(O(a
+log q) + σa log 2). Multiplying by
+a
+the dominant per-message term exp(−Ω(σa log(σ/a))) yields a total of at most
+exp(−Ω(σ log σ)) for small a (and much smaller for larger a). In particular, the
+entire medium-type contribution satisfies
+X
+Pr(|xG| ≤ δn) ≤ exp(−Ω(σ log σ)).
+(30)
+x: 2≤a(x)<Cσ
+
+Case III: Smallest type a = 1. This is the regime that governs the unavoidable
+σ-level failure exponent.
+Fix x with a(x) = 1. Then S1 = |v1 | ∼ Binomial(2σ, 1/2) by (21). Choose
+a constant ρ := 1/8 and define the event G1 := {S1 ≥ ρσ}. By Lemma 4 with
+M = 2σ and threshold ρσ = (ρ/2) · (2σ),
+
+
+Pr(¬G1 ) = Pr S1 ≤ ρσ ≤ 2−2σ (1−H2 (ρ/2)) .
+(31)
+With ρ/2 = 1/16, note that 1 − H2 (1/16) ≈ 0.6627, so the exponent is ≈ 1.325σ
+(strictly > σ).
+Now condition on G1 . Let B1 = A(u1 ). Apply Lemma 6 with m := ⌊(ρ/2)σ⌋.
+Since q = Θ(σ 2 ), we have m/q = Θ(1/σ), and since S1 ≥ ρσ,
+
+ρσ
+Pr B1 ≤
+2
+
+  q   m S1
+G1 ≤
+q
+m
+
+
+≤ exp qh(m/q) − S1 log(q/m)
+≤ exp(−Ω(σ log σ)).
+
+Thus, except with probability exp(−Ω(σ log σ)), we have B1 ≥ (ρ/2)σ.
+Conditional on B1 ≥ (ρ/2)σ, the second layer yields S2 ∼ Binomial(σB1 , 1/2)
+with σB1 ≥ (ρ/2)σ 2 = Θ(q). Therefore, by Lemma 4 with ρ′ = 1/4,
+
+ρσ 2
+Pr S2 ≤
+16
+
+B1 ≥
+
+ρσ 
+≤ exp(−Ω(σ 2 )) = exp(−Ω(q)).
+2
+
+On the complementary event S2 ≥ α3 q for some constant α3 > 0, the permutation π2 activates a constant fraction of blocks with probability 1 − exp(−Ω(q))
+(by Lemma 6 with constant m = β3 q), and then the final layer yields a binomial
+tail on Θ(n) bits:
+Pr(|y| ≤ δn | B2 ≥ β3 q) ≤ exp(−Ω(n)).
+53
+
+Collecting these bounds, we obtain for each fixed x with a(x) = 1:
+Pr(|xG| ≤ δn) ≤ 2−2σ(1−H2 (1/16)) +exp(−Ω(σ log σ))+exp(−Ω(q))+exp(−Ω(n)).
+
+Now sum over all x with a(x) = 1. There are exactly 1b (2σ − 1) ≤ b2σ =
+(q/2) 2σ such messages. Hence the total type-1 contribution is at most
+X
+q
+q
+Pr(|xG| ≤ δn) ≤ 2σ · 2−2σ(1−H2 (1/16)) + 2σ · exp(−Ω(σ log σ))
+2
+2
+x: a(x)=1
+
+q σ
+2 · exp(−Ω(q))
+2
+≤ poly(σ) · 2−κσ + exp(−Ω(σ log σ)) + exp(−Ω(q)),
++
+
+where
+
+κ := 2 1 − H2 (1/16) − 1 > 0.
+Thus there exists a constant γ > 0 such that the entire type-1 contribution is at
+most exp(−γσ) for all sufficiently large σ (hence for all sufficiently large n).
+Conclusion. Combining the three cases, we have
+E[N≤δn (G)] ≤ exp(−γσ) + exp(−Ω(σ log σ)) + 2−Ω(n) + exp(−Ω(q)) .
+|
+{z
+}
+|
+{z
+}
+| {z }
+type a=1
+
+types 2≤a<Cσ
+
+types a≥Cσ
+
+Since σ → ∞ with n, the dominant term is exp(−γσ). Therefore, for all sufficiently large n,
+Pr(dmin (G) ≤ δn) ≤ E[N≤δn (G)] ≤ exp(−γσ),
+as claimed.
+F.4
+
+Beyond t = 3
+
+The above proof shows an upper bound of the form exp(−Θ(σ)). This scaling
+is also the correct “floor” for first-moment arguments in this ensemble: there
+are Θ(q2σ ) messages with a(x) = 1, and for each such message x, the first-layer
+output v1 is uniform in {0, 1}2σ , so events like |v1 | = 1 occur with probability
+Θ(σ) · 2−2σ , already implying an expected Θ(qσ) · 2−σ population of unusually
+low-weight codewords (hence a natural σ-governed floor).
+Remark 2 (Extension to all constant t ≥ 4). For every constant t ≥ 4, setting
+σ = ⌈cn1/t ⌉ for a sufficiently large constant c yields linear minimum distance with
+failure probability at most exp(−Ω(q)). The proof follows the same template as
+above:
+– For large types a ≥ Cσ, by time ut−2 the number of active blocks reaches
+Θ(q) with failure exp(−Ω(q)), then the last two layers yield exp(−Ω(n))
+tails and the final binomial tail beats the global union bound.
+54
+
+– For small/medium types a < Cσ, the type count is still at most exp(O(σ 2 ))
+while the per-message failure probability improves (in fact) to exp(−Ω(σ t−1 )) =
+exp(−Ω(q)) due to the extra amplification layers.
+We omit the repetition of the same Chernoff + occupancy steps, which are
+identical to the t = 3 case but easier due to the additional slack.
+Remark 3 (On the case
+√ enumerator exhibits a phase
+√ t = 2). Empirically, the
+transition at σ = √
+Θ( n) for t = 2: for σ = Θ( n) the distance appears linear,
+while for σ = o( n) it appears sublinear. A proof for t = 2 likely follows a
+specialized type split plus a careful occupancy analysis of the single permutation
+layer, especially in the intermediate regime aσ ≈ q, and we leave it open.
+
+G
+
+Banded-Diagonal Codes
+
+We consider an alternative formulation of our Block-Diagonal code, which we
+refer to as the Banded-Diagonal code. Instead of having submatrices along the
+diagonal, this code has a diagonal band of random values. The width of the band
+is σ. Asymptotically, we suspect this code performs similarly but conceptually
+offers some advantages.
+In particular, consider a Block-Diagonal code and the string x = 0...0110...0
+which has two 1s somewhere in the string. Moreover, let us assume these two 1s
+fall within the same block. Then the minimum distance behavior of this x and
+that of x′ which has only one of these 1s set is identical. That is, once a block is
+“on”, having additional 1s in the input for this block does not change the output
+distribution, since in both cases it is uniform.
+If we contrast this with the Banded-Diagonal construction, each additional
+1 in the input does change the distribution as the non-zeros in the generator G
+do not perfectly overlap. In the worst case, x has two consecutive 1s, and there
+is then one additional output bit that will be uniform.
+Next, we define the enumerator for this code. However, the resulting enumerator is more computationally expensive to compute and therefore we chose not
+to implement it. We leave further investigation of this approach to future work.
+G.1
+
+The Enumerator
+
+The generator matrix G ∈ {0, 1}k×n is of the form
+
+α1,1 α1,2 ... α1,σ
+
+α2,1 α1,2 ... α1,σ
+
+G=
+.. ..
+..
+
+.
+.
+.
+O
+
+
+O
+
+
+,
+
+
+αk,1 αk,2 ... αk,σ
+
+Each αi for i ∈ [k] is sampled independently and uniformly at random from
+{0, 1}σi . Let
+
+αi = αi,1 αi,2 . . . αi,σi ,
+55
+
+where αi,j ∈ {0, 1}, i ∈ [k], j ∈ [σi ]. Here, we assume that k, n, σ ∈ N, and
+k, σ ≤ n.
+Let x ∈ {0, 1}k be an input word. Let
+
+x = x1 x2 . . . x k ,
+where xi ∈ {0, 1}, i ∈ [k]. Then, the codeword c = xG corresponding to x is
+given by
+
+c = c1 c2 . . . cn ,
+where
+min{i,k}
+
+X
+
+ci =
+
+xj αj,i+1−j ,
+
+j=max{i−σ+1,1}
+
+i ∈ [n].
+Suppose wt1 (x) = w. Define Q▲ : {0, 1}k → 2[n] , where Q▲ (x) ⊆ [n] is
+defined as
+
+
+min{i,k}
+
+
+_
+Q▲ (x) := i ∈ [n] :
+(xj = 1) ,
+
+
+j=max{i−σ+1,1}
+
+i.e., the set of i such that ci is not guaranteed to be zero. Additionally, define
+q▲ : {0, 1}k → [0, n], where q▲ (x) = |Q▲ (x)|. Also, define Q : {0, 1}n → 2[n] ,
+where Q(c) ⊆ [n] is the set of i such that ci = 1. We will abuse notation slightly
+to also have Q : {0, 1}k → 2[k] , where Q(x) ⊆ [k] is the set of i such that xi = 1.
+Note that |Q(x)| = w. We now have the following lemma.
+Lemma 7. For any x ∈ {0, 1}k and y ∈ {0, 1}n ,
+(
+2−q▲ (x) if Q(y) ⊆ Q▲ (x)
+Pr [Xx,G,y = 1] =
+.
+0
+otherwise
+Proof. Clearly, if i ̸∈ Q▲ (x), then ci = 0. Thus, Q(c) ⊆ Q▲ (x). In other words,
+if Q(y) ̸⊆ Q▲ (x), then Pr [Xx,G,y = 1] = 0.
+Consider any x ∈ {0, 1}k and y ∈ {0, 1}n such that Q(y) ⊆ Q▲ (x). Let
+
+y = y1 y2 . . . yn ,
+where yi ∈ {0, 1}, i ∈ [n]. Consider i ∈ Q▲ (x), i.e., an i such that xj = 1 for
+some j ∈ [max{i − σ + 1, 1}, min{i, k}]. Then,
+
+
+min{i,k}
+X
+1
+Pr yi =
+xj αj,i+1−j  = .
+2
+j=max{i−σ+1,1}
+
+Therefore,
+
+Pr ∀i ∈ Q▲ (x) : yi =
+
+min{i,k}
+
+
+
+X
+
+xj αj,i+1−j  = 2−q▲ (x) .
+
+j=max{i−σ+1,1}
+
+56
+
+Since Q(y) ⊆ Q▲ (x),
+
+
+
+
+min{i,k}
+
+Pr ∀i ̸∈ Q▲ (x) : yi =
+
+X
+
+xj αj,i+1−j  = 1.
+
+j=max{i−σ+1,1}
+
+Therefore,
+Pr [Xx,G,y = 1] = 2−q▲ (x) .
+
+We now have
+X
+
+ G 
+=
+EG←D Ew,h
+
+2−q▲ (x) ,
+
+(32)
+
+x∈{0,1}k ,y∈{0,1}n
+Q(y)⊆Q▲ (x)
+wt1 (x)=w,wt1 (y)=h
+
+i.e., we need to count the number of x ∈ {0, 1}k , y ∈ {0, 1}n with Q(y) ⊆
+Q▲ (x), wt1 (x) = w, and wt1 (y) = h. We perform this count using two intermediate variables. The first is q = q▲ (x). q ∈ [w, n], w being the worst case, when
+all the 1s in x appear at the tail end. The second is r which denotes the number
+of runs in Q▲ (x). To define runs, we begin by alternatively defining Q▲ (x). For
+i ∈ [k], let Ii = [i, min{i + σ − 1, n}]. It is immediate to see that
+[
+Q▲ (x) =
+Ii .
+i∈Q(x)
+
+We use the way Ii s, for i ∈ Q(x), overlap to define the runs in Q▲ (x). Define
+first(x) := min t.
+t∈Q(x)
+
+Note that if there exists no t ∈ Q(x) (i.e., if x = 0k ), then first(x) := 0. For any
+i ∈ [n], define
+next∆
+min t.
+x (i) :=
+t∈N
+i+t∈Q(x)
+
+Note that if for any i ∈ [n] there exists no t ∈ N such that i + t ∈ Q(x), then
+next∆
+x (i) := ∞. For any i ∈ [n], define
+nextx (i) := i + next∆
+x (i).
+[n]
+
+Define R : {0, 1}k → 22 , where R(x) ⊆ 2[n] , constructively as follows:
+1. Let i = first(x). If i = 0, return R(x) = ∅.
+2. Set r := {i}, r = 1, and j := i.
+3. // Ij and Inextx (j) do not overlap, so start a new run
+S
+If next∆
+x (j) ≥ σ − 1, add Rr =
+t∈r It to R(x) and set i := nextx (j) and
+r = r + 1. Return R(x) if i = ∞, otherwise, go back to Step 2.
+// Ij and Inextx (j) overlap, so continue the same run
+If next∆
+x (j) < σ − 1, add nextx (j) to r, set j := nextx (j), and go back to
+Step 3.
+57
+
+Essentially, a run is a maximal set of contiguous indices in Q▲ (x) belonging
+to overlapping Ii s for i ∈ Q(x), and R(x) is the set of runs in Q▲ (x). The
+intermediate variable r is defined as r = |R(x)|. Since |x| = w, r ∈ [0, w] by
+definition.
+We now compute the number of x ∈ {0, 1}k such that wt1 (x) = w, q▲ (x) =
+q, and |R(x)| = r in two cases.
+Case 1: q, r, w > 0.
+Let R(x) = {R1 , . . . , Rr } as determined by the algorithm above for constructing R(x), where Ri ⊆ [n] for i ∈ [r]. By definition, xRr must be of the
+form
+xRr = ur 10c ,
+for some ur ∈ {0, 1}∗ and α ∈ [0, σ − 1]. Furthermore, for i ∈ [r − 1], xRi
+must be of the form
+xRi = ui 10σ−1 ,
+for some ui ∈ {0, 1}∗ . We call a run R, complete, if xR is of the form xR =
+u10σ−1 for some u ∈ {0, 1}∗ . Similarly, we call it α-incomplete, if xR is of the
+form xR = u10σ−1−α , for some u ∈ {0, 1}∗ and α ∈ [σ−1]. Our prior observation
+can now be restated as for i ∈ [r − 1], Ri is complete, while Rr may either be
+complete or α-incomplete for some α ∈ [σ − 1].
+We next consider ui for i ∈ [r]. By definition, each ui for i ∈ [r] must be of
+the form
+ui = 10ℓi,1 . . . 10ℓi,ti
+where ti ∈ N ∪ {0}, and ℓi,j ∈ [0, σ − 2] for all j ∈ [ti ]. We call the (ordered)
+collection of strings 10ℓi,j for i ∈ [r] and j ∈ [ti ] the set of mini-runs of x. By
+definition, the number of mini-runs is given by
+X
+
+ti = w − r.
+
+i∈[r]
+
+Also,
+q̃ :=
+
+X
+
+|xRi | = q − min{σ − 1 − α, n − k},
+
+i∈[r]
+
+and
+X
+
+wt1 (xRi ) = wt1 (x) = w.
+
+i∈[r]
+
+Therefore,
+X
+
+wt0 (xRi ) = q̃ − w,
+
+i∈[r]
+
+58
+
+and
+X
+
+X
+
+wt0 (ui ) =
+
+i∈[r]
+
+wt0 (xRi ) − (r − 1)(σ − 1) − α
+
+i∈[r]
+
+= q̃ − w − (r − 1)(σ − 1) − α.
+Finally,
+wt0 (x[k]\Q▲ (x) ) = n − q̃
+Now, enumerating the x ∈ {0, 1}k such that wt1 (x) = w, q▲ (x) = q, and
+|R(x)| = r can be broken down into the following four steps:
+(1) Enumerate over α ∈ [0, σ − 1], i.e., over whether the rth run is complete or
+α-incomplete.
+(2) For each α, enumerate over the possible sets of mini-runs of x.
+(3) For each set of mini-runs of x, enumerate over the possible assignments of
+the mini-runs to each of the r runs.
+(4) For each assignment of the mini-runs of x to each of the r runs, enumerate
+over the possible assignments 0s from x[k]\Q▲ (x) to the regions surrounding
+each of the r runs.
+We proceed to work through each step. For each α ∈ [0, σ − 1], enumerating
+over the possible sets P
+of mini-runs of x is equivalent to the
+P number of ways in
+which we can assign i∈[r] wt0 (ui ) identical balls into i∈[r] ti labeled bins,
+each filled with at most σ − 2 balls. The number of ways to do this is thus
+
+
+X
+X
+(2),c
+Ew,q,r
+:= N 
+wt0 (ui ),
+ti , σ − 2
+i∈[r]
+
+=
+
+w−r
+X
+i=0
+
+i
+
+(−1)
+
+i∈[r]
+
+
+
+w−r
+i
+
+
+
+
+q̃ − σ(r + i − 1) + i − α − 2
+.
+w−r−1
+
+For each set of mini-runs of x, enumerating over the possible assignments of
+the
+P mini-runs to each of the r runs is equivalent to the number of solutions to
+i∈[r] ti = w − r where ti ∈ N ∪ {0} for i ∈ [r]. This is equal to
+(3),c
+Ew,q,r
+:= B(w − r, r) =
+
+
+
+
+w−1
+.
+r−1
+
+For each assignment of the mini-runs of x to each of the r runs, enumerating over the possible assignments 0s from x[k]\Q▲ (x) to the regions surrounding
+each of the r runs is equivalent to the number of ways in which we can assign
+wt0 (x[k]\Q▲ (x) ) identical balls into r + 1 labeled bins, if c = σ − 1 (i.e., if the
+rth run is complete), and into r labeled bins, if c < σ − 1 (i.e., if the rth run is
+α-incomplete for some α ∈ [σ − 1]), since 0s cannot follow an incomplete run.
+59
+
+The number of ways to do this is thus
+(
+B(wt0 (x[k]\Q▲ (x) ), r + 1)
+(4),c
+Ew,q,r
+:=
+B(wt0 (x[k]\Q▲ (x) ), r)
+(
+
+n−q̃+r
+if c = σ − 1
+r
+
+=
+.
+n−q̃+r−1
+otherwise
+r−1
+
+if c = σ − 1
+otherwise
+
+Putting the four steps together, the number of x ∈ {0, 1}k such that wt1 (x) =
+w, q▲ (x) = q, and |R(x)| = r is
+Ew,q,r :=
+
+σ−1
+X
+
+(2),c
+(3),c
+(4),c
+Ew,q,r
+· Ew,q,r
+· Ew,q,r
+
+c=0
+
+
+ "w−r
+
+
+
+
+X
+w−1
+w−r
+n − q̃ + r q̃ − σ(r + i) + i − 1
+=
+·
+(−1)i
+r−1
+i
+r
+w−r−1
+i=0
+
+
+
+#
+σ−2
+X
+X w−r
+n − q̃ + r − 1 q̃ − σ(r + i − 1) + i − c − 2
+i w−r
+(−1)
++
+i
+r−1
+w−r−1
+c=0 i=0
+where q̃ = q − min{σ − 1 − c, n − k}.
+Case 2: We now consider the cases where at least one of q, r, w is 0. Here, note
+that E0,0,0 := 1 but at least one of q, r, w are > 0 while at least one of them is
+0, then Ew,q,r := 0.
+Now, consider any x ∈ {0, 1}k such that wt1 (x) = w, q▲ (x) = q, and
+|R(x)| = r. We will count the number of y ∈ {0, 1}n such that wt1 (y) = h and
+Q(y) ⊆ Q▲ (x). This is simply equal to the number of ways of choosing h bits
+among the q bits of yi for i ∈ Q▲ (x) to set to 1. The number of ways to do this
+is thus
+ 
+q
+Eq,r,h :=
+.
+h
+Note that Eq,r,h does not depend on r. Putting everything together, we have
+X
+ G 
+2−q▲ (x)
+EG←D Ew,h
+x∈{0,1}k ,y∈{0,1}n
+Q(y)⊆Q▲ (x)
+wt1 (x)=w,wt1 (y)=h
+
+=
+
+=
+
+n X
+w
+X
+
+2−q · Ew,q,r · Eq,r,h
+
+q=w r=0
+n X
+w 
+X
+
+2−q ·
+
+q=w r=0
+
+60
+
+ 
+
+q
+· Ew,q,r .
+h
+
+Disclaimer
+Case studies, comparisons, statistics, research and recommendations are provided “AS IS” and intended for informational purposes only and should not be
+relied upon for operational, marketing, legal, technical, tax, financial or other
+advice. Visa Inc. neither makes any warranty or representation as to the completeness or accuracy of the information within this document, nor assumes any
+liability or responsibility that may result from reliance on such information. The
+Information contained herein is not intended as investment or legal advice, and
+readers are encouraged to seek the advice of a competent professional where such
+advice is required.
+These materials and best practice recommendations are provided for informational purposes only and should not be relied upon for marketing, legal, regulatory or other advice. Recommended marketing materials should be independently evaluated in light of your specific business needs and any applicable laws
+and regulations. Visa is not responsible for your use of the marketing materials,
+best practice recommendations, or other information, including errors of any
+kind, contained in this document.
+
+61
+
+

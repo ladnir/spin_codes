@@ -1,0 +1,382 @@
+
+
+\section{Random Convolution}
+
+
+We will follow the strategy outlined in \sectionref{eenum}. In the context of cryptography, this type of convolution was first described in \cite{silver} but has no proof of minimum distance. It was later used in conjunction with an expander to obtain the Expand-Convolute codes \cite{EC} with a Markov chain based proof of minimum distance. We will discuss the relation to \cite{EC} later and why our techniques are more effective. 
+
+Let \dist denote the set of all random convolutions with a state size of $\sigma$. I.e.,
+$$
+\dist := \left\{ \prod_{i\in [n]}\C'_i\in \{0,1\}^{n\times n} \mid \C'_{i,j,j}=1, \C'_{,i,j,j-[\sigma],j}\in\{0,1\}^\sigma, \C'_{i,j,[n]\setminus [j-\sigma,j]}=0\right\}
+$$
+For each $w,h\in [n]$, we will count all of the triples $(\xv,\yv,\C)$ such that $\hw{\xv}=w,\hw{\yv}=h, \C\in \dist$ and $\yv = \xv\C$. In particular, we will compute the enumerator as 
+$$
+\enum^{\textsf{rConv}}_{w,h} = \frac{|\{(\xv,\yv,\G) \mid \hw{\xv}=w,\hw{\yv}=h, \C\in \dist, \yv = \xv\C \}|}{|\dist|}
+$$
+
+For any fixed convolution $\C\in \dist$ it will be difficult to compute the enumerator. However, by considering all such convolutions together it will be possible to exactly count the number of such triples and thereby compute the enumerator for the ensamble. First let us consider a representative sample for $\sigma=4,w=7,h=9$:
+\begin{align*}
+    x= & \texttt{0\textcolor{blue}{1}\textcolor{red}{010000001010}00\textcolor{blue}{1}\textcolor{red}{0010010}}\\
+    y= & \texttt{0\textcolor{blue}{1}\textcolor{brown}{00100011}\textcolor{blue}{0000}00\textcolor{blue}{1}\textcolor{brown}{1001110}}\\
+    \qv= & \texttt{001111111111110001111111}
+\end{align*}
+For now let us ignore \qv string and observe some properties of $\xv,\yv$:
+\begin{itemize}
+    \item Like an accumulator, the output will remain zero until the first 1 in the input, at which point the output will also be 1. E.g. at $\xv_2=1$ and $\yv_2=1$ above.
+    \item At iterations $i$, if one of the last $\sigma$ outputs is 1, then the next output is 1 with probability 1/2, over the choices of $\C$. In particular,
+    $\yv_i=\cv_i\cdot \yv_{i-[\sigma]} + \xv_i$. Since $\yv_{i-[\sigma]}$ is non-zero and $\cv_i\in\{0,1\}^\sigma$ is uniform (over the choices of $\C$), then $\yv_i$ is uniform. Equivalently, half the of $\C\in \dist$ will result in $\yv_i=0$ and half in $\yv_i=1$.
+    \item When there is at least 1 non-zero in the previous $\sigma$ outputs, we say that the convolution is ``on'', as seen in the example above and is denoted by $\qv_i=1$. When the convolution is on ($\qv_i=1$), the value of $\xv_i$ does not change the distribution of the output $\yv_i$ when we consider $\C\gets \dist$ as a random variable. In the example above, we mark such input bits in red, i.e. indices $i\in [3,14]\cup [18,24]$. We call these regions of $\xv$ ``\textbf{input freezones}.''
+    
+    \item It is possible for the convolution to turn off. This occures when there are $\sigma$ consecutive zeros in the output. Over the choice of $\C$, this can happen at any point. In the example above, we marked these output bits in blue, i.e. indices $i\in [11,14]$. We call each such region a ``\textbf{termination zone}.''
+
+    \item The regions of $\yv$ where the convolution is on and not in a termination zone, we call a ``\textbf{output freezone}.'' In this region, there can be any number of zeros and ones subject to not having $\sigma$ consecutive zeros. 
+
+    \item Once the convolution is off, it will remain off until there is a one in the input. We call regions where the convolution is off ``\textbf{deadzones},'' i.e. $[1,2]\cup[15,16]$ in the example above.
+\end{itemize}
+
+Given these observations, our goal is to derive the numerator $\enum^\dist_{w,h}$. However, directly doing this given only the input output weight constraint is too challenging. Instead, we will place further constraints on the pattern and then sum over all values of these additional constrains to compute $\enum^\dist_{w,h}$. 
+
+\paragraph{Additional Constraints.} We will further restrict the set of input and output pairs such that 
+\begin{itemize}
+    \item There are exactly $r$ runs transitions, where the convolutions turns on or off. I.e. $r:=\left|\{i\in [n] \mid \qv_{i}\neq \qv_{i-1} \}\right|$ and $\qv_i:=1$ if $\yv_{i-[\sigma]}\neq0^\sigma$ and 0 otherwise.
+    \item There are exactly $t_0$ output freezone zeros. I.e. $t_0:=\left|\{i \in [n] \mid \yv_i=0,\qv_{i+[\sigma]}=1^\sigma,\}\right|$
+    %\item There are exactly $b\in \{0,1\}$ runs that are on at index $n$. I.e. $b:=\yv_{n-[0,\sigma)}=0^\sigma$.
+\end{itemize}
+Let $\enum^\dist_{w,h,r,t_0}$ count exact number of such $(\xv,\yv,\C)$ that satifies the constraints divided by the total number of convolutions.
+In our example above, we have $r=2,t_0=12$. Note that there are some combinations of $w,h,r,t_0,b$ such that it is impossible satifiy the constraints, in which case we will have $\enum^\dist_{w,h,r,t_0}=0$. 
+
+
+
+\subsection{The Enumerator}
+
+Our strategy will be to iteratively build up the set of all strings satifying the constrains. At each step we will count the number of options for some subpattern and then multiply these options together to get the overall value for the enumerator.
+
+\paragraph{Baseline.} Let us first imagin just placing all $h$ one in $\yv$. There is a single way to do this. We also know that there must be at least one 1 in the input which is aligned with the first 1 in $\yv$.  For our example above with $r=3,h=9$, we would have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}???????????????}\\
+    \yv=&\texttt{?\blue{1}?1?1?1?1?1?1?1?}
+\end{align*}
+where \texttt{?} represent some sequence of zero and ones. 
+
+
+\paragraph{Run transition points.} By construction, there are $r$ transitions where $\qv_{i}$ is not equal to $\qv_{i+1}$. Let us focus on when the convolution transitions to the on state, $\qv_i=0,\qv_{i+1}=1$. There are $r_1:=\lceil r/2\rceil$ such transitions. Such a transition must occur at an index $i$ s.t. $\yv_i=1$. It is known that the first 1 in $\yv$ must start a run. There are $h-1$ remaining ones in  $\yv$. Therefore there are
+$$
+E_1:=\binom{h-1}{\lceil r/2\rceil-1}
+$$
+ways to assign the transition points.
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}???????????\blue{1}???????}\\
+    \yv=&\texttt{?\blue{1}?\olive{1}?\olive{1}?\olive{1}\blue{0000}?\blue{1}?\olive{1}?\olive{1}?\olive{1}?}
+\end{align*}
+where we chose the subset $\{4\}\subseteq[8]$, i.e. the 5th 1 in $\yv$. This choice places several contraints on the pattern. First we know that all other output ones are in $\yv$ freezone and therefore are colored brown above. Ignoring the first run of zeros, there are $r_0:=\lfloor r/2\rfloor$ runs of zeros. In our example, $r_0=1$. Each run of zeros must be preceeded by a termination zone of $\sigma$ zeros in $\yv$. These are output zeros colored blue in our example. This implies that $(n-h)\geq r_0\sigma$. Finally, there must be a one in the input $\xv$ at the start of each run (implying $w\geq r$). However, it is possible that $w,h$ have a value such that these constraints are impossible to satisfy. While one might think this is a problem, it turns out that this will be taken care of in the subsequent steps.
+
+\paragraph{Freezone output zeros.} The freezone output zeros must come after a 1 in the output except if the 1 is followed by a termination zone. There are $h-r_0=h-\lfloor r/2\rfloor$ such locations. Given that the runs are now fixed, we can not have more than $\sigma-1$ contiguous zeros (otherwise a new termination zone would be introduced). There are $t_0$ zeros which need to be assigned. Therefore we have
+$$
+    E_2:=\ballsBinsCap(t_0, h-\lfloor r/2\rfloor, \sigma-1)
+$$
+ways to assign the output freezone zeros where $\ballsBinsCap$ is the number of ways to assign $t_0$ balls into $h-\lfloor r/2\rfloor$ bins, each with a capacity of $\sigma-1$.
+Again, there is a constraint that we have at most $t_0\leq (h-\lfloor r/2\rfloor)(\sigma-1)$ zeros in the output freezone.
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}?????????????\blue{1}?????}\\
+    \yv=&\texttt{?\blue{1}\olive{00100011}\blue{0000}?\blue{1}\olive{10011}}
+\end{align*}
+
+\paragraph{Deadzones.} Recall that a deadzone a region where the convolution is off ($\qv_i=0$) and both the input and output are zero. We know that there are $t_0$ zeros in $\yv$ were assigned to runs and $r_0\sigma=\lfloor r/2\rfloor\sigma$ zeros assigned to terminations. The remaining $n-h-t_0-r_0\sigma$ output zeros must be assined to the deadzones. There are $r_0+1$ deadzones. Therefore, we have
+$v:=n-h-t_0-\lfloor r/2\rfloor\sigma$ balls to be assigned to $\lfloor r/2\rfloor+1$ bins, i.e.
+$$
+E_3:= \ballsBins(v,\lfloor r/2\rfloor+1)
+$$
+This requires adds the constraint that $v\leq k-w$.
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{0\blue{1}????????????00\blue{1}?????}\\
+    \yv=&\texttt{0\blue{1}\olive{00100011}\blue{0000}00\blue{1}\olive{10011}}
+\end{align*}
+
+
+\paragraph{Freezone inputs.} The remaining assignments is to determine how the zeros and ones in the input freezone should be allocated. There are no constraint in the relative prositions. There are $k-r_1-v$ remaining positions and $w-r_1$ of them must be assigned the value of 1. Therefore there are
+$$
+E_4:=\binom{k-\lceil r/2\rceil-v}{w-\lceil r/2\rceil}
+$$
+was to assign the ones. This completed our example as
+\begin{align*}
+    x= & \texttt{0\textcolor{blue}{1}\textcolor{red}{010000001010}00\textcolor{blue}{1}\textcolor{red}{0010010}}\\
+    y= & \texttt{0\textcolor{blue}{1}\textcolor{brown}{00100011}\textcolor{blue}{0000}00\textcolor{blue}{1}\textcolor{brown}{1001110}}\\
+    \text{on?}= & \texttt{001111111111110001111111}
+\end{align*}
+
+
+\paragraph{Scaling by the number of compatiable \C.} Although we have counted the number of possible $(\xv,\yv,\C)$, we now must compute the expected number of $(\xv,\yv)$ pairs over the random choice of $\C\gets \dist$. Fortunently, this is an easy task as it is a direct function of $w,h,r,t_0$. In particular, whenever the convolution was on, there were two options for the value of the next $\yv_i$ value depending on the choice of $\C$. Exactly half of them mapped $\yv_i$ to 0 and the other half to 1. Therefore, if the convolution was on for $g$ steps, then then in expectation there will be
+$$
+\enum^\dist_{w,h,r,t_0}=2^{-g}E_1E_2E_3E_4
+$$
+ways to map an $\xv$ to a $\yv$ under our constraints. Observe that the convolution is on for the whole of the input freezones. Therefore we have $g:=n-r_1-v$.
+
+
+\paragraph{Putting it together.}
+The overall enumerator can then be constructed as
+\begin{align*}
+    \enum^\dist_{w,h} :=&\sum_{r=0}^{r'} \sum_{t_0=0}^{t_0'}2^{-g}E_1E_2E_3E_4\\
+    =&\sum_{r=0}^{r'} \sum_{t_0=0}^{t_0'}2^{-g} ...
+\end{align*}
+where $r':=...,t_0':=..., v=...$.
+
+
+
+\todo{investigate larger rate. might be challenging.}
+
+\todo{investigate starting with the convolution "on". This can be done by either initializing the start with a random combination of the rest or by inserting noise from LPN/SD. Silver discusses this.}
+\iffalse
+\paragraph{Larger rate.}
+
+
+
+
+\begin{align*}
+    x= & \texttt{0 \textcolor{blue}{1 }\textcolor{red}{0 1 0 0 0 1 }0 0 \textcolor{blue}{1 }\textcolor{red}{0 0 1}}\\
+    y= & \texttt{00\textcolor{blue}{11}\textcolor{brown}{01000011}\textcolor{blue}{0000}0000\textcolor{blue}{11}\textcolor{brown}{001110}}\\
+    \text{on?}= & \texttt{0011111111111111000011111111}
+\end{align*}
+
+
+$E_1$ remains unchanged.
+
+\fi
+
+
+\iffalse
+\subsection{The Enumerator}
+
+Our strategy will be to iteratively build up the set of all strings satifying the constrains. At each step we will count the number of options for some subpattern and then multiply these options together to get the overall value for the enumerator.
+
+\paragraph{Baseline.} Let us first imagin just placing all $h$ one in the output. If $b=1$ (the last run terminations) then we would know there are at least $\sigma$ zeros following the last 1 in $\yv$. There is a single way to do this. We know that there must be at least one 1 in the input which is aligned with the first 1 in the output.  For our example above with $h=9,b=0$, we would have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}???????????????}\\
+    \yv=&\texttt{?\blue{1}?1?1?1?1?1?1?1?}
+\end{align*}
+where \texttt{?} represent some sequence of zero and ones. 
+\paragraph{Terminations zones.} A termination zone happens before the start of a run for which there are $r-1$ runs still unassigned. $h-1$ of the output ones (not counting the first 1) may start one of these runs. Therefore we have 
+$$
+E_1:=\binom{h-1}{r-1}
+$$
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}???????????\blue{1}???????}\\
+    \yv=&\texttt{?\blue{1}?\olive{1}?\olive{1}?\olive{1}\blue{0000}?\blue{1}?\olive{1}?\olive{1}?\olive{1}?}
+\end{align*}
+where we chose the subset $\{4\}\subseteq[8]$, i.e. the 5th 1 in the output. This choice places several contraints on the pattern. First we know that all other output ones are in the output freezone and therefore are colored brown above. It additionally mandates that prior to the start of all but the first run there must be $\sigma$ output zeros (termination zones and colored blue above, implying $(n-h)\geq (r-1+b)\sigma$). Finally, there must be a one in the input $\xv$ at the start of each run (implying $w\geq r$). However, it is possible that $w,h$ have a value such that these constraints are impossible to satisfy. While one might think this is a problem, it turns out that this will be taken care of in the subsequent steps.
+
+\paragraph{Freezone output zeros.} The freezone output zeros must reside within a run and come before some 1 that is also in the output freezone. Additionally, if $b=0$ then they may also come after the last 1. There are $h-r$ such ones. Given that the runs are now fixed, we can not have more than $\sigma-1$ zeros before any of these $h-r$ output freezone ones (otherwise a new termination zone would be introduced). There are $t_0$ zeros which need to be assigned to come before one of these 1s or possibily after the last. Therefore we have
+$$
+    E_2:=\ballsBinsCap(t_0, h-r + 1-b, \sigma-1)
+$$
+ways to assign the output freezone zeros where $\ballsBinsCap$ is the number of ways to assign $t_0$ balls into $h-r+ 1-b$ bins, each with a capacity of $\sigma-1$.
+Again, there is a constraint that we have at most $t_0\leq (h-r)\sigma$ zeros in the output freezone.
+
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{?\blue{1}?????????????\blue{1}?????}\\
+    \yv=&\texttt{?\blue{1}\olive{00100011}\blue{0000}?\blue{1}\olive{10011}}
+\end{align*}
+
+\paragraph{Deadzones.} Recall that a deadzone a region where the convolution is off and both the input and output are zero. We know that there are $t_0$ zeros in the output were assigned to runs and $(r-1+b)\sigma$ zeros assigned to terminations. The remaining $n-h-t_0-(r-1+b)\sigma$ output zeros must be assined to the deadzones. There are $r$ deadzones before the runs and $b$ deadzones after the last run. Therefore, we have
+$v:=n-h-t_0-(r-1+b)\sigma$ balls to be assigned to $r+b$ bins, i.e.
+$$
+E_3:= \ballsBins(v,r+b)
+$$
+This requires adds the constraint that $v\leq k-w$.
+Continuing with our example above we have
+\begin{align*}
+    \xv=&\texttt{0\blue{1}????????????00\blue{1}?????}\\
+    \yv=&\texttt{0\blue{1}\olive{00100011}\blue{0000}00\blue{1}\olive{10011}}
+\end{align*}
+
+
+\paragraph{Freezone inputs.} The remaining assignments is to determine how the zeros and ones in the input freezone should be allocated. There are no constraint in the relative prositions. There are $n-r-v$ remaining positions and $w-r$ of them must be assigned the value of 1. Therefore there are
+$$
+E_4:=\binom{n-r-v}{w-r}
+$$
+was to assign the ones. This completed our example as
+\begin{align*}
+    x= & \texttt{0\textcolor{blue}{1}\textcolor{red}{010000001010}00\textcolor{blue}{1}\textcolor{red}{0010010}}\\
+    y= & \texttt{0\textcolor{blue}{1}\textcolor{brown}{00100011}\textcolor{blue}{0000}00\textcolor{blue}{1}\textcolor{brown}{1001110}}\\
+    \text{on?}= & \texttt{001111111111110001111111}
+\end{align*}
+
+\paragraph{Scaling by the number of compatiable \C.} Although we have counted the number of possible $(\xv,\yv,\C)$, we now must compute the expected number of $(\xv,\yv)$ pairs over the random choice of $\C\gets \dist$. Fortunently, this is an easy task as it is a direct function of $w,h,r,t_0,b$. In particular, whenever the convolution was on, there were two options for the value of the next $\yv_i$ value depending on the choice of $\C$. Exactly half of them mapped $\yv_i$ to 0 and the other half to 1. Therefore, if the convolution was on for $g$ steps, then then in expectation there will be
+$$
+\enum^\dist_{w,h,r,t_0,b}=2^{-g}E_1E_2E_3E_4
+$$
+ways to map an $\xv$ to a $\yv$ under our constraints. Observe that the convolution is on for the termination zones and the output freezones. There are $(r-1+b)\sigma$ zeros in the termination zones and $t_0+h-r$ elements in the output freezones. Therefore we have $g:=(r-1+b)\sigma+t_0+h-r$.
+
+
+\paragraph{Putting it together.}
+The overall enumerator can then be constructed as
+\begin{align*}
+    \enum^\dist_{w,h} :=&\sum_{b=0}^1 \sum_{r=0}^{r'} \sum_{t_0=0}^{t_0'}2^{-g}E_1E_2E_3E_4\\
+    =&\sum_{b=0}^1 \sum_{r=0}^{r'} \sum_{t_0=0}^{t_0'}2^{-g}\binom{h-1}{r-1}\ballsBinsCap(t_0, h-r + 1-b, \sigma-1)\ballsBins(v,r+b)\binom{n-r-v}{w-r}
+\end{align*}
+where $r':=\min(w,h,(n-h)/\sigma -b+1),t_0':=n-h-(r-1+b)\sigma, v=n-h-t_0-(r-1+b)\sigma$.
+
+
+
+
+
+
+\fi
+
+
+
+
+
+
+\iffalse
+
+
+\subsection{Defining $\enum_{w,h,g,r}$}
+
+This will be pretty similar to what we had before. Let us begin by defining useful quantities
+\begin{itemize}
+    \item $w$, input weight
+    \item $r$, number of runs
+    \item $h$, out weight. 
+    \item $b$, does the last run terminate.
+    \item $g$, the number of times we will assume the convolution will have a particular bit value. We can bound this as $g\geq r\sigma$ since each run. Additionally, we know each run.
+    \item $g_1=h-r$, the number of times that we guess the value of the convolution s.t. the next output bit $y_i$ is one. Equivalently, this is the number of ones in the output that don't explicitly start a run. %In the example above, we have $g_1=4$, i.e. 4 red ones.
+    \item $g_0=g-g_1$, the number of zeros the output contains while the convolution is on. %In the example above, we have $g_0=9$, i.e. the red and green zeros. 
+    \item $g_0'=g_0 - (r-b)\sigma$, the number of brown zeros in the output. The $(r-b)$ is used to take into account that the last run does not need to have $\sigma$ zeros to terminate it. 
+    Note that we can write 
+    \begin{align*}
+        g_0'&=g_0 - (r-b)\sigma\\
+        &=g-g_1- (r-b)\sigma\\
+        &=g-(h-r)- (r-b)\sigma\\
+        &=g-h+r-(r-b)\sigma
+    \end{align*}
+    %Although written as a dependent variable here, it will be more convenient to allow this to be the independent variable and define the other $g$ variables in terms of it. As such, we will define 
+    %$g=g_0'+h-r+r\sigma$.
+    \item $w'=w-r$, the number of ones in the input excluding the ones which start a run. Clearly, all ones in the input must start a run or be within a run.
+    \item $h'=h-r$, the number of ones in the output excluding the ones which start a run. Clearly, all ones in the output must start a run or be within a run.
+\end{itemize}
+
+We can bound certain relations between the variables. 
+\begin{itemize}
+    \item $h\geq r$, each run must produce as at least a single one,i.e. the first element of the run.
+    \item $g\geq r\sigma$, since each run requires $\sigma$ zeros to terminate it. 
+    \item $r\in [\min(w,h,n/(\sigma+1),(n-h)/\sigma)]$, we must have at least one run. \todo{exception if the only one is at the end.} At the maximum, each run must be started by an input one, $r\leq w$. Each run must start with an output run $r\leq w$. Each run requires a one to start and $\sigma$ zeros in the output. Therefore, $r\leq n/(\sigma+1)$ and $r<(n-h)/\sigma$.
+\end{itemize}
+
+\paragraph{Balls in Bins.} There are
+$$
+\mathcal{B}(n,k)={n+k-1\choose k-1}
+$$
+ways to assign $n$ balls into $k$ bins.
+
+
+\paragraph{Assigning output ones.} As with input ones, these must reside within the region that the convolution is on. $r$ of them are assigned to the start of a run. We have $h'=h-r$ output ones left over. Therefore we have
+\begin{align}
+\mathcal{B}(h',r)={h'+r-1\choose r-1}={h-1\choose r-1}
+\end{align}
+ways to assign these output ones to a path.
+
+\paragraph{Assigning ``on'' output zeros.} We have $n-h$ output zeros. For the ones within a run, there can be at most $c=\sigma-1$ consecutive zeros. Between runs, there can be any number of zeros. Recall that we have a total of $g$ steps while the convolution is on and of these 
+$$
+    g_1 = h-r
+$$
+will be output ones (red in the example). The remaining
+$$
+g_0=g-g_1=g-h+r
+$$
+will be zeros. These will come in two types. First, the run that terminates must have $\sigma$ zeros (green zeros). There are $r-1+b$ such runs and therefore there are
+$$
+(r-1+b)\sigma
+$$
+output zeros that terminate a run. This leaves us with
+$$
+    g_0'=g-h+r-(r-1+b)\sigma
+$$
+zeros mapped to the middle of a run (red zeros). Note,
+$$
+    g=g_0'+h-r+(r-1+b)\sigma.
+$$
+These $g_0'$ output zeros must be mapped to before an output one that does not start a run. There are $h-r$ such ones. Additionally, these output zeros can be mapped to the very end of the last convolution if it does not terminate, e.g. in the example there is one zero here. In total we have  $h-r+1-b$ bins. TO ensure that the run stays on, we can map at most $c=\sigma-1$ output zeros to any of these locations. Following \cite{ballsInBinsCap}, for $\nu=g_0'$ balls, $\mu=h-r+1-b$ bins and capacity $c$, there are 
+\begin{align}
+N(\nu,\mu, c) = \sum_{i=0}^\mu (-1)^i {\mu \choose i} {\mu +\nu -i (c+1)-1 \choose \mu-1}
+\end{align}
+ways to assign these output zeros within a run to a path. 
+
+\paragraph{Assigning ``off'' output zeros.} 
+There remains
+\begin{align*}
+v&=n-h-g_0  \\
+%&=n-h-(g-h+r)\\
+%&=n-h-(g-(h-r))\\
+%&=n-h-g+h-r\\
+&=n-g-r
+\end{align*}
+output zeros to be assigned outside of a run. There are $r+b$ such bins and therefore we have
+\begin{align}
+\mathcal{B}(v,r+b)={v + r+b-1\choose r+b-1}={n-g+b-1\choose r+b-1}
+\end{align}
+ways to assign the remaining zeros to a path. Note, this will also fix the input zeros to be at the same locations.
+
+
+
+\paragraph{Assigning input ones.} We know that we have $r$ runs which leaves us with $w'=w-r$ ones left over. We know that each must be part of some run. Therefore we have balls in bins
+\begin{align}
+\mathcal{B}(w',r)={w'+r-1\choose r-1}={w-1\choose r-1}
+\end{align}
+ways to assign these input ones to a path.
+
+\paragraph{Assigning input zeros. } Recall that the convolution is on for $g$ steps (ignoring the leading one that starts each run). While the convolution is on, 
+\begin{align*}    
+z_1 &= g-w'\\
+&=g-(w-r)\\
+&=g-w+r
+\end{align*}
+input zeros will be mapped to the runs. There are $w-r$ ones that don't start a run. Zeros can go before any one of these or after the last one if it does not terminate, i.e. if $1-b$. Therefore we have 
+\begin{align}
+    \mathcal{B}(z_1, w-r+1-b)={z_1+w-r-b\choose w-r-b}={g-b\choose w-r-b}
+\end{align}
+The remaining 
+\begin{align*}
+z_0&=n-w-z_1\\
+&=n-w-(g-w+r)\\
+&=n-g-r\\
+&=v
+\end{align*}
+input zeros are assigned to before any run or after the last one if it terminates. i.e. $r+b$. However, we have the constraint that these must be placed in the same location as the output zeros that are between runs. There
+\todo{???}
+
+
+
+
+
+
+
+\paragraph{Putting it together.} Therefore we have
+\begin{align*}
+\enum_{w,h,g_0',r}&=\sum_{b\in\{0,1\}}
+\mathcal{B}(h',r)
+N(g_0', h-r+1-b, \sigma-1)
+\mathcal{B}(v,r+b)
+\mathcal{B}(w',r)
+\mathcal{B}(z_1,w-r+1-b)\\
+&=\sum_{b\in\{0,1\}}
+{h-1\choose r-1}
+N(g_0', h-r+1-b, \sigma-1)
+{n-g+b-1\choose r+b-1}
+{w-1\choose r-1}
+{g-b\choose w-r-b}
+\end{align*}
+where $w\in[n],h\in[n],r\in [\min(w,h,(n-h)/\sigma)]$ and $g_0'=g-h+r-(r-1+b)\sigma$. If any value is negative, the term is zero.
+
+We can iterate over the possible runs to get
+$$
+\enum_{w,h,g}=\sum_{r\in[\min(w,h,n/(\sigma+1))]} \enum_{w,h,g-h+r-(r-b)\sigma, r}
+$$
+
+
+
+\fi

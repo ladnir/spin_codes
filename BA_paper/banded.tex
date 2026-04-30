@@ -1,0 +1,18 @@
+
+
+\section{Banded-Diagonal Codes}\label{sec:banded}
+
+We consider an alternative formulation of our Block-Diagonal code, called the Banded-Diagonal code, where the diagonal submatrices are replaced by a diagonal band of random entries of width $\sigma$. We expect similar asymptotic performance, but conceptually this formulation offers some advantages. See \appendixref{sec:bandedApx} for details.
+  \if\submission1
+  \else
+ In the Block-Diagonal case, 1s in the input $\xv$ that fall within the same block do not change the weight distribution of the output $\xv\G$. That is, once a block is ``on'', additional 1s in the input \xv of this block do not change the Hamming weight, since the output distribution of this block is already uniform. The idea of the banded construction is to offset each row so that there is some non-overlapping portion. That is, the generator of this subcode can be described as
+$$
+    \mathbf{G} = \left(\begin{matrix}
+    \mathbf{\alpha}_{1,1}&\mathbf{\alpha}_{1,2}& ...  & \mathbf{\alpha}_{1,\sigma}& & &&\mathbf{O}\\
+    &\mathbf{\alpha}_{2,1}& \mathbf{\alpha}_{2,2}&...  & \mathbf{\alpha}_{2,\sigma}&  &&\\
+     &  &\ddots&\ddots&&\ddots&&\\
+   \mathbf{O} &  &&\mathbf{\alpha}_{k,1} &\mathbf{\alpha}_{k,2}&...  & \mathbf{\alpha}_{k,\sigma}
+   \end{matrix}\right).
+$$
+More generally, each row will be offset from the previous by $(n-\sigma)/k$, which we assume to be an integer. We present the enumerator for this code in \appendixref{sec:bandedApx}. The computational cost of computing the enumerator proved to be higher than that of the Block-Diagonal codes, and therefore we chose not to implement it. However, we believe it could offer better concrete performance. Indeed, it is not hard to show that it too must have $\sigma\geq O(\sqrt[t]{k})$. We leave further investigation of this approach to future work. See \appendixref{sec:bandedApx} for more details.
+\fi

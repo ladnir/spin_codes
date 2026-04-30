@@ -1,0 +1,9 @@
+\begin{abstract}
+
+Linear error-correcting codes with fast encoding and high minimum distance are a central primitive across modern cryptography. They appear prominently in at least two domains: (1) pseudorandom correlation generators (PCGs), which enable sublinear-communication generation of correlations such as oblivious transfer and vector oblivious linear evaluation, and (2) zero-knowledge proof systems, where linear-time encoders underpin proof soundness and scalability. In both settings, the prover or sender must multiply by a large generator matrix $\G$, often with dimensions in the millions, making computational efficiency the dominant bottleneck.
+
+\qquad We propose a generalized paradigm for building crypto-friendly codes with provable minimum distance. Roughly speaking, these codes are based on the idea of randomized turbo codes such as repeat accumulate codes. We prove that their asymptotic minimum distance is linear and compute the exact expected weight spectrum of the codes for concrete sizes. We observe that our codes achieve full Gilbert-Varshamov minimum distance and outperform all prior constructions.
+
+\qquad We construct several novel codes, the most promising of which we call Block-Accumulate codes. Our codes are the fastest on both GPUs and CPUs. If we restrict our attention to codes with provable distance, our code is $8\times$ faster than state of the art on a CPU and $50\times$ faster on a GPU. Even if we use aggressive parameters with conjectured distance, our code is $3\times$ and $20\times$ faster, respectively. 
+Under these parameters, this yields overall PCG speedups of $2.5\times$ on the CPU and $15\times$ on the GPU, achieving about 200 million OTs or binary Beaver triples per second on the GPU (excluding the one-time 10 ms GGM seed expansion). We also observe a $3\times$ speedup and half the peak memory consumption of the Blaze zero-knowledge (PCS) scheme of Brehm et al. (Eurocrypt 25).
+\end{abstract}

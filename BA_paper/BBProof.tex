@@ -1,0 +1,471 @@
+
+\label{ssec:lin-dist-all-tge3}
+%\subsection{Template Proof of Linear Distance for Pure Block-Diagonal Serial Codes (Rate $1/2$)}
+\label{ssec:bd_template}
+
+This subsection provides a self-contained proof template showing that pure block-diagonal serial codes achieve
+\emph{linear} minimum distance at rate $R=1/2$ when the block size $\sigma$ grows as a suitable power of $n$.
+The argument is entirely elementary: it combines (i) binomial concentration for the weight growth across random linear blocks,
+(ii) an occupancy bound for how a random permutation spreads mass across $\sigma$-blocks, and (iii) a union bound organized by
+the message \emph{block-type} $a(x)$ (the number of nonzero message blocks).
+
+We give the full proof for depth $t=3$, which is the most delicate constant-depth case: the analysis must explicitly handle
+the smallest block-types, which induce an inherent $\exp(-\Theta(\sigma))$ ``floor'' in the failure probability.
+For every constant depth $t\ge 4$, the same steps go through with additional slack because the extra
+$(\pi_i,G_{i+1})$ layers provide further amplification before the final binomial tail; we summarize the necessary modifications
+after the $t=3$ proof.
+Finally, we briefly comment on the borderline case $t=2$, where the behavior is governed by a more sensitive single-permutation
+occupancy regime.
+
+
+
+
+
+\subsection{Notation and Conventions}
+Throughout, $\log$ denotes the natural logarithm and $\log_2$ denotes base-$2$.
+Let $H_2(p) := -p\log_2 p -(1-p)\log_2(1-p)$ be the binary entropy (base $2$), and
+let $h(p):=-p\log p -(1-p)\log(1-p)$ be the natural entropy.
+
+Assume $\sigma\mid n$ and $\sigma\mid k$ and $k=n/2$.
+Write
+\[
+q := \frac{n}{\sigma},
+\qquad
+b := \frac{k}{\sigma}=\frac{q}{2}.
+\]
+Partition length-$n$ vectors into $q$ contiguous blocks of length $\sigma$ and define
+$A(z)$ to be the number of nonzero blocks of $z$.
+Partition $x\in\F_2^k$ into $b$ message blocks of length $\sigma$ and let $a(x)$ be the number of nonzero message blocks.
+
+The depth-$3$ pure block-diagonal serial ensemble is
+\[
+G \;=\; G_1 \pi_1 G_2 \pi_2 G_3 \in \F_2^{k\times n},
+\]
+where:
+\begin{itemize}
+\item $G_1$ is block-diagonal with $b$ independent blocks, each uniform in $\F_2^{\sigma\times 2\sigma}$;
+\item $G_2,G_3$ are block-diagonal with $q$ independent blocks, each uniform in $\F_2^{\sigma\times\sigma}$;
+\item $\pi_1,\pi_2$ are independent uniform permutations of $[n]$.
+\end{itemize}
+For $x\in\F_2^k$, define the intermediate vectors
+\[
+v_1 := xG_1,\quad u_1 := v_1\pi_1,\quad v_2 := u_1G_2,\quad u_2 := v_2\pi_2,\quad y := u_2G_3=xG.
+\]
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Elementary Lemmas}
+We use only the following standard facts.
+
+\begin{lemma}[Uniform linear image]\label{lem:bd-uniform-formal}
+Let $M\leftarrow \F_2^{r\times m}$ be uniform (i.i.d.\ entries) and fix any $u\in\F_2^r\setminus\{0\}$.
+Then $uM$ is uniform in $\F_2^m$. In particular, $|uM|\sim \mathrm{Binomial}(m,1/2)$.
+\end{lemma}
+\begin{proof}
+The map $\phi:\F_2^{r\times m}\to\F_2^m$ given by $\phi(M)=uM$ is a surjective $\F_2$-linear map
+because $u\neq 0$ implies there exists $i$ with $u_i=1$, and by choosing the $i$th row of $M$ arbitrarily one can obtain any output.
+A uniform input to a surjective linear map yields a uniform output. Each coordinate of $uM$ is a nontrivial $\F_2$-linear form
+in the entries of $M$, hence unbiased; independence follows because distinct coordinates depend on disjoint sets of column entries.
+Thus $uM$ is uniform and its Hamming weight is $\mathrm{Binomial}(m,1/2)$.
+\end{proof}
+
+\begin{lemma}[Binomial lower tail via entropy]\label{lem:bd-bintail}
+Let $Z\sim \mathrm{Binomial}(M,1/2)$.
+Then for every $\rho\in(0,1/2)$,
+\[
+\Pr(Z\le \rho M)\le 2^{-M\,(1-H_2(\rho))}.
+\]
+\end{lemma}
+\begin{proof}
+For $\rho<1/2$,
+\[
+\Pr(Z\le \rho M)
+=\sum_{i=0}^{\lfloor\rho M\rfloor}\binom{M}{i}2^{-M}
+\le (\lfloor\rho M\rfloor+1)\binom{M}{\lfloor\rho M\rfloor}2^{-M}.
+\]
+Using the standard bound $\binom{M}{\rho M}\le 2^{M H_2(\rho)}$ (for $\rho M\in Z$; otherwise use floor\slash ceiling),
+we obtain $\Pr(Z\le \rho M)\le \mathrm{poly}(M)\cdot 2^{-M(1-H_2(\rho))}$.
+Absorbing the polynomial factor into a slightly weaker constant for large $M$ yields the stated inequality.
+(If desired, one can remove $\mathrm{poly}(M)$ by a slightly sharper counting argument; we do not need it.)
+\end{proof}
+
+\begin{lemma}[Type count]\label{lem:bd-typecount-formal}
+For each $a\in\{0,\dots,b\}$,
+\[
+\#\{x\in\F_2^k:\ a(x)=a\}
+=\binom{b}{a}(2^\sigma-1)^a
+\le \left(\frac{eb}{a}\right)^a 2^{\sigma a}.
+\]
+\end{lemma}
+\begin{proof}
+Choose which $a$ message blocks are nonzero (at most $\binom{b}{a}$ choices),
+and for each chosen block choose any nonzero vector in $\F_2^\sigma$ (exactly $2^\sigma-1$ choices).
+Finally apply $\binom{b}{a}\le (eb/a)^a$ and $2^\sigma-1\le 2^\sigma$.
+\end{proof}
+
+\begin{lemma}[Occupancy bound for a uniform permutation]\label{lem:bd-occ-perm}
+Let $S\in\{0,1,\dots,n\}$ and let $W\subseteq[n]$ be a uniformly random $S$-subset.
+Partition $[n]$ into $q$ blocks of size $\sigma$.
+Let $B$ be the number of blocks that intersect $W$ (equivalently, the number of nonzero blocks in the permuted vector).
+Then for every integer $m\in\{0,1,\dots,q\}$,
+\[
+\Pr(B\le m)\le \binom{q}{m}\left(\frac{m}{q}\right)^S
+\le \exp\!\Bigl(q\,h(m/q) - S\log(q/m)\Bigr).
+\]
+\end{lemma}
+\begin{proof}
+Fix a set $T$ of $m$ blocks. The union of these blocks has size $m\sigma=(m/q)n$.
+The event $\{W\subseteq \cup T\}$ has probability
+\[
+\Pr(W\subseteq \cup T)
+=\frac{\binom{m\sigma}{S}}{\binom{n}{S}}
+\le \left(\frac{m\sigma}{n}\right)^S
+=\left(\frac{m}{q}\right)^S,
+\]
+where we used $\binom{A}{S}/\binom{B}{S}\le (A/B)^S$ for $A\le B$.
+Union bounding over all $\binom{q}{m}$ choices of $T$ yields the first inequality.
+For the second, use $\binom{q}{m}\le \exp(q h(m/q))$.
+\end{proof}
+
+% ---------------------------------------------------------------------------
+% Linear distance for t=3 (rate 1/2) — fully detailed, formal, elementary
+% ---------------------------------------------------------------------------
+
+\subsection{Theorem for $t=3$}
+
+
+
+% ---------------------------------------------------------------------------
+% Main theorem (t=3)
+% ---------------------------------------------------------------------------
+
+\begin{theorem}[Linear distance for $t=3$, rate $1/2$]\label{thm:bd_t3_full}
+Fix $\beta:=0.9$ and $\delta:=0.08$ (so $\beta\cdot(1-H_2(\delta/\beta))>1/2$).
+There exist constants $c_0,\gamma>0$ such that the following holds.
+
+Let $\sigma=\lceil c n^{1/3}\rceil$ with some constant $c\ge c_0$, rounded so that $\sigma\mid n$ and $\sigma\mid k=n/2$.
+Let $q=n/\sigma$.
+For the depth-$3$ ensemble $G=G_1\pi_1G_2\pi_2G_3$ defined above,
+for all sufficiently large $n$,
+\[
+\Pr\bigl[d_{\min}(G)\le \delta n\bigr]\le \exp(-\gamma \sigma).
+\]
+\end{theorem}
+
+\begin{proof}
+Define the random variable
+\[
+N_{\le \delta n}(G):=\#\{x\in\F_2^k\setminus\{0\}:\ |xG|\le \delta n\}.
+\]
+Then $\{d_{\min}(G)\le \delta n\}\subseteq\{N_{\le\delta n}(G)\ge 1\}$, so by Markov,
+\[
+\Pr(d_{\min}(G)\le \delta n)\le \E[N_{\le\delta n}(G)].
+\]
+We bound the expectation by splitting over the type $a=a(x)$:
+\[
+\E[N_{\le\delta n}(G)]
+=\sum_{a=1}^{b}\ \sum_{x:\ a(x)=a}\Pr(|xG|\le \delta n).
+\]
+
+\paragraph{Step 0: two deterministic observations.}
+For any intermediate vector $z$ partitioned into $q$ blocks, we have
+\[
+|z|\ge A(z)\qquad\text{and}\qquad A(z)\le |z|.
+\]
+Moreover, for the block-diagonal maps $G_2,G_3$:
+conditional on $A(u_i)=m$, the output $v_{i+1}=u_iG_{i+1}$ consists of $m$ independent uniform $\sigma$-bit blocks
+(and $q-m$ zero blocks), hence
+\begin{equation}\label{eq:binom-from-blocks}
+|v_{i+1}|\ \big|\ (A(u_i)=m)\ \sim\ \mathrm{Binomial}(\sigma m,1/2).
+\end{equation}
+This is exactly \lemmaref{lem:bd-uniform-formal} applied blockwise, using independence of the random blocks.
+
+For $G_1$: conditional on $a(x)=a$, the vector $v_1=xG_1$ is supported on $a$ disjoint length-$2\sigma$ segments,
+each uniform, hence
+\begin{equation}\label{eq:S1-binom}
+S_1:=|v_1|\ \big|\ (a(x)=a)\ \sim\ \mathrm{Binomial}(2\sigma a,1/2).
+\end{equation}
+
+\paragraph{Case I: Large types $a\ge a_\star$ with $a_\star:=C\sigma$.}
+We will choose $C$ (a constant) later, sufficiently large.
+
+Fix any $x$ with $a(x)=a\ge C\sigma$.
+Let $S_1=|v_1|$. By \eqref{eq:S1-binom}, $\E[S_1]=\sigma a$.
+Apply \lemmaref{lem:bd-bintail} with $M=2\sigma a$ and $\rho=1/4$:
+\[
+\Pr\Bigl(S_1\le \frac{\sigma a}{2}\Bigr)
+=\Pr\Bigl(S_1\le \frac14\cdot (2\sigma a)\Bigr)
+\le 2^{-2\sigma a\,(1-H_2(1/4))}.
+\]
+In particular, since $a\ge C\sigma$, the RHS is at most $\exp(-\Omega(\sigma^2))$.
+
+Now condition on the event
+\[
+\mathcal E_1:=\Bigl\{S_1\ge \frac{\sigma a}{2}\Bigr\}.
+\]
+Under $\mathcal E_1$, we have $S_1\ge (C/2)\sigma^2$.
+Recall that $\sigma = c n^{1/3}$ implies $q=n/\sigma=\Theta(\sigma^2)$, more precisely
+$q = n/\sigma = (1/c)n^{2/3}$ and $\sigma^2=c^2 n^{2/3}=c^3 q$.
+Thus $S_1\ge (C/2)c^3 q$.
+
+Let $B_1:=A(u_1)$ be the number of nonzero blocks after the permutation $\pi_1$.
+Conditional on $S_1$, the support of $u_1$ is a uniformly random $S_1$-subset of $[n]$.
+Apply \lemmaref{lem:bd-occ-perm} with $m:=\lfloor \eta q\rfloor$ for some constant $\eta\in(0,1)$ (say $\eta=0.4$):
+\[
+\Pr\bigl(B_1\le \eta q\ \big|\ S_1\bigr)
+\le \exp\!\bigl(q h(\eta)-S_1\log(1/\eta)\bigr).
+\]
+Under $\mathcal E_1$, $S_1\ge \theta q$ where $\theta:=(C/2)c^3$.
+Therefore
+\[
+\Pr\bigl(B_1\le \eta q\ \big|\ \mathcal E_1\bigr)
+\le \exp\!\bigl(q(h(\eta)-\theta\log(1/\eta))\bigr).
+\]
+Choose $C$ (depending only on $c$ and $\eta$) so that $\theta>h(\eta)/\log(1/\eta)$, hence the exponent is $-\Omega(q)$.
+Thus, for this case,
+\begin{equation}\label{eq:caseI_B1}
+\Pr(B_1\le \eta q)\le \exp(-\Omega(q))+\exp(-\Omega(\sigma^2)).
+\end{equation}
+
+Next, conditional on $B_1\ge \eta q$, the block-diagonal multiplication by $G_2$ yields $S_2:=|v_2|$ with
+$S_2\sim \mathrm{Binomial}(\sigma B_1,1/2)$ by \eqref{eq:binom-from-blocks}, and $\sigma B_1\ge \eta \sigma q=\eta n$.
+Applying \lemmaref{lem:bd-bintail} with $M=\sigma B_1\ge \eta n$ and $\rho=1/4$ gives
+\begin{equation}\label{eq:caseI_S2}
+\Pr\Bigl(S_2\le \frac{\eta n}{4}\ \Big|\ B_1\ge \eta q\Bigr)\le 2^{-\eta n\,(1-H_2(1/4))}=\exp(-\Omega(n)).
+\end{equation}
+Now condition on the event $\mathcal E_2:=\{S_2\ge \alpha n\}$ where $\alpha:=\eta/4$.
+
+Under $\mathcal E_2$, consider $B_2:=A(u_2)$ after the permutation $\pi_2$.
+Again by \lemmaref{lem:bd-occ-perm}, with $m:=\lfloor \beta q\rfloor$ and recalling that $S_2\ge \alpha n=\alpha\sigma q$,
+\begin{align*}
+\Pr(B_2\le \beta q\mid S_2) 
+    &\le \exp\!\bigl(qh(\beta)-S_2\log(1/\beta)\bigr) \\
+    &\le \exp\!\bigl(qh(\beta)-\alpha\sigma q \log(1/\beta)\bigr) \\
+    &= \exp(-\Omega(n)),
+\end{align*}
+since $\sigma\to\infty$.
+
+Finally, conditional on $B_2\ge \beta q$, the last layer $G_3$ gives
+$|y|=|u_2G_3|\sim \mathrm{Binomial}(\sigma B_2,1/2)$ by \eqref{eq:binom-from-blocks}, and $\sigma B_2\ge \beta\sigma q=\beta n$.
+Thus $|y|$ stochastically dominates $\mathrm{Binomial}(\beta n,1/2)$, and
+\begin{equation}\label{eq:final-tail}
+\Pr(|y|\le \delta n\mid B_2\ge \beta q)\le 2^{-\beta n(1-H_2(\delta/\beta))}.
+\end{equation}
+
+Combining \eqref{eq:caseI_B1}, \eqref{eq:caseI_S2}, the bound on $B_2$, and \eqref{eq:final-tail}, we obtain:
+for every fixed $x$ with $a(x)\ge C\sigma$,
+\[
+\Pr(|xG|\le \delta n)\le 2^{-\beta n(1-H_2(\delta/\beta))}+\exp(-\Omega(n))+\exp(-\Omega(q)).
+\]
+Summing over all such $x$ (at most $2^k=2^{n/2}$ messages) gives total contribution
+\[
+\sum_{x:\ a(x)\ge C\sigma}\Pr(|xG|\le \delta n)
+\le 2^{n/2}\cdot 2^{-\beta n(1-H_2(\delta/\beta))}+\exp(-\Omega(n))+\exp(-\Omega(q)).
+\]
+By our choice of $(\beta,\delta)$, $\beta(1-H_2(\delta/\beta))>1/2$, so the first term is $2^{-\Omega(n)}$.
+Hence the entire large-type contribution is at most $2^{-\Omega(n)}+\exp(-\Omega(q))$.
+
+\paragraph{Case II: Medium types $2\le a < C\sigma$.}
+Fix any $x$ with $a(x)=a$ in this range.
+Let $S_1=|v_1|$. By \eqref{eq:S1-binom} and \lemmaref{lem:bd-bintail} with $M=2\sigma a$ and $\rho=1/4$,
+\begin{equation}\label{eq:caseII_S1}
+\Pr\Bigl(S_1\le \frac{\sigma a}{2}\Bigr)
+\le 2^{-2\sigma a\,(1-H_2(1/4))}.
+\end{equation}
+Define the event $\mathcal F_1:=\{S_1\ge \sigma a/2\}$.
+
+Now consider $B_1=A(u_1)$. Conditional on $S_1$, apply \lemmaref{lem:bd-occ-perm} with
+\[
+m:=\left\lfloor \frac{S_1}{4}\right\rfloor.
+\]
+Then
+\begin{equation}\label{eq:caseII_B1}
+\Pr\Bigl(B_1\le \frac{S_1}{4}\ \Big|\ S_1\Bigr)
+\le \binom{q}{m}\left(\frac{m}{q}\right)^{S_1}
+\le \exp\!\Bigl(q h(m/q)-S_1\log(q/m)\Bigr).
+\end{equation}
+On $\mathcal F_1$, we have $S_1\ge \sigma a/2$, and since $a\le C\sigma$ we also have $S_1\le \sigma a + O(\sqrt{\sigma a})\le O(\sigma^2)$.
+Recalling $q=\Theta(\sigma^2)$, we have $q/m=\Theta(q/S_1)=\Theta(\sigma/a)$, hence $\log(q/m)=\Omega(\log(\sigma/a))$.
+Thus the exponent in \eqref{eq:caseII_B1} is at most
+\[
+-q\cdot 0 + \bigl(-\Omega(S_1\log(\sigma/a))\bigr)\le -\Omega(\sigma a\log(\sigma/a)),
+\]
+for all sufficiently large $\sigma$.
+Therefore, there exists an absolute constant $c_1>0$ such that
+\begin{equation}\label{eq:caseII_B1_simple}
+\Pr\Bigl(B_1\le \frac{S_1}{4}\ \Big|\ \mathcal F_1\Bigr)\le \exp\bigl(-c_1\,\sigma a\log(\sigma/a)\bigr).
+\end{equation}
+
+Next, conditional on $\mathcal F_1$ and $B_1\ge S_1/4$, we have $B_1\ge S_1/4\ge (\sigma a/8)$.
+Then $S_2=|v_2|$ satisfies, by \eqref{eq:binom-from-blocks},
+\[
+S_2\ \big|\ (B_1)\ \sim\ \mathrm{Binomial}(\sigma B_1,1/2),
+\qquad
+\sigma B_1\ge \sigma\cdot\frac{\sigma a}{8}=\frac{\sigma^2 a}{8}.
+\]
+Applying \lemmaref{lem:bd-bintail} with $M=\sigma B_1$ and $\rho=1/4$ gives
+\begin{equation}\label{eq:caseII_S2}
+\Pr\Bigl(S_2\le \frac{\sigma^2 a}{64}\ \Big|\ B_1\ge \frac{\sigma a}{8}\Bigr)
+\le 2^{-(\sigma^2 a/8)\,(1-H_2(1/4))}
+=\exp(-\Omega(\sigma^2 a)).
+\end{equation}
+Since $a\ge 2$, the RHS is at most $\exp(-\Omega(\sigma^2))=\exp(-\Omega(q))$.
+
+Now condition on $\mathcal F_2:=\{S_2\ge \alpha_2 q\}$ for some constant $\alpha_2>0$.
+Indeed, \eqref{eq:caseII_S2} implies $\Pr(\neg\mathcal F_2)\le \exp(-\Omega(q))$ by choosing $\alpha_2$ small enough,
+because $\sigma^2 a=\Theta(q)\cdot a\ge 2\Theta(q)$.
+
+Under $\mathcal F_2$, apply \lemmaref{lem:bd-occ-perm} to $\pi_2$ with $m:=\lfloor \beta_0 q\rfloor$,
+where we choose some constant $\beta_0\in(0,1)$ smaller than the typical occupancy at load $\alpha_2$
+(for concreteness, take $\beta_0:=\alpha_2/4$; any fixed choice works).
+Since $S_2\ge \alpha_2 q$, we obtain
+\begin{equation}\label{eq:caseII_B2}
+\Pr(B_2\le \beta_0 q\mid \mathcal F_2)\le \exp(-\Omega(q)).
+\end{equation}
+Finally, conditional on $B_2\ge \beta_0 q$, the last layer gives
+$|y|\sim \mathrm{Binomial}(\sigma B_2,1/2)$ with $\sigma B_2\ge \beta_0\sigma q=\beta_0 n$,
+so by \eqref{eq:final-tail} (with $\beta_0$ in place of $\beta$),
+\[
+\Pr(|y|\le \delta n\mid B_2\ge \beta_0 q)\le 2^{-\beta_0 n(1-H_2(\delta/\beta_0))}=\exp(-\Omega(n)).
+\]
+
+Putting \eqref{eq:caseII_S1}, \eqref{eq:caseII_B1_simple}, \eqref{eq:caseII_S2}, \eqref{eq:caseII_B2} and the final binomial tail together,
+we get the following bound for each fixed $x$ with $2\le a(x)<C\sigma$:
+\[
+\Pr(|xG|\le \delta n)
+\le 2^{-\Omega(\sigma a)} + \exp\!\bigl(-\Omega(\sigma a\log(\sigma/a))\bigr)+\exp(-\Omega(q))+\exp(-\Omega(n)).
+\]
+Now sum over all such $x$ using \lemmaref{lem:bd-typecount-formal}.
+For each fixed $a\ge 2$, the number of $x$ with $a(x)=a$ is at most
+$\left(\frac{eb}{a}\right)^a 2^{\sigma a}\le \exp(O(a\log q)+\sigma a\log 2)$.
+Multiplying by the dominant per-message term $\exp(-\Omega(\sigma a\log(\sigma/a)))$ yields
+a total of at most $\exp(-\Omega(\sigma\log\sigma))$ for small $a$
+(and much smaller for larger $a$).
+In particular, the entire medium-type contribution satisfies
+\begin{equation}\label{eq:caseII_total}
+\sum_{x:\ 2\le a(x)<C\sigma}\Pr(|xG|\le \delta n)\le \exp(-\Omega(\sigma\log\sigma)).
+\end{equation}
+
+\paragraph{Case III: Smallest type $a=1$.}
+This is the regime that governs the unavoidable $\sigma$-level failure exponent.
+
+Fix $x$ with $a(x)=1$.
+Then $S_1=|v_1|\sim \mathrm{Binomial}(2\sigma,1/2)$ by \eqref{eq:S1-binom}.
+Choose a constant $\rho:=1/8$ and define the event $\mathcal G_1:=\{S_1\ge \rho\sigma\}$.
+By \lemmaref{lem:bd-bintail} with $M=2\sigma$ and threshold $\rho\sigma = (\rho/2)\cdot(2\sigma)$,
+\begin{equation}\label{eq:caseIII_S1small}
+\Pr(\neg \mathcal G_1)
+=\Pr\Bigl(S_1\le \rho\sigma\Bigr)
+\le 2^{-2\sigma\,(1-H_2(\rho/2))}.
+\end{equation}
+With $\rho/2=1/16$, note that $1-H_2(1/16)\approx 0.6627$, so the exponent is $\approx 1.325\sigma$ (strictly $> \sigma$).
+
+Now condition on $\mathcal G_1$.
+Let $B_1=A(u_1)$.
+Apply \lemmaref{lem:bd-occ-perm} with $m:=\lfloor (\rho/2)\sigma\rfloor$.
+Since $q=\Theta(\sigma^2)$, we have $m/q=\Theta(1/\sigma)$, and since $S_1\ge \rho\sigma$,
+\begin{align*}
+\Pr\Bigl(B_1 \le \frac{\rho\sigma}{2} \ \Big|\ \mathcal{G}_1\Bigr)
+    &\le \binom{q}{m} \left(\frac{m}{q}\right)^{S_1} \\
+    &\le \exp\!\Bigl( qh(m/q) - S_1 \log(q/m) \Bigr) \\
+    &\le \exp(-\Omega(\sigma \log \sigma)).
+\end{align*}
+Thus, except with probability $\exp(-\Omega(\sigma\log\sigma))$, we have $B_1\ge (\rho/2)\sigma$.
+
+Conditional on $B_1\ge (\rho/2)\sigma$, the second layer yields
+$S_2\sim \mathrm{Binomial}(\sigma B_1,1/2)$ with $\sigma B_1\ge (\rho/2)\sigma^2=\Theta(q)$.
+Therefore, by \lemmaref{lem:bd-bintail} with $\rho'=1/4$,
+\[
+\Pr\Bigl(S_2\le \frac{\rho\sigma^2}{16}\ \Big|\ B_1\ge \frac{\rho\sigma}{2}\Bigr)
+\le \exp(-\Omega(\sigma^2))=\exp(-\Omega(q)).
+\]
+On the complementary event $S_2\ge \alpha_3 q$ for some constant $\alpha_3>0$,
+the permutation $\pi_2$ activates a constant fraction of blocks with probability $1-\exp(-\Omega(q))$
+(by \lemmaref{lem:bd-occ-perm} with constant $m=\beta_3 q$),
+and then the final layer yields a binomial tail on $\Theta(n)$ bits:
+\[
+\Pr(|y|\le \delta n\mid B_2\ge \beta_3 q)\le \exp(-\Omega(n)).
+\]
+Collecting these bounds, we obtain for each fixed $x$ with $a(x)=1$:
+\[
+\Pr(|xG|\le \delta n)
+\le 2^{-2\sigma(1-H_2(1/16))} + \exp(-\Omega(\sigma\log\sigma))+\exp(-\Omega(q))+\exp(-\Omega(n)).
+\]
+
+Now sum over all $x$ with $a(x)=1$.
+There are exactly $\binom{b}{1}(2^\sigma-1)\le b2^\sigma = (q/2)\,2^\sigma$ such messages.
+Hence the total type-$1$ contribution is at most
+\begin{align*}
+\sum_{x:\ a(x)=1}\Pr(|xG|\le \delta n)
+&\le \frac{q}{2}\,2^\sigma\cdot 2^{-2\sigma(1-H_2(1/16))} \;+\; \frac{q}{2}\,2^\sigma\cdot \exp(-\Omega(\sigma\log\sigma)) \\
+&\quad
+\;+\; \frac{q}{2}\,2^\sigma\cdot \exp(-\Omega(q)) \\
+&\le \mathrm{poly}(\sigma)\cdot 2^{-\kappa\sigma} \;+\; \exp(-\Omega(\sigma\log\sigma))\;+\;\exp(-\Omega(q)),
+\end{align*}
+where
+\[
+\kappa \;:=\; 2\bigl(1-H_2(1/16)\bigr)-1 \;>\; 0.
+\]
+Thus there exists a constant $\gamma>0$ such that the entire type-$1$ contribution is at most $\exp(-\gamma\sigma)$
+for all sufficiently large $\sigma$ (hence for all sufficiently large $n$).
+
+\paragraph{Conclusion.}
+Combining the three cases, we have
+\[
+\E[N_{\le\delta n}(G)]
+\le
+\underbrace{\exp(-\gamma\sigma)}_{\text{type }a=1}
+\;+\;
+\underbrace{\exp(-\Omega(\sigma\log\sigma))}_{\text{types }2\le a<C\sigma}
+\;+\;
+\underbrace{2^{-\Omega(n)}+\exp(-\Omega(q))}_{\text{types }a\ge C\sigma}.
+\]
+Since $\sigma\to\infty$ with $n$, the dominant term is $\exp(-\gamma\sigma)$.
+Therefore, for all sufficiently large $n$,
+\[
+\Pr(d_{\min}(G)\le \delta n)\le \E[N_{\le\delta n}(G)]\le \exp(-\gamma\sigma),
+\]
+as claimed.
+\end{proof}
+
+
+\subsection{Beyond $t=3$}
+
+The above proof shows an upper bound of the form $\exp(-\Theta(\sigma))$.
+This scaling is also the correct ``floor'' for first-moment arguments in this ensemble:
+there are $\Theta(q 2^\sigma)$ messages with $a(x)=1$, and for each such message $x$,
+the first-layer output $v_1$ is uniform in $\{0,1\}^{2\sigma}$, so events like $|v_1|=1$ occur with probability
+$\Theta(\sigma)\cdot 2^{-2\sigma}$, already implying an expected $\Theta(q\sigma)\cdot 2^{-\sigma}$
+population of unusually low-weight codewords (hence a natural $\sigma$-governed floor).
+
+
+
+
+
+\begin{remark}[Extension to all constant $t\ge 4$]\label{rem:bd_tge4}
+For every constant $t\ge 4$, setting $\sigma=\lceil c n^{1/t}\rceil$ for a sufficiently large constant $c$ yields linear minimum distance with
+failure probability at most $\exp(-\Omega(q))$.
+The proof follows the same template as above:
+\begin{itemize}
+\item For large types $a\ge C\sigma$, by time $u_{t-2}$ the number of active blocks reaches $\Theta(q)$ with failure $\exp(-\Omega(q))$,
+then the last two layers yield $\exp(-\Omega(n))$ tails and the final binomial tail beats the global union bound.
+\item For small/medium types $a<C\sigma$, the type count is still at most $\exp(O(\sigma^2))$ while the per-message failure probability
+improves (in fact) to $\exp(-\Omega(\sigma^{t-1}))=\exp(-\Omega(q))$ due to the extra amplification layers.
+\end{itemize}
+We omit the repetition of the same Chernoff + occupancy steps, which are identical to the $t=3$ case but easier due to the additional slack.
+\end{remark}
+
+\begin{remark}[On the case $t=2$]\label{rem:bd_t2}
+Empirically, the enumerator exhibits a phase transition at $\sigma=\Theta(\sqrt{n})$ for $t=2$:
+for $\sigma=\Theta(\sqrt{n})$ the distance appears linear, while for $\sigma=o(\sqrt{n})$ it appears sublinear.
+A proof for $t=2$ likely follows a specialized type split plus a careful occupancy analysis of the single permutation layer,
+especially in the intermediate regime $a\sigma\approx q$, and we leave it open.
+\end{remark}

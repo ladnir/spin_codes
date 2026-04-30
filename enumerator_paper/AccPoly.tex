@@ -1,0 +1,76 @@
+
+\newcommand{\Xr}{\ensuremath{\mathrm{X}}\xspace}
+\newcommand{\Yr}{\ensuremath{\mathrm{Y}}\xspace}
+\newcommand{\Dr}{\ensuremath{\mathrm{D}}\xspace}
+
+\section{Polynomial}
+
+We will use a bivariet polynomial to track the input output weight enumerator. Variable $\Xr$ will represent input weight with the coefficient of $\Xr^w$ representing the number of weight $w$ inputs. More or less at least. Similarly, variable $Y$ will tack the output weight with the coefficient of $Y^h$ representing the number of weight $h$ outputs. The coefficient of $\Xr^wY^h$ then will represent the number of codewords with input output weight $(w,h)$. This representation will work nicely with some of the ideas to come. 
+
+The idea of having a polynomial count things is known as a generating function (polynomial). We have some domain a labels $\ell\in L$. The generating polynomial $f(\Xr)=\sum_{\ell\in L} c_\ell \Xr^\ell$ is the function where there is a count of $c_\ell$ for label $\ell$. This can be multivariant in the natural way. Although this seems like excessive complexity at first glance, we will be able to take advantage of the structure to succinctly express things in this form. 
+
+The hope is that this approach will work with both random convolutions and fixed convolutions. We will start with fixed, and in particular an accumulator as the warmup.
+
+\subsection{Accumulator's Polynomials}
+The state of an accumulator is just one bit. Each output is defined as 
+$$
+ \yv_i = \xv_i + \yv_{i-1}
+$$
+where the $i$th convolution value is just $\cv_i=(1)$. As with any linear code, we can express this n terms of polynomials. Let the input vector $\xv\in \Fbb^k$ be expressed as the polynomail 
+$$
+\xv(\Dr) = \xv_0 + \xv_1\Dr+\xv_2\Dr^2 + ...
+$$
+A code can can have an encoding $G(\Dr)$ s.t.
+$$
+\yv(\Dr) = \xv(\Dr) \cdot G(\Dr)
+$$
+is the polynomail representation of the codeword. These do not even need to be finite polynomials. An accumulator can be expressed as 
+$$
+ G(\Dr) = 1 + \Dr+\Dr^2+...
+$$
+The trivial cases of $\xv(\Dr)=\Dr^i$ clearly gives the correct result, i.e. $\yv(\Dr)=\Dr^i+\Dr^{i+1}+...$. However, there is also another representation of a accumulator as a rational polynomial
+$$
+G(\Dr) = \frac{1}{1-\Dr}.
+$$
+The recurive convolution equation $\yv_i = \xv_i + \yv_{i-1}$ states that the output has the relation
+$$
+\yv(\Dr) = \xv(\Dr) + \Dr \cdot \yv(\Dr)
+$$ which can easily be seen by simply looking at the coefficients of the polynomials. Therefore we have 
+\begin{align*}
+    \yv(\Dr) - \Dr \cdot \yv(\Dr) &= \xv(\Dr)\\
+    \yv(\Dr) (1 - \Dr) &= \xv(\Dr)\\
+    G(\Dr) &=\frac{\yv(\Dr)}{\xv(\Dr)} = \frac{1}{1-D}\\
+\end{align*}
+The fact that the encoding polynomial is rational tells us that ``small weight input'' can be mapped to potentially infinite weight outputs (as $n\rightarrow\infty$).
+
+
+We will make entensive use of the identity 
+$$
+1+x+x^2+... = \frac{1}{1-x}
+$$
+to its important that we are comfortable with it. 
+
+\subsection{State Transition}
+The recursive structure of a convolution can enable a succinct way to count the input output weight enumerator. As discussed above, we will use the so called generator function to this where the coefficient of the monomial $\Xr^w\Yr^h$ counts the number of inputs with weight $w$ are mapped to output with weight $h$.
+
+Let $A$ be the so called transition matrix with elements being monomials over $\Xr,\Yr$ and size $2^\sigma\times2^\sigma$. $A_{i,j}$ will encode information about the impact of moving from state $i\in\{0,1\}^\sigma$ to state $j\in \{0,1\}^\sigma$. In particular, the input output weight ``contribution'' that such a transition implies. Let us work this out for the accumulator with $\sigma=1$. Let us consider the convolution at some iteration $k$.
+
+\begin{enumerate}
+    \item $i=0,j=0$: The only way to transition from 0 to 0 is for $\yv_{k-1}=\xv_k=0$. Therefore this transition contributes 0 input and output weight. We express this as $A_{i,j}=\Xr^0\Yr^0=1$.
+    \item $i=1,j=0$: Given that we in state $1$ and transition to state 0, both $\xv_k,\yv_{k-1}$ must be 1. Therefore $A_{i,j}=\Xr^1\Yr^0=\Xr$.
+    \item $i=0,j=1$: This implies $A_{i,j}=\Xr\Yr$.
+    \item $i=1,j=1$: This implies $A_{i,j}=\Yr$.
+\end{enumerate}
+Therefore
+$$
+A = \begin{bmatrix}
+    1&\Xr\Yr\\
+    \Xr&\Yr
+\end{bmatrix}
+$$
+
+For more complicated state transitions, $A_{i,j}$ could be a polynomial where each monomial $c_{i,j}\Xr^w\Yr^h$ records that there are $c_{i,j}$ ways to transition from state $i$ to state $j$ such that the input to this transition $\xv_k$ has weight $h$ and the output $\yv_k$ has weight $w$. 
+
+
+The idea is that this structure can enable composition of steps through the convolution. If we take one step, and we start in state $i$, then there will be two transitions from this state. One with $\Xr^1$ to state $j_1$ for a 1 input bit and one with $\Xr^0$ to state $j_0$ for a 0 input bit. Note these will also have powers of $\Yr$ to track the output weight. The critical property is that if we want the transition for two steps, then $A^2$ will be the transition matrix. It will contain powers $\Xr^0,\Xr^1,\Xr^2$ terms which track all the place each of the various input weights are mapped to. We do not track the exact paths but the overall mass based on their input output weights. 
+

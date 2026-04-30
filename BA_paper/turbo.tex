@@ -1,0 +1,156 @@
+
+\section{The Enumeration Framework}\label{sec:turbo}
+
+\paragraph{Parallel Turbo Codes.} Turbo codes are an extremely successful class of linear error-correcting codes \cite{turbo,vucetic2012turbo}, known for their low encoding complexity and ability to correct errors near the channel capacity. Typical turbo code constructions use parallel concatenation of independent recursive convolutional subcodes, separated by random permutations (also known as interleavers). More specifically, a message $\xv\in \Fbb^k$ is encoded to a codeword $\cv =(\cv_1 || ... || \cv_t)$, where the subcodeword $\cv_i\in \Fbb^{\sigma}$ for $\sigma:=n/t$ is computed as
+$$
+    \cv_i := \xv \pi_i \G_i,
+$$
+where $\pi_i$ is a random permutation matrix, and $\G_i\in \Fbb^{k\times \sigma}$ is a recursive convolution. $\G_i$ is typically a structured upper triangular matrix known as a convolution. In particular, for each $\xv\in \Fbb^k$, $\cv:=\xv\G_i$ can be computed iteratively: at the $j$-th iteration, $\cv_j$ is computed as a linear combination of $\xv_j$ and some internal state vector $\sv_j\in \Fbb^m$. Typically, one defines $\sv_j:=(\cv_{j-1},\ldots,\cv_{j-m})$ as the vector of the previous $m$ outputs. $m$ is referred to as the state size or memory size of the convolution. These codes are called recursive convolutional codes because each output bit is computed as a linear combination of the current input bit and the previous $m$ output bits.
+
+While turbo codes with parallel recursive convolutions achieve good encode-decode performance in practice, it has been proven that they cannot achieve constant rate and linear minimum distance unless $m$ is linear in $n$~\cite{kahale1998minimum,spielman}. This parallel structure is often preferred because it facilitates efficient decoding.
+
+\paragraph{Serial Turbo Codes.} An alternative to parallel codes are serially concatenated codes \cite{kahale1998minimum,benedetto1998serial}, where the output of the previous subcode is the input to the next. I.e.,  $\cv_1:=\xv$ and 
+$
+    \cv_i := \cv_{i-1} \pi_i \G_i
+$
+for $i\in [2,t]$. 
+\cite{kahale1998minimum,spielman} proved that for $t = 3$ and a particularly simple convolution known as an accumulator (defined in \sectionref{sec:RA}), the code achieves a concretely high linear minimum distance at rate 1/4. Unfortunately, for efficiency reasons we are interested in rate 1/2, where the asymptotic guarantees are unclear and the concrete minimum distance is low.
+%Unfortunately, the concrete minimum distance that it achieves is relatively low and their convolution requires $O(\log n)$ depth. 
+In the coding theory literature, all $\cv_i$ are typically included in the final output to facilitate decoding, where $\cv_i$ are the parity bits of $\cv_{i-1}$. However, it is the last subcodeword $\cv_t$ that contributes the most to minimum distance. Indeed, this is implicit in \cite{spielman}, which considers only $\cv_t$ in the proof and writes $\cv := \xv \G_1 \pi_1 \G_2 \cdots \pi_{t-1} \G_t$.
+
+
+\subsection{Repeat-Accumulate Codes}\label{sec:RA}
+
+The most prominent serial turbo code is the repeat-accumulate (RA) code. Introduced in \cite{ra,kahale1998minimum}, the RA code was later generalized from $t=2$ to greater depths $t$, yielding variants such as the repeat-accumulate-accumulate (RAA) code or, more generally, the repeat-accumulate-$t$ (RA-$t$) code.
+The RA code construction is conceptually simple and follows the outline above. 
+Let $r$ denote the code rate. The matrix $\G_1$ is defined to repeat the input $\xv$ exactly $e := 1/r$ times; that is, $\G_1 := \mathbf{R} := (\I_k \, || \, \cdots \, || \, \I_k)$, where $\I_k \in \{0,1\}^{k \times k}$ is the identity matrix. For $i \in [2, t]$, the convolution matrix $\G_i := \mathbf{A}$, where $\mathbf{A}$ is an accumulator, an upper triangular matrix with all ones on and above the diagonal.
+Multiplication by $\mathbf{A}$ is a straightforward prefix sum on the input vector, i.e. $(\xv \mathbf{A})_i = \xv_1+\xv_2 + ... +\xv_i$.
+The encoding of a message $\xv$ into a codeword $\cv$ is defined by
+\[
+\cv =\xv \mathbf{R} \pi_1 \mathbf{A} ... \pi_{t-1} \mathbf{A}
+\]
+
+
+\noindent As shown in \cite{spielman}, when $t=3$, $e=4$, and the permutations $\pi_1,\pi_2$ are chosen uniformly at random, the resulting RAA code achieves a concretely high linear minimum distance with good probability. %Unfortunately, the concrete constants are quite small for RAA codes, leading to poor performance in practice.
+%One could increase the number of iterations beyond 2 but this comes at added computational costs. 
+We will discuss this approach later.
+
+
+\subsection{Expected Enumerators}\label{sec:eenum}
+
+Let $\G \in \{0,1\}^{k \times n}$ be the generator matrix of a code mapping $k$-bit input words into $n$-bit output codewords, where $k \le n$. Let $\dist$ denote a distribution over $\{0,1\}^{k \times n}$ and suppose we sample $\G$ according to $\dist$. Then we define the \emph{input-output Hamming weight enumerator}  as:
+$$
+    \enum^{\dist}_{w,h}:= \Ebb_{\G\gets\dist} \left|\left\{ \xv \in \Fbb^{k} \mid \hw{\xv}=w,\hw{\xv\G}=h \right\} \right|.
+$$ 
+That is, $\enum^{\dist}_{w,h}$ is the expected number of input words $\xv \in \{0,1\}^k$ with $\hw{\xv} = w$ and the corresponding codeword $\cv = \xv\G$ with $\hw{\cv} = h$. It will be useful to let $\enumVar^\dist$ be the random variable that $\enum^{\dist}$ is the expectation  of, i.e.  
+$$
+    \enumVar^{\dist}_{w,h}:= \left|\left\{ \xv \in \Fbb^{k} \mid \hw{\xv}=w,\hw{\xv\G}=h \right\} \right| \quad\text{ where } \quad  \G\gets\dist.
+$$ 
+Hence, $\enum^\dist_{w,h}=\Ebb_{\G\gets\dist}[\enumVar^\dist_{w,h}]$.
+Let $X_{\xv, \G, h}$ be the indicator random variable that equals $1$ if the codeword $\cv = \xv\G$, corresponding to the input $\xv \in \{0,1\}^k$, has Hamming weight $\hw{\cv} = h$, and $0$ otherwise.
+We have
+$$
+    \enum^\dist_{w,h}=\sum_{\substack{\xv \in \{0,1\}^k,\\\hw{\xv} = w}}\Pr_{\G \gets \dist}\left[X_{\xv, \G, h}=1\right].
+$$
+
+Similarly, let $X_{\xv, \G, \yv}$ be the indicator random variable that equals $1$ if $\yv = \xv\G$, and $0$ otherwise. We have
+$$
+    X_{\xv, \G, h} = \sum_{\substack{\yv \in \{0,1\}^n\\\hw{\yv} = h}}X_{\xv, \G, \yv},
+$$
+and therefore
+$$
+    \enum^\dist_{w,h}=\sum_{\substack{\xv\in \{0,1\}^k, \yv \in \{0,1\}^n,\\\hw{\xv} = w,\hw{\yv} = h}}\Pr_{\G \gets \dist}\left[X_{\xv, \G, \yv}=1\right].
+$$
+
+\subsection{Serially Concatenated Enumerators}\label{ssec:ceenum}
+
+Let $\G_1 \in \{0,1\}^{k \times n_1},\G_2\in \{0,1\}^{n_1 \times n}$ be generator matrices of a code  that maps a $k$-bit word to an $n_1$-bit intermediate encoding, and then to an $n$-bit codeword. Let $\dist_1, \dist_2$ denote the distributions from which $\G_1, \G_2$ are sampled, respectively. 
+Let $\pi \in \{0,1\}^{n_1 \times n_1}$ be a permutation matrix acting on $n_1$-bit words, and let $\mathcal{D}_\pi$ denote the uniform distribution over all such permutation matrices.
+We now consider the generator matrix $\G \in \{0,1\}^{k \times n}$ sampled as
+$$
+    \G:=\G_1\pi \G_2, \quad \text{ where }\quad \G_1\gets\dist_1,\G_2\gets\dist_2,\pi\gets\dist_\pi,
+$$
+to be the generator matrix of a code mapping $k$-bit input words into $n$-bit output codewords. Let $\dist := [ \G_1\pi\G_2 \mid \G_1\gets \dist_1 ,\pi\gets \dist_{\pi},\G_2\gets \dist_2]$. 
+
+We seek to express $\enum^{\dist}_{w,h}$ as a composition of $\enum^{\dist_1}_{w,h_1}$ and $\enum^{\dist_2}_{h_1,h}$ for $h_1\in [n_1]$.
+%Throughout this work, we will condition on the event that $\G$, $\G_1$, and $\G_2$ are all full rank matrices. 
+Consider the set of input words $\xv \in \{0,1\}^k$ with $\hw{\xv} = w$. Then the expected number of codewords $\cv_1 = \xv\G_1$, for $\G_1\gets \dist_1$, with $\hw{\cv_1} = h_1$, is $\enum^{\G_1}_{w,h_1}$.
+Note that over the choice of $\pi\gets\dist_\pi$, $\tilde{\cv}_1 = \cv_1\pi$ is a random word with $\hw{\tilde{\cv}_1} = \hw{\cv_1}$. Thus, consider a uniformly random input word ${\cv}' \in \{0,1\}^{n_1}$ with $\hw{{\cv}'} = h_1$. The probability (over the choice of ${\cv}'$) that the corresponding codeword $\cv = {\cv}'\G_2$ has $\hw{\cv} = h$ is
+$$
+   \Pr_{\G_2,\pi}[\hw{\cv'\G_2} = h \mid \hw{\cv'}=h_1 ]= p = \frac{\enumVar^{\dist_2}_{h_1,h}}{\binom{n_1}{h_1}}.
+$$  
+Therefore,
+\begin{align*}
+    \Ebb_{\pi \gets \dist_{\pi}}\left[E^{\dist_1 \pi \dist_2}_{w,h}\right] &=\sum_{v\in \Zbb} \Pr_{\pi \gets \dist_{\pi}}\left[E^{\dist_1 \pi \dist_2}_{w,h} = v\right] * v \\
+    &=\sum_{v\in \Zbb,\xv,\cv',\cv}\Pr_{\G_1\gets\dist_1}\left[\xv \G_1 = \cv'\right] \Pr_{\G_2}[\cv'\pi\G_2 = \cv \mid \hw{\cv} = v] * v \\
+    &=\sum_{h_1=0}^{n_1}
+    \frac{E^{\dist_1}_{w,h_1} }{\binom{n_1}{h_1}}\sum_{v,\cv' \text{ s.t. } \hw{\cv'}=h_1, \cv}
+    \Pr_{\G_2}[\cv'\pi\G_2 = \cv \mid \hw{\cv} = v] * v \\
+    %&=\sum_{h_1=0}^{n_1} E^{\dist_1}_{w,h_1} \Pr_{\G_2\gets\dist_2,\pi}[\hw{\cv'\pi\G} = h \mid \hw{\cv'}=h_1 ] \\
+    &=\sum_{h_1=0}^{n_1}\frac{E^{\G_1}_{w,h_1}\cdot E^{\G_2}_{h_1,h}}{\binom{n_1}{h_1}}.
+\end{align*}
+%where the $...$ step follows from the observation that $E^{\dist_1}_{w,h_1}$ counts the expected number of codewords of the desired weight over the whole input space $\xv$.
+Finally, since $\G_1$ and $\G_2$ are sampled independently,
+$$
+    \Ebb_{\G \gets \dist}\left[E^{\G}_{w,h}\right] = \sum_{h_1=0}^{n_1}\frac{\Ebb_{\G_1 \gets \dist_1}\left[E^{\G_1}_{w,h_1}\right]\cdot \Ebb_{\G_2 \gets \dist_2}\left[E^{\G_2}_{h_1,h}\right]}{\binom{n_1}{h_1}},
+$$ 
+and therefore we have $\enum^\dist_{w,h}=\sum_{h_1=0}^{n_1}\frac{\enum^{\dist_1}_{w,h_1} \enum^{\dist_2}_{h_1,h}}{{n_1\choose h_1}}$. 
+
+We first formalize the full depth-$t$ serial ensemble as follows.
+\begin{definition}[Depth-$t$ Serially Concatenated Ensemble]
+Fix $t\ge 1$ and dimensions $n_0:=k, n_1,\ldots,n_t:=n$. For each $i\in[t]$, let $\mathcal{D}_i$ be a distribution over matrices $\{0,1\}^{n_{i-1}\times n_i}$ and sample subcodes independently as $G_i \gets \mathcal{D}_i$. For each $i\in[t-1]$, let $\pi_i \in \{0,1\}^{n_i\times n_i}$ be a uniform random permutation matrix sampled independently. The depth-$t$ generator matrix $G \in \{0,1\}^{k\times n}$ is:$$G := G_1\pi_1G_2\cdots\pi_{t-1}G_t.$$We write $\mathcal{D}_{1:t}$ for the induced distribution of $G$.
+\end{definition}
+
+\paragraph{Iterative Enumeration.} Consider the case of computing an enumerator over larger depth $t$. E.g.,  for $t=3$, we have $\G=\G_1\pi_1\G_2\pi_2\G_3$. The template above would then suggest that 
+$$
+\enum^\dist_{w,h}=\sum_{h_1=0}^{n_1}\sum_{h_2=0}^{n_2}\frac{\enum^{\dist_1}_{w,h_1} \enum^{\dist_2}_{h_1,h_2} \enum^{\dist_2}_{h_2,h} }{{n_1\choose h_1}{n_2\choose h_2}}.
+$$
+Calculating this sum as is requires $O(n^{t-1})$ iterations. For any value of $t$ that is not a very small constant, the runtime of computing the enumeration becomes intractable. 
+Since we are interested in computing the values of $\enum^\dist$ for large $n$ and moderate $t$, we require a different strategy. Fortunately, the solution is straightforward.
+
+The weight distribution of the input set $\{0,1\}^k$ is a vector of rational numbers $\dw\in \mathbb{Q}^{[0,k]}$ and is easy to compute. For $w\in[0,k]$, there are $\dw_w:={k\choose w}$ inputs with Hamming weight $w$. The output weight distribution $\delta'\in \mathbb{Q}^{[0,n]}$ for an enumerator $\enum^\dist$ can then be computed as 
+$$
+    \dw'_{h} = \sum_{w=0}^k \frac{\dw_w}{{k\choose w}} \enum^\dist_{w,h}
+$$
+for $h\in [0,n]$. Here, one can think of $ \frac{\dw_w}{{k\choose w}}$ as a fraction denoting the probability that any given input string is present in the input. Given that $\dw$ corresponds to the set of all input strings, we have $ \frac{\dw_w}{{k\choose w}}=1$. 
+However, this observation can be used to compute the final weight distribution iteratively. Concretely, if $\G:=\G_1\pi_1\G_2 ... \pi_{t-1}\G_t$, then we can initialize $\dw_{1,w}:={k\choose w}$ and compute 
+$$
+    \dw_{i+1, h}:=\sum_{w=0}^{n_i} \frac{\dw_{i,w}}{{n_i\choose w}} \enum^{\dist_i}_{w,h}.
+$$
+for $i\in [t-1]$ and $h\in [0,n_{i+1}]$. The final weight distribution is therefore $\dw_t$. Again, the fraction $ \frac{\dw_{i,w}}{{n_i\choose w}}$ can be thought of as the probability that any given length-$n_i$ input string is currently in the weight distribution. In summary, approach results in a total of $O((t-1)n^2)$ iterations instead of the $O(n^t)$ iterations and is purely a better way to group ``common terms.''
+
+
+
+%\subsection{Parallel Concatenated Enumerators}\label{ssec:senum}
+%We consider two types of parallel concatenated codes. Due to the structure of these codes, we do not require a random permutation when concatenating them.
+
+%Let $\G_1 \gets\dist_1,\G_2\gets\dist_2$ be ${k \times n_1}, k\times n_2$ generator matrices sampled from $\dist_1, \dist_2$, respectively. Let $\G:=(\G_1 || \pi_2\G_2)\in \{0,1\}^{k\times n}$ by the parallel concatenation of $\G_1,\G_2$ with random permutation $\pi\gets\dist_\pi$. Let $\dist$ denote the distribution for $\G$. Then 
+%$$
+%    \enum^\dist_{w,h} = \sum_{h'=0}^{n_1} \enum_{w,h'}^{\dist_1}+\enum^{\dist_2}_{w,h-h'}
+%$$
+%This equality follows from the simple observation that for $\G$ to map a weight $w$ input to a weight $h$ output, the first subcode first  must output a weight $h'$ and the second output $h-h'$. The final equality can then be proved using a similar argument as serial concatenation.
+
+
+\subsection{Systematic Enumerator}\label{ssec:senum}
+We consider a special type of parallel concatenation of the identity matrix $\I\in \{0,1\}^{k\times k}$ and an arbitrary $\G_1\gets\dist_1$. Let $\G:=(\I||\G_1)\in \{0,1\}^{k\times n}$ be the concatenated code with distribution $\dist$. Then, the enumerator is
+$$
+\enum^\dist_{w,h}=\enum_{w,h-w}^{\dist_1}.
+$$
+Since $\I$ will contribute exact weight $w$ to the output, the overall enumerator is just the number of ways to map weight $w$ to $h-w$ via $\G_1\in \{0,1\}^{k\times n-k}$. 
+
+
+\paragraph{Iterative Enumeration.} At times, we will be interested in the case of $\G_1:=\G_{1,1}\pi_1\G_{1,2}...\pi_{t-1}\G_{1,t}$ being a serially concatenated code, and therefore
+$$      
+    \enum^{\dist_1}_{w,h}=\sum_{h_1=0}^{n_1}...\sum_{h_{t-1}=0}^{n_{t-1}}\frac{\enum^{\dist_{1,1}}_{w,h_1} ... \enum^{\dist_{1,t}}_{h_t,h} }{{n_1\choose h_1}...{n_{t-1}\choose h_{t-1}}}
+$$
+where $w\in [0,k]$ and $h\in [0,n-k]$. The systematic enumerator can then be expressed as
+$$      
+    \enum^{\dist}_{w,h}=\sum_{h_1=0}^{n_1}...\sum_{h_{t-1}=0}^{n_{t-1}}\frac{\enum^{\dist_{1,1}}_{w,h_1} ... \enum^{\dist_{1,t}}_{h_t,h-w} }{{n_1\choose h_1}...{n_{t-1}\choose h_{t-1}}}
+$$
+and evaluated iteratively as before, where the last iteration uses $h':=h-w$ in place of $h$. 
+
+Unfortunately, this prevents iterative enumeration as described above, since the input weight must be known when enumerating the final subcode.
+The limitation can be partially resolved by first building $\enum^{\dist}_{w,h}$ in an iterative way by first combining $\enum^{\dist_{1,1}}$ and $\enum^{\dist_{1,2}}$ before combining that enumerator with $\enum^{\dist_{1,3}}$, etc. Compared to the iterative enumeration described above, this approach requires $O(n)$ times more work, which significantly limits the parameters that can be considered. 
+
+%\subsection{Asymptotics vs. Concrete Parameters} 
+%Unlike most works in this space, we opt not to prove the asymptotic bound of our codes. It is primarily because the closed-form equations that we derive do not lend themselves to asymptotic bounds. The simple case of RA codes \cite{spielman} do have bounds, but their techniques do not easily apply to our more complex codes. Instead, we opt to compute the exact expected minimum distance of our codes for the parameters of interest, e.g., up to $2^{20}$. With more computational effort, this bound could be further pushed. We leave the possibility of proving asymptotic bounds to future work.

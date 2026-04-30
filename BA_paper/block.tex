@@ -1,0 +1,142 @@
+\section{Block-Diagonal Subcode}\label{sec:block}
+
+This section studies Block-Diagonal subcodes in isolation to expose their structure and limitations. These subcodes will serve as the outer layer of our final Block-Accumulate construction in \sectionref{sec:BDA} and serial Block-Diagonal codes in \sectionref{sec:BDSerial}.
+The generator matrix $\mathbf{G} \in \{0,1\}^{k \times n}$ of the subcode can be written in Block-Diagonal form; i.e., it can be decomposed into submatrices (which we refer to as blocks) $\mathbf{G}_i \in \{0,1\}^{\sigma\times e\sigma}$, $i \in [k/ \sigma]$, placed along the diagonal:
+$$
+    \mathbf{G} = \left(\begin{matrix}\mathbf{G}_1 & \mathbf{O} &\ldots&\mathbf{O}\\\mathbf{O} &\mathbf{G}_2 & \ldots&\mathbf{O}\\\vdots & \vdots &\ddots&\vdots\\\mathbf{O} & \mathbf{O} &\ldots&\mathbf{G}_{k/\sigma}\end{matrix}\right),
+$$
+where $\mathbf{O}$ is the $\sigma\times e\sigma$ zero matrix and $e := \frac{n}{k}$ is the expansion ratio. Our instantiations will only consider $e\in \{1,2\}$, but other values can also be used. Each $\mathbf{G}_i$ is sampled independently and uniformly at random from $\{0,1\}^{\sigma \times e\sigma}$. %Here, we assume that $k, n, \sigma \in \mathbb{N}$, $k \le n$ (i.e., $e \ge 1$), and $\sigma|k$.
+
+\subsection{Block-Diagonal Enumerator}
+Let $\xv \in \{0,1\}^k$ be an input word and denote the subwords as
+$$
+    \xv = \left(\begin{matrix}\xv_1 & \xv_2 &\ldots&\xv_{k/\sigma}\end{matrix}\right),
+$$
+where $\xv_i \in \{0,1\}^{\sigma}$, $i \in [k/ \sigma]$. Then, the codeword $\mathbf{c}=\xv\mathbf{G}$ corresponding to $\xv$ is given by
+$
+    \mathbf{c} = \left(\begin{matrix}\mathbf{c}_1 & \mathbf{c}_2 &\ldots&\mathbf{c}_{k/\sigma}\end{matrix}\right),
+$
+where $\mathbf{c}_i = \xv_i\mathbf{G}_i\in \{0,1\}^{e\sigma}$, $i \in [k/ \sigma]$. 
+
+
+Our goal is to construct the enumerator $\enum^\dist_{w,h}$, which counts the number of input-output pairs $(\xv,\yv)$, such that $\hw{\xv} = w$ and $\yv:=\xv\G$ with $\hw{\yv}=h$. However, given that $\G\gets \dist$ is essentially a random variable, there will not be a concrete number of such pairs. Moreover, for an arbitrary $\G$, it appears intractable to compute the enumerator for it. Instead, as discussed in \sectionref{sec:eenum}, we will compute the expectation of the enumerator for the random variable $\G\gets\dist$.
+
+We will achieve this in two phases by decomposing the main enumerator $\enum^{\dist}$ into two subenumerators for related properties. Given a weight $w$ input $\xv$, we will count the number of ways it could result in $q$ subwords $\xv_i$ being non-zero. This is a type of enumerator except that it does not count the binary Hamming weight, but the Hamming weight with elements in $\{0,1\}^\sigma$. One can then construct a second enumerator that counts the number of ways to map $q$ non-zero subwords to and output word $\cv$ with Hamming weight $h$.
+
+
+In more detail, let us define $\Qfn:\{0,1\}^{k} \rightarrow 2^{[k/\sigma]}$, where $\Qfn(\xv) \subseteq [k/\sigma]$ is the set of $i$ such that $\xv_i$ is non-zero. Additionally, define $\qfn:\{0,1\}^{k} \rightarrow [0,k/\sigma]$, where $\qfn(\xv) =|\Qfn(\xv)|$. We slightly abuse notation by also defining $\Qfn:\{0,1\}^{n} \rightarrow 2^{[k/\sigma]}$, where $\Qfn(\mathbf{c}) \subseteq [k/\sigma]$ is the set of $i$ such that $\mathbf{c}_i$ is non-zero. We now have the following lemma.
+
+\begin{lemma}
+For any $\xv\in \{0,1\}^k$ and $\yv \in \{0,1\}^n$,$$
+\Pr\left[X_{\xv, \mathbf{G}, \yv}=1\right] = \begin{cases}2^{-e\sigma\cdot\qfn(\xv)}&\textrm{if } \Qfn(\yv) \subseteq \Qfn(\xv)\\0&\textrm{otherwise}\end{cases}.$$
+
+\end{lemma}
+
+\begin{proof}
+Clearly, if $\xv_i = 0^{\sigma}$, then $\mathbf{c}_i = 0^{e\sigma}$. Thus, $\Qfn(\mathbf{c}) \subseteq \Qfn(\xv)$. In other words, if $\Qfn(\yv) \not\subseteq \Qfn(\xv)$, then $\Pr\left[X_{\xv, \mathbf{G}, \yv}=1\right]=0$.
+
+Consider any $\xv\in \{0,1\}^k$ and $\yv \in \{0,1\}^n$ such that $\Qfn(\yv) \subseteq \Qfn(\xv)$. For all $i\in[k/\sigma]$, let
+$
+    \mathbf{G}_i = \left(\begin{matrix}\mathbf{G}_{i,1} & \mathbf{G}_{i,2} &\ldots&\mathbf{G}_{i,e\sigma}\end{matrix}\right),
+$
+where $\mathbf{G}_{i,j} \in \{0,1\}^{\sigma}$ are the columns of $\mathbf{G}_i$ for $j \in [e\sigma]$. Let 
+$
+    \yv = \left(\begin{matrix}\yv_1 & \yv_2 &\ldots&\yv_{k/\sigma}\end{matrix}\right),
+$
+where $\yv_i \in \{0,1\}^{e\sigma}$, $i \in [k/ \sigma]$, and let 
+$
+    \yv_i = \left(\begin{matrix}\yv_{i,1} & \yv_{i,2} &\ldots&\yv_{i,e\sigma}\end{matrix}\right),
+$
+where $\yv_{i,j} \in \{0,1\}$ are the bits of $\yv_i$ for $j \in [e\sigma]$. Consider $i \in \Qfn(\xv)$, i.e., $\xv_{i} \ne 0^{\sigma}$. Then, for $j \in [e\sigma]$,
+$
+    \Pr\left[\yv_{i,j}=\xv_i\mathbf{G}_{i,j}\right]=\frac{1}{2}.
+$
+Therefore,
+$
+    \Pr\left[\forall i \in \Qfn(\xv) : \yv_{i}=\xv_i\mathbf{G}_{i}\right]=2^{-e\sigma\cdot\qfn(\xv)}.
+$
+Since $\Qfn(\yv) \subseteq \Qfn(\xv)$, 
+$
+    \Pr\left[\forall i \not\in \Qfn(\xv) : \yv_{i}=\xv_i\mathbf{G}_{i}\right]=1.
+$
+Therefore,$$
+\Pr\left[X_{\xv, \mathbf{G}, \yv}=1\right]=2^{-e\sigma\cdot\qfn(\xv)}.$$
+ 
+\end{proof}
+
+\noindent We now have$$
+\mathbb{E}_{\mathbf{G} \gets \mathcal{D}}\left[E^{\mathbf{G}}_{w,h}\right]=\sum_{\substack{\xv\in \{0,1\}^k, \yv \in \{0,1\}^n\\\Qfn(\yv) \subseteq \Qfn(\xv)\\\hw{\xv} = w,\hw{\yv} = h}}2^{-e\sigma\cdot\qfn(\xv)},$$
+i.e., we need to count the number of $\xv\in \{0,1\}^k$, $\yv \in \{0,1\}^n$ with $\Qfn(\yv) \subseteq \Qfn(\xv)$, $\hw{\xv} = w$, and $\hw{\yv} = h$. We perform this count using the intermediate variable $q = \qfn(\xv)$. We first compute the number of $\xv \in \{0,1\}^{k}$ such that $\hw{\xv} = w$ and $\qfn(\xv) = q$. This is equal to the number of $\xv \in \{0,1\}^{k}$ such that $\hw{\xv} = w$ and $\Qfn(\xv) = Q$ summed over all $Q \subseteq [k/\sigma]$ with $|Q| = q$. For any fixed $Q \subseteq [k/\sigma]$ with $|Q| = q$, the number of $\xv \in \{0,1\}^{k}$ such that $\hw{\xv} = w$ and $\Qfn(\xv) = Q$ is equivalent to the number of ways in which we can assign $w$ identical balls into $q$ labeled slotted bins each having a capacity of $\sigma$ such that none of the bins are empty, which is $S(w,q,\sigma)$. The number of $Q \subseteq [k/\sigma]$ with $|Q| = q$ is ${k/\sigma \choose q}$. Therefore, the number of $\xv \in \{0,1\}^{k}$ such that $\hw{\xv} = w$ and $\qfn(\xv) = q$ is 
+$$
+\enum_{w,q}  := {k/\sigma \choose q}\cdot S(w,q, \sigma) = {k/\sigma \choose q}\cdot\sum_{i=0}^q (-1)^i {q \choose i} {\sigma(q-i) \choose w}.$$
+Now, consider any $\xv \in \{0,1\}^{k}$ such that $\hw{\xv} = w$ and $\qfn(\xv) = q$. We will count the number of $\yv \in \{0,1\}^n$ such that $\hw{\yv} = h$ and $\Qfn(\yv) \subseteq \Qfn(\xv)$. This is simply equal to the number of ways of choosing $h$ bits among the $e\sigma q$ bits of $\yv_i$ for $i\in \Qfn(\xv)$ to set to $1$. The number of ways to do this is thus $
+E_{q,h} := {e\sigma q \choose h }.$
+Putting everything together, we have
+\begin{align*}
+\mathbb{E}_{\mathbf{G} \gets \mathcal{D}}\left[E^{\mathbf{G}}_{w,h}\right]&=\sum_{\substack{\xv \in \{0,1\}^k, \yv \in \{0,1\}^n\\\Qfn(\yv) \subseteq \Qfn(\xv)\\\hw{\xv} = w,\hw{\yv} = h}}2^{-e\sigma\cdot\qfn(\xv)} =\sum_{q=0}^{k/\sigma}2^{-e\sigma q} \cdot E_{w,q} \cdot E_{q,h}\\
+&=\sum_{q=0}^{k/\sigma}\left[2^{-e\sigma q} \cdot{k/\sigma \choose q }{e\sigma q \choose h }\cdot\sum_{i=0}^q (-1)^i {q \choose i} {\sigma(q-i) \choose w}\right].
+\end{align*}
+
+\paragraph{Optimization.} We remark that it is possible to precompute some of the terms used across the iterations. The scaling factor $\frac{D^i_{w}}{{k\choose w}}$ is only a function of $w$ but appears in $kn$ different terms. Therefore one can cache these values. Similarly, one can precompute $v_q=2^{-e\sigma q} \cdot{k/\sigma \choose q }$ for each value of $q\in[0,n/\sigma]$. The distribution is then computed as:
+\begin{align*}
+F_w&:=\frac{D_{w}}{{k\choose w}},
+v_q:=2^{-e\sigma q} \cdot{k/\sigma \choose q },
+S(w,q,\sigma)=c_{q,w} := v_q \cdot \sum_{i=0}^q (-1)^i {q \choose i} {\sigma(q-i) \choose w},\\
+E_{w,h} &:= \sum_q v_q c_{q,w}  {e\sigma q \choose h },
+\delta_h := \sum_w F_w   \cdot \sum_q c_{q,w}   {e\sigma q \choose h }
+\end{align*}
+
+
+
+\paragraph{Systematic Ensembles.} 
+An optimized version of our subcode instantiates $G$ in systematic form: $G := (I \parallel G')$. Here, $G' \in \{0,1\}^{k \times (n-k)}$ is a Block-Diagonal matrix as defined in \sectionref{sec:BDA} and \ref{sec:BDSerial}. This provides two primary benefits:
+\begin{itemize}
+    \item 
+Computational Efficiency: For a rate $1/2$ code, the cost of the first matrix multiplication is reduced by $2\times$.
+\item 
+Guaranteed Invertibility: Defining $G$ in systematic form ensures it is always invertible which ensures that the distance does not collapse to 0.
+\end{itemize}
+
+\iffalse
+\subsection{Parameter Selection}\label{sec:params}
+\stan{just comment out for internal deadline}
+\stan{talk about the code we wrote to figure out parameters, specify the parameters - expand block - permute - multiply where block sigma is 2 sqrt n, 1 iteration is enough, and 2x expansion}
+\peter{you have the latest figures here - maybe you could help with this one}
+
+\subsection{Permutation Optimization}\label{sec:permoptim}
+
+\srini{we do not need to do permutation at every step (as discussed earlier today)}
+
+\srinireply{I unfortunately don't recall this perfectly and would need to talk through it before writing it down. Do we need this for the internal deadline?}
+\fi
+
+\subsection{Empirical Weight Distribution}
+
+In this section, we examine the weight distribution of a non-systematic single Block-Diagonal matrix and the effect $\sigma$ has on it. 
+We present the enumerator as a contour plot in \figureref{fig:blockEnum} along with the plot of the final distribution of codewords $\delta_h$. 
+
+\begin{figure}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=1\linewidth, trim=0cm 1.4cm 0cm 1.2cm, clip]{fig/enum_B16_B256.512.16.txt.pdf}
+    
+    %\includesvg[width=0.9\linewidth]{fig/enum_B16_B256.512.16.txt.svg}
+    \caption{Depictions of the Block-Diagonal enumerator $\enum^{\dist }$ with $(t,k,n,\sigma)=(1,256,512,16)$. The $x$-axis is the output weight $h\in[0,n]$, $y$-axis of the plot is the input weight $w\in[0,k]$ and the $z$ value of the contour plot is the value $\log_2(\enum_{w,h})$. The bottom plot has the output distribution $\delta_h=\sum_{w=0}^k \enum_{w,h}$. }
+    \label{fig:blockEnum}
+\end{figure}
+
+The $z$-axis of the contour plot is the $\log_2$ expected number of weight-$w$ inputs mapping to weight-$h$ outputs. We place a colored gradient on the contour plot: green indicates that fewer than one codeword is expected, yellow indicates approximately one expected codeword, and red denotes that many codewords are expected. Unsurprisingly, this code does not achieve linear minimum distance as there must exist codewords with distance at most $\sigma$. This can easily be seen from the fact that the lower scatter plot does not go below $\log \delta_h = 0$ in \figureref{fig:blockEnum} near $h=0$. However, we believe that it is instructive to examine the distribution before generalizing to $t>1$. 
+
+Compared to a random linear code of the same size, the enumerator is very similar except in the low-weight regime where $w,h$ are small. In this regime, we observe a large skewing of the distribution towards the origin. Moreover, one can also observe a rippling pattern in the distribution. This is apparent when inspecting the $\enum_{w,h}=0$ and $\enum_{w,h}=10$ contour lines near the origin. These ripples are due to the distribution of when a single input chunk $\xv_i\in (\xv_{1},...,\xv_{k/\sigma})$ has a non-zero value. In this case, having weight $w=\sigma/2$ results in the largest number of such codewords, with each essentially being distributed uniformly over $\{0,1\}^{2\sigma}$. Therefore, at such values of $w$, we expect codewords with small $h$ to exist. This phenomenon repeats when two, three, or more chunks of $\xv$ have non-zero values.
+
+When $\sigma$ becomes sufficiently small, e.g. $\sigma\leq 4$, we observe that the code begins to break down. We believe this is primarily due to the high probability of sampling a block that is not invertible, e.g., when a row of $\G_i$ is zero or contains duplicate rows. \figureref{fig:blockEnum2} contains the distribution for the case of $\sigma=2$. Indeed, this becomes apparent because all weights up to approximately $w\leq 60$ have at least one output with expected weight $0$. To mitigate this, one could restrict the distribution to only sampling invertible matrices. However, this complicates the sampling algorithm and will not be needed in our final constructions. We leave investigating this for future work.
+
+Additionally, with such a small value of $\sigma$, an input of weight $w$ has its output weight $h$ bounded above by $w\sigma$. As seen in \figureref{fig:blockEnum2}, this essentially squashes the higher weight codewords into smaller values of $h$, hurting the overall distance.
+
+\begin{figure}\vspace{-0.3cm}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.75\linewidth, trim=0cm 1.4cm 0cm 1.2cm, clip]{fig/enum_B2_B256.512.2.txt.pdf} 
+    \caption{Depictions of the Block-Diagonal enumerator $\enum^{\dist }$ with $(t,k,n,\sigma)=(1,256,512,2)$.  See \figureref{fig:blockEnum} for details. }
+    \label{fig:blockEnum2}\vspace{-0.4cm}
+\end{figure}

@@ -1,0 +1,587 @@
+\section{Block Accumulate Minimum Distance Proof}\label{sec:BAProofApd}
+
+
+
+\if\submission1
+\else
+\paragraph{Proof overview.}
+Fix a nonzero input $\xv\in\{0,1\}^k$ and track Hamming weights through
+$\G=\B\pi_1\A\pi_2\A$:
+\[
+u:=\hw{\xv\B},\qquad
+h_1:=\hw{\xv\B\pi_1\A},\qquad
+h:=\hw{\xv\B\pi_1\A\pi_2\A}.
+\]
+We upper bound the expected number of nonzero codewords with final weight
+$h\le \varepsilon n$ and then apply Markov's inequality.
+\begin{enumerate}
+\item \emph{Outer block-diagonal distance.}
+  By \eqref{eq:umin_def}, any weight-$w$ input activates at least
+  $\lceil w/\sigma\rceil$ blocks, and each active block contributes at least $d'$
+  output weight. Hence
+  $u=\hw{\xv\B}\ge u_{\min}(w)=d'\lceil w/\sigma\rceil$.
+
+\item  \emph{Random interleavers give uniformity.}
+  Conditioned on $\hw{\xv\B}=u$, the vector after $\pi_1$ is uniform among all
+  length-$n$ vectors of weight $u$; similarly, conditioned on $h_1$, the vector
+  after $\pi_2$ is uniform among all weight-$h_1$ vectors. Thus both accumulator
+  stages are analyzed via the exact input-output enumerator $\enum_{u,h}$ of the accumulator.
+
+\item  \emph{Accumulators suppress very small outputs.}
+  Lemma~\ref{lem:small_eps} shows that for $h_1\le 2\varepsilon n$,
+  \[
+  \Pr[\hw{z\A}=h_1\mid \hw{z}=u]\;\le\;\left(4e^2\frac{h_1}{n}\right)^{u/2},
+  \]
+  and the RHS is monotone decreasing in $u$ when $\varepsilon$ is small. This
+  lets us eliminate the (potentially complicated) distribution of $u$ given
+  $\xv$ and upper bound by the worst case allowed by \eqref{eq:umin_def}.
+  Applying the same estimate to the second accumulator yields a strong tail bound
+  on $\Pr[h\le \varepsilon n\mid h_1]$.
+
+\item \emph{Support constraints truncate the weight ranges.}
+  Since $\enum_{a,b}=0$ unless $\lceil a/2\rceil\le b$, any final weight
+  $h\le \varepsilon n$ forces $h_1\le 2\varepsilon n$ and in turn forces
+  $u\le 2h_1$. Combined with $u\ge u_{\min}(w)$, this restricts the relevant
+  inputs to a low-weight regime.
+
+\item \emph{Re-index by the number of active blocks.}
+  The key counting step is to sum over inputs by the number $b$ of active
+  $\sigma$-bit blocks rather than by total Hamming weight $w$.
+  For inputs with exactly $b$ active blocks we have the sharp bound
+  $u\ge d'b$, and the number of such inputs is at most
+  $\binom{k/\sigma}{b}(2^\sigma-1)^b$.
+  This block-based counting aligns with the structure of $\B$ and yields a
+  geometric decay in $b$ once $d'>4$, implying that the expected number of
+  codewords with $h\le \varepsilon n$ tends to zero.
+\end{enumerate}
+
+\fi
+
+
+
+
+\begin{assumption}[Outer block-diagonal distance]
+Assume $\B$ is block-diagonal with input-block size $\sigma$ and that each activated block produces output Hamming weight at least some constant $d'>4$. Then for any $\xv$ with $w:=\hw{\xv}$,
+\begin{equation}
+\label{eq:umin_def}
+ u := \hw{\xv\B} \;\ge\; u_{\min}(w) := d' \Big\lceil \frac{w}{\sigma}\Big\rceil.
+\end{equation}
+\end{assumption}
+
+
+\paragraph{Accumulator input-output enumerator.}
+Using the standard accumulator from the preliminaries, we recall the (exact) input--output enumerator:
+\begin{equation}
+\label{eq:acc_exact}
+\enum^\A_{u,h}
+=
+\binom{n-h}{\lfloor u/2\rfloor}\binom{h-1}{\lceil u/2\rceil-1}.
+\end{equation}
+We will omit the superscript \A in this section. In particular, for uniform $z\in\{0,1\}^n$ conditioned on $\hw{z}=u$,
+\begin{equation}
+\label{eq:acc_prob_exact}
+\Pr[\hw{z\A}=h \mid \hw{z}=u]
+=
+\frac{\enum_{u,h}}{\binom{n}{u}},
+\end{equation}
+and $\enum_{u,h}=0$ unless $\lceil u/2\rceil \le h$.
+
+
+
+\begin{lemma}[Small-output contraction for the accumulator]
+\label{lem:small_eps}
+Let $\A$ be the length-$n$ accumulator with enumerator \eqref{eq:acc_exact}.
+There exists a constant $\varepsilon_0>0$ such that for all
+$0<\varepsilon\le \varepsilon_0$, all sufficiently large $n$, all
+$1\le h_1\le 2\varepsilon n$, and all $u\ge 1$,
+\begin{equation}
+\label{eq:small_eps_i}
+\Pr\big[\hw{z\A}=h_1\mid \hw{z}=u\big]
+=\frac{\enum_{u,h_1}}{\binom{n}{u}}
+\le \left(4e^2\frac{h_1}{n}\right)^{u/2}.
+\end{equation}
+Moreover, if $8e^2\varepsilon<1$, then the RHS of \eqref{eq:small_eps_i} is
+decreasing in $u$.
+
+In addition, for each fixed $h_1\le 2\varepsilon n$,
+\begin{equation}
+\label{eq:small_eps_ii}
+\sum_{h=1}^{\lfloor \varepsilon n\rfloor}
+\Pr\big[\hw{z\A}=h\mid \hw{z}=h_1\big]
+\le (\varepsilon n)\left(4e^2\varepsilon\right)^{h_1/2}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+We prove \eqref{eq:small_eps_i} first. Let $s=\lfloor u/2\rfloor$ and
+$t=\lceil u/2\rceil$, so $s+t=u$ and $s,t\ge u/2-1/2$. Using
+\eqref{eq:acc_exact},
+$
+\enum_{u,h_1}
+=
+\binom{n-h_1}{s}\binom{h_1-1}{t-1}
+\le
+\binom{n}{s}\binom{h_1}{t}.
+$
+Apply $\binom{N}{r}\le (eN/r)^r$ to both factors:
+$
+\enum_{u,h_1}
+\le
+\left(\frac{en}{s}\right)^s\left(\frac{eh_1}{t}\right)^t.
+$
+Also use $\binom{n}{u}\ge (n/u)^u$. Then
+$
+\frac{\enum_{u,h_1}}{\binom{n}{u}}
+\le
+\left(\frac{en}{s}\right)^s\left(\frac{eh_1}{t}\right)^t\left(\frac{u}{n}\right)^u
+=
+\left(e\frac{u}{s}\right)^s\left(e\frac{u}{t}\right)^t\left(\frac{h_1}{n}\right)^t.
+$
+If $u=1$, then $\enum_{1,h_1}=1$ and $\binom{n}{1}=n$, so
+$\Pr[\hw{z\A}=h_1\mid \hw{z}=1]=1/n\le (4e^2(h_1/n))^{1/2}$ for all sufficiently large $n$.
+Assume henceforth that $u\ge 2$, so $s,t\ge 1$.
+If $u$ is even then $s=t=u/2$ and $(u/s)^s(u/t)^t=2^u$.
+If $u$ is odd, write $u=2m+1$ so $s=m$ and $t=m+1$, and observe that
+\[
+\left(\frac{u}{s}\right)^s\left(\frac{u}{t}\right)^t
+=
+2^u\left(1+\frac{1}{2m}\right)^m\left(1-\frac{1}{2m+2}\right)^{m+1}
+\le 2^u,
+\]
+where the last inequality follows from $\log(1+x)\le x$ and $\log(1-x)\le -x-x^2/2$.
+Thus $\left(e\frac{u}{s}\right)^s\left(e\frac{u}{t}\right)^t \le (2e)^u$, and hence
+\[
+\frac{\enum_{u,h_1}}{\binom{n}{u}}
+\le
+(2e)^{u}\left(\frac{h_1}{n}\right)^{t}
+\le
+(2e)^{u}\left(\frac{h_1}{n}\right)^{u/2}.
+\]
+
+
+Finally, $(2e)^u=(4e^2)^{u/2}$ gives \eqref{eq:small_eps_i}. If
+$h_1\le 2\varepsilon n$ and $8e^2\varepsilon<1$, then
+$4e^2(h_1/n)\le 8e^2\varepsilon<1$, so the RHS of \eqref{eq:small_eps_i} is
+decreasing in $u$.
+
+For \eqref{eq:small_eps_ii}, apply \eqref{eq:small_eps_i} with $u\leftarrow h_1$
+to get, for each $h$,
+$
+\Pr[\hw{z\A}=h\mid \hw{z}=h_1]
+\le
+\left(4e^2\frac{h}{n}\right)^{h_1/2}.
+$
+Summing over $1\le h\le \varepsilon n$ and using $h/n\le \varepsilon$ yields
+\[
+\sum_{h=1}^{\lfloor \varepsilon n\rfloor}
+\Pr[\hw{z\A}=h\mid \hw{z}=h_1]
+\le
+(\varepsilon n)\left(4e^2\varepsilon\right)^{h_1/2}.
+\]
+\end{proof}
+
+
+\begin{theorem}[Linear minimum distance for BA-$3$]
+\label{thm:ba_linear_distance}
+Consider the Block-Accumulate code $\G:=\B\pi_1\A\pi_2\A$ of length $n$, where $\pi_1,\pi_2$ are independent uniform interleavers on $[n]$ and $\A$ is the standard length-$n$ accumulator.
+Assume the outer block-diagonal distance lower bound \eqref{eq:umin_def} holds.
+If the outer block distance satisfies $d'>4$, then for some sufficiently small
+constant $\varepsilon=\varepsilon(d',\sigma,R)>0$,
+\[
+\Pr[d_{\min}(\G)\ge \varepsilon n]\xrightarrow[n\to\infty]{}1.
+\]
+\end{theorem}
+\begin{remark}
+  We write $R:=k/n$ for the (constant) rate of the code. Here $\varepsilon$ depends only on $d', \sigma$ and the rate $R$, and not on $n$.
+\end{remark}
+\begin{proof}
+
+%------------------------------------------------------------
+\noindent\textbf{Step 1: Expected number of low-weight codewords.}
+
+Fix a constant $0<\varepsilon\le \varepsilon_0$ sufficiently small so that
+$8e^2\varepsilon<1$, $(4e^2\varepsilon)^{1/2}e<1$, and $\rho<1$ (as defined later).  Let $E_{\le \varepsilon n}$ denote the expected number of \emph{nonzero}
+codewords of weight at most $\varepsilon n$.
+By linearity of expectation,
+\begin{equation}
+\label{eq:Elow_start}
+E_{\le \varepsilon n}
+=
+\sum_{w=1}^{k} \binom{k}{w}\;
+\Pr\big[\hw{\xv\G}\le \varepsilon n\big],
+\end{equation}
+where $\xv$ is uniform over $\{x\in\{0,1\}^k:\hw{x}=w\}$.
+
+Introduce the intermediate weights
+\[
+ u=\hw{\xv\B},\qquad
+h_1=\hw{\xv\B\pi_1\A},\qquad
+h=\hw{\xv\B\pi_1\A\pi_2\A}=\hw{\xv\G}=\hw{\yv}.
+\]
+Conditioning on $(u,h_1,h)$,
+\begin{equation}
+\label{eq:Elow_expand}
+E_{\le \varepsilon n}
+=
+\sum_{w=1}^{k} \binom{k}{w}
+\sum_{u=0}^{n}\sum_{h_1=0}^{n}\sum_{h=1}^{\lfloor \varepsilon n\rfloor}
+\Pr[u \mid w]\;
+\Pr[h_1 \mid u]\;
+\Pr[h \mid h_1].
+\end{equation}
+
+\noindent\textbf{Uniformity under random interleavers.}
+Conditioned on $\hw{\xv\B}=u$, the vector $\xv\B\pi_1$ is uniform over all
+weight-$u$ vectors in $\{0,1\}^n$; similarly, conditioned on $h_1$, the vector
+$\xv\B\pi_1\A\pi_2$ is uniform over all weight-$h_1$ vectors in $\{0,1\}^n$.
+Thus \eqref{eq:acc_prob_exact} applies to both accumulator stages:
+\begin{equation}
+\label{eq:stage_probs}
+\Pr[h_1\mid u]=\frac{\enum_{u,h_1}}{\binom{n}{u}},
+\qquad
+\Pr[h\mid h_1]=\frac{\enum_{h_1,h}}{\binom{n}{h_1}}.
+\end{equation}
+
+%------------------------------------------------------------
+\noindent\textbf{Step 2: Remove the distribution of $u$ using monotonicity.}
+
+We only know $u\ge u_{\min}(w)$ from \eqref{eq:umin_def}; the exact distribution
+$\Pr[u\mid w]$ may be complicated. We eliminate it using a one-sided bound.
+
+For $h_1\le 2\varepsilon n$, Lemma~\ref{lem:small_eps}(i) gives
+$
+\Pr[\hw{z\A}=h_1\mid \hw{z}=u]
+=
+\frac{\enum_{u,h_1}}{\binom{n}{u}}
+\le \left(4e^2\frac{h_1}{n}\right)^{u/2}.
+$
+If $8e^2\varepsilon<1$, then $4e^2(h_1/n)\le 8e^2\varepsilon<1$ and the RHS is
+decreasing in $u$. Hence, for all $u\ge u_{\min}(w)$,
+$
+\Pr[\hw{z\A}=h_1\mid \hw{z}=u]
+\le \left(4e^2\frac{h_1}{n}\right)^{u_{\min}(w)/2}.
+$
+Therefore, using $\sum_u \Pr[u\mid w]=1$ and the fact that $u\ge u_{\min}(w)$,
+we may upper bound the $u$-average by the worst case:
+$
+\sum_{u}\Pr[u\mid w]\Pr[h_1\mid u]
+\le
+\left(4e^2\frac{h_1}{n}\right)^{u_{\min}(w)/2}$ for $ (h_1\le 2\varepsilon n).
+$
+
+Substituting into \eqref{eq:Elow_expand} and using \eqref{eq:stage_probs} for
+the second accumulator yields
+\begin{equation}
+\label{eq:Elow_after_mono}
+E_{\le \varepsilon n}
+\le
+\sum_{w=1}^{k}\binom{k}{w}
+\sum_{h_1=0}^{n}\sum_{h=1}^{\lfloor \varepsilon n\rfloor}
+\left(4e^2\frac{h_1}{n}\right)^{u_{\min}(w)/2}
+\cdot
+\frac{\enum_{h_1,h}}{\binom{n}{h_1}}.
+\end{equation}
+
+
+%------------------------------------------------------------
+\noindent\textbf{Step 3: Truncation (support constraints).}
+
+From \eqref{eq:acc_exact}, $\enum_{a,b}=0$ unless $\lceil a/2\rceil\le b$.
+Thus $\frac{\enum_{h_1,h}}{\binom{n}{h_1}}=0$ unless $h_1\le 2h$.
+Since $h\le \varepsilon n$, we may restrict to
+\begin{equation}
+\label{eq:h1_range}
+1\le h_1 \le 2\varepsilon n.
+\end{equation}
+Also, the first stage has $\enum_{u,h_1}=0$ unless $u\le 2h_1$; since
+$u\ge u_{\min}(w)$, we must have $u_{\min}(w)\le 2h_1$, i.e.
+$
+d'\Big\lceil \frac{w}{\sigma}\Big\rceil \le 2h_1
+\quad\Rightarrow\quad
+w \le \sigma\left\lfloor\frac{2h_1}{d'}\right\rfloor.
+$
+So \eqref{eq:Elow_after_mono} becomes
+\begin{equation}
+\label{eq:Elow_trunc}
+E_{\le \varepsilon n}
+\le
+\sum_{h_1=1}^{\lfloor 2\varepsilon n\rfloor}
+\sum_{w=1}^{\sigma\lfloor 2h_1/d'\rfloor}\binom{k}{w}
+\left(4e^2\frac{h_1}{n}\right)^{u_{\min}(w)/2}
+\sum_{h=1}^{\lfloor \varepsilon n\rfloor}
+\frac{\enum_{h_1,h}}{\binom{n}{h_1}}.
+\end{equation}
+
+%------------------------------------------------------------
+\noindent\textbf{Step 4: Bound the second-stage tail $\sum_{h\le \varepsilon n}\Pr[h\mid h_1]$.}
+
+By Lemma~\ref{lem:small_eps}(i) with $u\leftarrow h_1$,
+\[
+\frac{\enum_{h_1,h}}{\binom{n}{h_1}}
+\le
+\left(4e^2\frac{h}{n}\right)^{h_1/2}.
+\]
+Therefore,
+\begin{equation}
+\label{eq:second_tail}
+\sum_{h=1}^{\lfloor \varepsilon n\rfloor}\frac{\enum_{h_1,h}}{\binom{n}{h_1}}
+\le
+\sum_{h=1}^{\lfloor \varepsilon n\rfloor}\left(4e^2\frac{h}{n}\right)^{h_1/2}
+\le
+(\varepsilon n)\left(4e^2\varepsilon\right)^{h_1/2},
+\end{equation}
+where the last step uses monotonicity in $h$ and $h\le \varepsilon n$.
+
+Substitute \eqref{eq:second_tail} into \eqref{eq:Elow_trunc}:
+\begin{equation}
+\label{eq:Elow_mid}
+E_{\le \varepsilon n}
+\le
+(\varepsilon n)
+\sum_{h_1=1}^{\lfloor 2\varepsilon n\rfloor}
+\left(4e^2\varepsilon\right)^{h_1/2}
+\sum_{w=1}^{\sigma\lfloor 2h_1/d'\rfloor}\binom{k}{w}
+\left(4e^2\frac{h_1}{n}\right)^{u_{\min}(w)/2}.
+\end{equation}
+
+%------------------------------------------------------------
+\medskip
+\noindent\textbf{Step 5: Re-indexing by active blocks.}
+
+For an input $\xv\in\{0,1\}^k$, let $b=b(\xv)\in\{1,\dots,k/\sigma\}$ denote
+the number of $\sigma$-bit input blocks on which $\xv$ is nonzero.
+Since each active block contributes output weight at least $d'$, we have
+\begin{equation}
+\label{eq:umin_blocks}
+u=\hw{\xv\B}\;\ge\; d' b .
+\end{equation}
+
+For fixed $b$, the number of inputs activating exactly $b$ blocks is at most
+\begin{equation}
+\label{eq:count_blocks}
+N_b \;\le\; \binom{k/\sigma}{b}(2^\sigma-1)^b,
+\end{equation}
+since we choose the $b$ active blocks and then choose any nonzero
+$\sigma$-bit pattern in each active block.
+
+
+We now bound $E_{\le \varepsilon n}$ by summing over inputs grouped by the number
+$b=b(\xv)$ of active $\sigma$-bit blocks (rather than by total Hamming weight).
+From \eqref{eq:Elow_start}, equivalently
+\[
+E_{\le \varepsilon n}
+=
+\sum_{\xv\in\{0,1\}^k\setminus\{0\}}
+\Pr\!\big[\hw{\xv\G}\le \varepsilon n\big].
+\]
+Fix such an input $\xv$ and let $b=b(\xv)$. By \eqref{eq:umin_blocks} we have
+$u=\hw{\xv\B}\ge d'b$. Using the support constraint $\enum_{u,h_1}=0$ unless
+$u\le 2h_1$ and applying \eqref{eq:second_tail}, we obtain
+\[
+\Pr\!\big[\hw{\xv\G}\le \varepsilon n\big]
+\le
+(\varepsilon n)\sum_{h_1=1}^{\lfloor 2\varepsilon n\rfloor}
+\left(4e^2\varepsilon\right)^{h_1/2}\Pr[h_1\mid u].
+\]
+For each $h_1\le 2\varepsilon n$, Lemma~\ref{lem:small_eps}(i) gives
+\[
+\Pr[h_1\mid u]=\frac{\enum_{u,h_1}}{\binom{n}{u}}
+\le
+\left(4e^2\frac{h_1}{n}\right)^{u/2}
+\le
+\left(4e^2\frac{h_1}{n}\right)^{d'b/2},
+\]
+where the last inequality uses $u\ge d'b$ and $4e^2(h_1/n)\le 8e^2\varepsilon<1$.
+If $d'b>2h_1$ then $\Pr[h_1\mid u]=0$, so only $b\le 2h_1/d'$ contribute.
+Summing over all inputs with exactly $b$ active blocks and using \eqref{eq:count_blocks}
+gives
+\begin{align}
+E_{\le \varepsilon n}
+&\le
+(\varepsilon n)
+\sum_{h_1=1}^{\lfloor 2\varepsilon n\rfloor}
+\left(4e^2\varepsilon\right)^{h_1/2}
+\sum_{b=1}^{\lfloor 2h_1/d'\rfloor}
+N_b\left(4e^2\frac{h_1}{n}\right)^{d'b/2}.
+\label{eq:Elow_bh1}
+\end{align}
+
+
+
+\medskip
+\noindent\textbf{(5b) Bounding the $h_1$-sum and geometric decay in $b$.}
+
+We now swap the order of summation. Since $b\le 2h_1/d'$ if and only if
+$h_1\ge d'b/2$, \eqref{eq:Elow_bh1} becomes
+\begin{align}
+E_{\le \varepsilon n}
+&\le
+(\varepsilon n)
+\sum_{b=1}^{\lfloor 4\varepsilon n/d'\rfloor}
+N_b
+\sum_{h_1=\lceil d'b/2\rceil}^{\lfloor 2\varepsilon n\rfloor}
+\left(4e^2\varepsilon\right)^{h_1/2}
+\left(4e^2\frac{h_1}{n}\right)^{d'b/2}.
+\label{eq:swap_b_h1}
+\end{align}
+
+Define
+$
+f(h_1)
+:=
+\left(4e^2\varepsilon\right)^{h_1/2}
+\left(4e^2\frac{h_1}{n}\right)^{d'b/2}.
+$
+For $h_1\ge d'b/2$, we bound the ratio
+$
+\frac{f(h_1+1)}{f(h_1)}
+=
+(4e^2\varepsilon)^{1/2}
+\left(1+\frac{1}{h_1}\right)^{d'b/2}
+\le
+(4e^2\varepsilon)^{1/2}
+\exp\!\left(\frac{d'b}{2h_1}\right)
+\le
+(4e^2\varepsilon)^{1/2}e,
+$
+where the last inequality uses $h_1\ge d'b/2$.
+Choosing $\varepsilon>0$ sufficiently small so that
+$(4e^2\varepsilon)^{1/2}e<1$, the inner sum is geometrically decreasing,
+and there exists a constant $C_0$ (independent of $n$ and $b$) such that
+\begin{equation}
+\label{eq:h1_tail_by_first}
+\sum_{h_1=\lceil d'b/2\rceil}^{\lfloor 2\varepsilon n\rfloor} f(h_1)
+\;\le\;
+C_0\, f(\lceil d'b/2\rceil).
+\end{equation}
+
+Using $\lceil d'b/2\rceil\le d'b$ and $h_1/n\le d'b/n$ at the lower limit,
+we obtain
+$
+f(\lceil d'b/2\rceil)
+\le
+\left(4e^2\varepsilon\right)^{d'b/4}
+\left(4e^2\frac{d'b}{n}\right)^{d'b/2}.
+$
+Substituting into \eqref{eq:swap_b_h1} yields
+\begin{equation}
+\label{eq:Elow_after_h1}
+E_{\le \varepsilon n}
+\le
+(\varepsilon n)\,C_0
+\sum_{b=1}^{\lfloor 4\varepsilon n/d'\rfloor}
+N_b
+\left(4e^2\varepsilon\right)^{d'b/4}
+\left(4e^2\frac{d'b}{n}\right)^{d'b/2}.
+\end{equation}
+
+Finally, using \eqref{eq:count_blocks} and
+$\binom{k/\sigma}{b}\le (e k/(\sigma b))^b$ with $k=Rn$, we obtain
+\[
+E_{\le \varepsilon n}
+\le
+(\varepsilon n)\,C_0
+\sum_{b=1}^{\lfloor 4\varepsilon n/d'\rfloor}
+\left[
+\frac{eR(2^\sigma-1)}{\sigma b}
+\cdot
+\left(4e^2\varepsilon\right)^{d'/4}
+\cdot
+\left(4e^2 d' b\right)^{d'/2}
+\cdot
+n^{\,1-d'/2}
+\right]^b.
+\]
+We now analyze the $b$-sum.  Write the final bound as
+\[
+E_{\le \varepsilon n}
+\le
+(\varepsilon n)\,C_0
+\sum_{b=1}^{\lfloor 4\varepsilon n/d'\rfloor}
+\left[
+K(\sigma,R,d',\varepsilon)\cdot b^{d'/2-1}\cdot n^{\,1-d'/2}
+\right]^b,
+\]
+where
+\[
+K(\sigma,R,d',\varepsilon)
+:=
+\frac{eR(2^\sigma-1)}{\sigma}\cdot
+\left(4e^2\varepsilon\right)^{d'/4}\cdot
+\left(4e^2 d'\right)^{d'/2}
+\]
+absorbs all factors independent of $b$ and $n$.
+
+\paragraph{The bottleneck is $b=1$.}
+The $b=1$ term contributes
+\[
+E_{\le \varepsilon n}^{(b=1)}
+\;\le\;
+(\varepsilon n)\,C_0\cdot K(\sigma,R,d',\varepsilon)\cdot n^{\,1-d'/2}
+=
+O\!\left(n^{\,2-d'/2}\right).
+\]
+Therefore, to ensure $E_{\le \varepsilon n}\to 0$ as $n\to\infty$, we require
+\[
+2-\frac{d'}{2}<0
+\qquad\Longleftrightarrow\qquad
+d'>4.
+\]
+
+\paragraph{The terms with $b\ge 2$ are negligible.}
+Let $\alpha:=d'/2-1>1$. The $b$th summand equals
+\[
+\left[K(\sigma,R,d',\varepsilon)\left(\frac{b}{n}\right)^{\alpha}\right]^b.
+\]
+For all sufficiently large $n$ (so that $\sqrt{n}\le 4\varepsilon n/d'$), split the range into
+$2\le b\le \lfloor \sqrt{n}\rfloor$ and $b\ge \lceil \sqrt{n}\rceil$.
+
+If $2\le b\le \sqrt{n}$ then $b/n\le n^{-1/2}$, so
+\[
+\left[K\left(\frac{b}{n}\right)^{\alpha}\right]^b
+\le
+\left(K\,n^{-\alpha/2}\right)^b,
+\]
+and hence, for all sufficiently large $n$ (so that $K\,n^{-\alpha/2}<1/2$),
+\[
+\sum_{b=2}^{\lfloor \sqrt{n}\rfloor}
+\left[K\left(\frac{b}{n}\right)^{\alpha}\right]^b
+\le
+\sum_{b=2}^{\infty}\left(K\,n^{-\alpha/2}\right)^b
+=
+O\!\left(n^{-\alpha}\right).
+\]
+
+For $b\ge \sqrt{n}$, use the truncation $b\le \lfloor 4\varepsilon n/d'\rfloor$ to get
+$b/n\le 4\varepsilon/d'$. Define
+\[
+\rho:=K(\sigma,R,d',\varepsilon)\left(\frac{4\varepsilon}{d'}\right)^{\alpha},
+\]
+and choose $\varepsilon$ sufficiently small so that $\rho<1$. Then for all $b\ge \sqrt{n}$,
+\[
+\left[K\left(\frac{b}{n}\right)^{\alpha}\right]^b \le \rho^b \le \rho^{\sqrt{n}},
+\]
+so
+\[
+\sum_{b=\lceil \sqrt{n}\rceil}^{\lfloor 4\varepsilon n/d'\rfloor}
+\left[K\left(\frac{b}{n}\right)^{\alpha}\right]^b
+\le
+\frac{\rho^{\sqrt{n}}}{1-\rho}
+=o(n^{-2}).
+\]
+Multiplying by the outer factor $(\varepsilon n)C_0$ shows that the total contribution of
+$b\ge 2$ is $o(1)$. Together with the $b=1$ estimate above, this implies
+$E_{\le \varepsilon n}\to 0$ as $n\to\infty$.
+
+\medskip
+Finally, by Markov's inequality,
+\[
+\Pr[d_{\min}(\G)\le \varepsilon n]\le E_{\le \varepsilon n}\xrightarrow[n\to\infty]{}0,
+\]
+which proves the theorem.
+
+
+\end{proof}
+
+
+

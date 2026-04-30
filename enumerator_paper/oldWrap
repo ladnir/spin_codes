@@ -1,0 +1,140 @@
+
+This convolution has the constraint that for $(y_{i-1},...y_{i-\sigma})=(0,...,0,1)$, the next output bit is
+$$
+y_i=1+x
+$$
+This is achieved by requiring the last bit of $M_i$ to be one, therefore we have
+\begin{align*}
+    y_i&=M_i \cdot(y_{i-1},...y_{i-\sigma}) +x_i\\
+    &=y_{i-\sigma} +x_i\\
+    &=1 +x_i\\
+\end{align*}
+This was shown in expand convolute to help the minimum distance because the convolution can not simply turn itself off with no input.
+
+For example
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{010100}\textcolor{green}{0}\textcolor{red}{0101}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{00100100101}\\
+    y=&0\textcolor{red}{100}\textcolor{green}{10001}\textcolor{blue}{10000}00\textcolor{red}{11001110}\textcolor{olive}{1000}\\
+    %w  =&010101000010110010010010\\
+    %h  =&010010001100000011001110\\
+    v_0=&000000001000000000000000\\   
+    t_0=&001100000000000000110001\\    
+      g=&001111110111110001111111\\
+     \text{ on?}=&001111111111110011111111
+\end{align*}
+
+%The blue and green positions have fixed values due to the structure of the sequence.
+
+\noindent
+As before, we will define the following independent variables.
+\begin{itemize}
+    \item $n,w,h,r,b$ as before.
+    \item There are $v$ almost terminations (green subsequences).
+    \item There are $t_0$ free output zeros (red output zeros).
+    \item $d\in \{0,1\}$ is one iff the last run does not terminate ($b=0$) and the run ends with \textcolor{olive}{$1000$}. This is a special case where the next input bit would have determined the termination type (termination or almost termination).
+\end{itemize}
+
+\noindent All other quantities can be defined in terms of these:
+\begin{itemize}
+    \item There are $r'=r-1+b$ terminations.
+    \item There are $z=n-h-(v+d)(\sigma-1)-r'\sigma-t_0$ positions the convolution is off (black zeros). 
+    \item There are $f_0=n-w-z-v$ free input zeros (red zeros).
+    \item There are $f_1=w-r-r'$ free input ones (red ones).
+    \item There are $t_1=h-2v-r'$ free output ones (red ones).
+    %\item $d\in\{0,1\}$ to denote that if $b=0$, does the last run end with $\sigma-1$ zeros.
+    %\item $v_1=r +r'$ to denote the number of input ones with fixed value (blue input ones).
+    %\item $v_0$ to denote the number of input zeros in a run with fixed value (blue input zeros).  Independent.
+    %\item $u_1=r$ to denote the number of output ones with fixed value (blue output ones).
+    %\item $u_0=(v_0) (\sigma-1)+r'\sigma$ to denote the number of output zeros with fixed value (green or blue output zeros).
+    %\item $t_0$ to denote the number of non-fixed output zeros (red output zeros).
+    %\item $t_1=h-r$ to denote the number of non-fixed output ones (red output ones).
+    %\item $g=n-r-r'-z-v_0$ will denote the number of times the value of the convolution's random bits will impact the result (red input bits).
+\end{itemize}
+The sequence must follow the following rules:
+\begin{itemize}
+    \item \textbf{Off Zeros:} There are $z$ off zeros (black) and they are in the same position in the input and output.
+    \item \textbf{Run Begins:} The $r$ runs must be started with an input one.
+    \item \textbf{Almost terminations:} There are $v$ almost termination subsequences (greed). The input will have the pattern \textcolor{red}{$0100$}\textcolor{green}{$0$} where the red bits can have any value. The green bit is always zero.  The output sequences will always be \textcolor{green}{10001}.
+    \item \textbf{Terminations:} There are $r'$ terminations. The input will have the sequence \textcolor{red}{$0101$}\textcolor{blue}{$1$} where the red bits can have any value. The last bit is always one. The output sequences will always be \textcolor{blue}{10000}.
+    \item \textbf{Free input bits:} The $n-z-r-r'-v$ red input bits can take on any value. 
+
+    \item \textbf{Free output bits:} The red output positions must have the form of ...\textcolor{red}{10...0}... or ...\textcolor{green}{10001}\textcolor{red}{0...0}... where \textcolor{red}{0...0} represents $q\in \{0,...\sigma-2\}$ zeros. That is, each sequence of zeros must start with an almost termination or a red one.
+
+    \item \textbf{Special termination:} If $d=1$, then the sequence ends with \textcolor{olive}{$1000$}.
+    
+    \item \textbf{Weight:} There are a total of $w$ input ones and $h$ output ones.
+\end{itemize}
+
+\paragraph{Off zeros.} There are $z$ zeros when the convolution is off. There are $r'+1$ places they can be placed. Therefore we have
+\begin{align}
+    E_1=\mathcal{B}(z, r'+1)
+\end{align}
+ways of assigning them.
+
+For example, at this point we have
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{????}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{?????}, \quad \textcolor{red}{0000000000000}, \textcolor{red}{11111111},\textcolor{green}{0}\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{00000},\textcolor{red}{111111},\textcolor{green}{10001}
+\end{align*}
+In particular, we don't yet know how long a run is.
+
+\paragraph{Assigning free inputs bits.} Each of the $r$ runs must start with a one and each of the $r'$ terminating runs must end with one. Let $f_1=w-r-r'$ free input ones.
+
+There are $f_0=n-w-z-v$ free input zeros. Therefore there are 
+\begin{align}
+    E_2={f_0+f_1\choose f_0}
+\end{align}
+ways to choose which are the zeros. For example, at this point we have 
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{????}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{?????}, \quad \textcolor{red}{010100010100100100101},\textcolor{green}{0}\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{00000},\textcolor{red}{111111},\textcolor{green}{10001}
+\end{align*}
+assigned how the free input zeros and ones will be arranged but not to which run.
+
+\paragraph{Assigning almost terminations.} We have $v$ almost terminations. We can place this before or after any of the $t_1$ free output ones. Therefore, we have
+\begin{align}
+    E_3=\mathcal{B}(v,t_1+1)
+\end{align}
+
+ For example, at this point we have 
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{????}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{?????},\, \quad \textcolor{red}{010100010100100100101},\textcolor{green}{0}\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{00000},\textcolor{red}{1}\textcolor{green}{10001}\textcolor{red}{11111}\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{00000},\textcolor{red}{1}\textcolor{green}{1}\textcolor{red}{11111}
+\end{align*}
+The $v_0$ fixed value input zeros must be placed in a consistent location in the input but this location has not been determined.
+
+If $d$, then there will be $\sigma-1$ trailing output zeros.
+
+\paragraph{Assigning free output zeros.} The remaining $t_0$ output zeros must be assigned to come after any of the free output ones or almost termination. There are $v+t_1$ such bins.  We can have at most $\sigma-2$ consecutive zeros.  Therefore we have $t_0$ balls, $v+t_1$ bins, and capacity $\sigma-2$. As such, we have
+\begin{align}
+    E_4=N(t_0, v+t_1, \sigma-2)
+\end{align}
+assignments. Note that this fixed the position of the green input zeros within the free zeros and ones. For example, at this point we have 
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{????}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{?????},\, \quad \textcolor{red}{0101000}\textcolor{green}{0}\textcolor{red}{1010010010},\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{100}\textcolor{green}{10001}\textcolor{red}{11001110},\\
+    y=&0\textcolor{red}{?}\textcolor{blue}{10000}00\textcolor{red}{??}\textcolor{olive}{1000}, \quad \textcolor{red}{100},\textcolor{green}{10001},\textcolor{red}{1,100,1,1,10}
+\end{align*}
+
+\paragraph{Assigning run lengths.} We have $t_1+v$ output subsequences. These must be partitioned into runs. We can view this as having $t_1+v$ bins and $r'$ balls, where having $i$ items in a bin means this output subsequence has $i$ run terminations between it and the previous sequence. Therefore we have,
+\begin{align}
+    E_5=\mathcal{B}(t_1+v,r')
+\end{align}
+
+For example, the bin loads $\{0,0,1,0,0,0,0\}$ yields our example
+
+\begin{align*}
+    x=&0\textcolor{blue}{1}\textcolor{red}{010100}\textcolor{green}{0}\textcolor{red}{0101}\textcolor{blue}{1}00\textcolor{blue}{1}\textcolor{red}{00100100101}\\
+    y=&0\textcolor{red}{100}\textcolor{green}{10001}\textcolor{blue}{10000}00\textcolor{red}{11001110}\textcolor{olive}{1000}\\
+    \text{subsequence begins}=&0100100000000000110011100000
+\end{align*}
+
+\paragraph{Putting it together.}
+\begin{align*}
+\enum_{w,h,r,t_0,v}&=\sum_{db\in\{00,01,11\}}E_1E_2E_3E_4E_5\\
+&=\sum_{b\in\{0,1\},d\in\{0,b\}}
+\end{align*}
+where $w\in[n],h\in[n],r\in [\min(w,h,(n-h)/\sigma)]$ and $g_0'=g-h+r-(r-1+b)\sigma$. If any value is negative, the term is zero.
+
+\newpage\subsection*{Alternate Formulation}

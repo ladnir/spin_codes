@@ -1,0 +1,166 @@
+\section{OLD --- Matrix Accumulator}
+\textcolor{red}{broken, the unencoding doesnt work. See go to sec 5. }
+We propose a new convolution that we refer to as a matrix accumulator. It is a convolution $C$ with state size $\sigma$, e.g. $\sigma=\log n$. Let's assume $\sigma$ divides $k,n$ and we will express the input $x\in \bbG^{k}$ as a matrix $X\in \bbG^{k' \times \sigma}$ where $k'=k/\sigma$.  We will treat $X_i$ as a single element and accumulate the $X_i$. Specifically,
+\begin{align*}
+Y_1 &= X_1\\
+Y_i &= M_i Y_{i-1} + X_i
+\end{align*}
+where $M_i\in \bbG^{\sigma\times \sigma}$ are uniformly random and invertible. The final output is then defined by flattening $y=(Y_1 || ... || Y_{n'})$ where $n'=n/\sigma$. \textcolor{red}{Isn't $k' = n'$?}
+\todo{i guess here k=n??}
+
+\paragraph{Outline.} Our goal is to define the enumerator $\enum^C$ for this convolution.  We will show a series of transformations that map the instance above into a different accumulator instance $C'$ where the alphabet is $\{0,1,2\}$. We will give the enumerator $\enum^{C'}$ for this altered accumulator $C'$ and then map the enumerator back to $\enum^C$.
+
+We will consider fixing some $X\in \bbG^{k'\times \sigma}$ where $w\in [k']$ of the $X_i$'s will be non-zero. Over the random choices of the permutation and the convolution $C$, we show that any fixed $X$ is equivalent to a uniformly random one with the same weight $w$. We will then show that there are two special values for each $X_i$. We denote these values 0,1. The other $|\bbG|^\sigma -2$ values will be collectively denoted as $2$. $X$ will be encoded into this alphabet and  accumulated as
+$$
+    y_i=y_{i-1} + x_i
+$$
+where $y_{0}=0$ and $+$ for binary inputs behaving as binary addition while addition with a 2 always outputs 1.
+For example, $0+0=0,0+1=1, 0+2=1, 1+1=0$. We will define the enumerator for this accumulator and then map this back to one for $C$.
+
+
+\subsection{Encoding $x$} For some fixed $x\in \bbG$, observe that at iteration $i$ we are computing 
+$$
+    Y_i=M_i \cdot Y_{i-1} + X_i.
+$$
+where $X_i=(x_{(i-1)\sigma+1},...,x_{i\sigma})$.
+Consider the case where $Y_{i-1}=0$. Then
+\begin{enumerate}
+    \item if $X_i=0$, then $Y_i=0$
+    \item if $X_i=1$, then $Y_i\neq 0$
+    \item if $X_i$ is anything else, then $Y_i\neq 0$
+\end{enumerate}
+Consider $Y_{i - 1} \neq 0$. Then
+\begin{enumerate}
+    \item if $X_i=0$, then $Y_i\neq 0$.
+    \item if $X_i=-M_i\cdot Y_{i-1}$, then $Y_i=0$.
+    \item if $X_i$ is anything else, then $Y_i\neq 0$.
+\end{enumerate}
+Observe that these relations follow the same pattern as the operator + above. That is, given $X_i,Y_{i-1}$, one can define $x_i'$ as 
+\begin{itemize}
+    \item If $Y_{i-1}=0,$ then $x'_i=\min(2,X_i)$
+    \item If $Y_{i-1}\neq 0$ then sample $M_i$ uniformly and
+    \begin{itemize}
+        \item If $X_i=0$, $x_i'=0$.
+        \item If $X_i=-M_i\cdot Y_{i-1}$, $x_i'=1$.
+        \item otherwise, $x'_i = 2$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Enumerator.} Let $E$ be the function that performs this encoding. Then $\enum^{E}_{w,w_1,w_2}$ is the enumerator that counts the number of weight-$w$ $x$'s that can be encoded into $x'$ with $w_1$ $1$'s and $w_2$ $2$'s. 
+
+\subsection{Triary Accumulation} Given $x\in \{0,1,2\}^{k'}$, we need to compute the weight enumerator for accumulating $x$. When adding values we will use the truth table,
+\begin{center}
+    \begin{tabular}{c|ccc}
+        + & 0&1&2 \\\hline
+        0 & 0&1&1 \\
+        1 & 1&0&1 \\
+        2 & 1&1&1 \\
+    \end{tabular}
+\end{center}
+
+For example, we can accumulate $x$ as 
+\begin{align*}
+    x= 00201021\\
+    y= 00110010
+\end{align*} 
+We note that this accumulator $C'$ is not linear. 
+We will define the enumerator 
+$$
+\enum_{w_1,w_2,h} = |\{ x \mid \mathcal{W}_1(x)=w_1, \mathcal{W}_2(x)=w_2, \mathcal{W}_1(C'x)=h \}|
+$$
+That is, $\enum_{w_1,w_2,h}$ denote the number of weight inputs $x$ with $w_1$ ones and $w_2$ twos that when accumulated are mapped to $h$ ones.
+
+\paragraph{Runs Assignments.} As before, we can define a ``run'' in the output as maximal length substrings with all the same value. e.g. the run in the example above are $00,11,00,1,0$. As such, runs must alternate in value. Each run of zeros which starts at position $i>1$ implies that $x_i=1$, e.g. $x_5=1$ and $y_5=0$ is the start of a run of zeros.
+
+We will count any initial run of zeros as a run but not a \emph{proper run}. We make this distinction because this run is not initiated due to a non-zero in $x$.
+
+Let $x'=(x_i \mid y_i \oplus y_{i-1} = 1)$ denote the subset of $x$ that begins a proper run, e.g. $x'=2121$ in the example above. \textcolor{red}{In general, observe that $x'$ is the concatenation of the substrings $21,11$ with a possible trailing $1$ at the end, e.g. $11\, 21\, 11\, 21\, 21\, 1$.}
+
+
+We introduce a new parameter $r$ which denotes the number of proper runs there are. \textcolor{red}{Observe that there can be $r\in \{w_1,...,\min(2w_1, w_1+w_2)\}$ runs.} It should be $r \in \{w_1, \ldots, (w_1 + w_2)\}$. There will be $r_1=\lceil r/2\rceil$ runs of ones and $r_0=\lfloor r/2\rfloor$ proper runs of zeros. Overall, $b_2=r-w_1$ of the runs will begin with a $x_i=2$, the remaining $b_1 = r - b_2 = w_1$ will begin with a $x_i=1$. Again, note that no run of zeros begins with a $x_i=2$.
+
+Therefore, for each $r_1=\lceil r/2\rceil$ runs of ones, consider all possible combinations of assigning $b_1$ ones and $b_2$ twos to them. That is, there are
+$$
+{r_1 \choose b_2} = {\lceil r/2\rceil \choose r-w_1}
+$$
+assignments. 
+
+
+\paragraph{Twos Assignment.} For the fixed $r$, there are $w_2'=w_2-b_2$ position for which $x_i=2$ which do not start a run. As such, each of these must be assigned to one of the $r_1$ runs of ones. Therefore we have
+$$
+{r_1 + w_2' \choose r_1} = {w_2+w_1-\lfloor r/2\rfloor \choose \lceil r/2\rceil}
+$$
+possible assignments. 
+
+\paragraph{Zeros Assignment.} What remains is to count the number of valid assignments for the remaining $w_0=n'-w_1-w_2$ zeros positions in $x$. Zeros can be assigned to follow an of the ones or twos. Therefore, we have
+$$
+{w_0 + w_1+w_2 \choose w_1+w_2} = {n' \choose w_1+w_2} 
+$$
+assignments.
+
+\paragraph{Putting it together.} Overall, we therefore have 
+$$
+\enum^{C'}_{w_1,w_2,h} = \sum_{r\in [w_1,\min(2w_1,w_1+w_2)]}   {\lceil r/2\rceil \choose r-w_1} {w_2+w_1-\lfloor r/2\rfloor \choose \lceil r/2\rceil} {n' \choose w_1+w_2} 
+$$
+possible ways to accumulate an $x$ with $w_1$ ones and $w_2$ twos such that $C'x$ has $h$ ones.
+
+\paragraph{Alternate Formulation.} Suppose the output $y$ has $r$ proper runs and that the input $x$ has $w_1$ ones and $w_2$ twos. We make the following observations:
+\begin{itemize}
+\item There is at most one improper run of zeros.
+\item Every proper run of zeros is started by $x_i = 1$. There are $\lfloor r/2\rfloor$ many such runs.
+\item Every run of ones at $y_i$ is started by either $x_i = 1$ or $x_i = 2$. There are $\lceil r/2\rceil$ many such runs.
+\end{itemize}
+Let runs of ones that are started by $x_i = 1$ (resp. $x_i = 2$) be called Type A (resp. Type B) runs, and let proper runs of zeros be called Type C runs. 
+\begin{itemize}
+\item Consider a Type A (resp. Type B) run of length $\ell$. Then, the corresponding substring of $x$ could be any of the strings of the form $1(0\cup 2)^{\ell-1}$ (resp. $2(0\cup 2)^{\ell-1}$).
+\item Consider a Type C run of length $\ell$. Then, the corresponding substring of $x$ must be $10^{\ell-1}$.
+\end{itemize}
+Let $n_A$, $n_B$, $n_C$ denote the number of runs of each type. We must have
+$$n_A + n_B + n_C = r$$
+$$n_A + n_B = \lceil r/2 \rceil; \quad n_C = \lfloor r/2 \rfloor; \quad n_A + n_C = w_1$$
+Therefore
+$$n_A = w_1 - \lfloor r/2 \rfloor; \quad n_B = r - w_1$$
+We have
+$$0 \le n_B \le w_2$$
+Therefore
+$$w_1 \le r \le w_1 + w_2$$
+If these conditions are met, we can determine all possible $x$'s for a given $y$ subject to $x$ having $w_1$ ones and $w_2$ twos. The number of $y$'s that come from $x$'s having $w_1$ ones and $w_2$ twos is therefore
+$$\underbrace{\sum_{r = w_1}^{w_1 + w_2}}_{\textrm{number of runs}}\underbrace{\binom{\lceil r/2 \rceil}{r - w_1}}_{\substack{\textrm{pick Type A}\\\textrm{vs. Type B runs}\\\textrm{at this point, all}\\\textrm{run types are fixed}\\\textrm{all ones are fixed}\\\textrm{only need twos}}}\underbrace{\sum_{\substack{\ell_0 \ge 0, \ell_1, \ldots, \ell_r > 0:\\\sum_{i = 0}^r\ell_i = n'}}}_{\textrm{lengths of runs}}\underbrace{\binom{\sum_{i=1}^{\lceil r/2 \rceil}(\ell_i - 1)}{w_1 + w_2 - r}}_{\substack{\textrm{say } \ell_1, \ldots, \ell_{\lceil r/2 \rceil}\\\textrm{are lengths of}\\\textrm{Type A or B runs}\\\textrm{picks spots for}\\\textrm{remaining twos}}}$$
+In the sum above, the weight of $y$ is given by
+$$\sum_{i=1}^{\lceil r/2 \rceil}\ell_i$$
+Therefore, the number of $y$'s with weight $h$ that come from $x$'s having $w_1$ ones and $w_2$ twos is
+$$\sum_{r = w_1}^{w_1 + w_2}\binom{\lceil r/2 \rceil}{r - w_1}\sum_{\substack{\ell_0 \ge 0, \ell_1, \ldots, \ell_r > 0:\\\sum_{i = 0}^r\ell_i = n'\\\sum_{i=1}^{\lceil r/2 \rceil}\ell_i = h}}\binom{h - \lceil r/2 \rceil}{w_1 + w_2 - r}$$
+Finally, note that
+$$\sum_{\substack{\ell_0 \ge 0, \ell_1, \ldots, \ell_r > 0:\\\sum_{i = 0}^r\ell_i = n'\\\sum_{i=1}^{\lceil r/2 \rceil}\ell_i = h}}1 = \binom{n' - h}{\lfloor r/2 \rfloor}\binom{h - 1}{\lceil r/2 \rceil - 1}$$
+Therefore
+$$\mathbb{E}_{w_1, w_2, h}^{C'} = \sum_{r = w_1}^{w_1 + w_2}\binom{n' - h}{\lfloor r/2 \rfloor}\binom{h - 1}{\lceil r/2 \rceil - 1}\binom{\lceil r/2 \rceil}{r - w_1}\binom{h - \lceil r/2 \rceil}{w_1 + w_2 - r}$$
+
+\subsection{Unencoding}
+Observe that for each $x_i=2$, there are $q=2^\sigma-2$ values in $X_i$ that map to 2. Let $w$ denote the number of non-zero $\sigma$-bit blocks. Therefore, we have 
+\begin{align*}
+\enum^{C''}_{w,h} &= \sum_{w_1\in [0,w],w_2=w-w_1} q^{w_2}\enum^{C'}_{w_1,w_2,h}\\
+&= \sum_{w_1\in [0,w],w_2=w-w_1} q^{w_2} \sum_{r\in [w_1,\min(2w_1,w_1+w_2)]}   {\lceil r/2\rceil \choose r-w_1} {w_2+w_1-\lfloor r/2\rfloor \choose \lceil r/2\rceil} {n' \choose w_1+w_2} 
+\end{align*}
+This denotes the weight enumerator with respect to non-zero $\sigma$-bit blocks. Due to the $M_i$'s being uniform full rank matrices, the non-zeros for any fixed $X$ will be distributed uniformly randomly. Therefore we can define the overall weight distribution as follows.
+
+\textcolor{red}{$$\mathbb{E}_{w, h}^{C} = \sum_{w_1 = 0}^{w}\sum_{r = w_1}^{w_1 + w_2}(|\mathbb{G}|^{\sigma} - 2)^{w - w_1}\binom{n/\sigma - h}{\lfloor r/2 \rfloor}\binom{h - 1}{\lceil r/2 \rceil - 1}\binom{\lceil r/2 \rceil}{r - w_1}\binom{h - \lceil r/2 \rceil}{w_1 + w_2 - r}$$}
+
+\paragraph{Weight Distribution}
+
+Given a random weight $w$ input $x\in \bbG^n$, the probability of it resulting in a weight $h$ output is
+$$
+\mathbb{D}_{w,h}^C = \frac{\enum^{C}_{w,h}}{{n\choose w}}
+$$
+
+\textcolor{red}{$$\mathbb{D}_{w, h}^{C} = \frac{\mathbb{E}_{w, h}^{C}}{\binom{n/\sigma}{w}(|\mathbb{G}|^{\sigma} - 1)^{w}}$$}
+
+Assuming we do a $d=2=n/k$ repeater code followed by a matrix accumulator $C$, the expected number of non-zero codewords with weight at most $\epsilon n$ is
+\begin{align*}
+    E_{\epsilon n} &= \sum_{w=1}^n\sum_{h=1}^{\epsilon n} \frac{{k\choose w}\enum^C_{dw,h}}{{n\choose dw}}\\
+    &=
+    \sum_{w=1}^n
+    \sum_{h=1}^{\epsilon n}
+    \sum_{r=w_1}^{\min(2w_1,w)} \sum_{w_1 = 0}^{w}   \frac{{k\choose w} q^{w-w_1}  {\lceil r/2\rceil \choose r-w_1} {w-\lfloor r/2\rfloor \choose \lceil r/2\rceil} {n/\sigma \choose w} }{{n\choose dw}}
+\end{align*}
+
+Using the inequalities ${n\choose k}\leq (en/k)^k,$ we can bound this is

@@ -1,0 +1,73 @@
+
+\section{Applications}\label{sec:application}
+
+
+\subsection{Pseudorandom Correlation Generators }
+
+\paragraph{PCG Overview.}
+We focus on PCGs based on Syndrome Decoding (SD) / Learning Parity with Noise (LPN) for generating OT and VOLE correlations of size $k$ \cite{silentOTcrypto}. These protocols begin with the parties performing an interactive, efficient setup to produce random vectors $\av', \bv', \cv' \in \Fbb^n$ and a scalar $\Delta \in \Fbb$ satisfying
+$$
+  \cv' = \bv' + \Delta \av',
+$$
+where $\Fbb$ is a large field, e.g. $GF(2^{128})$, and $n\approx 2k$. One party learns the values $(\bv',\Delta)$, while the other learns $(\av',\cv')$. These vectors are uniformly distributed, except that $\av'$ is extremely sparse. This sparsity allows for the setup to be performed with communication sublinear in the size of the vectors. In a subsequent phase, the protocol transforms $\av',\bv',\cv'$ into 
+uniformly random looking vectors $\av,\bv,\cv \in \Fbb^k$, preserving the relation
+$$
+  \cv = \bv + \Delta \av.
+$$
+In particular, the sparse vector $\av'\in \Fbb^n$ is transformed into a pseudorandom vector $\av\in \Fbb^k$. For our parameter regime, $k$ is large (e.g., $2^{20}$), while $n = 2k$, and therefore this transformation is compressing. 
+
+This correlation, called \emph{vector oblivious linear evaluation} (VOLE), underpins many state-of-the-art protocols for zero-knowledge proofs~\cite{wolverine,ferret} and private set intersection~\cite{volePSI,blazingPSI}. Alternatively, one can locally convert this VOLE correlation into $k$ instances of OT or binary Beaver triples~\cite{silentOTCCS} \cite{silentOTcrypto}, which are employed in a wide range of cryptographic schemes.
+
+\paragraph{Multiplication by $\G$.}
+The core transformation step multiplies $\av',\bv'$, and
+$\cv'$ by a matrix $\G\in \Fbb^{k\times n}$, where $\G$ is the generator matrix of an error-correcting code with high minimum distance. Namely,
+$$
+  \av =\G \cdot \av', 
+  \quad
+  \bv = \G \cdot \bv', 
+  \quad
+  \cv = \G \cdot \cv'.
+$$
+A code $\G$ with high minimum distance\footnote{There are some exceptions, such as the Reed-Solomon Code.} ensures that an extremely sparse $\av'$ is mapped to a slightly shorter but essentially uniform vector $\av$. More formally, under the SD (a.k.a. dual LPN) assumption associated with $\G$, the vector $\av$ is indistinguishable from a random vector given $\G$.
+
+\paragraph{Improving Computational Efficiency.}
+Two major avenues have been explored to optimize these protocols:  
+(1) reducing the cost of multiplying by $\G$, which is a local computation but often the main bottleneck; and  
+(2) minimizing the interactive setup that yields the initial correlation $\av' = \bv' + \Delta \cv'$.
+Our focus is on the first challenge: designing $\G$ so that
+multiplication is efficient. Although several codes have been proposed~\cite{silentOTCCS,silver,EA,EC}, we show there is ample room for concrete improvement by constructing new high-minimum-distance codes that enable fast matrix-vector products.
+
+
+\subsection{Zero-Knowledge Proofs: The Blaze System}
+
+The Blaze system \cite{blaze} is a state-of-the-art multilinear polynomial commitment scheme (MLPCS) designed for high-efficiency provers over binary fields. A core component of Blaze's performance is its use of linear-time encodable codes, specifically the Repeat-Accumulate-Accumulate (RAA) code \cite{ra,kahale1998minimum}, as the underlying error-correcting primitive. 
+
+\paragraph{Blaze Framework.}
+Blaze operates as a compiler that combines two primary techniques:
+\begin{itemize}
+    \item {\bf Code Interleaving:} To commit to a large multilinear polynomial of size $N$, the prover interprets the coefficients as a $t \times k$ matrix (where $N = tk$) and encodes each row separately using a base linear code.
+
+    \item {\bf IOPP for Multilinear Evaluation:} Blaze lifts evaluation claims about the multilinear extension into claims about simple combinatorial extensions of the base code, utilizing an inner proof system (IOPP) to verify these smaller claims.
+\end{itemize}
+ 
+ In its standard instantiation, Blaze utilizes RAA codes at rate 1/4 to achieve the relative distance (approximately 0.19) required for soundness. While puncturing could theoretically achieve rate 1/2, it adds complexity and does not reduce the initial encoding work or memory footprint required to generate the full codeword before puncturing.
+ 
+ \paragraph{Conceptual Advantages of Block-Accumulate Codes.} Our Block-Accumulate (BA-3) codes offer several conceptual and practical improvements when integrated into the Blaze framework:
+ \begin{itemize}
+    \item {\bf Native Rate 1/2 Performance:} Unlike RAA codes, which require rate 1/4 for sufficient distance , BA-3 codes achieve high minimum distance (approximately 0.1) natively at rate 1/2.
+
+    \item {\bf Reduced Permutation Overhead:} By operating at rate 1/2, the permutations $\pi_i$ within the code act on vectors that are half the size of those in a rate 1/4 RAA scheme. This directly reduces computational work for both the encoder and the prover.
+
+    \item {\bf Memory Efficiency and Scalability:} Blaze's claim to fame is its ability to handle massive instances ($>2^{25}$ variables). Because BA-3 produces codewords half the size of unpunctured RAA, the total memory overhead is halved, effectively doubling the maximum polynomial size Blaze can handle on the same hardware.
+ \end{itemize}
+ 
+ 
+\paragraph{Future-Proofing Prover Bottlenecks.}
+Integrating highly optimized inner proof systems like PipFRI into Blaze highlights the critical need for faster encoding.
+ \begin{itemize}
+    \item {\bf The Role of PipFRI: } PipFRI utilizes a shred-to-shine methodology that decomposes polynomials into smaller chunks, drastically reducing the overhead of Fast Fourier Transforms (FFTs) and Merkle tree construction during the commitment and opening phases. This effectively slashes the $O(N \log N)$ bottleneck of standard FRI to near-linear time.
+
+    \item {\bf The Shift in Costs: } The total prover time in Blaze is a sum of "cryptographic work" (Merkle hashing, folding, handled by the inner system) and "coding work" (encoding via RAA/BA). As PipFRI reduces the cryptographic weight by orders of magnitude (e.g., 10x faster prover times), the static cost of the "coding work" becomes the primary target for optimization.
+
+    \item {\bf The BA-3 Advantage: } By providing a 2x speedup in encoding, BA-3 lowers the static floor of the computation. This ensures that as the variable ceiling of cryptographic costs lowers with innovations like PipFRI, the encoding step does not become the new bottleneck stalling the entire pipeline.
+\end{itemize}
