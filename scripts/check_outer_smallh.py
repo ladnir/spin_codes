@@ -8,12 +8,12 @@ import math
 from pathlib import Path
 
 from check_inner_smallw import parse_enum
-from dense_largek_eval import outer_small_h_exact_log2
+from dense_largek_eval import outer_small_h_banded_systematic_log2, outer_small_h_exact_log2
 
 
-def exact_outer_weight(rows: list[list[float]], h: int) -> float:
+def exact_outer_weight(rows: list[list[float]], k: int, h: int) -> float:
     total = 0.0
-    for row in rows:
+    for row in rows[: k + 1]:
         if h < len(row):
             v = row[h]
             if v != float("-inf"):
@@ -26,6 +26,8 @@ def main() -> int:
     ap.add_argument("--enum", type=Path, required=True)
     ap.add_argument("--k", type=int, required=True)
     ap.add_argument("--sigma", type=int, required=True)
+    ap.add_argument("--parity-n", type=int, default=None)
+    ap.add_argument("--mode", choices=("conv", "banded"), default="banded")
     ap.add_argument("--h-max", type=int, default=12)
     args = ap.parse_args()
 
@@ -37,8 +39,13 @@ def main() -> int:
     print("h, exact, model, model/exact, log2(model/exact)")
 
     for h in range(1, args.h_max + 1):
-        exact = exact_outer_weight(rows, h)
-        log2_model = outer_small_h_exact_log2(args.k, args.sigma, h)
+        exact = exact_outer_weight(rows, args.k, h)
+        if args.mode == "banded":
+            if args.parity_n is None:
+                raise SystemExit("--parity-n is required in banded mode")
+            log2_model = outer_small_h_banded_systematic_log2(args.k, args.sigma, args.parity_n, h)
+        else:
+            log2_model = outer_small_h_exact_log2(args.k, args.sigma, h)
         model = 0.0 if log2_model == float("-inf") else 2.0**log2_model
         ratio = model / exact if exact > 0.0 else float("inf")
         bits = math.log2(ratio) if ratio > 0.0 else float("-inf")

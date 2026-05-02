@@ -760,10 +760,9 @@ substantially more stable picture;
 can still be optimistic, so a more conservative competing heuristic is to anchor the tiny-weight law at the
 single-run probability \(p_1(\delta)\) and then correct the multi-run behavior by an explicit pairwise interaction
 factor;
-\item exact outer-only comparisons also suggest caution: in the dominant tiny-weight window the current closed-form
-outer count appears to sit a nearly constant few bits below the exact systematic-outer tables, so even the
-pairwise-calibrated run-mixture estimate should presently be read as somewhat optimistic until that normalization
-issue is either explained or corrected;
+\item after replacing the old convolutional proxy by the actual systematic banded small-weight law used in the
+enumerator, the outer mismatch becomes much smaller; the dominant uncertainty is therefore pushed back onto the inner
+tiny/intermediate-weight law rather than the outer count itself;
 \item in the parameterization \(\sigma=\lceil\log_2 k\rceil+c\), the present working model suggests that the
 transition occurs near a fixed offset \(c\), rather than at a fixed absolute \(\sigma\);
 \item more specifically, the current pairwise-calibrated run-mixture model treats an \(s\)-run input as having
@@ -774,18 +773,37 @@ q_s \approx q_1^s \exp(-\gamma(q_1)\tbinom{s}{2}),
 where \(q_1\approx p_1(\delta)\approx 2\delta\) and the exact inner-only tables suggest a simple linear interaction law
 \(\gamma(q_1)\approx a+bq_1\) over the regime \(q_1\in[0.17,0.25]\);
 \item at the concrete point \(k=2^{20}\), \(\delta=0.12\), and \(n=2k+\sigma\), the current optimistic refined model
-crosses below \(1\) near \(c=4\), the pairwise-calibrated run-mixture model crosses near
-\(c=5\), and the more conservative single-run model crosses only near \(c=6\), so the present evidence should be read
+crosses below \(1\) near \(c=5\), the pairwise-calibrated run-mixture model crosses near
+\(c=6\), and the more conservative single-run model crosses only near \(c=8\), so the present evidence should be read
 as a bracket rather than a single claimed threshold.
+\item this bracket is not a single-point artifact. In the current finite-length sweep over
+\(k=2^{10},2^{12},\dots,2^{20}\) at \(\delta=0.12\), the first offsets with estimated first moment below \(1\) are:
+\[
+\begin{array}{c|cccccc}
+\log_2 k & 10 & 12 & 14 & 16 & 18 & 20\\
+\hline
+c_{\mathrm{opt}}  & 5 & 4 & 4 & 5 & 5 & 5\\
+c_{\mathrm{ctr}}  & 4 & 4 & 4 & 5 & 6 & 6\\
+c_{\mathrm{pess}} & 4 & 5 & 6 & 7 & 7 & 8
+\end{array}
+\]
+So the present evidence is consistent with a transition region that drifts upward slowly with \(k\), with the
+pairwise-calibrated lane currently centered around \(c\approx 6\) by the time \(k\) reaches \(2^{20}\).
+\item overlap checks against the exact enumerator, using the observed threshold \(\delta=h_{\mathrm{thr}}/n\) and the exact
+first-moment value at that threshold, now show that the pairwise-calibrated and single-run lanes are much closer to the
+true finite-length behavior than the earlier convolutional proxy, but they still tend to be optimistic by a few bits on
+average, with the miss becoming larger as \(\sigma\) grows. So even the present \(c\approx 6\) center should still be
+read as a working estimate rather than a certification.
+\item accordingly, the current working language is to treat these three lanes as
+\emph{optimistic}, \emph{central}, and \emph{pessimistic} estimates rather than as competing theorem claims.
 \end{itemize}
 This should be read only as the current state of the model, not as a proved theorem.
 Its role is to tell us where further analytic work is most likely to pay off.
 
 \paragraph{What must be improved next.}
-The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} is already explicit and usable, but the
-current exact outer-only comparisons indicate that its normalization is still a few bits low in precisely the
-window that dominates the first moment.
-The remaining gap is therefore split between that outer normalization issue and the inner side:
+The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} has now largely been replaced, for
+finite-\(n\) estimation purposes, by the exact low-weight systematic banded law suggested by the enumerator.
+The remaining gap is therefore mostly on the inner side:
 even after sharpening the outer tiny-weight treatment, overlap checks against the exact enumerator still indicate that
 the present small-weight models remain somewhat optimistic in the small/intermediate-weight regime.
 So the next refinement target is not the bulk linear window, but rather a sharper and still explicit description of the

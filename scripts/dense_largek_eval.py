@@ -202,6 +202,131 @@ def outer_small_h_exact_log2(k_msg: int, sigma: int, h: int) -> float:
     return outer_small_h_exact_prefix(k_msg, sigma, h)[h]
 
 
+@lru_cache(maxsize=None)
+def balls_bins_cap_cached(balls: int, bins: int, cap: int) -> int:
+    if balls < 0 or bins < 0:
+        return 0
+    if balls == 0:
+        return 1
+    if cap < 0 or bins == 0:
+        return 0
+    if balls * 2 > bins * cap:
+        balls = bins * cap - balls
+    if balls < bins * cap:
+        d = 0
+        for i in range(bins):
+            bb = bins + balls - i * (cap + 1) - 1
+            if bb < bins - 1 or bb < 0:
+                break
+            term = math.comb(bins, i) * math.comb(bb, bins - 1)
+            d = d - term if (i & 1) else d + term
+        return d
+    if balls == bins * cap:
+        return 1
+    return 0
+
+
+@lru_cache(maxsize=None)
+def count_inputs_banded(w: int, q: int, runs: int, k: int, n: int, sigma: int) -> int:
+    if w == 0 and q == 0 and runs == 0:
+        return 1
+    if w <= 0 or q <= 0 or runs <= 0:
+        return 0
+    if runs > w or sigma <= 0 or q < w or q > n or q > w * sigma:
+        return 0
+
+    mini_runs = w - runs
+    assign_mini_runs = math.comb(w - 1, runs - 1)
+    total = 0
+    for c in range(sigma):
+        tail_trim = min(sigma - 1 - c, n - k)
+        q_tilde = q - tail_trim
+        zeros_inside_runs = q_tilde - w - (runs - 1) * (sigma - 1) - c
+        ways_mini_run_shapes = balls_bins_cap_cached(zeros_inside_runs, mini_runs, sigma - 2)
+        if ways_mini_run_shapes == 0:
+            continue
+
+        outside_zeros = k - q_tilde
+        boundary_bins = runs + 1 if c == sigma - 1 else runs
+        if outside_zeros < 0 or boundary_bins < 0:
+            continue
+        if outside_zeros == 0 and boundary_bins == 0:
+            ways_outside = 1
+        elif boundary_bins <= 0:
+            ways_outside = 0
+        else:
+            ways_outside = math.comb(outside_zeros + boundary_bins - 1, boundary_bins - 1)
+        if ways_outside == 0:
+            continue
+
+        total += assign_mini_runs * ways_mini_run_shapes * ways_outside
+    return total
+
+
+@lru_cache(maxsize=None)
+def parity_enum_banded_log2(k: int, n: int, sigma: int, w: int, h: int) -> float:
+    if w == 0 and h == 0:
+        return 0.0
+    if w == 0 or h > n or sigma == 0:
+        return float("-inf")
+    if sigma == 1:
+        val = math.comb(k, w) * math.comb(w, h) * (2.0 ** -w)
+        return math.log2(val) if val > 0 else float("-inf")
+
+    total = float("-inf")
+    q_max = min(n, w * sigma)
+    for q in range(w, q_max + 1):
+        choose_qh = math.comb(q, h) if 0 <= h <= q else 0
+        if choose_qh == 0:
+            continue
+        count_wq = 0
+        for runs in range(1, w + 1):
+            count_wq += count_inputs_banded(w, q, runs, k, n, sigma)
+        if count_wq == 0:
+            continue
+        term = math.log2(count_wq) + math.log2(choose_qh) - q
+        total = term if total == float("-inf") else log2add(total, term)
+    return total
+
+
+@lru_cache(maxsize=None)
+def outer_small_h_banded_systematic_prefix(k_msg: int, sigma: int, parity_n: int, h_max: int) -> tuple[float, ...]:
+    logs = [float("-inf")] * (h_max + 1)
+    for h in range(1, h_max + 1):
+        total = float("-inf")
+        w_hi = min(k_msg, h)
+        for w in range(1, w_hi + 1):
+            hp = h - w
+            term = parity_enum_banded_log2(k_msg, parity_n, sigma, w, hp)
+            if term != float("-inf"):
+                total = term if total == float("-inf") else log2add(total, term)
+        logs[h] = total
+    return tuple(logs)
+
+
+def outer_small_h_banded_systematic_log2(k_msg: int, sigma: int, parity_n: int, h: int) -> float:
+    if h <= 0:
+        return float("-inf")
+    return outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h)[h]
+
+
+def outer_small_h_prefix(
+    k_msg: int,
+    sigma: int,
+    h_max: int,
+    *,
+    outer_mode: str,
+    parity_n: int | None = None,
+) -> tuple[float, ...]:
+    if outer_mode == "conv":
+        return outer_small_h_exact_prefix(k_msg, sigma, h_max)
+    if outer_mode == "banded":
+        if parity_n is None:
+            raise ValueError("banded outer mode requires parity_n")
+        return outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h_max)
+    raise ValueError(f"unknown outer_mode: {outer_mode}")
+
+
 def run_tail_exact_log2(n: int, w: int, r: int) -> float:
     if r <= 1:
         return float("-inf")
@@ -259,10 +384,13 @@ def small_h_rigorous_log2(
     xi: float,
     h_lo: int,
     h_hi: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
 ) -> float:
     total = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
     for h in range(h_lo, h_hi + 1):
-        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        out = outer_logs[h]
         inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
         if inn <= 0.0:
             continue
@@ -278,6 +406,8 @@ def adaptive_small_h_rigorous(
     delta: float,
     xi: float,
     h_hi: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
     stop_gap_bits: float = 20.0,
     tail_confirm: int = 8,
     h_chunk: int = 16,
@@ -292,7 +422,7 @@ def adaptive_small_h_rigorous(
     h_done = 0
     while h_done < h_hi and not done:
         h_cap = min(h_hi, h_done + h_chunk)
-        outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_cap)
+        outer_logs = outer_small_h_prefix(k_msg, sigma, h_cap, outer_mode=outer_mode, parity_n=parity_n)
         for h in range(h_done + 1, h_cap + 1):
             out = outer_logs[h]
             inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
@@ -326,6 +456,8 @@ def adaptive_small_h_localtail(
     delta: float,
     xi: float,
     h_hi: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
     stop_gap_bits: float = 20.0,
     tail_confirm: int = 8,
     ratio_window: int = 4,
@@ -348,7 +480,7 @@ def adaptive_small_h_localtail(
     h_done = 0
     while h_done < h_hi and not done:
         h_cap = min(h_hi, h_done + h_chunk)
-        outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_cap)
+        outer_logs = outer_small_h_prefix(k_msg, sigma, h_cap, outer_mode=outer_mode, parity_n=parity_n)
         for h in range(h_done + 1, h_cap + 1):
             out = outer_logs[h]
             inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
@@ -396,11 +528,14 @@ def small_h_heuristic_log2(
     h_lo: int,
     h_hi: int,
     theta: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
 ) -> float:
     total = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
     for h in range(h_lo, h_hi + 1):
         eta = h / n
-        out = outer_small_h_exact_log2(k_msg, sigma, h)
+        out = outer_logs[h]
         inn = psi_run(eta, theta)
         total = log2add(total, out - n * inn)
     return total
@@ -413,11 +548,13 @@ def single_run_product_log2(
     h_lo: int,
     h_hi: int,
     q_single: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
 ) -> tuple[float, int, float]:
     total = float("-inf")
     peak_h = 0
     peak_term = float("-inf")
-    outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_hi)
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
     q_log = math.log2(q_single)
     for h in range(h_lo, h_hi + 1):
         out = outer_logs[h]
@@ -456,11 +593,13 @@ def run_mixture_model_log2(
     h_hi: int,
     q_single: float,
     gamma: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
 ) -> tuple[float, int, float]:
     total = float("-inf")
     peak_h = 0
     peak_term = float("-inf")
-    outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_hi)
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
     for h in range(h_lo, h_hi + 1):
         out = outer_logs[h]
         if out == float("-inf"):
@@ -588,6 +727,12 @@ def main() -> int:
         default="paper",
         help="Use n=2k ('paper') or n=2k+sigma ('extended', matching the enumerated sysBand line).",
     )
+    parser.add_argument(
+        "--outer-smallh-mode",
+        choices=("conv", "banded"),
+        default="banded",
+        help="Small-weight outer model: 'conv' uses the paper convolutional proxy, 'banded' uses the actual sysBand combinatorics.",
+    )
     parser.add_argument("--delta", type=float, default=0.12)
     parser.add_argument("--z", type=float, default=1.0 / 3.0)
     parser.add_argument("--rho", type=float, default=1.0 / 4.0)
@@ -650,14 +795,26 @@ def main() -> int:
         action="store_true",
         help="Also report the legacy run-mixture model with gamma = 0.2*q_single for comparison.",
     )
+    parser.add_argument(
+        "--show-bracket",
+        action="store_true",
+        help="Report the current optimistic / central / pessimistic bracket explicitly.",
+    )
     parser.add_argument("--adaptive-stop-gap", type=float, default=20.0)
     parser.add_argument("--adaptive-tail-confirm", type=int, default=8)
     parser.add_argument("--localtail-ratio-window", type=int, default=4)
+    parser.add_argument(
+        "--bracket-h-cap",
+        type=int,
+        default=24,
+        help="Maximum h used by the optimistic/central/pessimistic bracket models.",
+    )
     args = parser.parse_args()
 
     print(f"Concrete dense+dense large-k evaluator")
     print(f"  message length k : {args.k}")
     print(f"  n mode           : {args.n_mode}")
+    print(f"  outer small-h    : {args.outer_smallh_mode}")
     print(f"  delta            : {args.delta}")
     print(f"  z                : {args.z}")
     print(f"  rho              : {args.rho}")
@@ -668,6 +825,7 @@ def main() -> int:
 
     for sigma in sigma_values(args):
         n = total_length(args.k, sigma, args.n_mode)
+        parity_n = n - args.k
         w_out = outer_generating_bound(args.k, sigma, args.z)
         h0, s_tiny = tiny_window_bound(n, sigma, args.delta, args.z, args.xi, args.kappa, w_out)
         h1 = h0 + 1
@@ -688,14 +846,6 @@ def main() -> int:
         lg = math.log2(total) if total > 0.0 else float("-inf")
 
         h_cap = min(args.heuristic_h_cap, h_mid_hi)
-        log2_h_small = small_h_heuristic_log2(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            h_lo=1,
-            h_hi=h_cap,
-            theta=args.theta,
-        )
         h_resid_lo = h_cap + 1
         h_resid = geometric_window_bound(
             n=n,
@@ -705,115 +855,161 @@ def main() -> int:
             rho=args.rho,
             w_out=w_out,
         )
-        log2_h_total = log2_h_small
-        if h_resid > 0.0:
-            log2_h_total = log2add(log2_h_total, math.log2(h_resid))
-        if log2_s_lin != float("-inf"):
-            log2_h_total = log2add(log2_h_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_h_total = log2add(log2_h_total, log2_s_top)
-
-        log2_r_small = small_h_rigorous_log2(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            delta=args.delta,
-            xi=args.xi,
-            h_lo=1,
-            h_hi=h_cap,
-        )
-        log2_r_total = log2_r_small
-        if h_resid > 0.0:
-            log2_r_total = log2add(log2_r_total, math.log2(h_resid))
-        if log2_s_lin != float("-inf"):
-            log2_r_total = log2add(log2_r_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_r_total = log2add(log2_r_total, log2_s_top)
-
-        log2_a_small, h_stop, h_peak, h_peak_log2 = adaptive_small_h_rigorous(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            delta=args.delta,
-            xi=args.xi,
-            h_hi=h_mid_hi,
-            stop_gap_bits=args.adaptive_stop_gap,
-            tail_confirm=args.adaptive_tail_confirm,
-        )
-        a_resid = geometric_window_bound(
-            n=n,
-            h_lo=h_stop + 1,
-            h_hi=h_mid_hi,
-            z=args.z,
-            rho=args.rho,
-            w_out=w_out,
-        )
-        log2_a_total = log2_a_small
-        if a_resid > 0.0:
-            log2_a_total = log2add(log2_a_total, math.log2(a_resid))
-        if log2_s_lin != float("-inf"):
-            log2_a_total = log2add(log2_a_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_a_total = log2add(log2_a_total, log2_s_top)
-
-        log2_l_total, l_stop, l_peak, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            delta=args.delta,
-            xi=args.xi,
-            h_hi=h_mid_hi,
-            stop_gap_bits=args.adaptive_stop_gap,
-            tail_confirm=args.adaptive_tail_confirm,
-            ratio_window=args.localtail_ratio_window,
-        )
-        if log2_s_lin != float("-inf"):
-            log2_l_total = log2add(log2_l_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_l_total = log2add(log2_l_total, log2_s_top)
-
+        log2_h_small = log2_h_total = float("-inf")
+        log2_r_small = log2_r_total = float("-inf")
+        log2_a_small = log2_a_total = a_resid = float("-inf")
+        h_stop = h_peak = 0
+        h_peak_log2 = float("-inf")
+        log2_l_total = log2_l_tail = float("-inf")
+        l_stop = l_peak = 0
+        l_peak_log2 = float("-inf")
         q_single = args.q_single if args.q_single is not None else min(1.0, 2.0 * args.delta)
-        log2_q_total, q_peak_h, q_peak_log2 = single_run_product_log2(
-            k_msg=args.k,
-            sigma=sigma,
-            h_lo=1,
-            h_hi=min(64, h_mid_hi),
-            q_single=q_single,
-        )
-        if log2_s_lin != float("-inf"):
-            log2_q_total = log2add(log2_q_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_q_total = log2add(log2_q_total, log2_s_top)
-
+        log2_q_total = q_peak_log2 = float("-inf")
+        q_peak_h = 0
         gamma_runmix = args.gamma_runmix if args.gamma_runmix is not None else runmix_gamma_from_q(q_single)
-        log2_m_total, m_peak_h, m_peak_log2 = run_mixture_model_log2(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            h_lo=1,
-            h_hi=min(64, h_mid_hi),
-            q_single=q_single,
-            gamma=gamma_runmix,
-        )
-        if log2_s_lin != float("-inf"):
-            log2_m_total = log2add(log2_m_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_m_total = log2add(log2_m_total, log2_s_top)
-
+        log2_m_total = m_peak_log2 = float("-inf")
+        m_peak_h = 0
         gamma_runmix_legacy = 0.2 * q_single
-        log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
-            n=n,
-            k_msg=args.k,
-            sigma=sigma,
-            h_lo=1,
-            h_hi=min(64, h_mid_hi),
-            q_single=q_single,
-            gamma=gamma_runmix_legacy,
-        )
-        if log2_s_lin != float("-inf"):
-            log2_m0_total = log2add(log2_m0_total, log2_s_lin)
-        if log2_s_top != float("-inf"):
-            log2_m0_total = log2add(log2_m0_total, log2_s_top)
+        log2_m0_total = m0_peak_log2 = float("-inf")
+        m0_peak_h = 0
+
+        if args.show_heuristic:
+            log2_h_small = small_h_heuristic_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=h_cap,
+                theta=args.theta,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            log2_h_total = log2_h_small
+            if h_resid > 0.0:
+                log2_h_total = log2add(log2_h_total, math.log2(h_resid))
+            if log2_s_lin != float("-inf"):
+                log2_h_total = log2add(log2_h_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_h_total = log2add(log2_h_total, log2_s_top)
+
+        if args.show_exact_smallw:
+            log2_r_small = small_h_rigorous_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                xi=args.xi,
+                h_lo=1,
+                h_hi=h_cap,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            log2_r_total = log2_r_small
+            if h_resid > 0.0:
+                log2_r_total = log2add(log2_r_total, math.log2(h_resid))
+            if log2_s_lin != float("-inf"):
+                log2_r_total = log2add(log2_r_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_r_total = log2add(log2_r_total, log2_s_top)
+
+        if args.show_adaptive_smallw:
+            log2_a_small, h_stop, h_peak, h_peak_log2 = adaptive_small_h_rigorous(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                xi=args.xi,
+                h_hi=h_mid_hi,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+                stop_gap_bits=args.adaptive_stop_gap,
+                tail_confirm=args.adaptive_tail_confirm,
+            )
+            a_resid = geometric_window_bound(
+                n=n,
+                h_lo=h_stop + 1,
+                h_hi=h_mid_hi,
+                z=args.z,
+                rho=args.rho,
+                w_out=w_out,
+            )
+            log2_a_total = log2_a_small
+            if a_resid > 0.0:
+                log2_a_total = log2add(log2_a_total, math.log2(a_resid))
+            if log2_s_lin != float("-inf"):
+                log2_a_total = log2add(log2_a_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_a_total = log2add(log2_a_total, log2_s_top)
+
+        need_bracketish = args.show_localtail_smallw or args.show_single_run_model or args.show_run_mixture_model or args.show_run_mixture_legacy or args.show_bracket
+        bracket_h_hi = min(args.bracket_h_cap, h_mid_hi)
+        if args.show_localtail_smallw or args.show_bracket:
+            log2_l_total, l_stop, l_peak, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                xi=args.xi,
+                h_hi=bracket_h_hi if args.outer_smallh_mode == "banded" else h_mid_hi,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+                stop_gap_bits=args.adaptive_stop_gap,
+                tail_confirm=args.adaptive_tail_confirm,
+                ratio_window=args.localtail_ratio_window,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_l_total = log2add(log2_l_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_l_total = log2add(log2_l_total, log2_s_top)
+
+        if args.show_single_run_model or args.show_bracket:
+            log2_q_total, q_peak_h, q_peak_log2 = single_run_product_log2(
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_q_total = log2add(log2_q_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_q_total = log2add(log2_q_total, log2_s_top)
+
+        if args.show_run_mixture_model or args.show_bracket:
+            log2_m_total, m_peak_h, m_peak_log2 = run_mixture_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                gamma=gamma_runmix,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_m_total = log2add(log2_m_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_m_total = log2add(log2_m_total, log2_s_top)
+
+        if args.show_run_mixture_legacy:
+            log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                gamma=gamma_runmix_legacy,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_m0_total = log2add(log2_m0_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_m0_total = log2add(log2_m0_total, log2_s_top)
 
         print(f"sigma = {sigma}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
@@ -856,6 +1052,10 @@ def main() -> int:
             print(f"  M0_total (legacy run-mixture, gamma=0.2q)                : {format_log2(log2_m0_total)}")
             print(f"  M0_peak  (dominant h, log2 contribution)                 : h={m0_peak_h}, log2={m0_peak_log2:.3f}")
             print(f"  M0_gamma (legacy damping)                                : {gamma_runmix_legacy:.6f}")
+        if args.show_bracket:
+            print(f"  B_opt   (optimistic = local-tail)                        : {format_log2(log2_l_total)}")
+            print(f"  B_ctr   (central = pairwise run-mixture)                 : {format_log2(log2_m_total)}")
+            print(f"  B_pess  (pessimistic = single-run)                       : {format_log2(log2_q_total)}")
         if args.lambda_target is not None:
             target = -args.lambda_target
             ok = lg <= target
