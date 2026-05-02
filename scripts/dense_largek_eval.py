@@ -29,6 +29,10 @@ ETA_CRIT = 1.0 - 2.0 ** -0.5
 OUTER_LOW_SLOPE = math.log2(1.0 + math.sqrt(2.0))
 RUNMIX_GAMMA_INTERCEPT = 0.14461613
 RUNMIX_GAMMA_SLOPE = -0.42472604
+RUNMIX_GAMMA_SAFE_INTERCEPT = 0.1347
+RUNMIX_GAMMA_SAFE_SLOPE = -0.3910
+RUNMIX_LAMBDA_INTERCEPT = -0.003929694918965849
+RUNMIX_LAMBDA_SLOPE = 0.024519978056113938
 
 
 def h2(x: float) -> float:
@@ -580,6 +584,31 @@ def runmix_gamma_from_q(q_single: float) -> float:
     return max(0.0, RUNMIX_GAMMA_INTERCEPT + RUNMIX_GAMMA_SLOPE * q_single)
 
 
+def runmix_gamma_safe_from_q(q_single: float) -> float:
+    """Lower-envelope pairwise damping law for theorem-shaped experiments.
+
+    This is a conservative affine lower envelope for the minimum effective
+    pairwise exponent seen on the current exact inner-only overlap tables across
+    s=2..6. It is meant to be closer to something one could plausibly prove than
+    the least-squares central fit, while still retaining the same qualitative
+    structure.
+    """
+    return max(0.0, RUNMIX_GAMMA_SAFE_INTERCEPT + RUNMIX_GAMMA_SAFE_SLOPE * q_single)
+
+
+def runmix_lambda_from_q(q_single: float) -> float:
+    """Small cubic correction inferred after the pairwise fit.
+
+    After removing the pairwise damping term, the larger exact inner-only tables
+    still show a mild additional suppression once the run count reaches roughly
+    4--6. A tiny positive cubic coefficient captures that effect well while
+    remaining essentially invisible on the smaller n=120 table. We therefore
+    keep it as an optional refinement rather than part of the default central
+    lane.
+    """
+    return max(0.0, RUNMIX_LAMBDA_INTERCEPT + RUNMIX_LAMBDA_SLOPE * q_single)
+
+
 def run_count_weight(n: int, w: int, s: int) -> float:
     return math.comb(w - 1, s - 1) * math.comb(n - w + 1, s) / math.comb(n, w)
 
@@ -607,6 +636,47 @@ def run_mixture_model_log2(
         p = 0.0
         for s in range(1, h + 1):
             p += run_count_weight(n, h, s) * (q_single**s) * math.exp(-gamma * s * (s - 1) / 2.0)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def run_mixture_cubic_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    q_single: float,
+    gamma: float,
+    lambd: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = 0.0
+        for s in range(1, h + 1):
+            p += (
+                run_count_weight(n, h, s)
+                * (q_single**s)
+                * math.exp(
+                    -gamma * s * (s - 1) / 2.0
+                    - lambd * s * (s - 1) * (s - 2) / 6.0
+                )
+            )
         if p <= 0.0:
             continue
         term = out + math.log2(p)
@@ -779,6 +849,16 @@ def main() -> int:
         help="Also report a small-weight model using exact outer counts and a run-count mixture with q_s = q^s exp(-gamma s(s-1)/2).",
     )
     parser.add_argument(
+        "--show-run-mixture-safe",
+        action="store_true",
+        help="Also report a theorem-shaped safe pairwise run-mixture model using a conservative lower envelope for gamma(q).",
+    )
+    parser.add_argument(
+        "--show-run-mixture-cubic",
+        action="store_true",
+        help="Also report a refined run-mixture model with an additional cubic run-count damping term.",
+    )
+    parser.add_argument(
         "--q-single",
         type=float,
         default=None,
@@ -869,6 +949,12 @@ def main() -> int:
         gamma_runmix = args.gamma_runmix if args.gamma_runmix is not None else runmix_gamma_from_q(q_single)
         log2_m_total = m_peak_log2 = float("-inf")
         m_peak_h = 0
+        gamma_runmix_safe = runmix_gamma_safe_from_q(q_single)
+        log2_ms_total = ms_peak_log2 = float("-inf")
+        ms_peak_h = 0
+        lambda_runmix = runmix_lambda_from_q(q_single)
+        log2_mc_total = mc_peak_log2 = float("-inf")
+        mc_peak_h = 0
         gamma_runmix_legacy = 0.2 * q_single
         log2_m0_total = m0_peak_log2 = float("-inf")
         m0_peak_h = 0
@@ -941,7 +1027,7 @@ def main() -> int:
             if log2_s_top != float("-inf"):
                 log2_a_total = log2add(log2_a_total, log2_s_top)
 
-        need_bracketish = args.show_localtail_smallw or args.show_single_run_model or args.show_run_mixture_model or args.show_run_mixture_legacy or args.show_bracket
+        need_bracketish = args.show_localtail_smallw or args.show_single_run_model or args.show_run_mixture_model or args.show_run_mixture_safe or args.show_run_mixture_cubic or args.show_run_mixture_legacy or args.show_bracket
         bracket_h_hi = min(args.bracket_h_cap, h_mid_hi)
         if args.show_localtail_smallw or args.show_bracket:
             log2_l_total, l_stop, l_peak, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
@@ -993,6 +1079,41 @@ def main() -> int:
                 log2_m_total = log2add(log2_m_total, log2_s_lin)
             if log2_s_top != float("-inf"):
                 log2_m_total = log2add(log2_m_total, log2_s_top)
+
+        if args.show_run_mixture_safe:
+            log2_ms_total, ms_peak_h, ms_peak_log2 = run_mixture_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                gamma=gamma_runmix_safe,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_ms_total = log2add(log2_ms_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_ms_total = log2add(log2_ms_total, log2_s_top)
+
+        if args.show_run_mixture_cubic:
+            log2_mc_total, mc_peak_h, mc_peak_log2 = run_mixture_cubic_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                gamma=gamma_runmix,
+                lambd=lambda_runmix,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_mc_total = log2add(log2_mc_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_mc_total = log2add(log2_mc_total, log2_s_top)
 
         if args.show_run_mixture_legacy:
             log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
@@ -1048,6 +1169,17 @@ def main() -> int:
             print(f"  M_peak  (dominant h, log2 contribution)                  : h={m_peak_h}, log2={m_peak_log2:.3f}")
             print(f"  M_q     (single-run factor)                              : {q_single:.6f}")
             print(f"  M_gamma (run-mixture damping)                            : {gamma_runmix:.6f}")
+        if args.show_run_mixture_safe:
+            print(f"  MS_total (safe pairwise run-mixture)                     : {format_log2(log2_ms_total)}")
+            print(f"  MS_peak  (dominant h, log2 contribution)                 : h={ms_peak_h}, log2={ms_peak_log2:.3f}")
+            print(f"  MS_q     (single-run factor)                             : {q_single:.6f}")
+            print(f"  MS_gamma (safe pairwise damping)                         : {gamma_runmix_safe:.6f}")
+        if args.show_run_mixture_cubic:
+            print(f"  MC_total (run-mixture + cubic correction)                : {format_log2(log2_mc_total)}")
+            print(f"  MC_peak  (dominant h, log2 contribution)                 : h={mc_peak_h}, log2={mc_peak_log2:.3f}")
+            print(f"  MC_q     (single-run factor)                             : {q_single:.6f}")
+            print(f"  MC_gamma (pairwise damping)                              : {gamma_runmix:.6f}")
+            print(f"  MC_lambda (cubic damping)                                : {lambda_runmix:.6f}")
         if args.show_run_mixture_legacy:
             print(f"  M0_total (legacy run-mixture, gamma=0.2q)                : {format_log2(log2_m0_total)}")
             print(f"  M0_peak  (dominant h, log2 contribution)                 : h={m0_peak_h}, log2={m0_peak_log2:.3f}")

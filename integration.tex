@@ -794,6 +794,12 @@ first-moment value at that threshold, now show that the pairwise-calibrated and 
 true finite-length behavior than the earlier convolutional proxy, but they still tend to be optimistic by a few bits on
 average, with the miss becoming larger as \(\sigma\) grows. So even the present \(c\approx 6\) center should still be
 read as a working estimate rather than a certification.
+\item a useful theorem-shaped refinement is to replace the least-squares pairwise damping fit by a conservative affine
+lower envelope \(\gamma_{\mathrm{safe}}(q_1)\) for the minimum observed pairwise exponent across the current exact
+inner-only tables. Empirically this moves the central lane only slightly: at \(k=2^{20}\) and \(\delta=0.12\), the
+pairwise-calibrated model crosses below \(1\) near \(c=6\), and the safe-pairwise version does the same. So the
+current evidence suggests that a proof built around a pairwise run-mixture upper bound may lose only a small constant
+amount relative to the present central heuristic.
 \item accordingly, the current working language is to treat these three lanes as
 \emph{optimistic}, \emph{central}, and \emph{pessimistic} estimates rather than as competing theorem claims.
 \end{itemize}
