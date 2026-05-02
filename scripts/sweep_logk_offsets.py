@@ -11,12 +11,16 @@ from pathlib import Path
 from dense_largek_eval import (
     ETA_CRIT,
     GapResult,
+    adaptive_small_h_localtail,
     adaptive_small_h_rigorous,
     exact_smallw_inner_bound,
     geometric_window_bound,
     linear_window_gap,
     outer_generating_bound,
     outer_small_h_exact_log2,
+    run_mixture_model_log2,
+    runmix_gamma_from_q,
+    single_run_product_log2,
     small_h_heuristic_log2,
     total_length,
     tiny_window_bound,
@@ -158,6 +162,78 @@ def evaluate_point(
         lo = min(log2_a_small, log2_a_resid)
         log2_a_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
 
+    log2_l_total, l_stop_h, l_peak_h, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        delta=delta,
+        xi=xi,
+        h_hi=h_mid_hi,
+    )
+    if log2_s_lin != float("-inf"):
+        hi = max(log2_l_total, log2_s_lin)
+        lo = min(log2_l_total, log2_s_lin)
+        log2_l_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    if log2_s_top != float("-inf"):
+        hi = max(log2_l_total, log2_s_top)
+        lo = min(log2_l_total, log2_s_top)
+        log2_l_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
+    q_single = min(1.0, 2.0 * delta)
+    log2_q_total, q_peak_h, q_peak_log2 = single_run_product_log2(
+        k_msg=k_msg,
+        sigma=sigma,
+        h_lo=1,
+        h_hi=min(64, h_mid_hi),
+        q_single=q_single,
+    )
+    if log2_s_lin != float("-inf"):
+        hi = max(log2_q_total, log2_s_lin)
+        lo = min(log2_q_total, log2_s_lin)
+        log2_q_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    if log2_s_top != float("-inf"):
+        hi = max(log2_q_total, log2_s_top)
+        lo = min(log2_q_total, log2_s_top)
+        log2_q_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
+    gamma_runmix = runmix_gamma_from_q(q_single)
+    log2_m_total, m_peak_h, m_peak_log2 = run_mixture_model_log2(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        h_lo=1,
+        h_hi=min(64, h_mid_hi),
+        q_single=q_single,
+        gamma=gamma_runmix,
+    )
+    if log2_s_lin != float("-inf"):
+        hi = max(log2_m_total, log2_s_lin)
+        lo = min(log2_m_total, log2_s_lin)
+        log2_m_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    if log2_s_top != float("-inf"):
+        hi = max(log2_m_total, log2_s_top)
+        lo = min(log2_m_total, log2_s_top)
+        log2_m_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
+    gamma_runmix_legacy = 0.2 * q_single
+    log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        h_lo=1,
+        h_hi=min(64, h_mid_hi),
+        q_single=q_single,
+        gamma=gamma_runmix_legacy,
+    )
+    if log2_s_lin != float("-inf"):
+        hi = max(log2_m0_total, log2_s_lin)
+        lo = min(log2_m0_total, log2_s_lin)
+        log2_m0_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    if log2_s_top != float("-inf"):
+        hi = max(log2_m0_total, log2_s_top)
+        lo = min(log2_m0_total, log2_s_top)
+        log2_m0_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
     return {
         "n": float(n),
         "w_out_log2": math.log2(w_out) if w_out > 0.0 else float("-inf"),
@@ -181,6 +257,23 @@ def evaluate_point(
         "a_small_log2": log2_a_small,
         "a_tail_log2": log2_a_resid,
         "a_total_log2": log2_a_total,
+        "l_stop_h": float(l_stop_h),
+        "l_peak_h": float(l_peak_h),
+        "l_peak_log2": l_peak_log2,
+        "l_tail_log2": log2_l_tail,
+        "l_total_log2": log2_l_total,
+        "q_single": q_single,
+        "q_peak_h": float(q_peak_h),
+        "q_peak_log2": q_peak_log2,
+        "q_total_log2": log2_q_total,
+        "m_gamma": gamma_runmix,
+        "m_peak_h": float(m_peak_h),
+        "m_peak_log2": m_peak_log2,
+        "m_total_log2": log2_m_total,
+        "m0_gamma": gamma_runmix_legacy,
+        "m0_peak_h": float(m0_peak_h),
+        "m0_peak_log2": m0_peak_log2,
+        "m0_total_log2": log2_m0_total,
     }
 
 
@@ -242,6 +335,15 @@ def main() -> int:
                 "a_small_log2",
                 "a_tail_log2",
                 "a_total_log2",
+                "l_stop_h",
+                "l_peak_h",
+                "l_peak_log2",
+                "l_tail_log2",
+                "l_total_log2",
+                "q_single",
+                "q_peak_h",
+                "q_peak_log2",
+                "q_total_log2",
             ],
         )
         writer.writeheader()

@@ -19,11 +19,16 @@ from __future__ import annotations
 import argparse
 import math
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Iterable, List
+
+import numpy as np
 
 
 ETA_CRIT = 1.0 - 2.0 ** -0.5
 OUTER_LOW_SLOPE = math.log2(1.0 + math.sqrt(2.0))
+RUNMIX_GAMMA_INTERCEPT = 0.14461613
+RUNMIX_GAMMA_SLOPE = -0.42472604
 
 
 def h2(x: float) -> float:
@@ -123,22 +128,78 @@ def outer_generating_bound(k_msg: int, sigma: int, z: float) -> float:
     return span1 + span_ge_2
 
 
+@lru_cache(maxsize=None)
+def outer_small_h_exact_prefix(k_msg: int, sigma: int, h_max: int) -> tuple[float, ...]:
+    """Exact low-weight outer counts for 1 <= h <= h_max.
+
+    This computes the whole low-weight prefix at once. The first-span term is
+    explicit, and the span>=2 contribution is propagated by the coefficient
+    recurrence induced by multiplying by (1+x)^2 and dividing by 2 per added
+    span position:
+
+        g_{ell+1}[j] = 0.5 g_ell[j] + g_ell[j-1] + 0.5 g_ell[j-2]
+
+    where g_ell[j] = C(2 ell + sigma - 2, j) / 2^ell.
+    """
+    if h_max <= 0:
+        return tuple()
+
+    vals = np.zeros(h_max + 1, dtype=np.float64)
+    two_to_minus_sigma = 2.0 ** (-sigma)
+    two_to_minus_sigma_plus_1 = 0.5 * two_to_minus_sigma
+
+    for h in range(1, h_max + 1):
+        j = h - 1
+        if 0 <= j <= sigma + 1:
+            vals[h] += k_msg * math.comb(sigma + 1, j) * two_to_minus_sigma_plus_1
+
+    if h_max >= 2:
+        max_j = h_max - 2
+        g = np.zeros(max_j + 1, dtype=np.float64)
+        for j in range(max_j + 1):
+            if j <= sigma + 2:
+                g[j] = math.comb(sigma + 2, j) / 4.0
+
+        peak_add = 0.0
+        decay_count = 0
+        for ell in range(2, k_msg + 1):
+            mult = (k_msg - ell + 1) * two_to_minus_sigma
+            if mult != 0.0:
+                add = mult * g
+                vals[2:] += add
+
+                add_peak = float(np.max(add))
+                if add_peak > peak_add:
+                    peak_add = add_peak
+                    decay_count = 0
+                elif peak_add > 0.0 and add_peak <= peak_add * (2.0 ** -80):
+                    decay_count += 1
+                    if k_msg > 10000 and decay_count >= 64:
+                        break
+                else:
+                    decay_count = 0
+
+            if ell != k_msg:
+                nxt = np.zeros(max_j + 1, dtype=np.float64)
+                if max_j >= 0:
+                    nxt[0] = 0.5 * g[0]
+                if max_j >= 1:
+                    nxt[1] = 0.5 * g[1] + g[0]
+                if max_j >= 2:
+                    nxt[2:] = 0.5 * g[2:] + g[1:-1] + 0.5 * g[:-2]
+                g = nxt
+
+    logs = [float("-inf")] * (h_max + 1)
+    for h in range(1, h_max + 1):
+        if vals[h] > 0.0:
+            logs[h] = math.log2(vals[h])
+    return tuple(logs)
+
+
 def outer_small_h_exact_log2(k_msg: int, sigma: int, h: int) -> float:
-    total = float("-inf")
-
-    first = math.log2(k_msg) + log2_binom(sigma + 1, h - 1) - (sigma + 1)
-    total = log2add(total, first)
-
-    for ell in range(2, k_msg + 1):
-        mult = k_msg - ell + 1
-        term = (
-            math.log2(mult)
-            + log2_binom(2 * ell + sigma - 2, h - 2)
-            - (ell + sigma)
-        )
-        total = log2add(total, term)
-
-    return total
+    if h <= 0:
+        return float("-inf")
+    return outer_small_h_exact_prefix(k_msg, sigma, h)[h]
 
 
 def run_tail_exact_log2(n: int, w: int, r: int) -> float:
@@ -219,6 +280,7 @@ def adaptive_small_h_rigorous(
     h_hi: int,
     stop_gap_bits: float = 20.0,
     tail_confirm: int = 8,
+    h_chunk: int = 16,
 ) -> tuple[float, int, int, float]:
     total = float("-inf")
     best_term = float("-inf")
@@ -226,27 +288,104 @@ def adaptive_small_h_rigorous(
     last_h = 0
     decay_count = 0
 
-    for h in range(1, h_hi + 1):
-        out = outer_small_h_exact_log2(k_msg, sigma, h)
-        inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
-        if inn <= 0.0:
-            continue
-        term = out + math.log2(inn)
-        total = term if total == float("-inf") else log2add(total, term)
-        last_h = h
+    done = False
+    h_done = 0
+    while h_done < h_hi and not done:
+        h_cap = min(h_hi, h_done + h_chunk)
+        outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_cap)
+        for h in range(h_done + 1, h_cap + 1):
+            out = outer_logs[h]
+            inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+            if inn <= 0.0 or out == float("-inf"):
+                continue
+            term = out + math.log2(inn)
+            total = term if total == float("-inf") else log2add(total, term)
+            last_h = h
 
-        if term > best_term:
-            best_term = term
-            best_h = h
-            decay_count = 0
-        elif term <= best_term - stop_gap_bits:
-            decay_count += 1
-            if decay_count >= tail_confirm:
-                break
-        else:
-            decay_count = 0
+            if term > best_term:
+                best_term = term
+                best_h = h
+                decay_count = 0
+            elif term <= best_term - stop_gap_bits:
+                decay_count += 1
+                if decay_count >= tail_confirm:
+                    done = True
+                    break
+            else:
+                decay_count = 0
+        h_done = h_cap
 
     return total, last_h, best_h, best_term
+
+
+def adaptive_small_h_localtail(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    xi: float,
+    h_hi: int,
+    stop_gap_bits: float = 20.0,
+    tail_confirm: int = 8,
+    ratio_window: int = 4,
+    h_chunk: int = 16,
+) -> tuple[float, int, int, float, float]:
+    """Exact tiny-weight sum plus a local ratio tail heuristic.
+
+    This is not a proof object. It uses the actual exact term sequence and, once
+    the terms have fallen well below their peak for several consecutive h,
+    approximates the unseen tail by a geometric continuation whose ratio is the
+    maximum observed ratio across the last few exact steps.
+    """
+    total = float("-inf")
+    best_term = float("-inf")
+    best_h = 0
+    last_h = 0
+    decay_count = 0
+    term_logs: list[float] = []
+    done = False
+    h_done = 0
+    while h_done < h_hi and not done:
+        h_cap = min(h_hi, h_done + h_chunk)
+        outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_cap)
+        for h in range(h_done + 1, h_cap + 1):
+            out = outer_logs[h]
+            inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+            if inn <= 0.0 or out == float("-inf"):
+                continue
+            term = out + math.log2(inn)
+            term_logs.append(term)
+            total = term if total == float("-inf") else log2add(total, term)
+            last_h = h
+
+            if term > best_term:
+                best_term = term
+                best_h = h
+                decay_count = 0
+            elif term <= best_term - stop_gap_bits:
+                decay_count += 1
+                if decay_count >= tail_confirm:
+                    done = True
+                    break
+            else:
+                decay_count = 0
+        h_done = h_cap
+
+    tail_log = float("-inf")
+    if len(term_logs) >= ratio_window + 1:
+        ratios = []
+        for idx in range(len(term_logs) - ratio_window, len(term_logs)):
+            prev = term_logs[idx - 1]
+            cur = term_logs[idx]
+            ratios.append(2.0 ** (cur - prev))
+        q = max(ratios)
+        if 0.0 < q < 1.0:
+            last_term = term_logs[-1]
+            tail_log = last_term + math.log2(q / (1.0 - q))
+
+    total_with_tail = total if tail_log == float("-inf") else log2add(total, tail_log)
+    return total_with_tail, last_h, best_h, best_term, tail_log
 
 
 def small_h_heuristic_log2(
@@ -265,6 +404,78 @@ def small_h_heuristic_log2(
         inn = psi_run(eta, theta)
         total = log2add(total, out - n * inn)
     return total
+
+
+def single_run_product_log2(
+    *,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    q_single: float,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_hi)
+    q_log = math.log2(q_single)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        term = out + h * q_log
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def runmix_gamma_from_q(q_single: float) -> float:
+    """Pairwise interaction penalty inferred from large exact inner-only tables.
+
+    The model is anchored at the one-run factor q_single and uses a pairwise
+    damping term exp(-gamma * C(s,2)) for s runs. On the largest exact inner
+    tables currently available (n=120,128), the effective gamma extracted from
+    the two-run slice is well fit by a simple linear law in q_single over the
+    regime q_single ~= 0.17..0.25.
+    """
+    return max(0.0, RUNMIX_GAMMA_INTERCEPT + RUNMIX_GAMMA_SLOPE * q_single)
+
+
+def run_count_weight(n: int, w: int, s: int) -> float:
+    return math.comb(w - 1, s - 1) * math.comb(n - w + 1, s) / math.comb(n, w)
+
+
+def run_mixture_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    q_single: float,
+    gamma: float,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_exact_prefix(k_msg, sigma, h_hi)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = 0.0
+        for s in range(1, h + 1):
+            p += run_count_weight(n, h, s) * (q_single**s) * math.exp(-gamma * s * (s - 1) / 2.0)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
 
 
 def geometric_window_bound(
@@ -407,8 +618,41 @@ def main() -> int:
         action="store_true",
         help="Also report an adaptive exact small-weight finite-n bound and the stopping point used before the rigorous residual tail.",
     )
+    parser.add_argument(
+        "--show-localtail-smallw",
+        action="store_true",
+        help="Also report an adaptive exact small-weight model with a local geometric tail fit from the exact term sequence.",
+    )
+    parser.add_argument(
+        "--show-single-run-model",
+        action="store_true",
+        help="Also report a small-weight model using exact outer counts and a per-run factor q_single^h.",
+    )
+    parser.add_argument(
+        "--show-run-mixture-model",
+        action="store_true",
+        help="Also report a small-weight model using exact outer counts and a run-count mixture with q_s = q^s exp(-gamma s(s-1)/2).",
+    )
+    parser.add_argument(
+        "--q-single",
+        type=float,
+        default=None,
+        help="Override the single-run factor q used by --show-single-run-model. Default is 2*delta.",
+    )
+    parser.add_argument(
+        "--gamma-runmix",
+        type=float,
+        default=None,
+        help="Override the run-mixture damping gamma. Default uses the pairwise-calibrated law gamma(q).",
+    )
+    parser.add_argument(
+        "--show-run-mixture-legacy",
+        action="store_true",
+        help="Also report the legacy run-mixture model with gamma = 0.2*q_single for comparison.",
+    )
     parser.add_argument("--adaptive-stop-gap", type=float, default=20.0)
     parser.add_argument("--adaptive-tail-confirm", type=int, default=8)
+    parser.add_argument("--localtail-ratio-window", type=int, default=4)
     args = parser.parse_args()
 
     print(f"Concrete dense+dense large-k evaluator")
@@ -512,6 +756,65 @@ def main() -> int:
         if log2_s_top != float("-inf"):
             log2_a_total = log2add(log2_a_total, log2_s_top)
 
+        log2_l_total, l_stop, l_peak, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            delta=args.delta,
+            xi=args.xi,
+            h_hi=h_mid_hi,
+            stop_gap_bits=args.adaptive_stop_gap,
+            tail_confirm=args.adaptive_tail_confirm,
+            ratio_window=args.localtail_ratio_window,
+        )
+        if log2_s_lin != float("-inf"):
+            log2_l_total = log2add(log2_l_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_l_total = log2add(log2_l_total, log2_s_top)
+
+        q_single = args.q_single if args.q_single is not None else min(1.0, 2.0 * args.delta)
+        log2_q_total, q_peak_h, q_peak_log2 = single_run_product_log2(
+            k_msg=args.k,
+            sigma=sigma,
+            h_lo=1,
+            h_hi=min(64, h_mid_hi),
+            q_single=q_single,
+        )
+        if log2_s_lin != float("-inf"):
+            log2_q_total = log2add(log2_q_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_q_total = log2add(log2_q_total, log2_s_top)
+
+        gamma_runmix = args.gamma_runmix if args.gamma_runmix is not None else runmix_gamma_from_q(q_single)
+        log2_m_total, m_peak_h, m_peak_log2 = run_mixture_model_log2(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            h_lo=1,
+            h_hi=min(64, h_mid_hi),
+            q_single=q_single,
+            gamma=gamma_runmix,
+        )
+        if log2_s_lin != float("-inf"):
+            log2_m_total = log2add(log2_m_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_m_total = log2add(log2_m_total, log2_s_top)
+
+        gamma_runmix_legacy = 0.2 * q_single
+        log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
+            n=n,
+            k_msg=args.k,
+            sigma=sigma,
+            h_lo=1,
+            h_hi=min(64, h_mid_hi),
+            q_single=q_single,
+            gamma=gamma_runmix_legacy,
+        )
+        if log2_s_lin != float("-inf"):
+            log2_m0_total = log2add(log2_m0_total, log2_s_lin)
+        if log2_s_top != float("-inf"):
+            log2_m0_total = log2add(log2_m0_total, log2_s_top)
+
         print(f"sigma = {sigma}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
         print(f"  outer generating bound W(z)   : {format_prob(w_out)}")
@@ -535,6 +838,24 @@ def main() -> int:
             print(f"  A_total (adaptive finite-n mixed)                        : {format_log2(log2_a_total)}")
             print(f"  A_peak  (dominant h, log2 contribution)                  : h={h_peak}, log2={h_peak_log2:.3f}")
             print(f"  A_stop  (last exact h included)                          : {h_stop}")
+        if args.show_localtail_smallw:
+            print(f"  L_total (adaptive exact + local tail model)              : {format_log2(log2_l_total)}")
+            print(f"  L_tail  (local geometric continuation only)              : {format_log2(log2_l_tail)}")
+            print(f"  L_peak  (dominant h, log2 contribution)                  : h={l_peak}, log2={l_peak_log2:.3f}")
+            print(f"  L_stop  (last exact h included)                          : {l_stop}")
+        if args.show_single_run_model:
+            print(f"  Q_total (exact outer + q^h inner model)                  : {format_log2(log2_q_total)}")
+            print(f"  Q_peak  (dominant h, log2 contribution)                  : h={q_peak_h}, log2={q_peak_log2:.3f}")
+            print(f"  Q_q     (single-run factor)                              : {q_single:.6f}")
+        if args.show_run_mixture_model:
+            print(f"  M_total (exact outer + run-mixture inner model)          : {format_log2(log2_m_total)}")
+            print(f"  M_peak  (dominant h, log2 contribution)                  : h={m_peak_h}, log2={m_peak_log2:.3f}")
+            print(f"  M_q     (single-run factor)                              : {q_single:.6f}")
+            print(f"  M_gamma (run-mixture damping)                            : {gamma_runmix:.6f}")
+        if args.show_run_mixture_legacy:
+            print(f"  M0_total (legacy run-mixture, gamma=0.2q)                : {format_log2(log2_m0_total)}")
+            print(f"  M0_peak  (dominant h, log2 contribution)                 : h={m0_peak_h}, log2={m0_peak_log2:.3f}")
+            print(f"  M0_gamma (legacy damping)                                : {gamma_runmix_legacy:.6f}")
         if args.lambda_target is not None:
             target = -args.lambda_target
             ok = lg <= target

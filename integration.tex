@@ -743,22 +743,52 @@ it is a finite-\(n\) approximation assembled directly from the same exact combin
 proof, with only the residual window treated more coarsely.
 
 \paragraph{Current save point.}
-At the time of writing, the strongest finite-\(n\) working estimate suggests the following picture for the
-construction tracked by the enumerator:
+At the time of writing, the strongest finite-\(n\) working estimate is obtained by an
+\emph{adaptive exact tiny-weight sum}: we evaluate the exact outer small-\(h\) count together with the exact
+run-tail inner bound term-by-term until the contribution sequence has clearly fallen well below its peak.
+Beyond that point, the original geometric residual can be replaced by a local continuation model based on the observed
+decay of the exact tiny-weight terms.  Empirically, this makes very little difference for the candidate transition:
+the dominant mass is already concentrated at very small \(h\), typically around \(h\approx 5\text{--}10\) in the
+\(\sigma=\lceil \log_2 k\rceil + c\) regime of interest.
+
+Under this refined model, the current picture for the construction tracked by the enumerator is:
 \begin{itemize}
 \item the raw asymptotic heuristic is too optimistic and cannot be used by itself;
 \item replacing the tiny-weight window by the exact outer small-\(h\) counts plus the exact run-tail inner bound gives a
 substantially more stable picture;
+\item exact inner-only comparisons now suggest caution: at the very smallest weights, the present run-tail inner model
+can still be optimistic, so a more conservative competing heuristic is to anchor the tiny-weight law at the
+single-run probability \(p_1(\delta)\) and then correct the multi-run behavior by an explicit pairwise interaction
+factor;
+\item exact outer-only comparisons also suggest caution: in the dominant tiny-weight window the current closed-form
+outer count appears to sit a nearly constant few bits below the exact systematic-outer tables, so even the
+pairwise-calibrated run-mixture estimate should presently be read as somewhat optimistic until that normalization
+issue is either explained or corrected;
 \item in the parameterization \(\sigma=\lceil\log_2 k\rceil+c\), the present working model suggests that the
 transition occurs near a fixed offset \(c\), rather than at a fixed absolute \(\sigma\);
-\item more specifically, in the current calculations \(c=3\) still looks too small while \(c=4\) is the first offset
-that becomes plausible for the target distances suggested by the enumerator.
+\item more specifically, the current pairwise-calibrated run-mixture model treats an \(s\)-run input as having
+effective tail probability
+\[
+q_s \approx q_1^s \exp(-\gamma(q_1)\tbinom{s}{2}),
+\]
+where \(q_1\approx p_1(\delta)\approx 2\delta\) and the exact inner-only tables suggest a simple linear interaction law
+\(\gamma(q_1)\approx a+bq_1\) over the regime \(q_1\in[0.17,0.25]\);
+\item at the concrete point \(k=2^{20}\), \(\delta=0.12\), and \(n=2k+\sigma\), the current optimistic refined model
+crosses below \(1\) near \(c=4\), the pairwise-calibrated run-mixture model crosses near
+\(c=5\), and the more conservative single-run model crosses only near \(c=6\), so the present evidence should be read
+as a bracket rather than a single claimed threshold.
 \end{itemize}
 This should be read only as the current state of the model, not as a proved theorem.
 Its role is to tell us where further analytic work is most likely to pay off.
 
 \paragraph{What must be improved next.}
-The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} is already explicit and usable.
-The remaining gap is therefore mostly on the inner side:
-to turn this working model into a theorem-level finite-length estimate, one needs a sharper and still explicit control
-of the intermediate window between the exact small-\(h\) regime and the linear-weight exponent regime.
+The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} is already explicit and usable, but the
+current exact outer-only comparisons indicate that its normalization is still a few bits low in precisely the
+window that dominates the first moment.
+The remaining gap is therefore split between that outer normalization issue and the inner side:
+even after sharpening the outer tiny-weight treatment, overlap checks against the exact enumerator still indicate that
+the present small-weight models remain somewhat optimistic in the small/intermediate-weight regime.
+So the next refinement target is not the bulk linear window, but rather a sharper and still explicit description of the
+inner small-weight law for roughly \(h\approx 5\text{--}12\), ideally upgrading the pairwise run-mixture picture from a
+working estimate to a finite-\(n\) bound, together with a cleaner interpolation from that regime to the
+linear-weight exponent window.
