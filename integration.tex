@@ -1746,6 +1746,61 @@ Iterate the ratio bound:
 \(b_{H+j}\le 2^{-j\alpha}b_H\) for \(j\ge1\), and sum the resulting geometric series.
 \end{proof}
 
+\begin{lemma}[Checkpoint residual split at \(\delta=0.106\)]
+\label{lem:checkpoint-residual-split-0106}
+For the checkpoint
+\[
+k=2^{20},\quad N=2^{21},\quad \sigma=25,\quad \delta=0.106,\quad
+H=2000,\quad R=20,\quad \theta=0.35,\quad z=0.370884,
+\]
+the residual first-moment contribution after the finite prefix \(h\le H\) is reduced to four explicit pieces:
+\[
+\begin{array}{ll}
+\text{\rm (i)} & 1\le r\le R,\ M\le\theta N,\\
+\text{\rm (ii)} & 1\le r\le R,\ M>\theta N,\\
+\text{\rm (iii)} & r>R,\ M\le\theta N,\\
+\text{\rm (iv)} & r>R,\ M>\theta N.
+\end{array}
+\]
+Piece \({\rm (i)}\) is geometrically dominated from the boundary \(h=H\), with
+\[
+\log_2 q_{H,R,\theta,z}<-0.056.
+\]
+Piece \({\rm (ii)}\) is exponentially suppressed by Lemma~\ref{lem:bounded-r-high-slot-suppression}.  Piece
+\({\rm (iii)}\) is at most
+\[
+3N^4\,2^{-176}<2^{-90}.
+\]
+Piece \({\rm (iv)}\), and in fact every linear-weight contribution with
+\(H/N\le\eta\le1/4\), is absorbed by Lemma~\ref{lem:low-linear-handoff-0106}, giving a first-moment exponent gap at
+least \(0.009N\).
+\end{lemma}
+
+\begin{proof}
+For \({\rm (i)}\), substitute the displayed parameters into Lemma~\ref{lem:bounded-r-low-slot-ratio}.  Since
+\[
+q_{H,R,\theta,z}
+=
+z^{-1}\,
+\frac{\theta N-H+2R+1}{H-2R}\,
+\frac{H+1}{N-H}
+<2^{-0.056},
+\]
+Lemma~\ref{lem:geometric-residual-certificate} controls the low-slot bounded-\(r\) tail from the finite-prefix
+boundary.
+
+For \({\rm (ii)}\), Lemma~\ref{lem:bounded-r-high-slot-suppression} applies with \(R=20=O(\log N)\).  The earlier
+checkpoint calculation at \(\eta=1/4\) gives a positive high-slot exponent, so this branch is exponentially small.
+
+For \({\rm (iii)}\), the large-\(r\) low-slot ledger gives a worst summand below \(2^{-176}\) over
+\(r>20\), \(H\le h\le N/4\), and \(M\le0.35N\).  Lemma~\ref{lem:large-r-low-slot-certificate} then contributes the
+coarse union factor \(3N^4\), and \(3(2^{21})^4 2^{-176}<2^{-90}\).
+
+For \({\rm (iv)}\), \(H/N=2000/2^{21}>9\cdot10^{-4}\), so Lemma~\ref{lem:low-linear-handoff-0106} covers the entire
+interval from the finite-prefix handoff through \(\eta=1/4\).  The polynomial number of weight slices is negligible
+compared with the \(2^{-0.009N}\) exponent gap.
+\end{proof}
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
