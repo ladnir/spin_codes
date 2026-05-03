@@ -131,7 +131,13 @@ Corollary~\ref{cor:dense-inner-piecewise}:
 \[
 p_h(\delta)
 \le
-\frac{h(h-1)}{n-1} + (L2^{-m})^h + h\,b_{\delta,\xi}(n)
+\frac{h(h-1)}{n-1}
+\;+\;
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
+\;+\;
+h2^{-(m-1)}
+\;+\;
+b_{\delta,\xi}(n)
 \qquad (1\le h\le h_\star).
 \]
 Therefore
@@ -140,9 +146,12 @@ S_{\mathrm{low}}
 \le
 \sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h\frac{h(h-1)}{n-1}
 \;+\;
-\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h(L2^{-m})^h
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
 \;+\;
-b_{\delta,\xi}(n)\sum_{h=1}^{h_\star} h\beta_{\mathrm{out}}^h.
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h h2^{-(m-1)}
+\;+\;
+b_{\delta,\xi}(n)\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h.
 \]
 
 For the first term,
@@ -156,22 +165,28 @@ n^{\kappa\log_2(\beta_{\mathrm{out}})-1}(\log n)^{O(1)}
 \]
 by the first condition in \eqref{eq:dense-dense-parameter-conditions}.
 
-For the second term, since \(m=\gamma\log_2 n\),
+The fixed-tap replacement exposes the same phenomenon seen in the finite-\(n\) evaluator: the late-placement term
+cannot be controlled by the coarse global geometric outer envelope alone, since already \(h=1\) has inner probability
+\(\approx L/n\). This low/tiny window must use the explicit dense outer low-weight law
+\eqref{eq:dense-dense-working-outer-small}, rather than only \(\EE[\enum_{\Cone,h}]\le\beta_{\mathrm{out}}^h\).
+With that explicit outer law, the late-placement contribution is the same summable tiny-window term used in the
+working dense+dense estimates below.
+
+For the fixed-tap candidate term, since \(m=\gamma\log_2 n\),
 \[
-L2^{-m}=O(n^{1-\gamma}),
+h2^{-(m-1)}\le (\log n)^{O(1)}n^{-\gamma}
 \]
-so
+throughout \(h\le h_\star\), and therefore
 \[
-\beta_{\mathrm{out}}L2^{-m}=O(n^{1-\gamma})=o(1)
-\]
-because \(\gamma>1\). Hence
-\[
-\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h(L2^{-m})^h=o(1).
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h h2^{-(m-1)}
+\le
+(\log n)^{O(1)}n^{\kappa\log_2(\beta_{\mathrm{out}})-\gamma}
+=o(1).
 \]
 
-For the third term, \(b_{\delta,\xi}(n)\) is exponentially small in \(n\), while
+For the binomial term, \(b_{\delta,\xi}(n)\) is exponentially small in \(n\), while
 \[
-\sum_{h=1}^{h_\star} h\beta_{\mathrm{out}}^h
+\sum_{h=1}^{h_\star} \beta_{\mathrm{out}}^h
 \le
 (\log n)^{O(1)}\,n^{\kappa\log_2(\beta_{\mathrm{out}})},
 \]
@@ -400,7 +415,7 @@ that the outer exponent \(\Phi_{\mathrm{out}}^{\mathrm{sys}}\) sits below the de
 \label{prop:dense-dense-highweight-gap}
 Take
 \[
-\delta=0.12,
+\delta=0.109,
 \qquad
 \theta=0.005,
 \qquad
@@ -413,8 +428,8 @@ Theorem~\ref{prop:dense-inner-linear-exponent} shows that
 \Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
 \;
 -\;
-E_{\mathrm{in}}(\eta;0.005,0.12,8)
-\le -0.13
+E_{\mathrm{in}}(\eta;0.005,0.109,8)
+\le -0.003
 \qquad
 \text{for every }\eta\in[\eta_{\mathrm{crit}},0.99],
 \]
@@ -425,25 +440,25 @@ where
 Consequently,
 \[
 \sum_{h=\lceil \eta_{\mathrm{crit}}n\rceil}^{\lfloor 0.99n\rfloor}
-\EE[\enum_{\Cone,h}]\,p_h(0.12)
+\EE[\enum_{\Cone,h}]\,p_h(0.109)
 \le
-n^{O(1)}\,2^{-0.13n}.
+n^{O(1)}\,2^{-0.003n}.
 \]
 \end{theorem}
 
 \begin{proof}
 The inner exponent is
 \[
-E_{\mathrm{in}}(\eta;0.005,0.12,8)
+E_{\mathrm{in}}(\eta;0.005,0.109,8)
 =
 \min\!\left\{
 \Psi_{\mathrm{run}}^{(w)}(\eta,0.005),\
-10\cdot 0.12\left(1-H_2(1/10)\right)
+1-H_2(0.109)
 \right\}.
 \]
 The explicit binomial term equals
 \[
-10\cdot 0.12\left(1-H_2(1/10)\right)\approx 0.6372.
+1-H_2(0.109)\approx 0.5031.
 \]
 On \([\eta_{\mathrm{crit}},0.99]\), Corollary~\ref{cor:outer-dense-highweight-exponent} gives
 \[
@@ -451,17 +466,17 @@ On \([\eta_{\mathrm{crit}},0.99]\), Corollary~\ref{cor:outer-dense-highweight-ex
 \]
 A direct numerical evaluation of the explicit formulas on \([\eta_{\mathrm{crit}},0.99]\) then shows that the gap
 \[
-\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;0.005,0.12,8)
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;0.005,0.109,8)
 \]
-never exceeds \(-0.13\); the worst point occurs near \(\eta\approx 0.5\).
+never exceeds \(-0.003\); the worst point occurs near \(\eta\approx 0.5\).
 This verification is reproduced by the companion script
 \texttt{scripts/verify\_dense\_claims.py}, which for the present parameters reports a worst sampled gap
-of approximately \(-0.1372\) near \(\eta=0.5000\).
+of approximately \(-0.0031\) near \(\eta=0.5000\).
 The final summation bound is then exactly Theorem~\ref{thm:dense-dense-linear-weight-criterion}.
 \end{proof}
 
-\begin{theorem}[A concrete twelve-percent dense+dense theorem]
-\label{thm:dense-dense-twelve-percent}
+\begin{theorem}[A concrete 10.9-percent dense+dense theorem]
+\label{thm:dense-dense-explicit-constant}
 Assume
 \[
 c>\frac{1}{\log_2(3/2)},
@@ -478,14 +493,14 @@ m=\lceil \gamma\log_2 n\rceil
 \]
 satisfies
 \[
-\Pr[d_{\min}(\Csc)\le 0.12 n]=o(1).
+\Pr[d_{\min}(\Csc)\le 0.109 n]=o(1).
 \]
 \end{theorem}
 
 \begin{proof}
 Set
 \[
-\delta=0.12,
+\delta=0.109,
 \qquad
 \kappa=\frac12,
 \qquad
@@ -502,27 +517,27 @@ Split the first-moment sum into four windows:
 \[
 S_{\mathrm{tiny}}
 :=
-\sum_{h=1}^{h_0}\EE[\enum_{\Cone,h}]\,p_h(0.12),
+\sum_{h=1}^{h_0}\EE[\enum_{\Cone,h}]\,p_h(0.109),
 \]
 \[
 S_{\mathrm{low}}
 :=
-\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.12),
+\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.109),
 \]
 \[
 S_{\mathrm{lin}}
 :=
-\sum_{h=\lceil \eta_{\mathrm{crit}}n\rceil}^{\lfloor 0.99n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.12),
+\sum_{h=\lceil \eta_{\mathrm{crit}}n\rceil}^{\lfloor 0.99n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.109),
 \]
 and
 \[
 S_{\mathrm{top}}
 :=
-\sum_{h=\lceil 0.99n\rceil}^{n}\EE[\enum_{\Cone,h}]\,p_h(0.12).
+\sum_{h=\lceil 0.99n\rceil}^{n}\EE[\enum_{\Cone,h}]\,p_h(0.109).
 \]
 
 For \(S_{\mathrm{tiny}}\), the proof of Corollary~\ref{cor:dense-dense-concrete-choice} already applies verbatim,
-since \(0.12<1/8\), and gives \(S_{\mathrm{tiny}}=o(1)\).
+since \(0.109<1/8\), and gives \(S_{\mathrm{tiny}}=o(1)\).
 
 For \(S_{\mathrm{low}}\), Corollary~\ref{cor:outer-dense-lowlinear-envelope} gives
 \[
@@ -532,7 +547,7 @@ For \(S_{\mathrm{low}}\), Corollary~\ref{cor:outer-dense-lowlinear-envelope} giv
 Also, Corollary~\ref{cor:dense-inner-constant-geometric} applies with \(\rho=1/4\), \(\kappa=1/2\), and \(\gamma>2\),
 so for all \(h\ge h_0+1\),
 \[
-p_h(0.12)\le 3\cdot 4^{-h}.
+p_h(0.109)\le 3\cdot 4^{-h}.
 \]
 Therefore
 \[
@@ -552,10 +567,10 @@ o(1).
 
 For \(S_{\mathrm{lin}}\), Theorem~\ref{prop:dense-dense-highweight-gap} gives
 \[
-S_{\mathrm{lin}}\le n^{O(1)}2^{-0.13n}=o(1).
+S_{\mathrm{lin}}\le n^{O(1)}2^{-0.003n}=o(1).
 \]
 
-For \(S_{\mathrm{top}}\), use only the outer exponent and the trivial bound \(p_h(0.12)\le 1\).
+For \(S_{\mathrm{top}}\), use only the outer exponent and the trivial bound \(p_h(0.109)\le 1\).
 If \(h=\lfloor \eta n\rfloor\) with \(\eta\in[0.99,1]\), then Corollary~\ref{cor:outer-dense-highweight-exponent} gives
 \[
 \Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12
@@ -580,7 +595,7 @@ o(1).
 
 Combining the four windows proves
 \[
-\Pr[d_{\min}(\Csc)\le 0.12 n]
+\Pr[d_{\min}(\Csc)\le 0.109 n]
 \le
 S_{\mathrm{tiny}}+S_{\mathrm{low}}+S_{\mathrm{lin}}+S_{\mathrm{top}}
 =
@@ -593,7 +608,7 @@ o(1).
 
 The dense proof is no longer merely existential.
 The baseline theorem proves linear distance in full generality, and
-Theorem~\ref{thm:dense-dense-twelve-percent} already certifies one explicit distance constant.
+Theorem~\ref{thm:dense-dense-explicit-constant} already certifies one explicit distance constant.
 What remains is to push that certified constant upward toward the finite-length behavior seen in the dense enumerator.
 At the analytic level, there are still two concrete bottlenecks.
 
@@ -603,20 +618,20 @@ Corollary~\ref{lem:outer-dense-spectrum} gives only a global geometric envelope
 \EE[\enum_{\Cone,h}] \le \beta_{\mathrm{out}}^h.
 \]
 This is enough for the baseline theorem, but it is far too coarse for near-GV claims.
-The new explicit outer exponent already replaces it in the concrete twelve-percent theorem.
+The new explicit outer exponent already replaces it in the concrete explicit-constant theorem.
 To move further, one needs a sharper outer spectrum exponent in the moderate-weight regime,
 not merely a better global base \(\beta_{\mathrm{out}}\).
 
 \paragraph{Inner bottleneck.}
 On the inner side, Corollary~\ref{cor:dense-inner-constant-geometric} replaces the detailed run-aware behavior by a
 single geometric factor \(\rho^h\).
-Again, this is perfect for the low-linear splice used in Theorem~\ref{thm:dense-dense-twelve-percent},
+Again, this is perfect for the low-linear splice used in Theorem~\ref{thm:dense-dense-explicit-constant},
 but it loses the linear-weight exponent information needed for stronger distance constants.
 The natural next sharpening is to use the full dense-inner exponent more aggressively below the current
 \(\eta_{\mathrm{crit}}\) splice point.
 
 \paragraph{Current sharp obstruction.}
-The present paper already certifies \(d_{\min}(\Csc)\ge 0.12n\) with high probability.
+The present paper already certifies \(d_{\min}(\Csc)\ge 0.109n\) with high probability.
 The remaining blocker is therefore no longer linear distance itself, but rather the quantitative gap to the
 enumerator-guided curve.
 At the moment, the proof changes gears at \(\eta_{\mathrm{crit}}=1-2^{-1/2}\):
@@ -624,6 +639,33 @@ below that point it uses the low-linear outer envelope together with the inner g
 it uses the explicit exponent comparison.
 The next theorem should remove or lower that splice by comparing the explicit outer and inner exponents on a wider
 moderate-weight window.
+
+\paragraph{Linear-window ceiling for the current first-moment route.}
+After enforcing the constraint that a single ON episode has length at most \(n\), the old formal choice
+\((2+\xi)\delta>1\) no longer gives an exponent larger than the full-block fair-coin tail
+\[
+1-H_2(\delta).
+\]
+In the dangerous moderate-linear window the systematic dense outer has the random-code exponent
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12,
+\]
+whose maximum is \(1/2\) near \(\eta=1/2\). Thus this particular first-moment comparison can only pass while
+\[
+1-H_2(\delta)> \frac12,
+\]
+namely up to the rate-\(1/2\) random-linear threshold
+\[
+\delta_{\mathrm{GV},1/2}\approx 0.110027864.
+\]
+A position-aware first-start diagnostic is slightly stricter, because a moderately late first activation trades
+placement cost against a shorter fair-coin suffix; it places the practical sampled ceiling near
+\(\delta\approx 0.110\) on the no-OFF path when the exact first-start law is used. If one reserves an explicit
+post-start OFF budget of \(0.005n\), the same diagnostic still leaves room around \(\delta\approx 0.1085\).
+Consequently, pushing the certified constant back toward
+\(0.12\) cannot come from tuning \(\xi\) in the existing linear-window lemma. It would require either a genuinely
+smaller outer exponent in the dangerous moderate-weight window, or an inner linear-weight argument that beats the
+plain fair-coin suffix mechanism.
 
 \paragraph{Role of the enumerator.}
 The exact enumerator is therefore not the proof itself; it is the calibration tool that tells us where sharper
@@ -701,17 +743,19 @@ The dense+dense proof problem is now much more localized than that.
 \noindent
 \textbf{2. The outer side is largely understood at low weight.}
 For the tiny-weight window we use the actual systematic-banded small-weight law suggested by the enumerator rather than
-the earlier convolutional proxy:
+the earlier convolutional proxy. With the fixed-tap outer, a message support whose band-union has size \(q\) and whose
+\(\sigma\)-clusters number \(r\) contributes a deterministic parity weight \(r\), and the remaining \(q-r\) active
+parity coordinates are fair. Thus the parity weight law on that slice is
+\[
+r+\Binomial(q-r,\tfrac12),
+\]
+instead of the older \(\Binomial(q,\tfrac12)\) law. In particular,
 \begin{equation}
 \label{eq:dense-dense-working-outer-small}
-A_h^{\mathrm{out,exact}}
-\;=\;
-k\cdot \frac{\binom{\sigma+1}{h-1}}{2^{\sigma+1}}
-\;+\;
-\sum_{\ell=2}^{k}(k-\ell+1)\frac{\binom{2\ell+\sigma-2}{h-2}}{2^{\ell+\sigma}}.
+A_1^{\mathrm{out,ft}}=0
 \end{equation}
-Once this exact low-weight outer law is used, the dominant uncertainty shifts back onto the inner tiny/intermediate
-regime rather than the outer count itself.
+deterministically. Once this exact low-weight outer law is used, the dominant uncertainty shifts back onto the inner
+tiny/intermediate regime rather than the outer count itself.
 
 \medskip
 \noindent
@@ -733,6 +777,21 @@ Corollary~\ref{cor:first-run-late-qbase};
 \item the exact low-weight core should therefore be ``exact late placement plus a correction,'' not a direct promotion
 of the old \((L2^{-m})^r\) law.
 \end{itemize}
+
+With the fixed-tap dense recursive inner revived, the correction should be structurally smaller than the fully random
+tap ON/OFF heuristic suggested. The leading tap is fixed to one, so a genuine termination is not merely an all-zero output window:
+it is a \(10^m\) output pattern whose last zero is aligned with an input one. Thus early termination consumes one of
+the scarce weight-\(h\) input positions, which is exactly the kind of suppression needed for a summable isolated-slice
+upper bound.
+
+The first clean fixed-tap statistic is therefore not a raw early-start count, but a candidate-pair count: if an early
+isolated start is to terminate within a window of length \(L\), it must find a later input-one inside that window, and
+each such candidate costs \(2^{-(m-1)}\). Corollary~\ref{cor:fixedtap-isolated-pair-candidates} turns this into an
+explicit pair bound of order
+\[
+\binom{h}{2}\frac{L}{n}\,2^{-(m-1)}
+\]
+before any additional fair-coin lower-tail suppression is used.
 
 \paragraph{General philosophy of the current dense model.}
 The current working model is not trying to guess the minimum distance curve from scratch. It is trying to expose the
@@ -786,6 +845,11 @@ By now several parts of the picture are genuinely solid:
 What remains heuristic is the \emph{correction around that proved base}. The key change since earlier drafts is that
 this correction is no longer an amorphous global fit. It is now concentrated on the isolated slice and on explicit
 early-start statistics there.
+
+There is a separate linear-window proof ledger. The capped fair-suffix exponent and the exact first-start/no-OFF
+bound are proved. The post-start OFF budget now splits into two proved pieces: long input gaps have exponentially
+small total mass on every fixed linear weight slice, while the short-gap part cannot support linear OFF time once
+\(m=\gamma\log_2 n\), because linearly many short OFF episodes would require too many disjoint \(m\)-zero witnesses.
 
 \paragraph{Current proof-oriented picture.}
 The isolated slice \(R(U)=h\) is now the natural theorem core.
@@ -906,6 +970,124 @@ with \(\beta_\delta\) small on the tiny-weight window and \(\mathrm{Err}^{\mathr
 there. This isolates the two real sources of loss that still have to be controlled: residual interaction between
 otherwise isolated early episodes, and the lower-order adjacency event \(R(U)<h\).
 
+\paragraph{Updated fixed-tap certificate target.}
+The fixed-tap termination rule suggests a stronger pessimistic bound that is structured for the first-moment sum.
+The first valid statistic is not just the number of early input ones, since many early ones can lie inside the same
+still-alive episode. Instead let
+\[
+\Delta_L(U)
+:=
+\operatorname{span}\bigl(\supp(U)\cap\{1,\dots,N-L\}\bigr)
+\]
+with \(\Delta_L(U)=0\) if the early set is empty. Corollary~\ref{cor:fixedtap-weight-slice-multiepisode}
+gives the theorem-shaped certificate
+\[
+p_h^{\mathrm{in}}(\delta)
+\le
+\Pi_{N,h,L}(0)
++
+\sum_{r\ge 1}
+\Pi_{N,h,L}(r)\binom{h}{r}2^{-r(m-1)}
+\;+\;
+\Pr[\Binomial(L,\tfrac12)\le \delta N],
+\]
+where
+\[
+\Pi_{N,h,L}(r)
+=
+\Pr\!\left[\left\lceil\Delta_L(U)/(L+1)\right\rceil=r\mid \wt(U)=h\right]
+\]
+has an exact full-slice formula. This is deliberately pessimistic: it ignores the fine geometry of candidate
+terminations and only uses the fact that \(r\) length-\(L\) episodes are needed to cover an early span of class \(r\)
+unless a surviving episode pays the binomial lower-tail cost. The important point is that this correction has powers of
+\(2^{-(m-1)}\) tied to the early span class, so it is designed to be summable in
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).
+
+This also changes how to view the adjacency remainder. A naked
+\(\Pr[R(U)<h]=O(h^2/N)\) is fine for fixed-\(h\) asymptotics but is too crude as a first-moment summand once
+multiplied by the low-weight outer enumerator. The next proof target should therefore avoid leaving adjacency as an
+unweighted remainder whenever possible; the full weight-slice version of the multi-episode bound is a candidate route
+because it applies before splitting into \(R(U)=h\) and \(R(U)<h\).
+
+The span certificate is the first valid version of this route, but it is not yet the final summable theorem. Its
+weakness is structural: one terminating episode can cover many early input-one positions if they occur while the
+episode is already alive. The span statistic charges the fixed-tap termination, but it does not yet charge the output
+weight produced inside that alive interval. Finite-\(n\) checks show that this is enough to stabilize the tiniest
+window, but too weak once the diagnostic cap is pushed deeper into intermediate weights. The next correction therefore
+has to combine the span/episode-cover statistic with an internal fair-output budget for the input ones swallowed by
+each live episode.
+
+The most promising refinement is a \emph{paired-cover} certificate. A no-survival trajectory decomposes the early
+support into short live intervals, each beginning at an input-one start and ending at an aligned fixed-tap termination.
+For \(r\) such intervals with total live length \(T\), Corollary~\ref{cor:fixedtap-weight-slice-paired-cover} gives the
+full weight-slice upper bound
+\[
+\begin{aligned}
+p_h^{\mathrm{in}}(\delta)
+\le\;&
+\frac{\binom{L}{h}}{\binom{N}{h}}
+\;+\;
+\Pr[\Binomial(L,\tfrac12)\le d]
+\\
+&+
+\sum_{r=1}^{\lfloor h/2\rfloor}
+\sum_{T=2r}^{\min\{N,r(L+1)\}}
+\frac{
+\binom{N-T+r}{r}
+\binom{T-r-1}{r-1}
+\binom{T+L-2r}{h-2r}
+}{
+\binom{N}{h}
+}
+2^{-r(m-1)}
+\Pr[\Binomial((T-rm)_+,\tfrac12)\le d].
+\end{aligned}
+\]
+Here \(d=\lfloor\delta N\rfloor\). The count is intentionally pessimistic: it counts disjoint intervals anywhere in the
+block and only then forces the remaining support into the interval interiors together with the last \(L\) positions.
+Thus it absorbs the adjacency cases directly instead of leaving a separate
+\(\Pr[R(U)<h]\) remainder. The proof pieces are now isolated: Lemma~\ref{lem:fixedtap-no-survival-paired-cover} turns a
+no-survival trajectory into paired start/termination intervals, Lemma~\ref{lem:fixedtap-paired-cover-charge} gives the
+fixed-cover stochastic cost, and Corollary~\ref{cor:fixedtap-weight-slice-paired-cover} performs the union bound over
+covers.
+
+The remaining question is no longer local validity but global summability: after multiplying this upper bound by the
+fixed-tap outer enumerator \(A_h^{\mathrm{out}}\), the double sum over \(r,T\) has to stay below one in the target
+\(\sigma=\lceil\log_2 k\rceil+c\) regime. The finite-\(n\) diagnostic currently says this paired-cover/internal-tail
+form has the right scale, but the next analytic step is to replace that diagnostic by a clean entropy envelope for the
+\((h,r,T)\) sum.
+
+\paragraph{Current summability status of the paired-cover theorem.}
+The theorem-safe version of the finite-\(n\) check replaces the sampled search over \(T\) by a blocked upper sum: on
+each block \([T_0,T_1]\), the decreasing interval-placement factor is evaluated at \(T_0\), the increasing support
+factor at \(T_1\), the binomial lower-tail factor at \(T_0\), and the block length is paid explicitly. This is much
+more pessimistic than the fitted diagnostic, but it is the right kind of object for a proof.
+
+At \(k=2^{20}\), \(N=2k\), \(\delta=0.106\), and \(L=\lceil 2.1\delta N\rceil\), this blocked paired-cover bound for
+the low/intermediate prefix \(h\le64\) is still slightly above one at
+\(\sigma=\lceil\log_2 k\rceil+11=31\), but is below one at
+\(\sigma=\lceil\log_2 k\rceil+12=32\). The dominant failing shape just below this point is not an adjacency remainder:
+it is the \(r=1\) event where one long early episode of live length just below \(2\delta N\) swallows many input-one
+positions and pays only one fixed-tap termination. Thus the present proved lane supports the fixed-tap strategy with a
+larger offset, while improving the offset back toward the heuristic \(\sigma=28\) range requires a sharper treatment of
+this one-long-episode cluster.
+
+For reference, the current blocked-cover prefix certificates are:
+\[
+\begin{array}{c|c|c|c|c}
+k & \sigma & \sigma-\lceil\log_2 k\rceil & \delta & \log_2 \mu_{\le64}^{\mathrm{FCIB}}\\
+\hline
+2^{18} & 30 & 12 & 0.106 & -1.934\\
+2^{20} & 31 & 11 & 0.106 & \phantom{-}0.026\\
+2^{20} & 32 & 12 & 0.106 & -1.684
+\end{array}
+\]
+Here \(\mu_{\le64}^{\mathrm{FCIB}}\) denotes the fixed-tap outer first-moment contribution from the paired-cover
+bound on \(1\le h\le64\), together with the already-negligible linear and top-weight estimates used by the evaluator.
+These are finite-\(n\) certificates for the checked prefix, not yet an all-\(h\) asymptotic theorem. To turn the
+\(C=12\) evidence into a complete fixed-\(k\) proof one still has to write the remaining medium-weight bridge and the
+large-weight exponent estimates as a single auditable first-moment certificate.
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
@@ -981,8 +1163,9 @@ This does not yet prove the right theorem, but it is a much sharper target than 
 correction likely lives on the early-start hypergeometric law itself, not on the full run count.
 
 The new one-episode lemma confirms that \(\mathrm{Corr}_{N,h}(\delta)\) cannot be controlled by looking only at the
-first early ON-episode: that route is structurally valid but numerically much too loose. Hence the real target is a
-genuine multi-episode correction, probably pairwise at minimum.
+first early ON-episode: that route is structurally valid but numerically much too loose. The current multi-episode
+span certificate is the first pessimistic correction that has the right summability shape. It is probably not sharp,
+but it turns an explicit placement statistic into the proof object instead of fitting a free residual curve.
 
 \paragraph{What must be improved next.}
 The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} has now largely been replaced, for
@@ -991,9 +1174,8 @@ The remaining gap is therefore mostly on the inner side:
 even after sharpening the outer tiny-weight treatment, overlap checks against the exact enumerator still indicate that
 the present small-weight models remain somewhat optimistic in the small/intermediate-weight regime.
 So the next refinement target is not the bulk linear window, but rather a sharper and still explicit description of the
-inner small-weight law for roughly \(h\approx 5\text{--}12\), ideally upgrading the pairwise run-mixture picture from a
-working estimate to a finite-\(n\) bound. The current best proof-oriented subproblem is therefore the isolated slice
-\(R(U)=h\): prove a controlled correction around the exact late-placement base there, and then add the lower-order
-adjacency remainder coming from \(R(U)<h\). Once that is in place, the next task is a cleaner interpolation from that
-tiny/intermediate regime to the
-linear-weight exponent window.
+inner small/intermediate-weight law. The current best proof-oriented subproblem is to upgrade
+Corollary~\ref{cor:fixedtap-weight-slice-multiepisode} by charging not only the fixed-tap terminations needed to cover
+the early span, but also the fair-output cost of dense clusters of input ones that are swallowed by a live episode.
+Once that is in place, the next task is a cleaner interpolation from that tiny/intermediate regime to the linear-weight
+exponent window.

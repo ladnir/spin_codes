@@ -137,6 +137,14 @@ def binom_cdf_half_entropy_upper(n: int, k: int) -> float:
     return min(1.0, 2.0**exponent)
 
 
+def binom_cdf_half_entropy_log2(n: int, k: int) -> float:
+    if k < 0:
+        return float("-inf")
+    if k >= n or 2 * k >= n:
+        return 0.0
+    return -n * (1.0 - h2(k / n))
+
+
 def outer_generating_bound(k_msg: int, sigma: int, z: float) -> float:
     a = (1.0 + z) / 2.0
     q = ((1.0 + z) ** 2) / 2.0
@@ -291,50 +299,74 @@ def count_inputs_banded(w: int, q: int, runs: int, k: int, n: int, sigma: int) -
 
 
 @lru_cache(maxsize=None)
-def parity_enum_banded_log2(k: int, n: int, sigma: int, w: int, h: int) -> float:
+def parity_enum_banded_log2(k: int, n: int, sigma: int, w: int, h: int, fixed_tap: bool = False) -> float:
     if w == 0 and h == 0:
         return 0.0
     if w == 0 or h > n or sigma == 0:
         return float("-inf")
     if sigma == 1:
-        val = math.comb(k, w) * math.comb(w, h) * (2.0 ** -w)
+        if fixed_tap:
+            val = math.comb(k, w) if h == w else 0
+        else:
+            val = math.comb(k, w) * math.comb(w, h) * (2.0 ** -w)
         return math.log2(val) if val > 0 else float("-inf")
 
     total = float("-inf")
     q_max = min(n, w * sigma)
     for q in range(w, q_max + 1):
-        choose_qh = math.comb(q, h) if 0 <= h <= q else 0
-        if choose_qh == 0:
-            continue
-        count_wq = 0
         for runs in range(1, w + 1):
-            count_wq += count_inputs_banded(w, q, runs, k, n, sigma)
-        if count_wq == 0:
-            continue
-        term = math.log2(count_wq) + math.log2(choose_qh) - q
-        total = term if total == float("-inf") else log2add(total, term)
+            count_wqr = count_inputs_banded(w, q, runs, k, n, sigma)
+            if count_wqr == 0:
+                continue
+            if fixed_tap:
+                # Each sigma-cluster start has a deterministic fixed diagonal
+                # parity one. The other q-runs active parity coordinates remain
+                # fair. Thus parity weight is runs + Bin(q-runs, 1/2).
+                fair = q - runs
+                need = h - runs
+                choose = math.comb(fair, need) if 0 <= need <= fair else 0
+                denom_exp = fair
+            else:
+                choose = math.comb(q, h) if 0 <= h <= q else 0
+                denom_exp = q
+            if choose == 0:
+                continue
+            term = math.log2(count_wqr) + math.log2(choose) - denom_exp
+            total = term if total == float("-inf") else log2add(total, term)
     return total
 
 
 @lru_cache(maxsize=None)
-def outer_small_h_banded_systematic_prefix(k_msg: int, sigma: int, parity_n: int, h_max: int) -> tuple[float, ...]:
+def outer_small_h_banded_systematic_prefix(
+    k_msg: int,
+    sigma: int,
+    parity_n: int,
+    h_max: int,
+    fixed_tap: bool = False,
+) -> tuple[float, ...]:
     logs = [float("-inf")] * (h_max + 1)
     for h in range(1, h_max + 1):
         total = float("-inf")
         w_hi = min(k_msg, h)
         for w in range(1, w_hi + 1):
             hp = h - w
-            term = parity_enum_banded_log2(k_msg, parity_n, sigma, w, hp)
+            term = parity_enum_banded_log2(k_msg, parity_n, sigma, w, hp, fixed_tap=fixed_tap)
             if term != float("-inf"):
                 total = term if total == float("-inf") else log2add(total, term)
         logs[h] = total
     return tuple(logs)
 
 
-def outer_small_h_banded_systematic_log2(k_msg: int, sigma: int, parity_n: int, h: int) -> float:
+def outer_small_h_banded_systematic_log2(
+    k_msg: int,
+    sigma: int,
+    parity_n: int,
+    h: int,
+    fixed_tap: bool = False,
+) -> float:
     if h <= 0:
         return float("-inf")
-    return outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h)[h]
+    return outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h, fixed_tap=fixed_tap)[h]
 
 
 def outer_small_h_prefix(
@@ -347,10 +379,12 @@ def outer_small_h_prefix(
 ) -> tuple[float, ...]:
     if outer_mode == "conv":
         return outer_small_h_exact_prefix(k_msg, sigma, h_max)
-    if outer_mode == "banded":
+    if outer_mode in ("banded", "banded-fixedtap"):
         if parity_n is None:
             raise ValueError("banded outer mode requires parity_n")
-        return outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h_max)
+        return outer_small_h_banded_systematic_prefix(
+            k_msg, sigma, parity_n, h_max, fixed_tap=(outer_mode == "banded-fixedtap")
+        )
     raise ValueError(f"unknown outer_mode: {outer_mode}")
 
 
@@ -377,7 +411,11 @@ def tiny_window_bound(n: int, sigma: int, delta: float, z: float, xi: float, kap
     total = 0.0
     for h in range(1, h0 + 1):
         outer = w_out / (z ** h)
-        inner = (h * (h - 1)) / (n - 1) + ((L * (2.0 ** (-sigma))) ** h) + h * b
+        late = 0.0
+        if L - h + 1 >= h and n - h + 1 >= h:
+            late = math.exp2(log2_binom(L - h + 1, h) - log2_binom(n - h + 1, h))
+        fixedtap_term_base = h * (2.0 ** (1 - sigma))
+        inner = (h * (h - 1)) / (n - 1) + late + fixedtap_term_base + b
         total += outer * inner
     return h0, total
 
@@ -388,18 +426,15 @@ def exact_smallw_inner_bound(n: int, w: int, sigma: int, delta: float, xi: float
 
     L = int(math.ceil((2.0 + xi) * delta * n))
     b = binom_cdf_half_upper(L, int(math.floor(delta * n)))
-    base = L * (2.0 ** (-sigma))
+    late = 0.0
+    if L - w + 1 >= w and n - w + 1 >= w:
+        late = math.exp2(log2_binom(L - w + 1, w) - log2_binom(n - w + 1, w))
+    # Fixed-tap dense inner: a genuine termination must be aligned with an input
+    # one in the critical state, so the crude candidate count is w rather than L.
+    base = w * (2.0 ** (1 - sigma))
 
-    best = 1.0
-    for r in range(1, w + 1):
-        log2_run = run_tail_exact_log2(n, w, r)
-        run_term = 0.0 if log2_run == float("-inf") else 2.0 ** log2_run
-        off_term = min(1.0, base ** r)
-        bin_term = min(1.0, r * b)
-        val = min(1.0, run_term + off_term + bin_term)
-        if val < best:
-            best = val
-    return best
+    adjacency = w * (w - 1) / max(1, n - 1)
+    return min(1.0, adjacency + late + base + b)
 
 
 def small_h_rigorous_log2(
@@ -759,6 +794,213 @@ def isolated_early_pair_mean(n: int, h: int, l: int) -> float:
     return (h * (h - 1) / 2.0) * (prefix * (prefix - 1)) / (total_space * (total_space - 1))
 
 
+def _span_count_sum(prefix: int, l: int, h: int, span_lo: int, span_hi: int) -> int:
+    """Count weight-h words whose early support span lies in [span_lo, span_hi]."""
+    if h < 2 or span_hi < span_lo:
+        return 0
+    span_lo = max(2, span_lo)
+    span_hi = min(prefix, span_hi)
+    if span_hi < span_lo:
+        return 0
+    r = h - 2
+    t_lo = span_lo - 2 + l
+    t_hi = span_hi - 2 + l
+
+    def sum_binom(a: int, b: int, rr: int) -> int:
+        if b < a or rr < 0:
+            return 0
+        return math.comb(b + 1, rr + 1) - math.comb(a, rr + 1)
+
+    sum_c_r = sum_binom(t_lo, t_hi, r)
+    sum_c_r1 = sum_binom(t_lo, t_hi, r + 1)
+    # With t=s-2+l, the number of placements for a fixed span is
+    # (prefix - s + 1) C(s-2+l, h-2) = (prefix+l-1-t) C(t,r).
+    sum_t_c_r = r * sum_c_r + (r + 1) * sum_c_r1
+    return (prefix + l - 1) * sum_c_r - sum_t_c_r
+
+
+def fixedtap_multiepisode_span_bound(
+    n: int,
+    h: int,
+    sigma: int,
+    delta: float,
+    l: int,
+    *,
+    entropy_tail_bound: bool = True,
+) -> float:
+    """Pessimistic fixed-tap multi-episode upper bound for a full weight-h slice.
+
+    If the early input ones span s positions, episodes that terminate within
+    l steps can cover at most l+1 positions of that span each. Unless one such
+    episode pays the binomial lower-tail event, at least ceil(s/(l+1)) aligned fixed-tap
+    terminations are needed. The span distribution is exact under the uniform
+    weight-h law.
+    """
+    if h <= 0:
+        return 0.0
+    cut = math.floor(delta * n)
+    if l < 0:
+        return 1.0
+    l = min(n, l)
+    bin_tail = (
+        binom_cdf_half_entropy_upper(l, cut)
+        if entropy_tail_bound
+        else binom_cdf_half_upper(l, cut)
+    )
+
+    prefix = n - l
+    if prefix <= 0:
+        return min(1.0, 1.0 + bin_tail)
+
+    denom_log2 = log2_binom(n, h)
+    total = 0.0
+
+    no_early_log2 = log2_binom(l, h) - denom_log2
+    if no_early_log2 > -1074.0:
+        total += min(1.0, 2.0**no_early_log2)
+
+    one_early_log2 = math.log2(prefix) + log2_binom(l, h - 1) - denom_log2
+    if one_early_log2 > -1074.0:
+        needed_terms = 1
+        log2_episode = log2_binom(h, needed_terms) - needed_terms * (sigma - 1)
+        episode_term = 1.0 if log2_episode >= 0.0 else 2.0**log2_episode
+        total += min(1.0, 2.0**one_early_log2) * episode_term
+
+    cover = l + 1
+    max_terms = (prefix + cover - 1) // cover
+    for needed_terms in range(1, max_terms + 1):
+        span_lo = max(2, (needed_terms - 1) * cover + 1)
+        span_hi = min(prefix, needed_terms * cover)
+        count = _span_count_sum(prefix, l, h, span_lo, span_hi)
+        if count <= 0:
+            continue
+        count_log2 = math.log2(count)
+        prob_log2 = count_log2 - denom_log2
+        if prob_log2 < -1074.0:
+            continue
+        log2_episode = log2_binom(h, needed_terms) - needed_terms * (sigma - 1)
+        episode_term = 1.0 if log2_episode >= 0.0 else 2.0**log2_episode
+        total += min(1.0, 2.0**prob_log2) * episode_term
+    return min(1.0, total + bin_tail)
+
+
+def fixedtap_cover_internal_bound_log2(
+    n: int,
+    h: int,
+    sigma: int,
+    delta: float,
+    l: int,
+    *,
+    grid_steps: int = 160,
+) -> float:
+    """Cover-count diagnostic for fixed-tap multi-episode suppression.
+
+    A bad early pattern with no length-l surviving episode must be coverable by
+    short start-to-termination intervals. For r intervals of total live length T,
+    this lane uses the theorem-safe paired cover count
+
+        C(n-T+r,r) * C(T-r-1,r-1) * C(T+l-2r,h-2r) / C(n,h),
+
+    which overcounts by allowing the cover intervals to sit anywhere in the
+    block. The 2r distinguished positions are the starts and aligned fixed-tap
+    terminations. We then pay 2^{-r(sigma-1)} for those terminations and charge
+    a fair lower-tail on roughly T-r*sigma non-terminal live outputs. This is a
+    diagnostic implementation of the paired-cover theorem; the T loop is still
+    sampled, not an exact summation.
+    """
+    if h <= 0:
+        return float("-inf")
+    cut = math.floor(delta * n)
+    l = min(n, max(1, l))
+    cover = l + 1
+    denom = log2_binom(n, h)
+    total = float("-inf")
+
+    no_early = log2_binom(l, h) - denom
+    total = log2add(total, no_early)
+
+    for r in range(1, h // 2 + 1):
+        t_min = 2 * r
+        t_max = min(n, r * cover)
+        if t_min > t_max:
+            continue
+        raw = {t_min, t_max, min(t_max, max(t_min, r * sigma)), min(t_max, max(t_min, 2 * cut + r * sigma + 1))}
+        if t_max > t_min:
+            for idx in range(grid_steps):
+                frac = idx / max(1, grid_steps - 1)
+                raw.add(int(round(t_min * ((t_max / t_min) ** frac))))
+        candidates = sorted(t for t in raw if t_min <= t <= t_max)
+        for t in candidates:
+            if n - t + r < r:
+                continue
+            remaining_slots = min(n, t + l) - 2 * r
+            remaining_ones = h - 2 * r
+            if remaining_slots < remaining_ones:
+                continue
+            cover_count = (
+                log2_binom(n - t + r, r)
+                + log2_binom(t - r - 1, r - 1)
+                + log2_binom(remaining_slots, remaining_ones)
+                - denom
+            )
+            fair_len = max(0, t - r * sigma)
+            fair_tail = binom_cdf_half_entropy_log2(fair_len, cut)
+            total = log2add(total, cover_count - r * (sigma - 1) + fair_tail)
+    return min(0.0, total)
+
+
+def fixedtap_cover_internal_block_bound_log2(
+    n: int,
+    h: int,
+    sigma: int,
+    delta: float,
+    l: int,
+    *,
+    block_ratio: float = 1.01,
+) -> float:
+    """Theorem-safe block upper sum for the paired-cover/internal-tail bound.
+
+    This implements the corollary in the manuscript with a monotone block
+    bound over T. On a block [a,b], the decreasing placement factor is evaluated
+    at a, the increasing length/support factors at b, and the fair-tail upper
+    bound at a. The block length is then paid explicitly.
+    """
+    if h <= 0:
+        return float("-inf")
+    if block_ratio <= 1.0:
+        raise ValueError("block_ratio must be > 1")
+    cut = math.floor(delta * n)
+    l = min(n, max(1, l))
+    cover = l + 1
+    denom = log2_binom(n, h)
+    total = log2_binom(l, h) - denom
+
+    for r in range(1, h // 2 + 1):
+        t_min = 2 * r
+        t_max = min(n, r * cover)
+        if t_min > t_max:
+            continue
+        a = t_min
+        while a <= t_max:
+            b = min(t_max, max(a, int(math.floor(a * block_ratio))))
+            block_len = b - a + 1
+            remaining_slots = b + l - 2 * r
+            remaining_ones = h - 2 * r
+            if remaining_slots >= remaining_ones:
+                cover_count = (
+                    log2_binom(n - a + r, r)
+                    + log2_binom(b - r - 1, r - 1)
+                    + log2_binom(remaining_slots, remaining_ones)
+                    - denom
+                )
+                fair_len = max(0, a - r * sigma)
+                fair_tail = binom_cdf_half_entropy_log2(fair_len, cut)
+                term = math.log2(block_len) + cover_count - r * (sigma - 1) + fair_tail
+                total = log2add(total, term)
+            a = b + 1
+    return min(0.0, total)
+
+
 def isolated_position_single_model_prob(n: int, h: int, cut: int, m: int) -> float:
     """Position-sensitive isolated-slice model using one-run penalties by remaining suffix length.
 
@@ -1025,13 +1267,14 @@ def isolated_positional_pair_model_log2(
     k_msg: int,
     sigma: int,
     delta: float,
+    adjacency_xi: float,
     h_lo: int,
     h_hi: int,
     pair_a_bits: float,
     pair_b_bits: float,
     entropy_tail_bound: bool = True,
     clamp_correction_nonnegative: bool = True,
-    add_adjacency_remainder: bool = False,
+    adjacency_mode: str = "none",
     outer_mode: str = "conv",
     parity_n: int | None = None,
 ) -> tuple[float, int, float]:
@@ -1047,6 +1290,9 @@ def isolated_positional_pair_model_log2(
     peak_term = float("-inf")
     cut = math.floor(delta * n)
     l = 2 * cut
+    one_episode_l = min(n, max(l, math.ceil((2.0 + adjacency_xi) * delta * n)))
+    one_episode_off = one_episode_l * (2.0 ** (-sigma))
+    one_episode_bin = binom_cdf_half_entropy_upper(one_episode_l, cut)
     outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
     pos_probs = isolated_position_single_model_prefix(
         n, h_hi, cut, sigma, entropy_tail_bound=entropy_tail_bound
@@ -1062,12 +1308,125 @@ def isolated_positional_pair_model_log2(
         if clamp_correction_nonnegative:
             corr_bits = max(0.0, corr_bits)
         p = p_full * p_iso * (2.0**corr_bits)
-        if add_adjacency_remainder:
+        if adjacency_mode == "prob":
             p += 1.0 - p_full
+        elif adjacency_mode == "late":
+            for s in range(1, h):
+                p += run_count_weight(n, h, s) * late_start_base_prob(n, h, s, l)
+        elif adjacency_mode == "one-episode":
+            p_noniso = 0.0
+            for s in range(1, h):
+                p_noniso += run_count_weight(n, h, s) * (
+                    late_start_base_prob(n, h, s, one_episode_l) + one_episode_off + one_episode_bin
+                )
+            p += p_noniso
+        elif adjacency_mode != "none":
+            raise ValueError(f"unknown adjacency_mode: {adjacency_mode}")
         p = min(1.0, p)
         if p <= 0.0:
             continue
         term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def fixedtap_multiepisode_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    entropy_tail_bound: bool = True,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = fixedtap_multiepisode_span_bound(
+            n,
+            h,
+            sigma,
+            delta,
+            l,
+            entropy_tail_bound=entropy_tail_bound,
+        )
+        p = min(1.0, p)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def fixedtap_cover_internal_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        logp = fixedtap_cover_internal_bound_log2(n, h, sigma, delta, l)
+        term = out + logp
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def fixedtap_cover_internal_block_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+    block_ratio: float = 1.01,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        logp = fixedtap_cover_internal_block_bound_log2(
+            n, h, sigma, delta, l, block_ratio=block_ratio
+        )
+        term = out + logp
         total = term if total == float("-inf") else log2add(total, term)
         if term > peak_term:
             peak_term = term
@@ -1298,7 +1657,15 @@ def psi_run(eta: float, theta: float) -> float:
 
 
 def e_bin(delta: float, xi: float) -> float:
-    return (2.0 + xi) * delta * (1.0 - h2(1.0 / (2.0 + xi)))
+    # The episode length used in the forced-termination binomial tail cannot
+    # exceed the block. Earlier exploratory checks used the formal expression
+    # with (2+xi)delta > 1; capping exposes when that certificate is relying on
+    # an impossible episode length.
+    length_frac = min(1.0, (2.0 + xi) * delta)
+    threshold_frac = delta / length_frac
+    if threshold_frac >= 0.5:
+        return 0.0
+    return length_frac * (1.0 - h2(threshold_frac))
 
 
 @dataclass
@@ -1344,6 +1711,10 @@ def format_prob(p: float) -> str:
 def format_log2(log2p: float) -> str:
     if log2p == float("-inf"):
         return "0"
+    if log2p == float("inf"):
+        return "inf"
+    if log2p > 900.0:
+        return f"2^{{{log2p:.3f}}}"
     if log2p < -900.0:
         return f"2^{{{log2p:.3f}}}"
     p = 2.0 ** log2p
@@ -1381,9 +1752,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--outer-smallh-mode",
-        choices=("conv", "banded"),
-        default="banded",
-        help="Small-weight outer model: 'conv' uses the paper convolutional proxy, 'banded' uses the actual sysBand combinatorics.",
+        choices=("conv", "banded", "banded-fixedtap"),
+        default="banded-fixedtap",
+        help="Small-weight outer model: 'conv' uses the paper convolutional proxy, 'banded' uses the sysBand combinatorics, 'banded-fixedtap' fixes one parity tap per row.",
     )
     parser.add_argument("--delta", type=float, default=0.12)
     parser.add_argument("--z", type=float, default=1.0 / 3.0)
@@ -1391,6 +1762,12 @@ def main() -> int:
     parser.add_argument("--kappa", type=float, default=0.5)
     parser.add_argument("--theta", type=float, default=0.005)
     parser.add_argument("--xi", type=float, default=8.0)
+    parser.add_argument(
+        "--small-xi",
+        type=float,
+        default=0.1,
+        help="Window slack used by small-weight fixed-tap bounds; kept separate from the linear-window xi.",
+    )
     parser.add_argument("--eta-hi", type=float, default=0.99)
     parser.add_argument("--gap-step", type=float, default=1e-5)
     parser.add_argument("--lambda-target", type=float, default=None, help="Optional target z <= 2^-lambda.")
@@ -1439,6 +1816,27 @@ def main() -> int:
         "--show-one-episode-optimized",
         action="store_true",
         help="Also report the one-episode correction model after optimizing over L in [2delta n, (2+xi)delta n].",
+    )
+    parser.add_argument(
+        "--show-fixedtap-multiepisode",
+        action="store_true",
+        help="Also report a pessimistic fixed-tap multi-episode bound using the exact full-slice early-span law.",
+    )
+    parser.add_argument(
+        "--show-fixedtap-cover-internal",
+        action="store_true",
+        help="Also report the diagnostic cover-count model with an internal fair-output tail.",
+    )
+    parser.add_argument(
+        "--show-fixedtap-cover-block",
+        action="store_true",
+        help="Also report a theorem-safe blocked upper sum for the paired-cover/internal-tail bound.",
+    )
+    parser.add_argument(
+        "--fixedtap-cover-block-ratio",
+        type=float,
+        default=1.01,
+        help="Multiplicative T-block ratio for --show-fixedtap-cover-block.",
     )
     parser.add_argument(
         "--show-latebase-pairwise",
@@ -1589,6 +1987,18 @@ def main() -> int:
         action="store_true",
         help="Use exact binomial CDFs in the positional lane instead of entropy upper bounds. Intended for small exact-table checks.",
     )
+    parser.add_argument(
+        "--pos-pair-adjacency-mode",
+        choices=("none", "prob", "late", "one-episode"),
+        default="one-episode",
+        help="How to bound the non-isolated R(U)<h contribution in the positional-pair lane.",
+    )
+    parser.add_argument(
+        "--pos-pair-adjacency-xi",
+        type=float,
+        default=0.1,
+        help="Window slack xi used only for the positional-pair non-isolated one-episode remainder.",
+    )
     args = parser.parse_args()
 
     print(f"Concrete dense+dense large-k evaluator")
@@ -1601,13 +2011,14 @@ def main() -> int:
     print(f"  kappa            : {args.kappa}")
     print(f"  theta            : {args.theta}")
     print(f"  xi               : {args.xi}")
+    print(f"  small xi         : {args.small_xi}")
     print()
 
     for sigma in sigma_values(args):
         n = total_length(args.k, sigma, args.n_mode)
         parity_n = n - args.k
         w_out = outer_generating_bound(args.k, sigma, args.z)
-        h0, s_tiny = tiny_window_bound(n, sigma, args.delta, args.z, args.xi, args.kappa, w_out)
+        h0, s_tiny = tiny_window_bound(n, sigma, args.delta, args.z, args.small_xi, args.kappa, w_out)
         h1 = h0 + 1
         h_mid_hi = int(math.floor(ETA_CRIT * n))
         s_low = geometric_window_bound(n=n, h_lo=h1, h_hi=h_mid_hi, z=args.z, rho=args.rho, w_out=w_out)
@@ -1615,12 +2026,12 @@ def main() -> int:
         gap = linear_window_gap(args.delta, args.theta, args.xi, args.eta_hi, args.gap_step)
         lin_count = max(0, int(math.floor(min(args.eta_hi, 1.0 - args.theta) * n)) - int(math.ceil(ETA_CRIT * n)) + 1)
         log2_s_lin = float("-inf") if lin_count == 0 else math.log2(lin_count) + n * gap.worst_gap
-        s_lin = 0.0 if log2_s_lin < -900.0 else 2.0 ** log2_s_lin
+        s_lin = 0.0 if log2_s_lin < -900.0 else (float("inf") if log2_s_lin > 900.0 else 2.0 ** log2_s_lin)
 
         top_exp = h2(args.eta_hi) - 0.5
         top_count = max(0, n - int(math.ceil(args.eta_hi * n)) + 1)
         log2_s_top = float("-inf") if top_count == 0 else math.log2(top_count) + n * top_exp
-        s_top = 0.0 if log2_s_top < -900.0 else 2.0 ** log2_s_top
+        s_top = 0.0 if log2_s_top < -900.0 else (float("inf") if log2_s_top > 900.0 else 2.0 ** log2_s_top)
 
         total = s_tiny + s_low + s_lin + s_top
         lg = math.log2(total) if total > 0.0 else float("-inf")
@@ -1719,7 +2130,7 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
-                xi=args.xi,
+                xi=args.small_xi,
                 h_lo=1,
                 h_hi=h_cap,
                 outer_mode=args.outer_smallh_mode,
@@ -1739,7 +2150,7 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
-                xi=args.xi,
+                xi=args.small_xi,
                 h_hi=h_mid_hi,
                 outer_mode=args.outer_smallh_mode,
                 parity_n=parity_n,
@@ -1769,8 +2180,8 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
-                xi=args.xi,
-                h_hi=bracket_h_hi if args.outer_smallh_mode == "banded" else h_mid_hi,
+                xi=args.small_xi,
+                h_hi=bracket_h_hi if args.outer_smallh_mode in ("banded", "banded-fixedtap") else h_mid_hi,
                 outer_mode=args.outer_smallh_mode,
                 parity_n=parity_n,
                 stop_gap_bits=args.adaptive_stop_gap,
@@ -1819,7 +2230,7 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
-                xi=args.xi,
+                xi=args.small_xi,
                 h_lo=1,
                 h_hi=bracket_h_hi,
                 outer_mode=args.outer_smallh_mode,
@@ -1836,7 +2247,7 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
-                xi=args.xi,
+                xi=args.small_xi,
                 h_lo=1,
                 h_hi=bracket_h_hi,
                 outer_mode=args.outer_smallh_mode,
@@ -1846,6 +2257,61 @@ def main() -> int:
                 log2_eo_total = log2add(log2_eo_total, log2_s_lin)
             if log2_s_top != float("-inf"):
                 log2_eo_total = log2add(log2_eo_total, log2_s_top)
+
+        if args.show_fixedtap_multiepisode:
+            fme_l = math.ceil((2.0 + args.small_xi) * args.delta * n)
+            log2_fme_total, fme_peak_h, fme_peak_log2 = fixedtap_multiepisode_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=fme_l,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_fme_total = log2add(log2_fme_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_fme_total = log2add(log2_fme_total, log2_s_top)
+
+        if args.show_fixedtap_cover_internal:
+            fci_l = math.ceil((2.0 + args.small_xi) * args.delta * n)
+            log2_fci_total, fci_peak_h, fci_peak_log2 = fixedtap_cover_internal_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=fci_l,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_fci_total = log2add(log2_fci_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_fci_total = log2add(log2_fci_total, log2_s_top)
+
+        if args.show_fixedtap_cover_block:
+            fcib_l = math.ceil((2.0 + args.small_xi) * args.delta * n)
+            log2_fcib_total, fcib_peak_h, fcib_peak_log2 = fixedtap_cover_internal_block_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=fcib_l,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+                block_ratio=args.fixedtap_cover_block_ratio,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_fcib_total = log2add(log2_fcib_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_fcib_total = log2add(log2_fcib_total, log2_s_top)
 
         if args.show_latebase_pairwise:
             lb_l = math.ceil(2.0 * args.delta * n)
@@ -1925,13 +2391,14 @@ def main() -> int:
                 k_msg=args.k,
                 sigma=sigma,
                 delta=args.delta,
+                adjacency_xi=args.pos_pair_adjacency_xi,
                 h_lo=1,
                 h_hi=bracket_h_hi,
                 pair_a_bits=args.pos_pair_a_bits,
                 pair_b_bits=args.pos_pair_b_bits,
                 entropy_tail_bound=not args.pos_pair_exact_binomial,
                 clamp_correction_nonnegative=not args.pos_pair_allow_negative_correction,
-                add_adjacency_remainder=True,
+                adjacency_mode=args.pos_pair_adjacency_mode,
                 outer_mode=args.outer_smallh_mode,
                 parity_n=parity_n,
             )
@@ -1948,7 +2415,7 @@ def main() -> int:
                 delta=args.delta,
                 z=args.z,
                 rho=args.rho,
-                xi=args.xi,
+                xi=args.small_xi,
                 kappa=args.kappa,
                 theta=args.theta,
                 eta_hi=args.eta_hi,
@@ -2107,6 +2574,7 @@ def main() -> int:
                 log2_m0_total = log2add(log2_m0_total, log2_s_top)
 
         print(f"sigma = {sigma}")
+        print(f"  offset sigma-ceil(log2 k): {sigma - math.ceil(math.log2(args.k))}")
         print(f"  c = sigma/log2(n)             : {sigma / math.log2(n):.6f}")
         print(f"  outer generating bound W(z)   : {format_prob(w_out)}")
         print(f"  tiny window cutoff h0         : {h0}")
@@ -2149,6 +2617,21 @@ def main() -> int:
             print(f"  EO_total (optimized one-episode correction)              : {format_log2(log2_eo_total)}")
             print(f"  EO_peak  (dominant h, log2 contribution)                 : h={eo_peak_h}, log2={eo_peak_log2:.3f}")
             print(f"  EO_L     (best window length)                            : {eo_l}")
+        if args.show_fixedtap_multiepisode:
+            print(f"  FME_total (fixed-tap multi-episode bound)                : {format_log2(log2_fme_total)}")
+            print(f"  FME_peak  (dominant h, log2 contribution)                : h={fme_peak_h}, log2={fme_peak_log2:.3f}")
+            print(f"  FME_L     (late-placement window)                        : {fme_l}")
+            print(f"  FME_stat  (full-slice early span)                        : exact")
+        if args.show_fixedtap_cover_internal:
+            print(f"  FCI_total (cover + internal fair-tail diagnostic)        : {format_log2(log2_fci_total)}")
+            print(f"  FCI_peak  (dominant h, log2 contribution)                : h={fci_peak_h}, log2={fci_peak_log2:.3f}")
+            print(f"  FCI_L     (late-placement window)                        : {fci_l}")
+            print(f"  FCI_stat  (cover-count envelope)                         : diagnostic")
+        if args.show_fixedtap_cover_block:
+            print(f"  FCIB_total (blocked cover theorem upper sum)             : {format_log2(log2_fcib_total)}")
+            print(f"  FCIB_peak  (dominant h, log2 contribution)               : h={fcib_peak_h}, log2={fcib_peak_log2:.3f}")
+            print(f"  FCIB_L     (late-placement window)                       : {fcib_l}")
+            print(f"  FCIB_ratio (multiplicative T-block ratio)                : {args.fixedtap_cover_block_ratio}")
         if args.show_latebase_pairwise:
             print(f"  LB_total (late base + pairwise residual)                 : {format_log2(log2_lb_total)}")
             print(f"  LB_peak  (dominant h, log2 contribution)                 : h={lb_peak_h}, log2={lb_peak_log2:.3f}")
@@ -2166,9 +2649,12 @@ def main() -> int:
             print(f"  ISA_total (isolated-safe + adjacency remainder)          : {format_log2(log2_isa_total)}")
             print(f"  ISA_peak  (dominant h, log2 contribution)                : h={isa_peak_h}, log2={isa_peak_log2:.3f}")
         if args.show_isolated_pos_pair:
-            print(f"  IPP_total (positional + early-pair residual + adj)       : {format_log2(log2_ipp_total)}")
+            print(f"  IPP_total (positional + early-pair residual)             : {format_log2(log2_ipp_total)}")
             print(f"  IPP_peak  (dominant h, log2 contribution)                : h={ipp_peak_h}, log2={ipp_peak_log2:.3f}")
             print(f"  IPP_corr  (a + b E[pairs], bits)                         : a={args.pos_pair_a_bits:.6f}, b={args.pos_pair_b_bits:.6f}")
+            print(f"  IPP_adj   (non-isolated remainder mode)                  : {args.pos_pair_adjacency_mode}")
+            if args.pos_pair_adjacency_mode == "one-episode":
+                print(f"  IPP_adj_xi                                                : {args.pos_pair_adjacency_xi:.6f}")
         if args.show_isolated_hybrid:
             print(f"  IH_total (isolated tiny slice + coarse handoff)          : {format_log2(log2_ih_total)}")
             print(f"  IH_iso   (isolated-controlled tiny slice only)           : {format_log2(log2_ih_iso)}")

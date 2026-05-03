@@ -27,7 +27,7 @@ def main() -> int:
     ap.add_argument("--k", type=int, required=True)
     ap.add_argument("--sigma", type=int, required=True)
     ap.add_argument("--parity-n", type=int, default=None)
-    ap.add_argument("--mode", choices=("conv", "banded"), default="banded")
+    ap.add_argument("--mode", choices=("conv", "banded", "banded-fixedtap"), default="banded-fixedtap")
     ap.add_argument("--h-max", type=int, default=12)
     args = ap.parse_args()
 
@@ -40,10 +40,12 @@ def main() -> int:
 
     for h in range(1, args.h_max + 1):
         exact = exact_outer_weight(rows, args.k, h)
-        if args.mode == "banded":
+        if args.mode in ("banded", "banded-fixedtap"):
             if args.parity_n is None:
                 raise SystemExit("--parity-n is required in banded mode")
-            log2_model = outer_small_h_banded_systematic_log2(args.k, args.sigma, args.parity_n, h)
+            log2_model = outer_small_h_banded_systematic_log2(
+                args.k, args.sigma, args.parity_n, h, fixed_tap=(args.mode == "banded-fixedtap")
+            )
         else:
             log2_model = outer_small_h_exact_log2(args.k, args.sigma, h)
         model = 0.0 if log2_model == float("-inf") else 2.0**log2_model

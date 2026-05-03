@@ -15,8 +15,11 @@ from dense_largek_eval import (
     adaptive_small_h_localtail,
     adaptive_small_h_rigorous,
     exact_smallw_inner_bound,
+    fixedtap_cover_internal_model_log2,
+    fixedtap_multiepisode_model_log2,
     geometric_window_bound,
     linear_window_gap,
+    log2add,
     outer_generating_bound,
     outer_small_h_prefix,
     run_mixture_model_log2,
@@ -43,6 +46,7 @@ def evaluate_point(
     kappa: float,
     theta: float,
     xi: float,
+    small_xi: float,
     eta_hi: float,
     gap_step: float,
     heuristic_h_cap: int,
@@ -50,6 +54,7 @@ def evaluate_point(
     outer_smallh_mode: str,
     bracket_h_cap: int,
     only_bracket: bool,
+    include_fixedtap_cover: bool,
 ) -> dict[str, float]:
     n = total_length(k_msg, sigma, n_mode)
     parity_n = n - k_msg
@@ -81,10 +86,16 @@ def evaluate_point(
     l_peak_log2 = float("-inf")
     log2_l_tail = float("-inf")
     log2_l_total = float("-inf")
+    fme_peak_h = 0
+    fme_peak_log2 = float("-inf")
+    log2_fme_total = float("-inf")
+    fci_peak_h = 0
+    fci_peak_log2 = float("-inf")
+    log2_fci_total = float("-inf")
 
     if not only_bracket:
         w_out = outer_generating_bound(k_msg, sigma, z)
-        h0, s_tiny = tiny_window_bound(n, sigma, delta, z, xi, kappa, w_out)
+        h0, s_tiny = tiny_window_bound(n, sigma, delta, z, small_xi, kappa, w_out)
         s_low = geometric_window_bound(
             n=n,
             h_lo=h0 + 1,
@@ -137,7 +148,7 @@ def evaluate_point(
         outer_logs = outer_small_h_prefix(k_msg, sigma, h_cap, outer_mode=outer_smallh_mode, parity_n=parity_n)
         for h in range(1, h_cap + 1):
             out = outer_logs[h]
-            inn = exact_smallw_inner_bound(n, h, sigma, delta, xi)
+            inn = exact_smallw_inner_bound(n, h, sigma, delta, small_xi)
             if inn <= 0.0:
                 continue
             term = out + math.log2(inn)
@@ -179,7 +190,7 @@ def evaluate_point(
             k_msg=k_msg,
             sigma=sigma,
             delta=delta,
-            xi=xi,
+            xi=small_xi,
             h_hi=h_mid_hi,
             outer_mode=outer_smallh_mode,
             parity_n=parity_n,
@@ -207,8 +218,8 @@ def evaluate_point(
             k_msg=k_msg,
             sigma=sigma,
             delta=delta,
-            xi=xi,
-            h_hi=bracket_h_hi if outer_smallh_mode == "banded" else h_mid_hi,
+            xi=small_xi,
+            h_hi=bracket_h_hi if outer_smallh_mode in ("banded", "banded-fixedtap") else h_mid_hi,
             outer_mode=outer_smallh_mode,
             parity_n=parity_n,
         )
@@ -248,8 +259,8 @@ def evaluate_point(
             k_msg=k_msg,
             sigma=sigma,
             delta=delta,
-            xi=xi,
-            h_hi=bracket_h_hi if outer_smallh_mode == "banded" else h_mid_hi,
+            xi=small_xi,
+            h_hi=bracket_h_hi if outer_smallh_mode in ("banded", "banded-fixedtap") else h_mid_hi,
             outer_mode=outer_smallh_mode,
             parity_n=parity_n,
         )
@@ -345,6 +356,35 @@ def evaluate_point(
         lo = min(log2_m0_total, log2_s_top)
         log2_m0_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
 
+    if include_fixedtap_cover:
+        f_l = math.ceil((2.0 + small_xi) * delta * n)
+        log2_fme_total, fme_peak_h, fme_peak_log2 = fixedtap_multiepisode_model_log2(
+            n=n,
+            k_msg=k_msg,
+            sigma=sigma,
+            delta=delta,
+            h_lo=1,
+            h_hi=bracket_h_hi,
+            l=f_l,
+            outer_mode=outer_smallh_mode,
+            parity_n=parity_n,
+        )
+        log2_fci_total, fci_peak_h, fci_peak_log2 = fixedtap_cover_internal_model_log2(
+            n=n,
+            k_msg=k_msg,
+            sigma=sigma,
+            delta=delta,
+            h_lo=1,
+            h_hi=bracket_h_hi,
+            l=f_l,
+            outer_mode=outer_smallh_mode,
+            parity_n=parity_n,
+        )
+        for extra in (log2_s_lin, log2_s_top):
+            if extra != float("-inf"):
+                log2_fme_total = log2add(log2_fme_total, extra)
+                log2_fci_total = log2add(log2_fci_total, extra)
+
     return {
         "n": float(n),
         "w_out_log2": math.log2(w_out) if (w_out is not None and w_out > 0.0) else float("-inf"),
@@ -391,6 +431,12 @@ def evaluate_point(
         "m0_peak_h": float(m0_peak_h),
         "m0_peak_log2": m0_peak_log2,
         "m0_total_log2": log2_m0_total,
+        "fme_peak_h": float(fme_peak_h),
+        "fme_peak_log2": fme_peak_log2,
+        "fme_total_log2": log2_fme_total,
+        "fci_peak_h": float(fci_peak_h),
+        "fci_peak_log2": fci_peak_log2,
+        "fci_total_log2": log2_fci_total,
         "b_opt_log2": log2_l_total,
         "b_ctr_log2": log2_m_total,
         "b_safe_log2": log2_ms_total,
@@ -412,13 +458,15 @@ def main() -> int:
     parser.add_argument("--kappa", type=float, default=0.5)
     parser.add_argument("--theta", type=float, default=0.005)
     parser.add_argument("--xi", type=float, default=8.0)
+    parser.add_argument("--small-xi", type=float, default=0.1)
     parser.add_argument("--eta-hi", type=float, default=0.99)
     parser.add_argument("--gap-step", type=float, default=1e-5)
     parser.add_argument("--heuristic-h-cap", type=int, default=64)
     parser.add_argument("--n-mode", choices=("paper", "extended"), default="paper")
-    parser.add_argument("--outer-smallh-mode", choices=("conv", "banded"), default="banded")
+    parser.add_argument("--outer-smallh-mode", choices=("conv", "banded", "banded-fixedtap"), default="banded-fixedtap")
     parser.add_argument("--bracket-h-cap", type=int, default=24)
     parser.add_argument("--only-bracket", action="store_true")
+    parser.add_argument("--include-fixedtap-cover", action="store_true")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -483,6 +531,12 @@ def main() -> int:
                 "m0_peak_h",
                 "m0_peak_log2",
                 "m0_total_log2",
+                "fme_peak_h",
+                "fme_peak_log2",
+                "fme_total_log2",
+                "fci_peak_h",
+                "fci_peak_log2",
+                "fci_total_log2",
                 "b_opt_log2",
                 "b_ctr_log2",
                 "b_safe_log2",
@@ -508,6 +562,7 @@ def main() -> int:
                         kappa=args.kappa,
                         theta=args.theta,
                         xi=args.xi,
+                        small_xi=args.small_xi,
                         eta_hi=args.eta_hi,
                         gap_step=args.gap_step,
                         heuristic_h_cap=args.heuristic_h_cap,
@@ -515,6 +570,7 @@ def main() -> int:
                         outer_smallh_mode=args.outer_smallh_mode,
                         bracket_h_cap=args.bracket_h_cap,
                         only_bracket=args.only_bracket,
+                        include_fixedtap_cover=args.include_fixedtap_cover,
                     )
                     row.update(
                         {
