@@ -1386,10 +1386,11 @@ finite prefix through \(H\), the low-slot residual is a controlled geometric ser
 exponentially small in \(N\).  Thus the \(r=1\) part no longer requires sampling beyond the prefix, except for the
 separate handoff to the established linear-window exponent bound.
 
-\begin{lemma}[Bounded-\(r\) low-slot geometric ratio]
+\begin{lemma}[Truncated-\(r\) low-slot geometric ratio]
 \label{lem:bounded-r-low-slot-ratio}
-Fix \(R\ge1\).  Under the same outer generating-function bound \(A_h^{\mathrm{out}}\le W(z)z^{-h}\), consider any
-fixed \(1\le r\le R\) global-cover subpiece.  Its support factor has the form
+Fix a truncation parameter \(R\ge1\).  Under the same outer generating-function bound
+\(A_h^{\mathrm{out}}\le W(z)z^{-h}\), consider any \(1\le r\le R\) global-cover subpiece.  Its support factor has the
+form
 \[
 \frac{\binom{M}{h-c}}{\binom{N}{h}},
 \qquad
@@ -1414,6 +1415,7 @@ z^{-1}\,
 <1,
 \]
 then the low-slot contribution of all \(1\le r\le R\) pieces is controlled by a finite sum of geometric residuals.
+The parameter \(R\) may be chosen with \(N\), provided \(2R<H\) and \(q_{H,R,\theta,z}<1\).
 \end{lemma}
 
 \begin{proof}
@@ -1428,10 +1430,10 @@ many \(r\le R\) and over the finite set of live-geometry blocks preserves the sa
 the finite prefactor already present in the computed prefix.
 \end{proof}
 
-\begin{lemma}[Bounded-\(r\) high-slot suppression below the linear splice]
+\begin{lemma}[Truncated-\(r\) high-slot suppression below the linear splice]
 \label{lem:bounded-r-high-slot-suppression}
-Fix constants \(R\ge1\), \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  For any fixed
-\(1\le r\le R\), restrict the global-cover subpieces to support-slot length \(M=xN\ge\theta N\).  Then their total
+Fix a truncation parameter \(R\ge1\), constants \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  For
+any \(1\le r\le R\), restrict the global-cover subpieces to support-slot length \(M=xN\ge\theta N\).  Then their total
 contribution over \(H<h\le\eta N\) is at most
 \[
 N^{O_R(1)}W(z)\,
@@ -1439,6 +1441,8 @@ N^{O_R(1)}W(z)\,
 \]
 with \(E_{\mathrm{hi}}\) as in Lemma~\ref{lem:r-one-high-slot-suppression}.  Thus, when \(E_{\mathrm{hi}}>0\), the
 combined high-slot contribution of all bounded \(1\le r\le R\) pieces is exponentially negligible.
+This remains an exponential suppression for any \(R=O(\log N)\), since then the factor \(N^{O_R(1)}\) is
+\(2^{O((\log N)^2)}=2^{o(N)}\).
 \end{lemma}
 
 \begin{proof}
@@ -1458,14 +1462,16 @@ The remaining choices of \(r\) interval lengths and placements contribute only \
 \(x\in[\theta,1]\) and summing over \(r\le R\) proves the claim.
 \end{proof}
 
-For the current certificate \(R=8\) and \(H=2000\).  With the same \(\theta=0.35\) and \(z=0.370884\),
+The truncation \(R\) is therefore flexible.  The current evaluator used \(R=8\), mostly as a conservative constant
+split.  With \(H=2000\), \(\theta=0.35\), and \(z=0.370884\),
 \[
 \log_2 q_{H,8,\theta,z}\approx -0.072,
 \]
-so the low-slot residual remains geometric for every \(1\le r\le8\).  The high-slot exponent is unchanged from the
-\(r=1\) calculation and remains positive for the bridge splice choices above.  Thus the finite-prefix certificate now
-covers the bounded-\(r\) episode-cover pieces used by the evaluator.  The remaining proof task is to add a separate
-tail over large \(r\), using the fixed-tap factor \(2^{-r(\sigma-1)}\) and the interval-count entropy.
+so the low-slot residual remains geometric for every \(1\le r\le8\).  One could instead take a slowly growing split,
+for example \(R\asymp\log k\), as long as \(H\) is chosen so that \(2R<H\) and \(q_{H,R,\theta,z}<1\); the high-slot
+large-deviation lemma still has exponential room.  Thus \(R=8\) is not intrinsic.  It is just the current finite
+certificate cut, and the remaining proof task is to add a separate tail over \(r>R\), using the fixed-tap factor
+\(2^{-r(\sigma-1)}\) and the interval-count entropy.
 
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
