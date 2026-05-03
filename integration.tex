@@ -1945,6 +1945,56 @@ checks the finite prefix and the displayed residual constants together.  Its cer
 Markov's inequality then gives the stated failure-probability bound.
 \end{proof}
 
+\begin{theorem}[Finite dense+dense margin checkpoint with one extra tap]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma26}
+Consider the same fixed-tap banded systematic outer / fixed-tap dense recursive inner construction as
+Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}, but with outer memory and inner memory both equal to
+\[
+\sigma=m=26.
+\]
+Keep \(k=2^{20}\), \(N=2^{21}\), and \(d=\lfloor0.106N\rfloor=222298\).  Then the stronger checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(26)}
+\le
+2^{-0.9}.
+\]
+Equivalently, with probability at least \(1-2^{-0.9}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+The first-moment reduction is the same as in Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}.  The finite prefix
+now uses \(H_{\mathrm{pre}}=600\), \(R=16\), exact survivor-only accounting through \(h\le30\), exact fixed-tap banded
+outer counts through \(h\le80\), and a coarser certified blocked grid with block ratios \(1.02\) and \(1.1\).  The
+prefix verifier reports
+\[
+\log_2\mu_{\le600}\le -0.967862,
+\]
+again with peak contribution at \(h=2\).  Its omitted \(r>16\) prefix tails are below \(2^{-52}\) on the low-slot side
+and below \(2^{-83000}\) on the high-slot side, so they do not change the displayed total.
+
+For \(h>600\), the residual split is the same four-way split as Lemma~\ref{lem:checkpoint-residual-split-0106}, with
+\[
+H=600,\qquad R=16,\qquad \sigma=26.
+\]
+The bounded-\(r\) low-slot ratio is already below one:
+\[
+\log_2 q_{600,16,0.35,0.370884}<-0.0028.
+\]
+The large-\(r\) low-slot ledger, after the same \(3N^4\) union, is below \(2^{-52}\).  The bounded-\(r\) high-slot
+branch and the linear handoff are unchanged in exponent and remain covered by
+Lemmas~\ref{lem:bounded-r-high-slot-suppression} and~\ref{lem:low-linear-handoff-0106}; the top-weight range is again
+handled by the outer-exponent argument using \(p_h^{\mathrm{in}}\le1\).
+
+The top-level verifier for this margin checkpoint is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig26.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(26)}\le -0.967862<-0.9\).  Markov's inequality gives the stated bound.
+\end{proof}
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is

@@ -102,9 +102,21 @@ def main() -> int:
     parser.add_argument("--n", type=int, default=2**21)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--d", type=int, default=222298)
+    parser.add_argument("--sigma", type=int, default=25)
+    parser.add_argument("--h-min", type=int, default=1)
+    parser.add_argument("--h-max", type=int, default=2000)
     parser.add_argument("--r-cap", type=int, default=20)
+    parser.add_argument("--prefix-r-max", default="", help="Expected r_max field in the prefix summary.")
     parser.add_argument("--theta-slot", type=float, default=0.35)
     parser.add_argument("--z", type=float, default=0.370884)
+    parser.add_argument("--exact-through", type=int, default=80)
+    parser.add_argument("--z-min", default="0.005")
+    parser.add_argument("--z-max", default="0.999")
+    parser.add_argument("--z-count", default="160")
+    parser.add_argument("--block-ratio", default="1.01")
+    parser.add_argument("--suffix-block-ratio", default="1.01")
+    parser.add_argument("--stop-gap-bits", default="60")
+    parser.add_argument("--tail-confirm", default="8")
     parser.add_argument("--max-total-log2", type=float, default=-0.34)
     parser.add_argument("--max-tail-log2", type=float, default=-800.0)
     parser.add_argument("--max-ratio-log2", type=float, default=-0.35)
@@ -121,10 +133,10 @@ def main() -> int:
     tail_residual = float(tail["tail_residual_log2"])
     certified_total = float(tail["certified_total_log2_if_ratio_holds"])
     observed_ratio = float(tail["observed_worst_log2_ratio"])
-    offset_s = 25 - math.ceil(math.log2(args.k))
+    offset_s = args.sigma - math.ceil(math.log2(args.k))
     low_ledger = large_r_low_slot_max(
         k=args.k,
-        sigma=25,
+        sigma=args.sigma,
         offset_s=offset_s,
         h_min=1,
         r_cap=args.r_cap,
@@ -135,9 +147,9 @@ def main() -> int:
     low_union = math.log2(3.0) + 4.0 * math.log2(args.n) + low_ledger.value
     high_value, high_data = prefix_large_r_high_slot_bound(
         k=args.k,
-        sigma=25,
+        sigma=args.sigma,
         delta=args.delta,
-        h_max=2000,
+        h_max=args.h_max,
         r_cap=args.r_cap,
         theta=args.theta_slot,
         z=args.z,
@@ -170,14 +182,32 @@ def main() -> int:
     ok &= check("N", summary["N"] == str(args.n), summary["N"])
     ok &= check("delta", abs(float(summary["delta"]) - args.delta) <= 1e-15, summary["delta"])
     ok &= check("d", summary["d"] == str(args.d), summary["d"])
-    ok &= check("sigma", summary["sigma"] == "25", summary["sigma"])
-    ok &= check("offset", summary["offset"] == "5", summary["offset"])
-    ok &= check("h window", summary["h_min"] == "1" and summary["h_max"] == "2000", f"{summary['h_min']}..{summary['h_max']}")
+    ok &= check("sigma", summary["sigma"] == str(args.sigma), summary["sigma"])
+    ok &= check("offset", summary["offset"] == str(offset_s), summary["offset"])
+    ok &= check(
+        "h window",
+        summary["h_min"] == str(args.h_min) and summary["h_max"] == str(args.h_max),
+        f"{summary['h_min']}..{summary['h_max']}",
+    )
     ok &= check("exact outer mode", summary["exact_outer_mode"] == "fixedtap-banded", summary["exact_outer_mode"])
-    ok &= check("exact outer through", summary["exact_through"] == "80", summary["exact_through"])
-    ok &= check("z grid", summary["z_min"] == "0.005" and summary["z_max"] == "0.999" and summary["z_count"] == "160", f"{summary['z_min']}..{summary['z_max']} x {summary['z_count']}")
-    ok &= check("block ratios", summary["block_ratio"] == "1.01" and summary["suffix_block_ratio"] == "1.01", f"{summary['block_ratio']}, {summary['suffix_block_ratio']}")
-    ok &= check("r stopping rule", summary["stop_gap_bits"] == "60" and summary["tail_confirm"] == "8" and summary["r_max"] == "", f"gap={summary['stop_gap_bits']}, confirm={summary['tail_confirm']}, r_max={summary['r_max']!r}")
+    ok &= check("exact outer through", summary["exact_through"] == str(args.exact_through), summary["exact_through"])
+    ok &= check(
+        "z grid",
+        summary["z_min"] == args.z_min and summary["z_max"] == args.z_max and summary["z_count"] == args.z_count,
+        f"{summary['z_min']}..{summary['z_max']} x {summary['z_count']}",
+    )
+    ok &= check(
+        "block ratios",
+        summary["block_ratio"] == args.block_ratio and summary["suffix_block_ratio"] == args.suffix_block_ratio,
+        f"{summary['block_ratio']}, {summary['suffix_block_ratio']}",
+    )
+    ok &= check(
+        "r stopping rule",
+        summary["stop_gap_bits"] == args.stop_gap_bits
+        and summary["tail_confirm"] == args.tail_confirm
+        and summary["r_max"] == args.prefix_r_max,
+        f"gap={summary['stop_gap_bits']}, confirm={summary['tail_confirm']}, r_max={summary['r_max']!r}",
+    )
     ok &= check("prefix total", total <= args.max_total_log2, f"{total:.6f} <= {args.max_total_log2:.6f}")
     ok &= check("peak location", peak_h == 2, f"h={peak_h}")
     ok &= check("tail ratio", observed_ratio <= args.max_ratio_log2, f"{observed_ratio:.6f} <= {args.max_ratio_log2:.6f}")

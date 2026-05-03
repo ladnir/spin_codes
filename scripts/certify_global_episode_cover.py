@@ -26,6 +26,8 @@ import csv
 import math
 from pathlib import Path
 
+import numpy as np
+
 from dense_largek_eval import (
     binom_cdf_half_entropy_log2,
     fixedtap_banded_outer_gf_log2,
@@ -197,6 +199,35 @@ def survivor_only_exact_log2(*, n: int, h: int, tail_cache: list[float]) -> floa
     return min(0.0, total)
 
 
+def survivor_only_exact_prefix_log2(*, n: int, h_max: int, tail_cache: list[float]) -> list[float]:
+    """Vectorized exact suffix-start sums for h=1..h_max.
+
+    For fixed h, the suffix length U has law
+
+        P[U=u] = C(u-1,h-1) / C(N,h).
+
+    The recurrence from h to h+1 avoids the scalar log-sum loop for each h.
+    """
+
+    vals = [float("-inf")] * (h_max + 1)
+    if h_max <= 0:
+        return vals
+
+    tails = np.exp2(np.asarray(tail_cache, dtype=np.float64))
+    u = np.arange(n + 1, dtype=np.float64)
+    probs = np.zeros(n + 1, dtype=np.float64)
+    probs[1:] = 1.0 / n
+
+    for h in range(1, h_max + 1):
+        total = float(np.dot(probs[h:], tails[h:]))
+        vals[h] = min(0.0, math.log2(total)) if total > 0.0 else float("-inf")
+        if h < h_max:
+            probs *= ((u - h) / h) * ((h + 1) / (n - h))
+            probs[: h + 1] = 0.0
+
+    return vals
+
+
 def terminated_only_log2(
     *,
     n: int,
@@ -335,12 +366,16 @@ def global_episode_inner_log2(
     tail_mode: str,
     exact_survivor: bool,
     tail_cache: list[float] | None,
+    exact_survivor_value: float | None = None,
 ) -> tuple[float, int, float, list[tuple[int, float]]]:
     d = math.floor(delta * n)
     if exact_survivor:
-        if tail_cache is None:
+        if exact_survivor_value is not None:
+            total = exact_survivor_value
+        elif tail_cache is None:
             raise ValueError("exact survivor mode requires a tail cache")
-        total = survivor_only_exact_log2(n=n, h=h, tail_cache=tail_cache)
+        else:
+            total = survivor_only_exact_log2(n=n, h=h, tail_cache=tail_cache)
     else:
         total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio, tail_mode=tail_mode)
     best_r = 0
@@ -453,9 +488,13 @@ def main() -> None:
     summaries: list[dict[str, str | int | float]] = []
     series: dict[int, list[tuple[int, float, float]]] = {}
     tail_cache: list[float] | None = None
+    exact_survivor_values: list[float] | None = None
     if args.exact_survivor_through >= args.h_min:
         print(f"precomputing {args.tail_mode} tail cache for exact survivor sums", flush=True)
         tail_cache = [tail_log2(u, d, args.tail_mode) for u in range(n + 1)]
+        exact_hi = min(args.exact_survivor_through, args.h_max)
+        print(f"precomputing exact survivor sums through h={exact_hi}", flush=True)
+        exact_survivor_values = survivor_only_exact_prefix_log2(n=n, h_max=exact_hi, tail_cache=tail_cache)
     for sigma in sigmas:
         print(f"sigma={sigma}: global episode cover h={args.h_min}..{args.h_max}", flush=True)
         gf_outer, gf_z = outer_gf_bounds(k=args.k, sigma=sigma, h_min=args.h_min, h_max=args.h_max, zs=zs)
@@ -489,6 +528,11 @@ def main() -> None:
                 tail_mode=args.tail_mode,
                 exact_survivor=h <= args.exact_survivor_through,
                 tail_cache=tail_cache,
+                exact_survivor_value=(
+                    exact_survivor_values[h]
+                    if exact_survivor_values is not None and h < len(exact_survivor_values)
+                    else None
+                ),
             )
             term = outer + inner if outer != float("-inf") and inner != float("-inf") else float("-inf")
             if args.pieces_out is not None:
