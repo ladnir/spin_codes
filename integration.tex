@@ -1319,6 +1319,73 @@ dominant \(r=1\) saddle at slot length about \(0.265N\), so it lies safely insid
 large-deviation cost of the shared binomial lower tail; numerically this branch is already more than \(2^{24000}\)
 below the leading low-slot saddle in the \(h=500\) to \(h=2000\) range.
 
+\begin{lemma}[High-slot \(r=1\) suppression below the linear splice]
+\label{lem:r-one-high-slot-suppression}
+Fix constants \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  Consider the same \(r=1\) global-cover
+subpieces as Lemma~\ref{lem:r-one-low-slot-ratio}, but restrict to summands whose support-slot length \(M=xN\)
+satisfies \(x\ge\theta\).  Suppose the outer is bounded by \(A_h^{\mathrm{out}}\le W(z)z^{-h}\).  Then the total
+contribution of the high-slot \(r=1\) branch over \(H<h\le\eta N\) is at most
+\[
+N^{O(1)}W(z)\,
+2^{-N E_{\mathrm{hi}}(\delta,\theta,\eta,z)},
+\]
+where
+\[
+E_{\mathrm{hi}}(\delta,\theta,\eta,z)
+:=
+\inf_{x\in[\theta,1]}
+\left\{
+x\Bigl(1-H_2(\delta/x)\Bigr)
+-
+\eta\max\{0,\log_2(x/z)\}
+\right\}.
+\]
+In particular, whenever \(E_{\mathrm{hi}}>0\), this branch is exponentially negligible compared with the finite
+prefix.
+\end{lemma}
+
+\begin{proof}
+For either \(r=1\) subpiece, high slot length \(M=xN\) forces charged live length at least \(xN-O(m)\): for the
+all-terminated piece this is \((U-m)_+\) with \(M=U-2\), while for the final-survivor piece it is
+\(S+(T-m)_+\) with \(M=S+T-3\).  Hence the shared lower-tail factor is bounded by
+\[
+2^{-xN(1-H_2(\delta/x))+o(N)}
+\]
+uniformly over \(x\ge\theta\).
+
+The \(h\)-dependent support factor has the form
+\(\binom{M}{h-c}/\binom{N}{h}\), with \(c\in\{2,3\}\).  Using falling factorials,
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}
+\le
+\left(\frac{h}{N-h}\right)^c
+\left(\frac{M}{N}\right)^{h-c}.
+\]
+For \(h\le\eta N\), the polynomial-in-\(N\) prefactor absorbs the fixed \(c\), and after multiplying by the outer
+factor \(z^{-h}\) we get at most
+\[
+N^{O(1)}\,
+2^{\eta N\max\{0,\log_2(x/z)\}}.
+\]
+The remaining live-geometry choices for \(r=1\) contribute only another polynomial factor in \(N\).  Taking the worst
+\(x\in[\theta,1]\) proves the displayed bound.
+\end{proof}
+
+For the same checkpoint parameters, \(\delta=0.106\), \(\theta=0.35\), \(z=0.370884\), and even \(\eta=0.25\), the
+exponent satisfies
+\[
+E_{\mathrm{hi}}(\delta,\theta,\eta,z)>0.018.
+\]
+Thus the high-slot \(r=1\) branch is exponentially suppressed throughout the sublinear/intermediate window.  The
+remaining \(h>\eta N\) range belongs to the separate linear-window exponent comparison, not to the finite-prefix
+episode-cover certificate.
+
+Combining Lemmas~\ref{lem:r-one-low-slot-ratio}, \ref{lem:r-one-high-slot-suppression}, and
+\ref{lem:geometric-residual-certificate} gives the desired \(r=1\) conclusion for the bridge window: after computing a
+finite prefix through \(H\), the low-slot residual is a controlled geometric series, while the high-slot residual is
+exponentially small in \(N\).  Thus the \(r=1\) part no longer requires sampling beyond the prefix, except for the
+separate handoff to the established linear-window exponent bound.
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
