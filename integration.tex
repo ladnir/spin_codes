@@ -1247,6 +1247,12 @@ survival-only bridge crosses near offset \(0\), so the remaining proof slack is 
 tiny \(h\) survivor/late-placement accounting and in the remaining conservative episode-cover overcount, not in a
 medium-weight tail obstruction.
 
+The remaining unbounded-\(h\) bookkeeping should now be a tail lemma, not a new modeling step.  In the same
+\(\sigma=25\) certificate, the sampled contribution is already monotone decreasing after \(h=100\); after \(h=500\)
+the worst observed adjacent log-ratio through \(h=2000\) is below \(-0.36\) bits.  This is not used as a theorem yet,
+but it gives the right target for the final h-block certificate: prove a uniform geometric domination beyond a finite
+prefix, then add the negligible residual to the displayed break-even sum.
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
