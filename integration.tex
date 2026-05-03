@@ -1249,9 +1249,33 @@ medium-weight tail obstruction.
 
 The remaining unbounded-\(h\) bookkeeping should now be a tail lemma, not a new modeling step.  In the same
 \(\sigma=25\) certificate, the sampled contribution is already monotone decreasing after \(h=100\); after \(h=500\)
-the worst observed adjacent log-ratio through \(h=2000\) is below \(-0.36\) bits.  This is not used as a theorem yet,
-but it gives the right target for the final h-block certificate: prove a uniform geometric domination beyond a finite
-prefix, then add the negligible residual to the displayed break-even sum.
+the worst observed adjacent log-ratio through \(h=2000\) is below \(-0.36\) bits.  If that same ratio were proved
+uniformly for \(h>2000\), the residual tail would be below \(-839\) bits and the displayed break-even total would be
+unchanged at six decimals.  This is not used as a theorem yet, but it gives the right target for the final h-block
+certificate: prove a uniform geometric domination beyond a finite prefix, then add the negligible residual to the
+displayed break-even sum.
+
+\begin{lemma}[Geometric residual certificate]
+\label{lem:geometric-residual-certificate}
+Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
+\[
+b_{h+1}\le 2^{-\alpha}b_h
+\qquad(h\ge H).
+\]
+Then
+\[
+\sum_{h>H}b_h
+\le
+\frac{2^{-\alpha}}{1-2^{-\alpha}}\,b_H.
+\]
+Consequently, any finite first-moment prefix through \(H\) becomes a full first-moment certificate once the displayed
+ratio bound is proved for the residual terms.
+\end{lemma}
+
+\begin{proof}
+Iterate the ratio bound:
+\(b_{H+j}\le 2^{-j\alpha}b_H\) for \(j\ge1\), and sum the resulting geometric series.
+\end{proof}
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
