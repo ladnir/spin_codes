@@ -839,9 +839,10 @@ Thus the present \emph{crossover evidence} for this lane is near
 \[
 \sigma\approx \lceil\log_2 k\rceil,
 \]
-not near \(\lceil\log_2 k\rceil+10\). This is not yet a proof of distance \(0.106N\); it is a calibration result for
-one now-corrected bridge. Its value is that the contribution has negative slope after the small/intermediate hump,
-rather than remaining flat or rising into larger \(h\).
+not near \(\lceil\log_2 k\rceil+10\). This table is only a calibration result for one now-corrected bridge, but the
+later checkpoint certificate upgrades the \(\sigma=25\) lane into a finite-\(n\) theorem.  The value of the table is
+that the contribution has negative slope after the small/intermediate hump, rather than remaining flat or rising into
+larger \(h\).
 
 \paragraph{What is solid versus what is still heuristic.}
 By now several parts of the picture are genuinely solid:
@@ -1814,10 +1815,9 @@ finite-\(h\) factor \((h/(N-h))^c\); Lemma~\ref{lem:large-r-low-slot-certificate
 branch.  The complementary high-slot case is no longer a separate bridge phenomenon once \(H/N\) enters the
 low-linear window covered by Lemma~\ref{lem:low-linear-handoff-0106}.
 
-What remains for a full break-even certificate is therefore not another unbounded \(h\)-search.  It is to make the
-finite prefix \(h\le2000\) and the numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} into a
-single reproducible certificate artifact, then decide how much negative margin should be required beyond mere
-\(\log_2\mu<0\).  The current top-level checkpoint verifier is
+The break-even checkpoint is therefore no longer an unbounded \(h\)-search.  The finite prefix \(h\le2000\) and the
+numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} are now packaged as a single reproducible
+certificate artifact.  The current top-level checkpoint verifier is
 \[
 \texttt{python scripts/verify\_checkpoint\_0106.py}.
 \]
