@@ -324,7 +324,7 @@ def global_episode_inner_log2(
     tail_mode: str,
     exact_survivor: bool,
     tail_cache: list[float] | None,
-) -> tuple[float, int, float]:
+) -> tuple[float, int, float, list[tuple[int, float]]]:
     d = math.floor(delta * n)
     if exact_survivor:
         if tail_cache is None:
@@ -334,6 +334,7 @@ def global_episode_inner_log2(
         total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio, tail_mode=tail_mode)
     best_r = 0
     best_piece = total
+    pieces = [(0, total)]
     max_r = h // 2 if r_max is None else min(r_max, h // 2)
     below_count = 0
     for r in range(1, max_r + 1):
@@ -357,6 +358,7 @@ def global_episode_inner_log2(
             piece,
             survivor_piece,
         )
+        pieces.append((r, piece))
         total = log2add(total, piece)
         if piece > best_piece:
             best_piece = piece
@@ -368,7 +370,7 @@ def global_episode_inner_log2(
                 break
         else:
             below_count = 0
-    return min(0.0, total), best_r, best_piece
+    return min(0.0, total), best_r, best_piece, pieces
 
 
 def main() -> None:
@@ -406,6 +408,11 @@ def main() -> None:
     parser.add_argument("--exact-outer-csv", default=None)
     parser.add_argument("--exact-through", type=int, default=80)
     parser.add_argument("--out-prefix", default=None)
+    parser.add_argument(
+        "--pieces-out",
+        default=None,
+        help="Optional long-form CSV of inner r-piece contributions for proof diagnostics.",
+    )
     parser.add_argument("--no-png", action="store_true")
     args = parser.parse_args()
 
@@ -424,6 +431,7 @@ def main() -> None:
             out_base = Path.cwd() / out_base
 
     rows: list[dict[str, str | int | float]] = []
+    piece_rows: list[dict[str, str | int | float]] = []
     summaries: list[dict[str, str | int | float]] = []
     series: dict[int, list[tuple[int, float, float]]] = {}
     tail_cache: list[float] | None = None
@@ -443,7 +451,7 @@ def main() -> None:
             use_exact = h <= args.exact_through and exact_outer[h] != float("-inf")
             outer = exact_outer[h] if use_exact else gf_outer[h]
             source = "exact" if use_exact else "gf"
-            inner, best_r, best_piece = global_episode_inner_log2(
+            inner, best_r, best_piece, pieces = global_episode_inner_log2(
                 n=n,
                 h=h,
                 sigma=sigma,
@@ -459,6 +467,20 @@ def main() -> None:
                 tail_cache=tail_cache,
             )
             term = outer + inner if outer != float("-inf") and inner != float("-inf") else float("-inf")
+            if args.pieces_out is not None:
+                for r, piece in pieces:
+                    piece_rows.append(
+                        {
+                            "sigma": sigma,
+                            "h": h,
+                            "r": r,
+                            "outer_log2": format_log2(outer),
+                            "inner_piece_log2": format_log2(piece),
+                            "term_piece_log2": format_log2(
+                                outer + piece if outer != float("-inf") and piece != float("-inf") else float("-inf")
+                            ),
+                        }
+                    )
             total = log2add(total, term)
             if term > peak_term:
                 peak_term = term
@@ -555,6 +577,19 @@ def main() -> None:
         writer.writerows(summaries)
     print(f"Wrote {csv_path}")
     print(f"Wrote {summary_path}")
+    if args.pieces_out is not None:
+        pieces_path = Path(args.pieces_out)
+        if not pieces_path.is_absolute():
+            pieces_path = Path.cwd() / pieces_path
+        pieces_path.parent.mkdir(parents=True, exist_ok=True)
+        with pieces_path.open("w", newline="") as f:
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["sigma", "h", "r", "outer_log2", "inner_piece_log2", "term_piece_log2"],
+            )
+            writer.writeheader()
+            writer.writerows(piece_rows)
+        print(f"Wrote {pieces_path}")
 
     if args.no_png:
         return

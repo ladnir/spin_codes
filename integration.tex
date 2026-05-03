@@ -1255,6 +1255,12 @@ unchanged at six decimals.  This is not used as a theorem yet, but it gives the 
 certificate: prove a uniform geometric domination beyond a finite prefix, then add the negligible residual to the
 displayed break-even sum.
 
+A piece decomposition of the same certificate shows where that ratio proof should start.  Past the exact-outer cutoff
+\(h=80\), the leading global-cover contribution is the \(r=1\) term; the \(r=0\) survivor piece has already fallen far
+below it, and the \(r\ge2\) pieces carry additional fixed-tap termination factors.  Thus the next local proof target is
+not an undifferentiated bound on the whole inner model, but a ratio estimate for the fixed-\(r\) block summands,
+beginning with \(r=1\), followed by a summable comparison over \(r\ge2\).
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
