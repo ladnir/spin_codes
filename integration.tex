@@ -1386,6 +1386,87 @@ finite prefix through \(H\), the low-slot residual is a controlled geometric ser
 exponentially small in \(N\).  Thus the \(r=1\) part no longer requires sampling beyond the prefix, except for the
 separate handoff to the established linear-window exponent bound.
 
+\begin{lemma}[Bounded-\(r\) low-slot geometric ratio]
+\label{lem:bounded-r-low-slot-ratio}
+Fix \(R\ge1\).  Under the same outer generating-function bound \(A_h^{\mathrm{out}}\le W(z)z^{-h}\), consider any
+fixed \(1\le r\le R\) global-cover subpiece.  Its support factor has the form
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}},
+\qquad
+c\in\{2r,2r+1\},
+\]
+with all other factors independent of \(h\) for a fixed live geometry.  Restrict to \(M\le\theta N\).  If
+\(h\ge H\ge2R+1\), then every such summand satisfies
+\[
+\frac{\text{summand}_{h+1}}{\text{summand}_{h}}
+\le
+z^{-1}\,
+\frac{\theta N-h+2R+1}{h-2R}\,
+\frac{h+1}{N-h}.
+\]
+Consequently, if
+\[
+q_{H,R,\theta,z}
+:=
+z^{-1}\,
+\frac{\theta N-H+2R+1}{H-2R}\,
+\frac{H+1}{N-H}
+<1,
+\]
+then the low-slot contribution of all \(1\le r\le R\) pieces is controlled by a finite sum of geometric residuals.
+\end{lemma}
+
+\begin{proof}
+For fixed \(r\) and fixed live geometry, the adjacent ratio is
+\[
+z^{-1}
+\frac{M-h+c}{h+1-c}
+\frac{h+1}{N-h}.
+\]
+The larger case is \(c=2r+1\le2R+1\).  Using \(M\le\theta N\) gives the displayed bound.  Summing over the finitely
+many \(r\le R\) and over the finite set of live-geometry blocks preserves the same geometric residual form, with only
+the finite prefactor already present in the computed prefix.
+\end{proof}
+
+\begin{lemma}[Bounded-\(r\) high-slot suppression below the linear splice]
+\label{lem:bounded-r-high-slot-suppression}
+Fix constants \(R\ge1\), \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  For any fixed
+\(1\le r\le R\), restrict the global-cover subpieces to support-slot length \(M=xN\ge\theta N\).  Then their total
+contribution over \(H<h\le\eta N\) is at most
+\[
+N^{O_R(1)}W(z)\,
+2^{-N E_{\mathrm{hi}}(\delta,\theta,\eta,z)},
+\]
+with \(E_{\mathrm{hi}}\) as in Lemma~\ref{lem:r-one-high-slot-suppression}.  Thus, when \(E_{\mathrm{hi}}>0\), the
+combined high-slot contribution of all bounded \(1\le r\le R\) pieces is exponentially negligible.
+\end{lemma}
+
+\begin{proof}
+For fixed \(r\le R\), high slot length \(M=xN\) forces charged live length at least \(xN-O_R(m)\): the all-terminated
+piece has charged length \((U-rm)_+\) with \(M=U-2r\), while the final-survivor piece has charged length
+\(S+(T-rm)_+\) with \(M=S+T-2r-1\).  Hence the shared binomial lower tail contributes
+\[
+2^{-xN(1-H_2(\delta/x))+o(N)}
+\]
+uniformly over \(x\ge\theta\).  The support factor is
+\(\binom{M}{h-c}/\binom{N}{h}\) with \(c\le2R+1\), so the same falling-factorial estimate as in
+Lemma~\ref{lem:r-one-high-slot-suppression} gives, for \(h\le\eta N\),
+\[
+N^{O_R(1)}2^{\eta N\max\{0,\log_2(x/z)\}}.
+\]
+The remaining choices of \(r\) interval lengths and placements contribute only \(N^{O_R(1)}\).  Taking the worst
+\(x\in[\theta,1]\) and summing over \(r\le R\) proves the claim.
+\end{proof}
+
+For the current certificate \(R=8\) and \(H=2000\).  With the same \(\theta=0.35\) and \(z=0.370884\),
+\[
+\log_2 q_{H,8,\theta,z}\approx -0.072,
+\]
+so the low-slot residual remains geometric for every \(1\le r\le8\).  The high-slot exponent is unchanged from the
+\(r=1\) calculation and remains positive for the bridge splice choices above.  Thus the finite-prefix certificate now
+covers the bounded-\(r\) episode-cover pieces used by the evaluator.  The remaining proof task is to add a separate
+tail over large \(r\), using the fixed-tap factor \(2^{-r(\sigma-1)}\) and the interval-count entropy.
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
