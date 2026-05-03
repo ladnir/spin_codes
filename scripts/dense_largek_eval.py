@@ -31,8 +31,20 @@ RUNMIX_GAMMA_INTERCEPT = 0.14461613
 RUNMIX_GAMMA_SLOPE = -0.42472604
 RUNMIX_GAMMA_SAFE_INTERCEPT = 0.1347
 RUNMIX_GAMMA_SAFE_SLOPE = -0.3910
+RUNMIX_SAFE_SLACK_BITS = 0.5
 RUNMIX_LAMBDA_INTERCEPT = -0.003929694918965849
 RUNMIX_LAMBDA_SLOPE = 0.024519978056113938
+LATEBASE_BETA_INTERCEPT = 0.12557873
+LATEBASE_BETA_SLOPE = -0.36374342
+ISOLATED_BETA_BITS_INTERCEPT = 0.67
+ISOLATED_BETA_BITS_SLOPE = -1.92
+ISOLATED_BETA_BITS_SAFE_MARGIN = 0.03
+ISOLATED_BETA_HDEP_INTERCEPT = 0.46605946
+ISOLATED_BETA_HDEP_SLOPE_Q = -1.39605011
+ISOLATED_BETA_HDEP_SLOPE_H = 0.01055334
+ISOLATED_BETA_HDEP_SAFE_MARGIN = 0.02
+ISOLATED_POSITIONAL_PAIR_SAFE_A_BITS = -0.50296039
+ISOLATED_POSITIONAL_PAIR_SAFE_B_BITS = 0.186
 
 
 def h2(x: float) -> float:
@@ -112,6 +124,17 @@ def binom_cdf_half_upper(n: int, k: int, *, exact_limit: int = 2000, tail_terms:
         return min(1.0, partial)
     remainder = safe_prob(logs[-1]) * (last_ratio / (1.0 - last_ratio))
     return min(1.0, partial + remainder)
+
+
+def binom_cdf_half_entropy_upper(n: int, k: int) -> float:
+    if k < 0:
+        return 0.0
+    if k >= n or 2 * k >= n:
+        return 1.0
+    exponent = -n * (1.0 - h2(k / n))
+    if exponent < -1074.0:
+        return 0.0
+    return min(1.0, 2.0**exponent)
 
 
 def outer_generating_bound(k_msg: int, sigma: int, z: float) -> float:
@@ -613,6 +636,565 @@ def run_count_weight(n: int, w: int, s: int) -> float:
     return math.comb(w - 1, s - 1) * math.comb(n - w + 1, s) / math.comb(n, w)
 
 
+def late_start_base_prob(n: int, w: int, s: int, l: int) -> float:
+    if s < 1 or s > w:
+        return 0.0
+    if l - w + 1 < s:
+        return 0.0
+    return math.comb(l - w + 1, s) / math.comb(n - w + 1, s)
+
+
+def late_start_mixture_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = 0.0
+        for s in range(1, h + 1):
+            p += run_count_weight(n, h, s) * late_start_base_prob(n, h, s, l)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def latebase_beta_from_q(q_single: float) -> float:
+    """Residual pairwise inflation after factoring out exact late placement.
+
+    Units are natural-log per run pair, so the correction factor is
+    exp(beta * C(s,2)).
+    """
+    return max(0.0, LATEBASE_BETA_INTERCEPT + LATEBASE_BETA_SLOPE * q_single)
+
+
+def isolated_beta_bits_from_q(q_single: float) -> float:
+    """Safe upper envelope for the isolated-slice residual, in log2 bits/pair.
+
+    This is calibrated from exact inner-only overlap tables after factoring out:
+      1. the exact isolated-slice mass Pr[R(U)=h], and
+      2. the exact late-placement base on that slice.
+
+    It is intentionally conservative and should be read as a theorem-shaped
+    working envelope rather than a best fit.
+    """
+    return max(0.0, ISOLATED_BETA_BITS_INTERCEPT + ISOLATED_BETA_BITS_SLOPE * q_single)
+
+
+def isolated_beta_hdep_bits_from_qh(q_single: float, h: int) -> float:
+    """Working h-dependent envelope for isolated-slice residual, in log2 bits/pair."""
+    return max(
+        0.0,
+        ISOLATED_BETA_HDEP_INTERCEPT
+        + ISOLATED_BETA_HDEP_SLOPE_Q * q_single
+        + ISOLATED_BETA_HDEP_SLOPE_H * max(0, h - 2),
+    )
+
+
+def isolated_full_run_prob(n: int, h: int) -> float:
+    if h < 0 or h > n:
+        return 0.0
+    return math.comb(n - h + 1, h) / math.comb(n, h)
+
+
+def isolated_order_late_prob(n: int, h: int, r: int, l: int) -> float:
+    """Exact isolated-slice probability that the r-th one lies in the last l positions.
+
+    Conditioned on wt(U)=h and R(U)=h, map the isolated one positions
+    X_1 < ... < X_h to the ordinary subset Y_i = X_i - i + 1 of [N-h+1].
+    Then X_r > N-l iff Y_r > N-l-r+1, i.e. at most r-1 of the Y_i lie
+    before that threshold.
+    """
+    if r < 1 or r > h:
+        return 0.0
+    total_space = n - h + 1
+    cutoff = n - l - r + 1
+    tail = l - h + r
+    if cutoff < 0:
+        return 1.0
+    num = 0
+    for j in range(r):
+        if j > cutoff:
+            break
+        tail_take = h - j
+        if tail_take < 0 or tail_take > tail:
+            continue
+        num += math.comb(cutoff, j) * math.comb(tail, tail_take)
+    return num / math.comb(total_space, h)
+
+
+def isolated_early_count_prob(n: int, h: int, l: int, j: int) -> float:
+    """Exact isolated-slice probability that exactly j starts occur before the final l positions."""
+    total_space = n - h + 1
+    tail = l - h + 1
+    prefix = n - l
+    if j < 0 or j > h or j > prefix or h - j > tail or tail < 0:
+        return 0.0
+    return math.comb(prefix, j) * math.comb(tail, h - j) / math.comb(total_space, h)
+
+
+def isolated_early_pair_mean(n: int, h: int, l: int) -> float:
+    """Expected number of early-start pairs on the isolated slice."""
+    total_space = n - h + 1
+    prefix = n - l
+    if h < 2 or prefix < 2 or total_space < 2:
+        return 0.0
+    return (h * (h - 1) / 2.0) * (prefix * (prefix - 1)) / (total_space * (total_space - 1))
+
+
+def isolated_position_single_model_prob(n: int, h: int, cut: int, m: int) -> float:
+    """Position-sensitive isolated-slice model using one-run penalties by remaining suffix length.
+
+    For an early isolated start at shifted position y <= n-2*cut, the corresponding remaining suffix
+    has length t = n-y+1. This model assigns that start the theorem-shaped one-run penalty
+
+        tau_y = min(1, t * 2^{-m} + Pr[Binomial(t, 1/2) <= cut]),
+
+    then averages the product of those penalties over the exact isolated h-subset law.
+    """
+    total_space = n - h + 1
+    l = 2 * cut
+    tail = l - h + 1
+    prefix = n - l
+    if tail < 0:
+        return 0.0
+    taus = []
+    for y in range(1, prefix + 1):
+        t = n - y + 1
+        tau = min(1.0, t * (2.0 ** (-m)) + binom_cdf_half_upper(t, cut))
+        taus.append(tau)
+
+    elem = [0.0] * (h + 1)
+    elem[0] = 1.0
+    for tau in taus:
+        for j in range(h, 0, -1):
+            elem[j] += tau * elem[j - 1]
+
+    total = 0.0
+    denom = math.comb(total_space, h)
+    for j in range(h + 1):
+        if h - j > tail:
+            continue
+        total += elem[j] * math.comb(tail, h - j) / denom
+    return total
+
+
+def isolated_position_single_model_prefix(
+    n: int,
+    h_hi: int,
+    cut: int,
+    m: int,
+    *,
+    entropy_tail_bound: bool,
+) -> list[float]:
+    """Compute positional one-run probabilities for all h <= h_hi.
+
+    The large-k evaluator uses the entropy-tail option: it replaces each
+    binomial CDF by a standard entropy upper bound, making this a pessimistic
+    theorem-shaped lane and avoiding millions of exact CDF evaluations.
+    """
+    l = 2 * cut
+    prefix = n - l
+    elem = [0.0] * (h_hi + 1)
+    elem[0] = 1.0
+    for y in range(1, prefix + 1):
+        t = n - y + 1
+        bin_tail = (
+            binom_cdf_half_entropy_upper(t, cut)
+            if entropy_tail_bound
+            else binom_cdf_half_upper(t, cut)
+        )
+        tau = min(1.0, t * (2.0 ** (-m)) + bin_tail)
+        for j in range(min(h_hi, y), 0, -1):
+            elem[j] += tau * elem[j - 1]
+
+    probs = [0.0] * (h_hi + 1)
+    for h in range(1, h_hi + 1):
+        total_space = n - h + 1
+        tail = l - h + 1
+        if tail < 0:
+            continue
+        denom = math.comb(total_space, h)
+        total = 0.0
+        for j in range(h + 1):
+            if h - j > tail:
+                continue
+            total += elem[j] * math.comb(tail, h - j) / denom
+        probs[h] = min(1.0, total)
+    return probs
+
+
+def isolated_slice_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    beta_bits_per_pair: float = 0.0,
+    add_adjacency_remainder: bool = False,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p_full = isolated_full_run_prob(n, h)
+        late = late_start_base_prob(n, h, h, l)
+        corr_bits = beta_bits_per_pair * h * (h - 1) / 2.0
+        p = p_full * late * (2.0**corr_bits)
+        if add_adjacency_remainder:
+            p += 1.0 - p_full
+        p = min(1.0, p)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def isolated_window_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    z: float,
+    rho: float,
+    xi: float,
+    kappa: float,
+    theta: float,
+    eta_hi: float,
+    gap_step: float,
+    h_iso_hi: int,
+    beta_bits_per_pair: float = 0.0,
+    add_adjacency_remainder: bool = False,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, float, int, float, int]:
+    w_out = outer_generating_bound(k_msg, sigma, z)
+    h0, _ = tiny_window_bound(n, sigma, delta, z, xi, kappa, w_out)
+    h_iso_hi = min(h_iso_hi, h0)
+    l = math.ceil(2.0 * delta * n)
+    log2_iso, peak_h, peak_log2 = isolated_slice_model_log2(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        h_lo=1,
+        h_hi=h_iso_hi,
+        l=l,
+        beta_bits_per_pair=beta_bits_per_pair,
+        add_adjacency_remainder=add_adjacency_remainder,
+        outer_mode=outer_mode,
+        parity_n=parity_n,
+    )
+    h_lo_rest = h_iso_hi + 1
+    h_mid_hi = int(math.floor(ETA_CRIT * n))
+    log2_rest = float("-inf")
+    if h_lo_rest <= h_mid_hi:
+        s_rest = geometric_window_bound(n=n, h_lo=h_lo_rest, h_hi=h_mid_hi, z=z, rho=rho, w_out=w_out)
+        if s_rest > 0.0:
+            log2_rest = math.log2(s_rest)
+    gap = linear_window_gap(delta, theta, xi, eta_hi, gap_step)
+    lin_count = max(0, int(math.floor(min(eta_hi, 1.0 - theta) * n)) - int(math.ceil(ETA_CRIT * n)) + 1)
+    log2_lin = float("-inf") if lin_count == 0 else math.log2(lin_count) + n * gap.worst_gap
+    top_exp = h2(eta_hi) - 0.5
+    top_count = max(0, n - int(math.ceil(eta_hi * n)) + 1)
+    log2_top = float("-inf") if top_count == 0 else math.log2(top_count) + n * top_exp
+    total = log2_iso
+    if log2_rest != float("-inf"):
+        total = log2add(total, log2_rest)
+    if log2_lin != float("-inf"):
+        total = log2add(total, log2_lin)
+    if log2_top != float("-inf"):
+        total = log2add(total, log2_top)
+    return total, log2_iso, peak_h, peak_log2, h0
+
+
+def isolated_runmix_split_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    h_iso_hi: int,
+    h_hi: int,
+    beta_bits_per_pair: float,
+    gamma_runmix_safe: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    l = math.ceil(2.0 * delta * n)
+    q_single = min(1.0, 2.0 * delta)
+    for h in range(1, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        if h <= h_iso_hi:
+            p_full = isolated_full_run_prob(n, h)
+            p = p_full * late_start_base_prob(n, h, h, l) * (2.0 ** (beta_bits_per_pair * h * (h - 1) / 2.0))
+            p += 1.0 - p_full
+        else:
+            p = 0.0
+            for s in range(1, h + 1):
+                p += run_count_weight(n, h, s) * (q_single**s) * math.exp(-gamma_runmix_safe * s * (s - 1) / 2.0)
+        p = min(1.0, p)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def isolated_slice_model_hdep_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    q_single: float,
+    beta_margin_bits: float = 0.0,
+    add_adjacency_remainder: bool = False,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p_full = isolated_full_run_prob(n, h)
+        late = late_start_base_prob(n, h, h, l)
+        beta_bits_per_pair = isolated_beta_hdep_bits_from_qh(q_single, h) + beta_margin_bits
+        corr_bits = beta_bits_per_pair * h * (h - 1) / 2.0
+        p = p_full * late * (2.0**corr_bits)
+        if add_adjacency_remainder:
+            p += 1.0 - p_full
+        p = min(1.0, p)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def isolated_positional_pair_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    h_lo: int,
+    h_hi: int,
+    pair_a_bits: float,
+    pair_b_bits: float,
+    entropy_tail_bound: bool = True,
+    clamp_correction_nonnegative: bool = True,
+    add_adjacency_remainder: bool = False,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    """Position-sensitive isolated model with an early-pair residual inflation.
+
+    The base term is the isolated-slice positional one-run model. The residual
+    correction is measured in log2 bits and is affine in the exact expected
+    number of early isolated pairs. This is a theorem-shaped diagnostic lane,
+    not a proved bound.
+    """
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    cut = math.floor(delta * n)
+    l = 2 * cut
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    pos_probs = isolated_position_single_model_prefix(
+        n, h_hi, cut, sigma, entropy_tail_bound=entropy_tail_bound
+    )
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p_full = isolated_full_run_prob(n, h)
+        p_iso = pos_probs[h]
+        epair = isolated_early_pair_mean(n, h, l)
+        corr_bits = pair_a_bits + pair_b_bits * epair
+        if clamp_correction_nonnegative:
+            corr_bits = max(0.0, corr_bits)
+        p = p_full * p_iso * (2.0**corr_bits)
+        if add_adjacency_remainder:
+            p += 1.0 - p_full
+        p = min(1.0, p)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def latebase_pairwise_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    h_lo: int,
+    h_hi: int,
+    l: int,
+    beta: float,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = 0.0
+        for s in range(1, h + 1):
+            p += run_count_weight(n, h, s) * late_start_base_prob(n, h, s, l) * math.exp(beta * s * (s - 1) / 2.0)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term
+
+
+def one_episode_correction_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    xi: float,
+    h_lo: int,
+    h_hi: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+) -> tuple[float, int, float, int]:
+    total = float("-inf")
+    peak_h = 0
+    peak_term = float("-inf")
+    l = min(n, math.ceil((2.0 + xi) * delta * n))
+    cut = math.floor(delta * n)
+    off = l * (2.0 ** (-sigma))
+    bin_tail = binom_cdf_half_upper(l, cut)
+    outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+    for h in range(h_lo, h_hi + 1):
+        out = outer_logs[h]
+        if out == float("-inf"):
+            continue
+        p = 0.0
+        for s in range(1, h + 1):
+            p += run_count_weight(n, h, s) * late_start_base_prob(n, h, s, l)
+        p = min(1.0, p + off + bin_tail)
+        if p <= 0.0:
+            continue
+        term = out + math.log2(p)
+        total = term if total == float("-inf") else log2add(total, term)
+        if term > peak_term:
+            peak_term = term
+            peak_h = h
+    return total, peak_h, peak_term, l
+
+
+def optimized_one_episode_model_log2(
+    *,
+    n: int,
+    k_msg: int,
+    sigma: int,
+    delta: float,
+    xi: float,
+    h_lo: int,
+    h_hi: int,
+    outer_mode: str = "conv",
+    parity_n: int | None = None,
+    l_steps: int = 64,
+) -> tuple[float, int, float, int]:
+    cut = math.floor(delta * n)
+    l_min = max(cut + 1, math.ceil(2.0 * delta * n))
+    l_max = min(n, max(l_min, math.ceil((2.0 + xi) * delta * n)))
+    if l_min > l_max:
+        l_min = l_max = min(n, max(1, cut + 1))
+
+    candidates = sorted({int(round(v)) for v in np.linspace(l_min, l_max, l_steps)} | {l_min, l_max})
+    best = (float("inf"), 0, float("inf"), l_min)
+    for l in candidates:
+        total = float("-inf")
+        peak_h = 0
+        peak_term = float("-inf")
+        off = l * (2.0 ** (-sigma))
+        bin_tail = binom_cdf_half_upper(l, cut)
+        outer_logs = outer_small_h_prefix(k_msg, sigma, h_hi, outer_mode=outer_mode, parity_n=parity_n)
+        for h in range(h_lo, h_hi + 1):
+            out = outer_logs[h]
+            if out == float("-inf"):
+                continue
+            p = 0.0
+            for s in range(1, h + 1):
+                p += run_count_weight(n, h, s) * late_start_base_prob(n, h, s, l)
+            p = min(1.0, p + off + bin_tail)
+            if p <= 0.0:
+                continue
+            term = out + math.log2(p)
+            total = term if total == float("-inf") else log2add(total, term)
+            if term > peak_term:
+                peak_term = term
+                peak_h = h
+        scalar = float("inf") if total == float("-inf") else total
+        if scalar < best[0]:
+            best = (scalar, peak_h, peak_term, l)
+    return best
+
+
 def run_mixture_model_log2(
     *,
     n: int,
@@ -844,6 +1426,61 @@ def main() -> int:
         help="Also report a small-weight model using exact outer counts and a per-run factor q_single^h.",
     )
     parser.add_argument(
+        "--show-late-base-model",
+        action="store_true",
+        help="Also report the exact conditioned late-placement base mixture implied by Corollary first-run-late-qbase.",
+    )
+    parser.add_argument(
+        "--show-one-episode-model",
+        action="store_true",
+        help="Also report the theorem-shaped one-episode correction model using L=(2+xi)delta n.",
+    )
+    parser.add_argument(
+        "--show-one-episode-optimized",
+        action="store_true",
+        help="Also report the one-episode correction model after optimizing over L in [2delta n, (2+xi)delta n].",
+    )
+    parser.add_argument(
+        "--show-latebase-pairwise",
+        action="store_true",
+        help="Also report exact late placement with a fitted pairwise residual inflation exp(beta*C(s,2)).",
+    )
+    parser.add_argument(
+        "--show-isolated-model",
+        action="store_true",
+        help="Also report the exact isolated-slice late-placement base Pr[R=h] * late_base(h,h,h).",
+    )
+    parser.add_argument(
+        "--show-isolated-safe",
+        action="store_true",
+        help="Also report a theorem-shaped isolated-slice model with a safe residual inflation on the R(U)=h slice.",
+    )
+    parser.add_argument(
+        "--show-isolated-safe-adj",
+        action="store_true",
+        help="Also report the isolated-safe model after adding the full adjacency remainder 1-Pr[R=h].",
+    )
+    parser.add_argument(
+        "--show-isolated-pos-pair",
+        action="store_true",
+        help="Also report the position-sensitive isolated one-run model with early-pair residual inflation.",
+    )
+    parser.add_argument(
+        "--show-isolated-hybrid",
+        action="store_true",
+        help="Also report isolated-slice control only on the dominant tiny window, with the usual coarse handoff above it.",
+    )
+    parser.add_argument(
+        "--show-split-safe",
+        action="store_true",
+        help="Also report a proof-oriented split lane: isolated-slice control on very tiny h, then safe run-mixture above it.",
+    )
+    parser.add_argument(
+        "--show-split-safe-hdep",
+        action="store_true",
+        help="Also report the split-safe lane with an h-dependent isolated-slice residual envelope.",
+    )
+    parser.add_argument(
         "--show-run-mixture-model",
         action="store_true",
         help="Also report a small-weight model using exact outer counts and a run-count mixture with q_s = q^s exp(-gamma s(s-1)/2).",
@@ -852,6 +1489,11 @@ def main() -> int:
         "--show-run-mixture-safe",
         action="store_true",
         help="Also report a theorem-shaped safe pairwise run-mixture model using a conservative lower envelope for gamma(q).",
+    )
+    parser.add_argument(
+        "--show-run-mixture-safe-slack",
+        action="store_true",
+        help="Also report the safe pairwise run-mixture model after adding an explicit multiplicative slack factor.",
     )
     parser.add_argument(
         "--show-run-mixture-cubic",
@@ -871,6 +1513,24 @@ def main() -> int:
         help="Override the run-mixture damping gamma. Default uses the pairwise-calibrated law gamma(q).",
     )
     parser.add_argument(
+        "--isolated-beta-bits",
+        type=float,
+        default=None,
+        help="Override the isolated-slice residual envelope in log2 bits per isolated run pair.",
+    )
+    parser.add_argument(
+        "--isolated-beta-safe-margin",
+        type=float,
+        default=ISOLATED_BETA_BITS_SAFE_MARGIN,
+        help="Extra safety margin added to the isolated-slice residual envelope, in log2 bits per pair.",
+    )
+    parser.add_argument(
+        "--runmix-safe-slack-bits",
+        type=float,
+        default=RUNMIX_SAFE_SLACK_BITS,
+        help="Extra log2 slack added to the safe pairwise run-mixture lane. Default is the current empirical half-bit envelope.",
+    )
+    parser.add_argument(
         "--show-run-mixture-legacy",
         action="store_true",
         help="Also report the legacy run-mixture model with gamma = 0.2*q_single for comparison.",
@@ -888,6 +1548,46 @@ def main() -> int:
         type=int,
         default=24,
         help="Maximum h used by the optimistic/central/pessimistic bracket models.",
+    )
+    parser.add_argument(
+        "--isolated-h-cap",
+        type=int,
+        default=10,
+        help="Maximum h controlled by the isolated-slice hybrid lane before handing off to the usual coarse windows.",
+    )
+    parser.add_argument(
+        "--split-iso-h-cap",
+        type=int,
+        default=4,
+        help="Maximum h controlled by the isolated slice in the split-safe lane.",
+    )
+    parser.add_argument(
+        "--isolated-beta-hdep-safe-margin",
+        type=float,
+        default=ISOLATED_BETA_HDEP_SAFE_MARGIN,
+        help="Extra safety margin added to the h-dependent isolated-slice residual envelope, in log2 bits per pair.",
+    )
+    parser.add_argument(
+        "--pos-pair-a-bits",
+        type=float,
+        default=ISOLATED_POSITIONAL_PAIR_SAFE_A_BITS,
+        help="Intercept for the positional early-pair residual lane, in log2 bits.",
+    )
+    parser.add_argument(
+        "--pos-pair-b-bits",
+        type=float,
+        default=ISOLATED_POSITIONAL_PAIR_SAFE_B_BITS,
+        help="Slope for the positional early-pair residual lane, in log2 bits per expected early pair.",
+    )
+    parser.add_argument(
+        "--pos-pair-allow-negative-correction",
+        action="store_true",
+        help="Allow the positional early-pair affine correction to reduce the base model when negative.",
+    )
+    parser.add_argument(
+        "--pos-pair-exact-binomial",
+        action="store_true",
+        help="Use exact binomial CDFs in the positional lane instead of entropy upper bounds. Intended for small exact-table checks.",
     )
     args = parser.parse_args()
 
@@ -946,12 +1646,47 @@ def main() -> int:
         q_single = args.q_single if args.q_single is not None else min(1.0, 2.0 * args.delta)
         log2_q_total = q_peak_log2 = float("-inf")
         q_peak_h = 0
+        log2_b_total = b_peak_log2 = float("-inf")
+        b_peak_h = 0
+        log2_e_total = e_peak_log2 = float("-inf")
+        e_peak_h = 0
+        e_l = 0
+        log2_eo_total = eo_peak_log2 = float("-inf")
+        eo_peak_h = 0
+        eo_l = 0
+        log2_lb_total = lb_peak_log2 = float("-inf")
+        lb_peak_h = 0
+        lb_l = 0
+        beta_late = latebase_beta_from_q(q_single)
+        beta_iso_bits = (
+            args.isolated_beta_bits
+            if args.isolated_beta_bits is not None
+            else isolated_beta_bits_from_q(q_single) + args.isolated_beta_safe_margin
+        )
+        log2_i_total = i_peak_log2 = float("-inf")
+        i_peak_h = 0
+        log2_is_total = is_peak_log2 = float("-inf")
+        is_peak_h = 0
+        log2_isa_total = isa_peak_log2 = float("-inf")
+        isa_peak_h = 0
+        log2_ipp_total = ipp_peak_log2 = float("-inf")
+        ipp_peak_h = 0
+        log2_ih_total = log2_ih_iso = ih_peak_log2 = float("-inf")
+        ih_peak_h = 0
+        ih_h0 = 0
+        log2_ss_total = ss_peak_log2 = float("-inf")
+        ss_peak_h = 0
+        log2_ssh_total = ssh_peak_log2 = float("-inf")
+        ssh_peak_h = 0
+        iso_l = math.ceil(2.0 * args.delta * n)
         gamma_runmix = args.gamma_runmix if args.gamma_runmix is not None else runmix_gamma_from_q(q_single)
         log2_m_total = m_peak_log2 = float("-inf")
         m_peak_h = 0
         gamma_runmix_safe = runmix_gamma_safe_from_q(q_single)
         log2_ms_total = ms_peak_log2 = float("-inf")
         ms_peak_h = 0
+        log2_mss_total = mss_peak_log2 = float("-inf")
+        mss_peak_h = 0
         lambda_runmix = runmix_lambda_from_q(q_single)
         log2_mc_total = mc_peak_log2 = float("-inf")
         mc_peak_h = 0
@@ -1027,7 +1762,6 @@ def main() -> int:
             if log2_s_top != float("-inf"):
                 log2_a_total = log2add(log2_a_total, log2_s_top)
 
-        need_bracketish = args.show_localtail_smallw or args.show_single_run_model or args.show_run_mixture_model or args.show_run_mixture_safe or args.show_run_mixture_cubic or args.show_run_mixture_legacy or args.show_bracket
         bracket_h_hi = min(args.bracket_h_cap, h_mid_hi)
         if args.show_localtail_smallw or args.show_bracket:
             log2_l_total, l_stop, l_peak, l_peak_log2, log2_l_tail = adaptive_small_h_localtail(
@@ -1063,6 +1797,228 @@ def main() -> int:
             if log2_s_top != float("-inf"):
                 log2_q_total = log2add(log2_q_total, log2_s_top)
 
+        if args.show_late_base_model:
+            log2_b_total, b_peak_h, b_peak_log2 = late_start_mixture_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=math.ceil(2.0 * args.delta * n),
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_b_total = log2add(log2_b_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_b_total = log2add(log2_b_total, log2_s_top)
+
+        if args.show_one_episode_model:
+            log2_e_total, e_peak_h, e_peak_log2, e_l = one_episode_correction_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                xi=args.xi,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_e_total = log2add(log2_e_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_e_total = log2add(log2_e_total, log2_s_top)
+
+        if args.show_one_episode_optimized:
+            log2_eo_total, eo_peak_h, eo_peak_log2, eo_l = optimized_one_episode_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                xi=args.xi,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_eo_total = log2add(log2_eo_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_eo_total = log2add(log2_eo_total, log2_s_top)
+
+        if args.show_latebase_pairwise:
+            lb_l = math.ceil(2.0 * args.delta * n)
+            log2_lb_total, lb_peak_h, lb_peak_log2 = latebase_pairwise_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=lb_l,
+                beta=beta_late,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_lb_total = log2add(log2_lb_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_lb_total = log2add(log2_lb_total, log2_s_top)
+
+        if args.show_isolated_model:
+            log2_i_total, i_peak_h, i_peak_log2 = isolated_slice_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=iso_l,
+                beta_bits_per_pair=0.0,
+                add_adjacency_remainder=False,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_i_total = log2add(log2_i_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_i_total = log2add(log2_i_total, log2_s_top)
+
+        if args.show_isolated_safe:
+            log2_is_total, is_peak_h, is_peak_log2 = isolated_slice_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=iso_l,
+                beta_bits_per_pair=beta_iso_bits,
+                add_adjacency_remainder=False,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_is_total = log2add(log2_is_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_is_total = log2add(log2_is_total, log2_s_top)
+
+        if args.show_isolated_safe_adj:
+            log2_isa_total, isa_peak_h, isa_peak_log2 = isolated_slice_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                l=iso_l,
+                beta_bits_per_pair=beta_iso_bits,
+                add_adjacency_remainder=True,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_isa_total = log2add(log2_isa_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_isa_total = log2add(log2_isa_total, log2_s_top)
+
+        if args.show_isolated_pos_pair:
+            log2_ipp_total, ipp_peak_h, ipp_peak_log2 = isolated_positional_pair_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                pair_a_bits=args.pos_pair_a_bits,
+                pair_b_bits=args.pos_pair_b_bits,
+                entropy_tail_bound=not args.pos_pair_exact_binomial,
+                clamp_correction_nonnegative=not args.pos_pair_allow_negative_correction,
+                add_adjacency_remainder=True,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_ipp_total = log2add(log2_ipp_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_ipp_total = log2add(log2_ipp_total, log2_s_top)
+
+        if args.show_isolated_hybrid:
+            log2_ih_total, log2_ih_iso, ih_peak_h, ih_peak_log2, ih_h0 = isolated_window_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                z=args.z,
+                rho=args.rho,
+                xi=args.xi,
+                kappa=args.kappa,
+                theta=args.theta,
+                eta_hi=args.eta_hi,
+                gap_step=args.gap_step,
+                h_iso_hi=args.isolated_h_cap,
+                beta_bits_per_pair=beta_iso_bits,
+                add_adjacency_remainder=True,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+
+        if args.show_split_safe:
+            log2_ss_total, ss_peak_h, ss_peak_log2 = isolated_runmix_split_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                delta=args.delta,
+                h_iso_hi=args.split_iso_h_cap,
+                h_hi=bracket_h_hi,
+                beta_bits_per_pair=beta_iso_bits,
+                gamma_runmix_safe=gamma_runmix_safe,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_ss_total = log2add(log2_ss_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_ss_total = log2add(log2_ss_total, log2_s_top)
+
+        if args.show_split_safe_hdep:
+            # Isolated h-dependent control through split_iso_h_cap, then safe run-mixture above it.
+            split_total = float("-inf")
+            peak_h = 0
+            peak_term = float("-inf")
+            outer_logs = outer_small_h_prefix(
+                args.k, sigma, bracket_h_hi, outer_mode=args.outer_smallh_mode, parity_n=parity_n
+            )
+            for h in range(1, bracket_h_hi + 1):
+                out = outer_logs[h]
+                if out == float("-inf"):
+                    continue
+                if h <= args.split_iso_h_cap:
+                    p_full = isolated_full_run_prob(n, h)
+                    beta_bits_per_pair = (
+                        isolated_beta_hdep_bits_from_qh(q_single, h) + args.isolated_beta_hdep_safe_margin
+                    )
+                    p = p_full * late_start_base_prob(n, h, h, iso_l) * (
+                        2.0 ** (beta_bits_per_pair * h * (h - 1) / 2.0)
+                    )
+                    p += 1.0 - p_full
+                else:
+                    p = 0.0
+                    for s in range(1, h + 1):
+                        p += run_count_weight(n, h, s) * (q_single**s) * math.exp(
+                            -gamma_runmix_safe * s * (s - 1) / 2.0
+                        )
+                p = min(1.0, p)
+                if p <= 0.0:
+                    continue
+                term = out + math.log2(p)
+                split_total = term if split_total == float("-inf") else log2add(split_total, term)
+                if term > peak_term:
+                    peak_term = term
+                    peak_h = h
+            log2_ssh_total, ssh_peak_h, ssh_peak_log2 = split_total, peak_h, peak_term
+            if log2_s_lin != float("-inf"):
+                log2_ssh_total = log2add(log2_ssh_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_ssh_total = log2add(log2_ssh_total, log2_s_top)
+
         if args.show_run_mixture_model or args.show_bracket:
             log2_m_total, m_peak_h, m_peak_log2 = run_mixture_model_log2(
                 n=n,
@@ -1096,6 +2052,24 @@ def main() -> int:
                 log2_ms_total = log2add(log2_ms_total, log2_s_lin)
             if log2_s_top != float("-inf"):
                 log2_ms_total = log2add(log2_ms_total, log2_s_top)
+
+        if args.show_run_mixture_safe_slack:
+            log2_mss_total, mss_peak_h, mss_peak_log2 = run_mixture_model_log2(
+                n=n,
+                k_msg=args.k,
+                sigma=sigma,
+                h_lo=1,
+                h_hi=bracket_h_hi,
+                q_single=q_single,
+                gamma=gamma_runmix_safe,
+                outer_mode=args.outer_smallh_mode,
+                parity_n=parity_n,
+            )
+            if log2_s_lin != float("-inf"):
+                log2_mss_total = log2add(log2_mss_total, log2_s_lin)
+            if log2_s_top != float("-inf"):
+                log2_mss_total = log2add(log2_mss_total, log2_s_top)
+            log2_mss_total += args.runmix_safe_slack_bits
 
         if args.show_run_mixture_cubic:
             log2_mc_total, mc_peak_h, mc_peak_log2 = run_mixture_cubic_model_log2(
@@ -1164,6 +2138,50 @@ def main() -> int:
             print(f"  Q_total (exact outer + q^h inner model)                  : {format_log2(log2_q_total)}")
             print(f"  Q_peak  (dominant h, log2 contribution)                  : h={q_peak_h}, log2={q_peak_log2:.3f}")
             print(f"  Q_q     (single-run factor)                              : {q_single:.6f}")
+        if args.show_late_base_model:
+            print(f"  B_total (exact outer + exact late-placement base)        : {format_log2(log2_b_total)}")
+            print(f"  B_peak  (dominant h, log2 contribution)                  : h={b_peak_h}, log2={b_peak_log2:.3f}")
+        if args.show_one_episode_model:
+            print(f"  E_total (late base + one-episode correction)             : {format_log2(log2_e_total)}")
+            print(f"  E_peak  (dominant h, log2 contribution)                  : h={e_peak_h}, log2={e_peak_log2:.3f}")
+            print(f"  E_L     ((2+xi)delta n window)                           : {e_l}")
+        if args.show_one_episode_optimized:
+            print(f"  EO_total (optimized one-episode correction)              : {format_log2(log2_eo_total)}")
+            print(f"  EO_peak  (dominant h, log2 contribution)                 : h={eo_peak_h}, log2={eo_peak_log2:.3f}")
+            print(f"  EO_L     (best window length)                            : {eo_l}")
+        if args.show_latebase_pairwise:
+            print(f"  LB_total (late base + pairwise residual)                 : {format_log2(log2_lb_total)}")
+            print(f"  LB_peak  (dominant h, log2 contribution)                 : h={lb_peak_h}, log2={lb_peak_log2:.3f}")
+            print(f"  LB_L     (late-placement window)                         : {lb_l}")
+            print(f"  LB_beta  (nat-log per run pair)                          : {beta_late:.6f}")
+        if args.show_isolated_model:
+            print(f"  I_total  (isolated slice late-placement base)            : {format_log2(log2_i_total)}")
+            print(f"  I_peak   (dominant h, log2 contribution)                 : h={i_peak_h}, log2={i_peak_log2:.3f}")
+            print(f"  I_L      (late-placement window)                         : {iso_l}")
+        if args.show_isolated_safe:
+            print(f"  IS_total (isolated slice + safe residual)                : {format_log2(log2_is_total)}")
+            print(f"  IS_peak  (dominant h, log2 contribution)                 : h={is_peak_h}, log2={is_peak_log2:.3f}")
+            print(f"  IS_beta  (safe residual bits per pair)                   : {beta_iso_bits:.6f}")
+        if args.show_isolated_safe_adj:
+            print(f"  ISA_total (isolated-safe + adjacency remainder)          : {format_log2(log2_isa_total)}")
+            print(f"  ISA_peak  (dominant h, log2 contribution)                : h={isa_peak_h}, log2={isa_peak_log2:.3f}")
+        if args.show_isolated_pos_pair:
+            print(f"  IPP_total (positional + early-pair residual + adj)       : {format_log2(log2_ipp_total)}")
+            print(f"  IPP_peak  (dominant h, log2 contribution)                : h={ipp_peak_h}, log2={ipp_peak_log2:.3f}")
+            print(f"  IPP_corr  (a + b E[pairs], bits)                         : a={args.pos_pair_a_bits:.6f}, b={args.pos_pair_b_bits:.6f}")
+        if args.show_isolated_hybrid:
+            print(f"  IH_total (isolated tiny slice + coarse handoff)          : {format_log2(log2_ih_total)}")
+            print(f"  IH_iso   (isolated-controlled tiny slice only)           : {format_log2(log2_ih_iso)}")
+            print(f"  IH_peak  (dominant isolated h, log2 contribution)        : h={ih_peak_h}, log2={ih_peak_log2:.3f}")
+            print(f"  IH_h0    (paper tiny-window cutoff)                      : {ih_h0}")
+        if args.show_split_safe:
+            print(f"  SS_total (isolated tiny h + safe run-mixture above)      : {format_log2(log2_ss_total)}")
+            print(f"  SS_peak  (dominant h, log2 contribution)                 : h={ss_peak_h}, log2={ss_peak_log2:.3f}")
+            print(f"  SS_hiso  (isolated slice used through h)                 : {args.split_iso_h_cap}")
+        if args.show_split_safe_hdep:
+            print(f"  SSH_total (split-safe with h-dependent isolated fit)     : {format_log2(log2_ssh_total)}")
+            print(f"  SSH_peak  (dominant h, log2 contribution)                : h={ssh_peak_h}, log2={ssh_peak_log2:.3f}")
+            print(f"  SSH_hiso  (isolated slice used through h)                : {args.split_iso_h_cap}")
         if args.show_run_mixture_model:
             print(f"  M_total (exact outer + run-mixture inner model)          : {format_log2(log2_m_total)}")
             print(f"  M_peak  (dominant h, log2 contribution)                  : h={m_peak_h}, log2={m_peak_log2:.3f}")
@@ -1174,6 +2192,10 @@ def main() -> int:
             print(f"  MS_peak  (dominant h, log2 contribution)                 : h={ms_peak_h}, log2={ms_peak_log2:.3f}")
             print(f"  MS_q     (single-run factor)                             : {q_single:.6f}")
             print(f"  MS_gamma (safe pairwise damping)                         : {gamma_runmix_safe:.6f}")
+        if args.show_run_mixture_safe_slack:
+            print(f"  MSS_total (safe pairwise + slack)                        : {format_log2(log2_mss_total)}")
+            print(f"  MSS_peak  (dominant h, log2 contribution)                : h={mss_peak_h}, log2={mss_peak_log2 + args.runmix_safe_slack_bits:.3f}")
+            print(f"  MSS_slack (added log2 slack)                             : {args.runmix_safe_slack_bits:.3f}")
         if args.show_run_mixture_cubic:
             print(f"  MC_total (run-mixture + cubic correction)                : {format_log2(log2_mc_total)}")
             print(f"  MC_peak  (dominant h, log2 contribution)                 : h={mc_peak_h}, log2={mc_peak_log2:.3f}")

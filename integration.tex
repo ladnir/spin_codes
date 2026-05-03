@@ -681,51 +681,12 @@ So the first-order question is:
 \emph{for a target \(\delta\), which offset \(c\) is enough?}
 
 \paragraph{The current finite-\(n\) model.}
-The working evaluator splits \eqref{eq:dense-dense-working-mu} into three windows.
+The working evaluator still splits \eqref{eq:dense-dense-working-mu} into three windows, but the philosophy has
+become more focused than when this section started.
 
 \medskip
 \noindent
-\textbf{1. Small weights.}
-For \(1\le h\le H\) (currently \(H\) is a small fixed cutoff such as \(64\)), we use the exact low-weight outer count
-\begin{equation}
-\label{eq:dense-dense-working-outer-small}
-A_h^{\mathrm{out,exact}}
-\;=\;
-k\cdot \frac{\binom{\sigma+1}{h-1}}{2^{\sigma+1}}
-\;+\;
-\sum_{\ell=2}^{k}(k-\ell+1)\frac{\binom{2\ell+\sigma-2}{h-2}}{2^{\ell+\sigma}},
-\end{equation}
-and pair it with the exact run-tail inner bound from
-\eqref{eq:dense-inner-run-opt-envelope}.
-Concretely, for each small \(h\) we optimize over \(r\in\{1,\dots,h\}\):
-\begin{equation}
-\label{eq:dense-dense-working-small-inner}
-p_h^{\mathrm{in}}(\delta)
-\;\lesssim\;
-\min_{1\le r\le h}
-\left(
-\mathrm{RunTail}_n(h,r)+(L2^{-\sigma})^r+r\,b_{\delta,\xi}(n)
-\right),
-\end{equation}
-with \(L=\lceil(2+\xi)\delta n\rceil\).
-This is the most informative part of the present model.
-
-\medskip
-\noindent
-\textbf{2. Intermediate weights.}
-For \(H<h<\eta_{\mathrm{crit}}n\), the current model still falls back to a geometric residual of the form
-\[
-A_h^{\mathrm{out}}\cdot p_h^{\mathrm{in}}(\delta)
-\;\lesssim\;
-\text{const}\cdot
-\left(\frac{\rho}{z}\right)^h,
-\]
-with the same \(z\) and \(\rho\) as in the analytic proof.
-This is the weakest part of the finite-length model and remains the main source of conservatism.
-
-\medskip
-\noindent
-\textbf{3. Linear weights.}
+\textbf{1. Linear weights are no longer the mystery.}
 For \(h=\eta n\) with \(\eta\ge \eta_{\mathrm{crit}}\), we use the explicit exponent comparison already proved in the
 main text:
 \[
@@ -733,51 +694,69 @@ A_h^{\mathrm{out}}\,p_h^{\mathrm{in}}(\delta)
 \;\lesssim\;
 n^{O(1)}\,2^{n(\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;\theta,\delta,\xi))}.
 \]
-At the moment, this window is \emph{not} the dominant obstruction in the parameter ranges suggested by the enumerator.
+This window is currently not the dominant obstruction in the parameter ranges suggested by the enumerator.
+The dense+dense proof problem is now much more localized than that.
 
-\paragraph{What this model is trying to capture.}
-The working hypothesis is that, after one separates the low-weight outer combinatorics from the low-weight inner
-run-count mechanism, the threshold behavior is controlled primarily by the offset \(c\).
-In that sense the model is intended to be more principled than a raw empirical fit:
-it is a finite-\(n\) approximation assembled directly from the same exact combinatorial quantities that appear in the
-proof, with only the residual window treated more coarsely.
+\medskip
+\noindent
+\textbf{2. The outer side is largely understood at low weight.}
+For the tiny-weight window we use the actual systematic-banded small-weight law suggested by the enumerator rather than
+the earlier convolutional proxy:
+\begin{equation}
+\label{eq:dense-dense-working-outer-small}
+A_h^{\mathrm{out,exact}}
+\;=\;
+k\cdot \frac{\binom{\sigma+1}{h-1}}{2^{\sigma+1}}
+\;+\;
+\sum_{\ell=2}^{k}(k-\ell+1)\frac{\binom{2\ell+\sigma-2}{h-2}}{2^{\ell+\sigma}}.
+\end{equation}
+Once this exact low-weight outer law is used, the dominant uncertainty shifts back onto the inner tiny/intermediate
+regime rather than the outer count itself.
 
-\paragraph{Current save point.}
-At the time of writing, the strongest finite-\(n\) working estimate is obtained by an
-\emph{adaptive exact tiny-weight sum}: we evaluate the exact outer small-\(h\) count together with the exact
-run-tail inner bound term-by-term until the contribution sequence has clearly fallen well below its peak.
-Beyond that point, the original geometric residual can be replaced by a local continuation model based on the observed
-decay of the exact tiny-weight terms.  Empirically, this makes very little difference for the candidate transition:
-the dominant mass is already concentrated at very small \(h\), typically around \(h\approx 5\text{--}10\) in the
-\(\sigma=\lceil \log_2 k\rceil + c\) regime of interest.
-
-Under this refined model, the current picture for the construction tracked by the enumerator is:
-\begin{itemize}
-\item the raw asymptotic heuristic is too optimistic and cannot be used by itself;
-\item replacing the tiny-weight window by the exact outer small-\(h\) counts plus the exact run-tail inner bound gives a
-substantially more stable picture;
-\item exact inner-only comparisons now suggest caution: at the very smallest weights, the present run-tail inner model
-can still be optimistic, so a more conservative competing heuristic is to anchor the tiny-weight law at the
-single-run probability \(p_1(\delta)\) and then correct the multi-run behavior by an explicit pairwise interaction
-factor;
-\item after replacing the old convolutional proxy by the actual systematic banded small-weight law used in the
-enumerator, the outer mismatch becomes much smaller; the dominant uncertainty is therefore pushed back onto the inner
-tiny/intermediate-weight law rather than the outer count itself;
-\item in the parameterization \(\sigma=\lceil\log_2 k\rceil+c\), the present working model suggests that the
-transition occurs near a fixed offset \(c\), rather than at a fixed absolute \(\sigma\);
-\item more specifically, the current pairwise-calibrated run-mixture model treats an \(s\)-run input as having
-effective tail probability
+\medskip
+\noindent
+\textbf{3. The inner side should be built around exact late placement, not raw run tails.}
+The old pointwise run-tail picture
 \[
-q_s \approx q_1^s \exp(-\gamma(q_1)\tbinom{s}{2}),
+\min_{1\le r\le h}
+\left(
+\mathrm{RunTail}_n(h,r)+(L2^{-\sigma})^r+r\,b_{\delta,\xi}(n)
+\right)
 \]
-where \(q_1\approx p_1(\delta)\approx 2\delta\) and the exact inner-only tables suggest a simple linear interaction law
-\(\gamma(q_1)\approx a+bq_1\) over the regime \(q_1\in[0.17,0.25]\);
-\item at the concrete point \(k=2^{20}\), \(\delta=0.12\), and \(n=2k+\sigma\), the current optimistic refined model
-crosses below \(1\) near \(c=5\), the pairwise-calibrated run-mixture model crosses near
-\(c=6\), and the more conservative single-run model crosses only near \(c=8\), so the present evidence should be read
-as a bracket rather than a single claimed threshold.
-\item this bracket is not a single-point artifact. In the current finite-length sweep over
-\(k=2^{10},2^{12},\dots,2^{20}\) at \(\delta=0.12\), the first offsets with estimated first moment below \(1\) are:
+is still useful as a baseline, but it is no longer the conceptual center.
+The current philosophy is:
+\begin{itemize}
+\item the one-run base factor \(q_1(\delta)\approx 2\delta\) is now analytically anchored by
+Corollary~\ref{cor:dense-inner-single-run};
+\item the conditioned late-start power \(q_1(\delta)^s\) is analytically anchored by
+Corollary~\ref{cor:first-run-late-qbase};
+\item the exact low-weight core should therefore be ``exact late placement plus a correction,'' not a direct promotion
+of the old \((L2^{-m})^r\) law.
+\end{itemize}
+
+\paragraph{General philosophy of the current dense model.}
+The current working model is not trying to guess the minimum distance curve from scratch. It is trying to expose the
+\emph{smallest theorem-shaped object that still matches the exact overlap data}.
+At this point the philosophy is:
+\begin{enumerate}
+\item use exact or proved combinatorics whenever possible;
+\item isolate the first place where the proof stops matching the exact tables;
+\item treat the residual there as the real theorem target, rather than patching the whole first moment globally.
+\end{enumerate}
+This is why the current dense save point is organized around isolated low-weight slices and exact early-start
+statistics, not around increasingly elaborate global fit parameters.
+
+\paragraph{Current evidence lanes.}
+The finite-\(n\) evidence is now best read as a bracket rather than a single claim.
+At \(k=2^{20}\), \(\delta=0.12\), and \(n=2k+\sigma\), the current optimistic / central / pessimistic lanes cross
+below \(1\) near
+\[
+c_{\mathrm{opt}}\approx 5,\qquad
+c_{\mathrm{ctr}}\approx 6,\qquad
+c_{\mathrm{pess}}\approx 8.
+\]
+On the sweep \(k=2^{10},2^{12},\dots,2^{20}\) at \(\delta=0.12\), the first offsets with estimated first moment below
+\(1\) are currently
 \[
 \begin{array}{c|cccccc}
 \log_2 k & 10 & 12 & 14 & 16 & 18 & 20\\
@@ -787,24 +766,223 @@ c_{\mathrm{ctr}}  & 4 & 4 & 4 & 5 & 6 & 6\\
 c_{\mathrm{pess}} & 4 & 5 & 6 & 7 & 7 & 8
 \end{array}
 \]
-So the present evidence is consistent with a transition region that drifts upward slowly with \(k\), with the
-pairwise-calibrated lane currently centered around \(c\approx 6\) by the time \(k\) reaches \(2^{20}\).
-\item overlap checks against the exact enumerator, using the observed threshold \(\delta=h_{\mathrm{thr}}/n\) and the exact
-first-moment value at that threshold, now show that the pairwise-calibrated and single-run lanes are much closer to the
-true finite-length behavior than the earlier convolutional proxy, but they still tend to be optimistic by a few bits on
-average, with the miss becoming larger as \(\sigma\) grows. So even the present \(c\approx 6\) center should still be
-read as a working estimate rather than a certification.
-\item a useful theorem-shaped refinement is to replace the least-squares pairwise damping fit by a conservative affine
-lower envelope \(\gamma_{\mathrm{safe}}(q_1)\) for the minimum observed pairwise exponent across the current exact
-inner-only tables. Empirically this moves the central lane only slightly: at \(k=2^{20}\) and \(\delta=0.12\), the
-pairwise-calibrated model crosses below \(1\) near \(c=6\), and the safe-pairwise version does the same. So the
-current evidence suggests that a proof built around a pairwise run-mixture upper bound may lose only a small constant
-amount relative to the present central heuristic.
-\item accordingly, the current working language is to treat these three lanes as
-\emph{optimistic}, \emph{central}, and \emph{pessimistic} estimates rather than as competing theorem claims.
+and the current theorem-shaped safe lane still sits near \(c\approx 6\text{--}7\) after a modest explicit proof tax.
+These numbers are not theorem statements. Their role is only to tell us which proof targets are worth pursuing.
+
+\paragraph{What is solid versus what is still heuristic.}
+By now several parts of the picture are genuinely solid:
+\begin{itemize}
+\item the single-run law \(p_1^{\mathrm{in}}(\delta)\approx 2\delta\);
+\item the conditioned late-placement base
+\[
+\sum_{s=1}^{h}
+\pi_{N,h}(s)\,
+\frac{\binom{L-h+1}{s}}{\binom{N-h+1}{s}};
+\]
+\item the fact that fixed tiny weights are overwhelmingly supported on the isolated slice \(R(U)=h\);
+\item the fact that deterministic short-gap merging is not the dominant large-\(k\) correction in the
+\(h\approx 5\text{--}10\) window.
 \end{itemize}
-This should be read only as the current state of the model, not as a proved theorem.
-Its role is to tell us where further analytic work is most likely to pay off.
+What remains heuristic is the \emph{correction around that proved base}. The key change since earlier drafts is that
+this correction is no longer an amorphous global fit. It is now concentrated on the isolated slice and on explicit
+early-start statistics there.
+
+\paragraph{Current proof-oriented picture.}
+The isolated slice \(R(U)=h\) is now the natural theorem core.
+On that slice we have, in increasing order of sharpness:
+\begin{itemize}
+\item the exact late-placement base
+\[
+\PP[R(U)=h]\cdot \frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}};
+\]
+\item exact order-statistic control from Corollary~\ref{cor:isolated-order-late};
+\item the exact early-count law from Corollary~\ref{cor:isolated-early-count};
+\item the exact expected early-pair count from Corollary~\ref{cor:isolated-early-pair-mean}.
+\end{itemize}
+The important negative results are now just as useful as the positive ones:
+\begin{itemize}
+\item the one-episode correction is much too weak by itself;
+\item a uniform per-early-start penalty \(\tau\) already tracks the isolated slice fairly well locally, but is too loose
+as a large-\(k\) theorem lane;
+\item a position-sensitive one-run penalty
+\[
+\tau_y(\delta)\approx (N-y+1)2^{-m}+\PP[\Binomial(N-y+1,\tfrac12)\le \delta N]
+\]
+works well through roughly \(h\le 4\), but then starts to undershoot in the battleground window \(h\approx 5\text{--}7\).
+\end{itemize}
+So the remaining problem is no longer ``find a better global heuristic.'' It is to explain the residual after the
+position-sensitive one-run base.
+
+\paragraph{The current best residual target.}
+At the moment the cleanest residual statistic is the hypergeometric early-pair count on the isolated slice.
+After factoring out the position-sensitive one-run base, the exact overlap tables are well described by an affine law
+in
+\[
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+\;=\;
+\binom{h}{2}\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\]
+More specifically, on the current overlap set the residual coefficients themselves vary smoothly with
+\[
+q_1=\frac{2\lfloor \delta N\rfloor}{N}
+\qquad\text{and}\qquad \frac{1}{m},
+\]
+which makes this look much closer to a real analytic theorem target than to a one-off regression artifact.
+This should still be read as a working estimate, not as a proved law, but it is now the most principled target we have.
+
+\paragraph{Current save point.}
+The dense+dense picture is now the following.
+\begin{itemize}
+\item The outer side is largely under control in the tiny-weight regime.
+\item The linear-weight window is no longer the main bottleneck.
+\item The proof should be organized around exact late placement on the isolated slice.
+\item The next theorem ingredient is an explicit multi-episode correction built on top of the position-sensitive
+one-run base, most naturally through the early-start hypergeometric law and especially its early-pair statistic.
+\end{itemize}
+This should be read only as the current state of the model, not as a proved theorem. Its role is to preserve the
+current proof philosophy and identify the narrow next step.
+
+\paragraph{The theorem-shaped inner target suggested by the model.}
+The current computational evidence suggests that the right next proof target is not an arbitrary refinement of
+\eqref{eq:dense-inner-run-opt-envelope}, but an \emph{exact late-placement base plus a controlled correction}. Writing
+\[
+\pi_{N,h}(s)
+\;:=\;
+\PP[\#\mathrm{runs}(U)=s]
+\;=\;
+\frac{\binom{h-1}{s-1}\binom{N-h+1}{s}}{\binom{N}{h}},
+\]
+for \(U\) uniform on the weight-\(h\) slice, the natural target inequality is
+\begin{equation}
+\label{eq:dense-dense-working-pairwise-target}
+p_h^{\mathrm{in}}(\delta)
+\;\le\;
+\sum_{s=1}^{h}
+\pi_{N,h}(s)\,
+\frac{\binom{L-h+1}{s}}{\binom{N-h+1}{s}}
+\;+\; \mathrm{Corr}_{N,h}(\delta),
+\end{equation}
+where \(L=\lceil 2\delta N\rceil\) and the correction term \(\mathrm{Corr}_{N,h}(\delta)\) should be negligible on the
+tiny/intermediate window.
+The point is not that \eqref{eq:dense-dense-working-pairwise-target} is proved already, but that it is now a sharply
+formulated analytic target: the late-placement base itself is already proved, and what remains is to upper-bound the
+correction \(\mathrm{Corr}_{N,h}(\delta)\) coming from low-weight outcomes that are \emph{not} explained by pure
+late placement. The present overlap checks suggest that this correction is a genuine low-order term in the dominant
+tiny/intermediate window, rather than evidence for a qualitatively different small-weight law. The older pairwise
+run-mixture lanes should now be read only as structured candidate models for \(\mathrm{Corr}_{N,h}(\delta)\), not as
+the theorem core itself.
+
+\paragraph{Why the isolated slice is the right core.}
+At the smallest fixed weights, Corollary~\ref{cor:run-count-full} suggests that one should separate
+\(\mathrm{Corr}_{N,h}(\delta)\) into:
+\begin{itemize}
+\item an isolated-run correction on the dominant \(R(U)=h\) slice, and
+\item a lower-order adjacency correction from the event \(R(U)<h\).
+\end{itemize}
+That looks like the cleanest route if we later try to turn the current finite-\(h\) evidence into an actual proof.
+Numerically, the exact isolated-slice base
+\[
+\PP[R(U)=h]\cdot \frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}}
+\]
+already matches the exact one-run slice exactly and stays within a few bits through the dominant tiny weights on the
+current overlap tables. The remaining residual on that isolated slice is smooth and monotone enough that it looks
+like a real correction term, not a failure of the late-placement core itself.
+
+\paragraph{A concrete isolated-slice working target.}
+The simplest working version of that correction is
+\begin{equation}
+\label{eq:dense-dense-working-isolated-target}
+p_h^{\mathrm{in}}(\delta)
+\;\le\;
+\PP[R(U)=h]\,
+\frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}}\,
+2^{\beta_\delta \binom{h}{2}}
+\;+\;
+\PP[R(U)<h]
+\;+\;
+\mathrm{Err}^{\mathrm{iso}}_{N,h}(\delta),
+\end{equation}
+with \(\beta_\delta\) small on the tiny-weight window and \(\mathrm{Err}^{\mathrm{iso}}_{N,h}(\delta)\) ideally negligible
+there. This isolates the two real sources of loss that still have to be controlled: residual interaction between
+otherwise isolated early episodes, and the lower-order adjacency event \(R(U)<h\).
+
+\paragraph{What the exact isolated statistics buy us.}
+Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
+slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
+the clean theorem object behind statements like ``there is at most one genuinely early isolated impulse.'' Current
+numerics show that the \(r=2\) version is still too weak by itself to certify the observed small-weight regime, but it
+is now a precise proved object rather than a heuristic guess.
+
+Corollary~\ref{cor:isolated-early-count} sharpens that viewpoint further: on the isolated slice one can count exactly
+how many isolated starts fall before the final \(L\) positions. Empirically, a model of the form
+\[
+\sum_{j=0}^h
+\PP[J_L(U)=j\mid \wt(U)=h,\ R(U)=h]\tau^j
+\]
+with a single \(\tau\) already tracks the exact isolated slices within about a bit on the current overlap tables.
+That is encouraging because it isolates the remaining analytic burden into a per-early-episode penalty.
+At the same time, a uniform safe \(\tau\) is still too loose when inserted into the large-\(k\) first moment, so the
+next useful theorem likely needs a position-sensitive or \(j\)-sensitive refinement rather than a single global
+constant.
+
+The natural position-sensitive version is to assign each early isolated start position \(y\le N-L\) its own
+penalty \(\tau_y(\delta)\), and then average the product of those penalties over the exact isolated-start
+configuration. On the isolated slice this would take the form
+\[
+\frac{1}{\binom{N-h+1}{h}}
+\sum_{j=0}^h
+\binom{L-h+1}{h-j}\,
+e_j\!\bigl(\tau_1(\delta),\dots,\tau_{N-L}(\delta)\bigr),
+\]
+where \(e_j\) is the \(j\)-th elementary symmetric polynomial. The uniform-\(\tau\) model is exactly the special case
+\(\tau_y\equiv \tau\), so the current overlap evidence can be read as saying that the right theorem probably lives one
+level above the constant-\(\tau\) simplification, not in a completely different combinatorial regime.
+
+The most natural first choice is to take \(\tau_y(\delta)\) from the one-run bound with remaining suffix length
+\(N-y+1\), namely
+\[
+\tau_y(\delta)
+\approx
+(N-y+1)2^{-m}
+\;+\;
+\Pr[\Binomial(N-y+1,\tfrac12)\le \delta N].
+\]
+That position-sensitive one-run model does explain the isolated slice better than a global constant at the very
+smallest weights, but it still undershoots once \(h\) reaches the \(5\text{--}7\) window driving the current
+large-\(k\) transition. So the next theorem is still not just ``plug in the one-run law per early start''; it needs
+an additional multi-episode interaction term on top of that exact early-count decomposition.
+
+\paragraph{The current best residual law.}
+One especially clean candidate is suggested by Corollary~\ref{cor:isolated-early-pair-mean}: after factoring out the
+position-sensitive one-run model, the remaining overlap gap is well tracked by an affine function of the exact
+expected number of early-start pairs
+\[
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+=
+\binom{h}{2}\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\]
+On the current overlap tables the residual coefficients are well fit by
+\[
+a(q_1,m)\approx -1.1434 + 6.1146\,q_1 - \frac{15.4212}{m},
+\]
+\[
+b(q_1,m)\approx 0.4950 - 1.0649\,q_1 - \frac{0.7693}{m},
+\]
+so the residual takes the working form
+\[
+\text{gap bits}
+\approx
+a(q_1,m)
++
+b(q_1,m)\,
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right].
+\]
+This does not yet prove the right theorem, but it is a much sharper target than a free global fit: it says the next
+correction likely lives on the early-start hypergeometric law itself, not on the full run count.
+
+The new one-episode lemma confirms that \(\mathrm{Corr}_{N,h}(\delta)\) cannot be controlled by looking only at the
+first early ON-episode: that route is structurally valid but numerically much too loose. Hence the real target is a
+genuine multi-episode correction, probably pairwise at minimum.
 
 \paragraph{What must be improved next.}
 The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} has now largely been replaced, for
@@ -814,5 +992,8 @@ even after sharpening the outer tiny-weight treatment, overlap checks against th
 the present small-weight models remain somewhat optimistic in the small/intermediate-weight regime.
 So the next refinement target is not the bulk linear window, but rather a sharper and still explicit description of the
 inner small-weight law for roughly \(h\approx 5\text{--}12\), ideally upgrading the pairwise run-mixture picture from a
-working estimate to a finite-\(n\) bound, together with a cleaner interpolation from that regime to the
+working estimate to a finite-\(n\) bound. The current best proof-oriented subproblem is therefore the isolated slice
+\(R(U)=h\): prove a controlled correction around the exact late-placement base there, and then add the lower-order
+adjacency remainder coming from \(R(U)<h\). Once that is in place, the next task is a cleaner interpolation from that
+tiny/intermediate regime to the
 linear-weight exponent window.

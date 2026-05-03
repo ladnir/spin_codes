@@ -145,6 +145,29 @@ Under the uniform weight-$w$ model,
 \]
 \end{proof}
 
+\begin{corollary}[Gap survival while ON]
+\label{cor:dense-gap-survival}
+Fix an interval of $g\ge 0$ consecutive zero inputs, and condition on the event that the encoder is ON at the start of
+that interval. Then the probability that the encoder remains ON throughout the whole gap is exactly the probability that
+a length-$g$ fair-coin sequence contains no run of $m$ consecutive zeros.
+In particular,
+\begin{equation}
+\label{eq:dense-gap-survival}
+\PP[\text{survive a zero gap of length }g \mid \ON]
+\;\ge\;
+1-g\,2^{-m},
+\end{equation}
+and if $g<m$ then the survival probability is $1$.
+\end{corollary}
+
+\begin{proof}
+While the encoder stays ON, Lemma~\ref{lem:dense-fair-while-on} gives i.i.d.\ fair-coin outputs across the gap.
+By Lemma~\ref{lem:dense-off-requires-mzeros}, an ON$\to$OFF transition can occur during the gap if and only if one of
+those outputs starts a length-$m$ all-zero window. Thus the survival event is exactly the event that the $g$ fair-coin
+outputs contain no run of $m$ consecutive zeros. The lower bound \eqref{eq:dense-gap-survival} is the union bound over
+the at most $g$ candidate start positions for such a zero window, and for $g<m$ no such window can occur.
+\end{proof}
+
 \begin{lemma}[Dense inner: three-term low-weight tail]
 \label{lem:dense-three-term-tail}
 Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$, and let $Y=\Enc_{\mathrm{in}}(U)$ be produced by
@@ -202,6 +225,60 @@ The three terms in \eqref{eq:dense-three-term} correspond to:
 (iii) otherwise, the encoder stays ON for at least $(1-\varepsilon)N$ steps and outputs behave like fair coins, so
 $\wt(Y)$ has a large-deviation tail $q_{\delta,\varepsilon}(N)$.
 
+\begin{corollary}[Single-run base factor]
+\label{cor:dense-inner-single-run}
+Fix $\delta\in(0,1/2)$ and let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=1$.
+Let $Y=\Enc_{\mathrm{in}}(U)$ be produced by \eqref{eq:dense-inner-def}. Then
+\begin{equation}
+\label{eq:dense-inner-single-run}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+\frac{\lceil 2\delta N\rceil}{N}
+\;+\;
+N2^{-m}
+\;+\;
+\PP[\Binomial(\lceil 2\delta N\rceil,\tfrac12)\le \delta N].
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:dense-inner-single-run-asym}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+2\delta
+\;+\;
+O\!\left(\frac{1}{N}\right)
+\;+\;
+N2^{-m}
+\;+\;
+2^{-\Omega_\delta(N)}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Let $T$ be the unique index with $U_T=1$. Under the uniform weight-$1$ model, $T$ is uniform on $\{1,\dots,N\}$.
+
+On the event that the encoder never transitions from \ON to \OFF after time $T+1$, Lemma~\ref{lem:dense-fair-while-on}
+implies that $(Y_{T+1},\dots,Y_N)$ are i.i.d.\ fair coins. If $N-T\ge \lceil 2\delta N\rceil$, then
+\[
+\PP[\wt(Y)\le \delta N \mid T,\ \text{no OFF after }T+1]
+\;\le\;
+\PP[\Binomial(\lceil 2\delta N\rceil,\tfrac12)\le \delta N]
+\]
+by monotonicity in the number of fair-coin steps. Otherwise $N-T<\lceil 2\delta N\rceil$, which is equivalent to
+\[
+T > N-\lceil 2\delta N\rceil.
+\]
+Since $T$ is uniform, this exceptional late-start event has probability at most $\lceil 2\delta N\rceil/N$.
+
+Finally, by Lemma~\ref{lem:dense-off-requires-mzeros} and the same union bound as in Lemma~\ref{lem:dense-three-term-tail},
+the probability that an ON$\to$OFF transition occurs after time $T+1$ is at most $N2^{-m}$.
+Union bounding these three mechanisms proves \eqref{eq:dense-inner-single-run}.
+
+For \eqref{eq:dense-inner-single-run-asym}, note that $\lceil 2\delta N\rceil/N = 2\delta + O(1/N)$, while the
+binomial term is exponentially small because $\delta < \lceil 2\delta N\rceil/(2\lceil 2\delta N\rceil)$ for all
+sufficiently large $N$.
+\end{proof}
+
 % ============================================================
 \subsection{Forced-termination contraction (tightening the small-$w$ regime)}
 \label{subsec:inner-dense-forced-termination}
@@ -251,6 +328,457 @@ $s+1$ gaps, giving
 choices.
 Dividing by the total number $\binom{N}{w}$ of weight-$w$ words yields the stated probability formula,
 and summing over $s<r$ gives \eqref{eq:run-lower-tail-exact}.
+\end{proof}
+
+\begin{lemma}[Gap composition conditioned on weight and run count]
+\label{lem:gap-composition-given-runs}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Write the zero gaps around the $s$ runs as
+\[
+z_0,\ z_1,\ \dots,\ z_{s-1},\ z_s,
+\]
+where $z_0$ and $z_s$ are the leading and trailing zero counts and each internal gap $z_i$ for
+$1\le i\le s-1$ is at least $1$. Define shifted internal gaps
+\[
+y_0:=z_0,\qquad y_i:=z_i-1 \ (1\le i\le s-1),\qquad y_s:=z_s.
+\]
+Then $(y_0,\dots,y_s)$ is uniform over all weak compositions of
+\[
+M:=N-w-(s-1)
+\]
+into $s+1$ parts.
+
+In particular, for any fixed internal gap $G=z_i$ with $1\le i\le s-1$,
+\begin{equation}
+\label{eq:internal-gap-marginal}
+\PP[G=g \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-g+s-1}{s-1}}{\binom{M+s}{s}}
+\qquad (g\ge 1),
+\end{equation}
+whenever $M-g\ge 0$, and therefore
+\begin{equation}
+\label{eq:internal-gap-mean}
+\EE[G \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+1+\frac{M}{s+1}
+\;=\;
+\frac{N-w+2}{s+1}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Conditioned on $\wt(U)=w$ and $R(U)=s$, a word is specified by:
+\begin{itemize}
+\item a composition of $w$ into $s$ positive run lengths, and
+\item a choice of zero gaps $z_0,z_1,\dots,z_s$ with $z_0,z_s\ge 0$, $z_i\ge 1$ for $1\le i\le s-1$, and
+\(\sum_{i=0}^s z_i=N-w\).
+\end{itemize}
+After the shift $y_i=z_i-1$ on the internal gaps, the second datum becomes a weak composition of
+$M=N-w-(s-1)$ into $s+1$ parts. For each fixed shifted gap vector there are exactly
+$\binom{w-1}{s-1}$ compatible run-length compositions, so under the uniform law on the $(w,s)$-slice the shifted
+gap vector is itself uniform over those weak compositions.
+
+Fix an internal gap $G=z_i$ and write $G=1+Y_i$. The event $\{G=g\}$ is equivalent to $Y_i=g-1$, leaving
+$M-(g-1)=M-g+1$ units to be distributed across the remaining $s$ coordinates. Hence
+\[
+\PP[G=g \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-g+s-1}{s-1}}{\binom{M+s}{s}},
+\]
+which is \eqref{eq:internal-gap-marginal}. Finally, by symmetry of the uniform composition law,
+$\EE[Y_i]=M/(s+1)$, so \eqref{eq:internal-gap-mean} follows from $G=1+Y_i$.
+\end{proof}
+
+\begin{corollary}[Forced-cluster count from short gaps]
+\label{cor:forced-cluster-count}
+Fix a memory parameter $m\ge 1$. Under the same conditioning as
+Lemma~\ref{lem:gap-composition-given-runs}, define the \emph{forced cluster count}
+\[
+C_m(U)
+\;:=\;
+1+\#\{\,i\in\{1,\dots,s-1\}: z_i\ge m\,\}.
+\]
+Equivalently, one merges adjacent runs whenever their separating zero gap is $<m$.
+Then
+\begin{equation}
+\label{eq:forced-cluster-prob}
+\PP[z_i\ge m \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}}
+\end{equation}
+for each internal gap \(z_i\), whenever \(M-m+1\ge 0\), and therefore
+\begin{equation}
+\label{eq:forced-cluster-mean}
+\EE[C_m(U)\mid \wt(U)=w,\ R(U)=s]
+\;=\;
+1+(s-1)\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+By definition, \(z_i\ge m\) if and only if \(y_i=z_i-1\ge m-1\).
+Under Lemma~\ref{lem:gap-composition-given-runs}, the shifted gap vector is uniform over weak compositions of
+\(M\) into \(s+1\) parts. So fixing \(y_i\ge m-1\) and subtracting \(m-1\) from that coordinate leaves a weak
+composition of \(M-(m-1)\) into \(s+1\) parts. Hence
+\[
+\PP[z_i\ge m \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-(m-1)+s}{s}}{\binom{M+s}{s}}
+\;=\;
+\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}},
+\]
+which is \eqref{eq:forced-cluster-prob}. The expectation formula
+\eqref{eq:forced-cluster-mean} then follows by linearity of expectation over the \(s-1\) exchangeable internal gaps.
+\end{proof}
+
+\begin{lemma}[First-run late tail conditioned on the run count]
+\label{lem:first-run-late-given-runs}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Let $T_1(U)$ denote the start position of the first run of ones.
+Then for every integer $t\in\{0,1,\dots,N-w\}$,
+\begin{equation}
+\label{eq:first-run-late-given-runs}
+\PP[T_1(U)>t \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{N-t-w+1}{s}}{\binom{N-w+1}{s}}.
+\end{equation}
+Consequently,
+\begin{equation}
+\label{eq:first-run-late-given-runs-simple}
+\PP[T_1(U)>t \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\left(1-\frac{t}{N}\right)^s.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The event $\{T_1(U)>t\}$ means that the first $t$ coordinates are all zero, so the entire weight-$w$, $s$-run pattern
+must be placed in the remaining $N-t$ coordinates. By Lemma~\ref{lem:run-count-distribution}, the number of such words is
+\[
+\binom{w-1}{s-1}\binom{N-t-w+1}{s},
+\]
+while the total number of weight-$w$, $s$-run words is
+\[
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
+Taking the ratio gives \eqref{eq:first-run-late-given-runs}.
+
+For the bound, write
+\[
+\frac{\binom{N-t-w+1}{s}}{\binom{N-w+1}{s}}
+\;=\;
+\prod_{j=0}^{s-1}\frac{N-t-w+1-j}{N-w+1-j}
+\;=\;
+\prod_{j=0}^{s-1}\left(1-\frac{t}{N-w+1-j}\right).
+\]
+Since $N-w+1-j\le N$, each factor is at most $1-t/N$, proving
+\eqref{eq:first-run-late-given-runs-simple}.
+\end{proof}
+
+\begin{corollary}[Conditioned late-start base factor]
+\label{cor:first-run-late-qbase}
+Fix $\delta\in(0,1/2)$ and let
+\[
+L:=\lceil 2\delta N\rceil.
+\]
+Under the same conditioning as Lemma~\ref{lem:first-run-late-given-runs},
+\begin{equation}
+\label{eq:first-run-late-qbase}
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;\le\;
+\left(\frac{L}{N}\right)^s.
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:first-run-late-qbase-asym}
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\left(2\delta + O\!\left(\frac{1}{N}\right)\right)^s.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:first-run-late-given-runs} with $t=N-L$.
+Then
+\[
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}.
+\]
+The bound follows from
+\[
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;=\;
+\prod_{j=0}^{s-1}\frac{L-w+1-j}{N-w+1-j}
+\;\le\;
+\left(\frac{L}{N}\right)^s,
+\]
+and $L/N = 2\delta + O(1/N)$ gives \eqref{eq:first-run-late-qbase-asym}.
+\end{proof}
+
+\begin{corollary}[Two isolated ones: exact late-placement factor]
+\label{cor:first-run-late-two-run}
+Fix $\delta\in(0,1/2)$ and let $L=\lceil 2\delta N\rceil$.
+If $U$ is uniform over $\{0,1\}^N$ conditioned on $\wt(U)=2$ and $R(U)=2$, then
+\begin{equation}
+\label{eq:first-run-late-two-run}
+\PP[T_1(U)>N-L \mid \wt(U)=2,\ R(U)=2]
+\;=\;
+\frac{\binom{L-1}{2}}{\binom{N-1}{2}}.
+\end{equation}
+Equivalently,
+\begin{equation}
+\label{eq:first-run-late-two-run-asym}
+\PP[T_1(U)>N-L \mid \wt(U)=2,\ R(U)=2]
+\;=\;
+\left(\frac{L}{N}\right)^2
+\left(1+O\!\left(\frac{1}{L}\right)\right).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+This is the special case $(w,s)=(2,2)$ of Corollary~\ref{cor:first-run-late-qbase}. The asymptotic form follows from
+\[
+\frac{\binom{L-1}{2}}{\binom{N-1}{2}}
+\;=\;
+\left(\frac{L}{N}\right)^2
+\frac{(1-1/L)(1-2/L)}{(1-1/N)(1-2/N)}.
+\]
+\end{proof}
+
+\begin{corollary}[Isolated order statistics: exact late tail]
+\label{cor:isolated-order-late}
+Fix integers \(1\le r\le h\le N\) and let \(L\in\{1,\dots,N\}\).
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=h\) and \(R(U)=h\), and write
+\[
+X_1(U)<X_2(U)<\cdots<X_h(U)
+\]
+for the ordered one positions.
+Then
+\begin{equation}
+\label{eq:isolated-order-late}
+\PP[X_r(U)>N-L \mid \wt(U)=h,\ R(U)=h]
+\;=\;
+\frac{1}{\binom{N-h+1}{h}}
+\sum_{j=0}^{r-1}
+\binom{N-L-r+1}{j}\binom{L-h+r}{h-j},
+\end{equation}
+with the convention that the sum is interpreted as \(1\) when \(N-L-r+1<0\).
+\end{corollary}
+
+\begin{proof}
+Conditioned on \(\wt(U)=h\) and \(R(U)=h\), the isolated one positions satisfy
+\[
+1\le X_1<\cdots<X_h\le N,
+\qquad
+X_{i+1}\ge X_i+2.
+\]
+Define
+\[
+Y_i:=X_i-i+1,\qquad i=1,\dots,h.
+\]
+Then
+\[
+1\le Y_1<\cdots<Y_h\le N-h+1,
+\]
+and the map \(X\mapsto Y\) is a bijection from isolated \(h\)-subsets of \([N]\) to ordinary \(h\)-subsets of
+\([N-h+1]\). Hence \(Y_1<\cdots<Y_h\) is uniform over all \(h\)-subsets of \([N-h+1]\).
+
+Now \(X_r>N-L\) is equivalent to
+\[
+Y_r=X_r-r+1 > N-L-r+1.
+\]
+So among the \(Y_i\), at most \(r-1\) may lie in the prefix \(\{1,\dots,N-L-r+1\}\), while the remaining
+\(h-j\) elements must lie in the tail of size
+\[
+(N-h+1)-(N-L-r+1)=L-h+r.
+\]
+Choosing exactly \(j\) prefix elements gives
+\[
+\binom{N-L-r+1}{j}\binom{L-h+r}{h-j},
+\]
+and summing over \(j=0,\dots,r-1\) proves \eqref{eq:isolated-order-late}.
+\end{proof}
+
+\begin{corollary}[Isolated early-count decomposition]
+\label{cor:isolated-early-count}
+Fix \(h\le N\) and let \(L\in\{1,\dots,N\}\).
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=h\) and \(R(U)=h\), and define
+\[
+J_L(U)
+\;:=\;
+\#\{\,i\in\{1,\dots,h\}: X_i(U)\le N-L\,\},
+\]
+the number of isolated one-positions that start before the final \(L\) coordinates.
+Then for every \(j\in\{0,\dots,h\}\),
+\begin{equation}
+\label{eq:isolated-early-count}
+\PP[J_L(U)=j \mid \wt(U)=h,\ R(U)=h]
+\;=\;
+\frac{\binom{N-L}{j}\binom{L-h+1}{h-j}}{\binom{N-h+1}{h}},
+\end{equation}
+with the convention that the right-hand side is \(0\) when either binomial coefficient is undefined.
+\end{corollary}
+
+\begin{proof}
+Under the shift \(Y_i=X_i-i+1\) from the proof of Corollary~\ref{cor:isolated-order-late},
+the isolated slice \(\wt(U)=h,\ R(U)=h\) becomes a uniform \(h\)-subset
+\[
+1\le Y_1<\cdots<Y_h\le N-h+1.
+\]
+The condition \(X_i\le N-L\) is equivalent to \(Y_i\le N-L-i+1\), and therefore
+\(J_L(U)=j\) means exactly \(j\) of the shifted positions lie in the prefix \(\{1,\dots,N-L\}\),
+while the remaining \(h-j\) lie in the tail of size
+\[
+(N-h+1)-(N-L)=L-h+1.
+\]
+Choosing those two groups independently gives
+\[
+\binom{N-L}{j}\binom{L-h+1}{h-j}
+\]
+valid isolated \(h\)-subsets. Dividing by the total \(\binom{N-h+1}{h}\) proves
+\eqref{eq:isolated-early-count}.
+\end{proof}
+
+\begin{corollary}[Expected number of early isolated pairs]
+\label{cor:isolated-early-pair-mean}
+Under the same conditioning and notation as Corollary~\ref{cor:isolated-early-count},
+\begin{equation}
+\label{eq:isolated-early-pair-mean}
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+\;=\;
+\binom{h}{2}\,
+\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Under the shift \(Y_i=X_i-i+1\) from the proof of Corollary~\ref{cor:isolated-order-late}, the isolated slice becomes a
+uniform \(h\)-subset of \([N-h+1]\), and \(J_L(U)\) counts how many of those \(h\) points land in the distinguished
+prefix of size \(N-L\). So \(J_L(U)\) has the usual hypergeometric distribution with population size \(N-h+1\),
+success population \(N-L\), and sample size \(h\). The factorial second moment of a hypergeometric variable gives
+\[
+\EE[J_L(U)(J_L(U)-1)\mid \wt(U)=h,\ R(U)=h]
+\;=\;
+h(h-1)\frac{(N-L)(N-L-1)}{(N-h+1)(N-h)}.
+\]
+Dividing by \(2\) proves \eqref{eq:isolated-early-pair-mean}.
+\end{proof}
+
+\begin{corollary}[Tiny weights are almost all isolated]
+\label{cor:run-count-full}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=h\ge 1$.
+Then
+\begin{equation}
+\label{eq:run-count-full}
+\PP[R(U)=h]
+\;=\;
+\frac{\binom{N-h+1}{h}}{\binom{N}{h}}.
+\end{equation}
+In particular, for every fixed $h$,
+\begin{equation}
+\label{eq:run-count-full-asym}
+\PP[R(U)=h]
+\;=\;
+1-O_h\!\left(\frac{1}{N}\right),
+\end{equation}
+and more concretely,
+\begin{equation}
+\label{eq:run-count-full-lower}
+\PP[R(U)=h]
+\;\ge\;
+1-\frac{h(h-1)}{N}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+The exact formula is the case $s=h$ of Lemma~\ref{lem:run-count-distribution}. For the lower bound, let
+\[
+A_i:=\{U_i=U_{i+1}=1\},\qquad i=1,\dots,N-1.
+\]
+If $R(U)<h$, then at least one adjacency event $A_i$ occurs. Under the uniform weight-$h$ model,
+\[
+\PP[A_i]
+\;=\;
+\frac{\binom{N-2}{h-2}}{\binom{N}{h}}
+\;=\;
+\frac{h(h-1)}{N(N-1)}.
+\]
+Hence by a union bound,
+\[
+\PP[R(U)<h]
+\;\le\;
+(N-1)\frac{h(h-1)}{N(N-1)}
+\;=\;
+\frac{h(h-1)}{N},
+\]
+which proves \eqref{eq:run-count-full-lower}. The asymptotic claim \eqref{eq:run-count-full-asym} is immediate for
+fixed \(h\).
+\end{proof}
+
+\begin{lemma}[Late-start plus one-episode correction]
+\label{lem:dense-late-start-one-episode}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Let $Y=\Enc_{\mathrm{in}}(U)$, fix an integer $L$ with $1\le L\le N$, and let $T_1(U)$ be the first run start.
+Then for every threshold $d\ge 0$,
+\begin{equation}
+\label{eq:dense-late-start-one-episode}
+\PP[\wt(Y)\le d \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;+\;
+L2^{-m}
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d].
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let $E_{\mathrm{late}}:=\{T_1(U)>N-L\}$.
+On the complementary event $E_{\mathrm{late}}^c$, the first run starts by time $N-L$.
+As in the proof of Corollary~\ref{cor:dense-inner-single-run}, that first run forces the encoder into the ON state at
+the next time step, thereby initiating the first ON-episode.
+
+If that first ON-episode terminates within its first $L$ steps, then by Lemma~\ref{lem:dense-off-requires-mzeros} and
+Lemma~\ref{lem:dense-fair-while-on}, some length-$m$ all-zero output window must begin within those $L$ steps. By a
+union bound this has probability at most $L2^{-m}$.
+
+Otherwise the first ON-episode survives for at least $L$ steps. On that whole interval the outputs are i.i.d.\ fair
+coins by Lemma~\ref{lem:dense-fair-while-on}. Since the total weight of $Y$ is at most $d$, in particular those first
+$L$ output bits of the episode must contain at most $d$ ones. The probability of that event is exactly
+\(\PP[\Binomial(L,\tfrac12)\le d]\).
+
+Thus, on $E_{\mathrm{late}}^c$, the low-weight event is contained in the union of the ``early termination within $L$''
+event and the length-$L$ binomial tail event. Adding back the late-start event $E_{\mathrm{late}}$ proves
+\eqref{eq:dense-late-start-one-episode}.
+\end{proof}
+
+\begin{corollary}[Run-mixture slice bound from one episode]
+\label{cor:dense-late-start-slice}
+Fix $\delta\in(0,1/2)$ and let $d=\lfloor \delta N\rfloor$.
+Then for every $w\ge 1$,
+\begin{equation}
+\label{eq:dense-late-start-slice}
+p_w(\delta)
+\;\le\;
+\sum_{s=1}^{w}
+\PP[R(U)=s]\,
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;+\;
+L2^{-m}
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d],
+\end{equation}
+where \(U\) is uniform on the weight-\(w\) slice and \(L\in\{1,\dots,N\}\) is arbitrary.
+\end{corollary}
+
+\begin{proof}
+Average Lemma~\ref{lem:dense-late-start-one-episode} over the conditional run-count law from
+Lemma~\ref{lem:run-count-distribution}, then substitute Corollary~\ref{cor:first-run-late-qbase} for the
+late-start term.
 \end{proof}
 
 \begin{lemma}[Entropy bound for the run lower tail]
@@ -774,6 +1302,49 @@ using the fact that a random interleaver typically spreads $w$ ones into $\appro
 We now have the exact finite-$N$ formula \eqref{eq:run-lower-tail-exact}. The next sharpening is to convert it into a
 clean entropy-style exponent for linear weights, so the integration section can optimize over $r$ analytically rather
 than numerically.
+
+\item \textbf{Replace raw run count by an episode-aware small-weight law.}
+The current finite-length evidence suggests that the main optimism in the old small-$w$ proof comes from treating
+distinct runs as if they necessarily generated distinct ON-episodes. In reality several runs may merge into the same
+episode when the encoder stays ON across the intervening zero gaps. A better theorem target is therefore not a direct
+promotion of the old $(L2^{-m})^r$ contraction, but an exact late-placement base together with a controlled
+multi-episode correction.
+
+The current proof ladder is now:
+\begin{enumerate}
+\item isolate the dominant \(R(U)=h\) slice and use the exact late-placement base there;
+\item use Corollaries~\ref{cor:isolated-order-late} and \ref{cor:isolated-early-count} to control exact early-start
+statistics on that isolated slice;
+\item treat \(R(U)<h\) as a lower-order adjacency remainder;
+\item prove the remaining correction on the isolated slice through a small explicit statistic, rather than through the
+full run count.
+\end{enumerate}
+
+Corollary~\ref{cor:forced-cluster-count} already shows that deterministic short-gap merging is negligible in the
+large-$k$, \(h\approx 5\text{--}10\) regime currently driving the first-moment estimates. So the remaining correction
+is more likely to be an \emph{episode-length} effect (multiple early episodes that still die quickly) than a large
+hidden collapse of many runs into a few forced clusters.
+
+The one-run corollary suggests the first concrete position-sensitive candidate:
+assign each early isolated start at position \(y\) the suffix-length penalty
+\[
+(N-y+1)2^{-m} + \PP[\Binomial(N-y+1,\tfrac12)\le \delta N].
+\]
+Current overlap checks show that this already explains the isolated slice well at the tiniest weights, but still
+undershoots in the \(h\approx 5\text{--}7\) window. So the missing theorem ingredient is now even clearer:
+not the exact placement law, but the interaction term between multiple early episodes on top of it.
+
+A particularly clean next target is to express that correction through the hypergeometric early-start count from
+Corollary~\ref{cor:isolated-early-count}, or even just through the exact expected early-pair count from
+Corollary~\ref{cor:isolated-early-pair-mean}, rather than through the full run count. Current overlap fits also
+suggest that the coefficients in such an early-pair correction vary smoothly with the one-run base parameter
+\(q_1\) and with \(1/m\), which makes this look much closer to a real analytic theorem target than a one-off fit.
+
+\item \textbf{The first one-episode correction is too weak.}
+Lemma~\ref{lem:dense-late-start-one-episode} and Corollary~\ref{cor:dense-late-start-slice} give a very clean
+theorem-shaped correction to the exact late-placement base, but current numerics show that this first-episode-only
+bound is still far too loose to explain the observed small-weight regime. So the next real theorem target must exploit
+suppression from \emph{multiple} early episodes, not just the first one.
 
 \item \textbf{Explicit constants in the binomial tail.}
 If we want explicit finite-$N$ numerics, replace the entropy bound by an explicit Chernoff/Bennett form

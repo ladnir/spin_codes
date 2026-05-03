@@ -11,6 +11,7 @@ from pathlib import Path
 from dense_largek_eval import (
     ETA_CRIT,
     GapResult,
+    RUNMIX_SAFE_SLACK_BITS,
     adaptive_small_h_localtail,
     adaptive_small_h_rigorous,
     exact_smallw_inner_bound,
@@ -19,6 +20,7 @@ from dense_largek_eval import (
     outer_generating_bound,
     outer_small_h_prefix,
     run_mixture_model_log2,
+    runmix_gamma_safe_from_q,
     runmix_gamma_from_q,
     single_run_product_log2,
     small_h_heuristic_log2,
@@ -300,6 +302,28 @@ def evaluate_point(
         lo = min(log2_m_total, log2_s_top)
         log2_m_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
 
+    gamma_runmix_safe = runmix_gamma_safe_from_q(q_single)
+    log2_ms_total, ms_peak_h, ms_peak_log2 = run_mixture_model_log2(
+        n=n,
+        k_msg=k_msg,
+        sigma=sigma,
+        h_lo=1,
+        h_hi=bracket_h_hi,
+        q_single=q_single,
+        gamma=gamma_runmix_safe,
+        outer_mode=outer_smallh_mode,
+        parity_n=parity_n,
+    )
+    if log2_s_lin != float("-inf"):
+        hi = max(log2_ms_total, log2_s_lin)
+        lo = min(log2_ms_total, log2_s_lin)
+        log2_ms_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    if log2_s_top != float("-inf"):
+        hi = max(log2_ms_total, log2_s_top)
+        lo = min(log2_ms_total, log2_s_top)
+        log2_ms_total = hi + math.log2(1.0 + 2.0 ** (lo - hi))
+    log2_mss_total = log2_ms_total + RUNMIX_SAFE_SLACK_BITS
+
     gamma_runmix_legacy = 0.2 * q_single
     log2_m0_total, m0_peak_h, m0_peak_log2 = run_mixture_model_log2(
         n=n,
@@ -357,12 +381,20 @@ def evaluate_point(
         "m_peak_h": float(m_peak_h),
         "m_peak_log2": m_peak_log2,
         "m_total_log2": log2_m_total,
+        "ms_gamma": gamma_runmix_safe,
+        "ms_peak_h": float(ms_peak_h),
+        "ms_peak_log2": ms_peak_log2,
+        "ms_total_log2": log2_ms_total,
+        "mss_slack_bits": RUNMIX_SAFE_SLACK_BITS,
+        "mss_total_log2": log2_mss_total,
         "m0_gamma": gamma_runmix_legacy,
         "m0_peak_h": float(m0_peak_h),
         "m0_peak_log2": m0_peak_log2,
         "m0_total_log2": log2_m0_total,
         "b_opt_log2": log2_l_total,
         "b_ctr_log2": log2_m_total,
+        "b_safe_log2": log2_ms_total,
+        "b_safe_slack_log2": log2_mss_total,
         "b_pess_log2": log2_q_total,
     }
 
@@ -441,12 +473,20 @@ def main() -> int:
                 "m_peak_h",
                 "m_peak_log2",
                 "m_total_log2",
+                "ms_gamma",
+                "ms_peak_h",
+                "ms_peak_log2",
+                "ms_total_log2",
+                "mss_slack_bits",
+                "mss_total_log2",
                 "m0_gamma",
                 "m0_peak_h",
                 "m0_peak_log2",
                 "m0_total_log2",
                 "b_opt_log2",
                 "b_ctr_log2",
+                "b_safe_log2",
+                "b_safe_slack_log2",
                 "b_pess_log2",
             ],
         )
