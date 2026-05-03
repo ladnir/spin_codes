@@ -1261,6 +1261,64 @@ below it, and the \(r\ge2\) pieces carry additional fixed-tap termination factor
 not an undifferentiated bound on the whole inner model, but a ratio estimate for the fixed-\(r\) block summands,
 beginning with \(r=1\), followed by a summable comparison over \(r\ge2\).
 
+\begin{lemma}[Low-slot \(r=1\) geometric ratio]
+\label{lem:r-one-low-slot-ratio}
+Fix an outer generating-function parameter \(z\in(0,1)\), so that
+\[
+A_h^{\mathrm{out}}\le W(z)z^{-h}.
+\]
+Consider either exact \(r=1\) global-cover subpiece: the all-terminated piece, whose support factor has the form
+\(\binom{M}{h-2}/\binom{N}{h}\), or the terminated-plus-final-survivor piece, whose support factor has the form
+\(\binom{M}{h-3}/\binom{N}{h}\).  All other factors in a fixed live-geometry summand are independent of \(h\).
+Restrict to summands with \(M\le \theta N\).  If \(h\ge H\ge3\), then each such summand satisfies
+\[
+\frac{\text{summand}_{h+1}}{\text{summand}_{h}}
+\le
+z^{-1}\,
+\frac{\theta N-h+3}{h-2}\,
+\frac{h+1}{N-h}.
+\]
+Consequently, if
+\[
+q_{H,\theta,z}
+:=
+z^{-1}\,
+\frac{\theta N-H+3}{H-2}\,
+\frac{H+1}{N-H}
+<1,
+\]
+then the low-slot \(r=1\) contribution is geometrically dominated beyond \(H\), up to the residual factor in
+Lemma~\ref{lem:geometric-residual-certificate}.
+\end{lemma}
+
+\begin{proof}
+For a fixed geometry, the only \(h\)-dependent factor after multiplying by the outer generating-function envelope is
+\[
+z^{-h}\frac{\binom{M}{h-c}}{\binom{N}{h}},
+\qquad c\in\{2,3\}.
+\]
+The adjacent ratio is
+\[
+z^{-1}
+\frac{M-h+c}{h+1-c}
+\frac{h+1}{N-h}.
+\]
+The case \(c=3\) is the larger of the two for \(h\ge3\).  Using \(M\le\theta N\) gives the displayed bound.  The right
+side is decreasing on the small-weight interval used here; taking \(h=H\) gives the uniform ratio \(q_{H,\theta,z}\).
+Summing the resulting geometric series is exactly Lemma~\ref{lem:geometric-residual-certificate}.
+\end{proof}
+
+For the current \(k=2^{20}\) checkpoint, \(N=2^{21}\).  Taking \(H=2000\), \(\theta=0.35\), and the tail outer
+parameter \(z=0.370884\) gives
+\[
+\log_2 q_{H,\theta,z}\approx -0.084.
+\]
+This proves the desired finite-prefix reduction for the low-slot part of the \(r=1\) tail.  The diagnostics place the
+dominant \(r=1\) saddle at slot length about \(0.265N\), so it lies safely inside this low-slot branch.  The remaining
+\(r=1\) proof obligation is therefore the high-slot branch \(M>\theta N\), which should be discharged by the
+large-deviation cost of the shared binomial lower tail; numerically this branch is already more than \(2^{24000}\)
+below the leading low-slot saddle in the \(h=500\) to \(h=2000\) range.
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
