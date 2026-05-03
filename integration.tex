@@ -1669,9 +1669,15 @@ case \(r=21\), \(h=2000\), \(c=42\), and is about
 \]
 before summing the remaining live-slot indices.  Even a very coarse \(N^4\) union over \(h,r\) and the suffix
 geometry leaves roughly \(90\) bits of slack.  Lemma~\ref{lem:large-r-low-slot-certificate} packages exactly this
-calculation: the low-slot residual closes once \(R\) is taken near \(\log k\).  The remaining large-\(r\) task is now
-the complementary high-slot branch, which should be absorbed by the same lower-tail exponent that handled
-bounded \(r\).
+calculation: the low-slot residual closes once \(R\) is taken near \(\log k\).
+
+The complementary high-slot branch is subtler.  For bounded \(r\), Lemma~\ref{lem:bounded-r-high-slot-suppression}
+charges live length \(xN-O_R(m)\), so the ordinary binomial lower-tail exponent absorbs the support entropy.  For
+\(r>R\), this cannot simply be recycled: \(r\sigma\) may be a macroscopic subtraction from the charged live length.
+Thus the remaining large-\(r\) task is either to hand this branch to the established linear-weight exponent
+comparison, or to prove a new large-\(r\) entropy bound that keeps the interval count, the \(2^{-r(\sigma-1)}\)
+termination cost, and the reduced charged live length in the same exponent.  The low-slot certificate above removes
+the bridge-tail part of the problem; it does not by itself solve the high-slot large-\(r\) branch.
 
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
