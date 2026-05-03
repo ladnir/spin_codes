@@ -1816,8 +1816,10 @@ branch.  The complementary high-slot case is no longer a separate bridge phenome
 low-linear window covered by Lemma~\ref{lem:low-linear-handoff-0106}.
 
 The break-even checkpoint is therefore no longer an unbounded \(h\)-search.  The finite prefix \(h\le2000\) and the
-numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} are now packaged as a single reproducible
-certificate artifact.  The current top-level checkpoint verifier is
+numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} are packaged as a single reproducible
+certificate artifact.  The theorem below is a finite-\(n\), computer-assisted certificate: the analytic reductions are
+the displayed lemmas, and the numerical inputs are the committed prefix and residual summaries checked by the verifier.
+The current top-level checkpoint verifier is
 \[
 \texttt{python scripts/verify\_checkpoint\_0106.py}.
 \]
@@ -1832,9 +1834,9 @@ N=2k=2^{21}
 \]
 and inner memory \(m=25\).  Let \(\Csc\) be the resulting serially concatenated code, and set
 \[
-d=\lfloor 0.106\,N\rfloor.
+d=\lfloor 0.106\,N\rfloor=222298.
 \]
-The current checkpoint certificate gives
+The checkpoint certificate gives
 \[
 \Pr[d_{\min}(\Csc)\le d]
 \le
@@ -1844,7 +1846,10 @@ The current checkpoint certificate gives
 <0.8.
 \]
 Equivalently, with probability at least \(1-2^{-0.34}\) over the outer ensemble, interleaver, and inner ensemble,
-the relative minimum distance is larger than \(0.106\).
+\[
+d_{\min}(\Csc)\ge222299,
+\]
+and hence the relative minimum distance is larger than \(0.106\).
 \end{theorem}
 
 \begin{proof}
@@ -1871,8 +1876,10 @@ low-slot branch is a geometric residual from the boundary; the bounded-\(r\) hig
 suppressed; the large-\(r\) low-slot branch is below \(2^{-90}\) after the coarse union over live geometry; and the
 large-\(r\) high-slot/linear handoff has exponent gap at least \(0.009N\) until the usual high-linear splice takes
 over.  The range \(\eta\ge\eta_{\mathrm{crit}}\) is covered by the already-proved linear-weight comparison
-Theorem~\ref{prop:dense-dense-highweight-gap} with the easier target \(\delta=0.106<0.109\), and the top-weight
-range is handled by the same outer-exponent argument as in Theorem~\ref{thm:dense-dense-explicit-constant}.
+Theorem~\ref{prop:dense-dense-highweight-gap} with the easier target \(\delta=0.106<0.109\), since
+\(p_h^{\mathrm{in}}(\delta)\) is nondecreasing in \(\delta\).  The top-weight range is handled by the same
+outer-exponent argument as in Theorem~\ref{thm:dense-dense-explicit-constant}; this part uses only the trivial
+inner bound \(p_h^{\mathrm{in}}\le1\), so it is independent of the choice of \(\delta\).
 
 The top-level verifier
 \[
