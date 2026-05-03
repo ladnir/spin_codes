@@ -417,6 +417,7 @@ def main() -> None:
     args = parser.parse_args()
 
     n = 2 * args.k
+    d = math.floor(args.delta * n)
     suffix_block_ratio = args.suffix_block_ratio if args.suffix_block_ratio is not None else args.block_ratio
     sigmas = parse_sigmas(args.sigmas)
     zs = z_grid(args.z_min, args.z_max, args.z_count)
@@ -436,7 +437,6 @@ def main() -> None:
     series: dict[int, list[tuple[int, float, float]]] = {}
     tail_cache: list[float] | None = None
     if args.exact_survivor_through >= args.h_min:
-        d = math.floor(args.delta * n)
         print(f"precomputing {args.tail_mode} tail cache for exact survivor sums", flush=True)
         tail_cache = [tail_log2(u, d, args.tail_mode) for u in range(n + 1)]
     for sigma in sigmas:
@@ -488,6 +488,10 @@ def main() -> None:
             points.append((h, term, total))
             rows.append(
                 {
+                    "k": args.k,
+                    "N": n,
+                    "delta": f"{args.delta:.12g}",
+                    "d": d,
                     "sigma": sigma,
                     "offset": sigma - math.ceil(math.log2(args.k)),
                     "h": h,
@@ -515,6 +519,10 @@ def main() -> None:
         )
         summaries.append(
             {
+                "k": args.k,
+                "N": n,
+                "delta": f"{args.delta:.12g}",
+                "d": d,
                 "sigma": sigma,
                 "offset": sigma - math.ceil(math.log2(args.k)),
                 "h_min": args.h_min,
@@ -537,6 +545,10 @@ def main() -> None:
         writer = csv.DictWriter(
             f,
             fieldnames=[
+                "k",
+                "N",
+                "delta",
+                "d",
                 "sigma",
                 "offset",
                 "h",
@@ -558,6 +570,10 @@ def main() -> None:
         writer = csv.DictWriter(
             f,
             fieldnames=[
+                "k",
+                "N",
+                "delta",
+                "d",
                 "sigma",
                 "offset",
                 "h_min",

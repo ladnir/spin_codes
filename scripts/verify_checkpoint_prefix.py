@@ -49,6 +49,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     parser.add_argument("--tailcert", type=Path, default=DEFAULT_TAILCERT)
+    parser.add_argument("--k", type=int, default=2**20)
+    parser.add_argument("--n", type=int, default=2**21)
+    parser.add_argument("--delta", type=float, default=0.106)
+    parser.add_argument("--d", type=int, default=222298)
     parser.add_argument("--max-total-log2", type=float, default=-0.34)
     parser.add_argument("--max-tail-log2", type=float, default=-800.0)
     parser.add_argument("--max-ratio-log2", type=float, default=-0.35)
@@ -76,6 +80,10 @@ def main() -> int:
     print()
 
     ok = True
+    ok &= check("k", summary["k"] == str(args.k), summary["k"])
+    ok &= check("N", summary["N"] == str(args.n), summary["N"])
+    ok &= check("delta", abs(float(summary["delta"]) - args.delta) <= 1e-15, summary["delta"])
+    ok &= check("d", summary["d"] == str(args.d), summary["d"])
     ok &= check("sigma", summary["sigma"] == "25", summary["sigma"])
     ok &= check("offset", summary["offset"] == "5", summary["offset"])
     ok &= check("h window", summary["h_min"] == "1" and summary["h_max"] == "2000", f"{summary['h_min']}..{summary['h_max']}")
