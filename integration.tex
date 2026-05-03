@@ -1816,7 +1816,10 @@ low-linear window covered by Lemma~\ref{lem:low-linear-handoff-0106}.
 What remains for a full break-even certificate is therefore not another unbounded \(h\)-search.  It is to make the
 finite prefix \(h\le2000\) and the numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} into a
 single reproducible certificate artifact, then decide how much negative margin should be required beyond mere
-\(\log_2\mu<0\).
+\(\log_2\mu<0\).  The current finite-prefix summary and its conditional geometric-tail summary are checked by
+\[
+\texttt{python scripts/verify\_checkpoint\_prefix.py}.
+\]
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
