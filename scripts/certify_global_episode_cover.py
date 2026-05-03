@@ -166,6 +166,26 @@ def survivor_only_log2(*, n: int, h: int, d: int, block_ratio: float, tail_mode:
     return min(0.0, total)
 
 
+def survivor_only_exact_log2(*, n: int, h: int, tail_cache: list[float]) -> float:
+    """Exact suffix-start count for one final survivor and no terminated intervals.
+
+    The binomial lower tail may still be an upper bound, depending on the
+    tail-cache construction, but the suffix placement sum is exact:
+
+        sum_U C(U-1,h-1)/C(N,h) * tail(U).
+
+    This is intended for small h, where the current certificate peak lives.
+    """
+    denom = log2_binom(n, h)
+    total = float("-inf")
+    log_count = 0.0  # C(h-1,h-1)
+    for u in range(h, n + 1):
+        total = log2add(total, log_count - denom + tail_cache[u])
+        if u < n:
+            log_count += math.log2(u / (u - h + 1))
+    return min(0.0, total)
+
+
 def terminated_only_log2(
     *,
     n: int,
@@ -302,9 +322,16 @@ def global_episode_inner_log2(
     tail_confirm: int,
     suffix_survivor: bool,
     tail_mode: str,
+    exact_survivor: bool,
+    tail_cache: list[float] | None,
 ) -> tuple[float, int, float]:
     d = math.floor(delta * n)
-    total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio, tail_mode=tail_mode)
+    if exact_survivor:
+        if tail_cache is None:
+            raise ValueError("exact survivor mode requires a tail cache")
+        total = survivor_only_exact_log2(n=n, h=h, tail_cache=tail_cache)
+    else:
+        total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio, tail_mode=tail_mode)
     best_r = 0
     best_piece = total
     max_r = h // 2 if r_max is None else min(r_max, h // 2)
@@ -366,6 +393,12 @@ def main() -> None:
     parser.add_argument("--tail-confirm", type=int, default=8)
     parser.add_argument("--tail-mode", choices=("entropy", "be"), default="entropy")
     parser.add_argument(
+        "--exact-survivor-through",
+        type=int,
+        default=0,
+        help="Use the exact suffix-start survivor-only sum through this h.",
+    )
+    parser.add_argument(
         "--ordinary-survivor-interval",
         action="store_true",
         help="Use the older safe overcount that treats the final survivor as an arbitrary interval.",
@@ -393,6 +426,11 @@ def main() -> None:
     rows: list[dict[str, str | int | float]] = []
     summaries: list[dict[str, str | int | float]] = []
     series: dict[int, list[tuple[int, float, float]]] = {}
+    tail_cache: list[float] | None = None
+    if args.exact_survivor_through >= args.h_min:
+        d = math.floor(args.delta * n)
+        print(f"precomputing {args.tail_mode} tail cache for exact survivor sums", flush=True)
+        tail_cache = [tail_log2(u, d, args.tail_mode) for u in range(n + 1)]
     for sigma in sigmas:
         print(f"sigma={sigma}: global episode cover h={args.h_min}..{args.h_max}", flush=True)
         gf_outer, gf_z = outer_gf_bounds(k=args.k, sigma=sigma, h_min=args.h_min, h_max=args.h_max, zs=zs)
@@ -417,6 +455,8 @@ def main() -> None:
                 tail_confirm=args.tail_confirm,
                 suffix_survivor=not args.ordinary_survivor_interval,
                 tail_mode=args.tail_mode,
+                exact_survivor=h <= args.exact_survivor_through,
+                tail_cache=tail_cache,
             )
             term = outer + inner if outer != float("-inf") and inner != float("-inf") else float("-inf")
             total = log2add(total, term)
@@ -437,6 +477,7 @@ def main() -> None:
                     "cum_log2": format_log2(total),
                     "best_r": best_r,
                     "best_piece_log2": format_log2(best_piece),
+                    "survivor_only_sum": "exact" if h <= args.exact_survivor_through else "blocked",
                 }
             )
             if h == args.h_min or h % 25 == 0 or h == args.h_max:
@@ -464,6 +505,7 @@ def main() -> None:
                 "inner_model": "GLOBAL_EPISODE_COVER_SHARED_BUDGET",
                 "survivor_count": "ORDINARY_INTERVAL" if args.ordinary_survivor_interval else "FINAL_SUFFIX",
                 "tail_mode": args.tail_mode,
+                "exact_survivor_through": args.exact_survivor_through,
             }
         )
 
@@ -484,6 +526,7 @@ def main() -> None:
                 "cum_log2",
                 "best_r",
                 "best_piece_log2",
+                "survivor_only_sum",
             ],
         )
         writer.writeheader()
@@ -505,6 +548,7 @@ def main() -> None:
                 "inner_model",
                 "survivor_count",
                 "tail_mode",
+                "exact_survivor_through",
             ],
         )
         writer.writeheader()
