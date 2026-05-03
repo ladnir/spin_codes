@@ -5,6 +5,7 @@ This script checks the four quantitative constants used in the
 ``Checkpoint residual split at delta=0.106'' lemma:
 
 * bounded-r low-slot adjacent ratio;
+* bounded-r high-slot exponent;
 * large-r low-slot ledger maximum;
 * the resulting coarse N^4 union slack;
 * the low-linear handoff gap on the sampled grid.
@@ -35,6 +36,40 @@ class LedgerMax:
 def bounded_r_log2_ratio(*, n: int, h: int, r_cap: int, theta: float, z: float) -> float:
     q = (1.0 / z) * ((theta * n - h + 2 * r_cap + 1) / (h - 2 * r_cap)) * ((h + 1) / (n - h))
     return math.log2(q)
+
+
+def binary_entropy(p: float) -> float:
+    if p <= 0.0 or p >= 1.0:
+        return 0.0
+    return -p * math.log2(p) - (1.0 - p) * math.log2(1.0 - p)
+
+
+def high_slot_exponent(*, delta: float, theta: float, eta: float, z: float) -> tuple[float, float]:
+    """Minimize the high-slot exponent from the bounded-r suppression lemma."""
+
+    def exponent(x: float) -> float:
+        return x * (1.0 - binary_entropy(delta / x)) - eta * max(0.0, math.log2(x / z))
+
+    def derivative_high_piece(x: float) -> float:
+        return 1.0 + math.log2(1.0 - delta / x) - eta / (x * math.log(2.0))
+
+    candidates = {theta, 1.0}
+    if theta <= z <= 1.0:
+        candidates.add(z)
+
+    lo = max(theta, z)
+    hi = 1.0
+    if lo < hi and derivative_high_piece(lo) < 0.0 and derivative_high_piece(hi) > 0.0:
+        for _ in range(80):
+            mid = 0.5 * (lo + hi)
+            if derivative_high_piece(mid) < 0.0:
+                lo = mid
+            else:
+                hi = mid
+        candidates.add(0.5 * (lo + hi))
+
+    best_x = min(candidates, key=exponent)
+    return exponent(best_x), best_x
 
 
 def large_r_candidate_tail_log2(*, eta: float, offset_s: int, r_cap: int) -> float:
@@ -137,6 +172,7 @@ def main() -> int:
     parser.add_argument("--eta-lo", type=float, default=0.0009)
     parser.add_argument("--gap-step", type=float, default=1e-4)
     parser.add_argument("--min-ratio-slack", type=float, default=0.05)
+    parser.add_argument("--min-high-slot-exponent", type=float, default=0.018)
     parser.add_argument("--max-low-slot-ledger", type=float, default=-170.0)
     parser.add_argument("--max-union-bound", type=float, default=-85.0)
     parser.add_argument("--min-linear-gap", type=float, default=0.009)
@@ -146,6 +182,12 @@ def main() -> int:
     offset_s = args.sigma - math.ceil(math.log2(args.k))
 
     log2_q = bounded_r_log2_ratio(n=n, h=args.h_min, r_cap=args.r_cap, theta=args.theta_slot, z=args.z)
+    high_slot, high_slot_x = high_slot_exponent(
+        delta=args.delta,
+        theta=args.theta_slot,
+        eta=args.eta,
+        z=args.z,
+    )
     candidate_tail = large_r_candidate_tail_log2(eta=args.eta, offset_s=offset_s, r_cap=args.r_cap)
     ledger = large_r_low_slot_max(
         k=args.k,
@@ -179,6 +221,7 @@ def main() -> int:
     print(f"z = {args.z}")
     print()
     print(f"bounded-r low-slot log2 q = {log2_q:.12f}")
+    print(f"bounded-r high-slot exponent = {high_slot:.12f} at x={high_slot_x:.12f}")
     print(f"large-r candidate tail log2 = {candidate_tail:.12f}")
     print(
         "large-r low-slot ledger max = "
@@ -194,6 +237,7 @@ def main() -> int:
     ok = True
     checks = [
         ("bounded-r ratio", log2_q <= -args.min_ratio_slack),
+        ("bounded-r high-slot exponent", high_slot >= args.min_high_slot_exponent),
         ("large-r low-slot ledger", ledger.value <= args.max_low_slot_ledger),
         ("large-r union bound", union_log2 <= args.max_union_bound),
         ("linear handoff gap", gap.worst_gap <= -args.min_linear_gap),

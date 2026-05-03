@@ -1791,8 +1791,12 @@ z^{-1}\,
 Lemma~\ref{lem:geometric-residual-certificate} controls the low-slot bounded-\(r\) tail from the finite-prefix
 boundary.
 
-For \({\rm (ii)}\), Lemma~\ref{lem:bounded-r-high-slot-suppression} applies with \(R=20=O(\log N)\).  The earlier
-checkpoint calculation at \(\eta=1/4\) gives a positive high-slot exponent, so this branch is exponentially small.
+For \({\rm (ii)}\), Lemma~\ref{lem:bounded-r-high-slot-suppression} applies with \(R=20=O(\log N)\).  At
+\(\eta=1/4\), the checkpoint verifier computes
+\[
+E_{\mathrm{hi}}(0.106,0.35,1/4,0.370884)>0.018,
+\]
+so this branch is exponentially small.
 
 For \({\rm (iii)}\), the large-\(r\) low-slot ledger gives a worst summand below \(2^{-176}\) over
 \(r>20\), \(H\le h\le N/4\), and \(M\le0.35N\).  Lemma~\ref{lem:large-r-low-slot-certificate} then contributes the
