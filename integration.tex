@@ -1799,6 +1799,11 @@ coarse union factor \(3N^4\), and \(3(2^{21})^4 2^{-176}<2^{-90}\).
 For \({\rm (iv)}\), \(H/N=2000/2^{21}>9\cdot10^{-4}\), so Lemma~\ref{lem:low-linear-handoff-0106} covers the entire
 interval from the finite-prefix handoff through \(\eta=1/4\).  The polynomial number of weight slices is negligible
 compared with the \(2^{-0.009N}\) exponent gap.
+
+The companion verification command for the displayed checkpoint constants is
+\[
+\texttt{python scripts/verify\_checkpoint\_residual.py}.
+\]
 \end{proof}
 
 Thus the tail problem has become finite and auditable at the current checkpoint.  The phrase ``low-slot \(r>R\)''
