@@ -1590,6 +1590,57 @@ same two interval-placement binomials, with terminated length \(T\), suffix leng
 \(M=S+T-2r-1\); the same argument gives the displayed replacement.
 \end{proof}
 
+\begin{lemma}[Large-\(r\) low-slot finite certificate]
+\label{lem:large-r-low-slot-certificate}
+In the setting of Lemma~\ref{lem:large-r-low-slot-ledger}, fix \(H\), \(R\), \(\eta\), and \(\theta\).  Define
+\[
+\begin{aligned}
+\mathcal{L}(h,r,c,M)
+ &:=
+\log_2 W(z)
++r\log_2\!\left(\frac{e^2\,2^{2-s}(M+2r+2)}{r^2}\right)
++c\log_2\!\left(\frac{h}{N-h}\right)
+\\
+&\hspace{1cm}
++(h-c)\log_2\!\left(\frac{M}{N}\right)
+-h\log_2 z .
+\end{aligned}
+\]
+Suppose that
+\[
+\max
+\mathcal{L}(h,r,c,M)
+\le -B
+\]
+over all
+\[
+H\le h\le \eta N,\qquad
+R<r\le h/2,\qquad
+c\in\{2r,2r+1\},\qquad
+h-c\le M\le\theta N .
+\]
+Then the total low-slot contribution of all global-cover pieces with \(r>R\), \(H\le h\le\eta N\), and
+support-slot length at most \(\theta N\) is at most
+\[
+3N^4\,2^{-B}.
+\]
+Moreover, the displayed maximum may be checked with \(M=\lfloor\theta N\rfloor\).
+\end{lemma}
+
+\begin{proof}
+Lemma~\ref{lem:large-r-low-slot-ledger} bounds each all-terminated low-slot summand by
+\(2^{\mathcal{L}(h,r,2r,M)}\), since \(M+2r\le M+2r+2\), and each suffix-survivor low-slot summand by
+\(2^{\mathcal{L}(h,r,2r+1,M)}\), since \(T+S+1=M+2r+2\).  There are at most \(N\) choices of \(h\), at most \(N\)
+choices of \(r\), at most \(N\) choices of the all-terminated slot \(M\), and at most \(N^2\) choices of the suffix
+pair \((S,T)\).  The all-terminated family contributes at most \(N^3\) such terms and the suffix-survivor family at
+most \(N^4\); the harmless factor \(3\) absorbs these two families and endpoint conventions.  Summing every low-slot
+piece gives at most \(3N^4 2^{-B}\).
+
+For fixed \(h,r,c\), the function \(\mathcal{L}(h,r,c,M)\) is increasing in \(M\) on the feasible range: the term
+\(\log(M+2r+2)\) is increasing, and \(h-c\ge0\).  Therefore the maximum is attained at the largest allowed support
+slot, \(M=\lfloor\theta N\rfloor\).
+\end{proof}
+
 This ledger is the missing bookkeeping object for the large-\(r\) tail.  The important finite-\(n\) feature is the
 unrelaxed factor
 \[
@@ -1617,9 +1668,10 @@ case \(r=21\), \(h=2000\), \(c=42\), and is about
 -176\ \text{bits}
 \]
 before summing the remaining live-slot indices.  Even a very coarse \(N^4\) union over \(h,r\) and the suffix
-geometry would leave roughly \(90\) bits of slack.  This is not yet the final certificate statement, but it changes the
-large-\(r\) picture: the low-slot residual appears to close once \(R\) is taken near \(\log k\), and the remaining
-formal task is to package this ledger into a finite maximization plus polynomial slot count.
+geometry leaves roughly \(90\) bits of slack.  Lemma~\ref{lem:large-r-low-slot-certificate} packages exactly this
+calculation: the low-slot residual closes once \(R\) is taken near \(\log k\).  The remaining large-\(r\) task is now
+the complementary high-slot branch, which should be absorbed by the same lower-tail exponent that handled
+bounded \(r\).
 
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
