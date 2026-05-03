@@ -17,14 +17,19 @@ and the conditional geometric-tail summary by:
       --out scripts/global_episode_cover_suffix_be_exactsurv30_k1048576_sig25_d0106_h2000_tailcert.csv
 
 This verifier intentionally consumes the small summary artifacts rather than
-rerunning the h<=2000 evaluator.
+rerunning the h<=2000 evaluator.  It also checks a coarse analytic tail for the
+large-r pieces omitted by the evaluator's internal stopping rule.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import math
 from pathlib import Path
+
+from dense_largek_eval import binom_cdf_half_entropy_log2, fixedtap_banded_outer_gf_log2, log2add
+from verify_checkpoint_residual import large_r_low_slot_max, ledger_value
 
 
 DEFAULT_STEM = "global_episode_cover_suffix_be_exactsurv30_k1048576_sig25_d0106_h2000"
@@ -45,6 +50,50 @@ def check(name: str, passed: bool, detail: str) -> bool:
     return passed
 
 
+def prefix_large_r_high_slot_bound(
+    *,
+    k: int,
+    sigma: int,
+    delta: float,
+    h_max: int,
+    r_cap: int,
+    theta: float,
+    z: float,
+) -> tuple[float, tuple[int, int, int, float, float]]:
+    n = 2 * k
+    offset_s = sigma - math.ceil(math.log2(k))
+    d = math.floor(delta * n)
+    log2_w = fixedtap_banded_outer_gf_log2(k, k, sigma, z)
+    best = float("-inf")
+    best_data = (-1, -1, -1, float("-inf"), float("-inf"))
+
+    for r in range(r_cap + 1, h_max // 2 + 1):
+        # On the prefix h<=h_max and with high slot M>theta N, the support/outer
+        # ledger is maximized by M=N and h=h_max.  The shared live budget is
+        # minimized at the slot boundary, after subtracting r terminal windows.
+        charged = max(0, math.floor(theta * n) - r * (sigma - 2))
+        tail = binom_cdf_half_entropy_log2(charged, d)
+        for c in (2 * r, 2 * r + 1):
+            if c > h_max:
+                continue
+            ledger = ledger_value(
+                log2_w=log2_w,
+                n=n,
+                offset_s=offset_s,
+                z=z,
+                h=h_max,
+                r=r,
+                c=c,
+                m_slot=n,
+            )
+            value = ledger + tail
+            if value > best:
+                best = value
+                best_data = (h_max, r, c, ledger, tail)
+
+    return best, best_data
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
@@ -53,9 +102,14 @@ def main() -> int:
     parser.add_argument("--n", type=int, default=2**21)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--d", type=int, default=222298)
+    parser.add_argument("--r-cap", type=int, default=20)
+    parser.add_argument("--theta-slot", type=float, default=0.35)
+    parser.add_argument("--z", type=float, default=0.370884)
     parser.add_argument("--max-total-log2", type=float, default=-0.34)
     parser.add_argument("--max-tail-log2", type=float, default=-800.0)
     parser.add_argument("--max-ratio-log2", type=float, default=-0.35)
+    parser.add_argument("--max-prefix-large-r-low-union-log2", type=float, default=-40.0)
+    parser.add_argument("--max-prefix-large-r-high-union-log2", type=float, default=-1000.0)
     args = parser.parse_args()
 
     summary = read_one(args.summary)
@@ -67,6 +121,29 @@ def main() -> int:
     tail_residual = float(tail["tail_residual_log2"])
     certified_total = float(tail["certified_total_log2_if_ratio_holds"])
     observed_ratio = float(tail["observed_worst_log2_ratio"])
+    offset_s = 25 - math.ceil(math.log2(args.k))
+    low_ledger = large_r_low_slot_max(
+        k=args.k,
+        sigma=25,
+        offset_s=offset_s,
+        h_min=1,
+        r_cap=args.r_cap,
+        eta=0.25,
+        theta=args.theta_slot,
+        z=args.z,
+    )
+    low_union = math.log2(3.0) + 4.0 * math.log2(args.n) + low_ledger.value
+    high_value, high_data = prefix_large_r_high_slot_bound(
+        k=args.k,
+        sigma=25,
+        delta=args.delta,
+        h_max=2000,
+        r_cap=args.r_cap,
+        theta=args.theta_slot,
+        z=args.z,
+    )
+    high_union = math.log2(3.0) + 4.0 * math.log2(args.n) + high_value
+    certified_with_r_tail = log2add(log2add(certified_total, low_union), high_union)
 
     print("Dense+dense checkpoint finite-prefix verification")
     print(f"summary = {args.summary}")
@@ -77,6 +154,15 @@ def main() -> int:
     print(f"tail_residual_log2 = {tail_residual:.6f}")
     print(f"certified_total_log2_if_ratio_holds = {certified_total:.6f}")
     print(f"observed_worst_log2_ratio = {observed_ratio:.6f}")
+    print(
+        "prefix omitted large-r low-slot union log2 = "
+        f"{low_union:.6f} from h={low_ledger.h}, r={low_ledger.r}, c={low_ledger.c}"
+    )
+    print(
+        "prefix omitted large-r high-slot union log2 = "
+        f"{high_union:.6f} from h={high_data[0]}, r={high_data[1]}, c={high_data[2]}"
+    )
+    print(f"certified_total_with_prefix_r_tail_log2 = {certified_with_r_tail:.6f}")
     print()
 
     ok = True
@@ -87,14 +173,29 @@ def main() -> int:
     ok &= check("sigma", summary["sigma"] == "25", summary["sigma"])
     ok &= check("offset", summary["offset"] == "5", summary["offset"])
     ok &= check("h window", summary["h_min"] == "1" and summary["h_max"] == "2000", f"{summary['h_min']}..{summary['h_max']}")
+    ok &= check("exact outer mode", summary["exact_outer_mode"] == "fixedtap-banded", summary["exact_outer_mode"])
+    ok &= check("exact outer through", summary["exact_through"] == "80", summary["exact_through"])
+    ok &= check("z grid", summary["z_min"] == "0.005" and summary["z_max"] == "0.999" and summary["z_count"] == "160", f"{summary['z_min']}..{summary['z_max']} x {summary['z_count']}")
+    ok &= check("block ratios", summary["block_ratio"] == "1.01" and summary["suffix_block_ratio"] == "1.01", f"{summary['block_ratio']}, {summary['suffix_block_ratio']}")
+    ok &= check("r stopping rule", summary["stop_gap_bits"] == "60" and summary["tail_confirm"] == "8" and summary["r_max"] == "", f"gap={summary['stop_gap_bits']}, confirm={summary['tail_confirm']}, r_max={summary['r_max']!r}")
     ok &= check("prefix total", total <= args.max_total_log2, f"{total:.6f} <= {args.max_total_log2:.6f}")
     ok &= check("peak location", peak_h == 2, f"h={peak_h}")
     ok &= check("tail ratio", observed_ratio <= args.max_ratio_log2, f"{observed_ratio:.6f} <= {args.max_ratio_log2:.6f}")
     ok &= check("tail residual", tail_residual <= args.max_tail_log2, f"{tail_residual:.6f} <= {args.max_tail_log2:.6f}")
     ok &= check(
+        "prefix omitted large-r low-slot",
+        low_union <= args.max_prefix_large_r_low_union_log2,
+        f"{low_union:.6f} <= {args.max_prefix_large_r_low_union_log2:.6f}",
+    )
+    ok &= check(
+        "prefix omitted large-r high-slot",
+        high_union <= args.max_prefix_large_r_high_union_log2,
+        f"{high_union:.6f} <= {args.max_prefix_large_r_high_union_log2:.6f}",
+    )
+    ok &= check(
         "certified total",
-        certified_total <= args.max_total_log2,
-        f"{certified_total:.6f} <= {args.max_total_log2:.6f}",
+        certified_with_r_tail <= args.max_total_log2,
+        f"{certified_with_r_tail:.6f} <= {args.max_total_log2:.6f}",
     )
     print(f"STATUS: {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1

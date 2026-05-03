@@ -1873,7 +1873,9 @@ gives
 \[
 \log_2 \mu_{\le2000}\le -0.347781,
 \]
-with peak contribution at \(h=2\).
+with peak contribution at \(h=2\).  The same prefix verifier also audits the evaluator's internal \(r\)-stopping rule:
+the omitted \(r>20\) low-slot prefix tail is below \(2^{-45}\), while the corresponding high-slot prefix tail is below
+\(2^{-80000}\).  Adding these tails does not change the displayed total at the shown precision.
 
 For \(h>2000\), Lemma~\ref{lem:checkpoint-residual-split-0106} supplies the residual split.  The bounded-\(r\)
 low-slot branch is a geometric residual from the boundary; the bounded-\(r\) high-slot branch is exponentially

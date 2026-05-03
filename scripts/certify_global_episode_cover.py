@@ -31,6 +31,7 @@ from dense_largek_eval import (
     fixedtap_banded_outer_gf_log2,
     log2_binom,
     log2add,
+    outer_small_h_banded_systematic_prefix,
 )
 
 
@@ -112,6 +113,16 @@ def load_exact_outer(path: str | None, sigma: int, h_max: int) -> list[float]:
             h = int(row["h"])
             if 0 <= h <= h_max and "outer_log2" in row:
                 vals[h] = float(row["outer_log2"])
+    return vals
+
+
+def exact_fixedtap_outer_prefix(k_msg: int, parity_n: int, sigma: int, h_max: int) -> list[float]:
+    vals = [float("-inf")] * (h_max + 1)
+    if h_max <= 0:
+        return vals
+    prefix = outer_small_h_banded_systematic_prefix(k_msg, sigma, parity_n, h_max, fixed_tap=True)
+    for h in range(1, h_max + 1):
+        vals[h] = prefix[h]
     return vals
 
 
@@ -407,6 +418,12 @@ def main() -> None:
     )
     parser.add_argument("--exact-outer-csv", default=None)
     parser.add_argument("--exact-through", type=int, default=80)
+    parser.add_argument(
+        "--exact-outer-mode",
+        choices=("fixedtap-banded", "csv-only", "none"),
+        default="fixedtap-banded",
+        help="Source for exact low-weight outer counts before falling back to the GF envelope.",
+    )
     parser.add_argument("--out-prefix", default=None)
     parser.add_argument(
         "--pieces-out",
@@ -443,6 +460,13 @@ def main() -> None:
         print(f"sigma={sigma}: global episode cover h={args.h_min}..{args.h_max}", flush=True)
         gf_outer, gf_z = outer_gf_bounds(k=args.k, sigma=sigma, h_min=args.h_min, h_max=args.h_max, zs=zs)
         exact_outer = load_exact_outer(args.exact_outer_csv, sigma, args.h_max)
+        if args.exact_outer_mode == "fixedtap-banded":
+            exact_hi = min(args.exact_through, args.h_max)
+            formula_outer = exact_fixedtap_outer_prefix(args.k, args.k, sigma, exact_hi)
+            for h in range(1, exact_hi + 1):
+                exact_outer[h] = formula_outer[h]
+        elif args.exact_outer_mode == "none":
+            exact_outer = [float("-inf")] * (args.h_max + 1)
         total = float("-inf")
         peak_h = -1
         peak_term = float("-inf")
@@ -536,6 +560,16 @@ def main() -> None:
                 "survivor_count": "ORDINARY_INTERVAL" if args.ordinary_survivor_interval else "FINAL_SUFFIX",
                 "tail_mode": args.tail_mode,
                 "exact_survivor_through": args.exact_survivor_through,
+                "exact_outer_mode": args.exact_outer_mode,
+                "exact_through": args.exact_through,
+                "z_min": f"{args.z_min:.12g}",
+                "z_max": f"{args.z_max:.12g}",
+                "z_count": args.z_count,
+                "block_ratio": f"{args.block_ratio:.12g}",
+                "suffix_block_ratio": f"{suffix_block_ratio:.12g}",
+                "stop_gap_bits": f"{args.stop_gap_bits:.12g}",
+                "tail_confirm": args.tail_confirm,
+                "r_max": "" if args.r_max is None else args.r_max,
             }
         )
 
@@ -587,6 +621,16 @@ def main() -> None:
                 "survivor_count",
                 "tail_mode",
                 "exact_survivor_through",
+                "exact_outer_mode",
+                "exact_through",
+                "z_min",
+                "z_max",
+                "z_count",
+                "block_ratio",
+                "suffix_block_ratio",
+                "stop_gap_bits",
+                "tail_confirm",
+                "r_max",
             ],
         )
         writer.writeheader()
