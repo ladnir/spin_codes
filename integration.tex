@@ -1528,11 +1528,11 @@ for the full large-\(r\) first-moment tail: the global-cover interval entropy st
 isolate the remaining large-\(r\) task.  Once the live-geometry count is grouped by low slot and high slot, the
 termination-candidate part already has a rapidly summable \((\mathrm{const}/R)^R\) factor when \(R\asymp\log k\).
 
-\begin{lemma}[Large-\(r\) low-slot live-geometry ledger]
+\begin{lemma}[Large-\(r\) live-geometry ledger]
 \label{lem:large-r-low-slot-ledger}
 Let \(N=2k\), let \(\sigma=\lceil\log_2 k\rceil+s\), and assume
 \(A_h^{\mathrm{out}}\le W(z)z^{-h}\).  Consider a fixed global-cover subpiece with \(r\) terminated intervals and
-support-slot length \(M\le\theta N\).  Let \(c=2r\) for the all-terminated piece and \(c=2r+1\) for the
+support-slot length \(M\le N\).  Let \(c=2r\) for the all-terminated piece and \(c=2r+1\) for the
 terminated-plus-final-survivor piece.  Ignoring the shared binomial lower-tail factor, which is at most \(1\), the
 corresponding first-moment summand is bounded by
 \[
@@ -1671,6 +1671,55 @@ case \(r=21\), \(h=2000\), \(c=42\), and is about
 before summing the remaining live-slot indices.  Even a very coarse \(N^4\) union over \(h,r\) and the suffix
 geometry leaves roughly \(90\) bits of slack.  Lemma~\ref{lem:large-r-low-slot-certificate} packages exactly this
 calculation: the low-slot residual closes once \(R\) is taken near \(\log k\).
+
+The same ledger also audits the finite-prefix evaluator's internal \(r\)-cut.  The evaluator explicitly sums the
+global-cover pieces until the terms have fallen far below the current maximum; the proof certificate then adds a
+separate deterministic tail for the omitted \(r>20\) pieces.
+
+\begin{lemma}[Prefix large-\(r\) stopping tail]
+\label{lem:prefix-large-r-stopping-tail}
+For the checkpoint
+\[
+N=2^{21},\quad
+\sigma=25,\quad
+s=5,\quad
+z=0.370884,\quad
+\theta=0.35,\quad
+R=20,\quad
+H_{\mathrm{pre}}=2000,
+\]
+the total global-cover contribution with \(1\le h\le H_{\mathrm{pre}}\) and \(r>R\), omitted by the finite-prefix
+evaluator's \(r\)-stopping rule, is bounded by
+\[
+2^{-45}+2^{-80000}.
+\]
+\end{lemma}
+
+\begin{proof}
+Split by the same support-slot threshold \(M\le\theta N\) and \(M>\theta N\).  For the low-slot branch, apply
+Lemma~\ref{lem:large-r-low-slot-certificate} with \(H=1\) and \(\eta=1/4\), which only enlarges the finite-prefix range
+\(h\le H_{\mathrm{pre}}\).  The verification finds the maximum of
+\(\mathcal{L}\) at
+\[
+h=725,\qquad r=21,\qquad c=42,\qquad M=\lfloor0.35N\rfloor,
+\]
+with the \(3N^4\) union included giving a total below \(2^{-45}\).
+
+For the high-slot branch, use the same ledger with the support factor maximized by \(M=N\).  For fixed \(r,c\) this
+ledger is increasing in \(h\le H_{\mathrm{pre}}\), since \(z<1\) and \(h/(N-h)\) is increasing, so it is enough to check
+\(h=H_{\mathrm{pre}}\).  The shared live budget is minimized at the slot boundary: for both the all-terminated and
+final-suffix pieces, \(M>\theta N\) gives at least
+\[
+\lfloor\theta N\rfloor-r(\sigma-2)
+\]
+chargeable fair-output positions, up to harmless endpoint slack.  Multiplying the \(M=N,h=H_{\mathrm{pre}}\) ledger by
+the corresponding binomial lower-tail bound and taking the same \(3N^4\) union gives a total below \(2^{-80000}\).
+
+The displayed numerical maxima are checked by
+\[
+\texttt{python scripts/verify\_checkpoint\_prefix.py}.
+\]
+\end{proof}
 
 The complementary high-slot branch is subtler.  For bounded \(r\), Lemma~\ref{lem:bounded-r-high-slot-suppression}
 charges live length \(xN-O_R(m)\), so the ordinary binomial lower-tail exponent absorbs the support entropy.  For
