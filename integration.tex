@@ -1679,6 +1679,51 @@ comparison, or to prove a new large-\(r\) entropy bound that keeps the interval 
 termination cost, and the reduced charged live length in the same exponent.  The low-slot certificate above removes
 the bridge-tail part of the problem; it does not by itself solve the high-slot large-\(r\) branch.
 
+\begin{lemma}[Low linear handoff for the \(0.106\) checkpoint]
+\label{lem:low-linear-handoff-0106}
+For \(\delta=0.106\), take \(\xi=8\) in Theorem~\ref{prop:dense-inner-linear-exponent} and take the run-fraction
+parameter there to be \(10^{-3}\).  Then
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+-
+E_{\mathrm{in}}(\eta;10^{-3},0.106,8)
+\le -0.009
+\qquad
+(9\cdot10^{-4}\le \eta\le 1/4).
+\]
+\end{lemma}
+
+\begin{proof}
+On this interval \(\eta<\eta_{\mathrm{crit}}\), so Corollary~\ref{cor:outer-dense-highweight-exponent} gives
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=\eta\log_2(1+\sqrt2).
+\]
+The binomial exponent in Theorem~\ref{prop:dense-inner-linear-exponent} is
+\[
+E_{\mathrm{bin}}(0.106,8)=1-H_2(0.106)>0.512,
+\]
+so throughout this low-linear interval the minimum is attained by the run-deficit exponent.  Substituting
+\(10^{-3}\) in the explicit run rate function from Corollary~\ref{cor:run-lower-tail-alpha}, direct numerical
+evaluation of the resulting one-variable function on \(9\cdot10^{-4}\le\eta\le1/4\) gives the displayed gap.  The
+companion check is
+\[
+\begin{gathered}
+\texttt{python scripts/verify\_dense\_claims.py --delta 0.106 --theta 0.001 --xi 8}\\
+\texttt{--eta-lo 0.0009 --eta-hi 0.25}.
+\end{gathered}
+\]
+At the left endpoint,
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(9\cdot10^{-4})\approx0.00114,
+\qquad
+E_{\mathrm{in}}(9\cdot10^{-4};10^{-3},0.106,8)\approx0.01037.
+\]
+\end{proof}
+
+Since \(2000/2^{21}\approx9.54\cdot10^{-4}\), Lemma~\ref{lem:low-linear-handoff-0106} overlaps the current finite
+prefix.  Thus, for the checkpoint certificate, the high-slot large-\(r\) branch can be treated as part of the
+already-proved linear-weight handoff once the finite prefix reaches \(H=2000\).
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
