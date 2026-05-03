@@ -1601,6 +1601,26 @@ be organized as a pure linear-entropy estimate from the start.  It should first 
 Lemma~\ref{lem:large-r-low-slot-ledger} in the bridge window, then hand off to the high-slot/linear exponent only
 after the support slot is a genuine constant fraction of \(N\).
 
+At the current checkpoint this ledger has substantial slack.  With
+\[
+N=2^{21},\quad
+\sigma=25,\quad
+s=5,\quad
+z=0.370884,\quad
+\theta=0.35,\quad
+H=2000,\quad
+R=20,
+\]
+the worst low-slot value of the displayed bound over \(r>R\), \(h\ge H\), and \(h\le N/4\) occurs at the first omitted
+case \(r=21\), \(h=2000\), \(c=42\), and is about
+\[
+-176\ \text{bits}
+\]
+before summing the remaining live-slot indices.  Even a very coarse \(N^4\) union over \(h,r\) and the suffix
+geometry would leave roughly \(90\) bits of slack.  This is not yet the final certificate statement, but it changes the
+large-\(r\) picture: the low-slot residual appears to close once \(R\) is taken near \(\log k\), and the remaining
+formal task is to package this ledger into a finite maximization plus polynomial slot count.
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
