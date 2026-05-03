@@ -1801,6 +1801,18 @@ interval from the finite-prefix handoff through \(\eta=1/4\).  The polynomial nu
 compared with the \(2^{-0.009N}\) exponent gap.
 \end{proof}
 
+Thus the tail problem has become finite and auditable at the current checkpoint.  The phrase ``low-slot \(r>R\)''
+means precisely branch \({\rm (iii)}\): more than \(R\) terminated early episodes, but with the total support slot
+still shorter than \(\theta N\).  This was the dangerous bridge-tail case because the linear exponent loses the
+finite-\(h\) factor \((h/(N-h))^c\); Lemma~\ref{lem:large-r-low-slot-certificate} keeps that factor and closes the
+branch.  The complementary high-slot case is no longer a separate bridge phenomenon once \(H/N\) enters the
+low-linear window covered by Lemma~\ref{lem:low-linear-handoff-0106}.
+
+What remains for a full break-even certificate is therefore not another unbounded \(h\)-search.  It is to make the
+finite prefix \(h\le2000\) and the numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} into a
+single reproducible certificate artifact, then decide how much negative margin should be required beyond mere
+\(\log_2\mu<0\).
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
@@ -1883,12 +1895,10 @@ but it turns an explicit placement statistic into the proof object instead of fi
 \paragraph{What must be improved next.}
 The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} has now largely been replaced, for
 finite-\(n\) estimation purposes, by the exact low-weight systematic banded law suggested by the enumerator.
-The remaining gap is therefore mostly on the inner side:
-even after sharpening the outer tiny-weight treatment, overlap checks against the exact enumerator still indicate that
-the present small-weight models remain somewhat optimistic in the small/intermediate-weight regime.
-So the next refinement target is not the bulk linear window, but rather a sharper and still explicit description of the
-inner small/intermediate-weight law. The current best proof-oriented subproblem is to upgrade
+The remaining conceptual gap is therefore mostly on the inner side of the finite prefix: the current bridge residual
+is summable, but the small/intermediate-weight certificate still needs the sharpest safe version of the
+fixed-tap-dense recursive law.  The current best proof-oriented subproblem is to upgrade
 Corollary~\ref{cor:fixedtap-weight-slice-multiepisode} by charging not only the fixed-tap terminations needed to cover
 the early span, but also the fair-output cost of dense clusters of input ones that are swallowed by a live episode.
-Once that is in place, the next task is a cleaner interpolation from that tiny/intermediate regime to the linear-weight
-exponent window.
+Once that is in place, the remaining task is to package the exact finite-prefix computation and the residual split into
+one certificate with the desired negative margin.
