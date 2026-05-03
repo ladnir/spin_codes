@@ -13,10 +13,10 @@ diagnostic mistakes that made the medium bridge look dangerous:
 * late support is not a free bucket after an early termination;
 * separated live episodes do not get separate budgets of d output ones.
 
-The interval count is intentionally pessimistic.  For r terminated intervals
-and one optional surviving interval with total live length U, we count ordered
-disjoint intervals anywhere in [N], even though the survivor must be the final
-suffix in the real trajectory.  That makes the expression auditable and safe.
+The interval count is intentionally pessimistic but keeps the final survivor's
+geometry: r terminated intervals may occur before one final surviving suffix.
+The old diagnostic treated that survivor as an ordinary interval anywhere in
+[N], which was safe but too loose in the tiny-weight crossover range.
 """
 
 from __future__ import annotations
@@ -32,6 +32,38 @@ from dense_largek_eval import (
     log2_binom,
     log2add,
 )
+
+
+def binom_cdf_half_be_log2(n: int, k: int) -> float:
+    """Berry-Esseen upper bound for P[Bin(n,1/2) <= k].
+
+    This is useful near and above the mean, where the entropy bound returns 1.
+    The constant is deliberately conservative.  For k below the mean we take
+    the minimum of this bound and the entropy bound used elsewhere.
+    """
+    if k < 0:
+        return float("-inf")
+    if k >= n:
+        return 0.0
+    if n <= 0:
+        return 0.0
+    entropy = binom_cdf_half_entropy_log2(n, k)
+    mu = 0.5 * n
+    sigma = 0.5 * math.sqrt(n)
+    z = (k + 0.5 - mu) / sigma
+    normal = 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+    # Conservative Berry-Esseen allowance for Bernoulli(1/2).
+    be = min(1.0, max(0.0, normal + 0.8 / math.sqrt(n)))
+    be_log = math.log2(be) if be > 0.0 else float("-inf")
+    return min(entropy, be_log)
+
+
+def tail_log2(n: int, k: int, mode: str) -> float:
+    if mode == "entropy":
+        return binom_cdf_half_entropy_log2(n, k)
+    if mode == "be":
+        return binom_cdf_half_be_log2(n, k)
+    raise ValueError(f"unknown tail mode: {mode}")
 
 
 def parse_sigmas(text: str) -> list[int]:
@@ -121,14 +153,14 @@ def block_ranges(lo: int, hi: int, ratio: float) -> list[tuple[int, int]]:
     return out
 
 
-def survivor_only_log2(*, n: int, h: int, d: int, block_ratio: float) -> float:
+def survivor_only_log2(*, n: int, h: int, d: int, block_ratio: float, tail_mode: str) -> float:
     """One final surviving suffix and no prior terminated intervals."""
     denom = log2_binom(n, h)
     total = float("-inf")
     # For suffix length U in [a,b], C(U-1,h-1) and the binomial lower-tail are
     # both upper-bounded at the most favorable endpoint for safety.
     for a, b in block_ranges(h, n, block_ratio):
-        tail = binom_cdf_half_entropy_log2(a, d)
+        tail = tail_log2(a, d, tail_mode)
         term = math.log2(b - a + 1) + log2_binom(b - 1, h - 1) - denom + tail
         total = log2add(total, term)
     return min(0.0, total)
@@ -142,6 +174,7 @@ def terminated_only_log2(
     d: int,
     r: int,
     block_ratio: float,
+    tail_mode: str,
 ) -> float:
     """All support is covered by r terminated intervals."""
     if h < 2 * r:
@@ -152,7 +185,7 @@ def terminated_only_log2(
     u_hi = n
     for a, b in block_ranges(u_lo, u_hi, block_ratio):
         charged = max(0, a - r * sigma)
-        tail = binom_cdf_half_entropy_log2(charged, d)
+        tail = tail_log2(charged, d, tail_mode)
         # Decreasing placement at a, increasing length/support factors at b.
         term = (
             math.log2(b - a + 1)
@@ -175,6 +208,7 @@ def terminated_plus_survivor_log2(
     d: int,
     r: int,
     block_ratio: float,
+    tail_mode: str,
 ) -> float:
     """r terminated intervals plus one final surviving interval.
 
@@ -189,7 +223,7 @@ def terminated_plus_survivor_log2(
     u_hi = n
     for a, b in block_ranges(u_lo, u_hi, block_ratio):
         charged = max(0, a - r * sigma)
-        tail = binom_cdf_half_entropy_log2(charged, d)
+        tail = tail_log2(charged, d, tail_mode)
         term = (
             math.log2(b - a + 1)
             + log2_binom(b - r - 1, r)
@@ -203,6 +237,58 @@ def terminated_plus_survivor_log2(
     return min(0.0, total)
 
 
+def terminated_plus_suffix_survivor_log2(
+    *,
+    n: int,
+    h: int,
+    sigma: int,
+    d: int,
+    r: int,
+    block_ratio: float,
+    tail_mode: str,
+) -> float:
+    """r terminated intervals before one final surviving suffix.
+
+    The survivor has suffix length S.  The r terminated intervals have total
+    live length T and lie in the prefix of length N-S.  Remaining input-one
+    positions lie inside the terminated interval interiors or in the surviving
+    suffix after its start.  The shared budget charges the survivor length S
+    plus the nonterminal live outputs of the terminated intervals.
+    """
+    if h < 2 * r + 1:
+        return float("-inf")
+    denom = log2_binom(n, h)
+    total = float("-inf")
+    s_min = 1
+    s_max = n - 2 * r
+    for sa, sb in block_ranges(s_min, s_max, block_ratio):
+        t_min = 2 * r
+        t_max = n - sb
+        if t_min > t_max:
+            continue
+        for ta, tb in block_ranges(t_min, t_max, block_ratio):
+            if n - sa - ta + r < r:
+                continue
+            slots = sb + tb - 2 * r - 1
+            need = h - 2 * r - 1
+            if slots < need:
+                continue
+            charged = sa + max(0, ta - r * sigma)
+            tail = tail_log2(charged, d, tail_mode)
+            term = (
+                math.log2(sb - sa + 1)
+                + math.log2(tb - ta + 1)
+                + log2_binom(tb - r - 1, r - 1)
+                + log2_binom(n - sa - ta + r, r)
+                + log2_binom(slots, need)
+                - denom
+                - r * (sigma - 1)
+                + tail
+            )
+            total = log2add(total, term)
+    return min(0.0, total)
+
+
 def global_episode_inner_log2(
     *,
     n: int,
@@ -211,20 +297,38 @@ def global_episode_inner_log2(
     delta: float,
     r_max: int | None,
     block_ratio: float,
+    suffix_block_ratio: float,
     stop_gap_bits: float,
     tail_confirm: int,
+    suffix_survivor: bool,
+    tail_mode: str,
 ) -> tuple[float, int, float]:
     d = math.floor(delta * n)
-    total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio)
+    total = survivor_only_log2(n=n, h=h, d=d, block_ratio=block_ratio, tail_mode=tail_mode)
     best_r = 0
     best_piece = total
     max_r = h // 2 if r_max is None else min(r_max, h // 2)
     below_count = 0
     for r in range(1, max_r + 1):
-        piece = terminated_only_log2(n=n, h=h, sigma=sigma, d=d, r=r, block_ratio=block_ratio)
+        piece = terminated_only_log2(n=n, h=h, sigma=sigma, d=d, r=r, block_ratio=block_ratio, tail_mode=tail_mode)
+        survivor_piece = (
+            terminated_plus_suffix_survivor_log2(
+                n=n,
+                h=h,
+                sigma=sigma,
+                d=d,
+                r=r,
+                block_ratio=suffix_block_ratio,
+                tail_mode=tail_mode,
+            )
+            if suffix_survivor
+            else terminated_plus_survivor_log2(
+                n=n, h=h, sigma=sigma, d=d, r=r, block_ratio=block_ratio, tail_mode=tail_mode
+            )
+        )
         piece = log2add(
             piece,
-            terminated_plus_survivor_log2(n=n, h=h, sigma=sigma, d=d, r=r, block_ratio=block_ratio),
+            survivor_piece,
         )
         total = log2add(total, piece)
         if piece > best_piece:
@@ -251,9 +355,21 @@ def main() -> None:
     parser.add_argument("--z-max", type=float, default=0.999)
     parser.add_argument("--z-count", type=int, default=160)
     parser.add_argument("--block-ratio", type=float, default=1.01)
+    parser.add_argument(
+        "--suffix-block-ratio",
+        type=float,
+        default=None,
+        help="Optional coarser block ratio for the expensive suffix-survivor double sum.",
+    )
     parser.add_argument("--r-max", type=int, default=None)
     parser.add_argument("--stop-gap-bits", type=float, default=60.0)
     parser.add_argument("--tail-confirm", type=int, default=8)
+    parser.add_argument("--tail-mode", choices=("entropy", "be"), default="entropy")
+    parser.add_argument(
+        "--ordinary-survivor-interval",
+        action="store_true",
+        help="Use the older safe overcount that treats the final survivor as an arbitrary interval.",
+    )
     parser.add_argument("--exact-outer-csv", default=None)
     parser.add_argument("--exact-through", type=int, default=80)
     parser.add_argument("--out-prefix", default=None)
@@ -261,6 +377,7 @@ def main() -> None:
     args = parser.parse_args()
 
     n = 2 * args.k
+    suffix_block_ratio = args.suffix_block_ratio if args.suffix_block_ratio is not None else args.block_ratio
     sigmas = parse_sigmas(args.sigmas)
     zs = z_grid(args.z_min, args.z_max, args.z_count)
     if args.out_prefix is None:
@@ -295,8 +412,11 @@ def main() -> None:
                 delta=args.delta,
                 r_max=args.r_max,
                 block_ratio=args.block_ratio,
+                suffix_block_ratio=suffix_block_ratio,
                 stop_gap_bits=args.stop_gap_bits,
                 tail_confirm=args.tail_confirm,
+                suffix_survivor=not args.ordinary_survivor_interval,
+                tail_mode=args.tail_mode,
             )
             term = outer + inner if outer != float("-inf") and inner != float("-inf") else float("-inf")
             total = log2add(total, term)
@@ -342,6 +462,8 @@ def main() -> None:
                 "peak_term_log2": format_log2(peak_term),
                 "outer_after_exact": "FIXED_TAP_BANDED_GF_GRID",
                 "inner_model": "GLOBAL_EPISODE_COVER_SHARED_BUDGET",
+                "survivor_count": "ORDINARY_INTERVAL" if args.ordinary_survivor_interval else "FINAL_SUFFIX",
+                "tail_mode": args.tail_mode,
             }
         )
 
@@ -381,6 +503,8 @@ def main() -> None:
                 "peak_term_log2",
                 "outer_after_exact",
                 "inner_model",
+                "survivor_count",
+                "tail_mode",
             ],
         )
         writer.writeheader()
