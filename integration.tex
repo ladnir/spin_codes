@@ -1527,6 +1527,80 @@ for the full large-\(r\) first-moment tail: the global-cover interval entropy st
 isolate the remaining large-\(r\) task.  Once the live-geometry count is grouped by low slot and high slot, the
 termination-candidate part already has a rapidly summable \((\mathrm{const}/R)^R\) factor when \(R\asymp\log k\).
 
+\begin{lemma}[Large-\(r\) low-slot live-geometry ledger]
+\label{lem:large-r-low-slot-ledger}
+Let \(N=2k\), let \(\sigma=\lceil\log_2 k\rceil+s\), and assume
+\(A_h^{\mathrm{out}}\le W(z)z^{-h}\).  Consider a fixed global-cover subpiece with \(r\) terminated intervals and
+support-slot length \(M\le\theta N\).  Let \(c=2r\) for the all-terminated piece and \(c=2r+1\) for the
+terminated-plus-final-survivor piece.  Ignoring the shared binomial lower-tail factor, which is at most \(1\), the
+corresponding first-moment summand is bounded by
+\[
+W(z)\,
+\left(
+\frac{e^2\,2^{2-s}(M+2r)}{r^2}
+\right)^r
+\left(\frac{h}{N-h}\right)^c
+\left(\frac{M}{N}\right)^{h-c}
+z^{-h}.
+\]
+The same bound holds for the suffix-survivor subpiece after taking \(M=S+T-2r-1\) and replacing \(M+2r\) by
+\(T+S+1\).
+\end{lemma}
+
+\begin{proof}
+For the all-terminated subpiece, the live-geometry count is
+\[
+\binom{U-r-1}{r-1}\binom{N-U+r}{r},
+\qquad U=M+2r.
+\]
+It is bounded by
+\[
+\left(\frac{eU}{r}\right)^r\left(\frac{eN}{r}\right)^r.
+\]
+Multiplying by the fixed-tap termination cost and using
+\[
+2^{-r(\sigma-1)}
+\le
+\left(\frac{2^{2-s}}{N}\right)^r
+\]
+leaves the prefactor
+\[
+\left(\frac{e^2\,2^{2-s}U}{r^2}\right)^r.
+\]
+
+It remains to bound the support probability after the interleaver.  The support factor has the form
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}.
+\]
+Since
+\[
+\binom{N}{h}
+=
+\binom{N}{h-c}\frac{(N-h+c)_c}{(h)_c},
+\]
+we have
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}
+\le
+\left(\frac{M}{N}\right)^{h-c}
+\left(\frac{h}{N-h}\right)^c.
+\]
+Multiplying by the outer factor \(W(z)z^{-h}\) proves the all-terminated claim.  The suffix-survivor geometry has the
+same two interval-placement binomials, with terminated length \(T\), suffix length \(S\), and support-slot length
+\(M=S+T-2r-1\); the same argument gives the displayed replacement.
+\end{proof}
+
+This ledger is the missing bookkeeping object for the large-\(r\) tail.  The important finite-\(n\) feature is the
+unrelaxed factor
+\[
+\left(\frac{h}{N-h}\right)^c.
+\]
+For the current prefix handoff \(h\approx2000\) and \(N=2^{21}\), replacing this by the linear-window bound
+\((\eta/(1-\eta))^c\) would throw away roughly \((700)^{2r}\) at \(r\approx20\).  Thus the large-\(r\) proof should not
+be organized as a pure linear-entropy estimate from the start.  It should first use
+Lemma~\ref{lem:large-r-low-slot-ledger} in the bridge window, then hand off to the high-slot/linear exponent only
+after the support slot is a genuine constant fraction of \(N\).
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
