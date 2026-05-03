@@ -805,28 +805,43 @@ At this point the philosophy is:
 This is why the current dense save point is organized around isolated low-weight slices and exact early-start
 statistics, not around increasingly elaborate global fit parameters.
 
-\paragraph{Current evidence lanes.}
-The finite-\(n\) evidence is now best read as a bracket rather than a single claim.
-At \(k=2^{20}\), \(\delta=0.12\), and \(n=2k+\sigma\), the current optimistic / central / pessimistic lanes cross
-below \(1\) near
+\paragraph{Current distance--memory ledger.}
+The finite-\(n\) evidence is now best read as a bracket rather than a single claim. Earlier sweeps at
+\(\delta=0.12\) suggested offsets \(c\approx 5\text{--}8\) in
+\(\sigma=\lceil\log_2 k\rceil+c\), but those lanes belonged to an older model and should not be treated as the
+current theorem target. The active target is the fixed-tap dense recursive inner at relative distance
 \[
-c_{\mathrm{opt}}\approx 5,\qquad
-c_{\mathrm{ctr}}\approx 6,\qquad
-c_{\mathrm{pess}}\approx 8.
+\delta=0.106.
 \]
-On the sweep \(k=2^{10},2^{12},\dots,2^{20}\) at \(\delta=0.12\), the first offsets with estimated first moment below
-\(1\) are currently
+For \(k=2^{20}\), \(N=2k\), and \(d=\lfloor\delta N\rfloor\), the corrected crossover diagnostics now ask for the
+first-moment mass in the form
 \[
-\begin{array}{c|cccccc}
-\log_2 k & 10 & 12 & 14 & 16 & 18 & 20\\
+\Pr[d_{\min}\le \delta N]\le \mu_{N,\sigma}(\delta),
+\qquad
+\log_2\mu_{N,\sigma}(\delta)\ \text{reported below.}
+\]
+For the corrected late-survival bridge, scanned through \(h\le2000\), the current calibration is
+\[
+\begin{array}{c|c|c|c}
+\sigma & \sigma-\lceil\log_2 k\rceil & \log_2\mu_{\le2000}^{\mathrm{surv}}(0.106) & \text{peak }h\\
 \hline
-c_{\mathrm{opt}}  & 5 & 4 & 4 & 5 & 5 & 5\\
-c_{\mathrm{ctr}}  & 4 & 4 & 4 & 5 & 6 & 6\\
-c_{\mathrm{pess}} & 4 & 5 & 6 & 7 & 7 & 8
+16 & -4 & \phantom{-}44.79 & 200\\
+18 & -2 & \phantom{-}4.79  & 95\\
+20 & \phantom{-}0 & -13.04 & 46\\
+22 & \phantom{-}2 & -22.50 & 24\\
+24 & \phantom{-}4 & -28.63 & 16\\
+26 & \phantom{-}6 & -33.24 & 12\\
+28 & \phantom{-}8 & -37.00 & 10\\
+30 & 10 & -44.28 & 9
 \end{array}
 \]
-and the current theorem-shaped safe lane still sits near \(c\approx 6\text{--}7\) after a modest explicit proof tax.
-These numbers are not theorem statements. Their role is only to tell us which proof targets are worth pursuing.
+Thus the present \emph{crossover evidence} for this lane is near
+\[
+\sigma\approx \lceil\log_2 k\rceil,
+\]
+not near \(\lceil\log_2 k\rceil+10\). This is not yet a proof of distance \(0.106N\); it is a calibration result for
+one now-corrected bridge. Its value is that the contribution has negative slope after the small/intermediate hump,
+rather than remaining flat or rising into larger \(h\).
 
 \paragraph{What is solid versus what is still heuristic.}
 By now several parts of the picture are genuinely solid:
@@ -899,9 +914,13 @@ The dense+dense picture is now the following.
 \begin{itemize}
 \item The outer side is largely under control in the tiny-weight regime.
 \item The linear-weight window is no longer the main bottleneck.
-\item The proof should be organized around exact late placement on the isolated slice.
-\item The next theorem ingredient is an explicit multi-episode correction built on top of the position-sensitive
-one-run base, most naturally through the early-start hypergeometric law and especially its early-pair statistic.
+\item Exact late placement on the isolated slice remains the right tiny-weight base.
+\item For the medium-weight bridge, the proof must keep the random interleaver visible and work only through
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).
+\item Every early/late episode decomposition must use a shared distance budget; no late tail or late termination may be
+left as a free bucket.
+\item The current crossover evidence for \(\delta=0.106\) at \(k=2^{20}\) puts the corrected survival bridge near
+\(\sigma=\lceil\log_2 k\rceil\), but this is still a calibration result rather than a theorem.
 \end{itemize}
 This should be read only as the current state of the model, not as a proved theorem. Its role is to preserve the
 current proof philosophy and identify the narrow next step.
@@ -1057,46 +1076,85 @@ fixed-tap outer enumerator \(A_h^{\mathrm{out}}\), the double sum over \(r,T\) h
 form has the right scale, but the next analytic step is to replace that diagnostic by a clean entropy envelope for the
 \((h,r,T)\) sum.
 
-\paragraph{Current summability status of the paired-cover theorem.}
-The theorem-safe version of the finite-\(n\) check replaces the sampled search over \(T\) by a blocked upper sum: on
-each block \([T_0,T_1]\), the decreasing interval-placement factor is evaluated at \(T_0\), the increasing support
-factor at \(T_1\), the binomial lower-tail factor at \(T_0\), and the block length is paid explicitly. This is much
-more pessimistic than the fitted diagnostic, but it is the right kind of object for a proof.
+\paragraph{What we learned from the failed medium-weight envelopes.}
+The paired-cover theorem above is locally valid, but several finite-\(n\) diagnostics based on it were misleading.
+The useful record is the sequence of mistakes, since each mistake identifies a condition the eventual theorem must
+enforce.
 
-At \(k=2^{20}\), \(N=2k\), \(\delta=0.106\), and \(L=\lceil 2.1\delta N\rceil\), this blocked paired-cover bound for
-the low/intermediate prefix \(h\le64\) is still slightly above one at
-\(\sigma=\lceil\log_2 k\rceil+11=31\), but is below one at
-\(\sigma=\lceil\log_2 k\rceil+12=32\). The dominant failing shape just below this point is not an adjacency remainder:
-it is the \(r=1\) event where one long early episode of live length just below \(2\delta N\) swallows many input-one
-positions and pays only one fixed-tap termination. Thus the present proved lane supports the fixed-tap strategy with a
-larger offset, while improving the offset back toward the heuristic \(\sigma=28\) range requires a sharper treatment of
-this one-long-episode cluster.
-
-For reference, the current blocked-cover prefix certificates are:
+\begin{enumerate}
+\item \emph{The interleaver must stay visible.}  The outer code only supplies the weight enumerator
+\(A_h^{\mathrm{out}}\).  After the random permutation, the inner support is uniform on the weight-\(h\) slice.
+Consequently, an outer-coordinate event such as ``the outer support lies in an early burst plus a late tail'' is not a
+proof object for the concatenated code.  The correct first-moment object remains
 \[
-\begin{array}{c|c|c|c|c}
-k & \sigma & \sigma-\lceil\log_2 k\rceil & \delta & \log_2 \mu_{\le64}^{\mathrm{FCIB}}\\
-\hline
-2^{18} & 30 & 12 & 0.106 & -1.934\\
-2^{20} & 31 & 11 & 0.106 & \phantom{-}0.026\\
-2^{20} & 32 & 12 & 0.106 & -1.684
-\end{array}
+\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta).
 \]
-Here \(\mu_{\le64}^{\mathrm{FCIB}}\) denotes the fixed-tap outer first-moment contribution from the paired-cover
-bound on \(1\le h\le64\), together with the already-negligible linear and top-weight estimates used by the evaluator.
-These are finite-\(n\) certificates for the checked prefix, not yet an all-\(h\) asymptotic theorem. To turn the
-\(C=12\) evidence into a complete fixed-\(k\) proof one still has to write the remaining medium-weight bridge and the
-large-weight exponent estimates as a single auditable first-moment certificate.
 
-A subsequent cap extension shows that the \(h\le64\) prefix was affected by the artificial boundary. At the same
-parameters \(k=2^{20}\), \(\delta=0.106\), and \(\sigma=32\), increasing the blocked-cover prefix to \(h\le80\) gives
+\item \emph{A cap peak is a boundary warning.}  The early \(h\le64\) and \(h\le80\) blocked-cover checks had their
+largest terms at the right endpoint.  Such a line should be written \(64+\) or \(80+\), not interpreted as a true peak.
+Those computations showed that the raw envelope was unfinished; they did not locate the real crossover.
+
+\item \emph{The late tail is not free.}  A support pattern consisting of an early terminated burst and later support in
+the final tail cannot be charged only for the early burst.  If the encoder remains ON from the early burst to the tail,
+then the fair-output lower-tail must be paid over the combined live span.  If the early episode terminates and the tail
+starts a new episode, then the later episode must either survive, paying its suffix span, or terminate, paying an
+additional fixed-tap termination together with its own live span.
+
+\item \emph{Separated episodes share one distance budget.}  A second diagnostic was still too pessimistic because it
+allowed the early episode to spend \(d\) output ones and the late episode to spend another \(d\).  The distance event is
+\(\wt(Y)\le d\), so disjoint live intervals must be charged by a single binomial lower tail over their combined free
+times, or by an explicit convolution bounded by that shared-budget tail.
+
+\item \emph{A crude late-termination union is still a free bucket.}  The term
+\((j-1)2^{-(\sigma-1)}\) for a late termination is useful only after the late episode declares a live span.  Without
+that span it again permits many late support positions to hide without paying output weight.  The theorem should
+therefore be piecewise: surviving late episodes pay a combined suffix tail; terminated late episodes pay both a
+fixed-tap termination and a live-span output budget.
+\end{enumerate}
+
+After these corrections, the representative \(r=1\), \(T=2d\) lane at
 \[
-\log_2 \mu_{\le80}^{\mathrm{FCIB}}=1.282,
+k=2^{20},\qquad N=2k,\qquad \delta=0.106,\qquad L=\lceil2.1d\rceil
 \]
-with the dominant contribution again occurring at the cap \(h=80\). Thus the \(C=12\) line should be read only as a
-tiny/intermediate-prefix sanity check, not as a credible fixed-\(k\) certificate. The current theorem-safe paired-cover
-bound still has an unresolved medium-weight burst problem: as \(h\) grows, a single live interval of length
-\(\approx 2\delta N\) can absorb more support entropy than the present \(r=1\) charge pays for.
+has a very different shape.  With exact fixed-tap outer counts through \(h\le80\), the early-burst plus properly
+charged late-survival lane at \(\sigma=34\) gives
+\[
+\log_2 \mu_{\le80}^{r=1,T=2d,\mathrm{surv}}\approx -22.36,
+\]
+with the largest checked term still at \(h=80+\), of size about \(2^{-25.24}\).  Extending the same corrected survival
+bridge with a fixed-tap banded outer generating-function envelope through \(h\le2000\) gives the crossover table in the
+previous paragraph: \(\sigma=18\) is still above one, while \(\sigma=20=\lceil\log_2 k\rceil\) is already below one for
+this lane.  A separate explicit two-terminated-episode span diagnostic is also strongly negative at
+\(k=2^{20}\), with totals roughly
+\[
+\log_2\mu^{\mathrm{2term}}_{\le2000}
+\approx -71.7,\ -76.9,\ -81.8
+\qquad
+\text{for }\sigma=30,32,34.
+\]
+These numbers are not final certificates because the outer envelope past the exact prefix is still a calibration
+bound and the all-episode decomposition has not been written as a theorem.  They do, however, change the expected
+memory scale: the current evidence points toward
+\[
+\sigma=\lceil\log_2 k\rceil+O(1),
+\]
+with the numerical crossover for the corrected survival bridge very close to offset \(0\).
+
+\paragraph{Current piecewise theorem target.}
+The next theorem should be a pessimistic upper bound built for summation in the first moment, not a sharp fixed-\(h\)
+asymptotic.  The desired structure is:
+\begin{enumerate}
+\item exact or exact-enveloped outer counts for the tiny prefix;
+\item a corrected one-episode survival bound in which early and late live spans share the distance budget;
+\item a terminated-episode bound in which every fixed-tap termination declares a live span and pays the corresponding
+fair-output lower-tail cost;
+\item a multi-episode version of the same accounting, summed over the number of start/termination pairs and their
+total live length;
+\item a separate large-weight exponent window once \(h\) is large enough for the entropy bounds to dominate.
+\end{enumerate}
+This is the better way to think about the problem.  The bottleneck is not an uncontrolled linear-weight window, and it
+is not a free late tail.  The bottleneck is to make the episode decomposition auditable enough that no support mass can
+be hidden in a tail bucket without paying either a shared survival tail or a declared termination span.
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated

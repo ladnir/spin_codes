@@ -163,6 +163,106 @@ def outer_generating_bound(k_msg: int, sigma: int, z: float) -> float:
     return span1 + span_ge_2
 
 
+def fixedtap_banded_outer_gf_log2(k_msg: int, parity_n: int, sigma: int, z: float) -> float:
+    """Log2 generating function for the fixed-tap banded systematic outer.
+
+    This computes
+
+        sum_x z^{wt(x)} z^{r(x)} ((1+z)/2)^{q(x)-r(x)}
+
+    for the active fixed-tap banded outer, where q is the number of active
+    parity coordinates and r is the number of active parity clusters. The zero
+    message is excluded. The transfer state is the distance since the last
+    message one, capped at sigma; state sigma means the current parity window is
+    inactive.
+    """
+    if not (0.0 < z < 1.0):
+        raise ValueError("z must lie in (0,1)")
+    if k_msg < 0 or parity_n < 0 or sigma <= 0:
+        raise ValueError("invalid fixed-tap banded outer parameters")
+    states = sigma + 1
+    inactive = sigma
+    a = (1.0 + z) / 2.0
+
+    def normalize_vec(v: np.ndarray) -> tuple[np.ndarray, float]:
+        scale = float(np.max(v))
+        if scale <= 0.0:
+            return v, float("-inf")
+        return v / scale, math.log2(scale)
+
+    def normalize_mat(mtx: np.ndarray) -> tuple[np.ndarray, float]:
+        scale = float(np.max(mtx))
+        if scale <= 0.0:
+            return mtx, float("-inf")
+        return mtx / scale, math.log2(scale)
+
+    def apply_power(v: np.ndarray, v_log: float, matrix: np.ndarray, exp: int) -> tuple[np.ndarray, float]:
+        base = matrix
+        base_log = 0.0
+        while exp > 0:
+            if exp & 1:
+                v = base @ v
+                v, inc = normalize_vec(v)
+                v_log += base_log + inc
+            exp >>= 1
+            if exp:
+                base = base @ base
+                base, inc = normalize_mat(base)
+                base_log = 2.0 * base_log + inc
+        return v, v_log
+
+    # Message/parity positions 1..min(k_msg, parity_n): choose x_t, then emit
+    # parity coordinate t from the updated window.
+    choose = np.zeros((states, states), dtype=np.float64)
+    for d in range(states):
+        prev_active = d < sigma
+        # Choose x_t=1: systematic z, active parity; inactive->active creates
+        # the deterministic fixed-tap cluster start z, active continuation is fair.
+        choose[0, d] += z * (a if prev_active else z)
+        # Choose x_t=0.
+        nd = min(sigma, d + 1)
+        if nd < sigma:
+            choose[nd, d] += a
+        else:
+            choose[nd, d] += 1.0
+
+    # Tail parity positions after the message ends: x_t is forced to zero.
+    zero = np.zeros((states, states), dtype=np.float64)
+    for d in range(states):
+        nd = min(sigma, d + 1)
+        if nd < sigma:
+            zero[nd, d] += a
+        else:
+            zero[nd, d] += 1.0
+
+    # Message-only positions if the parity block is shorter: choose x_t, but no
+    # parity coordinate is emitted.
+    msg_only = np.zeros((states, states), dtype=np.float64)
+    for d in range(states):
+        msg_only[0, d] += z
+        msg_only[min(sigma, d + 1), d] += 1.0
+
+    v = np.zeros(states, dtype=np.float64)
+    v[inactive] = 1.0
+    v_log = 0.0
+    common = min(k_msg, parity_n)
+    v, v_log = apply_power(v, v_log, choose, common)
+    if parity_n > common:
+        v, v_log = apply_power(v, v_log, zero, parity_n - common)
+    if k_msg > common:
+        v, v_log = apply_power(v, v_log, msg_only, k_msg - common)
+
+    v_sum = float(np.sum(v))
+    if v_sum <= 0.0:
+        return float("-inf")
+    log_all = v_log + math.log2(v_sum)
+    # Remove the zero message, whose generating contribution is exactly one.
+    if log_all <= 1e-10:
+        val = max(0.0, (2.0**log_all) - 1.0)
+        return math.log2(val) if val > 0.0 else float("-inf")
+    return log_all + math.log2(1.0 - 2.0 ** (-log_all))
+
+
 @lru_cache(maxsize=None)
 def outer_small_h_exact_prefix(k_msg: int, sigma: int, h_max: int) -> tuple[float, ...]:
     """Exact low-weight outer counts for 1 <= h <= h_max.
