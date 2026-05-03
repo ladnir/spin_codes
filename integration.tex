@@ -1689,7 +1689,7 @@ parameter there to be \(10^{-3}\).  Then
 E_{\mathrm{in}}(\eta;10^{-3},0.106,8)
 \le -0.009
 \qquad
-(9\cdot10^{-4}\le \eta\le 1/4).
+(9\cdot10^{-4}\le \eta\le \eta_{\mathrm{crit}}).
 \]
 \end{lemma}
 
@@ -1704,12 +1704,13 @@ E_{\mathrm{bin}}(0.106,8)=1-H_2(0.106)>0.512,
 \]
 so throughout this low-linear interval the minimum is attained by the run-deficit exponent.  Substituting
 \(10^{-3}\) in the explicit run rate function from Corollary~\ref{cor:run-lower-tail-alpha}, direct numerical
-evaluation of the resulting one-variable function on \(9\cdot10^{-4}\le\eta\le1/4\) gives the displayed gap.  The
+evaluation of the resulting one-variable function on
+\(9\cdot10^{-4}\le\eta\le\eta_{\mathrm{crit}}\) gives the displayed gap.  The
 companion check is
 \[
 \begin{gathered}
 \texttt{python scripts/verify\_dense\_claims.py --delta 0.106 --theta 0.001 --xi 8}\\
-\texttt{--eta-lo 0.0009 --eta-hi 0.25}.
+\texttt{--eta-lo 0.0009 --eta-hi 0.292893218813}.
 \end{gathered}
 \]
 At the left endpoint,
@@ -1772,7 +1773,7 @@ Piece \({\rm (ii)}\) is exponentially suppressed by Lemma~\ref{lem:bounded-r-hig
 3N^4\,2^{-176}<2^{-90}.
 \]
 Piece \({\rm (iv)}\), and in fact every linear-weight contribution with
-\(H/N\le\eta\le1/4\), is absorbed by Lemma~\ref{lem:low-linear-handoff-0106}, giving a first-moment exponent gap at
+\(H/N\le\eta\le\eta_{\mathrm{crit}}\), is absorbed by Lemma~\ref{lem:low-linear-handoff-0106}, giving a first-moment exponent gap at
 least \(0.009N\).
 \end{lemma}
 
@@ -1797,8 +1798,8 @@ For \({\rm (iii)}\), the large-\(r\) low-slot ledger gives a worst summand below
 coarse union factor \(3N^4\), and \(3(2^{21})^4 2^{-176}<2^{-90}\).
 
 For \({\rm (iv)}\), \(H/N=2000/2^{21}>9\cdot10^{-4}\), so Lemma~\ref{lem:low-linear-handoff-0106} covers the entire
-interval from the finite-prefix handoff through \(\eta=1/4\).  The polynomial number of weight slices is negligible
-compared with the \(2^{-0.009N}\) exponent gap.
+interval from the finite-prefix handoff through \(\eta_{\mathrm{crit}}\).  The polynomial number of weight slices is
+negligible compared with the \(2^{-0.009N}\) exponent gap.
 
 The companion verification command for the displayed checkpoint constants is
 \[
@@ -1820,6 +1821,66 @@ single reproducible certificate artifact, then decide how much negative margin s
 \[
 \texttt{python scripts/verify\_checkpoint\_0106.py}.
 \]
+
+\begin{theorem}[Finite dense+dense checkpoint at relative distance \(0.106\)]
+\label{thm:finite-dense-dense-checkpoint-0106}
+Consider the fixed-tap banded systematic outer ensemble with message length \(k=2^{20}\), parity length \(k\), and
+outer memory \(\sigma=25\), concatenated through a uniform interleaver with the fixed-tap dense recursive inner ensemble of
+blocklength
+\[
+N=2k=2^{21}
+\]
+and inner memory \(m=25\).  Let \(\Csc\) be the resulting serially concatenated code, and set
+\[
+d=\lfloor 0.106\,N\rfloor.
+\]
+The current checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}
+\le
+2^{-0.34}
+<0.8.
+\]
+Equivalently, with probability at least \(1-2^{-0.34}\) over the outer ensemble, interleaver, and inner ensemble,
+the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+By the direct first-moment reduction, it is enough to upper-bound
+\[
+\mu_{N,25}(0.106)
+=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}\,p_h^{\mathrm{in}}(0.106).
+\]
+The finite prefix \(h\le2000\) is certified by the global episode-cover computation with exact survivor-only
+accounting through \(h\le30\), fixed-tap banded outer counts where available, and the fixed-tap banded generating
+function envelope thereafter.  The committed summary checked by
+\[
+\texttt{python scripts/verify\_checkpoint\_prefix.py}
+\]
+gives
+\[
+\log_2 \mu_{\le2000}\le -0.347781,
+\]
+with peak contribution at \(h=2\).
+
+For \(h>2000\), Lemma~\ref{lem:checkpoint-residual-split-0106} supplies the residual split.  The bounded-\(r\)
+low-slot branch is a geometric residual from the boundary; the bounded-\(r\) high-slot branch is exponentially
+suppressed; the large-\(r\) low-slot branch is below \(2^{-90}\) after the coarse union over live geometry; and the
+large-\(r\) high-slot/linear handoff has exponent gap at least \(0.009N\) until the usual high-linear splice takes
+over.  The range \(\eta\ge\eta_{\mathrm{crit}}\) is covered by the already-proved linear-weight comparison
+Theorem~\ref{prop:dense-dense-highweight-gap} with the easier target \(\delta=0.106<0.109\), and the top-weight
+range is handled by the same outer-exponent argument as in Theorem~\ref{thm:dense-dense-explicit-constant}.
+
+The top-level verifier
+\[
+\texttt{python scripts/verify\_checkpoint\_0106.py}
+\]
+checks the finite prefix and the displayed residual constants together.  Its certified total is below \(2^{-0.34}\).
+Markov's inequality then gives the stated failure-probability bound.
+\end{proof}
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated

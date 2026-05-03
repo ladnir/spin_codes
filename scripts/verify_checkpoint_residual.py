@@ -20,7 +20,7 @@ import math
 from dataclasses import dataclass
 
 from dense_largek_eval import fixedtap_banded_outer_gf_log2
-from verify_dense_claims import scan_gap
+from verify_dense_claims import ETA_CRIT, scan_gap
 
 
 @dataclass
@@ -129,6 +129,7 @@ def main() -> int:
     parser.add_argument("--h-min", type=int, default=2000)
     parser.add_argument("--r-cap", type=int, default=20)
     parser.add_argument("--eta", type=float, default=0.25)
+    parser.add_argument("--linear-eta-hi", type=float, default=ETA_CRIT)
     parser.add_argument("--theta-slot", type=float, default=0.35)
     parser.add_argument("--z", type=float, default=0.370884)
     parser.add_argument("--run-theta", type=float, default=0.001)
@@ -159,7 +160,7 @@ def main() -> int:
     union_log2 = math.log2(3.0) + 4.0 * math.log2(n) + ledger.value
     gap = scan_gap(
         eta_lo=args.eta_lo,
-        eta_hi=args.eta,
+        eta_hi=args.linear_eta_hi,
         theta=args.run_theta,
         delta=args.delta,
         xi=args.xi,
@@ -185,6 +186,7 @@ def main() -> int:
     )
     print(f"large-r low-slot after 3*N^4 union log2 = {union_log2:.12f}")
     print()
+    print(f"linear handoff eta window = [{args.eta_lo:.12f}, {args.linear_eta_hi:.12f}]")
     print(f"linear handoff worst gap = {gap.worst_gap:.12f} at eta={gap.worst_eta:.12f}")
     print(f"linear handoff outer = {gap.outer_at_worst:.12f}")
     print(f"linear handoff inner = {gap.inner_at_worst:.12f}")
