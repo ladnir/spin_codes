@@ -1088,6 +1088,16 @@ These are finite-\(n\) certificates for the checked prefix, not yet an all-\(h\)
 \(C=12\) evidence into a complete fixed-\(k\) proof one still has to write the remaining medium-weight bridge and the
 large-weight exponent estimates as a single auditable first-moment certificate.
 
+A subsequent cap extension shows that the \(h\le64\) prefix was affected by the artificial boundary. At the same
+parameters \(k=2^{20}\), \(\delta=0.106\), and \(\sigma=32\), increasing the blocked-cover prefix to \(h\le80\) gives
+\[
+\log_2 \mu_{\le80}^{\mathrm{FCIB}}=1.282,
+\]
+with the dominant contribution again occurring at the cap \(h=80\). Thus the \(C=12\) line should be read only as a
+tiny/intermediate-prefix sanity check, not as a credible fixed-\(k\) certificate. The current theorem-safe paired-cover
+bound still has an unresolved medium-weight burst problem: as \(h\) grows, a single live interval of length
+\(\approx 2\delta N\) can absorb more support entropy than the present \(r=1\) charge pays for.
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
