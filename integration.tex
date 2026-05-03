@@ -1473,6 +1473,60 @@ large-deviation lemma still has exponential room.  Thus \(R=8\) is not intrinsic
 certificate cut, and the remaining proof task is to add a separate tail over \(r>R\), using the fixed-tap factor
 \(2^{-r(\sigma-1)}\) and the interval-count entropy.
 
+\begin{lemma}[Large-\(r\) fixed-tap candidate tail]
+\label{lem:large-r-fixedtap-candidate-tail}
+Let \(N=2k\), let \(\sigma=\lceil\log_2 k\rceil+s\), and put
+\[
+q_\sigma:=2^{-(\sigma-1)}.
+\]
+For any \(h\le\eta N\) and any integer \(R\ge0\),
+\[
+\sum_{r>R}\binom{h}{r}q_\sigma^r
+\le
+\frac{
+\left(\dfrac{e\eta 2^{2-s}}{R+1}\right)^{R+1}
+}{
+1-\dfrac{e\eta 2^{2-s}}{R+2}
+},
+\]
+provided \(e\eta 2^{2-s}<R+2\).
+\end{lemma}
+
+\begin{proof}
+Since \(2^{\lceil\log_2 k\rceil}\ge k=N/2\),
+\[
+q_\sigma
+=
+2^{-(\lceil\log_2 k\rceil+s-1)}
+\le
+\frac{2^{2-s}}{N}.
+\]
+Thus, for \(h\le\eta N\),
+\[
+\binom{h}{r}q_\sigma^r
+\le
+\left(\frac{ehq_\sigma}{r}\right)^r
+\le
+\left(\frac{e\eta2^{2-s}}{r}\right)^r.
+\]
+Writing \(A=e\eta2^{2-s}\), the adjacent ratio of \((A/r)^r\) satisfies
+\[
+\frac{(A/(r+1))^{r+1}}{(A/r)^r}
+=
+\frac{A}{r+1}\left(\frac{r}{r+1}\right)^r
+\le
+\frac{A}{r+1}.
+\]
+Therefore the tail beginning at \(r=R+1\) is dominated by a geometric series with ratio at most \(A/(R+2)\), proving
+the claim.
+\end{proof}
+
+For the same checkpoint parameters, \(\eta=1/4\), offset \(s=5\), and the natural split \(R=\log_2 k=20\), the right
+side of Lemma~\ref{lem:large-r-fixedtap-candidate-tail} is below \(2^{-166}\).  This estimate should not be mistaken
+for the full large-\(r\) first-moment tail: the global-cover interval entropy still has to be charged.  Its role is to
+isolate the remaining large-\(r\) task.  Once the live-geometry count is grouped by low slot and high slot, the
+termination-candidate part already has a rapidly summable \((\mathrm{const}/R)^R\) factor when \(R\asymp\log k\).
+
 \begin{lemma}[Geometric residual certificate]
 \label{lem:geometric-residual-certificate}
 Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
