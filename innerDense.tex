@@ -170,6 +170,48 @@ being \(1\) at least \(1/2\). The usual induction for Bernoulli stochastic domin
 bound.
 \end{proof}
 
+\begin{lemma}[Exact final-survivor suffix average]
+\label{lem:fixedtap-final-survivor-suffix}
+Let \(U\) be uniform on the weight-\(h\) slice of \(\{0,1\}^N\), and let
+\[
+\tau(U):=\min\supp(U),\qquad S(U):=N-\tau(U)+1.
+\]
+Let \(\mathcal{S}_{\mathrm{fin}}\) be the event that the ON episode started by the first input one survives through the
+end of the block. Then, for every \(d\ge 0\),
+\[
+\PP\!\left[
+\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d
+\middle| \wt(U)=h
+\right]
+\le
+\sum_{S=h}^{N}
+\frac{\binom{S-1}{h-1}}{\binom{N}{h}}\,
+\PP[\Binomial(S,\tfrac12)\le d].
+\]
+\end{lemma}
+
+\begin{proof}
+Condition on the first input-one position \(\tau=t\), and put \(S=N-t+1\). The bit \(y_t\) is deterministically \(1\),
+because the encoder is still \(\OFF\) before the first input one. On \(\mathcal{S}_{\mathrm{fin}}\), the remaining
+outputs \(y_{t+1},\dots,y_N\) stay on a surviving ON episode. By the same stochastic-domination argument as
+Lemma~\ref{lem:fixedtap-surviving-episode-tail}, the suffix output weight
+\(\sum_{i=t}^{N}Y_i\) dominates \(\Binomial(S,\tfrac12)\) in the lower-tail direction. Hence, for this fixed value of
+\(t\),
+\[
+\PP[\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d\mid U,\tau=t]
+\le
+\PP[\Binomial(S,\tfrac12)\le d].
+\]
+Finally, under the uniform weight-\(h\) law,
+\[
+\PP[S(U)=S\mid \wt(U)=h]
+=
+\frac{\binom{S-1}{h-1}}{\binom{N}{h}},
+\]
+since the first one is at position \(N-S+1\) and the remaining \(h-1\) ones are chosen from the later \(S-1\) positions.
+Averaging over \(S\) proves the claim.
+\end{proof}
+
 \begin{lemma}[ON$\to$OFF requires an $m$-run of zeros in the output]
 \label{lem:dense-off-requires-mzeros}
 If $\OFF_q$ holds at some time $q\ge 2$, then the preceding $m$ outputs are all zero:
