@@ -1156,6 +1156,77 @@ This is the better way to think about the problem.  The bottleneck is not an unc
 is not a free late tail.  The bottleneck is to make the episode decomposition auditable enough that no support mass can
 be hidden in a tail bucket without paying either a shared survival tail or a declared termination span.
 
+\paragraph{First global episode-cover certificate.}
+The first implementation of that target is a deliberately conservative global cover.  A low-weight trajectory is
+covered by \(r\) terminated ON intervals, with an optional final surviving interval.  If the total live length is \(U\),
+then all live intervals pay a single shared binomial tail
+\[
+\Pr[\Binomial((U-r\sigma)_+,\tfrac12)\le d],
+\]
+and the \(r\) fixed-tap terminations pay \(2^{-r(\sigma-1)}\).  The interval count is intentionally an overcount:
+the optional survivor is counted as an ordinary ordered interval, even though dynamically it must be the final suffix.
+For \(r\ge1\), the two schematic summands are
+\[
+\frac{
+\binom{U-r-1}{r-1}
+\binom{N-U+r}{r}
+\binom{U-2r}{h-2r}
+}{\binom{N}{h}}
+2^{-r(\sigma-1)}
+\Pr[\Binomial((U-r\sigma)_+,\tfrac12)\le d]
+\]
+for all-terminated covers, and
+\[
+\frac{
+\binom{U-r-1}{r}
+\binom{N-U+r+1}{r+1}
+\binom{U-2r-1}{h-2r-1}
+}{\binom{N}{h}}
+2^{-r(\sigma-1)}
+\Pr[\Binomial((U-r\sigma)_+,\tfrac12)\le d]
+\]
+for \(r\) terminated intervals plus one survivor.  The \(r=0\) survivor-only case is counted by the exact suffix-start
+sum
+\[
+\sum_{U=h}^{N}
+\frac{\binom{U-1}{h-1}}{\binom{N}{h}}
+\Pr[\Binomial(U,\tfrac12)\le d].
+\]
+These expressions are then multiplied by the fixed-tap outer enumerator and summed over \(h\).
+
+At \(k=2^{20}\), \(N=2k\), and \(\delta=0.106\), using exact fixed-tap outer counts through \(h\le80\) and the
+fixed-tap banded outer generating-function envelope beyond that, the current blocked finite-\(n\) certificate gives
+\[
+\begin{array}{c|c|c|c}
+\sigma & \sigma-\lceil\log_2 k\rceil & \log_2\mu_{\le500}^{\mathrm{glob}}(0.106) & \text{peak }h\\
+\hline
+18 & -2 & \phantom{-}47.03 & 107\\
+20 & \phantom{-}0 & \phantom{-}23.97 & 81\\
+22 & \phantom{-}2 & \phantom{-}12.16 & 23\\
+24 & \phantom{-}4 & \phantom{-}6.10 & 15\\
+26 & \phantom{-}6 & \phantom{-}1.86 & 8\\
+28 & \phantom{-}8 & -0.84 & 2\\
+30 & 10 & -1.96 & 2\\
+32 & 12 & -2.30 & 2\\
+34 & 14 & -2.40 & 2
+\end{array}
+\]
+Pushing the \(\sigma=28\) line to \(h\le2000\) leaves the same total,
+\[
+\log_2\mu_{\le2000}^{\mathrm{glob}}(0.106)\approx -0.84,
+\]
+with no right-boundary peak; the terms are already below \(-1500\) bits by \(h=2000\).  Spot checks at
+\(h=5000,10^4,2\cdot10^4,5\cdot10^4,\dots\) remain very negative under the same global-cover formula, even when the
+number of terminated intervals is allowed to increase past the diagnostic cap.
+
+Thus the current conservative certificate crosses near
+\[
+\sigma\approx \lceil\log_2 k\rceil+8
+\]
+for the fixed \(k=2^{20}\), \(\delta=0.106\) test point.  The sharper survival-only bridge crosses near offset \(0\),
+so the remaining proof slack is now visible: it is the cost of the global interval overcount and the tiny-weight
+outer/inner splice, not evidence for a medium-weight tail obstruction.
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
