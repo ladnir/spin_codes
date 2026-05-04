@@ -2144,18 +2144,44 @@ The reproducibility entry point for this scan is
 \paragraph{A block-outer finite-\(n\) upgrade.}
 The small/intermediate ridge above is an outer-spectrum problem as much as an inner-tail problem.  A conservative
 implementation upgrade is to keep the fixed-tap dense recursive inner, but replace the systematic random banded outer
-by a direct sum of short systematic block codes.  If a local \([n_0,b]\) block has weight enumerator
+by a direct sum of short block codes.  The proof interface is only the outer weight enumerator; systematic form is not
+needed.
+
+\begin{lemma}[Block-outer first-moment interface]
+\label{lem:block-outer-first-moment-interface}
+Let \(C_{\mathrm{loc}}\subseteq\F_2^{n_0}\) be a binary linear \([n_0,b]\) code with homogeneous weight enumerator
 \[
 W_{\mathrm{loc}}(z)=\sum_j A^{\mathrm{loc}}_j z^j,
 \]
-and \(M=k/b\) independent blocks are used, then the outer enumerator is controlled by
+and let \(C_{\mathrm{out}}=C_{\mathrm{loc}}^{\oplus M}\).  Its message length is \(k=Mb\), its
+outer/interleaver length is \(N=Mn_0\), and its weight enumerator is
 \[
 W_{\mathrm{out}}(z)=W_{\mathrm{loc}}(z)^M,
 \]
-with the zero word removed at the end.  This plugs into exactly the same first-moment interface
-\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer;
-the block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short
-published or certified local spectrum.
+where \(A_0^{\mathrm{out}}=1\) is omitted in the nonzero-codeword sum.  If \(p_h^{\mathrm{in}}(\delta)\) is any valid
+upper bound on the fixed-tap dense recursive inner producing output weight at most \(\lfloor\delta N\rfloor\) from an
+interleaved outer word of weight \(h\), then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+\mu_{\mathrm{block}}(\delta)
+:=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+The direct-sum enumerator identity follows by multiplying the local generating functions block by block.  Conditional
+on any nonzero outer word of weight \(h\), the uniform interleaver randomizes only the support positions seen by the
+inner code, so the same inner bound \(p_h^{\mathrm{in}}(\delta)\) applies to every such word.  Summing these failure
+probabilities over all nonzero outer words gives \(\mu_{\mathrm{block}}(\delta)\), and Markov's inequality gives the
+minimum-distance bound.
+\end{proof}
+
+Thus a local code with a published or certified spectrum drops into exactly the same first-moment interface
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer; the
+block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short local
+spectrum certificate.
 
 As a first citable test case we used the fourth-order binary Reed--Muller code
 \[
@@ -2256,8 +2282,7 @@ so the relative minimum distance is larger than \(0.09\).
 \end{theorem}
 
 \begin{proof}
-The direct first-moment reduction applies exactly as in Theorem~\ref{thm:dense-dense-direct-first-moment}; the outer
-need not be systematic, because the interleaver only uses the outer weight enumerator.  Let
+Apply Lemma~\ref{lem:block-outer-first-moment-interface} with \(C_{\mathrm{loc}}=RM(4,9)\).  Let
 \[
 W_{RM}(z)=\sum_j A_j^{RM}z^j
 \]
