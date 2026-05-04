@@ -2161,9 +2161,36 @@ As a first citable test case we used the fourth-order binary Reed--Muller code
 \[
 RM(4,9):\qquad [512,256,32].
 \]
-Its exact weight distribution was tabulated by Markov and Borissov in 2025.  Using that table as
-\(W_{\mathrm{loc}}\), with \(k=2^{20}\), \(M=4096\), \(N=2^{21}\), fixed-tap inner memory \(\sigma=32\), and the
-same global episode-cover inner bound, gives the following low-weight first-moment diagnostics:
+Its exact weight distribution was tabulated by Markov and Borissov in 2025.  Equivalently, because \(RM(4,9)\) is a
+Type-II self-dual binary code, its homogeneous weight enumerator has the Gleason form
+\[
+W_{RM}(x,y)
+=
+\sum_{j=0}^{21} c_j\,
+\Phi(x,y)^{64-3j}\Psi(x,y)^j,
+\]
+where
+\[
+\Phi=x^8+14x^4y^4+y^8,
+\qquad
+\Psi=x^4y^4(x^4-y^4)^4.
+\]
+The integer coefficient vector \((c_0,\ldots,c_{21})\) is
+\[
+\begin{gathered}
+1,\ -896,\ 366400,\ -90591488,\ 15125312416,\ -1804090983680,\\
+158633285104000,\ -10462864561216000,\ 521844917396785920,\\
+-19703740374727094272,\ 560488125281758654464,\ -11885355149550800420864,\\
+184790978198497210204160,\ -2057511108351137030602752,\\
+15886111690015316194099200,\ -81428598375642719259197440,\\
+261053953183414744116101120,\ -481398485705822986116792320,\\
+451352262788439851856297984,\ -176727086611150405833326592,\\
+20139935110366512638066688,\ -279475807551445268430848 .
+\end{gathered}
+\]
+For the first-moment evaluator, \(W_{\mathrm{loc}}(z)=W_{RM}(1,z)\).  Using this spectrum with \(k=2^{20}\),
+\(M=4096\), \(N=2^{21}\), fixed-tap inner memory \(\sigma=32\), and the same global episode-cover inner bound, gives
+the following low-weight diagnostics:
 \[
 \begin{array}{c|rrrr}
 \delta & .106 & .104 & .092 & .090\\
@@ -2269,10 +2296,8 @@ degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is 
 for that block can be imported, it should drop into the same \(W_{\mathrm{loc}}^M\) interface and may recover the
 missing margin at \(\delta=.106\).
 
-The reproducibility entry points are the block-outer probe and BCH-parameter scripts in \(\texttt{scripts/}\).
-The current \(RM(4,9)\), \(\delta=.09\) checkpoint artifact is audited by
-\(\texttt{verify\_rm\_block\_checkpoint.py}\), and the residual constants above are audited by
-\(\texttt{verify\_rm\_block\_residual.py}\).
+The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
+verifiers in \(\texttt{scripts/}\).
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
