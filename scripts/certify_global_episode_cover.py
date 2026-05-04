@@ -144,11 +144,13 @@ def outer_gf_bounds(
         best = float("inf")
         best_here = float("nan")
         for z, log_w in log_ws:
+            if log_w == float("-inf"):
+                continue
             val = log_w - h * math.log2(z)
             if val < best:
                 best = val
                 best_here = z
-        logs[h] = best
+        logs[h] = best if best != float("inf") else float("-inf")
         best_z[h] = best_here
     return logs, best_z
 
@@ -526,7 +528,9 @@ def main() -> None:
         peak_term = float("-inf")
         points: list[tuple[int, float, float]] = []
         for h in range(args.h_min, args.h_max + 1):
-            use_exact = h <= args.exact_through and exact_outer[h] != float("-inf")
+            use_exact = h <= args.exact_through and args.exact_outer_mode == "fixedtap-banded"
+            if not use_exact:
+                use_exact = h <= args.exact_through and exact_outer[h] != float("-inf")
             outer = exact_outer[h] if use_exact else gf_outer[h]
             source = "exact" if use_exact else "gf"
             inner, best_r, best_piece, pieces = global_episode_inner_log2(

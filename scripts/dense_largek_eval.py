@@ -258,7 +258,7 @@ def fixedtap_banded_outer_gf_log2(k_msg: int, parity_n: int, sigma: int, z: floa
     log_all = v_log + math.log2(v_sum)
     # Remove the zero message, whose generating contribution is exactly one.
     if log_all <= 1e-10:
-        val = max(0.0, (2.0**log_all) - 1.0)
+        val = math.expm1(log_all * math.log(2.0))
         return math.log2(val) if val > 0.0 else float("-inf")
     return log_all + math.log2(1.0 - 2.0 ** (-log_all))
 
