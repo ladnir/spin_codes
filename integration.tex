@@ -2097,6 +2097,50 @@ It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and 
 \(\log_2\mu_{\mathrm{cert}}^{(32,\mathrm{tail})}\le -6.297944<-6.2\).  Markov's inequality gives the stated bound.
 \end{proof}
 
+\paragraph{Sigma-margin scan for the terminated-tail model.}
+The terminated-tail correction removes the artificial right-boundary \(h=2\) floor, but it does not by itself make a
+large finite-\(n\) safety margin cheap.  To calibrate the cost of a \(40\)-bit first-moment margin, we scanned
+\[
+\sigma=m\in\{24,32,40,\ldots\}
+\]
+at \(k=2^{20}\), with outer parity length \(k+\sigma\), interleaver length \(N=2k+\sigma\), and
+\(d=\lfloor \delta N\rfloor\).  The scan uses exact fixed-tap outer counts through \(h\le30\), exact final-survivor
+placement through the same window, and the global episode-cover inner bound.  It is therefore best read as a
+small-weight margin diagnostic, with the crossing point later checked by the larger prefix certificate when needed.
+
+\[
+\begin{array}{c|rrrrrrrr}
+\sigma & 24 & 32 & 40 & 48 & 56 & 64 & 72 & 80\\
+\hline
+-\log_2\mu_{\le30},\ \delta=.106
+&0.002&6.298&12.088&17.869&23.650&29.431&35.212&40.993\\
+h_*
+&6&8&9&10&12&13&15&16\\
+\hline
+-\log_2\mu_{\le30},\ \delta=.09
+&1.842&8.110&14.202&20.292&26.382&32.471&38.561&44.651\\
+h_*
+&5&7&8&9&10&12&13&14
+\end{array}
+\]
+
+Thus, on this \(+8\) grid, both \(\delta=0.106\) and \(\delta=0.09\) first cross \(40\) bits at \(\sigma=80\), although
+the \(\delta=0.09\) curve is already within about \(1.44\) bits of the target at \(\sigma=72\).  At \(\delta=0.106\),
+the crossing point was also checked with the larger prefix machinery at \(\sigma=80\): exact outer counts through
+\(h\le50\), global episode-cover terms through \(h\le500\), and the residual split beyond \(H=500\) give
+\[
+\log_2\mu_{\le500}\le -40.991450,
+\]
+with peak contribution at \(h=16\).  The large-\(r\) residual ledger after the \(3N^4\) union is below \(2^{-812}\).
+The diagnostic conclusion is that the corrected finite-\(k\) proof has a real small/intermediate ridge, not just a
+right-boundary artifact: increasing \(\sigma\) buys roughly \(0.7\) bits of margin per tap in this range, and the
+maximizing weight drifts from tiny \(h\) toward \(h\approx 0.2\sigma\).
+
+The reproducibility entry point for this scan is
+\[
+\texttt{python scripts/scan\_sigma\_margin\_tail.py}.
+\]
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
