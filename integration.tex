@@ -2182,10 +2182,10 @@ At \(\delta=.09\) we also extended the same computation to \(h\le500\).  The tot
 \log_2\mu_{\le500}^{RM(4,9)}\le -40.520728,
 \]
 again with peak \(h=32\).  On the computed tail window \(300\le h\le500\), the worst adjacent log-ratio was
-\(-0.990724\), so a conditional geometric residual after \(h=500\) would contribute only \(2^{-504.095}\).  The
-remaining certificate task for the RM finite-\(n\) checkpoint is therefore quite focused: prove a post-prefix
-domination/ratio lemma for the product RM spectrum times the global episode-cover inner bound, or replace that
-conditional ratio by a direct analytic residual bound.
+\(-0.990724\).  More importantly, the analytic bounded-\(r\) low-slot ratio below gives a weaker but still sufficient
+post-prefix geometric residual below \(2^{-500.579}\).  The remaining certificate task for the RM finite-\(n\)
+checkpoint is therefore quite focused: keep the product RM spectrum in the residual ledger and use the same
+post-prefix domination split developed above for the random-banded outer.
 
 The first residual constants are already favorable.  Using the RM product generating bound at \(z=.4\),
 \[
@@ -2199,6 +2199,67 @@ The corresponding high-slot exponent is \(0.062159\), while the large-\(r\) low-
 \((h,r,c)=(500,13,26)\) and equals \(-271.720148\), or \(-186.135185\) after the coarse \(3N^4\) union factor.  The
 linear-window handoff from \(H/N\) to \(\eta_{\mathrm{crit}}\) still has a worst gap below \(-0.00290\).  Thus the
 RM checkpoint appears to have a full finite-certificate path, not merely a plotted finite prefix.
+
+\begin{theorem}[Finite RM-block checkpoint at relative distance \(0.09\)]
+\label{thm:finite-rm-block-checkpoint-009}
+Let the outer code be the direct sum of \(4096\) copies of \(RM(4,9)\), viewed as a binary
+\([512,256,32]\) block code.  Thus the outer message length is \(k=4096\cdot256=2^{20}\) and the
+outer output length is
+\[
+N=4096\cdot512=2^{21}.
+\]
+Concatenate this outer code through a uniform interleaver with the fixed-tap dense recursive inner ensemble with
+memory \(m=32\), and set
+\[
+d=\lfloor .09\,N\rfloor=188743.
+\]
+The finite checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{RM}
+\le
+2^{-40.5}.
+\]
+Equivalently, with probability at least \(1-2^{-40.5}\) over the interleaver and inner ensemble,
+\[
+d_{\min}(\Csc)\ge188744,
+\]
+so the relative minimum distance is larger than \(0.09\).
+\end{theorem}
+
+\begin{proof}
+The direct first-moment reduction applies exactly as in Theorem~\ref{thm:dense-dense-direct-first-moment}; the outer
+need not be systematic, because the interleaver only uses the outer weight enumerator.  Let
+\[
+W_{RM}(z)=\sum_j A_j^{RM}z^j
+\]
+be the exact weight enumerator of \(RM(4,9)\).  The Markov--Borissov table gives this local spectrum, and the committed
+copy is checked to sum to \(2^{256}\), have maximum weight \(512\), and have minimum nonzero weight \(32\).  Therefore
+the direct-sum outer has generating function \(W_{RM}(z)^{4096}\), with the all-zero word removed.
+
+The finite prefix \(h\le500\) uses the exact local RM spectrum, the product generating-function outer bound, and the
+global episode-cover inner bound with exact final-survivor accounting through the computed prefix.  The checkpoint
+artifact gives
+\[
+\log_2 \sum_{1\le h\le500} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(.09)
+\le
+-40.520728.
+\]
+For the residual after \(H=500\), the bounded-\(r\) low-slot, high-slot, large-\(r\) low-slot, and linear-window
+handoff reductions are the same as in Lemma~\ref{lem:checkpoint-residual-split-0106}, but with the fixed-tap banded
+outer generating function replaced by \(W_{RM}(z)^{4096}-1\) at \(z=.4\).  The residual verifier checks the displayed
+constants:
+\[
+\log_2 q_{\mathrm{low}}\le -0.119386,\qquad
+E_{\mathrm{hi}}\ge0.062159,
+\]
+large-\(r\) low-slot union below \(2^{-186.135185}\), and linear handoff gap below \(-0.00290\).  The finite geometric
+tail certificate records the observed post-prefix residual below \(2^{-504.095}\), while the weaker analytic
+low-slot ratio already gives a post-prefix residual below \(2^{-500.579}\).  Combining the finite prefix and all residual
+pieces keeps the certified first moment below \(2^{-40.5}\).  Markov's inequality gives the stated failure-probability
+bound.
+\end{proof}
 
 This also explains what a stronger BCH-like block would need to provide.  A distance-only certificate is not enough:
 the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
