@@ -2177,6 +2177,16 @@ The peak is the minimum-weight local block term.  Thus \(RM(4,9)\) does not by i
 \(\sigma=32\).  This is already much better structured than rejection sampling away the first few random-banded
 outer weights: the entire finite outer spectrum is explicit.
 
+At \(\delta=.09\) we also extended the same computation to \(h\le500\).  The total remained
+\[
+\log_2\mu_{\le500}^{RM(4,9)}\le -40.520728,
+\]
+again with peak \(h=32\).  On the computed tail window \(300\le h\le500\), the worst adjacent log-ratio was
+\(-0.990724\), so a conditional geometric residual after \(h=500\) would contribute only \(2^{-504.095}\).  The
+remaining certificate task for the RM finite-\(n\) checkpoint is therefore quite focused: prove a post-prefix
+domination/ratio lemma for the product RM spectrum times the global episode-cover inner bound, or replace that
+conditional ratio by a direct analytic residual bound.
+
 This also explains what a stronger BCH-like block would need to provide.  A distance-only certificate is not enough:
 the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
 published or certified local spectrum envelope.  Primitive binary BCH arithmetic gives a natural candidate near
