@@ -1995,6 +1995,56 @@ It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and 
 \(\log_2\mu_{\mathrm{cert}}^{(26)}\le -0.967862<-0.9\).  Markov's inequality gives the stated bound.
 \end{proof}
 
+\begin{theorem}[Finite dense+dense larger-margin checkpoint]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma32}
+Consider the same fixed-tap banded systematic outer / fixed-tap dense recursive inner construction as
+Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}, but with
+\[
+\sigma=m=32.
+\]
+Keep \(k=2^{20}\), \(N=2^{21}\), and \(d=\lfloor0.106N\rfloor=222298\).  Then the larger-margin checkpoint certificate
+gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(32)}
+\le
+2^{-2.4}.
+\]
+Equivalently, with probability at least \(1-2^{-2.4}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+The certificate uses the same first-moment split as
+Theorems~\ref{thm:finite-dense-dense-checkpoint-0106} and~\ref{thm:finite-dense-dense-checkpoint-0106-sigma26}.  The
+finite prefix uses \(H_{\mathrm{pre}}=500\), \(R=12\), exact survivor-only accounting through \(h\le30\), exact fixed-tap
+banded outer counts through \(h\le80\), and the same certified blocked grid ratios \(1.02\) and \(1.1\) as the
+\(\sigma=26\) margin checkpoint.  The prefix verifier reports
+\[
+\log_2\mu_{\le500}\le -2.424512,
+\]
+with peak contribution still at \(h=2\).  The observed adjacent tail ratio on the computed prefix, checked from
+\(h=200\) through \(500\), is at most \(-0.685731\) bits, giving a geometric residual below \(2^{-351}\).
+
+For \(h>500\), the residual split uses
+\[
+H=500,\qquad R=12,\qquad \sigma=32.
+\]
+The bounded-\(r\) low-slot ratio satisfies
+\[
+\log_2 q_{500,12,0.35,0.370884}<-0.0103.
+\]
+The large-\(r\) low-slot ledger, after the \(3N^4\) union, is below \(2^{-154}\).  The high-slot branch, linear handoff,
+and top-weight range are handled by the same residual lemmas as before.
+
+The top-level verifier is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig32.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(32)}\le -2.424512<-2.4\).  Markov's inequality gives the stated bound.
+\end{proof}
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
