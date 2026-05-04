@@ -131,6 +131,7 @@ def exact_fixedtap_outer_prefix(k_msg: int, parity_n: int, sigma: int, h_max: in
 def outer_gf_bounds(
     *,
     k: int,
+    parity_n: int,
     sigma: int,
     h_min: int,
     h_max: int,
@@ -138,7 +139,7 @@ def outer_gf_bounds(
 ) -> tuple[list[float], list[float]]:
     logs = [float("-inf")] * (h_max + 1)
     best_z = [float("nan")] * (h_max + 1)
-    log_ws = [(z, fixedtap_banded_outer_gf_log2(k, k, sigma, z)) for z in zs]
+    log_ws = [(z, fixedtap_banded_outer_gf_log2(k, parity_n, sigma, z)) for z in zs]
     for h in range(h_min, h_max + 1):
         best = float("inf")
         best_here = float("nan")
@@ -422,6 +423,12 @@ def global_episode_inner_log2(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--k", type=int, required=True)
+    parser.add_argument(
+        "--parity-extra",
+        type=int,
+        default=0,
+        help="Extra terminated parity coordinates beyond k. The interleaver length is k+(k+parity_extra).",
+    )
     parser.add_argument("--sigmas", required=True)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--h-min", type=int, default=1)
@@ -468,7 +475,8 @@ def main() -> None:
     parser.add_argument("--no-png", action="store_true")
     args = parser.parse_args()
 
-    n = 2 * args.k
+    parity_n = args.k + args.parity_extra
+    n = args.k + parity_n
     d = math.floor(args.delta * n)
     suffix_block_ratio = args.suffix_block_ratio if args.suffix_block_ratio is not None else args.block_ratio
     sigmas = parse_sigmas(args.sigmas)
@@ -497,11 +505,18 @@ def main() -> None:
         exact_survivor_values = survivor_only_exact_prefix_log2(n=n, h_max=exact_hi, tail_cache=tail_cache)
     for sigma in sigmas:
         print(f"sigma={sigma}: global episode cover h={args.h_min}..{args.h_max}", flush=True)
-        gf_outer, gf_z = outer_gf_bounds(k=args.k, sigma=sigma, h_min=args.h_min, h_max=args.h_max, zs=zs)
+        gf_outer, gf_z = outer_gf_bounds(
+            k=args.k,
+            parity_n=parity_n,
+            sigma=sigma,
+            h_min=args.h_min,
+            h_max=args.h_max,
+            zs=zs,
+        )
         exact_outer = load_exact_outer(args.exact_outer_csv, sigma, args.h_max)
         if args.exact_outer_mode == "fixedtap-banded":
             exact_hi = min(args.exact_through, args.h_max)
-            formula_outer = exact_fixedtap_outer_prefix(args.k, args.k, sigma, exact_hi)
+            formula_outer = exact_fixedtap_outer_prefix(args.k, parity_n, sigma, exact_hi)
             for h in range(1, exact_hi + 1):
                 exact_outer[h] = formula_outer[h]
         elif args.exact_outer_mode == "none":
@@ -558,6 +573,8 @@ def main() -> None:
                 {
                     "k": args.k,
                     "N": n,
+                    "parity_n": parity_n,
+                    "parity_extra": args.parity_extra,
                     "delta": f"{args.delta:.12g}",
                     "d": d,
                     "sigma": sigma,
@@ -589,6 +606,8 @@ def main() -> None:
             {
                 "k": args.k,
                 "N": n,
+                "parity_n": parity_n,
+                "parity_extra": args.parity_extra,
                 "delta": f"{args.delta:.12g}",
                 "d": d,
                 "sigma": sigma,
@@ -625,6 +644,8 @@ def main() -> None:
             fieldnames=[
                 "k",
                 "N",
+                "parity_n",
+                "parity_extra",
                 "delta",
                 "d",
                 "sigma",
@@ -650,6 +671,8 @@ def main() -> None:
             fieldnames=[
                 "k",
                 "N",
+                "parity_n",
+                "parity_extra",
                 "delta",
                 "d",
                 "sigma",

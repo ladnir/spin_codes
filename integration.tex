@@ -2045,6 +2045,58 @@ It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and 
 \(\log_2\mu_{\mathrm{cert}}^{(32)}\le -2.424512<-2.4\).  Markov's inequality gives the stated bound.
 \end{proof}
 
+\begin{theorem}[Finite dense+dense checkpoint with terminated outer tail]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma32-tail}
+Consider the fixed-tap banded systematic outer with message length \(k=2^{20}\), outer memory \(\sigma=32\), and a
+terminated parity tail of length \(\sigma\), so the outer/interleaver length is
+\[
+N=2k+\sigma=2097184.
+\]
+Concatenate it through the fixed-tap dense recursive inner with \(m=32\), and set
+\[
+d=\lfloor0.106N\rfloor=222301.
+\]
+Then the terminated-tail checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(32,\mathrm{tail})}
+\le
+2^{-6.2}.
+\]
+Equivalently, with probability at least \(1-2^{-6.2}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+This is the same certificate as Theorem~\ref{thm:finite-dense-dense-checkpoint-0106-sigma32}, except that the outer
+small-weight enumerator and generating-function envelope use parity length \(k+\sigma\) rather than \(k\), and the inner
+interleaver length is \(N=2k+\sigma\).  The finite prefix uses \(H_{\mathrm{pre}}=500\), \(R=12\), exact survivor-only
+accounting through \(h\le30\), exact fixed-tap banded outer counts through \(h\le80\), and blocked grid ratios \(1.02\)
+and \(1.1\).  The prefix verifier reports
+\[
+\log_2\mu_{\le500}\le -6.297944.
+\]
+The peak contribution moves from the truncated-boundary \(h=2\) mode to \(h=8\), with peak term \(-8.912531\).  The
+observed adjacent tail ratio from \(h=200\) through \(500\) is at most \(-0.685739\) bits, giving a geometric residual
+below \(2^{-354}\).  The omitted \(r>12\) prefix tails are below \(2^{-155}\) on the low-slot side and below \(2^{-83000}\)
+on the high-slot side.
+
+For \(h>500\), the residual split uses \(H=500\), \(R=12\), \(\sigma=32\), and \(N=2k+\sigma\).  The bounded-\(r\)
+low-slot ratio remains below one:
+\[
+\log_2 q_{500,12,0.35,0.370884}<-0.0103,
+\]
+and the large-\(r\) low-slot ledger after the \(3N^4\) union is below \(2^{-156}\).  The high-slot branch, linear
+handoff, and top-weight range are unchanged at this resolution.
+
+The top-level verifier is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig32\_tail.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(32,\mathrm{tail})}\le -6.297944<-6.2\).  Markov's inequality gives the stated bound.
+\end{proof}
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is

@@ -53,6 +53,7 @@ def check(name: str, passed: bool, detail: str) -> bool:
 def prefix_large_r_high_slot_bound(
     *,
     k: int,
+    parity_n: int,
     sigma: int,
     delta: float,
     h_max: int,
@@ -60,10 +61,10 @@ def prefix_large_r_high_slot_bound(
     theta: float,
     z: float,
 ) -> tuple[float, tuple[int, int, int, float, float]]:
-    n = 2 * k
+    n = k + parity_n
     offset_s = sigma - math.ceil(math.log2(k))
     d = math.floor(delta * n)
-    log2_w = fixedtap_banded_outer_gf_log2(k, k, sigma, z)
+    log2_w = fixedtap_banded_outer_gf_log2(k, parity_n, sigma, z)
     best = float("-inf")
     best_data = (-1, -1, -1, float("-inf"), float("-inf"))
 
@@ -100,6 +101,7 @@ def main() -> int:
     parser.add_argument("--tailcert", type=Path, default=DEFAULT_TAILCERT)
     parser.add_argument("--k", type=int, default=2**20)
     parser.add_argument("--n", type=int, default=2**21)
+    parser.add_argument("--parity-extra", type=int, default=0)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--d", type=int, default=222298)
     parser.add_argument("--sigma", type=int, default=25)
@@ -117,6 +119,7 @@ def main() -> int:
     parser.add_argument("--suffix-block-ratio", default="1.01")
     parser.add_argument("--stop-gap-bits", default="60")
     parser.add_argument("--tail-confirm", default="8")
+    parser.add_argument("--peak-h", type=int, default=2)
     parser.add_argument("--max-total-log2", type=float, default=-0.34)
     parser.add_argument("--max-tail-log2", type=float, default=-800.0)
     parser.add_argument("--max-ratio-log2", type=float, default=-0.35)
@@ -126,6 +129,7 @@ def main() -> int:
 
     summary = read_one(args.summary)
     tail = read_one(args.tailcert)
+    parity_n = args.k + args.parity_extra
 
     total = float(summary["total_log2"])
     peak_h = int(summary["peak_h"])
@@ -136,6 +140,7 @@ def main() -> int:
     offset_s = args.sigma - math.ceil(math.log2(args.k))
     low_ledger = large_r_low_slot_max(
         k=args.k,
+        parity_n=parity_n,
         sigma=args.sigma,
         offset_s=offset_s,
         h_min=1,
@@ -147,6 +152,7 @@ def main() -> int:
     low_union = math.log2(3.0) + 4.0 * math.log2(args.n) + low_ledger.value
     high_value, high_data = prefix_large_r_high_slot_bound(
         k=args.k,
+        parity_n=parity_n,
         sigma=args.sigma,
         delta=args.delta,
         h_max=args.h_max,
@@ -180,6 +186,12 @@ def main() -> int:
     ok = True
     ok &= check("k", summary["k"] == str(args.k), summary["k"])
     ok &= check("N", summary["N"] == str(args.n), summary["N"])
+    ok &= check("parity_n", summary.get("parity_n", str(args.k)) == str(parity_n), summary.get("parity_n", str(args.k)))
+    ok &= check(
+        "parity_extra",
+        summary.get("parity_extra", "0") == str(args.parity_extra),
+        summary.get("parity_extra", "0"),
+    )
     ok &= check("delta", abs(float(summary["delta"]) - args.delta) <= 1e-15, summary["delta"])
     ok &= check("d", summary["d"] == str(args.d), summary["d"])
     ok &= check("sigma", summary["sigma"] == str(args.sigma), summary["sigma"])
@@ -209,7 +221,7 @@ def main() -> int:
         f"gap={summary['stop_gap_bits']}, confirm={summary['tail_confirm']}, r_max={summary['r_max']!r}",
     )
     ok &= check("prefix total", total <= args.max_total_log2, f"{total:.6f} <= {args.max_total_log2:.6f}")
-    ok &= check("peak location", peak_h == 2, f"h={peak_h}")
+    ok &= check("peak location", peak_h == args.peak_h, f"h={peak_h}")
     ok &= check("tail ratio", observed_ratio <= args.max_ratio_log2, f"{observed_ratio:.6f} <= {args.max_ratio_log2:.6f}")
     ok &= check("tail residual", tail_residual <= args.max_tail_log2, f"{tail_residual:.6f} <= {args.max_tail_log2:.6f}")
     ok &= check(

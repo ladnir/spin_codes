@@ -120,6 +120,7 @@ def h_candidates_for_fixed_rc(*, n: int, h_low: int, h_high: int, c: int, m_slot
 def large_r_low_slot_max(
     *,
     k: int,
+    parity_n: int,
     sigma: int,
     offset_s: int,
     h_min: int,
@@ -128,10 +129,10 @@ def large_r_low_slot_max(
     theta: float,
     z: float,
 ) -> LedgerMax:
-    n = 2 * k
+    n = k + parity_n
     h_high_global = math.floor(eta * n)
     m_slot = math.floor(theta * n)
-    log2_w = fixedtap_banded_outer_gf_log2(k, k, sigma, z)
+    log2_w = fixedtap_banded_outer_gf_log2(k, parity_n, sigma, z)
     best = LedgerMax(value=float("-inf"), h=-1, r=-1, c=-1, m_slot=m_slot)
 
     r_high = h_high_global // 2
@@ -159,6 +160,7 @@ def large_r_low_slot_max(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--k", type=int, default=2**20)
+    parser.add_argument("--parity-extra", type=int, default=0)
     parser.add_argument("--sigma", type=int, default=25)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--h-min", type=int, default=2000)
@@ -178,7 +180,8 @@ def main() -> int:
     parser.add_argument("--min-linear-gap", type=float, default=0.009)
     args = parser.parse_args()
 
-    n = 2 * args.k
+    parity_n = args.k + args.parity_extra
+    n = args.k + parity_n
     offset_s = args.sigma - math.ceil(math.log2(args.k))
 
     log2_q = bounded_r_log2_ratio(n=n, h=args.h_min, r_cap=args.r_cap, theta=args.theta_slot, z=args.z)
@@ -191,6 +194,7 @@ def main() -> int:
     candidate_tail = large_r_candidate_tail_log2(eta=args.eta, offset_s=offset_s, r_cap=args.r_cap)
     ledger = large_r_low_slot_max(
         k=args.k,
+        parity_n=parity_n,
         sigma=args.sigma,
         offset_s=offset_s,
         h_min=args.h_min,
@@ -211,6 +215,7 @@ def main() -> int:
 
     print("Dense+dense checkpoint residual verification")
     print(f"k = {args.k}")
+    print(f"parity_n = {parity_n}")
     print(f"N = {n}")
     print(f"sigma = {args.sigma}")
     print(f"offset s = {offset_s}")
