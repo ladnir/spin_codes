@@ -186,6 +186,12 @@ def main() -> int:
         help="CSV with columns weight,count for one local block. Required for --model spectrum-csv.",
     )
     parser.add_argument(
+        "--expect-spectrum-dim",
+        type=int,
+        default=None,
+        help="When using --model spectrum-csv, require the local counts to sum to 2^this value.",
+    )
+    parser.add_argument(
         "--singleton-volume",
         action="store_true",
         help="For h<=2b, also intersect with the one-active-block ambient-volume bound.",
@@ -203,6 +209,13 @@ def main() -> int:
     if args.model == "spectrum-csv":
         if not spectrum:
             raise ValueError("--model spectrum-csv requires --local-spectrum-csv")
+        if args.expect_spectrum_dim is not None:
+            total_words = sum(count for _, count in spectrum)
+            expected_words = 1 << args.expect_spectrum_dim
+            if total_words != expected_words:
+                raise ValueError(
+                    f"local spectrum counts sum to {total_words}, expected 2^{args.expect_spectrum_dim}"
+                )
         d0s = [min(weight for weight, count in spectrum if weight > 0 and count > 0)]
 
     if args.out_prefix is None:

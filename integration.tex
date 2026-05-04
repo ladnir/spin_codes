@@ -2141,6 +2141,52 @@ The reproducibility entry point for this scan is
 \texttt{python scripts/scan\_sigma\_margin\_tail.py}.
 \]
 
+\paragraph{A block-outer finite-\(n\) upgrade.}
+The small/intermediate ridge above is an outer-spectrum problem as much as an inner-tail problem.  A conservative
+implementation upgrade is to keep the fixed-tap dense recursive inner, but replace the systematic random banded outer
+by a direct sum of short systematic block codes.  If a local \([n_0,b]\) block has weight enumerator
+\[
+W_{\mathrm{loc}}(z)=\sum_j A^{\mathrm{loc}}_j z^j,
+\]
+and \(M=k/b\) independent blocks are used, then the outer enumerator is controlled by
+\[
+W_{\mathrm{out}}(z)=W_{\mathrm{loc}}(z)^M,
+\]
+with the zero word removed at the end.  This plugs into exactly the same first-moment interface
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer;
+the block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short
+published or certified local spectrum.
+
+As a first citable test case we used the fourth-order binary Reed--Muller code
+\[
+RM(4,9):\qquad [512,256,32].
+\]
+Its exact weight distribution was tabulated by Markov and Borissov in 2025.  Using that table as
+\(W_{\mathrm{loc}}\), with \(k=2^{20}\), \(M=4096\), \(N=2^{21}\), fixed-tap inner memory \(\sigma=32\), and the
+same global episode-cover inner bound, gives the following low-weight first-moment diagnostics:
+\[
+\begin{array}{c|rrrr}
+\delta & .106 & .104 & .092 & .090\\
+\hline
+-\log_2 \mu_{\le220}^{RM(4,9)} & 32.686 & 33.603 & 39.474 & 40.521\\
+h_* & 32 & 32 & 32 & 32
+\end{array}
+\]
+The peak is the minimum-weight local block term.  Thus \(RM(4,9)\) does not by itself give a \(40\)-bit margin at
+\(\delta=.106\), but it does give a clean, fully spectrum-based checkpoint around \(\delta\approx .091\) at
+\(\sigma=32\).  This is already much better structured than rejection sampling away the first few random-banded
+outer weights: the entire finite outer spectrum is explicit.
+
+This also explains what a stronger BCH-like block would need to provide.  A distance-only certificate is not enough:
+the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
+published or certified local spectrum envelope.  Primitive binary BCH arithmetic gives a natural candidate near
+length \(511\): the narrow-sense code with designed distance \(61\) has dimension \(259\) by the cyclotomic-coset
+degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is plausible.  If a usable spectrum bound
+for that block can be imported, it should drop into the same \(W_{\mathrm{loc}}^M\) interface and may recover the
+missing margin at \(\delta=.106\).
+
+The reproducibility entry points are the block-outer probe and BCH-parameter scripts in \(\texttt{scripts/}\).
+
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
 slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
