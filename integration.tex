@@ -2354,7 +2354,14 @@ for that block can be imported, it should drop into the same \(W_{\mathrm{loc}}^
 missing margin at \(\delta=.106\).
 
 The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
-verifiers in \(\texttt{scripts/}\).
+verifiers in \(\texttt{scripts/}\).  The RM checkpoint constants are also collected in the certificate manifest
+\[
+\texttt{scripts/certificates/rm512\_256\_sig32\_delta009.json},
+\]
+which is audited by
+\[
+\texttt{python scripts/verify\_block\_certificate\_manifest.py}.
+\]
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
