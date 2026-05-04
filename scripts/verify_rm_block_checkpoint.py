@@ -7,11 +7,9 @@ This checker consumes the summary artifacts from
 
 and the geometric tail post-processor.  It verifies the published local
 RM(4,9) spectrum was copied consistently, and that the finite prefix plus the
-conditional post-prefix tail meet the requested first-moment margin.
-
-The final tail is intentionally conditional: the script checks the observed
-finite ratio and resulting residual, while the paper still needs the matching
-post-prefix domination lemma.
+conditional post-prefix tail meet the requested first-moment margin.  Pair this
+with verify_rm_block_residual.py, which audits the analytic post-prefix
+domination constants used in the manuscript.
 """
 
 from __future__ import annotations

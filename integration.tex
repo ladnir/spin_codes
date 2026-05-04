@@ -2178,6 +2178,38 @@ probabilities over all nonzero outer words gives \(\mu_{\mathrm{block}}(\delta)\
 minimum-distance bound.
 \end{proof}
 
+\begin{lemma}[Finite block-certificate template]
+\label{lem:finite-block-certificate-template}
+In the setting of Lemma~\ref{lem:block-outer-first-moment-interface}, fix a prefix cutoff \(H\), an episode cutoff
+\(R\), and a live-slot cutoff \(\theta N\).  Suppose the prefix satisfies
+\[
+P_H:=\sum_{1\le h\le H} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\le P,
+\]
+and suppose the residual \(h>H\) is bounded by four audited pieces
+\[
+\begin{array}{ll}
+T_{\mathrm{lo},\le R} & (1\le r\le R,\ M\le\theta N),\\
+T_{\mathrm{hi},\le R} & (1\le r\le R,\ M>\theta N),\\
+T_{\mathrm{lo},>R} & (r>R,\ M\le\theta N),\\
+T_{\mathrm{hi},>R} & (r>R,\ M>\theta N).
+\end{array}
+\]
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+P+T_{\mathrm{lo},\le R}+T_{\mathrm{hi},\le R}+T_{\mathrm{lo},>R}+T_{\mathrm{hi},>R}.
+\]
+In particular, a finite certificate proving that the right-hand side is at most \(2^{-\lambda}\) gives failure
+probability at most \(2^{-\lambda}\).
+\end{lemma}
+
+\begin{proof}
+This is only bookkeeping.  Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure probability to the
+first moment over nonzero outer weights.  The prefix contributes \(P_H\), and the residual partition covers all
+post-prefix episode configurations.  Summing the audited upper bounds gives the displayed estimate.
+\end{proof}
+
 Thus a local code with a published or certified spectrum drops into exactly the same first-moment interface
 \(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer; the
 block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short local
@@ -2298,10 +2330,10 @@ artifact gives
 \le
 -40.520728.
 \]
-For the residual after \(H=500\), the bounded-\(r\) low-slot, high-slot, large-\(r\) low-slot, and linear-window
-handoff reductions are the same as in Lemma~\ref{lem:checkpoint-residual-split-0106}, but with the fixed-tap banded
-outer generating function replaced by \(W_{RM}(z)^{4096}-1\) at \(z=.4\).  The residual verifier checks the displayed
-constants:
+For the residual after \(H=500\), apply Lemma~\ref{lem:finite-block-certificate-template} with \(R=12\) and
+\(\theta=.35\).  The bounded-\(r\) low-slot, high-slot, large-\(r\) low-slot, and linear-window handoff reductions are
+the same as in Lemma~\ref{lem:checkpoint-residual-split-0106}, but with the fixed-tap banded outer generating function
+replaced by \(W_{RM}(z)^{4096}-1\) at \(z=.4\).  The residual verifier checks the displayed constants:
 \[
 \log_2 q_{\mathrm{low}}\le -0.119386,\qquad
 E_{\mathrm{hi}}\ge0.062159,
