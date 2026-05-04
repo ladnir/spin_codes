@@ -98,6 +98,23 @@ def local_random_like_log2(block_bits: int, d0: int, z: float) -> float:
     return math.log2(total)
 
 
+def load_local_spectrum(path: str | None) -> list[tuple[int, int]]:
+    if path is None:
+        return []
+    rows: list[tuple[int, int]] = []
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            rows.append((int(row["weight"]), int(row["count"])))
+    return rows
+
+
+def local_spectrum_log2(spectrum: list[tuple[int, int]], z: float) -> float:
+    total = 0.0
+    for weight, count in spectrum:
+        total += count * (z**weight)
+    return math.log2(total) if total > 0.0 else float("-inf")
+
+
 def outer_block_gf_bounds(
     *,
     blocks: int,
@@ -106,6 +123,7 @@ def outer_block_gf_bounds(
     h_max: int,
     zs: list[float],
     model: str,
+    spectrum: list[tuple[int, int]],
 ) -> tuple[list[float], list[float]]:
     vals = [float("-inf")] * (h_max + 1)
     best_z = [float("nan")] * (h_max + 1)
@@ -115,6 +133,8 @@ def outer_block_gf_bounds(
             local = local_floor_total_log2(block_bits, d0, z)
         elif model == "random-like":
             local = local_random_like_log2(block_bits, d0, z)
+        elif model == "spectrum-csv":
+            local = local_spectrum_log2(spectrum, z)
         else:
             raise ValueError(f"unknown local model: {model}")
         local_logs.append((z, log2_sub_one(blocks * local)))
@@ -159,7 +179,12 @@ def main() -> int:
     parser.add_argument("--z-count", type=int, default=220)
     parser.add_argument("--block-ratio", type=float, default=1.02)
     parser.add_argument("--suffix-block-ratio", type=float, default=1.1)
-    parser.add_argument("--model", choices=("floor-total", "random-like"), default="floor-total")
+    parser.add_argument("--model", choices=("floor-total", "random-like", "spectrum-csv"), default="floor-total")
+    parser.add_argument(
+        "--local-spectrum-csv",
+        default=None,
+        help="CSV with columns weight,count for one local block. Required for --model spectrum-csv.",
+    )
     parser.add_argument(
         "--singleton-volume",
         action="store_true",
@@ -174,6 +199,11 @@ def main() -> int:
     d = math.floor(args.delta * n)
     d0s = parse_int_list(args.d0s)
     zs = z_grid(args.z_min, args.z_max, args.z_count)
+    spectrum = load_local_spectrum(args.local_spectrum_csv)
+    if args.model == "spectrum-csv":
+        if not spectrum:
+            raise ValueError("--model spectrum-csv requires --local-spectrum-csv")
+        d0s = [min(weight for weight, count in spectrum if weight > 0 and count > 0)]
 
     if args.out_prefix is None:
         out_base = Path(__file__).with_name(
@@ -223,6 +253,7 @@ def main() -> int:
             h_max=args.h_max,
             zs=zs,
             model=args.model,
+            spectrum=spectrum,
         )
         if args.singleton_volume:
             singleton_hi = min(args.h_max, 2 * args.block_bits, 2 * d0 - 1)
