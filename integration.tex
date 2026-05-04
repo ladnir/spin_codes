@@ -2187,6 +2187,19 @@ remaining certificate task for the RM finite-\(n\) checkpoint is therefore quite
 domination/ratio lemma for the product RM spectrum times the global episode-cover inner bound, or replace that
 conditional ratio by a direct analytic residual bound.
 
+The first residual constants are already favorable.  Using the RM product generating bound at \(z=.4\),
+\[
+\log_2(W_{\mathrm{out}}(.4)-1)=33.494442,
+\]
+the bounded-\(r\) low-slot ratio at the handoff \(H=500\), \(R=12\), and \(\theta=.35\) is
+\[
+\log_2 q_{\mathrm{low}}\le -0.119386.
+\]
+The corresponding high-slot exponent is \(0.062159\), while the large-\(r\) low-slot ledger is maximized at
+\((h,r,c)=(500,13,26)\) and equals \(-271.720148\), or \(-186.135185\) after the coarse \(3N^4\) union factor.  The
+linear-window handoff from \(H/N\) to \(\eta_{\mathrm{crit}}\) still has a worst gap below \(-0.00290\).  Thus the
+RM checkpoint appears to have a full finite-certificate path, not merely a plotted finite prefix.
+
 This also explains what a stronger BCH-like block would need to provide.  A distance-only certificate is not enough:
 the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
 published or certified local spectrum envelope.  Primitive binary BCH arithmetic gives a natural candidate near
@@ -2197,7 +2210,8 @@ missing margin at \(\delta=.106\).
 
 The reproducibility entry points are the block-outer probe and BCH-parameter scripts in \(\texttt{scripts/}\).
 The current \(RM(4,9)\), \(\delta=.09\) checkpoint artifact is audited by
-\(\texttt{verify\_rm\_block\_checkpoint.py}\).
+\(\texttt{verify\_rm\_block\_checkpoint.py}\), and the residual constants above are audited by
+\(\texttt{verify\_rm\_block\_residual.py}\).
 
 \paragraph{What the exact isolated statistics buy us.}
 Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
