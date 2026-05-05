@@ -85,13 +85,13 @@ def local_floor_total_log2(block_bits: int, d0: int, z: float) -> float:
     return math.log2(1.0 + 2.0**nonzero)
 
 
-def local_random_like_log2(block_bits: int, d0: int, z: float) -> float:
+def local_random_like_log2(block_bits: int, local_length: int, d0: int, z: float) -> float:
     """Expected random-linear local spectrum with a hard floor below d0.
 
     This is a heuristic comparison lane, not a theorem input.
     """
-    n = 2 * block_bits
-    rate_factor = (2.0**block_bits - 1.0) / (2.0**n - 1.0) if n <= 100 else 2.0 ** (-block_bits)
+    n = local_length
+    rate_factor = (2.0**block_bits - 1.0) / (2.0**n - 1.0) if n <= 100 else 2.0 ** (block_bits - n)
     total = 1.0
     for j in range(d0, n + 1):
         total += rate_factor * math.comb(n, j) * (z**j)
@@ -119,6 +119,7 @@ def outer_block_gf_bounds(
     *,
     blocks: int,
     block_bits: int,
+    local_length: int,
     d0: int,
     h_max: int,
     zs: list[float],
@@ -132,7 +133,7 @@ def outer_block_gf_bounds(
         if model == "floor-total":
             local = local_floor_total_log2(block_bits, d0, z)
         elif model == "random-like":
-            local = local_random_like_log2(block_bits, d0, z)
+            local = local_random_like_log2(block_bits, local_length, d0, z)
         elif model == "spectrum-csv":
             local = local_spectrum_log2(spectrum, z)
         else:
@@ -154,21 +155,27 @@ def outer_block_gf_bounds(
     return vals, best_z
 
 
-def singleton_block_floor_log2(blocks: int, block_bits: int, d0: int, h: int) -> float:
+def singleton_block_floor_log2(blocks: int, block_bits: int, local_length: int, d0: int, h: int) -> float:
     """A sharper optional bound for one active block.
 
     This is only valid for h within one local block and uses the ambient volume.
     It is often better than the total-count floor right near h=d0.
     """
-    if h < d0 or h > 2 * block_bits:
+    if h < d0 or h > local_length:
         return float("-inf")
-    return math.log2(blocks) + min(block_bits, log2_binom(2 * block_bits, h))
+    return math.log2(blocks) + min(block_bits, log2_binom(local_length, h))
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--k", type=int, default=2**20)
     parser.add_argument("--block-bits", type=int, default=80)
+    parser.add_argument(
+        "--local-length",
+        type=int,
+        default=None,
+        help="Local block output length. Defaults to 2*block_bits for the older rate-half probes.",
+    )
     parser.add_argument("--sigma", type=int, default=32)
     parser.add_argument("--delta", type=float, default=0.106)
     parser.add_argument("--d0s", default="8:24")
@@ -201,7 +208,8 @@ def main() -> int:
 
     blocks = (args.k + args.block_bits - 1) // args.block_bits
     k_eff = blocks * args.block_bits
-    n = 2 * k_eff
+    local_length = args.local_length if args.local_length is not None else 2 * args.block_bits
+    n = blocks * local_length
     d = math.floor(args.delta * n)
     d0s = parse_int_list(args.d0s)
     zs = z_grid(args.z_min, args.z_max, args.z_count)
@@ -262,6 +270,7 @@ def main() -> int:
         outer_logs, outer_z = outer_block_gf_bounds(
             blocks=blocks,
             block_bits=args.block_bits,
+            local_length=local_length,
             d0=d0,
             h_max=args.h_max,
             zs=zs,
@@ -269,9 +278,9 @@ def main() -> int:
             spectrum=spectrum,
         )
         if args.singleton_volume:
-            singleton_hi = min(args.h_max, 2 * args.block_bits, 2 * d0 - 1)
+            singleton_hi = min(args.h_max, local_length, 2 * d0 - 1)
             for h in range(d0, singleton_hi + 1):
-                one = singleton_block_floor_log2(blocks, args.block_bits, d0, h)
+                one = singleton_block_floor_log2(blocks, args.block_bits, local_length, d0, h)
                 if one < outer_logs[h]:
                     outer_logs[h] = one
                     outer_z[h] = float("nan")
@@ -300,6 +309,7 @@ def main() -> int:
                     "d": d,
                     "sigma": args.sigma,
                     "block_bits": args.block_bits,
+                    "local_length": local_length,
                     "blocks": blocks,
                     "d0": d0,
                     "h": h,
@@ -321,6 +331,7 @@ def main() -> int:
                 "d": d,
                 "sigma": args.sigma,
                 "block_bits": args.block_bits,
+                "local_length": local_length,
                 "blocks": blocks,
                 "d0": d0,
                 "h_max": args.h_max,

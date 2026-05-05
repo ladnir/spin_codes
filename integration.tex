@@ -2359,9 +2359,21 @@ This also explains what a stronger BCH-like block would need to provide.  A dist
 the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
 published or certified local spectrum envelope.  Primitive binary BCH arithmetic gives a natural candidate near
 length \(511\): the narrow-sense code with designed distance \(61\) has dimension \(259\) by the cyclotomic-coset
-degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is plausible.  If a usable spectrum bound
-for that block can be imported, it should drop into the same \(W_{\mathrm{loc}}^M\) interface and may recover the
-missing margin at \(\delta=.106\).
+degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is plausible.  Such a subcode would use
+\[
+4096\text{ blocks},\qquad k=2^{20},\qquad N=4096\cdot511=2093056.
+\]
+The random-like local-spectrum diagnostic for a \([511,256,61]\)-shaped block, at \(\sigma=32\) and \(\delta=.106\),
+gives
+\[
+\log_2\mu_{\le220}^{\mathrm{randlike}}\le -68.881624,
+\qquad h_*=61,
+\]
+with \(d=\lfloor .106N\rfloor=221863\).  This is not a certificate, but it says the BCH direction has enough apparent
+headroom: even a few dozen bits of loss relative to the random-like local spectrum could still leave a \(40\)-bit
+finite margin.  The remaining missing object is therefore quite specific: an upper spectrum envelope for the
+\([511,259,\ge61]\) BCH parent, or directly for a certified \([511,256,\ge61]\) subcode.  The parent spectrum would
+already upper-bound any subcode spectrum, losing at most the three-dimensional overcount at the total-codeword level.
 
 The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
 verifiers in \(\texttt{scripts/}\).  The RM checkpoint constants are also collected in the certificate manifest
