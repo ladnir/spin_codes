@@ -2529,6 +2529,22 @@ Thus the boundary problem is equivalently to count monic degree-\(30\) polynomia
 Yg(Y)^2+1
 \]
 has \(61\) distinct nonzero roots.  This lacunary splitting formulation is the next finite theorem target.
+One way to see the remaining gap is to use more than the \(30\) interpolation points needed to determine \(g\).  If a
+valid boundary word has support size \(61\), then for any \(s\ge30\) it is counted \(\binom{61}{s}\) times by its
+\(s\)-subsets.  The raw bound
+\[
+\binom{511}{s}/\binom{61}{s}
+\]
+gets worse as \(s\) grows, but an \(s\)-set is consistent with a monic degree-\(30\) interpolant only if roughly
+\(s-30\) algebraic conditions over \(\F_{512}\) hold.  If those conditions behaved independently, the \(s=45\) ledger
+would save \(15\cdot9=135\) bits, enough to beat the certificate allowance by about \(25\) bits.  Thus the concrete
+finite problem is not to improve generic interpolation by a little; it is to prove a rank/equidistribution statement
+for these overdetermined interpolation conditions.
+Small exact toy cases support the random-splitting intuition.  For the analogous family \(Yg(Y)^2+1\) over
+\(\F_{32}\) with \(h=5\), exact enumeration gives \(6\) completely split \(g\)'s, compared with random expectation
+\(2^{2.37}\).  Over \(\F_{64}\) with \(h=7\), exact enumeration gives \(85\), compared with random expectation
+\(2^{5.04}\).  These small cases are not evidence for a theorem at \(q=512\), but they do not show the kind of
+large oversplitting bias that would make the boundary target implausible.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2586,6 +2602,14 @@ The random-splitting boundary heuristic is recorded by
 The finite interpolation bound is recorded by
 \[
 \texttt{python scripts/check\_bch\_boundary\_interpolation\_bound.py}.
+\]
+The higher-interpolation rank budget is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_higher\_interp\_budget.py}.
+\]
+Small-field exact splitting sanity checks are recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_smallfield.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
