@@ -2381,6 +2381,17 @@ designed-distance-\(61\) candidate gives error allowances of roughly \(2^{2258}\
 \(h=220\) when the denominator parameter is matched to the generator degree.  Thus the current BCH task is not to cite
 an asymptotic random-like spectrum theorem verbatim; it is to obtain a short finite envelope for the relevant
 low-weight parent spectrum, or to choose a nearby local code whose finite spectrum is already tabulated.
+The first natural adaptation of the Sidelnikov/Krasikov--Litsyn proof is a dual-window MacWilliams bound: if the
+nonzero dual weights lie in a central window \(W\), then
+\[
+A_h(C)\le 2^{-r}\binom{511}{h}+\max_{j\in W}|K_h(j)|.
+\]
+This support-only version is much too weak in our regime.  The Carlitz--Uchiyama half-width for \(t\approx30\) already
+covers the entire length, and even the unrealistic window \(W=\{256\}\) would spend about \(116.18\) bits of spectrum
+slack at \(h=61\) and \(80.78\) bits at \(h=89\), exceeding the \(56.75\)-bit budget for the
+\([511,259,\ge61]\) target.  Thus the adaptable part of the old BCH spectra proof is not merely dual concentration; it
+must be the moment/cancellation step that uses the BCH zero set to make the nonzero dual contribution cancel across
+weights.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2414,6 +2425,10 @@ The BCH asymptotic-bound diagnostic above is recorded by
 The corresponding random-like slack budget is recorded by
 \[
 \texttt{python scripts/check\_bch\_spectrum\_slack\_budget.py}.
+\]
+The dual-window MacWilliams audit is recorded by
+\[
+\texttt{python scripts/check\_bch\_dual\_window\_envelope.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
