@@ -4,7 +4,7 @@
 The manifest records the local spectrum source, finite-prefix artifacts, tail
 certificate, and residual constants for a spectrum-csv block outer.  This
 script checks that the referenced files match their hashes and recomputes the
-RM-style residual constants from the manifest parameters.
+block-spectrum residual constants from the manifest parameters.
 """
 
 from __future__ import annotations
@@ -17,8 +17,13 @@ import math
 from pathlib import Path
 from typing import Any
 
-from verify_rm_block_residual import large_r_low_slot_max_rm, rm_product_log2_w
-from verify_checkpoint_residual import bounded_r_log2_ratio, high_slot_exponent
+from block_outer_upgrade_probe import load_local_spectrum, local_spectrum_log2
+from verify_checkpoint_residual import (
+    bounded_r_log2_ratio,
+    high_slot_exponent,
+    h_candidates_for_fixed_rc,
+    ledger_value,
+)
 from verify_dense_claims import scan_gap
 
 
@@ -92,6 +97,59 @@ def log2add(x: float, y: float) -> float:
     hi = max(x, y)
     lo = min(x, y)
     return hi + math.log2(1.0 + 2.0 ** (lo - hi))
+
+
+def product_spectrum_log2_w(*, spectrum_path: Path, blocks: int, z: float) -> float:
+    local = local_spectrum_log2(load_local_spectrum(str(spectrum_path)), z)
+    all_log = blocks * local
+    if all_log == float("-inf"):
+        return float("-inf")
+    if all_log <= 1e-10:
+        val = math.expm1(all_log * math.log(2.0))
+        return math.log2(val) if val > 0.0 else float("-inf")
+    return all_log + math.log2(1.0 - 2.0 ** (-all_log))
+
+
+def large_r_low_slot_max_block(
+    *,
+    log2_w: float,
+    n: int,
+    offset_s: int,
+    h_min: int,
+    r_cap: int,
+    eta: float,
+    theta: float,
+    z: float,
+) -> tuple[float, int, int, int, int]:
+    h_high_global = math.floor(eta * n)
+    m_slot = math.floor(theta * n)
+    best_value = float("-inf")
+    best_h = -1
+    best_r = -1
+    best_c = -1
+
+    for r in range(r_cap + 1, h_high_global // 2 + 1):
+        for c in (2 * r, 2 * r + 1):
+            h_low = max(h_min, c)
+            if h_low > h_high_global:
+                continue
+            for h in h_candidates_for_fixed_rc(n=n, h_low=h_low, h_high=h_high_global, c=c, m_slot=m_slot, z=z):
+                value = ledger_value(
+                    log2_w=log2_w,
+                    n=n,
+                    offset_s=offset_s,
+                    z=z,
+                    h=h,
+                    r=r,
+                    c=c,
+                    m_slot=m_slot,
+                )
+                if value > best_value:
+                    best_value = value
+                    best_h = h
+                    best_r = r
+                    best_c = c
+    return best_value, best_h, best_r, best_c, m_slot
 
 
 def close(name: str, actual: float, expected: float, *, tol: float) -> bool:
@@ -205,7 +263,7 @@ def verify_residual(manifest: dict[str, Any], *, tol: float) -> bool:
     offset_s = params["sigma"] - math.ceil(math.log2(params["k"]))
     eta_lo = residual["h_min"] / params["n"]
 
-    log2_w = rm_product_log2_w(spectrum_path=spectrum_path, blocks=params["blocks"], z=residual["z"])
+    log2_w = product_spectrum_log2_w(spectrum_path=spectrum_path, blocks=params["blocks"], z=residual["z"])
     log2_q = bounded_r_log2_ratio(
         n=params["n"],
         h=residual["h_min"],
@@ -219,7 +277,7 @@ def verify_residual(manifest: dict[str, Any], *, tol: float) -> bool:
         eta=residual["eta"],
         z=residual["z"],
     )
-    low_value, _, _, _, _ = large_r_low_slot_max_rm(
+    low_value, _, _, _, _ = large_r_low_slot_max_block(
         log2_w=log2_w,
         n=params["n"],
         offset_s=offset_s,
