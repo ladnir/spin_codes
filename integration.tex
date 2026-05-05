@@ -2382,6 +2382,18 @@ designed-distance-\(61\) candidate gives error allowances of roughly \(2^{2258}\
 an asymptotic random-like spectrum theorem verbatim; it is to obtain a short finite envelope for the relevant
 low-weight parent spectrum, or to choose a nearby local code whose finite spectrum is already tabulated.
 
+There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
+narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
+random-like diagnostic for a \([511,250,63]\)-shaped block gives
+\[
+-\log_2\mu_{\le220}^{\mathrm{randlike}}\ge102.653059,
+\qquad h_*=89,
+\]
+at the same \(\sigma=32\), \(\delta=.106\) checkpoint, with \(4195\) local blocks and
+\(N=2143645\).  Its uniform random-like slack budget before the \(40\)-bit margin disappears is about \(62.71\) bits.
+This neighbor is therefore not worse from the first-moment point of view.  The tradeoff is conceptual rather than
+numerical: it gives up six local message bits per block but starts from a better-documented minimum-distance line.
+
 The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
 verifiers in \(\texttt{scripts/}\).  The RM checkpoint constants are also collected in the certificate manifest
 \[
