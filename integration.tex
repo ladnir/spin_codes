@@ -2482,6 +2482,36 @@ scaling \(T\mapsto \beta T\) lets one normalize \(p_{61}=1\).  This is the same 
 the Augot--Charpin--Sendrier minimum-distance approach to BCH codes.  For the \(\Delta=63\), \(k=250\) neighbor, the
 first free boundary power sum is \(p_{63}\), but \(\gcd(63,511)=7\), so scaling leaves seven nonzero classes rather
 than a single normalized case.
+In the normalized \(h=61\) case, writing
+\[
+g(Y)=Y^{30}+e_2Y^{29}+e_4Y^{28}+\cdots+e_{60},
+\]
+the locator polynomial is
+\[
+f_T(X)=Xg(X^2)+1.
+\]
+Thus the boundary supports are exactly the \(61\)-element subsets of \(\F_{512}^\times\) on which
+\[
+xg(x^2)=1
+\]
+for some monic degree-\(30\) polynomial \(g\).  Since \(x\mapsto x^2\) is a permutation of \(\F_{512}^\times\), any
+\(31\) proposed support points determine \(g\) by interpolation; the remaining \(30\) points must then be additional
+roots of the same degree-\(61\) polynomial \(Xg(X^2)+1\).  A finite boundary certificate could therefore be built by
+counting, or upper-bounding, the monic degree-\(30\) polynomials \(g\) for which \(Xg(X^2)+1\) splits completely over
+\(\F_{512}^\times\).  The naive \(2^{270}\) count of all such \(g\)'s is far too loose, so the splitting condition is
+the essential extra structure.  Including the \(511\)-element scaling orbit, this naive boundary count is about
+\(2^{278.997}\), whereas the \([511,259]\)-parent certificate would allow only about \(2^{67.131}\) weight-\(61\)
+words.  Thus the splitting condition must save roughly \(212\) bits at the boundary.  The analogous naive count for
+the \([511,250,63]\) neighbor is about \(215\) bits above its allowance.
+The random-polynomial heuristic says this amount of saving is plausible.  A random monic degree-\(61\) polynomial over
+\(\F_{512}\) splits into \(61\) distinct nonzero roots with probability
+\[
+\binom{511}{61}/512^{61}\approx 2^{-283.62}.
+\]
+Multiplying by the \(2^{270}\) normalized locator family and the \(511\)-element scaling orbit gives an expected
+boundary codeword count around \(2^{-4.62}\), about \(71.75\) bits below the certificate allowance.  The analogous
+\(h=63\) heuristic has about \(80.71\) bits of room.  This is only heuristic, but it suggests the boundary slice is
+probably not structurally fatal; the proof needs a finite splitting-count upper bound for this special family.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2527,6 +2557,14 @@ The parent/subcode correction target is recorded by
 The Newton boundary normalization ledger is recorded by
 \[
 \texttt{python scripts/check\_bch\_newton\_boundary.py}.
+\]
+The corresponding trivial boundary-count gap is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_trivial\_bounds.py}.
+\]
+The random-splitting boundary heuristic is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_split\_heuristic.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
