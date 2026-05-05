@@ -2374,6 +2374,12 @@ headroom: even a few dozen bits of loss relative to the random-like local spectr
 finite margin.  The remaining missing object is therefore quite specific: an upper spectrum envelope for the
 \([511,259,\ge61]\) BCH parent, or directly for a certified \([511,256,\ge61]\) subcode.  The parent spectrum would
 already upper-bound any subcode spectrum, losing at most the three-dimensional overcount at the total-codeword level.
+The known asymptotic BCH-spectrum theorems are useful orientation, but not yet a finite certificate at this length:
+plugging the explicit error factor from the Krasikov--Litsyn BCH spectrum bound into the native \(n=511\),
+designed-distance-\(61\) candidate gives error allowances of roughly \(2^{2258}\) at \(h=61\) and \(2^{2969}\) at
+\(h=220\) when the denominator parameter is matched to the generator degree.  Thus the current BCH task is not to cite
+an asymptotic random-like spectrum theorem verbatim; it is to obtain a short finite envelope for the relevant
+low-weight parent spectrum, or to choose a nearby local code whose finite spectrum is already tabulated.
 
 The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
 verifiers in \(\texttt{scripts/}\).  The RM checkpoint constants are also collected in the certificate manifest
@@ -2387,6 +2393,10 @@ which is audited by
 For a new spectrum-csv block candidate, the corresponding manifest is generated from the prefix and tail artifacts by
 \[
 \texttt{python scripts/create\_block\_certificate\_manifest.py}.
+\]
+The BCH asymptotic-bound diagnostic above is recorded by
+\[
+\texttt{python scripts/check\_bch\_kl\_spectrum\_bound.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
