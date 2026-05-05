@@ -2550,6 +2550,16 @@ of points in \(\F_{512}^\times\), the observed consistency rate was \(13/5000\),
 one independent \(\F_{512}\)-condition.  For random \(32\)-sets, \(0/5000\) successes were observed, consistent with
 the much smaller \(512^{-2}\) prediction.  This is again only diagnostic, but it supports the idea that the missing
 finite theorem is a rank/equidistribution statement rather than a fight against an obvious algebraic bias.
+The first overdetermined condition has an explicit symmetric form.  For a \(31\)-set \(S\subset\F_{512}^\times\), the
+top coefficient of the degree-\(30\) interpolation polynomial for \(Y^{255}\) on \(S\) is the divided difference
+\((Y^{255})[S]\), which equals the complete homogeneous symmetric polynomial \(h_{225}(S)\).  Therefore \(S\) is
+consistent with a monic degree-\(30\) \(g\) iff
+\[
+h_{225}(S)=1.
+\]
+A direct checker verifies this identity against interpolation, and a \(q=512\) sample gave \(3/1000\) successes for
+this equation, again on the \(1/512\) scale.  For larger \(s\), the corresponding rank problem is that all \(31\)-subsets
+of the \(s\)-set have the same divided-difference value \(1\), with only \(s-30\) independent conditions expected.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2619,6 +2629,10 @@ Small-field exact splitting sanity checks are recorded by
 The \(q=512\) interpolation-consistency sampler is recorded by
 \[
 \texttt{python scripts/check\_bch\_boundary\_interp\_sampling.py}.
+\]
+The divided-difference form of the first consistency condition is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_divdiff.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
