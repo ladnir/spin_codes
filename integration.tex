@@ -2476,6 +2476,12 @@ f_T(X)=X^h+e_2X^{h-2}+e_4X^{h-4}+\cdots+e_{h-1}X+e_h.
 Moreover \(f_T(X)=X f_T'(X)+e_h\).  Since the roots are nonzero, every root satisfies \(x f_T'(x)=e_h\).  This does
 not yet count the minimum-weight words, but it is a sharper algebraic object than a generic subset of size \(h\): the
 \(h=61\) and \(h=63\) boundary slices are constrained root sets of this special polynomial family.
+For the \(\Delta=61\) parent, the first free power sum at the boundary is \(p_{61}\).  Newton gives
+\(p_{61}=e_{61}\), so it is nonzero for a weight-\(61\) support in \(\F_{512}^\times\).  Since \(\gcd(61,511)=1\),
+scaling \(T\mapsto \beta T\) lets one normalize \(p_{61}=1\).  This is the same locator-polynomial reduction used in
+the Augot--Charpin--Sendrier minimum-distance approach to BCH codes.  For the \(\Delta=63\), \(k=250\) neighbor, the
+first free boundary power sum is \(p_{63}\), but \(\gcd(63,511)=7\), so scaling leaves seven nonzero classes rather
+than a single normalized case.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2517,6 +2523,10 @@ The dual-window MacWilliams audit is recorded by
 The parent/subcode correction target is recorded by
 \[
 \texttt{python scripts/check\_bch\_macwilliams\_target.py}.
+\]
+The Newton boundary normalization ledger is recorded by
+\[
+\texttt{python scripts/check\_bch\_newton\_boundary.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
