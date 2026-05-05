@@ -2366,12 +2366,13 @@ degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is 
 The random-like local-spectrum diagnostic for a \([511,256,61]\)-shaped block, at \(\sigma=32\) and \(\delta=.106\),
 gives
 \[
-\log_2\mu_{\le220}^{\mathrm{randlike}}\le -68.881624,
-\qquad h_*=61,
+-\log_2\mu_{\le220}^{\mathrm{randlike}}\ge 96.675835,
+\qquad h_*=89,
 \]
 with \(d=\lfloor .106N\rfloor=221863\).  This is not a certificate, but it says the BCH direction has enough apparent
-headroom: even a few dozen bits of loss relative to the random-like local spectrum could still leave a \(40\)-bit
-finite margin.  The remaining missing object is therefore quite specific: an upper spectrum envelope for the
+headroom.  A uniform multiplicative loss of about \(2^{56.75}\) on the nonzero random-like local spectrum would still
+leave a \(40\)-bit margin in this prefix diagnostic.  The remaining missing object is therefore quite specific: an
+upper spectrum envelope for the
 \([511,259,\ge61]\) BCH parent, or directly for a certified \([511,256,\ge61]\) subcode.  The parent spectrum would
 already upper-bound any subcode spectrum, losing at most the three-dimensional overcount at the total-codeword level.
 The known asymptotic BCH-spectrum theorems are useful orientation, but not yet a finite certificate at this length:
@@ -2397,6 +2398,10 @@ For a new spectrum-csv block candidate, the corresponding manifest is generated 
 The BCH asymptotic-bound diagnostic above is recorded by
 \[
 \texttt{python scripts/check\_bch\_kl\_spectrum\_bound.py}.
+\]
+The corresponding random-like slack budget is recorded by
+\[
+\texttt{python scripts/check\_bch\_spectrum\_slack\_budget.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}

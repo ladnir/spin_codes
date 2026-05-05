@@ -67,6 +67,14 @@ def log2_sub_one(log_x: float) -> float:
     return log_x + math.log2(1.0 - 2.0 ** (-log_x))
 
 
+def log2_one_plus(log_x: float) -> float:
+    if log_x == float("-inf"):
+        return 0.0
+    if log_x < -40.0:
+        return math.log1p(2.0**log_x) / math.log(2.0)
+    return math.log2(1.0 + 2.0**log_x)
+
+
 def format_log2(x: float) -> str:
     if x == float("-inf"):
         return "-inf"
@@ -80,9 +88,7 @@ def local_floor_total_log2(block_bits: int, d0: int, z: float) -> float:
     # small smoke-test block sizes.
     if block_bits <= 50:
         nonzero = math.log2((2.0**block_bits - 1.0) * (z**d0))
-    if nonzero < -60.0:
-        return math.log2(1.0 + 2.0**nonzero)
-    return math.log2(1.0 + 2.0**nonzero)
+    return log2_one_plus(nonzero)
 
 
 def local_random_like_log2(block_bits: int, local_length: int, d0: int, z: float) -> float:
@@ -91,11 +97,12 @@ def local_random_like_log2(block_bits: int, local_length: int, d0: int, z: float
     This is a heuristic comparison lane, not a theorem input.
     """
     n = local_length
-    rate_factor = (2.0**block_bits - 1.0) / (2.0**n - 1.0) if n <= 100 else 2.0 ** (block_bits - n)
-    total = 1.0
+    log_rate = math.log2((2.0**block_bits - 1.0) / (2.0**n - 1.0)) if n <= 100 else block_bits - n
+    nonzero = float("-inf")
+    log_z = math.log2(z)
     for j in range(d0, n + 1):
-        total += rate_factor * math.comb(n, j) * (z**j)
-    return math.log2(total)
+        nonzero = log2add(nonzero, log_rate + log2_binom(n, j) + j * log_z)
+    return log2_one_plus(nonzero)
 
 
 def load_local_spectrum(path: str | None) -> list[tuple[int, int]]:
@@ -109,10 +116,21 @@ def load_local_spectrum(path: str | None) -> list[tuple[int, int]]:
 
 
 def local_spectrum_log2(spectrum: list[tuple[int, int]], z: float) -> float:
-    total = 0.0
+    zero_count = 0
+    nonzero = float("-inf")
+    log_z = math.log2(z)
     for weight, count in spectrum:
-        total += count * (z**weight)
-    return math.log2(total) if total > 0.0 else float("-inf")
+        if not count:
+            continue
+        if weight == 0:
+            zero_count += count
+        else:
+            nonzero = log2add(nonzero, math.log2(count) + weight * log_z)
+    if zero_count == 0:
+        return nonzero
+    if zero_count == 1:
+        return log2_one_plus(nonzero)
+    return log2add(math.log2(zero_count), nonzero)
 
 
 def outer_block_gf_bounds(
