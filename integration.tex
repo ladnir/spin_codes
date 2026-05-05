@@ -2413,6 +2413,36 @@ or more pessimistically if
 This is the concrete cancellation theorem we need from the BCH zero set.  The lower-rate native neighbor has no
 three-bit parent/subcode tax, so the analogous target for the \([511,250,63]\) code is \(62.71\) bits.
 
+There is an equivalent subset-count formulation which may be the more useful proof object.  Let \(q=512\), identify the
+\(511\) cyclic positions with \(\F_q^\times\), and let \(B(\Delta)\) be the primitive narrow-sense BCH code whose zero
+set contains \(\alpha,\alpha^2,\ldots,\alpha^{\Delta-1}\).  Then
+\[
+A_h(B(\Delta))
+=
+\#\left\{
+T\subseteq \F_q^\times:\ |T|=h,\quad
+\sum_{x\in T}x^i=0\ \text{for every }1\le i<\Delta
+\right\}.
+\]
+Indeed, the binary word with support \(T\) has codeword polynomial \(c(z)=\sum_{x=\alpha^\ell\in T}z^\ell\), and the
+BCH zero conditions are exactly \(c(\alpha^i)=\sum_{x\in T}x^i=0\).  Thus the missing BCH theorem can also be stated as
+a finite equidistribution bound for \(h\)-subsets of \(\F_{512}^\times\) under the first \(\Delta-1\) power sums.  For
+\(\Delta=61\), the target is that this constrained subset count is at most \(2^{53.75}\) times the random-like
+\([511,259]\) count, uniformly over the local prefix weights used by the block certificate.  This is the same content
+as the MacWilliams correction bound, but it exposes the algebraic equations that a direct finite proof would need to
+exploit.
+In characteristic two the even constraints are Frobenius consequences of the odd ones:
+\[
+\left(\sum_{x\in T}x^i\right)^2=\sum_{x\in T}x^{2i}.
+\]
+For the \(\Delta=61\) parent, the cyclotomic-coset representatives below \(61\) are
+\[
+1,3,5,\ldots,31,\quad 35,37,39,41,43,45,47,\quad 51,53,55,57,59,
+\]
+twenty-eight size-\(9\) cosets, giving redundancy \(252\).  The \(\Delta=63\), \(k=250\) neighbor adds the coset of
+\(61\), giving redundancy \(261\).  Thus a finite proof only has to control the joint distribution of these
+\(28\) or \(29\) trace/power-sum constraints, not sixty unrelated equations.
+
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
 random-like diagnostic for a \([511,250,63]\)-shaped block gives
