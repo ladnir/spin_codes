@@ -2512,6 +2512,23 @@ Multiplying by the \(2^{270}\) normalized locator family and the \(511\)-element
 boundary codeword count around \(2^{-4.62}\), about \(71.75\) bits below the certificate allowance.  The analogous
 \(h=63\) heuristic has about \(80.71\) bits of room.  This is only heuristic, but it suggests the boundary slice is
 probably not structurally fatal; the proof needs a finite splitting-count upper bound for this special family.
+Equivalently, after the change of variable \(Y=X^2\), the normalized \(h=61\) boundary words are monic degree-\(30\)
+polynomials \(g(Y)\) agreeing with the word \(Y^{255}\) on \(61\) points of \(\F_{512}^\times\).  The generic
+interpolation/list-size bound gives
+\[
+\#\{g\}\le \binom{511}{30}/\binom{61}{30},
+\]
+so the total boundary codeword count is at most \(2^{112.260}\) after restoring the scaling orbit.  This is rigorous
+but still about \(45.13\) bits above the certificate allowance, so generic Reed--Solomon list-decoding bounds are not
+yet enough.  The special received word has extra structure:
+\[
+Y\,(Y^{255})^2=1\quad \text{on }\F_{512}^\times.
+\]
+Thus the boundary problem is equivalently to count monic degree-\(30\) polynomials \(g\) for which
+\[
+Yg(Y)^2+1
+\]
+has \(61\) distinct nonzero roots.  This lacunary splitting formulation is the next finite theorem target.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2565,6 +2582,10 @@ The corresponding trivial boundary-count gap is recorded by
 The random-splitting boundary heuristic is recorded by
 \[
 \texttt{python scripts/check\_bch\_boundary\_split\_heuristic.py}.
+\]
+The finite interpolation bound is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_interpolation\_bound.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
