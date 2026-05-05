@@ -2258,9 +2258,19 @@ h_* & 32 & 32 & 32 & 32
 \end{array}
 \]
 The peak is the minimum-weight local block term.  Thus \(RM(4,9)\) does not by itself give a \(40\)-bit margin at
-\(\delta=.106\), but it does give a clean, fully spectrum-based checkpoint around \(\delta\approx .091\) at
-\(\sigma=32\).  This is already much better structured than rejection sampling away the first few random-banded
-outer weights: the entire finite outer spectrum is explicit.
+\(\delta=.106\), but it does give a clean, fully spectrum-based checkpoint around \(\delta\approx .09\) at
+\(\sigma=32\).  The important finite-\(k\) headline is
+\[
+k=2^{20},\qquad N=2^{21},\qquad \sigma=32,\qquad
+\Pr[d_{\min}\le188743]\le2^{-40.5},
+\]
+or equivalently \(d_{\min}\ge188744\) with probability at least \(1-2^{-40.5}\).  In relative terms this certifies
+\[
+\frac{d_{\min}}{N}\ge\frac{188744}{2097152}>0.09000015
+\]
+except with probability at most \(2^{-40.5}\).  The nearby \(\delta=.092,.104,.106\) entries in the table are prefix
+diagnostics, not full manifest certificates.  This is already much better structured than rejection sampling away the
+first few random-banded outer weights: the entire finite outer spectrum is explicit.
 
 At \(\delta=.09\) we also extended the same computation to \(h\le500\).  The total remained
 \[
