@@ -2393,6 +2393,26 @@ slack at \(h=61\) and \(80.78\) bits at \(h=89\), exceeding the \(56.75\)-bit bu
 must be the moment/cancellation step that uses the BCH zero set to make the nonzero dual contribution cancel across
 weights.
 
+The finite target can be stated cleanly in MacWilliams form.  Let \(C\) be the \([511,259]\) BCH parent, let
+\(r=252\), and write
+\[
+A_h(C)=2^{-r}\left(\binom{511}{h}+S_h\right),
+\qquad
+S_h=\sum_{j>0} A_j(C^\perp)K_h(j),
+\]
+where \(K_h\) is the binary Krawtchouk polynomial.  Since the actual implementation target is a
+\([511,256]\) subcode, using the parent spectrum already spends three local bits.  The \(56.75\)-bit random-like slack
+budget is therefore met by the parent if, for all local weights used by the prefix certificate,
+\[
+\log_2\left(1+\frac{S_h}{\binom{511}{h}}\right)\le 53.75,
+\]
+or more pessimistically if
+\[
+\log_2\left(1+\frac{|S_h|}{\binom{511}{h}}\right)\le 53.75.
+\]
+This is the concrete cancellation theorem we need from the BCH zero set.  The lower-rate native neighbor has no
+three-bit parent/subcode tax, so the analogous target for the \([511,250,63]\) code is \(62.71\) bits.
+
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
 random-like diagnostic for a \([511,250,63]\)-shaped block gives
@@ -2429,6 +2449,10 @@ The corresponding random-like slack budget is recorded by
 The dual-window MacWilliams audit is recorded by
 \[
 \texttt{python scripts/check\_bch\_dual\_window\_envelope.py}.
+\]
+The parent/subcode correction target is recorded by
+\[
+\texttt{python scripts/check\_bch\_macwilliams\_target.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
