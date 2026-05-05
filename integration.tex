@@ -2443,6 +2443,40 @@ twenty-eight size-\(9\) cosets, giving redundancy \(252\).  The \(\Delta=63\), \
 \(61\), giving redundancy \(261\).  Thus a finite proof only has to control the joint distribution of these
 \(28\) or \(29\) trace/power-sum constraints, not sixty unrelated equations.
 
+The additive-character version is the bridge back to MacWilliams.  For a set \(E\) of coset representatives, let
+\[
+P_{\mathbf a}(x)=\sum_{e\in E}a_e x^e,\qquad a_e\in\F_{512},
+\]
+and let \(\psi(u)=(-1)^{\mathrm{Tr}_{\F_{512}/\F_2}(u)}\).  Orthogonality gives
+\[
+A_h(B(\Delta))
+=2^{-9|E|}
+\sum_{\mathbf a\in\F_{512}^{E}}
+[z^h]\prod_{x\in\F_{512}^\times}\left(1+z\,\psi(P_{\mathbf a}(x))\right).
+\]
+The zero choice of \(\mathbf a\) is the random-like main term.  For \(\mathbf a\ne0\), if
+\[
+w(\mathbf a)=\#\{x\in\F_{512}^\times:\ \mathrm{Tr}(P_{\mathbf a}(x))=1\},
+\]
+then the coefficient is
+\[
+[z^h](1+z)^{511-w(\mathbf a)}(1-z)^{w(\mathbf a)}=K_h(w(\mathbf a)).
+\]
+Thus the missing cancellation theorem can be attacked either as a statement about the weight distribution of the dual
+trace-code family \(\mathrm{Tr}(P_{\mathbf a}(x))\), or directly as a high-degree elementary-symmetric cancellation
+over the signs \(\psi(P_{\mathbf a}(x))\).
+
+There is also special structure at the minimum-weight edge.  If \(T\subseteq\F_{512}^\times\) has size \(h\) and
+\(\sum_{x\in T}x^i=0\) for \(1\le i<h\), then Newton's identities imply, in characteristic two, that all odd elementary
+symmetric functions below degree \(h\) vanish.  For odd \(h\), the monic polynomial with roots \(T\) therefore has the
+form
+\[
+f_T(X)=X^h+e_2X^{h-2}+e_4X^{h-4}+\cdots+e_{h-1}X+e_h.
+\]
+Moreover \(f_T(X)=X f_T'(X)+e_h\).  Since the roots are nonzero, every root satisfies \(x f_T'(x)=e_h\).  This does
+not yet count the minimum-weight words, but it is a sharper algebraic object than a generic subset of size \(h\): the
+\(h=61\) and \(h=63\) boundary slices are constrained root sets of this special polynomial family.
+
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
 random-like diagnostic for a \([511,250,63]\)-shaped block gives
