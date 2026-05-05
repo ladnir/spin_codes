@@ -2545,6 +2545,11 @@ Small exact toy cases support the random-splitting intuition.  For the analogous
 \(2^{2.37}\).  Over \(\F_{64}\) with \(h=7\), exact enumeration gives \(85\), compared with random expectation
 \(2^{5.04}\).  These small cases are not evidence for a theorem at \(q=512\), but they do not show the kind of
 large oversplitting bias that would make the boundary target implausible.
+A direct \(q=512\) sampler gives the same first-order signal for overdetermined interpolation.  For random \(31\)-sets
+of points in \(\F_{512}^\times\), the observed consistency rate was \(13/5000\), on the \(1/512\) scale predicted by
+one independent \(\F_{512}\)-condition.  For random \(32\)-sets, \(0/5000\) successes were observed, consistent with
+the much smaller \(512^{-2}\) prediction.  This is again only diagnostic, but it supports the idea that the missing
+finite theorem is a rank/equidistribution statement rather than a fight against an obvious algebraic bias.
 
 There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
 narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
@@ -2610,6 +2615,10 @@ The higher-interpolation rank budget is recorded by
 Small-field exact splitting sanity checks are recorded by
 \[
 \texttt{python scripts/check\_bch\_boundary\_smallfield.py}.
+\]
+The \(q=512\) interpolation-consistency sampler is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_interp\_sampling.py}.
 \]
 
 \paragraph{What the exact isolated statistics buy us.}
