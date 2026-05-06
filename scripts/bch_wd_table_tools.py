@@ -22,7 +22,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import html
 import math
+import re
 import ssl
 import urllib.request
 from pathlib import Path
@@ -104,14 +106,56 @@ def compare_spectra(left: dict[int, int], right: dict[int, int]) -> list[tuple[i
     return [(w, left.get(w, 0), right.get(w, 0)) for w in weights if left.get(w, 0) != right.get(w, 0)]
 
 
+def section_text(index_html: str, section_title: str) -> str:
+    match = re.search(rf"<h1>\s*{re.escape(section_title)}\s*</h1>", index_html, re.IGNORECASE)
+    if match is None:
+        raise ValueError(f"section not found: {section_title}")
+    next_section = re.search(r"<h1>", index_html[match.end() :], re.IGNORECASE)
+    if next_section is None:
+        return index_html[match.end() :]
+    return index_html[match.end() : match.end() + next_section.start()]
+
+
+def audit_index(index_html: str, section_title: str, length: int) -> list[tuple[int, bool, str]]:
+    section = section_text(index_html, section_title)
+    linked: dict[int, str] = {}
+    for href, n_s, k_s in re.findall(r'<a\s+href="([^"]+)">\s*\((\d+),(\d+)\)', section, re.IGNORECASE):
+        if int(n_s) == length:
+            linked[int(k_s)] = html.unescape(href)
+
+    all_dims = set(linked)
+    for n_s, k_s in re.findall(r"\((\d+),(\d+)\)", section):
+        if int(n_s) == length:
+            all_dims.add(int(k_s))
+    return [(k, k in linked, linked.get(k, "")) for k in sorted(all_dims)]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--extended", required=True, help="Extended BCH .wd path or URL")
+    parser.add_argument("--extended", default=None, help="Extended BCH .wd path or URL")
     parser.add_argument("--primitive", default=None, help="Primitive BCH .wd path or URL to compare")
     parser.add_argument("--length", type=int, default=None, help="Extended length N; default max table weight")
     parser.add_argument("--out-csv", type=Path, default=None, help="Optional derived primitive CSV")
     parser.add_argument("--insecure-url", action="store_true", help="Disable TLS verification for public table URLs")
+    parser.add_argument("--index-url", default=None, help="Audit linked dimensions on a weight-table index page")
+    parser.add_argument("--section", default="Extended Binary Primitive BCH Codes")
     args = parser.parse_args()
+
+    if args.index_url is not None:
+        if args.length is None:
+            raise SystemExit("--length is required with --index-url")
+        rows = audit_index(read_text(args.index_url, args.insecure_url), args.section, args.length)
+        print("BCH weight-distribution index audit")
+        print(f"index_url={args.index_url}")
+        print(f"section={args.section}")
+        print(f"length={args.length}")
+        print("dimension,linked,href")
+        for dim, linked, href in rows:
+            print(f"{dim},{int(linked)},{href}")
+        return 0
+
+    if args.extended is None:
+        raise SystemExit("--extended is required unless --index-url is used")
 
     ext_name, ext_source, ext_spectrum = parse_wd_table(read_text(args.extended, args.insecure_url))
     length = args.length if args.length is not None else max(ext_spectrum)
