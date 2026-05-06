@@ -2633,6 +2633,20 @@ upward, with the central dimensions \(71,\ldots,199\) listed but not linked.  Th
 derives the published \([255,63]\) primitive table with no mismatches.  Thus the public database is enough to validate
 the import and extension algebra, but not enough by itself for a \(k\approx128\) block; the affine-coset computation is
 still needed for the central dimension.
+As a direct block-outer trial, we also imported the Okayama/Desaki exact weight distribution
+\(\texttt{EBCH128\_64.wd}\).  The table sums to \(2^{64}\), has length \(128\), and has \(d_{\min}=22\).  Plugging this
+exact \([128,64,22]\) local spectrum into the same \(k=2^{20}\), \(N=2^{21}\), \(\sigma=32\) block-outer first-moment
+prefix gives
+\[
+\begin{array}{c|c|c|c}
+\delta & d=\lfloor \delta N\rfloor & -\log_2 \mu_{\le220} & h_*\\
+\hline
+.106 & 222298 & 12.382683 & 25\\
+.09 & 188743 & 18.592737 & 24
+\end{array}
+\]
+Thus this specific exact EBCH table is a useful import/sanity rung, but it is not competitive with the RM checkpoint:
+its local floor \(22\) leaves the small-block-weight contribution too large for the current finite-\(n\) target.
 The first affine-orbit sanity check works on exact-enumerable \(m=5\) BCH codes.  The important bookkeeping point is
 that affine orbits live in the extended code: an extended weight \(W\) slice combines primitive weights \(W-1\) and
 \(W\).  With this convention, the \([31,21,5]\) code has one affine orbit of \(992\) extended weight-\(6\) words, and
@@ -2710,6 +2724,13 @@ For example, the \(m=6,\ h=13\) recovery check above is reproduced by
 The published-table import and extended-to-primitive validation rung is recorded by
 \[
 \texttt{python scripts/bch\_wd\_table\_tools.py}.
+\]
+Single \(\texttt{.wd}\) files in the public Okayama format are converted to block-probe CSV spectra by
+\[
+\begin{array}{l}
+\texttt{python scripts/import\_wd\_spectrum.py scripts/EBCH128\_64.wd}\\
+\texttt{\quad scripts/ebch128\_64\_spectrum.csv --expect-dim 64 --expect-length 128}.
+\end{array}
 \]
 For example, the public \(m=8\) availability audit is
 \[
