@@ -865,6 +865,8 @@ Currently checkable:
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the exact RM direct-sum outer prefix coefficients and exact-outer reweighting in
   `certify_rm_outer_prefix_exact.py`
+- the paper-facing finite statement `lem:rm-prefix-support-split`, which packages the exact support gap and
+  `h=32`/`h>32` split checked by the verifier
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication

@@ -3064,12 +3064,59 @@ with the maximum at \(h=32\).  The exact peak is \(0.303593738594\).  The naive 
 is \(0.3130655524\) at \(h=32\), about \(1.0312\) times too large, so the proof must use the averaged-binomial sum
 \(S_H\) rather than endpoint domination if one works with the smoothed outer envelope.
 
-The exact RM direct-sum support gives a sharper and cleaner finite certificate.  Computing the truncated coefficients of
-the local RM spectrum to \(h\le500\) shows that the positive support begins
+The exact RM direct-sum support gives a sharper and cleaner finite certificate.
+
+\begin{lemma}[Exact RM prefix support split certificate]
+\label{lem:rm-prefix-support-split}
+Consider the finite checkpoint \(N=2^{21}\), \(\delta=.09\), and the RM direct-sum outer consisting of \(4096\)
+copies of the local \([512,256]\) RM block whose weight enumerator is
+\[
+W_{\rm loc}(z)=\sum_{a=0}^{512} A_a^{\rm loc}z^a.
+\]
+Let
+\[
+A_h^{\rm RM}:=[z^h]\,W_{\rm loc}(z)^{4096}.
+\]
+The integer-truncated coefficient certificate through \(h\le500\) verifies that the positive support begins
 \[
 32,\ 48,\ 56,\ 60,\ 64,\ldots,
 \]
-so the apparent adjacent \(h=33,34,\ldots\) ridge is a Cauchy-smoothing artifact.  Reweighting the same audited
+and has \(114\) positive supported weights in \(1\le h\le500\).  Replacing the smoothed outer rows in the audited
+\(32\le h\le500\) ledgers by the exact coefficients \(A_h^{\rm RM}\) gives
+\[
+\begin{array}{c|ccc}
+\text{piece} & \log_2\text{ total} & \log_2(h=32) & \log_2(h>32)\\
+\hline
+\text{window }5949\le T\le17948 & -37.383345 & -37.383482 & -50.738253\\
+\text{ultra-late }T<5949 & -41.113442 & -41.113442 & -66.416502
+\end{array}
+\]
+The same exact-outer reweighting gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early},\ e\le16}^{\rm exact\ outer}\le -86.910456,
+\qquad
+\log_2\mu_{32\le h\le500,\ {\rm early},\ e\ge17}^{\rm exact\ outer}\le -319.977808.
+\]
+\end{lemma}
+
+\begin{proof}
+The local enumerator coefficients \(A_a^{\rm loc}\) are read as integers from the checked CSV spectrum file.  Since the
+outer is a direct sum of \(4096\) identical blocks, its weight enumerator is \(W_{\rm loc}(z)^{4096}\).  The certificate
+computes this polynomial modulo \(z^{501}\) by binary exponentiation with exact integer convolutions, so no
+floating-point or smoothing step enters the support calculation.  The split values are then obtained by reweighting each
+audited CSV row by
+\[
+\log_2 A_h^{\rm RM}-\log_2 A_h^{\rm smooth}
+\]
+and then partitioning the rows into the \(h=32\) slice and the supported \(h>32\) remainder before log-summing.  The
+verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+checks the first two positive support weights \(32,48\), the displayed split totals, and the final combined totals.
+\end{proof}
+
+Thus the apparent adjacent \(h=33,34,\ldots\) ridge is a Cauchy-smoothing artifact.  Reweighting the same audited
 inner/placement rows by exact RM direct-sum coefficients gives
 \[
 \log_2\mu_{32\le h\le500,\ {\rm window}}^{\rm exact\ outer}\le -37.383345,
