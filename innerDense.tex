@@ -3328,6 +3328,49 @@ The peak row is \(h=32,r=1\) in the first early bucket, with inner exponent \(-1
 \log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\ge17}\le -305.738816.
 \]
 
+\begin{corollary}[Small-weight finite-prefix certificate]
+\label{cor:fullsplit-small-prefix-all-first-active}
+At the finite checkpoint \(N=2^{21}\), \(\delta=.09\), and the RM direct-sum outer from
+Lemma~\ref{lem:rm-prefix-support-split}, the contribution of all first-active positions for supported weights
+\(32\le h\le500\) satisfies
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active,\ exact\ outer}\le -37.278528.
+\]
+More explicitly, the three placement regimes obey
+\[
+\begin{array}{c|c}
+\text{first-active regime} & \log_2\text{ contribution}\\
+\hline
+T<5949 & -41.113442\\
+5949\le T\le17948 & -37.383345\\
+T>17948 & -86.910456
+\end{array}
+\]
+after exact RM outer reweighting.
+\end{corollary}
+
+\begin{proof}
+The ultra-late line \(T<5949\) is the placement-only exact-outer prefix in
+Lemma~\ref{lem:rm-prefix-support-split}.  The window line \(5949\le T\le17948\) is the log-sum of the explicit
+\(e\le8\) ledger, justified over the three window buckets by
+Lemma~\ref{lem:fullsplit-tiny-prefix-interiorT}, and the crude \(e\ge9\) residual
+\[
+\log_2\mu_{32\le h\le500,\ {\rm window}}^{e\ge9,\ {\rm exact\ outer}}\le -284.004805.
+\]
+The early line \(T>17948\) is the log-sum of the bucket-uniform \(e\le16\) ledger and the crude \(e\ge17\) residual:
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\le16,\ {\rm exact\ outer}}\le -86.910456,
+\qquad
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\ge17,\ {\rm exact\ outer}}\le -319.977808.
+\]
+Finally,
+\[
+\log_2\!\left(2^{-41.113442}+2^{-37.383345}+2^{-86.910456}\right)\le -37.278528.
+\]
+The verifier \(\texttt{scripts/verify\_fullsplit\_finite\_ledger.py}\) checks each displayed numerical input and the
+final log-sum.
+\end{proof}
+
 For the remaining early branch \(h>500\), high-density rows expose an important bookkeeping trap.  If one reuses the
 endpoint-placement interface above, the scan can look catastrophically positive: near \(h=1100001\) in the far early
 bucket, endpoint placement at \(T_{\max}\) paired with the inner survival bound at \(T_{\min}=27949\) gives a false

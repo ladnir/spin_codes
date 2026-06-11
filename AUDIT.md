@@ -867,6 +867,8 @@ Currently checkable:
   `certify_rm_outer_prefix_exact.py`
 - the paper-facing finite statement `lem:rm-prefix-support-split`, which packages the exact support gap and
   `h=32`/`h>32` split checked by the verifier
+- the paper-facing small-weight prefix corollary `cor:fullsplit-small-prefix-all-first-active`, which combines the
+  ultra-late, window, and early `h <= 500` pieces
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
