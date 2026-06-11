@@ -2876,6 +2876,52 @@ The same coefficient inequality also proves the fixed-support claim, since a fix
 with probability \(\Pr[Q=q]/\binom bq\), which is at most the displayed maximum.
 \end{proof}
 
+\paragraph{First-active placement coverage.}
+For the finite checkpoint \(N=2^{21}\), \(b=64\), write \(M=N/b=32768\).  If the first active inner block is
+\(i_1\), define
+\[
+T:=M-i_1,\qquad r:=\wt(U_{i_1}),\qquad H:=h-r.
+\]
+Thus \(T\) is the number of later \(b\)-blocks after the first active block.  The current checked ledger uses the split
+\[
+\begin{array}{c|c|c}
+\text{regime} & T\text{ range} & \text{current status}\\
+\hline
+\text{ultra-late} & 0\le T<5949 & \text{placement cap checked for }h\le500\\
+\text{audited window} & 5949\le T\le17948 & \text{episode ledger checked}\\
+\text{early} & T>17948 & \text{not yet part of this finite certificate.}
+\end{array}
+\]
+The audited window is exactly the script parameterization
+\[
+T=5949+g-1,\qquad 1\le g\le12000,
+\]
+split into gap buckets \(1\text{--}4000\), \(4001\text{--}8000\), and \(8001\text{--}12000\).  Since \(r\le64\), the
+far endpoint \(T=17948\) implies the feasibility cutoff
+\[
+h=H+r\le 64\cdot17948+64=1148736.
+\]
+The verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+now also checks the placement-only ultra-late prefix
+\[
+\sum_{32\le h\le500} A_h^{\rm RM}
+\Pr[\text{first active block lies in the final }5949\text{ blocks}]
+\le 2^{-40.115431}.
+\]
+The window ledger itself remains
+\[
+\log_2\mu_{\rm window}\le -34.767174,
+\]
+and the union of this checked window with the checked ultra-late prefix has
+\[
+\log_2\mu_{\rm ultra\mbox{-}late\ prefix\ +\ window}\le -34.732187.
+\]
+The proof debt is therefore no longer the boundary slice \(T\approx5949\); it is the remaining first-active coverage,
+namely the early region \(T>17948\) and the post-prefix part of the ultra-late cap.
+
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
 \(1\text{--}4000\), \(4001\text{--}8000\), \(8001\text{--}12000\), and

@@ -114,6 +114,12 @@ class InteriorAuditSummary:
     worst_repro: dict[str, str]
 
 
+def log2_binom(n: int, k: int) -> float:
+    if k < 0 or k > n:
+        return float("-inf")
+    return (math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1)) / math.log(2.0)
+
+
 def log2add(a: float, b: float) -> float:
     if a == float("-inf"):
         return b
@@ -122,6 +128,42 @@ def log2add(a: float, b: float) -> float:
     if a < b:
         a, b = b, a
     return a + math.log2(1.0 + 2.0 ** (b - a))
+
+
+def late_prefix_cap_log2(
+    path: Path,
+    *,
+    n: int,
+    b: int,
+    late_blocks: int,
+    h_max: int,
+) -> tuple[float, int, dict[str, float] | None]:
+    total = float("-inf")
+    rows = 0
+    peak: dict[str, float] | None = None
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if "h" not in row or "outer_log2" not in row:
+                continue
+            outer_text = row["outer_log2"]
+            if not outer_text or outer_text == "-inf":
+                continue
+            h = int(row["h"])
+            if h < 1 or h > h_max:
+                continue
+            outer = float(outer_text)
+            late = log2_binom(late_blocks * b, h) - log2_binom(n, h)
+            term = outer + late
+            rows += 1
+            total = log2add(total, term)
+            if peak is None or term > peak["term_log2"]:
+                peak = {
+                    "h": float(h),
+                    "outer_log2": outer,
+                    "late_log2": late,
+                    "term_log2": term,
+                }
+    return total, rows, peak
 
 
 def csv_logsum(path: Path, column: str) -> tuple[float, int, dict[str, str] | None]:
@@ -252,6 +294,15 @@ def main() -> int:
         type=Path,
         default=ROOT / "fullsplit_exact_interior_h0_499_allT.csv",
     )
+    parser.add_argument(
+        "--outer-prefix-csv",
+        type=Path,
+        default=ROOT / "block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv",
+    )
+    parser.add_argument("--N", type=int, default=2**21)
+    parser.add_argument("--block-bits", type=int, default=64)
+    parser.add_argument("--late-blocks", type=int, default=5949)
+    parser.add_argument("--late-prefix-h-max", type=int, default=500)
     parser.add_argument("--skip-prefix-interior-audit", action="store_true")
     parser.add_argument("--prefix-interior-rows", type=int, default=1500)
     parser.add_argument("--prefix-interior-tolerance", type=float, default=1e-7)
@@ -322,6 +373,25 @@ def main() -> int:
             f"delta={interior.worst_repro['left_reproduction_delta']}"
         )
 
+    late_prefix, late_rows, late_peak = late_prefix_cap_log2(
+        args.outer_prefix_csv,
+        n=args.N,
+        b=args.block_bits,
+        late_blocks=args.late_blocks,
+        h_max=args.late_prefix_h_max,
+    )
+    check_close("late_prefix_T_lt_5949_cap", late_prefix, -40.115431, args.tolerance)
+    print(f"late_prefix_T_lt_{args.late_blocks}_cap_rows,{late_rows}")
+    print(f"late_prefix_T_lt_{args.late_blocks}_cap_log2,{late_prefix:.6f}")
+    if late_peak is not None:
+        print(
+            f"late_prefix_T_lt_{args.late_blocks}_cap_peak,"
+            f"h={int(late_peak['h'])},"
+            f"outer_log2={late_peak['outer_log2']:.6f},"
+            f"late_log2={late_peak['late_log2']:.6f},"
+            f"term_log2={late_peak['term_log2']:.6f}"
+        )
+
     parts: dict[str, float] = {}
     for item in csv_ledgers:
         total, rows, peak = csv_logsum(item.path, item.column)
@@ -354,6 +424,9 @@ def main() -> int:
         total = log2add(total, value)
     print(f"finite_ledger_total_log2,{total:.6f}")
     print(f"finite_ledger_margin_bits,{-total:.6f}")
+    late_plus_window = log2add(late_prefix, total)
+    print(f"late_plus_window_total_log2,{late_plus_window:.6f}")
+    print(f"late_plus_window_margin_bits,{-late_plus_window:.6f}")
     return 0
 
 

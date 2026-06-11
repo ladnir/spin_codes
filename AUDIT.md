@@ -14,9 +14,11 @@ The current finite ledger reports
 
 ```text
 log2 mu_finite <= -34.767174
+log2 mu_late_plus_window <= -34.732187
 ```
 
-This is a finite first-moment certificate for the audited late-window split. It is not yet a polished global theorem.
+The first line is the audited window `5949 <= T <= 17948`. The second also includes the checked placement-only
+ultra-late prefix `T < 5949`, through `h <= 500`. It is not yet a polished global theorem.
 
 ## Construction Under Audit
 
@@ -53,9 +55,9 @@ extra_turnoff_for_certified_upper_log2,-67.63641049043137
 status,PASS
 ```
 
-Scope: this exact-cancellation add-on is certified for the current tiny-prefix
-domain `0 <= H <= 499`, `T >= 5949`. Extending the same cancellation atom to
-larger `H` is separate proof debt.
+Scope: this sharper exact-cancellation add-on is certified for the current tiny-prefix
+domain `0 <= H <= 499`, `T >= 5949`. Outside this tiny prefix, use the global
+Bernstein envelope below.
 
 For theorem-facing wrappers outside the tiny prefix, use the global Bernstein
 envelope:
@@ -101,12 +103,15 @@ Expected key outputs:
 ```text
 prefix_interior_audit_rows,1500
 prefix_interior_audit_worst,bucket=gap_8001_12000,H=75,diff=2.19205276153e-09,T=13949
+late_prefix_T_lt_5949_cap_log2,-40.115431
 prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_ge9_tail_log2,-269.335258
 postprefix_501_2000_eall_log2,-182.259739
 interval_2001_1148736_total_log2,-586.597103
 finite_ledger_total_log2,-34.767174
 finite_ledger_margin_bits,34.767174
+late_plus_window_total_log2,-34.732187
+late_plus_window_margin_bits,34.732187
 ```
 
 For the monotonicity audit, every reported middle/far bucket slack should be positive. The smallest current slack is
@@ -423,11 +428,13 @@ Currently checkable:
 - the high-`h` fixed-pole interval rows as numerical certificates, with printed regeneration commands and selected
   opt-in recomputation checks
 - the sufficient endpoint monotonicity inequalities for the listed intervals
+- the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the tiny-prefix interior-`T` finite certificate now stated as Lemma `lem:fullsplit-tiny-prefix-interiorT`
 - the selected-gap product/conditioning bound now stated as Lemma `lem:fullsplit-selected-gap-product`
 - the finite-prefix and global termination atoms now stated as Lemma
   `lem:fullsplit-certified-termination-atoms`
+- the current first-active placement partition: ultra-late prefix, audited window, and early remainder
 
 Still proof debt:
 
@@ -435,8 +442,8 @@ Still proof debt:
   analytic monotonicity
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
-- state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and
-  what is handled elsewhere
+- cover the remaining first-active regimes: the early region `T > 17948` and the post-prefix ultra-late cap beyond
+  `h > 500`
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 

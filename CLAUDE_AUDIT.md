@@ -54,11 +54,11 @@ This is acceptable for a ledger manifest, but not yet a fully regenerated audit-
 
 In the wrapper, `e01_cauchy_log2` / `eall_ratio_log2` can return `-inf` when the left endpoint `T_min` cannot hold `H`, even though later `T` in the same bucket can be feasible. The current important high-tail runs use `feasible-min`, but the general tool is unsafe in `min` mode for high `H`.
 
-### F5 Medium: Current number is a late-window slice
+### F5 Medium: First-active coverage is now explicit, but not global
 
-The `-34.767174` claim is for the audited late-window split, not the entire dense+dense construction unless the other placement regimes are separately covered.
+The `-34.767174` claim is for the audited window `5949 <= T <= 17948`. The verifier now also checks the placement-only ultra-late prefix `T < 5949`, `h <= 500`, giving the combined late-plus-window value `-34.732187`.
 
-The paper and audit packet should keep this qualifier visible.
+Remaining coverage debt: the early region `T > 17948` and the post-prefix ultra-late cap beyond `h > 500`.
 
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
@@ -85,10 +85,11 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 1. Should the high-interval manifest remain command-reproducible, or should every interval be regenerated into checked artifacts?
 2. Should the opt-in high-interval recomputation be expanded into a scheduled/full certificate run?
 3. Should Lemma `lem:fullsplit-tiny-prefix-interiorT` remain as a finite certificate, or should it be replaced by analytic monotonicity?
-4. Which section covers first-active placements outside the audited late-window split?
+4. What theorem will cover the remaining first-active regimes `T > 17948` and ultra-late `h > 500`?
 
 ## Suggested Next Fixes
 
-1. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
-2. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
-3. Add interval/rational arithmetic for the final ledger.
+1. Prove or certify the remaining first-active regimes `T > 17948` and ultra-late `h > 500`.
+2. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
+3. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
+4. Add interval/rational arithmetic for the final ledger.
