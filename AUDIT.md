@@ -90,6 +90,7 @@ Run these first:
 ```powershell
 python scripts\verify_fullsplit_turnoff_atom.py
 python scripts\verify_fullsplit_global_turnoff_envelope.py
+python scripts\verify_fullsplit_high_interval_adjustment.py
 python scripts\verify_fullsplit_finite_ledger.py
 python scripts\check_fullsplit_T_monotonicity.py --sufficient-reduction
 pdflatex -interaction=nonstopmode main_permConv.tex
@@ -101,7 +102,7 @@ Expected key outputs:
 prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_ge9_tail_log2,-269.335258
 postprefix_501_2000_eall_log2,-182.259739
-interval_2001_1148736_total_log2,-586.581877
+interval_2001_1148736_total_log2,-586.597103
 finite_ledger_total_log2,-34.767174
 finite_ledger_margin_bits,34.767174
 ```
@@ -300,33 +301,40 @@ scripts/check_fullsplit_T_monotonicity.py
 Current interval rows:
 
 ```text
-2001--7858          (lambda,rho)=(0.02,0.01)   log2 mu=-586.581877
-7859--20550         (0.05,0.03)                log2 mu=-2655.929602
-20551--75000        (0.2,0.1)                  log2 mu=-6025.558821
-75001--250000       (0.5,0.3)                  log2 mu=-12844.853611
-250001--350000      (1.2,0.5)                  log2 mu=-28476.625315
-350001--400000      (1.2,1.0)                  log2 mu=-81555.579312
-400001--450000      (1.2,1.0)                  log2 mu=-91421.757760
-450001--550000      (1.2,1.0)                  log2 mu=-82081.946102
-550001--650000      (1.2,1.0)                  log2 mu=-1518.478235
-650001--725000      (1.2,2.0)                  log2 mu=-116328.118720
-725001--750000      (1.2,3.0)                  log2 mu=-169887.887695
-750001--850000      (1.2,3.0)                  log2 mu=-134523.568420
-850001--950000      (1.2,3.0)                  log2 mu=-117534.828304
-950001--1050000     (1.2,3.0)                  log2 mu=-285052.535442
-1050001--1148736    (1.2,3.0)                  log2 mu=-562860.701412
+2001--7858          (lambda,rho)=(0.02,0.01)   log2 mu=-586.597103
+7859--20550         (0.05,0.03)                log2 mu=-2655.944828
+20551--75000        (0.2,0.1)                  log2 mu=-6025.574047
+75001--250000       (0.5,0.3)                  log2 mu=-12844.868837
+250001--350000      (1.2,0.5)                  log2 mu=-28476.640541
+350001--400000      (1.2,1.0)                  log2 mu=-81555.594538
+400001--450000      (1.2,1.0)                  log2 mu=-91421.772986
+450001--550000      (1.2,1.0)                  log2 mu=-82081.961328
+550001--650000      (1.2,1.0)                  log2 mu=-1518.493461
+650001--725000      (1.2,2.0)                  log2 mu=-116328.133946
+725001--750000      (1.2,3.0)                  log2 mu=-169887.902921
+750001--850000      (1.2,3.0)                  log2 mu=-134523.583646
+850001--950000      (1.2,3.0)                  log2 mu=-117534.843530
+950001--1050000     (1.2,3.0)                  log2 mu=-285052.550668
+1050001--1148736    (1.2,3.0)                  log2 mu=-562860.716638
 ```
 
 The combined interval total is still dominated by `2001--7858`:
 
 ```text
-log2 mu_2001_1148736 = -586.581877
+log2 mu_2001_1148736 = -586.597103
 ```
 
-These rows include a conservative `+1.5` bit allowance for switching the
+These rows include a checked `+1.484774` bit adjustment for switching the
 high-interval all-episode wrapper from the finite-prefix atom to the global
-Bernstein atom. A spot recomputation of the leading interval gives
-`-586.597103`, inside this allowance.
+Bernstein atom. The verifier
+
+```powershell
+python scripts\verify_fullsplit_high_interval_adjustment.py
+```
+
+shows that the required adjustment is `1.484773404861` bits, leaving about
+`5.95e-7` bits of slack. A spot recomputation of the leading interval gives
+`-586.597103`, matching the adjusted row.
 
 The cutoff `h = 1148736` is the feasibility edge for the current far bucket:
 
@@ -390,7 +398,7 @@ Currently checkable:
 Still proof debt:
 
 - convert the `32..500`, `e <= 8` finite grid from "CSV artifact" to an audit-grade finite lemma
-- replace the conservative `+1.5` high-interval allowance by regenerated interval artifacts if desired
+- make the hard-coded high-interval rows reproducible from documented commands or regenerated interval artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and
   what is handled elsewhere

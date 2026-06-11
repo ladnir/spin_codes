@@ -14,7 +14,7 @@ Scope:
 
 ## Verdict
 
-The certificate is structurally coherent: the script formulas for the e=1 Cauchy envelope, the e>=2 same-lambda multiplier, the selected-gap closed forms, and the sufficient endpoint monotonicity reduction all match the manuscript lemmas, and the four-piece ledger arithmetic in `verify_fullsplit_finite_ledger.py` is a correct log-sum of its inputs. However, the headline `log2 mu_finite <= -34.767174` is a numerical certificate with at least three load-bearing links that are currently assumed rather than checked: the bucket-wide reuse of left-endpoint-T exact grids in the dominant piece, the provenance of the termination atom `p_term`, and the hard-coded interval rows that the verifier merely re-sums. It is correctly described as not yet a polished global theorem.
+The certificate is structurally coherent: the script formulas for the e=1 Cauchy envelope, the e>=2 same-lambda multiplier, the selected-gap closed forms, and the sufficient endpoint monotonicity reduction all match the manuscript lemmas, and the four-piece ledger arithmetic in `verify_fullsplit_finite_ledger.py` is a correct log-sum of its inputs. However, the headline `log2 mu_finite <= -34.767174` is a numerical certificate with load-bearing links that are currently assumed rather than checked: the bucket-wide reuse of left-endpoint-T exact grids in the dominant piece and the hard-coded interval rows that the verifier merely re-sums. It is correctly described as not yet a polished global theorem.
 
 ## Findings
 
@@ -40,8 +40,9 @@ Resolution note: `scripts/verify_fullsplit_turnoff_atom.py` now derives this ato
 `0 <= H <= 499`, `T >= 5949`. It computes `log2 p0 = -64.00457432724919`,
 `log2 eta = -67.63641076470455`, `log2(p0+eta) = -63.89264922047382`, and uses the rounded-up certificate atom
 `-63.8926492`. For larger `H`, `scripts/verify_fullsplit_global_turnoff_envelope.py` now proves the Bernstein
-envelope `log2 p_term <= -62.4078758`; high interval rows carry a conservative `+1.5` bit allowance for this wider
-atom.
+envelope `log2 p_term <= -62.4078758`. The high-interval rows carry a checked `+1.484774` bit adjustment for this
+wider atom; `scripts/verify_fullsplit_high_interval_adjustment.py` computes the required adjustment as
+`1.484773404861` bits, including the tail multiplier, leaving about `5.95e-7` bits of slack.
 
 ### F3 High: High interval rows are hard-coded in the ledger verifier
 
@@ -81,7 +82,7 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 
 ## Author Questions
 
-1. Can the conservative `+1.5` high-interval allowance be replaced by regenerated interval artifacts?
+1. Can the hard-coded high-interval rows be made reproducible from documented commands or regenerated interval artifacts?
 2. Which command generated the fifteen interval rows, and was `feasible-min` used?
 3. What justifies applying the exact `e <= 8` grids at bucket left endpoints across entire buckets?
 4. Where is the product bound for multiple terminations proved?
