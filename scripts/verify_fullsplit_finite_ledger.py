@@ -107,6 +107,13 @@ class CsvLedger:
     expected_log2: float
 
 
+@dataclass(frozen=True)
+class InteriorAuditSummary:
+    rows: int
+    worst: dict[str, str]
+    worst_repro: dict[str, str]
+
+
 def log2add(a: float, b: float) -> float:
     if a == float("-inf"):
         return b
@@ -129,6 +136,42 @@ def csv_logsum(path: Path, column: str) -> tuple[float, int, dict[str, str] | No
             if peak is None or value > float(peak[column]):
                 peak = row
     return total, rows, peak
+
+
+def read_interior_audit_summary(path: Path) -> InteriorAuditSummary:
+    rows: list[dict[str, str]]
+    with path.open(newline="") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        raise SystemExit(f"{path}: no interior-audit rows")
+    worst = max(rows, key=lambda row: float(row["max_log2_minus_left"]))
+    worst_repro = max(rows, key=lambda row: abs(float(row["left_reproduction_delta"])))
+    return InteriorAuditSummary(rows=len(rows), worst=worst, worst_repro=worst_repro)
+
+
+def check_interior_audit(
+    path: Path,
+    *,
+    expected_rows: int,
+    tolerance: float,
+    reproduction_tolerance: float,
+) -> InteriorAuditSummary:
+    summary = read_interior_audit_summary(path)
+    if summary.rows != expected_rows:
+        raise SystemExit(f"prefix interior audit: expected {expected_rows} rows, got {summary.rows}")
+    worst_diff = float(summary.worst["max_log2_minus_left"])
+    if worst_diff > tolerance:
+        raise SystemExit(
+            f"prefix interior audit: worst interior increase {worst_diff:.12g} "
+            f"exceeds tolerance {tolerance:.12g}"
+        )
+    worst_repro = abs(float(summary.worst_repro["left_reproduction_delta"]))
+    if worst_repro > reproduction_tolerance:
+        raise SystemExit(
+            f"prefix interior audit: worst left-endpoint reproduction error "
+            f"{worst_repro:.12g} exceeds tolerance {reproduction_tolerance:.12g}"
+        )
+    return summary
 
 
 def check_close(name: str, actual: float, expected: float, tol: float) -> None:
@@ -205,6 +248,15 @@ def main() -> int:
         default=ROOT / "fullsplit_piecewise_h501_2000_eall_hsummary.csv",
     )
     parser.add_argument(
+        "--prefix-interior-audit-csv",
+        type=Path,
+        default=ROOT / "fullsplit_exact_interior_h0_499_allT.csv",
+    )
+    parser.add_argument("--skip-prefix-interior-audit", action="store_true")
+    parser.add_argument("--prefix-interior-rows", type=int, default=1500)
+    parser.add_argument("--prefix-interior-tolerance", type=float, default=1e-7)
+    parser.add_argument("--prefix-interior-reproduction-tolerance", type=float, default=5e-6)
+    parser.add_argument(
         "--print-high-interval-commands",
         action="store_true",
         help="Print the theorem-facing recomputation command for every high interval.",
@@ -248,6 +300,28 @@ def main() -> int:
     ]
 
     print("Full-split finite ledger")
+    if not args.skip_prefix_interior_audit:
+        interior = check_interior_audit(
+            args.prefix_interior_audit_csv,
+            expected_rows=args.prefix_interior_rows,
+            tolerance=args.prefix_interior_tolerance,
+            reproduction_tolerance=args.prefix_interior_reproduction_tolerance,
+        )
+        print(f"prefix_interior_audit_rows,{interior.rows}")
+        print(
+            "prefix_interior_audit_worst,"
+            f"bucket={interior.worst['bucket']},"
+            f"H={interior.worst['H']},"
+            f"diff={interior.worst['max_log2_minus_left']},"
+            f"T={interior.worst['T_at_max']}"
+        )
+        print(
+            "prefix_interior_audit_worst_repro,"
+            f"bucket={interior.worst_repro['bucket']},"
+            f"H={interior.worst_repro['H']},"
+            f"delta={interior.worst_repro['left_reproduction_delta']}"
+        )
+
     parts: dict[str, float] = {}
     for item in csv_ledgers:
         total, rows, peak = csv_logsum(item.path, item.column)

@@ -99,6 +99,8 @@ pdflatex -interaction=nonstopmode main_permConv.tex
 Expected key outputs:
 
 ```text
+prefix_interior_audit_rows,1500
+prefix_interior_audit_worst,bucket=gap_8001_12000,H=75,diff=2.19205276153e-09,T=13949
 prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_ge9_tail_log2,-269.335258
 postprefix_501_2000_eall_log2,-182.259739
@@ -183,6 +185,8 @@ Interpretation: the exact `e <= 8` totals were checked for every
 value is at the left endpoint itself and is numerical roundoff, not an interior
 increase. This is a finite audit, not the eventual analytic monotonicity lemma,
 but it removes the dominant `T`-reuse assumption from the current finite ledger.
+The standard finite-ledger verifier now checks this tracked audit artifact by
+default before summing the prefix rows.
 
 The row-level prefix sum can be regenerated with:
 
@@ -425,7 +429,8 @@ Currently checkable:
 
 Still proof debt:
 
-- convert the `32..500`, `e <= 8` finite grid from "CSV artifact" to an audit-grade finite lemma
+- promote the `32..500`, `e <= 8` finite-grid artifact checks into a clean written finite lemma, or replace them by
+  an analytic monotonicity lemma
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and

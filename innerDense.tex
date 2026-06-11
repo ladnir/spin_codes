@@ -3483,9 +3483,9 @@ The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.
 \]
-It combines the explicit \(32\le h\le500\), \(e\le8\) CSV ledger, the crude \(e\ge9\) prefix residual, the
-all-episode \(501\le h\le2000\) wrapper row, and the fixed-pole interval table above.  The reported combined finite
-late-window contribution is
+It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) prefix, then combines
+that explicit CSV ledger with the crude \(e\ge9\) prefix residual, the all-episode \(501\le h\le2000\) wrapper row,
+and the fixed-pole interval table above.  The reported combined finite late-window contribution is
 \[
 \log_2\mu_{\rm finite}^{\rm fullsplit}\le -34.767174,
 \]
