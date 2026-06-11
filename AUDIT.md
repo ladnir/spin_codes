@@ -177,6 +177,12 @@ h_le,80,log2,-34.767370670,share,0.999863886476
 h_le,96,log2,-34.767184998,share,0.999992575315
 max_ratio_all,0.852699299925,from,32,to,33
 max_ratio_after_33,0.833794827634,from,33,to,34
+prefix_ridge_first_outer_ratio,2.8086853907
+prefix_ridge_first_placement_ratio,0.303593739174
+prefix_ridge_first_inner_ratio,1
+prefix_ridge_tail_outer_ratio,2.74641945768
+prefix_ridge_tail_placement_ratio,0.303593402422
+prefix_ridge_tail_inner_ratio,1
 ridge_geometric_infinite_log2,-34.769785229
 ridge_total_ratio_bound_log2,-34.767141024
 ridge_total_ratio_bound_slack_bits,3.32625484987e-05
@@ -191,7 +197,19 @@ first-gap `h`-sum, with the `r >= 2` and middle/far gap pieces treated as
 small remainders. The main finite-ledger verifier now checks this ratio
 skeleton directly: the infinite geometric ridge bound plus the exact remainder
 gives log2 contribution `-34.767141`, only `3.4e-5` bits above the exact
-`e <= 8` prefix table.
+`e <= 8` prefix table. The component split is now also checked there. For the
+dominant `r=1`, first-gap ridge, the inner row is constant to numerical
+precision; the ratio is the product of an outer-spectrum slope and the
+placement slope
+
+```text
+P_{h+1}/P_h = (S_h/S_{h-1}) * (h+1)/(N-h)
+S_H = sum_{g=1}^{4000} binom(64*(5949+g-1), H).
+```
+
+The next analytic target is therefore small and explicit: prove either the
+direct product ratio, or the separate outer bounds `2.809`, `2.747` and
+placement bound `0.303594`, then attach the already-checked remainder.
 
 The per-`T` inner grids feeding this row are:
 

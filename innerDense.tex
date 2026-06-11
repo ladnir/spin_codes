@@ -3033,6 +3033,28 @@ only \(3.4\cdot10^{-5}\) bits above the exact finite prefix ledger.  The decompo
 \[
 \texttt{python scripts/analyze\_fullsplit\_prefix\_ridge.py}.
 \]
+The ratio itself factors into outer-spectrum growth, first-active placement, and the inner \(e\le8\) value.  On this
+ridge the inner span is only \(3.2\cdot10^{-12}\) bits.  If
+\[
+S_H:=\sum_{g=1}^{4000}\binom{64(5949+g-1)}{H},
+\]
+then the \(r=1\), first-gap placement contribution satisfies
+\[
+\frac{P_{h+1}}{P_h}
+=
+\frac{S_h}{S_{h-1}}\frac{h+1}{N-h}.
+\]
+The current finite component certificate checks
+\[
+\begin{array}{c|ccc}
+\text{step} & A_{h+1}^{\rm out}/A_h^{\rm out} & P_{h+1}/P_h & \text{inner ratio}\\
+\hline
+32\to33 & 2.808686 & .303594 & \le 1.000000001\\
+h\ge33 & 2.746420 & .303594 & \le 1.000000001.
+\end{array}
+\]
+Thus the analytic replacement should prove these two component slope bounds, or a direct product bound, rather than
+re-summing all \(469\) ridge rows.
 The standard verifier
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}

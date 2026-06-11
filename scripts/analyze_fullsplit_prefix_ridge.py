@@ -194,6 +194,36 @@ def main() -> None:
         ridge_peak = float(ridge_rows[0]["_term"])
         first_ratio = 2.0 ** (float(ridge_rows[1]["_term"]) - ridge_peak)
         tail_ratio = max_ratio_after_first[0]
+        first_outer_ratio = 2.0 ** (
+            float(ridge_rows[1]["outer_log2_bound"]) - float(ridge_rows[0]["outer_log2_bound"])
+        )
+        first_placement_ratio = 2.0 ** (
+            float(ridge_rows[1]["placement_log2"]) - float(ridge_rows[0]["placement_log2"])
+        )
+        first_inner_ratio = 2.0 ** (
+            float(ridge_rows[1]["inner_log2"]) - float(ridge_rows[0]["inner_log2"])
+        )
+        tail_outer_ratio = max(
+            2.0 ** (
+                float(ridge_rows[i]["outer_log2_bound"])
+                - float(ridge_rows[i - 1]["outer_log2_bound"])
+            )
+            for i in range(2, len(ridge_rows))
+        )
+        tail_placement_ratio = max(
+            2.0 ** (
+                float(ridge_rows[i]["placement_log2"])
+                - float(ridge_rows[i - 1]["placement_log2"])
+            )
+            for i in range(2, len(ridge_rows))
+        )
+        tail_inner_ratio = max(
+            2.0 ** (
+                float(ridge_rows[i]["inner_log2"])
+                - float(ridge_rows[i - 1]["inner_log2"])
+            )
+            for i in range(2, len(ridge_rows))
+        )
         finite_factor = 1.0 + first_ratio * (1.0 - tail_ratio ** (len(ridge_rows) - 1)) / (1.0 - tail_ratio)
         infinite_factor = 1.0 + first_ratio / (1.0 - tail_ratio)
         finite_geometric = ridge_peak + math.log2(finite_factor)
@@ -210,6 +240,12 @@ def main() -> None:
         print(f"ridge_remainder_exact_log2,{remainder_exact:.9f}")
         print(f"ridge_first_ratio,{first_ratio:.12g}")
         print(f"ridge_tail_ratio,{tail_ratio:.12g}")
+        print(f"ridge_first_outer_ratio,{first_outer_ratio:.12g}")
+        print(f"ridge_first_placement_ratio,{first_placement_ratio:.12g}")
+        print(f"ridge_first_inner_ratio,{first_inner_ratio:.12g}")
+        print(f"ridge_tail_outer_ratio,{tail_outer_ratio:.12g}")
+        print(f"ridge_tail_placement_ratio,{tail_placement_ratio:.12g}")
+        print(f"ridge_tail_inner_ratio,{tail_inner_ratio:.12g}")
         print(f"ridge_geometric_finite_log2,{finite_geometric:.9f}")
         print(f"ridge_geometric_infinite_log2,{infinite_geometric:.9f}")
         print(f"ridge_geometric_slack_bits,{finite_geometric - ridge_exact:.12g}")

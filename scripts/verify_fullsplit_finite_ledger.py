@@ -233,6 +233,12 @@ class PrefixRidgeRatioSummary:
     total_bound_log2: float
     total_exact_log2: float
     inner_span_bits: float
+    first_outer_ratio: float
+    first_placement_ratio: float
+    first_inner_ratio: float
+    tail_outer_ratio: float
+    tail_placement_ratio: float
+    tail_inner_ratio: float
 
 
 def prefix_ridge_ratio_summary(
@@ -246,7 +252,7 @@ def prefix_ridge_ratio_summary(
     total = float("-inf")
     ridge_exact = float("-inf")
     remainder_exact = float("-inf")
-    ridge: list[tuple[int, float, float]] = []
+    ridge: list[tuple[int, float, float, float, float]] = []
     with path.open(newline="") as f:
         for row in csv.DictReader(f):
             rows += 1
@@ -258,24 +264,38 @@ def prefix_ridge_ratio_summary(
             total = log2add(total, term)
             if r == first_r and g0 == gap_min and g1 == gap_max:
                 ridge_exact = log2add(ridge_exact, term)
-                ridge.append((h, term, float(row["inner_log2"])))
+                ridge.append(
+                    (
+                        h,
+                        term,
+                        float(row["outer_log2_bound"]),
+                        float(row["placement_log2"]),
+                        float(row["inner_log2"]),
+                    )
+                )
             else:
                 remainder_exact = log2add(remainder_exact, term)
 
     if len(ridge) < 2:
         raise SystemExit("prefix ridge ratio: need at least two ridge rows")
     ridge.sort(key=lambda item: item[0])
-    for (prev_h, _, _), (h, _, _) in zip(ridge, ridge[1:]):
+    for (prev_h, *_), (h, *_) in zip(ridge, ridge[1:]):
         if h != prev_h + 1:
             raise SystemExit(f"prefix ridge ratio: non-consecutive h values {prev_h}, {h}")
 
     peak_log2 = ridge[0][1]
     first_ratio = 2.0 ** (ridge[1][1] - peak_log2)
     tail_ratio = max(2.0 ** (ridge[i][1] - ridge[i - 1][1]) for i in range(2, len(ridge)))
+    first_outer_ratio = 2.0 ** (ridge[1][2] - ridge[0][2])
+    first_placement_ratio = 2.0 ** (ridge[1][3] - ridge[0][3])
+    first_inner_ratio = 2.0 ** (ridge[1][4] - ridge[0][4])
+    tail_outer_ratio = max(2.0 ** (ridge[i][2] - ridge[i - 1][2]) for i in range(2, len(ridge)))
+    tail_placement_ratio = max(2.0 ** (ridge[i][3] - ridge[i - 1][3]) for i in range(2, len(ridge)))
+    tail_inner_ratio = max(2.0 ** (ridge[i][4] - ridge[i - 1][4]) for i in range(2, len(ridge)))
     factor = 1.0 + first_ratio / (1.0 - tail_ratio)
     geometric = peak_log2 + math.log2(factor)
     total_bound = log2add(geometric, remainder_exact)
-    inner_values = [inner for _, _, inner in ridge]
+    inner_values = [inner for *_, inner in ridge]
     return PrefixRidgeRatioSummary(
         rows=rows,
         ridge_rows=len(ridge),
@@ -288,6 +308,12 @@ def prefix_ridge_ratio_summary(
         total_bound_log2=total_bound,
         total_exact_log2=total,
         inner_span_bits=max(inner_values) - min(inner_values),
+        first_outer_ratio=first_outer_ratio,
+        first_placement_ratio=first_placement_ratio,
+        first_inner_ratio=first_inner_ratio,
+        tail_outer_ratio=tail_outer_ratio,
+        tail_placement_ratio=tail_placement_ratio,
+        tail_inner_ratio=tail_inner_ratio,
     )
 
 
@@ -457,6 +483,10 @@ def main() -> int:
     parser.add_argument("--prefix-ridge-tail-ratio-max", type=float, default=0.833795)
     parser.add_argument("--prefix-ridge-total-bound-max-log2", type=float, default=-34.76713)
     parser.add_argument("--prefix-ridge-inner-span-tolerance", type=float, default=1e-9)
+    parser.add_argument("--prefix-ridge-first-outer-ratio-max", type=float, default=2.809)
+    parser.add_argument("--prefix-ridge-tail-outer-ratio-max", type=float, default=2.747)
+    parser.add_argument("--prefix-ridge-placement-ratio-max", type=float, default=0.303594)
+    parser.add_argument("--prefix-ridge-inner-ratio-max", type=float, default=1.000000001)
     parser.add_argument(
         "--print-high-interval-commands",
         action="store_true",
@@ -594,11 +624,37 @@ def main() -> int:
             f"prefix ridge: inner span {ridge_ratio.inner_span_bits:.12g} exceeds "
             f"{args.prefix_ridge_inner_span_tolerance:.12g}"
         )
+    if ridge_ratio.first_outer_ratio > args.prefix_ridge_first_outer_ratio_max:
+        raise SystemExit(
+            f"prefix ridge: first outer ratio {ridge_ratio.first_outer_ratio:.12g} exceeds "
+            f"{args.prefix_ridge_first_outer_ratio_max:.12g}"
+        )
+    if ridge_ratio.tail_outer_ratio > args.prefix_ridge_tail_outer_ratio_max:
+        raise SystemExit(
+            f"prefix ridge: tail outer ratio {ridge_ratio.tail_outer_ratio:.12g} exceeds "
+            f"{args.prefix_ridge_tail_outer_ratio_max:.12g}"
+        )
+    if max(ridge_ratio.first_placement_ratio, ridge_ratio.tail_placement_ratio) > args.prefix_ridge_placement_ratio_max:
+        raise SystemExit(
+            "prefix ridge: placement ratio exceeds "
+            f"{args.prefix_ridge_placement_ratio_max:.12g}"
+        )
+    if max(ridge_ratio.first_inner_ratio, ridge_ratio.tail_inner_ratio) > args.prefix_ridge_inner_ratio_max:
+        raise SystemExit(
+            "prefix ridge: inner ratio exceeds "
+            f"{args.prefix_ridge_inner_ratio_max:.12g}"
+        )
     print(f"prefix_ridge_ratio_rows,{ridge_ratio.ridge_rows}")
     print(f"prefix_ridge_exact_log2,{ridge_ratio.ridge_exact_log2:.6f}")
     print(f"prefix_ridge_remainder_exact_log2,{ridge_ratio.remainder_exact_log2:.6f}")
     print(f"prefix_ridge_first_ratio,{ridge_ratio.first_ratio:.12g}")
     print(f"prefix_ridge_tail_ratio,{ridge_ratio.tail_ratio:.12g}")
+    print(f"prefix_ridge_first_outer_ratio,{ridge_ratio.first_outer_ratio:.12g}")
+    print(f"prefix_ridge_first_placement_ratio,{ridge_ratio.first_placement_ratio:.12g}")
+    print(f"prefix_ridge_first_inner_ratio,{ridge_ratio.first_inner_ratio:.12g}")
+    print(f"prefix_ridge_tail_outer_ratio,{ridge_ratio.tail_outer_ratio:.12g}")
+    print(f"prefix_ridge_tail_placement_ratio,{ridge_ratio.tail_placement_ratio:.12g}")
+    print(f"prefix_ridge_tail_inner_ratio,{ridge_ratio.tail_inner_ratio:.12g}")
     print(f"prefix_ridge_geometric_bound_log2,{ridge_ratio.geometric_log2:.6f}")
     print(f"prefix_ridge_total_ratio_bound_log2,{ridge_ratio.total_bound_log2:.6f}")
     print(f"prefix_ridge_total_ratio_bound_slack_bits,{ridge_ratio.total_bound_log2 - ridge_ratio.total_exact_log2:.12g}")
