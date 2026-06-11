@@ -24,7 +24,7 @@ The dominant piece uses `csv` mode on `32 <= h <= 500`. The wrapper looks up the
 
 This is sound only if the exact `e <= 8` episode sum is nonincreasing in `T`, or if every interior `T` is directly audited. The current fixed-pole monotonicity script certifies the `h >= 2001` interval certificate, not the exact tiny-prefix grids.
 
-Resolution note: `scripts/check_fullsplit_exact_grid_interior.py` now audits every `H=0..499` and every `T` in the three placement buckets. The tracked artifact has `1500` rows and worst positive difference `2.19205276153e-09`, at the left endpoint itself. `verify_fullsplit_finite_ledger.py` checks this artifact by default. Remaining debt: write this as an explicit finite lemma, or replace it with an analytic monotonicity lemma.
+Resolution note: `scripts/check_fullsplit_exact_grid_interior.py` now audits every `H=0..499` and every `T` in the three placement buckets. The tracked artifact has `1500` rows and worst positive difference `2.19205276153e-09`, at the left endpoint itself. `verify_fullsplit_finite_ledger.py` checks this artifact by default. The manuscript now records this as Lemma `lem:fullsplit-tiny-prefix-interiorT`. Remaining debt: decide whether to keep this finite lemma or replace it with analytic monotonicity.
 
 ### F2 High: Termination atom provenance is not audit-grade
 
@@ -84,15 +84,13 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 
 1. Should the high-interval manifest remain command-reproducible, or should every interval be regenerated into checked artifacts?
 2. Should the opt-in high-interval recomputation be expanded into a scheduled/full certificate run?
-3. Should the tiny-prefix interior audit remain a finite lemma, or should it be replaced by analytic monotonicity?
-4. Where is the product bound for multiple terminations proved?
+3. Should Lemma `lem:fullsplit-tiny-prefix-interiorT` remain as a finite certificate, or should it be replaced by analytic monotonicity?
+4. Where is the product/conditioning bound for multiple terminations proved?
 5. Which section covers first-active placements outside the audited late-window split?
 
 ## Suggested Next Fixes
 
-1. Promote the exact-grid `T` interior audit for `32 <= h <= 500` into explicit finite-lemma text, or replace it with analytic monotonicity.
-2. Tighten the global `p_term` exact-cancellation envelope, or keep the current Bernstein bound as the theorem-facing constant.
-3. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
-4. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
-5. Correct stale prose numbers and separate old diagnostics from theorem-facing rows.
-6. Add interval/rational arithmetic for the final ledger.
+1. State the product/conditioning bound for multiple terminations.
+2. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
+3. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
+4. Add interval/rational arithmetic for the final ledger.

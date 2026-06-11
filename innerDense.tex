@@ -2910,29 +2910,59 @@ with middle/far bucket contributions
 4001\text{--}8000:\ -82.122759,\qquad
 8001\text{--}12000:\ -85.867481.
 \]
-There is one remaining \(T\)-dependence caveat in this exact-grid prefix: the summation wrapper indexes the exact
-inner CSV by \(H\), while a placement bucket contains a range of residual lengths \(T\).  For the finite
-\(N=2^{21}\) certificate this is now checked directly.  The skipped-gap suffix
+\begin{lemma}[Tiny-prefix interior-\(T\) finite certificate]
+\label{lem:fullsplit-tiny-prefix-interiorT}
+Consider the finite checkpoint \(N=2^{21}\), \(\delta=.09\), \(b=64\), and the finite-prefix termination atom
+\(\log_2 p_{\rm term}\le -63.8926492\).  Let
+\[
+{\cal B}_1=[5949,9948],\qquad
+{\cal B}_2=[9949,13948],\qquad
+{\cal B}_3=[13949,17948]
+\]
+be the three residual-length buckets corresponding to gap ranges \(1\text{--}4000\),
+\(4001\text{--}8000\), and \(8001\text{--}12000\).  For \(0\le H\le499\), let
+\(p_{\le8}(H,T)\) denote the exact full-split selected-gap inner probability with at most eight charged
+terminations, computed from the closed-form fixed-\(e\) episode summands.  The tracked finite audit certifies that,
+for each bucket \({\cal B}_i=[T_i^-,T_i^+]\),
+\[
+\log_2 p_{\le8}(H,T)
+\le
+\log_2 p_{\le8}(H,T_i^-)+10^{-7}
+\qquad
+(0\le H\le499,\ T_i^-\le T\le T_i^+).
+\]
+The recorded maximum excess is \(2.19205276153\cdot 10^{-9}\), attained at the left endpoint itself; the largest
+left-endpoint reproduction error is \(5.52478240934\cdot 10^{-9}\) bits.  Consequently, for the current finite
+first-moment ledger, the left-endpoint CSVs at \(T=5949,9949,13949\) are valid representatives for the whole
+\(32\le h\le500,\ e\le8\) prefix up to the stated numerical tolerance.
+\end{lemma}
+
+\begin{proof}
+For fixed \(H\), \(T\), and selected-gap count \(e\), the exact episode summand is finite.  The skipped-gap suffix
 \[
 \sum_{L=x}^{T}\binom{T-L+e-1}{e-1}\binom{L-e}{x-e}\,S(L)
 \]
-is swept by a short cumulative recurrence, so all interior residual lengths can be audited without regenerating a
-CSV at every \(T\).  Running over every \(H=0,\ldots,499\) and every \(T\) in the three 4000-block placement buckets
-gives:
+depends on \(x,e,T\), but not on \(H\).  The audit implementation is
 \[
-\begin{array}{c|c|c|c}
-\text{checked set} & \#\text{rows} & \max(\log_2 p_T-\log_2 p_{\rm left}) & T_{\rm max}\\
-\hline
-H=0,\ldots,499;\ \text{all three buckets} & 1500 & 2.2\cdot 10^{-9} & \text{left endpoint}.
-\end{array}
+\begin{gathered}
+\texttt{scripts/check\_fullsplit\_exact\_grid\_interior.py}\\
+\texttt{--h-values 0:499,\quad --sample-step 1,\quad --method combined}.
+\end{gathered}
 \]
-The small positive value is floating roundoff in reproducing the left endpoint, not an interior increase.  The audit is
-performed by
+It sweeps all interior \(T\)'s by maintaining the short cumulative sums for these suffixes, rather than regenerating a
+separate CSV for every \(T\).  It checks all \(500\) values of \(H\) in all three buckets, writing one summary row for
+each \((H,{\cal B}_i)\), hence \(1500\) rows.  The standard ledger verifier
 \[
-\texttt{scripts/check\_fullsplit\_exact\_grid\_interior.py}.
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
 \]
-This is still a finite certificate rather than an analytic monotonicity theorem, but it removes the dominant
-tiny-prefix \(T\)-reuse assumption from the current ledger.
+now reads the tracked artifact
+\[
+\texttt{scripts/fullsplit\_exact\_interior\_h0\_499\_allT.csv}
+\]
+and fails unless the row count is \(1500\), the worst interior excess is at most \(10^{-7}\), and the worst
+left-endpoint reproduction error is at most \(5\cdot10^{-6}\).  The current artifact has the numerical maxima stated
+above.
+\end{proof}
 
 The same closed form extends to any fixed number \(e\) of selected skipped gaps:
 \[
