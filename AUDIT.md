@@ -113,7 +113,7 @@ scripts/fast_fullsplit_e08_T9949_H0_499_all.csv
 scripts/fast_fullsplit_e08_T13949_H0_499_all.csv
 ```
 
-The matching right-endpoint grids are:
+The matching right-endpoint grids, used for the earlier endpoint guard, are:
 
 ```text
 scripts/fast_fullsplit_e08_T9948_H0_499_all.csv
@@ -121,26 +121,24 @@ scripts/fast_fullsplit_e08_T13948_H0_499_all.csv
 scripts/fast_fullsplit_e08_T17948_H0_499_all.csv
 ```
 
-Endpoint audit:
+Full interior-`T` audit:
 
 ```powershell
-python scripts\check_fullsplit_exact_grid_endpoints.py
+python scripts\check_fullsplit_exact_grid_interior.py --h-values 0:499 --sample-step 1 --method combined --summary-only --output-csv scripts\fullsplit_exact_interior_h0_499_allT.csv
 ```
 
 Current output:
 
 ```text
-bucket,H_min,H_max,max_total_right_minus_left,H_total,left_total,right_total,max_column_right_minus_left,column,H_column
-gap_1_4000,0,499,-43.63206913,1,-20.0117348926,-63.6438040227,0.00201643022984,e8_log2,7
-gap_4001_8000,0,499,0,0,-63.892649238,-63.892649238,0.000859762181619,e8_log2,7
-gap_8001_12000,0,499,0,0,-63.892649238,-63.892649238,0.000476502560048,e8_log2,7
+Full-split exact-grid interior audit
+summary,rows=1500,worst_bucket=gap_8001_12000,worst_H=75,worst_diff=2.19202433982e-09,worst_T=13949,worst_repro_bucket=gap_8001_12000,worst_repro_H=185,worst_repro_delta=-5.52483925276e-09
 ```
 
-Interpretation: the exact `e <= 8` totals are endpoint-safe for the full
-`H = 0..499` table. The small positive column wiggles are individual fixed-`e`
-columns, not the log-summed total used in the ledger. This does not yet prove
-monotonicity for every interior `T` in the bucket; that remains a proof
-obligation.
+Interpretation: the exact `e <= 8` totals were checked for every
+`H = 0..499` and every `T` in the three placement buckets. The worst positive
+value is at the left endpoint itself and is numerical roundoff, not an interior
+increase. This is a finite audit, not the eventual analytic monotonicity lemma,
+but it removes the dominant `T`-reuse assumption from the current finite ledger.
 
 The row-level prefix sum can be regenerated with:
 
@@ -148,9 +146,10 @@ The row-level prefix sum can be regenerated with:
 python scripts\sum_fullsplit_piecewise_certificate.py --h-values 32:500 --inner-mode-by-gap csv,csv,csv --inner-knot-csvs "scripts\fast_fullsplit_e08_T5949_H0_499_all.csv;scripts\fast_fullsplit_e08_T9949_H0_499_all.csv;scripts\fast_fullsplit_e08_T13949_H0_499_all.csv" --require-knot-coverage --output-csv scripts\fullsplit_piecewise_h32_500_csv.csv
 ```
 
-Audit priority: high. This is the narrow waist of the certificate. After the
-right-endpoint check, the remaining issue is the analytic or finite certified
-control of the interior `T` values.
+Audit priority: high. This is the narrow waist of the certificate. The finite
+interior-`T` control is now checked; the remaining proof debt is to either keep
+this as an explicit finite certificate or replace it by a clean analytic
+monotonicity lemma.
 
 ### 2. Tiny Prefix, Crude Episode Tail
 

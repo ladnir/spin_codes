@@ -2871,27 +2871,28 @@ with middle/far bucket contributions
 8001\text{--}12000:\ -85.867481.
 \]
 There is one remaining \(T\)-dependence caveat in this exact-grid prefix: the summation wrapper indexes the exact
-inner CSV by \(H\), while a placement bucket contains a range of residual lengths \(T\).  As a first audit guard, we
-computed right-endpoint grids with the same inflated termination atom and compared the exact \(e\le8\) total against
-the left-endpoint grids for every \(H=0,\ldots,499\):
+inner CSV by \(H\), while a placement bucket contains a range of residual lengths \(T\).  For the finite
+\(N=2^{21}\) certificate this is now checked directly.  The skipped-gap suffix
+\[
+\sum_{L=x}^{T}\binom{T-L+e-1}{e-1}\binom{L-e}{x-e}\,S(L)
+\]
+is swept by a short cumulative recurrence, so all interior residual lengths can be audited without regenerating a
+CSV at every \(T\).  Running over every \(H=0,\ldots,499\) and every \(T\) in the three 4000-block placement buckets
+gives:
 \[
 \begin{array}{c|c|c|c}
-\text{gap bucket} & \max_H(\log_2 p_{\rm right}-\log_2 p_{\rm left})
-& H_{\rm max} & \text{largest single-column wiggle}\\
+\text{checked set} & \#\text{rows} & \max(\log_2 p_T-\log_2 p_{\rm left}) & T_{\rm max}\\
 \hline
-1\text{--}4000 & -43.632069 & 1 & +0.002016\ (e=8,H=7)\\
-4001\text{--}8000 & 0 & 0 & +0.000860\ (e=8,H=7)\\
-8001\text{--}12000 & 0 & 0 & +0.000477\ (e=8,H=7).
+H=0,\ldots,499;\ \text{all three buckets} & 1500 & 2.2\cdot 10^{-9} & \text{left endpoint}.
 \end{array}
 \]
-Thus the bucket right endpoints do not exceed the left-endpoint exact totals; the equality cases are the \(H=0\)
-pure-termination rows.  The positive entries in the last column are individual fixed-\(e\) terms, not the log-summed
-total used by the ledger.  This endpoint check is performed by
+The small positive value is floating roundoff in reproducing the left endpoint, not an interior increase.  The audit is
+performed by
 \[
-\texttt{python scripts/check\_fullsplit\_exact\_grid\_endpoints.py}.
+\texttt{scripts/check\_fullsplit\_exact\_grid\_interior.py}.
 \]
-It is not yet the desired analytic monotonicity proof for all interior \(T\), but it removes the immediate
-left-versus-right endpoint ambiguity in the finite prefix.
+This is still a finite certificate rather than an analytic monotonicity theorem, but it removes the dominant
+tiny-prefix \(T\)-reuse assumption from the current ledger.
 
 The same closed form extends to any fixed number \(e\) of selected skipped gaps:
 \[
