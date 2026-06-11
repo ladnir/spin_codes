@@ -471,6 +471,9 @@ It also makes the full far bucket cheap:
 ```text
 python scripts\sum_fullsplit_paired_early_eall.py --h-values 1000501,1150501,1200501,1250501 --first-r-values 1:64 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --outer-complement-symmetry --lambdas 2.3 --rhos 1
 total_log2 = -132646.190570
+endpoint_total_log2 = -132646.193762
+full_minus_endpoint_bits = 0.003192
+ege1_T_endpoint_geom_bound: lambda=2.3, rho=1, log2_g=8.821856, overhead_bits=0.003199
 h=1000501: -133179.352477
 h=1150501: -132946.385366
 h=1200501: -132646.190570
@@ -480,8 +483,34 @@ branch_ege1_log2 = -132646.190570
 ```
 
 For `h=1200501`, the full far bucket is only `0.003192` bits above the endpoint/full-`r` value. The high-density
-proof target is therefore sharper than before: prove endpoint dominance in `T`, then handle the first-block
-hypergeometric `r`-sum or tails without a heuristic local-`r` window.
+`T` overhead is now backed by Lemma `lem:fullsplit-paired-endpoint-dominance`: with `lambda=2.3, rho=1`,
+`log2_g=8.821856`, so the geometric right-endpoint overhead bound is `0.003199` bits. The high-density proof target
+is therefore sharper than before: handle the first-block hypergeometric `r`-sum or tails without a heuristic local-`r`
+window, then close the remaining `h` interval/complement-spectrum envelope.
+
+Important correction from a broader endpoint-only scan: `h=1200501` is not the sampled high-density peak. Scanning
+`h=1100501:1300501:5000` moved the peak to the `1115k` neighborhood, and a step-one zoom over
+`1115101:1115201:1` found the sampled endpoint peak at:
+
+```text
+h = 1115146
+endpoint_h_log2 = -132529.972886
+endpoint_peak_r = 32
+endpoint_peak_term_log2 = -132533.304269
+endpoint_total_minus_endpoint_peak_bits = 3.331383
+```
+
+Running the full far bucket at this corrected sampled peak gives:
+
+```text
+python scripts\sum_fullsplit_paired_early_eall.py --h-values 1115146 --first-r-values 1:64 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --outer-complement-symmetry --lambdas 2.3 --rhos 1
+total_log2 = -132529.969694
+endpoint_total_log2 = -132529.972886
+full_minus_endpoint_bits = 0.003192
+```
+
+This changes the honest bookkeeping but not the qualitative conclusion: the next missing proof is the `h` interval
+closure around the high-density peaks. The `T` and first-block `r` costs look small and stable.
 
 Current interpretation: early high-density has ample numerical margin once `T` pairing and outer complement symmetry
 are both used. Remaining proof work is interval packaging: a paired placement-survival lemma over `h`, plus a local

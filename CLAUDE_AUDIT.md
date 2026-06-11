@@ -90,8 +90,15 @@ paired all-episode wrapper into `e=0` and `e>=1` Cauchy branches and sums the ex
 reproduces the endpoint/full-`r` check at `h=1200501` with `total_log2=-132646.193762`, peak `r=32`, `T=32767`,
 branch `ege1`. On the full far bucket `22001 <= gap <= 26819`, all `r=1..64`, and sampled high-density rows
 `h=1000501,1150501,1200501,1250501`, it gives total `-132646.190570`, dominated by
-`h=1200501`. Thus the remaining high-density work is an endpoint-dominance and first-block `r`-sum/tail lemma,
-not a slow per-`T` enumeration problem.
+`h=1200501`. The manuscript now includes Lemma `lem:fullsplit-paired-endpoint-dominance`, which proves the `T`
+endpoint reduction for the paired `e>=1` branch when `G>2`; in the dominant row `lambda=2.3,rho=1` gives
+`log2_g=8.821856` and a `0.003199`-bit geometric overhead bound. Thus the remaining high-density work is the
+first-block `r`-sum/tail and the `h` interval/complement-spectrum envelope, not a slow per-`T` enumeration problem.
+Correction: a broader endpoint scan shows the sampled high-density peak is not at `h=1200501`. A step-one zoom over
+`1115101 <= h <= 1115201` finds the sampled endpoint peak at `h=1115146`, with endpoint total
+`-132529.972886`, peak `r=32`, and endpoint peak term `-132533.304269`; the full far bucket at this row is
+`-132529.969694`. This is still enormously safe, but the final certificate must close an `h` interval around this
+ridge rather than cite only the older four sampled rows.
 
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 

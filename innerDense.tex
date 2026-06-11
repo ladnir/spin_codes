@@ -3281,9 +3281,35 @@ h & \log_2\mu_{\rm paired}^{\rm eall}(22001\le g\le26819,\;1\le r\le64)\\
 \end{array}
 \]
 At \(h=1200501\) this is only \(0.003192\) bits above the endpoint/full-\(r\) value, and the displayed total is
-entirely dominated by the \(e\ge1\) branch; the \(e=0\) branch contributes \(-136323.731114\).  This strongly suggests
-that the final early high-density proof should be organized as an endpoint-dominance lemma in \(T\) plus an exact
-hypergeometric first-block \(r\)-sum or \(r\)-tail bound.
+entirely dominated by the \(e\ge1\) branch; the \(e=0\) branch contributes \(-136323.731114\).  For the pole used in
+this row, \(\lambda=2.3,\rho=1\), one has
+\[
+\log_2 G_{\lambda,\rho}=8.821856,
+\]
+so Lemma~\ref{lem:fullsplit-paired-endpoint-dominance} gives a uniform \(T\)-bucket overhead of at most
+\[
+-\log_2\left(1-\frac{1}{G_{\lambda,\rho}-1}\right)=0.003199
+\]
+bits for the \(e\ge1\) branch.  This turns the observed endpoint dominance into a proof-shaped bound.  The remaining
+early high-density task is therefore an exact hypergeometric first-block \(r\)-sum or \(r\)-tail bound, plus an interval
+bound in \(h\) for the outer/complement spectrum.
+
+A broader endpoint scan shows why the \(h\)-interval step should not be skipped.  Scanning
+\[
+h=1100501,1105501,\ldots,1300501
+\]
+moves the sampled peak to the neighborhood of \(h=1115\)k.  A step-one zoom over \(1115101\le h\le1115201\) finds
+\[
+h=1115146
+\]
+as the sampled endpoint peak.  At this row, the full far bucket \(22001\le g\le26819\), all \(1\le r\le64\), gives
+\[
+\log_2\mu_{\rm paired}^{\rm eall}\le -132529.969694,
+\]
+with endpoint value \(-132529.972886\), \(T\)-overhead \(0.003192\) bits, and peak \(r=32\) endpoint term
+\(-132533.304269\).  Thus the corrected sampled high-density peak is about \(116\) bits larger than the earlier
+four-point table suggested, but still has the same structural explanation: endpoint dominance in \(T\), a small
+constant first-block \(r\)-sum, and a large remaining first-moment margin.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
@@ -3656,6 +3682,51 @@ selected, gives the same \(k=x\) factor directly.  Finally,
 \binom{T-x+k}{k}\le \binom{T}{k},
 \]
 which gives \eqref{eq:fullsplit-e-tail-ht-multiplier}.
+
+\begin{lemma}[Right-endpoint dominance for paired early sums]
+\label{lem:fullsplit-paired-endpoint-dominance}
+Fix \(b,H,\lambda,\rho\), and write
+\[
+G_{\lambda,\rho}:=
+\big((1+\rho)^b-1\big)\frac{M_+(\lambda)}{1-M_+(\lambda)}.
+\]
+Assume \(G_{\lambda,\rho}>2\).  Let \(T_0\le T_1 < H\), and put
+\[
+T_*:=\max\{T_0,\lceil H/b\rceil\},\qquad
+S_T(H;\lambda,\rho):=
+\sum_{x=\lceil H/b\rceil}^{T}(x+1)G_{\lambda,\rho}^x .
+\]
+Then
+\begin{equation}
+\label{eq:fullsplit-paired-endpoint-dominance}
+\sum_{T=T_*}^{T_1}
+S_T(H;\lambda,\rho)\bigl(1+R_{H,T}(\lambda)\bigr)
+\le
+\frac{
+S_{T_1}(H;\lambda,\rho)\bigl(1+R_{H,T_1}(\lambda)\bigr)
+}{
+1-(G_{\lambda,\rho}-1)^{-1}
+}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For \(T\ge T_*\),
+\[
+S_{T-1}
+\le
+\sum_{x=\lceil H/b\rceil}^{T-1}T\,G_{\lambda,\rho}^x
+\le
+\frac{T\,G_{\lambda,\rho}^{T}}{G_{\lambda,\rho}-1},
+\qquad
+S_T\ge (T+1)G_{\lambda,\rho}^{T}.
+\]
+Thus \(S_{T-1}/S_T\le (G_{\lambda,\rho}-1)^{-1}\).  Iterating this adjacent-ratio bound gives a geometric tail
+from the right endpoint.  The multiplier \(R_{H,T}(\lambda)\) in
+\eqref{eq:fullsplit-e-tail-ht-multiplier} is nondecreasing in \(T\), since every summand contains
+\(\binom{T}{k}\).  Replacing all \(1+R_{H,T}\) by the endpoint value \(1+R_{H,T_1}\) and summing the geometric series
+gives \eqref{eq:fullsplit-paired-endpoint-dominance}.
+\end{proof}
 
 The multiplier is tiny in the finite regimes that currently matter.  The audit helper
 \[

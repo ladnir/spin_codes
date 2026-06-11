@@ -53,19 +53,22 @@ def log2_sum_e0_T(
     T_max: int,
     pref: float,
     log_m: float,
-) -> tuple[float, int, float]:
+) -> tuple[float, int, float, float]:
     total = float("-inf")
     peak_T = -1
     peak = float("-inf")
+    endpoint = float("-inf")
     for T in range(T_min, T_max + 1):
         if H > b * T:
             continue
         val = log2_binom(b * T, H) + pref + T * log_m
+        if T == T_max:
+            endpoint = val
         total = log2add(total, val)
         if val > peak:
             peak = val
             peak_T = T
-    return total, peak_T, peak
+    return total, peak_T, peak, endpoint
 
 
 def log2_sum_ege1_T(
@@ -79,11 +82,12 @@ def log2_sum_ege1_T(
     log_rho: float,
     log_g: float,
     log_q: float,
-) -> tuple[float, int, float]:
+) -> tuple[float, int, float, float]:
     x_min = 0 if H == 0 else max(1, (H + b - 1) // b)
     total = float("-inf")
     peak_T = -1
     peak = float("-inf")
+    endpoint = float("-inf")
     for T in range(T_min, T_max + 1):
         x_max = min(H, T)
         if x_min > x_max:
@@ -91,11 +95,13 @@ def log2_sum_ege1_T(
         s_t = log2_arith_geom_sum(log_g, max(1, x_min), x_max)
         tail = log2_one_plus_pow2(log2_ht_tail_envelope(H=H, T=T, log_q=log_q))
         val = term_log2 + pref - H * log_rho + s_t + tail
+        if T == T_max:
+            endpoint = val
         total = log2add(total, val)
         if val > peak:
             peak = val
             peak_T = T
-    return total, peak_T, peak
+    return total, peak_T, peak, endpoint
 
 
 def main() -> int:
@@ -163,10 +169,15 @@ def main() -> int:
         raise SystemExit("no valid lambda values")
 
     total = float("-inf")
+    endpoint_total = float("-inf")
     by_h: dict[int, float] = {}
+    endpoint_by_h: dict[int, float] = {}
     by_bucket = [float("-inf") for _ in buckets]
+    endpoint_by_bucket = [float("-inf") for _ in buckets]
     peak = None
+    endpoint_peak = None
     branch_totals = {"e0": float("-inf"), "ege1": float("-inf")}
+    endpoint_branch_totals = {"e0": float("-inf"), "ege1": float("-inf")}
 
     for h in h_values:
         outer_h = min(h, args.N - h) if args.outer_complement_symmetry else h
@@ -175,6 +186,7 @@ def main() -> int:
             continue
         common_h = outer - log2_binom(args.N, h)
         h_total = float("-inf")
+        endpoint_h_total = float("-inf")
         for r in r_values:
             if r < 1 or r > min(h, b):
                 continue
@@ -188,12 +200,14 @@ def main() -> int:
 
                 best_e0 = float("inf")
                 best_e0_meta = None
+                best_e0_endpoint = float("-inf")
                 best_ege1 = float("inf")
                 best_ege1_meta = None
+                best_ege1_endpoint = float("-inf")
                 for lam, M in mgf_by_lam.items():
                     pref = lam * d / math.log(2.0)
                     log_m = math.log2(M)
-                    e0_sum, e0_T, e0_peak = log2_sum_e0_T(
+                    e0_sum, e0_T, e0_peak, e0_endpoint = log2_sum_e0_T(
                         b=b,
                         H=H,
                         T_min=T_min,
@@ -203,6 +217,7 @@ def main() -> int:
                     )
                     if e0_sum < best_e0:
                         best_e0 = e0_sum
+                        best_e0_endpoint = e0_endpoint
                         best_e0_meta = (lam, float("nan"), e0_T, e0_peak)
 
                     log_q = args.turnoff_log2 + math.log2(1.0 - M)
@@ -210,7 +225,7 @@ def main() -> int:
                     for rho in rhos:
                         log_block = log2_expm1_pos(b * math.log1p(rho))
                         log_g = log_block + log_m_over
-                        ege1_sum, ege1_T, ege1_peak = log2_sum_ege1_T(
+                        ege1_sum, ege1_T, ege1_peak, ege1_endpoint = log2_sum_ege1_T(
                             b=b,
                             H=H,
                             T_min=T_min,
@@ -223,16 +238,25 @@ def main() -> int:
                         )
                         if ege1_sum < best_ege1:
                             best_ege1 = ege1_sum
+                            best_ege1_endpoint = ege1_endpoint
                             best_ege1_meta = (lam, rho, ege1_T, ege1_peak)
 
                 e0_term = common + best_e0
                 ege1_term = common + best_ege1
+                e0_endpoint_term = common + best_e0_endpoint
+                ege1_endpoint_term = common + best_ege1_endpoint
                 term = log2add(e0_term, ege1_term)
+                endpoint_term = log2add(e0_endpoint_term, ege1_endpoint_term)
                 total = log2add(total, term)
+                endpoint_total = log2add(endpoint_total, endpoint_term)
                 h_total = log2add(h_total, term)
+                endpoint_h_total = log2add(endpoint_h_total, endpoint_term)
                 by_bucket[idx] = log2add(by_bucket[idx], term)
+                endpoint_by_bucket[idx] = log2add(endpoint_by_bucket[idx], endpoint_term)
                 branch_totals["e0"] = log2add(branch_totals["e0"], e0_term)
                 branch_totals["ege1"] = log2add(branch_totals["ege1"], ege1_term)
+                endpoint_branch_totals["e0"] = log2add(endpoint_branch_totals["e0"], e0_endpoint_term)
+                endpoint_branch_totals["ege1"] = log2add(endpoint_branch_totals["ege1"], ege1_endpoint_term)
                 if peak is None or term > peak["term_log2"]:
                     peak_branch = "e0" if e0_term >= ege1_term else "ege1"
                     peak_meta = best_e0_meta if peak_branch == "e0" else best_ege1_meta
@@ -253,7 +277,21 @@ def main() -> int:
                         "peak_T": peak_meta[2] if peak_meta else -1,
                         "branch_peak_log2": peak_meta[3] if peak_meta else float("nan"),
                     }
+                if endpoint_peak is None or endpoint_term > endpoint_peak["term_log2"]:
+                    peak_branch = "e0" if e0_endpoint_term >= ege1_endpoint_term else "ege1"
+                    endpoint_peak = {
+                        "term_log2": endpoint_term,
+                        "h": h,
+                        "r": r,
+                        "H": H,
+                        "gap_min": gap_min,
+                        "gap_max": gap_max,
+                        "branch": peak_branch,
+                        "e0_term": e0_endpoint_term,
+                        "ege1_term": ege1_endpoint_term,
+                    }
         by_h[h] = h_total
+        endpoint_by_h[h] = endpoint_h_total
 
     print("Full-split paired early all-episode split sum")
     print(f"N,{args.N}")
@@ -266,12 +304,30 @@ def main() -> int:
     print(f"rho_count,{len(rhos)}")
     print(f"total_log2,{total:.6f}")
     print(f"margin_bits,{-total:.6f}")
+    print(f"endpoint_total_log2,{endpoint_total:.6f}")
+    print(f"full_minus_endpoint_bits,{total - endpoint_total:.6f}")
+    for lam, M in mgf_by_lam.items():
+        log_m_over = math.log2(M / (1.0 - M))
+        for rho in rhos:
+            log_g = log2_expm1_pos(b * math.log1p(rho)) + log_m_over
+            if log_g <= 1.0:
+                overhead = float("inf")
+            else:
+                overhead = -math.log2(1.0 - 1.0 / (2.0 ** log_g - 1.0))
+            print(
+                f"ege1_T_endpoint_geom_bound,lambda={lam:.6g},rho={rho:.6g},"
+                f"log2_g={log_g:.6f},overhead_bits={overhead:.6f}"
+            )
     print(f"branch_e0_log2,{branch_totals['e0']:.6f}")
     print(f"branch_ege1_log2,{branch_totals['ege1']:.6f}")
+    print(f"endpoint_branch_e0_log2,{endpoint_branch_totals['e0']:.6f}")
+    print(f"endpoint_branch_ege1_log2,{endpoint_branch_totals['ege1']:.6f}")
     for idx, (gap_min, gap_max) in enumerate(buckets):
         print(f"gap_{gap_min}_{gap_max}_log2,{by_bucket[idx]:.6f}")
+        print(f"endpoint_gap_{gap_min}_{gap_max}_log2,{endpoint_by_bucket[idx]:.6f}")
     for h in h_values:
         print(f"h_{h}_log2,{by_h.get(h, float('-inf')):.6f}")
+        print(f"endpoint_h_{h}_log2,{endpoint_by_h.get(h, float('-inf')):.6f}")
     if peak:
         print(f"peak_h,{peak['h']}")
         print(f"peak_first_r,{peak['r']}")
@@ -287,6 +343,18 @@ def main() -> int:
         print(f"peak_e0_term_log2,{peak['e0_term']:.6f}")
         print(f"peak_ege1_term_log2,{peak['ege1_term']:.6f}")
         print(f"peak_term_log2,{peak['term_log2']:.6f}")
+    if endpoint_peak:
+        print(f"endpoint_peak_h,{endpoint_peak['h']}")
+        print(f"endpoint_peak_first_r,{endpoint_peak['r']}")
+        print(f"endpoint_peak_remaining_ones,{endpoint_peak['H']}")
+        print(f"endpoint_peak_gap_min,{endpoint_peak['gap_min']}")
+        print(f"endpoint_peak_gap_max,{endpoint_peak['gap_max']}")
+        print(f"endpoint_peak_branch,{endpoint_peak['branch']}")
+        print(f"endpoint_peak_e0_term_log2,{endpoint_peak['e0_term']:.6f}")
+        print(f"endpoint_peak_ege1_term_log2,{endpoint_peak['ege1_term']:.6f}")
+        print(f"endpoint_peak_term_log2,{endpoint_peak['term_log2']:.6f}")
+        print(f"endpoint_total_minus_endpoint_peak_bits,{endpoint_total - endpoint_peak['term_log2']:.6f}")
+        print(f"full_total_minus_endpoint_peak_bits,{total - endpoint_peak['term_log2']:.6f}")
     return 0
 
 
