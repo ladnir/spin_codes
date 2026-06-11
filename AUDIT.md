@@ -109,9 +109,17 @@ Expected key outputs:
 prefix_interior_audit_rows,1500
 prefix_interior_audit_worst,bucket=gap_8001_12000,H=75,diff=2.19205276153e-09,T=13949
 late_prefix_T_lt_5949_cap_log2,-40.115431
+exact_outer_support_positive_count,114
+exact_outer_support_min_positive,32
+exact_outer_support_next_positive_after_min,48
+exact_outer_support_first_positive,32;48;56;60;64;68;72;76;80
 late_prefix_T_lt_5949_exact_outer_log2,-41.113442
+late_prefix_T_lt_5949_exact_outer_split_log2,-41.113442
+late_prefix_T_lt_5949_exact_outer_above_split_log2,-66.416502
 prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_le8_exact_outer_log2,-37.383345
+prefix_32_500_e_le8_exact_outer_split_log2,-37.383482
+prefix_32_500_e_le8_exact_outer_above_split_log2,-50.738253
 prefix_32_500_e_ge9_tail_log2,-269.335258
 prefix_32_500_e_ge9_tail_exact_outer_log2,-284.004805
 postprefix_501_2000_eall_log2,-182.259739
@@ -178,19 +186,28 @@ python scripts\certify_rm_outer_prefix_exact.py --ledger-csv scripts\fullsplit_p
 Key output:
 
 ```text
+support_positive_count,114
 support_min_positive,32
+support_next_positive_after_min,48
 support_first_positive,32;48;56;60;64;68;72;76;80
 late_prefix_exact_log2,-41.113442
+late_prefix_exact_split_log2,-41.113442
+late_prefix_exact_above_split_log2,-66.416502
 ledger_exact_outer_log2,-37.383345   # fullsplit_piecewise_h32_500_csv.csv
+ledger_exact_split_log2,-37.383482   # h=32 slice of fullsplit_piecewise_h32_500_csv.csv
+ledger_exact_above_split_log2,-50.738253 # h>32 support remainder
 ledger_exact_outer_log2,-284.004805  # fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv
 ledger_exact_outer_log2,-86.910456   # fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv
 ledger_exact_outer_log2,-319.977808  # fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
 ```
 
 Interpretation: the current live finite prefix is exact-support dominated by
-`h=32`. The old adjacent `h=33,34,...` ridge below is a useful diagnostic for
-the smoothed Cauchy outer envelope, but it is not the current bottleneck once
-the exact RM direct-sum support is used.
+`h=32`, with the next possible weight only at `h=48`. The checked window split
+is `-37.383482` bits from `h=32` and `-50.738253` bits from all supported
+`h>32`; the checked ultra-late split is `-41.113442` and `-66.416502`.
+The old adjacent `h=33,34,...` ridge below is a useful diagnostic for the
+smoothed Cauchy outer envelope, but it is not the current bottleneck once the
+exact RM direct-sum support is used.
 
 Smoothed-outer ridge decomposition:
 

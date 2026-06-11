@@ -22,6 +22,7 @@ from certify_rm_outer_prefix_exact import (
     direct_sum_coefficients,
     exact_late_prefix_sum,
     load_local_spectrum,
+    positive_support,
     reweighted_ledger_sum,
 )
 
@@ -667,6 +668,16 @@ def main() -> int:
         blocks=args.exact_outer_blocks,
         h_max=args.exact_outer_h_max,
     )
+    exact_support = positive_support(exact_outer_coeffs, args.exact_outer_h_max)
+    if len(exact_support) < 2 or exact_support[0] != 32 or exact_support[1] != 48:
+        raise SystemExit(
+            "exact RM support: expected first positive weights 32,48; "
+            f"got {exact_support[:2]}"
+        )
+    print(f"exact_outer_support_positive_count,{len(exact_support)}")
+    print(f"exact_outer_support_min_positive,{exact_support[0]}")
+    print(f"exact_outer_support_next_positive_after_min,{exact_support[1]}")
+    print(f"exact_outer_support_first_positive,{';'.join(str(h) for h in exact_support if h <= 80)}")
     exact_late_prefix = exact_late_prefix_sum(
         exact_outer_coeffs,
         n=args.N,
@@ -675,8 +686,21 @@ def main() -> int:
         h_max=args.late_prefix_h_max,
     )
     check_close("late_prefix_T_lt_5949_exact_outer", exact_late_prefix.total_log2, -41.113442, args.tolerance)
+    check_close("late_prefix_T_lt_5949_exact_outer_split", exact_late_prefix.split_log2, -41.113442, args.tolerance)
+    check_close(
+        "late_prefix_T_lt_5949_exact_outer_above_split",
+        exact_late_prefix.above_split_log2,
+        -66.416502,
+        args.tolerance,
+    )
     print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_rows,{exact_late_prefix.rows}")
     print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_log2,{exact_late_prefix.total_log2:.6f}")
+    print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_split_h,{exact_late_prefix.split_h}")
+    print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_split_log2,{exact_late_prefix.split_log2:.6f}")
+    print(
+        f"late_prefix_T_lt_{args.late_blocks}_exact_outer_above_split_log2,"
+        f"{exact_late_prefix.above_split_log2:.6f}"
+    )
     print(
         f"late_prefix_T_lt_{args.late_blocks}_exact_outer_peak,"
         f"h={exact_late_prefix.peak_h},"
@@ -700,15 +724,32 @@ def main() -> int:
         "early_32_500_e_le16_uniformsurv": -86.910456,
         "early_32_500_e_ge17_tail": -319.977808,
     }
+    exact_outer_split_expected = {
+        "prefix_32_500_e_le8": (-37.383482, -50.738253),
+        "prefix_32_500_e_ge9_tail": (-540.423048, -284.004805),
+        "early_32_500_e_le16_uniformsurv": (-86.910458, -106.352289),
+        "early_32_500_e_ge17_tail": (-1019.441595, -319.977808),
+    }
     exact_outer_parts: dict[str, float] = {}
     for item in csv_ledgers:
         if item.name not in exact_outer_expected:
             continue
         summary = reweighted_ledger_sum(item.path, exact_outer_coeffs)
         check_close(f"{item.name}_exact_outer", summary.exact_log2, exact_outer_expected[item.name], args.tolerance)
+        split_expected, above_split_expected = exact_outer_split_expected[item.name]
+        check_close(f"{item.name}_exact_outer_split", summary.split_log2, split_expected, args.tolerance)
+        check_close(
+            f"{item.name}_exact_outer_above_split",
+            summary.above_split_log2,
+            above_split_expected,
+            args.tolerance,
+        )
         exact_outer_parts[item.name] = summary.exact_log2
         print(f"{item.name}_exact_outer_live_rows,{summary.live_rows}")
         print(f"{item.name}_exact_outer_log2,{summary.exact_log2:.6f}")
+        print(f"{item.name}_exact_outer_split_h,{summary.split_h}")
+        print(f"{item.name}_exact_outer_split_log2,{summary.split_log2:.6f}")
+        print(f"{item.name}_exact_outer_above_split_log2,{summary.above_split_log2:.6f}")
         print(
             f"{item.name}_exact_outer_peak,"
             f"outer_weight={summary.peak_h},first_r={summary.peak_first_r},"

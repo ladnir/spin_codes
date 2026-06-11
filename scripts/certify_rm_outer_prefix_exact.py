@@ -80,6 +80,9 @@ class ReweightedLedgerSummary:
     live_rows: int
     cauchy_log2: float
     exact_log2: float
+    split_h: int
+    split_log2: float
+    above_split_log2: float
     peak_term_log2: float
     peak_h: int
     peak_first_r: int
@@ -94,6 +97,12 @@ def exact_outer_log2(coeffs: list[int], h: int) -> float:
     return math.log2(coeffs[h])
 
 
+def positive_support(coeffs: list[int], h_max: int | None = None) -> list[int]:
+    if h_max is None:
+        h_max = len(coeffs) - 1
+    return [h for h, coeff in enumerate(coeffs[: h_max + 1]) if h > 0 and coeff]
+
+
 def old_outer_column(row: dict[str, str]) -> str:
     if "outer_log2_bound" in row:
         return "outer_log2_bound"
@@ -102,11 +111,18 @@ def old_outer_column(row: dict[str, str]) -> str:
     raise KeyError("row has neither outer_log2_bound nor outer_log2")
 
 
-def reweighted_ledger_sum(path: Path, coeffs: list[int]) -> ReweightedLedgerSummary:
+def reweighted_ledger_sum(path: Path, coeffs: list[int], *, split_h: int | None = None) -> ReweightedLedgerSummary:
+    if split_h is None:
+        support = positive_support(coeffs)
+        if not support:
+            raise SystemExit("exact outer coefficients have no positive support")
+        split_h = support[0]
     rows = 0
     live_rows = 0
     cauchy_total = float("-inf")
     exact_total = float("-inf")
+    split_total = float("-inf")
+    above_split_total = float("-inf")
     peak: tuple[float, dict[str, str], float] | None = None
     with path.open(newline="") as f:
         for row in csv.DictReader(f):
@@ -121,6 +137,10 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int]) -> ReweightedLedgerSumm
             old_outer = float(row[column])
             exact_term = cauchy_term - old_outer + outer
             exact_total = log2add(exact_total, exact_term)
+            if h == split_h:
+                split_total = log2add(split_total, exact_term)
+            elif h > split_h:
+                above_split_total = log2add(above_split_total, exact_term)
             live_rows += 1
             if peak is None or exact_term > peak[0]:
                 peak = (exact_term, row, outer)
@@ -132,6 +152,9 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int]) -> ReweightedLedgerSumm
         live_rows=live_rows,
         cauchy_log2=cauchy_total,
         exact_log2=exact_total,
+        split_h=split_h,
+        split_log2=split_total,
+        above_split_log2=above_split_total,
         peak_term_log2=peak_term,
         peak_h=int(peak_row["outer_weight"]),
         peak_first_r=int(peak_row["first_r"]),
@@ -145,6 +168,9 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int]) -> ReweightedLedgerSumm
 class LatePrefixSummary:
     total_log2: float
     rows: int
+    split_h: int
+    split_log2: float
+    above_split_log2: float
     peak_h: int
     peak_outer_log2: float
     peak_late_log2: float
@@ -158,8 +184,16 @@ def exact_late_prefix_sum(
     b: int,
     late_blocks: int,
     h_max: int,
+    split_h: int | None = None,
 ) -> LatePrefixSummary:
+    if split_h is None:
+        support = positive_support(coeffs, h_max)
+        if not support:
+            raise SystemExit("exact late prefix: no positive support")
+        split_h = support[0]
     total = float("-inf")
+    split_total = float("-inf")
+    above_split_total = float("-inf")
     rows = 0
     peak: tuple[float, int, float, float] | None = None
     for h in range(1, min(h_max, len(coeffs) - 1) + 1):
@@ -169,6 +203,10 @@ def exact_late_prefix_sum(
         late = log2_binom(late_blocks * b, h) - log2_binom(n, h)
         term = outer + late
         total = log2add(total, term)
+        if h == split_h:
+            split_total = log2add(split_total, term)
+        elif h > split_h:
+            above_split_total = log2add(above_split_total, term)
         rows += 1
         if peak is None or term > peak[0]:
             peak = (term, h, outer, late)
@@ -178,6 +216,9 @@ def exact_late_prefix_sum(
     return LatePrefixSummary(
         total_log2=total,
         rows=rows,
+        split_h=split_h,
+        split_log2=split_total,
+        above_split_log2=above_split_total,
         peak_h=peak_h,
         peak_outer_log2=peak_outer,
         peak_late_log2=peak_late,
@@ -205,13 +246,17 @@ def main() -> int:
     local = load_local_spectrum(args.local_spectrum_csv, args.h_max)
     coeffs = direct_sum_coefficients(local, blocks=args.blocks, h_max=args.h_max)
     support = [h for h, coeff in enumerate(coeffs) if coeff]
+    positive = positive_support(coeffs, args.h_max)
     print("Exact RM outer prefix")
     print(f"local_spectrum_csv,{args.local_spectrum_csv}")
     print(f"blocks,{args.blocks}")
     print(f"h_max,{args.h_max}")
     print(f"support_count,{len(support)}")
-    print(f"support_min_positive,{min(h for h in support if h > 0)}")
-    print(f"support_first_positive,{';'.join(str(h) for h in support if h > 0 and h <= 80)}")
+    print(f"support_positive_count,{len(positive)}")
+    print(f"support_min_positive,{positive[0]}")
+    if len(positive) > 1:
+        print(f"support_next_positive_after_min,{positive[1]}")
+    print(f"support_first_positive,{';'.join(str(h) for h in positive if h <= 80)}")
 
     late = exact_late_prefix_sum(
         coeffs,
@@ -222,6 +267,9 @@ def main() -> int:
     )
     print(f"late_prefix_exact_rows,{late.rows}")
     print(f"late_prefix_exact_log2,{late.total_log2:.6f}")
+    print(f"late_prefix_exact_split_h,{late.split_h}")
+    print(f"late_prefix_exact_split_log2,{late.split_log2:.6f}")
+    print(f"late_prefix_exact_above_split_log2,{late.above_split_log2:.6f}")
     print(
         "late_prefix_exact_peak,"
         f"h={late.peak_h},outer_log2={late.peak_outer_log2:.6f},"
@@ -235,6 +283,9 @@ def main() -> int:
         print(f"ledger_live_rows,{summary.live_rows}")
         print(f"ledger_cauchy_log2,{summary.cauchy_log2:.6f}")
         print(f"ledger_exact_outer_log2,{summary.exact_log2:.6f}")
+        print(f"ledger_exact_split_h,{summary.split_h}")
+        print(f"ledger_exact_split_log2,{summary.split_log2:.6f}")
+        print(f"ledger_exact_above_split_log2,{summary.above_split_log2:.6f}")
         print(
             "ledger_exact_peak,"
             f"h={summary.peak_h},r={summary.peak_first_r},"

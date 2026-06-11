@@ -3074,12 +3074,15 @@ inner/placement rows by exact RM direct-sum coefficients gives
 \[
 \log_2\mu_{32\le h\le500,\ {\rm window}}^{\rm exact\ outer}\le -37.383345,
 \]
-with the \(h=32\) slice alone contributing \(-37.383482\) and all \(h>32\) support contributing only \(-50.738253\).
+with the \(h=32\) slice alone contributing \(-37.383482\) and all supported \(h>32\) rows together contributing only
+\(-50.738253\).  The certificate also checks that there are \(114\) positive supported weights in this prefix and that
+the next supported weight after \(32\) is \(48\).
 The exact ultra-late prefix is
 \[
 \log_2\mu_{32\le h\le500,\ T<5949}^{\rm exact\ outer}\le -41.113442,
 \]
-and the combined finite ledger becomes
+with supported \(h>32\) contributing only \(-66.416502\).
+The combined finite ledger becomes
 \[
 \log_2\mu_{\rm finite}^{\rm exact\ outer}\le -37.383345,\qquad
 \log_2\mu_{\rm late+window}^{\rm exact\ outer}\le -37.278528.
