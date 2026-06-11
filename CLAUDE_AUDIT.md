@@ -80,6 +80,10 @@ Paired all-episode update: `probe_fullsplit_early_paired_survival.py --inner-mod
 all-episode wrapper to each exact `T` placement term. Sparse high-density checks with complement symmetry have the
 current sampled worst near `h=1200501`, local `r=32..43`, at `total_log2=-132647.058774`. This is not an interval
 certificate yet, but it strongly suggests the remaining high-density task is packaging, not a new obstruction.
+Follow-up endpoint check: at `h=1200501`, freezing the dominant endpoint `T=32767` and summing all `r=1..64` gives
+`-132646.193762`, only `3.331383` bits above the peak `r=32` term. The single `r=32` all-`T` sum is only `0.003191`
+bits above its endpoint term. The intended proof split is therefore endpoint dominance in `T` plus a first-block
+hypergeometric `r`-tail bound.
 
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 

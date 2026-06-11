@@ -3251,6 +3251,23 @@ h & r\text{-window} & \log_2\mu_{\rm paired}^{\rm eall} & \text{peak }r\\
 This is still a sampled diagnostic, not a closed interval theorem.  Its value is that the remaining early
 high-density certificate no longer looks numerically tight: the proof debt is to package the paired \(T\)-sum and the
 local \(r\)-window reduction into interval lemmas.
+The first-block count direction also appears benign.  On the same four sampled \(h\)-values, if one freezes the
+dominating endpoint \(T=32767\) and sums over all \(1\le r\le64\), the paired all-episode totals are
+\[
+\begin{array}{c|c}
+h & \log_2\mu_{\rm paired}^{\rm eall}(T=32767,\;1\le r\le64)\\
+\hline
+1000501 & -133179.355669\\
+1150501 & -132946.388557\\
+1200501 & -132646.193762\\
+1250501 & -132834.786925 .
+\end{array}
+\]
+For the worst of these rows, \(h=1200501\), the single peak term is \(-132649.525145\) at \(r=32\), so the entire
+\(r\)-sum costs only \(3.331383\) bits.  Meanwhile the single-\(r=32\), all-\(T\) sum is
+\(-132649.521954\), only \(0.003191\) bits above the endpoint peak.  This strongly suggests that the final early
+high-density proof should be organized as an endpoint-dominance lemma in \(T\) plus an exact hypergeometric
+first-block \(r\)-tail bound.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives

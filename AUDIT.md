@@ -440,6 +440,19 @@ h=1200501, r=32..43: total_log2 = -132647.058774, peak_r=32
 h=1250501, r=33..45: total_log2 = -132835.935679, peak_r=33
 ```
 
+Endpoint/full-`r` profile at the same sampled high-density points, using `gap-start=gap-stop=26819` and `r=1..64`:
+
+```text
+h=1000501: total_log2 = -133179.355669
+h=1150501: total_log2 = -132946.388557
+h=1200501: total_log2 = -132646.193762, peak_r=32, peak_term=-132649.525145
+h=1250501: total_log2 = -132834.786925
+```
+
+At the sampled worst `h=1200501`, the `r`-sum costs only `3.331383` bits over the peak term, while the single
+`r=32` all-`T` sum is `-132649.521954`, only `0.003191` bits over the endpoint peak. This points to the final proof
+shape: endpoint dominance in `T`, plus an exact first-block hypergeometric `r`-tail bound.
+
 Current interpretation: early high-density has ample numerical margin once `T` pairing and outer complement symmetry
 are both used. Remaining proof work is interval packaging: a paired placement-survival lemma over `h`, plus a local
 `r`-window/placement-ratio reduction so we do not have to enumerate all `r` in the theorem statement.
