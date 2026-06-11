@@ -62,7 +62,7 @@ The paper and audit packet should keep this qualifier visible.
 
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
-Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. Remaining polish: the finite-prefix and global `p_term` verifiers should be cited as the numeric certificates for the local conditional atom used by that lemma.
+Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.
 
 ### F7 Medium: Floating-point rigor
 
@@ -85,12 +85,10 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 1. Should the high-interval manifest remain command-reproducible, or should every interval be regenerated into checked artifacts?
 2. Should the opt-in high-interval recomputation be expanded into a scheduled/full certificate run?
 3. Should Lemma `lem:fullsplit-tiny-prefix-interiorT` remain as a finite certificate, or should it be replaced by analytic monotonicity?
-4. Should the finite-prefix and global `p_term` verifiers be packaged as one standalone termination-atom lemma?
-5. Which section covers first-active placements outside the audited late-window split?
+4. Which section covers first-active placements outside the audited late-window split?
 
 ## Suggested Next Fixes
 
 1. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
 2. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
 3. Add interval/rational arithmetic for the final ledger.
-4. Package the local `p_term` verifiers as one theorem-facing termination-atom certificate.

@@ -2814,6 +2814,68 @@ The verifier is
 \texttt{python scripts/verify\_fullsplit\_global\_turnoff\_envelope.py}.
 \]
 
+\begin{lemma}[Certified full-split termination atoms]
+\label{lem:fullsplit-certified-termination-atoms}
+For the EBCH \([128,64]\) full-split law with \(b=64\), let \(Q\) denote the next-state weight after one nonzero BCH
+split branch.  The self-turnoff atom satisfies
+\[
+\log_2\Pr[Q=0]=-64.00457432724919.
+\]
+For every finite-prefix ledger state with \(0\le H\le499\) remaining input ones and \(T\ge5949\) remaining blocks, the
+episode-ledger exposure described in Lemma~\ref{lem:fullsplit-selected-gap-product} has a valid charged termination atom
+\[
+\log_2 p_{\rm term}^{\rm fin}\le -63.8926492.
+\]
+For every \(0\le H\le bT\) and \(T\ge5949\), the stronger global exposure has a valid charged termination atom
+\[
+\log_2 p_{\rm term}^{\rm glob}\le -62.4078758.
+\]
+The global atom is also safe after conditioning on any fixed next-block target support.
+\end{lemma}
+
+\begin{proof}
+The \(Q=0\) value is read from the EBCH split law.  For exact input/state cancellation in the finite-prefix ledger, a
+fixed state support of size \(q\) is hit by the next distinguished block with probability
+\[
+\frac{\binom{b(T-1)}{H-q}}{\binom{bT}{H}},
+\]
+and this ratio is decreasing in \(T\) for fixed \(H,q\).  Averaging over \(Q>0\), scanning \(0\le H\le499\) at
+\(T=5949\) gives
+\[
+\log_2\eta_{\rm fin}\le -67.63641076470455.
+\]
+Thus
+\[
+\log_2\bigl(\Pr[Q=0]+\eta_{\rm fin}\bigr)
+=-63.89264922047382
+\le -63.8926492.
+\]
+
+For the global atom, write \(n=bT\) and \(\alpha=H/n\).  For a fixed \(q\)-set in the next block,
+\[
+\frac{\binom{n-b}{H-q}}{\binom{n}{H}}
+=\frac{(H)_q(n-H)_{b-q}}{(n)_b}
+\le
+\left(1-\frac{b-1}{b\cdot5949}\right)^{-b}\alpha^q(1-\alpha)^{b-q}.
+\]
+Averaging over \(Q>0\) gives a Bernstein polynomial.  The verifier checks the finite coefficient inequality
+\[
+\max_{1\le q\le b}\frac{\Pr[Q=q]}{\binom bq}=\Pr[Q=b],
+\]
+so the exact-cancellation envelope is
+\[
+\log_2\eta_{\rm glob}\le -62.98700592417877.
+\]
+Adding the \(Q=0\) self-turnoff atom gives
+\[
+\log_2\bigl(\Pr[Q=0]+\eta_{\rm glob}\bigr)
+=-62.407875819071386
+\le -62.4078758.
+\]
+The same coefficient inequality also proves the fixed-support claim, since a fixed target support of size \(q\) is hit
+with probability \(\Pr[Q=q]/\binom bq\), which is at most the displayed maximum.
+\end{proof}
+
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
 \(1\text{--}4000\), \(4001\text{--}8000\), \(8001\text{--}12000\), and
@@ -3058,15 +3120,16 @@ The fast episode diagnostic, interpolation checker, and crude tail summation hel
 \begin{lemma}[Product bound for selected full-split terminations]
 \label{lem:fullsplit-selected-gap-product}
 Fix the full-codeword random-split inner.  Suppose \(p_{\rm term}\) is a uniform conditional upper bound on the
-one-live-branch termination atom in the following sense: after exposing any earlier blocks, earlier scramblers and
-splits, the current state weight, and the remaining input-placement counts, the probability of the charged termination
-event at the next selected opportunity is at most \(p_{\rm term}\).  The charged event may be the split atom \(q'=0\), or
-an exact input/state cancellation atom bundled into the same opportunity.
+one-live-branch termination atom under the exposure convention used by the episode ledger.  Namely, after exposing any
+earlier blocks, earlier scramblers and splits, the current state weight, the gap/occupancy skeleton being summed over,
+and the remaining input-placement counts, but before exposing the fresh random labels that can cause the next charged
+termination, the conditional probability of that charged event is at most \(p_{\rm term}\).  The charged event may be the
+split atom \(q'=0\), or an exact input/state cancellation atom bundled into the same opportunity.
 
-Then, for any fixed placement of the later input blocks and any fixed set \({\cal S}\) of \(e\) selected gaps in the
-episode decomposition,
+Then, for any fixed exposed gap/occupancy skeleton and any fixed set \({\cal S}\) of \(e\) selected gaps in the episode
+decomposition,
 \[
-\Pr[\text{all selected opportunities in }{\cal S}\text{ terminate}\mid\text{placement}]
+\Pr[\text{all selected opportunities in }{\cal S}\text{ terminate}\mid\text{skeleton}]
 \le
 p_{\rm term}^{e}.
 \]
@@ -3086,9 +3149,11 @@ bound.
 
 For the full-split construction the hypothesis is exactly the local exposure principle used above.  Conditional on a
 nonzero incoming state, the fresh scrambler makes the BCH codeword uniform over nonzero codewords, and the fresh split
-controls the \(q'=0\) atom independently of the past.  Conditional on a state support of size \(q\), the next input block
-support is uniform among supports with the exposed occupancy, giving the exact-cancellation atom.  The numerical
-finite-prefix and global values of \(p_{\rm term}\) are the corresponding union bounds for these two local atoms.
+controls the \(q'=0\) atom independently of the past.  The exact-cancellation part is whatever local random-placement
+atom has been left unexposed in the chosen ledger; the finite-prefix and global values of \(p_{\rm term}\) below are the
+corresponding certified union bounds for the split atom and that cancellation atom.  The global atom is pointwise in a
+fixed next-block support, while the sharper finite-prefix atom is used only with the finite ledger exposure for which it
+is verified.
 \end{proof}
 
 \begin{lemma}[All-episode generating bound for the full-split inner]
