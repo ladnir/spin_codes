@@ -3004,9 +3004,29 @@ r & \log_2\text{ contribution}\\
 \end{array}
 \]
 The peak row is still \(h=32,r=1\), gap \(1\text{--}4000\), with inner exponent \(-20.011735\) and full term
-\(-37.385767\).  This is not yet a theorem, because the interpolation envelope between sampled \(H\)-knots must be
-justified or replaced by a grid-plus-monotonicity certificate.  It does show that the prefix no longer has a hidden
-intermediate-\(h\) ridge once the episode-gap correction is included.  The envelope summation helper is
+\(-37.385767\).  The important refinement is that the full prefix is not a shapeless table effect.  It is a narrow
+near-boundary ridge:
+\[
+\begin{array}{c|c}
+\text{slice} & \text{share of the }e\le8,\ 32\le h\le500\text{ prefix}\\
+\hline
+\text{gap }1\text{--}4000 & 1-O(10^{-14})\\
+r=1 & .998168813\\
+h\le64 & .997505683\\
+h\le80 & .999863886\\
+h\le96 & .999992575
+\end{array}
+\]
+The total prefix value is \(2.618593\) bits above the single peak row.  Along the dominant \(r=1\), first-gap ridge,
+the largest adjacent ratio is \(0.8526993\) from \(h=32\) to \(33\), and after that it is at most \(0.8337949\) in the
+audited range.  Thus the next theorem target is an analytic geometric-ridge bound for the \(h\)-sum, not a collection
+of isolated fixed-\(h\) estimates.  The decomposition helper is
+\[
+\texttt{python scripts/analyze\_fullsplit\_prefix\_ridge.py}.
+\]
+This is not yet a theorem, because the interpolation envelope between sampled \(H\)-knots must be justified or replaced
+by a grid-plus-monotonicity certificate.  It does show that the prefix no longer has a broad hidden intermediate-\(h\)
+ridge once the episode-gap correction is included.  The envelope summation helper is
 \[
 \texttt{python scripts/sum\_fullsplit\_episode\_envelope.py}.
 \]
@@ -3134,6 +3154,8 @@ ledger.  Combining the explicit \(e\le8\) ledger with this \(e\ge9\) residual le
 \[
 \log_2 \mu_{\le500}^{\rm fullsplit}\le -34.767174.
 \]
+The tight part of this inequality is exactly the near-boundary geometric ridge described above; the middle/far buckets
+and the crude \(e\ge9\) tail are already many dozens of bits lower.
 
 For the early first-active buckets \(T>17948\), the same \(e\le8\) endpoint audit would be too expensive to promote
 directly over every interior \(T\).  Instead the checked finite certificate uses a bucket-uniform survival bound.  For a

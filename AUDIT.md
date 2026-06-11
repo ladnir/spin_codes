@@ -158,6 +158,34 @@ term_log2 = -37.38576684150053
 
 This is the dominant piece of the whole finite ledger.
 
+Current ridge decomposition:
+
+```powershell
+python scripts\analyze_fullsplit_prefix_ridge.py --expected-total-log2 -34.767174286
+```
+
+Key output:
+
+```text
+prefix_ridge_total_log2,-34.767174286
+prefix_ridge_peak,h=32,r=1,gap=1-4000,term_log2=-37.385766842
+prefix_ridge_peak_to_total_bits,2.618592555
+gap,1-4000,log2,-34.767174286,share,1
+r,1,log2,-34.769818553,share,0.998168812772
+h_le,64,log2,-34.770777320,share,0.997505683424
+h_le,80,log2,-34.767370670,share,0.999863886476
+h_le,96,log2,-34.767184998,share,0.999992575315
+max_ratio_all,0.852699299925,from,32,to,33
+max_ratio_after_33,0.833794827634,from,33,to,34
+```
+
+Interpretation: the narrow waist is a near-boundary geometric `h` ridge, not
+just one bad `h=32` row and not a broad intermediate-weight ridge. The theorem
+target should upper-bound this ridge summably: peak row, first `32 -> 33`
+transition, then a uniform adjacent-ratio bound for the remaining `r=1`,
+first-gap `h`-sum, with the `r >= 2` and middle/far gap pieces treated as
+small remainders.
+
 The per-`T` inner grids feeding this row are:
 
 ```text
@@ -713,6 +741,7 @@ Currently checkable:
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
 - the finite `32..500` row-level sum from the existing CSV artifacts
+- the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`
 - the tiny-prefix interior-`T` finite certificate now stated as Lemma `lem:fullsplit-tiny-prefix-interiorT`
 - the selected-gap product/conditioning bound now stated as Lemma `lem:fullsplit-selected-gap-product`
 - the finite-prefix and global termination atoms now stated as Lemma
@@ -723,6 +752,8 @@ Still proof debt:
 
 - decide whether to keep Lemma `lem:fullsplit-tiny-prefix-interiorT` as a finite certificate or eventually replace it by
   analytic monotonicity
+- replace the finite tiny-prefix ridge decomposition by an analytic summable bound: peak row, first adjacent step, and a
+  uniform ratio for the remaining `r=1`, first-gap `h`-sum
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - cover the remaining first-active regimes: the early region `T > 17948, h > 500` and the post-prefix ultra-late cap
