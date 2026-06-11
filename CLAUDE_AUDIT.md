@@ -76,6 +76,11 @@ Outer-side update: the RM512 local spectrum is complement-symmetric, so the dire
 `h=N`, `r=64` smoke gives `-1181735.473865` in the paired probe and `-1181723.239347` in the endpoint piecewise
 wrapper, the latter differing by the expected bucket-size overcount.
 
+Paired all-episode update: `probe_fullsplit_early_paired_survival.py --inner-mode eallratio` now attaches the fixed
+all-episode wrapper to each exact `T` placement term. Sparse high-density checks with complement symmetry have the
+current sampled worst near `h=1200501`, local `r=32..43`, at `total_log2=-132647.058774`. This is not an interval
+certificate yet, but it strongly suggests the remaining high-density task is packaging, not a new obstruction.
+
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
 Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.

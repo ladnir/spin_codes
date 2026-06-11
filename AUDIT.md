@@ -427,6 +427,23 @@ python scripts\sum_fullsplit_piecewise_certificate.py --h-values 2097152 --first
 The paired smoke gives `total_log2 = -1181735.473865`; the endpoint piecewise smoke gives `-1181723.239347`, exactly
 adding the `log2(4819)` bucket overcount.
 
+Paired all-episode diagnostics: `scripts/probe_fullsplit_early_paired_survival.py` now has
+`--inner-mode eallratio`, which attaches the same fixed-pole all-episode wrapper to each exact `T` placement term.
+A sparse complement-symmetric survival scan over `h=501,100501,...,2000501,N` peaks at
+`h=1000501`, `r=31`, `T=32767`, with `total_log2 = -136323.731114`. Local all-episode windows around the survival
+peaks give:
+
+```text
+h=1000501, r=25..37: total_log2 = -133179.527574, peak_r=32
+h=1150501, r=30..42: total_log2 = -132946.839848, peak_r=32
+h=1200501, r=32..43: total_log2 = -132647.058774, peak_r=32
+h=1250501, r=33..45: total_log2 = -132835.935679, peak_r=33
+```
+
+Current interpretation: early high-density has ample numerical margin once `T` pairing and outer complement symmetry
+are both used. Remaining proof work is interval packaging: a paired placement-survival lemma over `h`, plus a local
+`r`-window/placement-ratio reduction so we do not have to enumerate all `r` in the theorem statement.
+
 ### 6. Post-Prefix, All-Episode Wrapper
 
 Range:

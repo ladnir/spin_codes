@@ -26,12 +26,13 @@ from block_outer_upgrade_probe import (
     load_local_spectrum,
     local_spectrum_is_complement_symmetric,
     outer_block_gf_bounds,
+    outer_block_gf_bounds_for_weights,
     z_grid,
 )
 from bound_fullsplit_episode_gaps import load_spectrum, split_entries
 from dense_largek_eval import log2_binom, log2add
 from probe_block_recursive_inner import parse_int_list
-from sum_fullsplit_piecewise_certificate import parse_float_list
+from sum_fullsplit_piecewise_certificate import eall_ratio_log2, parse_float_list
 
 
 def bucket_ranges(start: int, stop: int, step: int) -> list[tuple[int, int]]:
@@ -59,6 +60,9 @@ def main() -> int:
     parser.add_argument("--gap-stop", type=int, default=26819)
     parser.add_argument("--gap-step", type=int, default=5000)
     parser.add_argument("--lambdas", default="0.05:20:0.05")
+    parser.add_argument("--rhos", default="0.5,1,2,3,10,100,1000,10000")
+    parser.add_argument("--turnoff-log2", type=float, default=-62.4078758)
+    parser.add_argument("--inner-mode", choices=("survival", "eallratio"), default="survival")
     parser.add_argument("--episode-slack-bits", type=float, default=0.0)
     parser.add_argument(
         "--outer-complement-symmetry",
@@ -78,22 +82,35 @@ def main() -> int:
         local_spectrum = load_local_spectrum(str(args.local_spectrum_csv))
         if not local_spectrum_is_complement_symmetric(local_spectrum, args.local_length):
             raise ValueError("--outer-complement-symmetry requested, but local spectrum is not symmetric")
-        h_max = max(min(h, args.N - h) for h in h_values)
+        outer_weights = sorted({min(h, args.N - h) for h in h_values})
     else:
         local_spectrum = load_local_spectrum(str(args.local_spectrum_csv))
-        h_max = max(h_values)
+        outer_weights = sorted(set(h_values))
     d = math.floor(args.distance_delta * args.N)
 
-    outer_logs, _outer_z = outer_block_gf_bounds(
-        blocks=args.outer_blocks,
-        block_bits=args.outer_block_bits,
-        local_length=args.local_length,
-        d0=args.local_distance,
-        h_max=h_max,
-        zs=z_grid(args.z_min, args.z_max, args.z_count),
-        model="spectrum-csv",
-        spectrum=local_spectrum,
-    )
+    if len(outer_weights) <= max(256, max(outer_weights, default=0) // 128):
+        outer_logs_sparse, _outer_z_sparse = outer_block_gf_bounds_for_weights(
+            blocks=args.outer_blocks,
+            block_bits=args.outer_block_bits,
+            local_length=args.local_length,
+            d0=args.local_distance,
+            weights=outer_weights,
+            zs=z_grid(args.z_min, args.z_max, args.z_count),
+            model="spectrum-csv",
+            spectrum=local_spectrum,
+        )
+    else:
+        outer_logs, _outer_z = outer_block_gf_bounds(
+            blocks=args.outer_blocks,
+            block_bits=args.outer_block_bits,
+            local_length=args.local_length,
+            d0=args.local_distance,
+            h_max=max(outer_weights),
+            zs=z_grid(args.z_min, args.z_max, args.z_count),
+            model="spectrum-csv",
+            spectrum=local_spectrum,
+        )
+        outer_logs_sparse = {h: outer_logs[h] for h in outer_weights}
 
     entries = split_entries(load_spectrum(args.inner_spectrum), args.block_bits)
     lambdas = parse_float_list(args.lambdas)
@@ -104,6 +121,7 @@ def main() -> int:
             log_mgfs.append((lam, math.log2(mgf)))
     if not log_mgfs:
         raise SystemExit("no valid lambda values")
+    rhos = parse_float_list(args.rhos)
 
     buckets = bucket_ranges(args.gap_start, args.gap_stop, args.gap_step)
     t_values: list[tuple[int, int, int]] = []
@@ -121,6 +139,28 @@ def main() -> int:
                 best = val
                 best_lam = lam
         survival[T] = (min(0.0, best) + args.episode_slack_bits, best_lam)
+    inner_cache: dict[tuple[int, int], tuple[float, float]] = {}
+
+    def inner_bound(T: int, H: int) -> tuple[float, float]:
+        if args.inner_mode == "survival":
+            return survival[T]
+        key = (T, H)
+        cached = inner_cache.get(key)
+        if cached is not None:
+            return cached
+        val, lam, _alpha, _rho = eall_ratio_log2(
+            b=args.block_bits,
+            T=T,
+            H=H,
+            distance=d,
+            term_log2=args.turnoff_log2,
+            entries=entries,
+            lambdas=lambdas,
+            rhos=rhos,
+        )
+        cached = (val, lam)
+        inner_cache[key] = cached
+        return cached
 
     total = float("-inf")
     by_bucket = [float("-inf") for _ in buckets]
@@ -128,7 +168,7 @@ def main() -> int:
     rows_by_h: dict[int, float] = {}
     for h in h_values:
         outer_h = min(h, args.N - h) if args.outer_complement_symmetry else h
-        outer = outer_logs[outer_h] if 0 <= outer_h < len(outer_logs) else float("-inf")
+        outer = outer_logs_sparse.get(outer_h, float("-inf"))
         if outer == float("-inf"):
             continue
         denom = log2_binom(args.N, h)
@@ -141,7 +181,7 @@ def main() -> int:
             for idx, gap, T in t_values:
                 if H > args.block_bits * T:
                     continue
-                inner, lam = survival[T]
+                inner, lam = inner_bound(T, H)
                 placement = choose_r + log2_binom(args.block_bits * T, H) - denom
                 term = outer + placement + inner
                 total = log2add(total, term)
@@ -168,7 +208,9 @@ def main() -> int:
     print(f"d,{d}")
     print(f"h_values,{args.h_values}")
     print(f"outer_complement_symmetry,{int(args.outer_complement_symmetry)}")
+    print(f"inner_mode,{args.inner_mode}")
     print(f"episode_slack_bits,{args.episode_slack_bits:.6f}")
+    print(f"inner_cache_entries,{len(inner_cache)}")
     print(f"total_log2,{total:.6f}")
     print(f"margin_bits,{-total:.6f}")
     for idx, (gap_min, gap_max) in enumerate(buckets):

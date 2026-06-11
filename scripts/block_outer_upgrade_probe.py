@@ -184,6 +184,48 @@ def outer_block_gf_bounds(
     return vals, best_z
 
 
+def outer_block_gf_bounds_for_weights(
+    *,
+    blocks: int,
+    block_bits: int,
+    local_length: int,
+    d0: int,
+    weights: list[int],
+    zs: list[float],
+    model: str,
+    spectrum: list[tuple[int, int]],
+) -> tuple[dict[int, float], dict[int, float]]:
+    vals = {h: (0.0 if h == 0 else float("-inf")) for h in weights}
+    best_z = {h: float("nan") for h in weights}
+    local_logs: list[tuple[float, float]] = []
+    for z in zs:
+        if model == "floor-total":
+            local = local_floor_total_log2(block_bits, d0, z)
+        elif model == "random-like":
+            local = local_random_like_log2(block_bits, local_length, d0, z)
+        elif model == "spectrum-csv":
+            local = local_spectrum_log2(spectrum, z)
+        else:
+            raise ValueError(f"unknown local model: {model}")
+        local_logs.append((z, log2_sub_one(blocks * local)))
+
+    for h in weights:
+        if h == 0 or h < d0:
+            continue
+        best = float("inf")
+        best_here = float("nan")
+        for z, global_log in local_logs:
+            if global_log == float("-inf"):
+                continue
+            candidate = global_log - h * math.log2(z)
+            if candidate < best:
+                best = candidate
+                best_here = z
+        vals[h] = best if best != float("inf") else float("-inf")
+        best_z[h] = best_here
+    return vals, best_z
+
+
 def singleton_block_floor_log2(blocks: int, block_bits: int, local_length: int, d0: int, h: int) -> float:
     """A sharper optional bound for one active block.
 

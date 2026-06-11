@@ -3229,6 +3229,29 @@ expose this as the \texttt{--outer-complement-symmetry} option; at \(h=N,r=64,T=
 \(-1181735.473865\), while the endpoint piecewise form gives \(-1181723.239347\), differing only by the
 \(\log_2(4819)\) bucket-size overcount.
 
+The paired probe now also supports the same-\(T\) all-episode wrapper directly.  A sparse survival scan over
+\(h=501,100501,\ldots,2000501,N\), with complement-symmetric outer weights and all \(1\le r\le64\), peaks at
+\[
+h=1000501,\qquad r=31,\qquad T=32767,
+\qquad
+\log_2\mu^{e=0}_{\rm paired}\le -136323.731114.
+\]
+Attaching the all-episode \(e\)all-ratio bound at the same \(T\)-values and scanning local \(r\)-windows near the
+survival peaks gives
+\[
+\begin{array}{c|c|c|c}
+h & r\text{-window} & \log_2\mu_{\rm paired}^{\rm eall} & \text{peak }r\\
+\hline
+1000501 & 25\text{--}37 & -133179.527574 & 32\\
+1150501 & 30\text{--}42 & -132946.839848 & 32\\
+1200501 & 32\text{--}43 & -132647.058774 & 32\\
+1250501 & 33\text{--}45 & -132835.935679 & 33 .
+\end{array}
+\]
+This is still a sampled diagnostic, not a closed interval theorem.  Its value is that the remaining early
+high-density certificate no longer looks numerically tight: the proof debt is to package the paired \(T\)-sum and the
+local \(r\)-window reduction into interval lemmas.
+
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
 \[
