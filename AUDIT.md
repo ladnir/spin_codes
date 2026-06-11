@@ -57,6 +57,24 @@ Scope: this exact-cancellation add-on is certified for the current tiny-prefix
 domain `0 <= H <= 499`, `T >= 5949`. Extending the same cancellation atom to
 larger `H` is separate proof debt.
 
+For theorem-facing wrappers outside the tiny prefix, use the global Bernstein
+envelope:
+
+```powershell
+python scripts\verify_fullsplit_global_turnoff_envelope.py
+```
+
+Expected key output:
+
+```text
+full_state_q_log2,-63.00228535065820
+finite_population_correction_log2,0.01527942647943
+eta_envelope_log2,-62.98700592417877
+computed_pterm_envelope_log2,-62.40787581907139
+certified_global_pterm_upper_log2,-62.40787580000000
+status,PASS
+```
+
 The relevant manuscript section starts in `innerDense.tex`, especially the full-split episode material and finite ledger around:
 
 ```text
@@ -71,6 +89,7 @@ Run these first:
 
 ```powershell
 python scripts\verify_fullsplit_turnoff_atom.py
+python scripts\verify_fullsplit_global_turnoff_envelope.py
 python scripts\verify_fullsplit_finite_ledger.py
 python scripts\check_fullsplit_T_monotonicity.py --sufficient-reduction
 pdflatex -interaction=nonstopmode main_permConv.tex
@@ -82,7 +101,7 @@ Expected key outputs:
 prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_ge9_tail_log2,-269.335258
 postprefix_501_2000_eall_log2,-182.259739
-interval_2001_1148736_total_log2,-588.081877
+interval_2001_1148736_total_log2,-586.581877
 finite_ledger_total_log2,-34.767174
 finite_ledger_margin_bits,34.767174
 ```
@@ -281,28 +300,33 @@ scripts/check_fullsplit_T_monotonicity.py
 Current interval rows:
 
 ```text
-2001--7858          (lambda,rho)=(0.02,0.01)   log2 mu=-588.081877
-7859--20550         (0.05,0.03)                log2 mu=-2657.429602
-20551--75000        (0.2,0.1)                  log2 mu=-6027.058821
-75001--250000       (0.5,0.3)                  log2 mu=-12846.353611
-250001--350000      (1.2,0.5)                  log2 mu=-28478.125315
-350001--400000      (1.2,1.0)                  log2 mu=-81557.079312
-400001--450000      (1.2,1.0)                  log2 mu=-91423.257760
-450001--550000      (1.2,1.0)                  log2 mu=-82083.446102
-550001--650000      (1.2,1.0)                  log2 mu=-1519.978235
-650001--725000      (1.2,2.0)                  log2 mu=-116329.618720
-725001--750000      (1.2,3.0)                  log2 mu=-169889.387695
-750001--850000      (1.2,3.0)                  log2 mu=-134525.068420
-850001--950000      (1.2,3.0)                  log2 mu=-117536.328304
-950001--1050000     (1.2,3.0)                  log2 mu=-285054.035442
-1050001--1148736    (1.2,3.0)                  log2 mu=-562862.201412
+2001--7858          (lambda,rho)=(0.02,0.01)   log2 mu=-586.581877
+7859--20550         (0.05,0.03)                log2 mu=-2655.929602
+20551--75000        (0.2,0.1)                  log2 mu=-6025.558821
+75001--250000       (0.5,0.3)                  log2 mu=-12844.853611
+250001--350000      (1.2,0.5)                  log2 mu=-28476.625315
+350001--400000      (1.2,1.0)                  log2 mu=-81555.579312
+400001--450000      (1.2,1.0)                  log2 mu=-91421.757760
+450001--550000      (1.2,1.0)                  log2 mu=-82081.946102
+550001--650000      (1.2,1.0)                  log2 mu=-1518.478235
+650001--725000      (1.2,2.0)                  log2 mu=-116328.118720
+725001--750000      (1.2,3.0)                  log2 mu=-169887.887695
+750001--850000      (1.2,3.0)                  log2 mu=-134523.568420
+850001--950000      (1.2,3.0)                  log2 mu=-117534.828304
+950001--1050000     (1.2,3.0)                  log2 mu=-285052.535442
+1050001--1148736    (1.2,3.0)                  log2 mu=-562860.701412
 ```
 
 The combined interval total is still dominated by `2001--7858`:
 
 ```text
-log2 mu_2001_1148736 = -588.081877
+log2 mu_2001_1148736 = -586.581877
 ```
+
+These rows include a conservative `+1.5` bit allowance for switching the
+high-interval all-episode wrapper from the finite-prefix atom to the global
+Bernstein atom. A spot recomputation of the leading interval gives
+`-586.597103`, inside this allowance.
 
 The cutoff `h = 1148736` is the feasibility edge for the current far bucket:
 
@@ -361,11 +385,12 @@ Currently checkable:
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the finite-prefix derivation of `log2 p_term <= -63.8926492`
+- the global wrapper derivation of `log2 p_term <= -62.4078758`
 
 Still proof debt:
 
 - convert the `32..500`, `e <= 8` finite grid from "CSV artifact" to an audit-grade finite lemma
-- extend or separately handle the exact-cancellation termination atom outside the finite-prefix domain
+- replace the conservative `+1.5` high-interval allowance by regenerated interval artifacts if desired
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and
   what is handled elsewhere

@@ -66,7 +66,7 @@ def main() -> int:
     parser.add_argument("--block-bits", type=int, default=64)
     parser.add_argument("--remaining-blocks", type=int, required=True)
     parser.add_argument("--remaining-ones", required=True)
-    parser.add_argument("--turnoff-log2", type=float, default=-63.8926492)
+    parser.add_argument("--turnoff-log2", type=float, default=-62.4078758)
     parser.add_argument("--lambdas", default="0.001,0.003,0.01,0.02,0.05")
     parser.add_argument("--cutoff-bits", type=float, default=120.0)
     args = parser.parse_args()

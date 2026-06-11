@@ -255,7 +255,7 @@ def main() -> int:
     parser.add_argument("--inner-spectrum", type=Path, default=Path(__file__).with_name("EBCH128_64.wd"))
     parser.add_argument("--inner-block-bits", type=int, default=64)
     parser.add_argument("--distance-delta", type=float, default=0.09)
-    parser.add_argument("--turnoff-log2", type=float, default=-63.8926492)
+    parser.add_argument("--turnoff-log2", type=float, default=-62.4078758)
     parser.add_argument("--h-values", default="32:500")
     parser.add_argument("--first-r-values", default="1:64")
     parser.add_argument("--late-blocks", type=int, default=5949)

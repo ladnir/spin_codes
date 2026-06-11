@@ -175,7 +175,7 @@ def main() -> int:
     parser.add_argument("--distance-delta", type=float, default=0.09)
     parser.add_argument("--remaining-blocks", type=int, required=True)
     parser.add_argument("--remaining-ones", required=True)
-    parser.add_argument("--turnoff-log2", type=float, default=-63.8926492)
+    parser.add_argument("--turnoff-log2", type=float, default=-62.4078758)
     parser.add_argument("--lambda-min", type=float, default=0.001)
     parser.add_argument("--lambda-max", type=float, default=2.0)
     parser.add_argument("--lambda-step", type=float, default=0.01)

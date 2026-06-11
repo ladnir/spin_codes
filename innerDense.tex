@@ -2789,6 +2789,31 @@ The audit-grade cancellation verifier is
 \texttt{python scripts/verify\_fullsplit\_turnoff\_atom.py}.
 \]
 
+For theorem-facing wrappers outside this finite prefix we use a slightly looser global atom.  Let \(n=bT\),
+\(\alpha=H/n\), and \(T\ge5949\).  For a fixed \(q\)-set in the next block,
+\[
+\frac{\binom{n-b}{H-q}}{\binom{n}{H}}
+=\frac{(H)_q(n-H)_{b-q}}{(n)_b}
+\le
+\left(1-\frac{b-1}{b\cdot5949}\right)^{-b}
+\alpha^q(1-\alpha)^{b-q}.
+\]
+Averaging over \(Q\) gives a Bernstein polynomial:
+\[
+\sum_{q>0}\Pr[Q=q]\alpha^q(1-\alpha)^{b-q}
+=
+\sum_{q>0}\frac{\Pr[Q=q]}{\binom bq}B_{q,b}(\alpha).
+\]
+For the EBCH split law the largest nonzero Bernstein coefficient is the \(q=b\) coefficient, giving
+\[
+\log_2\eta_{\rm glob}\le -62.98700592417877,\qquad
+\log_2(p_0+\eta_{\rm glob})\le -62.4078758.
+\]
+The verifier is
+\[
+\texttt{python scripts/verify\_fullsplit\_global\_turnoff\_envelope.py}.
+\]
+
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
 \(1\text{--}4000\), \(4001\text{--}8000\), \(8001\text{--}12000\), and
@@ -3144,7 +3169,7 @@ where \(\mathcal E\) is any certified inner envelope, such as
 inner theorem.
 
 The first coefficient-free diagnostic is mixed in exactly the useful way.  With the EBCH \([128,64]\) split law,
-the finite-prefix termination atom \(p_{\rm term}=2^{-63.8926492}\), \(N=2^{21}\), \(b=64\), and \(\delta=.09\),
+the global theorem-facing termination atom \(p_{\rm term}=2^{-62.4078758}\), \(N=2^{21}\), \(b=64\), and \(\delta=.09\),
 optimizing a coarse
 \((\lambda,a,\rho)\)-grid gives
 \[
@@ -3424,21 +3449,21 @@ tail \(h=1148736\):
 \begin{array}{c|c|c}
 h\text{ range} & (\lambda,\rho) & \log_2\mu\\
 \hline
-2001\text{--}7858 & (.02,.01) & -588.081877\\
-7859\text{--}20550 & (.05,.03) & -2657.429602\\
-20551\text{--}75000 & (.2,.1) & -6027.058821\\
-75001\text{--}250000 & (.5,.3) & -12846.353611\\
-250001\text{--}350000 & (1.2,.5) & -28478.125315\\
-350001\text{--}400000 & (1.2,1) & -81557.079312\\
-400001\text{--}450000 & (1.2,1) & -91423.257760\\
-450001\text{--}550000 & (1.2,1) & -82083.446102\\
-550001\text{--}650000 & (1.2,1) & -1519.978235\\
-650001\text{--}725000 & (1.2,2) & -116329.618720\\
-725001\text{--}750000 & (1.2,3) & -169889.387695\\
-750001\text{--}850000 & (1.2,3) & -134525.068420\\
-850001\text{--}950000 & (1.2,3) & -117536.328304\\
-950001\text{--}1050000 & (1.2,3) & -285054.035442\\
-1050001\text{--}1148736 & (1.2,3) & -562862.201412 .
+2001\text{--}7858 & (.02,.01) & -586.581877\\
+7859\text{--}20550 & (.05,.03) & -2655.929602\\
+20551\text{--}75000 & (.2,.1) & -6025.558821\\
+75001\text{--}250000 & (.5,.3) & -12844.853611\\
+250001\text{--}350000 & (1.2,.5) & -28476.625315\\
+350001\text{--}400000 & (1.2,1) & -81555.579312\\
+400001\text{--}450000 & (1.2,1) & -91421.757760\\
+450001\text{--}550000 & (1.2,1) & -82081.946102\\
+550001\text{--}650000 & (1.2,1) & -1518.478235\\
+650001\text{--}725000 & (1.2,2) & -116328.118720\\
+725001\text{--}750000 & (1.2,3) & -169887.887695\\
+750001\text{--}850000 & (1.2,3) & -134523.568420\\
+850001\text{--}950000 & (1.2,3) & -117534.828304\\
+950001\text{--}1050000 & (1.2,3) & -285052.535442\\
+1050001\text{--}1148736 & (1.2,3) & -562860.701412 .
 \end{array}
 \]
 The tight row remains the upper transition interval \(550001\text{--}650000\), not the multi-episode correction itself.
