@@ -41,11 +41,29 @@ class Bucket:
     left_csv: Path
 
 
-DEFAULT_BUCKETS = [
+WINDOW_BUCKETS = [
     Bucket("gap_1_4000", 5949, 9948, ROOT / "fast_fullsplit_e08_T5949_H0_499_all.csv"),
     Bucket("gap_4001_8000", 9949, 13948, ROOT / "fast_fullsplit_e08_T9949_H0_499_all.csv"),
     Bucket("gap_8001_12000", 13949, 17948, ROOT / "fast_fullsplit_e08_T13949_H0_499_all.csv"),
 ]
+
+EARLY_BUCKETS = [
+    Bucket("gap_12001_17000", 17949, 22948, ROOT / "fast_fullsplit_e08_T17949_H0_499_all.csv"),
+    Bucket("gap_17001_22000", 22949, 27948, ROOT / "fast_fullsplit_e08_T22949_H0_499_all.csv"),
+    Bucket("gap_22001_26819", 27949, 32767, ROOT / "fast_fullsplit_e08_T27949_H0_499_all.csv"),
+]
+
+DEFAULT_BUCKETS = WINDOW_BUCKETS
+
+
+def select_buckets(bucket_set: str) -> list[Bucket]:
+    if bucket_set == "window":
+        return list(WINDOW_BUCKETS)
+    if bucket_set == "early":
+        return list(EARLY_BUCKETS)
+    if bucket_set == "window-plus-early":
+        return list(WINDOW_BUCKETS) + list(EARLY_BUCKETS)
+    raise ValueError(f"unknown bucket set {bucket_set!r}")
 
 
 def logadd2_array(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -159,6 +177,7 @@ def update_denom_vector(*, denom: np.ndarray, h_values: np.ndarray, n_start: int
 def sweep_combined(
     *,
     H_values: list[int],
+    buckets: list[Bucket],
     b: int,
     e_max: int,
     t_max: int,
@@ -194,19 +213,19 @@ def sweep_combined(
 
     best: dict[str, np.ndarray] = {
         bucket.name: np.full(len(H_values), float("-inf"), dtype=np.float64)
-        for bucket in DEFAULT_BUCKETS
+        for bucket in buckets
     }
     best_t: dict[str, np.ndarray] = {
         bucket.name: np.full(len(H_values), -1, dtype=np.int64)
-        for bucket in DEFAULT_BUCKETS
+        for bucket in buckets
     }
     left_repro: dict[str, np.ndarray] = {
         bucket.name: np.full(len(H_values), float("nan"), dtype=np.float64)
-        for bucket in DEFAULT_BUCKETS
+        for bucket in buckets
     }
 
     bucket_by_t: dict[int, Bucket] = {}
-    for bucket in DEFAULT_BUCKETS:
+    for bucket in buckets:
         for T in range(bucket.t_min, bucket.t_max + 1, sample_step):
             bucket_by_t[T] = bucket
         bucket_by_t[bucket.t_min] = bucket
@@ -259,7 +278,7 @@ def sweep_combined(
         best_t[bucket.name][improve] = T
 
     result: dict[tuple[str, int], tuple[float, int, float]] = {}
-    for bucket in DEFAULT_BUCKETS:
+    for bucket in buckets:
         for idx, H in enumerate(H_values):
             result[(bucket.name, H)] = (
                 float(best[bucket.name][idx]),
@@ -284,13 +303,20 @@ def main() -> int:
     parser.add_argument("--tolerance", type=float, default=1e-7)
     parser.add_argument("--sample-step", type=int, default=1)
     parser.add_argument("--method", choices=("combined", "single"), default="combined")
+    parser.add_argument(
+        "--bucket-set",
+        choices=("window", "early", "window-plus-early"),
+        default="window",
+        help="Which saved left-endpoint bucket family to audit.",
+    )
     parser.add_argument("--summary-only", action="store_true")
     parser.add_argument("--output-csv", type=Path)
     args = parser.parse_args()
 
     H_values = parse_int_list(args.h_values)
     h_max = max(H_values)
-    t_max = max(bucket.t_max for bucket in DEFAULT_BUCKETS)
+    buckets = select_buckets(args.bucket_set)
+    t_max = max(bucket.t_max for bucket in buckets)
     d = math.floor(args.distance_delta * args.N)
     entries = split_entries(load_spectrum(args.spectrum), args.block_bits)
     survival = precompute_survival_log2(
@@ -303,7 +329,7 @@ def main() -> int:
     )
     logc = precompute_logc_table(n_max=t_max, k_max=h_max)
     log_coeff = precompute_nonempty_block_logcoeff(b=args.block_bits, h_max=h_max, x_max=h_max)
-    left_by_bucket = {bucket.name: load_left_totals(bucket.left_csv) for bucket in DEFAULT_BUCKETS}
+    left_by_bucket = {bucket.name: load_left_totals(bucket.left_csv) for bucket in buckets}
 
     fields = [
         "bucket",
@@ -323,6 +349,7 @@ def main() -> int:
     if args.method == "combined":
         combined = sweep_combined(
             H_values=H_values,
+            buckets=buckets,
             b=args.block_bits,
             e_max=args.e_max,
             t_max=t_max,
@@ -333,7 +360,7 @@ def main() -> int:
             sample_step=args.sample_step,
         )
         for H in H_values:
-            for bucket in DEFAULT_BUCKETS:
+            for bucket in buckets:
                 left = left_by_bucket[bucket.name][H]
                 best, best_t, left_repro = combined[(bucket.name, H)]
                 diff = best - left
@@ -380,7 +407,7 @@ def main() -> int:
 
     for H in H_values:
         watch_t: set[int] = set()
-        for bucket in DEFAULT_BUCKETS:
+        for bucket in buckets:
             watch_t.update(range(bucket.t_min, bucket.t_max + 1, args.sample_step))
             watch_t.add(bucket.t_min)
             watch_t.add(bucket.t_max)
@@ -395,7 +422,7 @@ def main() -> int:
             log_coeff_by_x=[log_coeff[x][H] for x in range(h_max + 1)],
             watch_t=watch_t,
         )
-        for bucket in DEFAULT_BUCKETS:
+        for bucket in buckets:
             left = left_by_bucket[bucket.name][H]
             left_repro = totals[bucket.t_min]
             best_t = bucket.t_min

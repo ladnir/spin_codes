@@ -2889,7 +2889,7 @@ Thus \(T\) is the number of later \(b\)-blocks after the first active block.  Th
 \hline
 \text{ultra-late} & 0\le T<5949 & \text{placement cap checked for }h\le500\\
 \text{audited window} & 5949\le T\le17948 & \text{episode ledger checked}\\
-\text{early} & T>17948 & \text{not yet part of this finite certificate.}
+\text{early} & T>17948 & \text{episode ledger checked for }h\le500
 \end{array}
 \]
 The audited window is exactly the script parameterization
@@ -2919,8 +2919,25 @@ and the union of this checked window with the checked ultra-late prefix has
 \[
 \log_2\mu_{\rm ultra\mbox{-}late\ prefix\ +\ window}\le -34.732187.
 \]
-The proof debt is therefore no longer the boundary slice \(T\approx5949\); it is the remaining first-active coverage,
-namely the early region \(T>17948\) and the post-prefix part of the ultra-late cap.
+The early \(h\le500\) part is now checked separately using the gap buckets
+\[
+12001\text{--}17000,\qquad 17001\text{--}22000,\qquad 22001\text{--}26819,
+\]
+equivalently \(17949\le T\le32767\).  The explicit \(e\le16\) bucket-uniform survival ledger gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\le16}\le -85.403338,
+\]
+and the crude \(e\ge17\) remainder gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\ge17}\le -305.738816.
+\]
+Thus the combined \(h\le500\) all-first-active-position value remains
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions}\le -34.732187,
+\]
+still dominated by the audited window and ultra-late prefix.  The proof debt is therefore no longer the boundary slice
+\(T\approx5949\), nor the small-weight early slice; it is the remaining first-active coverage for \(h>500\), together
+with the post-prefix part of the ultra-late cap.
 
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
@@ -3116,6 +3133,48 @@ The peak of this residual is again the far bucket at \(h=500,r=1\), but it is no
 ledger.  Combining the explicit \(e\le8\) ledger with this \(e\ge9\) residual leaves the current finite-prefix bound
 \[
 \log_2 \mu_{\le500}^{\rm fullsplit}\le -34.767174.
+\]
+
+For the early first-active buckets \(T>17948\), the same \(e\le8\) endpoint audit would be too expensive to promote
+directly over every interior \(T\).  Instead the checked finite certificate uses a bucket-uniform survival bound.  For a
+bucket \([T_-,T_+]\), remaining input weight \(H\), occupied remaining blocks \(x\), and selected skipped gaps \(e\),
+write \(S(L)\) for the Chernoff survival bound with \(L\) live blocks.  Since
+\[
+\binom{bT}{H}\ge \binom{bT_-}{H}
+\]
+and, after setting \(L=T-s\),
+\[
+\binom{T-L+e-1}{e-1}\binom{L-e}{x-e}
+\le
+\binom{T_+-L+e-1}{e-1}\binom{L-e}{x-e}
+\qquad (T_-\le T\le T_+),
+\]
+the whole bucket is bounded by replacing the skipped-gap suffix by
+\[
+\binom{x+1}{e}
+\sum_{L=x}^{T_+}
+\binom{T_+-L+e-1}{e-1}\binom{L-e}{x-e}S(L),
+\]
+with the endpoint \(e=x+1\) handled as \(\binom{T_+}{x}S(x)\).  This keeps the live-span Chernoff cost but removes the
+need for an all-interior \(T\) audit.  The generator is
+\[
+\texttt{python scripts/build\_fullsplit\_early\_uniform\_survival.py --e-max 16}.
+\]
+Using the three early buckets \(12001\text{--}17000\), \(17001\text{--}22000\), \(22001\text{--}26819\), the resulting
+row ledger gives
+\[
+\log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\le16}\le -85.403338,
+\]
+with bucket contributions
+\[
+12001\text{--}17000:\ -85.815880,\qquad
+17001\text{--}22000:\ -87.831441,\qquad
+22001\text{--}26819:\ -89.394315.
+\]
+The peak row is \(h=32,r=1\) in the first early bucket, with inner exponent \(-108.576588\) and full term
+\(-87.363392\).  The crude turnoff-count-only residual is then safe once started at \(e_{\min}=17\):
+\[
+\log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\ge17}\le -305.738816.
 \]
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
@@ -3662,14 +3721,20 @@ The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.
 \]
-It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) prefix, then combines
-that explicit CSV ledger with the crude \(e\ge9\) prefix residual, the all-episode \(501\le h\le2000\) wrapper row,
-and the fixed-pole interval table above.  The reported combined finite late-window contribution is
+It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
+that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
+\(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, and the fixed-pole
+interval table above.  The reported combined finite late-window contribution is unchanged:
 \[
 \log_2\mu_{\rm finite}^{\rm fullsplit}\le -34.767174,
 \]
 dominated by the tiny-prefix row \(h=32,r=1\) in the near bucket; the \(e\ge9\) prefix residual is already
-\(-269.335258\) bits and the entire \(h\ge501\) ledger is below \(-182.259739\) bits.
+\(-269.335258\) bits, the early \(h\le500\) contribution is \(-85.403338\) bits, and the entire \(h\ge501\)
+late-window ledger is below \(-182.259739\) bits.  Including the checked ultra-late placement prefix, the all-position
+\(32\le h\le500\) value is
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions}\le -34.732187.
+\]
 
 The per-\(h\) summary output also gives a compact active-pole map through \(h=50000\).  The dominant row is:
 \[

@@ -285,6 +285,16 @@ def main() -> int:
         default=ROOT / "fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv",
     )
     parser.add_argument(
+        "--early-prefix-e-le16-csv",
+        type=Path,
+        default=ROOT / "fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv",
+    )
+    parser.add_argument(
+        "--early-prefix-e-ge17-tail-csv",
+        type=Path,
+        default=ROOT / "fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv",
+    )
+    parser.add_argument(
         "--postprefix-eall-hsummary-csv",
         type=Path,
         default=ROOT / "fullsplit_piecewise_h501_2000_eall_hsummary.csv",
@@ -341,6 +351,18 @@ def main() -> int:
             args.prefix_e_ge9_tail_csv,
             "term_log2",
             -269.335258,
+        ),
+        CsvLedger(
+            "early_32_500_e_le16_uniformsurv",
+            args.early_prefix_e_le16_csv,
+            "term_log2",
+            -85.403338,
+        ),
+        CsvLedger(
+            "early_32_500_e_ge17_tail",
+            args.early_prefix_e_ge17_tail_csv,
+            "term_log2",
+            -305.738816,
         ),
         CsvLedger(
             "postprefix_501_2000_eall",
@@ -403,6 +425,11 @@ def main() -> int:
 
     prefix_all = log2add(parts["prefix_32_500_e_le8"], parts["prefix_32_500_e_ge9_tail"])
     print(f"prefix_32_500_all_e_log2,{prefix_all:.6f}")
+    early_all = log2add(
+        parts["early_32_500_e_le16_uniformsurv"],
+        parts["early_32_500_e_ge17_tail"],
+    )
+    print(f"early_32_500_all_e_log2,{early_all:.6f}")
 
     high_total = float("-inf")
     for label, lam, rho, value in HIGH_INTERVALS:
@@ -420,13 +447,16 @@ def main() -> int:
             print(f"interval_{interval.label}_recompute_status,PASS")
 
     total = float("-inf")
-    for value in [prefix_all, parts["postprefix_501_2000_eall"], high_total]:
+    for value in [prefix_all, early_all, parts["postprefix_501_2000_eall"], high_total]:
         total = log2add(total, value)
     print(f"finite_ledger_total_log2,{total:.6f}")
     print(f"finite_ledger_margin_bits,{-total:.6f}")
     late_plus_window = log2add(late_prefix, total)
     print(f"late_plus_window_total_log2,{late_plus_window:.6f}")
     print(f"late_plus_window_margin_bits,{-late_plus_window:.6f}")
+    h32_500_all_positions = log2add(late_prefix, log2add(prefix_all, early_all))
+    print(f"h32_500_all_first_active_positions_log2,{h32_500_all_positions:.6f}")
+    print(f"h32_500_all_first_active_positions_margin_bits,{-h32_500_all_positions:.6f}")
     return 0
 
 

@@ -8,17 +8,19 @@ The intended audit target is narrow:
 - finite checkpoint: `N = 2^21`, relative distance `delta = 0.09`, `d = floor(delta N) = 188743`
 - outer model: direct sum of `4096` copies of the binary `RM(4,9)` block code, i.e. local `[512,256,32]`
 - inner model: full-codeword random-split dense recursive inner with block size `b = 64`, using the EBCH `[128,64]` weight distribution
-- quantity being certified: a first-moment upper bound for the currently isolated late-window dense+dense contribution
+- quantity being certified: a first-moment upper bound for the currently isolated dense+dense contribution, with full first-active-position coverage for `32 <= h <= 500` and late-window coverage beyond that
 
 The current finite ledger reports
 
 ```text
 log2 mu_finite <= -34.767174
 log2 mu_late_plus_window <= -34.732187
+log2 mu_32_500_all_first_active_positions <= -34.732187
 ```
 
-The first line is the audited window `5949 <= T <= 17948`. The second also includes the checked placement-only
-ultra-late prefix `T < 5949`, through `h <= 500`. It is not yet a polished global theorem.
+The first line is still dominated by the audited window `5949 <= T <= 17948`. The second also includes the checked
+placement-only ultra-late prefix `T < 5949`, through `h <= 500`; the third records that the new early
+`T > 17948`, `h <= 500` slice is now included as well. It is not yet a polished global theorem.
 
 ## Construction Under Audit
 
@@ -119,7 +121,7 @@ the far-bucket row for `725001--950000`, about `3.773620` bits.
 
 ## Ledger Pieces
 
-The combined finite ledger has four pieces.
+The combined finite ledger now has six checked pieces.
 
 ### 1. Tiny Prefix, Explicit Episode Grid
 
@@ -254,7 +256,107 @@ python scripts\sum_fullsplit_turnoff_tail.py --outer-prefix-csv scripts\block_ou
 Audit priority: medium. Check that the crude `sum_{e>=9} binom(H+1,e) p_term^e` tail really applies to all omitted
 selected-gap configurations.
 
-### 3. Post-Prefix, All-Episode Wrapper
+### 3. Early Small-Weight Prefix, Uniform-Survival Grid
+
+Range:
+
+```text
+32 <= h <= 500
+1 <= r <= 64
+gap buckets: 12001--17000, 17001--22000, 22001--26819
+episode count: e <= 16
+```
+
+Artifacts:
+
+```text
+scripts/fullsplit_early_e16_uniformsurv_T17949_22948_H0_499.csv
+scripts/fullsplit_early_e16_uniformsurv_T22949_27948_H0_499.csv
+scripts/fullsplit_early_e16_uniformsurv_T27949_32767_H0_499.csv
+scripts/fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv
+```
+
+Current total:
+
+```text
+log2 mu_32_500_early_e_le16 = -85.403338
+```
+
+Bucket totals:
+
+```text
+12001--17000: -85.815880
+17001--22000: -87.831441
+22001--26819: -89.394315
+```
+
+Peak:
+
+```text
+h = 32
+r = 1
+remaining H = 31
+gap bucket = 12001--17000
+inner_log2 = -108.576588
+term_log2 = -87.36339217954111
+```
+
+Regenerate the bucket-uniform inner CSVs with:
+
+```powershell
+python scripts\build_fullsplit_early_uniform_survival.py --e-max 16
+```
+
+Then regenerate the row-level ledger with:
+
+```powershell
+python scripts\sum_fullsplit_piecewise_certificate.py --h-values 32:500 --first-r-values 1:64 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap csv,csv,csv --inner-knot-csvs "scripts\fullsplit_early_e16_uniformsurv_T17949_22948_H0_499.csv;scripts\fullsplit_early_e16_uniformsurv_T22949_27948_H0_499.csv;scripts\fullsplit_early_e16_uniformsurv_T27949_32767_H0_499.csv" --require-knot-coverage --gap-sum-mode exact --inner-T-by-gap min --turnoff-log2 -63.8926492 --output-csv scripts\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv --output-h-summary-csv scripts\fullsplit_piecewise_early_h32_500_e16_uniformsurv_hsummary.csv
+```
+
+Interpretation: this is not an endpoint monotonicity claim. The builder uses a bucket-uniform denominator and a
+bucket-uniform skipped-gap suffix while keeping the live-span Chernoff survival factor.
+
+### 4. Early Small-Weight Prefix, Crude Episode Tail
+
+Range:
+
+```text
+32 <= h <= 500
+gap buckets: 12001--17000, 17001--22000, 22001--26819
+e >= 17
+```
+
+Artifact:
+
+```text
+scripts/fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
+```
+
+Current total:
+
+```text
+log2 mu_32_500_early_e_ge17_tail = -305.738816
+```
+
+Peak:
+
+```text
+h = 500
+r = 1
+gap bucket = 22001--26819
+term_log2 = -306.4449663093145
+```
+
+Regenerate with:
+
+```powershell
+python scripts\sum_fullsplit_turnoff_tail.py --outer-prefix-csv scripts\block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv --h-values 32:500 --first-r-values 1:64 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --turnoff-log2 -63.8926492 --e-min 17 --output-csv scripts\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
+```
+
+Audit priority: medium. The crude tail is safe only after pushing the explicit uniform-survival grid to `e <= 16`;
+starting the crude tail at `e >= 9` fails badly in the far early bucket.
+
+### 5. Post-Prefix, All-Episode Wrapper
 
 Range:
 
@@ -292,7 +394,7 @@ python scripts\sum_fullsplit_piecewise_certificate.py --h-values 501:2000 --inne
 
 Audit priority: medium. This is now theorem-facing and no longer relies on an `e <= 1` caveat.
 
-### 4. Interval Certificate
+### 6. Interval Certificate
 
 Range:
 
@@ -442,8 +544,8 @@ Still proof debt:
   analytic monotonicity
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
-- cover the remaining first-active regimes: the early region `T > 17948` and the post-prefix ultra-late cap beyond
-  `h > 500`
+- cover the remaining first-active regimes: the early region `T > 17948, h > 500` and the post-prefix ultra-late cap
+  beyond `h > 500`
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 
