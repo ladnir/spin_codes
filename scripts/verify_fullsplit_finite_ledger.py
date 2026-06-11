@@ -18,6 +18,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from certify_prefix_placement_ratio import compute_sums, decimal_fraction, ratio_float
+from certify_rm_outer_prefix_exact import (
+    direct_sum_coefficients,
+    exact_late_prefix_sum,
+    load_local_spectrum,
+    reweighted_ledger_sum,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -524,6 +530,9 @@ def main() -> int:
         type=Path,
         default=ROOT / "block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv",
     )
+    parser.add_argument("--exact-outer-local-spectrum-csv", type=Path, default=ROOT / "rm512_256_spectrum.csv")
+    parser.add_argument("--exact-outer-blocks", type=int, default=4096)
+    parser.add_argument("--exact-outer-h-max", type=int, default=500)
     parser.add_argument("--N", type=int, default=2**21)
     parser.add_argument("--block-bits", type=int, default=64)
     parser.add_argument("--late-blocks", type=int, default=5949)
@@ -653,6 +662,29 @@ def main() -> int:
             f"term_log2={late_peak['term_log2']:.6f}"
         )
 
+    exact_outer_coeffs = direct_sum_coefficients(
+        load_local_spectrum(args.exact_outer_local_spectrum_csv, args.exact_outer_h_max),
+        blocks=args.exact_outer_blocks,
+        h_max=args.exact_outer_h_max,
+    )
+    exact_late_prefix = exact_late_prefix_sum(
+        exact_outer_coeffs,
+        n=args.N,
+        b=args.block_bits,
+        late_blocks=args.late_blocks,
+        h_max=args.late_prefix_h_max,
+    )
+    check_close("late_prefix_T_lt_5949_exact_outer", exact_late_prefix.total_log2, -41.113442, args.tolerance)
+    print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_rows,{exact_late_prefix.rows}")
+    print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_log2,{exact_late_prefix.total_log2:.6f}")
+    print(
+        f"late_prefix_T_lt_{args.late_blocks}_exact_outer_peak,"
+        f"h={exact_late_prefix.peak_h},"
+        f"outer_log2={exact_late_prefix.peak_outer_log2:.6f},"
+        f"late_log2={exact_late_prefix.peak_late_log2:.6f},"
+        f"term_log2={exact_late_prefix.peak_term_log2:.6f}"
+    )
+
     parts: dict[str, float] = {}
     for item in csv_ledgers:
         total, rows, peak = csv_logsum(item.path, item.column)
@@ -661,6 +693,29 @@ def main() -> int:
         print(f"{item.name}_rows,{rows}")
         print(f"{item.name}_log2,{total:.6f}")
         print_peak(item.name, peak, item.column)
+
+    exact_outer_expected = {
+        "prefix_32_500_e_le8": -37.383345,
+        "prefix_32_500_e_ge9_tail": -284.004805,
+        "early_32_500_e_le16_uniformsurv": -86.910456,
+        "early_32_500_e_ge17_tail": -319.977808,
+    }
+    exact_outer_parts: dict[str, float] = {}
+    for item in csv_ledgers:
+        if item.name not in exact_outer_expected:
+            continue
+        summary = reweighted_ledger_sum(item.path, exact_outer_coeffs)
+        check_close(f"{item.name}_exact_outer", summary.exact_log2, exact_outer_expected[item.name], args.tolerance)
+        exact_outer_parts[item.name] = summary.exact_log2
+        print(f"{item.name}_exact_outer_live_rows,{summary.live_rows}")
+        print(f"{item.name}_exact_outer_log2,{summary.exact_log2:.6f}")
+        print(
+            f"{item.name}_exact_outer_peak,"
+            f"outer_weight={summary.peak_h},first_r={summary.peak_first_r},"
+            f"gap_min={summary.peak_gap_min},gap_max={summary.peak_gap_max},"
+            f"outer_log2={summary.peak_outer_exact_log2:.6f},"
+            f"term_log2={summary.peak_term_log2:.6f}"
+        )
 
     ridge_ratio = prefix_ridge_ratio_summary(args.prefix_e_le8_csv)
     if ridge_ratio.first_ratio > args.prefix_ridge_first_ratio_max:
@@ -736,13 +791,16 @@ def main() -> int:
         print(f"prefix_placement_endpoint_bound_at_h_min,{placement.endpoint_ratio_at_h_min:.12g}")
         print(f"prefix_placement_endpoint_slack_factor,{placement.endpoint_slack_factor:.12g}")
 
-    prefix_all = log2add(parts["prefix_32_500_e_le8"], parts["prefix_32_500_e_ge9_tail"])
-    print(f"prefix_32_500_all_e_log2,{prefix_all:.6f}")
-    early_all = log2add(
-        parts["early_32_500_e_le16_uniformsurv"],
-        parts["early_32_500_e_ge17_tail"],
+    prefix_all = log2add(
+        exact_outer_parts["prefix_32_500_e_le8"],
+        exact_outer_parts["prefix_32_500_e_ge9_tail"],
     )
-    print(f"early_32_500_all_e_log2,{early_all:.6f}")
+    print(f"prefix_32_500_all_e_exact_outer_log2,{prefix_all:.6f}")
+    early_all = log2add(
+        exact_outer_parts["early_32_500_e_le16_uniformsurv"],
+        exact_outer_parts["early_32_500_e_ge17_tail"],
+    )
+    print(f"early_32_500_all_e_exact_outer_log2,{early_all:.6f}")
 
     high_total = float("-inf")
     for label, lam, rho, value in HIGH_INTERVALS:
@@ -777,10 +835,10 @@ def main() -> int:
         total = log2add(total, value)
     print(f"finite_ledger_total_log2,{total:.6f}")
     print(f"finite_ledger_margin_bits,{-total:.6f}")
-    late_plus_window = log2add(late_prefix, total)
+    late_plus_window = log2add(exact_late_prefix.total_log2, total)
     print(f"late_plus_window_total_log2,{late_plus_window:.6f}")
     print(f"late_plus_window_margin_bits,{-late_plus_window:.6f}")
-    h32_500_all_positions = log2add(late_prefix, log2add(prefix_all, early_all))
+    h32_500_all_positions = log2add(exact_late_prefix.total_log2, log2add(prefix_all, early_all))
     print(f"h32_500_all_first_active_positions_log2,{h32_500_all_positions:.6f}")
     print(f"h32_500_all_first_active_positions_margin_bits,{-h32_500_all_positions:.6f}")
     return 0

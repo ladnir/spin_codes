@@ -13,14 +13,17 @@ The intended audit target is narrow:
 The current finite ledger reports
 
 ```text
-log2 mu_finite <= -34.767174
-log2 mu_late_plus_window <= -34.732187
-log2 mu_32_500_all_first_active_positions <= -34.732187
+log2 mu_finite <= -37.383345
+log2 mu_late_plus_window <= -37.278528
+log2 mu_32_500_all_first_active_positions <= -37.278528
 ```
 
-The first line is still dominated by the audited window `5949 <= T <= 17948`. The second also includes the checked
-placement-only ultra-late prefix `T < 5949`, through `h <= 500`; the third records that the new early
-`T > 17948`, `h <= 500` slice is now included as well. It is not yet a polished global theorem.
+These values use exact RM direct-sum outer coefficients for the `h <= 500`
+prefix. The first line is still dominated by the audited window
+`5949 <= T <= 17948`. The second also includes the checked placement-only
+ultra-late prefix `T < 5949`, through `h <= 500`; the third records that the
+early `T > 17948`, `h <= 500` slice is included as well. It is not yet a
+polished global theorem.
 
 ## Construction Under Audit
 
@@ -106,14 +109,17 @@ Expected key outputs:
 prefix_interior_audit_rows,1500
 prefix_interior_audit_worst,bucket=gap_8001_12000,H=75,diff=2.19205276153e-09,T=13949
 late_prefix_T_lt_5949_cap_log2,-40.115431
+late_prefix_T_lt_5949_exact_outer_log2,-41.113442
 prefix_32_500_e_le8_log2,-34.767174
+prefix_32_500_e_le8_exact_outer_log2,-37.383345
 prefix_32_500_e_ge9_tail_log2,-269.335258
+prefix_32_500_e_ge9_tail_exact_outer_log2,-284.004805
 postprefix_501_2000_eall_log2,-182.259739
 interval_2001_1148736_total_log2,-586.597103
-finite_ledger_total_log2,-34.767174
-finite_ledger_margin_bits,34.767174
-late_plus_window_total_log2,-34.732187
-late_plus_window_margin_bits,34.732187
+finite_ledger_total_log2,-37.383345
+finite_ledger_margin_bits,37.383345
+late_plus_window_total_log2,-37.278528
+late_plus_window_margin_bits,37.278528
 ```
 
 For the monotonicity audit, every reported middle/far bucket slack should be positive. The smallest current slack is
@@ -140,10 +146,16 @@ Artifact:
 scripts/fullsplit_piecewise_h32_500_csv.csv
 ```
 
-Current total:
+Smoothed-outer total:
 
 ```text
 log2 mu_32_500_e_le8 = -34.767174
+```
+
+Exact-outer total:
+
+```text
+log2 mu_32_500_e_le8_exact_outer = -37.383345
 ```
 
 Peak:
@@ -156,9 +168,31 @@ gap bucket = 1--4000
 term_log2 = -37.38576684150053
 ```
 
-This is the dominant piece of the whole finite ledger.
+With exact RM direct-sum outer coefficients, this is the dominant piece of the
+whole finite ledger:
 
-Current ridge decomposition:
+```powershell
+python scripts\certify_rm_outer_prefix_exact.py --ledger-csv scripts\fullsplit_piecewise_h32_500_csv.csv --ledger-csv scripts\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv --ledger-csv scripts\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv --ledger-csv scripts\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
+```
+
+Key output:
+
+```text
+support_min_positive,32
+support_first_positive,32;48;56;60;64;68;72;76;80
+late_prefix_exact_log2,-41.113442
+ledger_exact_outer_log2,-37.383345   # fullsplit_piecewise_h32_500_csv.csv
+ledger_exact_outer_log2,-284.004805  # fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv
+ledger_exact_outer_log2,-86.910456   # fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv
+ledger_exact_outer_log2,-319.977808  # fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
+```
+
+Interpretation: the current live finite prefix is exact-support dominated by
+`h=32`. The old adjacent `h=33,34,...` ridge below is a useful diagnostic for
+the smoothed Cauchy outer envelope, but it is not the current bottleneck once
+the exact RM direct-sum support is used.
+
+Smoothed-outer ridge decomposition:
 
 ```powershell
 python scripts\analyze_fullsplit_prefix_ridge.py --expected-total-log2 -34.767174286
@@ -189,27 +223,23 @@ ridge_total_ratio_bound_slack_bits,3.32625484987e-05
 ridge_inner_log2_span,3.14770431942e-12
 ```
 
-Interpretation: the narrow waist is a near-boundary geometric `h` ridge, not
-just one bad `h=32` row and not a broad intermediate-weight ridge. The theorem
-target should upper-bound this ridge summably: peak row, first `32 -> 33`
-transition, then a uniform adjacent-ratio bound for the remaining `r=1`,
-first-gap `h`-sum, with the `r >= 2` and middle/far gap pieces treated as
-small remainders. The main finite-ledger verifier now checks this ratio
-skeleton directly: the infinite geometric ridge bound plus the exact remainder
-gives log2 contribution `-34.767141`, only `3.4e-5` bits above the exact
-`e <= 8` prefix table. The component split is now also checked there. For the
-dominant `r=1`, first-gap ridge, the inner row is constant to numerical
-precision; the ratio is the product of an outer-spectrum slope and the
-placement slope
+Interpretation for the smoothed Cauchy outer envelope: the narrow waist is a
+near-boundary geometric `h` ridge, not just one bad `h=32` row and not a broad
+intermediate-weight ridge. The verifier still checks this ratio skeleton as an
+audit of the smoothed table: the infinite geometric ridge bound plus the exact
+smoothed-table remainder gives log2 contribution `-34.767141`, only `3.4e-5`
+bits above the smoothed `e <= 8` prefix table. For the dominant `r=1`,
+first-gap ridge, the inner row is constant to numerical precision; the ratio is
+the product of an outer-spectrum slope and the placement slope
 
 ```text
 P_{h+1}/P_h = (S_h/S_{h-1}) * (h+1)/(N-h)
 S_H = sum_{g=1}^{4000} binom(64*(5949+g-1), H).
 ```
 
-The next analytic target is therefore small and explicit: prove either the
-direct product ratio, or the separate outer bounds `2.809`, `2.747` and
-placement bound `0.303594`, then attach the already-checked remainder.
+This smoothed-ridge target has been superseded for the RM finite checkpoint by
+the exact-support outer certificate above. It remains useful if we later replace
+RM by a smoother outer ensemble or need a Cauchy-envelope fallback.
 
 The placement slope is now checked independently of the row CSV by exact
 integer arithmetic:
@@ -315,10 +345,16 @@ Artifact:
 scripts/fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv
 ```
 
-Current total:
+Smoothed-outer total:
 
 ```text
 log2 mu_32_500_e_ge9_tail = -269.335258
+```
+
+Exact-outer total:
+
+```text
+log2 mu_32_500_e_ge9_tail_exact_outer = -284.004805
 ```
 
 Peak:
@@ -361,10 +397,16 @@ scripts/fullsplit_early_e16_uniformsurv_T27949_32767_H0_499.csv
 scripts/fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv
 ```
 
-Current total:
+Smoothed-outer total:
 
 ```text
 log2 mu_32_500_early_e_le16 = -85.403338
+```
+
+Exact-outer total:
+
+```text
+log2 mu_32_500_early_e_le16_exact_outer = -86.910456
 ```
 
 Bucket totals:
@@ -417,10 +459,16 @@ Artifact:
 scripts/fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
 ```
 
-Current total:
+Smoothed-outer total:
 
 ```text
 log2 mu_32_500_early_e_ge17_tail = -305.738816
+```
+
+Exact-outer total:
+
+```text
+log2 mu_32_500_early_e_ge17_tail_exact_outer = -319.977808
 ```
 
 Peak:
@@ -798,6 +846,8 @@ Currently checkable:
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
 - the finite `32..500` row-level sum from the existing CSV artifacts
+- the exact RM direct-sum outer prefix coefficients and exact-outer reweighting in
+  `certify_rm_outer_prefix_exact.py`
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
@@ -811,8 +861,8 @@ Still proof debt:
 
 - decide whether to keep Lemma `lem:fullsplit-tiny-prefix-interiorT` as a finite certificate or eventually replace it by
   analytic monotonicity
-- replace the finite tiny-prefix ridge decomposition by an analytic summable bound: peak row, first adjacent step,
-  averaged-binomial placement slope, and a uniform outer/inner product ratio for the remaining `r=1`, first-gap `h`-sum
+- replace the finite exact-support tiny-prefix decomposition by an analytic or clean finite lemma: exact `h=32` peak,
+  exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - cover the remaining first-active regimes: the early region `T > 17948, h > 500` and the post-prefix ultra-late cap
