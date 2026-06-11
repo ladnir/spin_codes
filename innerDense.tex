@@ -4131,6 +4131,36 @@ this as
 \log_2\mu_{1048577\le h\le N}^{\rm complement\ high}\le -35150.097366.
 \]
 
+\begin{corollary}[Checked post-prefix ledger rows]
+\label{cor:fullsplit-postprefix-checked-ledger}
+The checked \(h\ge501\) row families currently included in the finite ledger have union-bound total
+\[
+\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}\le -182.259739.
+\]
+These rows are
+\[
+\begin{array}{c|c}
+\text{row family} & \log_2\text{ contribution}\\
+\hline
+501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
+2001\le h\le1148736\ \text{fixed-pole intervals} & -586.597103\\
+1048577\le h\le N\ \text{complement-high intervals} & -35150.097366 .
+\end{array}
+\]
+\end{corollary}
+
+\begin{proof}
+The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact.  The second row is the fixed-pole
+interval table through the feasible far-bucket cutoff \(h=1148736\).  The third row is the complement-side high-density
+table.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger deliberately keeps this harmless
+overcount as a union bound.  Therefore the combined contribution is bounded by
+\[
+\log_2\!\left(2^{-182.259739}+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
+\]
+The verifier prints and checks this as
+\(\texttt{h501\_plus\_checked\_rows\_log2=-182.259739}\).
+\end{proof}
+
 The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.

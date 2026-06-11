@@ -124,6 +124,7 @@ prefix_32_500_e_ge9_tail_log2,-269.335258
 prefix_32_500_e_ge9_tail_exact_outer_log2,-284.004805
 postprefix_501_2000_eall_log2,-182.259739
 interval_2001_1148736_total_log2,-586.597103
+h501_plus_checked_rows_log2,-182.259739
 finite_ledger_total_log2,-37.383345
 finite_ledger_margin_bits,37.383345
 late_plus_window_total_log2,-37.278528
@@ -869,6 +870,8 @@ Currently checkable:
   `h=32`/`h>32` split checked by the verifier
 - the paper-facing small-weight prefix corollary `cor:fullsplit-small-prefix-all-first-active`, which combines the
   ultra-late, window, and early `h <= 500` pieces
+- the paper-facing checked post-prefix row corollary `cor:fullsplit-postprefix-checked-ledger`, which combines the
+  `501..2000`, fixed-pole interval, and complement-high ledger rows
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication

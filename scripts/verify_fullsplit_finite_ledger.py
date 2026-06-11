@@ -871,8 +871,14 @@ def main() -> int:
             print(f"complement_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"complement_interval_{interval.label}_recompute_status,PASS")
 
+    h501_plus_checked = float("-inf")
+    for value in [parts["postprefix_501_2000_eall"], high_total, complement_high_total]:
+        h501_plus_checked = log2add(h501_plus_checked, value)
+    check_close("h501_plus_checked_rows", h501_plus_checked, -182.259739, args.tolerance)
+    print(f"h501_plus_checked_rows_log2,{h501_plus_checked:.6f}")
+
     total = float("-inf")
-    for value in [prefix_all, early_all, parts["postprefix_501_2000_eall"], high_total, complement_high_total]:
+    for value in [prefix_all, early_all, h501_plus_checked]:
         total = log2add(total, value)
     print(f"finite_ledger_total_log2,{total:.6f}")
     print(f"finite_ledger_margin_bits,{-total:.6f}")
