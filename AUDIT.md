@@ -28,11 +28,34 @@ At each block:
 2. If `V_i = 0`, the branch emits zero and the state becomes zero.
 3. If `V_i != 0`, a dense scrambler makes the local EBCH codeword uniform over nonzero codewords.
 4. The `128` codeword coordinates are randomly split into `64` output coordinates and `64` next-state coordinates.
-5. The effective one-step termination atom used in the certificate is
+5. The conservative effective one-step termination atom used in the finite-prefix certificate is
 
 ```text
-log2 p_term = -63.89264923803805
+log2 p_term <= -63.8926492
 ```
+
+This is backed by:
+
+```powershell
+python scripts\verify_fullsplit_turnoff_atom.py
+```
+
+Expected key output:
+
+```text
+self_turnoff_p0_log2,-64.00457432724919
+eta_sup_H,499
+eta_sup_T,5949
+eta_sup_log2,-67.63641076470455
+computed_pterm_log2,-63.89264922047382
+certified_pterm_upper_log2,-63.89264920000000
+extra_turnoff_for_certified_upper_log2,-67.63641049043137
+status,PASS
+```
+
+Scope: this exact-cancellation add-on is certified for the current tiny-prefix
+domain `0 <= H <= 499`, `T >= 5949`. Extending the same cancellation atom to
+larger `H` is separate proof debt.
 
 The relevant manuscript section starts in `innerDense.tex`, especially the full-split episode material and finite ledger around:
 
@@ -47,6 +70,7 @@ innerDense.tex:3412
 Run these first:
 
 ```powershell
+python scripts\verify_fullsplit_turnoff_atom.py
 python scripts\verify_fullsplit_finite_ledger.py
 python scripts\check_fullsplit_T_monotonicity.py --sufficient-reduction
 pdflatex -interaction=nonstopmode main_permConv.tex
@@ -131,7 +155,7 @@ Current output:
 
 ```text
 Full-split exact-grid interior audit
-summary,rows=1500,worst_bucket=gap_8001_12000,worst_H=75,worst_diff=2.19202433982e-09,worst_T=13949,worst_repro_bucket=gap_8001_12000,worst_repro_H=185,worst_repro_delta=-5.52483925276e-09
+summary,rows=1500,worst_bucket=gap_8001_12000,worst_H=75,worst_diff=2.19205276153e-09,worst_T=13949,worst_repro_bucket=gap_8001_12000,worst_repro_H=185,worst_repro_delta=-5.52478240934e-09
 ```
 
 Interpretation: the exact `e <= 8` totals were checked for every
@@ -144,6 +168,15 @@ The row-level prefix sum can be regenerated with:
 
 ```powershell
 python scripts\sum_fullsplit_piecewise_certificate.py --h-values 32:500 --inner-mode-by-gap csv,csv,csv --inner-knot-csvs "scripts\fast_fullsplit_e08_T5949_H0_499_all.csv;scripts\fast_fullsplit_e08_T9949_H0_499_all.csv;scripts\fast_fullsplit_e08_T13949_H0_499_all.csv" --require-knot-coverage --output-csv scripts\fullsplit_piecewise_h32_500_csv.csv
+```
+
+The `e <= 8` endpoint grids are regenerated with the certified cancellation
+add-on:
+
+```powershell
+python scripts\fast_fullsplit_episode_e01.py --remaining-blocks 5949 --remaining-ones 0:499 --e-max 8 --extra-turnoff-log2 -67.63641049043137 --output-csv scripts\fast_fullsplit_e08_T5949_H0_499_all.csv
+python scripts\fast_fullsplit_episode_e01.py --remaining-blocks 9949 --remaining-ones 0:499 --e-max 8 --extra-turnoff-log2 -67.63641049043137 --output-csv scripts\fast_fullsplit_e08_T9949_H0_499_all.csv
+python scripts\fast_fullsplit_episode_e01.py --remaining-blocks 13949 --remaining-ones 0:499 --e-max 8 --extra-turnoff-log2 -67.63641049043137 --output-csv scripts\fast_fullsplit_e08_T13949_H0_499_all.csv
 ```
 
 Audit priority: high. This is the narrow waist of the certificate. The finite
@@ -182,6 +215,12 @@ term_log2 = -271.14116944335876
 ```
 
 This is intentionally pessimistic and far below the dominant `e <= 8` prefix.
+
+Regenerate with:
+
+```powershell
+python scripts\sum_fullsplit_turnoff_tail.py --outer-prefix-csv scripts\block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv --h-values 32:500 --first-r-values 1:64 --turnoff-log2 -63.8926492 --e-min 9 --output-csv scripts\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv
+```
 
 Audit priority: medium. Check that the crude `sum_{e>=9} binom(H+1,e) p_term^e` tail really applies to all omitted
 selected-gap configurations.
@@ -321,11 +360,12 @@ Currently checkable:
 - the high-`h` fixed-pole interval rows as numerical certificates
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the finite `32..500` row-level sum from the existing CSV artifacts
+- the finite-prefix derivation of `log2 p_term <= -63.8926492`
 
 Still proof debt:
 
 - convert the `32..500`, `e <= 8` finite grid from "CSV artifact" to an audit-grade finite lemma
-- verify the derivation and implementation of the effective termination atom `log2 p_term = -63.89264923803805`
+- extend or separately handle the exact-cancellation termination atom outside the finite-prefix domain
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and
   what is handled elsewhere

@@ -162,7 +162,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--spectrum", type=Path, default=Path(__file__).with_name("EBCH128_64.wd"))
     parser.add_argument("--block-bits", type=int, default=64)
-    parser.add_argument("--turnoff-log2", type=float, default=-63.89264923803805)
+    parser.add_argument("--turnoff-log2", type=float, default=-63.8926492)
     parser.add_argument("--intervals", help="Semicolon-separated h0:h1,lambda,rho entries.")
     parser.add_argument("--r-values", default="1:64")
     parser.add_argument("--buckets", default="4001:8000,8001:12000")

@@ -31,12 +31,15 @@ Claude classified this as a soundness assumption, not just presentation debt.
 The constant
 
 ```text
-log2 p_term = -63.89264923803805
+log2 p_term <= -63.8926492
 ```
 
 is load-bearing. The lemma says `p_term` should cover both the `q'=0` split event and exact input/state cancellation if charged. The audited scripts expose an optional `--extra-turnoff-log2`, but the CSV provenance does not make clear whether/how cancellation was included.
 
-This needs a derivation/checker script producing the constant and stating exactly what is included.
+Resolution note: `scripts/verify_fullsplit_turnoff_atom.py` now derives this atom for the finite-prefix domain
+`0 <= H <= 499`, `T >= 5949`. It computes `log2 p0 = -64.00457432724919`,
+`log2 eta = -67.63641076470455`, `log2(p0+eta) = -63.89264922047382`, and uses the rounded-up certificate atom
+`-63.8926492`. Remaining issue: the same exact-cancellation add-on is not yet certified for larger `H`.
 
 ### F3 High: High interval rows are hard-coded in the ledger verifier
 
@@ -76,7 +79,7 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 
 ## Author Questions
 
-1. Does `-63.89264923803805` include the occupied-block exact-cancellation atom required by the all-episode lemma?
+1. Outside the finite-prefix range, how is occupied-block exact cancellation handled in the all-episode lemma?
 2. Which command generated the fifteen interval rows, and was `feasible-min` used?
 3. What justifies applying the exact `e <= 8` grids at bucket left endpoints across entire buckets?
 4. Where is the product bound for multiple terminations proved?
@@ -84,8 +87,8 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 
 ## Suggested Next Fixes
 
-1. Certify exact-grid `T` monotonicity for `32 <= h <= 500`, or regenerate the tiny-prefix ledger at a proven worst-case `T`.
-2. Add a `p_term` derivation script and cite it from `AUDIT.md`.
+1. Certify exact-grid `T` monotonicity for `32 <= h <= 500`, or keep the current full interior finite audit as an explicit finite lemma.
+2. Extend the `p_term` exact-cancellation derivation beyond the finite prefix, or split larger-`H` cancellations into a separate bound.
 3. Make the interval rows reproducible from documented commands, or add a spot-recompute mode to the ledger verifier.
 4. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
 5. Correct stale prose numbers and separate old diagnostics from theorem-facing rows.

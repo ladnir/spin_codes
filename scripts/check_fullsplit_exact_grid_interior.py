@@ -275,7 +275,7 @@ def main() -> int:
     parser.add_argument("--N", type=int, default=2**21)
     parser.add_argument("--block-bits", type=int, default=64)
     parser.add_argument("--distance-delta", type=float, default=0.09)
-    parser.add_argument("--turnoff-log2", type=float, default=-63.89264923803805)
+    parser.add_argument("--turnoff-log2", type=float, default=-63.8926492)
     parser.add_argument("--h-values", default="0:80")
     parser.add_argument("--e-max", type=int, default=8)
     parser.add_argument("--lambda-min", type=float, default=0.001)

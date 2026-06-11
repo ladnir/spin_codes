@@ -2760,18 +2760,33 @@ H & T=5949 & T=9949 & T=13949\\
 499 & -67.64 & -68.35 & -68.83
 \end{array}
 \]
-The worst sampled value, \(-67.64\), inflates the termination atom only from \(-64.004574\) to \(-63.892649\).  Rerunning
-the \(h=500,T=13949\) episode-gap diagnostic with this inflated atom changes the inner exponent from \(-673.38\) to
-\(-673.27\), and the near \(h=32,T=5949\) ridge is unchanged because it is dominated by the no-termination survival
-branch.  Thus exact input/state cancellation can be folded into the same skipped-gap ledger, at least for the current
-\(h\le500\) finite prefix, by replacing \(p_0\) with
+The worst displayed value occurs at the smallest remaining span.  More generally, for fixed \(H,q\), the ratio
+\(\binom{b(T-1)}{H-q}/\binom{bT}{H}\) is decreasing in \(T\): adding more outside coordinates while keeping \(H\)
+fixed only lowers the chance that the distinguished next block contains exactly the prescribed \(q\)-set and no other
+selected coordinate.  Thus for the finite prefix \(H\le499\) and \(T\ge5949\), scanning the left endpoint gives
+\[
+\log_2 p_0=-64.00457432724919,\qquad
+\log_2\eta=-67.63641076470455,
+\]
+and hence
+\[
+\log_2(p_0+\eta)=-63.89264922047382.
+\]
+The finite certificate uses the slightly rounded-up atom
+\[
+\log_2 p_{\rm term}\le -63.8926492.
+\]
+Rerunning the \(h=500,T=13949\) episode-gap diagnostic with this inflated atom changes the inner exponent from
+\(-673.38\) to \(-673.27\), and the near \(h=32,T=5949\) ridge is unchanged because it is dominated by the
+no-termination survival branch.  Thus exact input/state cancellation can be folded into the same skipped-gap ledger,
+at least for the current \(h\le500\) finite prefix, by replacing \(p_0\) with
 \[
 p_{\mathrm{term}}:=p_0+\eta,\qquad
 \eta=\sup_{H,T}\sum_{q>0}\Pr[Q=q]\frac{\binom{b(T-1)}{H-q}}{\binom{bT}{H}}.
 \]
-The cancellation diagnostic is
+The audit-grade cancellation verifier is
 \[
-\texttt{python scripts/analyze\_fullsplit\_exact\_cancellation.py}.
+\texttt{python scripts/verify\_fullsplit\_turnoff\_atom.py}.
 \]
 
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
@@ -2858,7 +2873,7 @@ dominates there.  The implementation now factors the skipped-gap suffix sum, whi
 on \(H\), so denser interpolation audits are cheap.  It also includes the \(H=0\) endpoint explicitly: if no later input
 ones remain, the \(e=1\) branch is the single full zero gap and contributes exactly the effective termination atom
 \[
-\log_2 p_{\rm term}=-63.892649.
+\log_2 p_{\rm term}\le -63.8926492.
 \]
 Using full integer \(H=0,\ldots,499\) CSVs, with extrapolation disallowed in the envelope summation, removes the
 interpolation issue from the finite prefix.  The current \(e\le8\) ledger gives the total prefix value
@@ -3129,7 +3144,8 @@ where \(\mathcal E\) is any certified inner envelope, such as
 inner theorem.
 
 The first coefficient-free diagnostic is mixed in exactly the useful way.  With the EBCH \([128,64]\) split law,
-\(p_{\rm term}=2^{-63.892649}\), \(N=2^{21}\), \(b=64\), and \(\delta=.09\), optimizing a coarse
+the finite-prefix termination atom \(p_{\rm term}=2^{-63.8926492}\), \(N=2^{21}\), \(b=64\), and \(\delta=.09\),
+optimizing a coarse
 \((\lambda,a,\rho)\)-grid gives
 \[
 \begin{array}{c|cc}
