@@ -3469,7 +3469,9 @@ h\text{ range} & (\lambda,\rho) & \log_2\mu\\
 The displayed high-interval rows are the raw finite-prefix interval constants with a checked \(1.484774\)-bit
 adjustment for replacing the finite-prefix termination atom by the global Bernstein termination atom.  The helper
 \(\texttt{verify\_fullsplit\_high\_interval\_adjustment.py}\) computes the required adjustment as
-\(1.484773404861\) bits, including a negligible tail-multiplier allowance.
+\(1.484773404861\) bits, including a negligible tail-multiplier allowance.  The ledger helper
+\(\texttt{verify\_fullsplit\_finite\_ledger.py}\) can print the exact fixed-pole regeneration command for each interval
+and can spot-recompute selected intervals using \(\texttt{--check-high-intervals}\).
 The tight row remains the upper transition interval \(550001\text{--}650000\), not the multi-episode correction itself.
 Above this transition the feasible far-bucket tail quickly falls away; the later peaks are either at the left endpoint or
 near \(h=862232\), and all are far below the target first-moment level.

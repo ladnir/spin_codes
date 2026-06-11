@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import csv
 import math
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,34 +21,81 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 
 
+GLOBAL_TURNOFF_LOG2 = -62.4078758
 HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS = 1.484774
+
+
+@dataclass(frozen=True)
+class HighInterval:
+    start: int
+    stop: int
+    lam: float
+    rho: float
+    raw_log2: float
+
+    @property
+    def label(self) -> str:
+        return f"{self.start}--{self.stop}"
+
+    @property
+    def adjusted_log2(self) -> float:
+        return self.raw_log2 + HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS
+
+    def command(self) -> list[str]:
+        return [
+            sys.executable,
+            str(ROOT / "sum_fullsplit_piecewise_certificate.py"),
+            "--h-values",
+            f"{self.start}:{self.stop}",
+            "--inner-mode-by-gap",
+            "cap,eallratio,eallratio",
+            "--gap-sum-mode",
+            "endpoint",
+            "--inner-T-by-gap",
+            "feasible-min",
+            "--turnoff-log2",
+            f"{GLOBAL_TURNOFF_LOG2:.7f}",
+            "--lambdas",
+            f"{self.lam:g}",
+            "--rhos",
+            f"{self.rho:g}",
+        ]
+
+    def display_command(self) -> str:
+        script = r"scripts\sum_fullsplit_piecewise_certificate.py"
+        return (
+            f"python {script} --h-values {self.start}:{self.stop} "
+            "--inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint "
+            f"--inner-T-by-gap feasible-min --turnoff-log2 {GLOBAL_TURNOFF_LOG2:.7f} "
+            f"--lambdas {self.lam:g} --rhos {self.rho:g}"
+        )
 
 
 HIGH_INTERVALS_RAW = [
     # Raw interval rows generated with the sharper finite-prefix p_term.  The
     # theorem-facing wrapper uses the global Bernstein p_term; the checked
     # adjustment above covers this wider atom.
-    ("2001--7858", 0.02, 0.01, -588.081877),
-    ("7859--20550", 0.05, 0.03, -2657.429602),
-    ("20551--75000", 0.2, 0.1, -6027.058821),
-    ("75001--250000", 0.5, 0.3, -12846.353611),
-    ("250001--350000", 1.2, 0.5, -28478.125315),
-    ("350001--400000", 1.2, 1.0, -81557.079312),
-    ("400001--450000", 1.2, 1.0, -91423.257760),
-    ("450001--550000", 1.2, 1.0, -82083.446102),
-    ("550001--650000", 1.2, 1.0, -1519.978235),
-    ("650001--725000", 1.2, 2.0, -116329.618720),
-    ("725001--750000", 1.2, 3.0, -169889.387695),
-    ("750001--850000", 1.2, 3.0, -134525.068420),
-    ("850001--950000", 1.2, 3.0, -117536.328304),
-    ("950001--1050000", 1.2, 3.0, -285054.035442),
-    ("1050001--1148736", 1.2, 3.0, -562862.201412),
+    HighInterval(2001, 7858, 0.02, 0.01, -588.081877),
+    HighInterval(7859, 20550, 0.05, 0.03, -2657.429602),
+    HighInterval(20551, 75000, 0.2, 0.1, -6027.058821),
+    HighInterval(75001, 250000, 0.5, 0.3, -12846.353611),
+    HighInterval(250001, 350000, 1.2, 0.5, -28478.125315),
+    HighInterval(350001, 400000, 1.2, 1.0, -81557.079312),
+    HighInterval(400001, 450000, 1.2, 1.0, -91423.257760),
+    HighInterval(450001, 550000, 1.2, 1.0, -82083.446102),
+    HighInterval(550001, 650000, 1.2, 1.0, -1519.978235),
+    HighInterval(650001, 725000, 1.2, 2.0, -116329.618720),
+    HighInterval(725001, 750000, 1.2, 3.0, -169889.387695),
+    HighInterval(750001, 850000, 1.2, 3.0, -134525.068420),
+    HighInterval(850001, 950000, 1.2, 3.0, -117536.328304),
+    HighInterval(950001, 1050000, 1.2, 3.0, -285054.035442),
+    HighInterval(1050001, 1148736, 1.2, 3.0, -562862.201412),
 ]
 
 
 HIGH_INTERVALS = [
-    (label, lam, rho, value + HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS)
-    for label, lam, rho, value in HIGH_INTERVALS_RAW
+    (interval.label, interval.lam, interval.rho, interval.adjusted_log2)
+    for interval in HIGH_INTERVALS_RAW
 ]
 
 
@@ -106,6 +155,38 @@ def print_peak(prefix: str, peak: dict[str, str] | None, column: str) -> None:
     print(f"{prefix}_peak," + ",".join(fields))
 
 
+def parse_piecewise_total(stdout: str) -> float:
+    for line in stdout.splitlines():
+        if line.startswith("total_log2,"):
+            return float(line.split(",", 1)[1])
+    raise ValueError("piecewise certificate output did not contain total_log2")
+
+
+def selected_high_intervals(selection: str) -> list[HighInterval]:
+    if selection.lower() == "all":
+        return list(HIGH_INTERVALS_RAW)
+    labels = {part.strip() for part in selection.split(",") if part.strip()}
+    by_label = {interval.label: interval for interval in HIGH_INTERVALS_RAW}
+    missing = sorted(labels - set(by_label))
+    if missing:
+        raise SystemExit(f"unknown high interval label(s): {', '.join(missing)}")
+    return [interval for interval in HIGH_INTERVALS_RAW if interval.label in labels]
+
+
+def check_high_interval(interval: HighInterval, tolerance: float) -> float:
+    result = subprocess.run(
+        interval.command(),
+        cwd=ROOT.parent,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    actual = parse_piecewise_total(result.stdout)
+    check_close(f"interval_{interval.label}_recompute", actual, interval.adjusted_log2, tolerance)
+    return actual
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -123,8 +204,27 @@ def main() -> int:
         type=Path,
         default=ROOT / "fullsplit_piecewise_h501_2000_eall_hsummary.csv",
     )
+    parser.add_argument(
+        "--print-high-interval-commands",
+        action="store_true",
+        help="Print the theorem-facing recomputation command for every high interval.",
+    )
+    parser.add_argument(
+        "--check-high-intervals",
+        help=(
+            "Comma-separated high-interval labels to recompute, or 'all'. "
+            "Example: 2001--7858,550001--650000. This is opt-in because it is slower."
+        ),
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
+
+    if args.print_high_interval_commands:
+        print("High-interval recomputation commands")
+        for interval in HIGH_INTERVALS_RAW:
+            print(f"interval_{interval.label}_command,{interval.display_command()}")
+        if not args.check_high_intervals:
+            return 0
 
     csv_ledgers = [
         CsvLedger(
@@ -168,6 +268,12 @@ def main() -> int:
         print(f"interval_{label}_log2,{value:.6f}")
     print(f"interval_2001_1148736_total_log2,{high_total:.6f}")
     print("feasible_far_bucket_cutoff_h,1148736")
+
+    if args.check_high_intervals:
+        for interval in selected_high_intervals(args.check_high_intervals):
+            actual = check_high_interval(interval, args.tolerance)
+            print(f"interval_{interval.label}_recomputed_log2,{actual:.6f}")
+            print(f"interval_{interval.label}_recompute_status,PASS")
 
     total = float("-inf")
     for value in [prefix_all, parts["postprefix_501_2000_eall"], high_total]:

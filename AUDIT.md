@@ -298,6 +298,27 @@ scripts/verify_fullsplit_finite_ledger.py
 scripts/check_fullsplit_T_monotonicity.py
 ```
 
+The ledger manifest can also print the exact theorem-facing recomputation command for every high interval:
+
+```powershell
+python scripts\verify_fullsplit_finite_ledger.py --print-high-interval-commands
+```
+
+Each printed row has the form
+
+```powershell
+python scripts\sum_fullsplit_piecewise_certificate.py --h-values A:B --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas L --rhos R
+```
+
+To spot-check selected rows, run for example:
+
+```powershell
+python scripts\verify_fullsplit_finite_ledger.py --check-high-intervals 2001--7858
+python scripts\verify_fullsplit_finite_ledger.py --check-high-intervals 550001--650000
+```
+
+The second command is intentionally slower because it recomputes the awkward high-transition interval.
+
 Current interval rows:
 
 ```text
@@ -334,7 +355,13 @@ python scripts\verify_fullsplit_high_interval_adjustment.py
 
 shows that the required adjustment is `1.484773404861` bits, leaving about
 `5.95e-7` bits of slack. A spot recomputation of the leading interval gives
-`-586.597103`, matching the adjusted row.
+`-586.597103`, matching the adjusted row. The current spot checks also verify
+the transition interval:
+
+```text
+interval_2001--7858_recomputed_log2,-586.597103
+interval_550001--650000_recomputed_log2,-1518.493462
+```
 
 The cutoff `h = 1148736` is the feasibility edge for the current far bucket:
 
@@ -389,7 +416,8 @@ Currently checkable:
 
 - the finite ledger arithmetic in `verify_fullsplit_finite_ledger.py`
 - the `501..2000` all-episode wrapper row
-- the high-`h` fixed-pole interval rows as numerical certificates
+- the high-`h` fixed-pole interval rows as numerical certificates, with printed regeneration commands and selected
+  opt-in recomputation checks
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the finite-prefix derivation of `log2 p_term <= -63.8926492`
@@ -398,7 +426,7 @@ Currently checkable:
 Still proof debt:
 
 - convert the `32..500`, `e <= 8` finite grid from "CSV artifact" to an audit-grade finite lemma
-- make the hard-coded high-interval rows reproducible from documented commands or regenerated interval artifacts
+- decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and
   what is handled elsewhere
