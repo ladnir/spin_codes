@@ -177,6 +177,10 @@ h_le,80,log2,-34.767370670,share,0.999863886476
 h_le,96,log2,-34.767184998,share,0.999992575315
 max_ratio_all,0.852699299925,from,32,to,33
 max_ratio_after_33,0.833794827634,from,33,to,34
+ridge_geometric_infinite_log2,-34.769785229
+ridge_total_ratio_bound_log2,-34.767141024
+ridge_total_ratio_bound_slack_bits,3.32625484987e-05
+ridge_inner_log2_span,3.14770431942e-12
 ```
 
 Interpretation: the narrow waist is a near-boundary geometric `h` ridge, not
@@ -184,7 +188,10 @@ just one bad `h=32` row and not a broad intermediate-weight ridge. The theorem
 target should upper-bound this ridge summably: peak row, first `32 -> 33`
 transition, then a uniform adjacent-ratio bound for the remaining `r=1`,
 first-gap `h`-sum, with the `r >= 2` and middle/far gap pieces treated as
-small remainders.
+small remainders. The main finite-ledger verifier now checks this ratio
+skeleton directly: the infinite geometric ridge bound plus the exact remainder
+gives log2 contribution `-34.767141`, only `3.4e-5` bits above the exact
+`e <= 8` prefix table.
 
 The per-`T` inner grids feeding this row are:
 
@@ -741,7 +748,8 @@ Currently checkable:
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
 - the finite `32..500` row-level sum from the existing CSV artifacts
-- the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`
+- the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
+  `verify_fullsplit_finite_ledger.py`
 - the tiny-prefix interior-`T` finite certificate now stated as Lemma `lem:fullsplit-tiny-prefix-interiorT`
 - the selected-gap product/conditioning bound now stated as Lemma `lem:fullsplit-selected-gap-product`
 - the finite-prefix and global termination atoms now stated as Lemma

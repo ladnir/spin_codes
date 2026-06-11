@@ -48,6 +48,10 @@ def parse_h_cutoffs(text: str) -> list[int]:
     return [int(part) for part in text.split(",") if part]
 
 
+def row_matches_ridge(row: dict[str, str | int | float], *, gap: str, r: int) -> bool:
+    return int(row["_r"]) == r and str(row["_gap"]) == gap
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -76,6 +80,8 @@ def main() -> None:
         default="64,80,96,128,160",
         help="Comma-separated cumulative h cutoffs to report.",
     )
+    parser.add_argument("--ridge-gap", default="1-4000")
+    parser.add_argument("--ridge-r", type=int, default=1)
     args = parser.parse_args()
 
     rows: list[dict[str, str | int | float]] = []
@@ -152,19 +158,22 @@ def main() -> None:
             print(f"h_le,{h},log2,{cumulative:.9f},share,{share(cumulative, total):.12g}")
 
     print("prefix_ridge_adjacent_ratios_r1")
+    ridge_rows = sorted(
+        [row for row in rows if row_matches_ridge(row, gap=args.ridge_gap, r=args.ridge_r)],
+        key=lambda row: int(row["_h"]),
+    )
     previous_h: int | None = None
     previous_value: float | None = None
     max_ratio_all = (-1.0, None, None)
     max_ratio_after_first = (-1.0, None, None)
-    for h in sorted(by_h):
-        value = by_hr.get((h, 1), float("-inf"))
-        if value == float("-inf"):
-            continue
+    for row in ridge_rows:
+        h = int(row["_h"])
+        value = float(row["_term"])
         if previous_h is not None and previous_value is not None:
             ratio = 2.0 ** (value - previous_value)
             if ratio > max_ratio_all[0]:
                 max_ratio_all = (ratio, previous_h, h)
-            if previous_h >= 33 and ratio > max_ratio_after_first[0]:
+            if previous_h >= int(ridge_rows[1]["_h"]) and ratio > max_ratio_after_first[0]:
                 max_ratio_after_first = (ratio, previous_h, h)
         previous_h = h
         previous_value = value
@@ -172,6 +181,42 @@ def main() -> None:
     print(f"max_ratio_all,{ratio:.12g},from,{h0},to,{h1}")
     ratio, h0, h1 = max_ratio_after_first
     print(f"max_ratio_after_33,{ratio:.12g},from,{h0},to,{h1}")
+
+    if len(ridge_rows) >= 2:
+        ridge_exact = log2sum([float(row["_term"]) for row in ridge_rows])
+        remainder_exact = log2sum(
+            [
+                float(row["_term"])
+                for row in rows
+                if not row_matches_ridge(row, gap=args.ridge_gap, r=args.ridge_r)
+            ]
+        )
+        ridge_peak = float(ridge_rows[0]["_term"])
+        first_ratio = 2.0 ** (float(ridge_rows[1]["_term"]) - ridge_peak)
+        tail_ratio = max_ratio_after_first[0]
+        finite_factor = 1.0 + first_ratio * (1.0 - tail_ratio ** (len(ridge_rows) - 1)) / (1.0 - tail_ratio)
+        infinite_factor = 1.0 + first_ratio / (1.0 - tail_ratio)
+        finite_geometric = ridge_peak + math.log2(finite_factor)
+        infinite_geometric = ridge_peak + math.log2(infinite_factor)
+        finite_total_bound = log2add(finite_geometric, remainder_exact)
+        infinite_total_bound = log2add(infinite_geometric, remainder_exact)
+        inner_values = [float(row["inner_log2"]) for row in ridge_rows]
+        print("prefix_ridge_ratio_certificate")
+        print(
+            f"ridge_subset,r,{args.ridge_r},gap,{args.ridge_gap},"
+            f"h_min,{ridge_rows[0]['_h']},h_max,{ridge_rows[-1]['_h']},rows,{len(ridge_rows)}"
+        )
+        print(f"ridge_exact_log2,{ridge_exact:.9f}")
+        print(f"ridge_remainder_exact_log2,{remainder_exact:.9f}")
+        print(f"ridge_first_ratio,{first_ratio:.12g}")
+        print(f"ridge_tail_ratio,{tail_ratio:.12g}")
+        print(f"ridge_geometric_finite_log2,{finite_geometric:.9f}")
+        print(f"ridge_geometric_infinite_log2,{infinite_geometric:.9f}")
+        print(f"ridge_geometric_slack_bits,{finite_geometric - ridge_exact:.12g}")
+        print(f"ridge_total_ratio_bound_log2,{finite_total_bound:.9f}")
+        print(f"ridge_total_ratio_bound_slack_bits,{finite_total_bound - total:.12g}")
+        print(f"ridge_total_infinite_bound_log2,{infinite_total_bound:.9f}")
+        print(f"ridge_inner_log2_span,{max(inner_values) - min(inner_values):.12g}")
 
     print("prefix_ridge_top_rows")
     for index, row in enumerate(sorted_rows[: args.top_rows], start=1):

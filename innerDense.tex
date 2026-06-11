@@ -3020,10 +3020,24 @@ h\le96 & .999992575
 The total prefix value is \(2.618593\) bits above the single peak row.  Along the dominant \(r=1\), first-gap ridge,
 the largest adjacent ratio is \(0.8526993\) from \(h=32\) to \(33\), and after that it is at most \(0.8337949\) in the
 audited range.  Thus the next theorem target is an analytic geometric-ridge bound for the \(h\)-sum, not a collection
-of isolated fixed-\(h\) estimates.  The decomposition helper is
+of isolated fixed-\(h\) estimates.  The finite version already has this form: replacing the exact ridge by the infinite
+geometric bound
+\[
+T_{32}\left(1+\frac{0.852700}{1-0.833795}\right)
+\]
+and adding the exact non-ridge remainder gives
+\[
+\log_2\mu_{\rm prefix}^{\rm ratio}\le -34.767141,
+\]
+only \(3.4\cdot10^{-5}\) bits above the exact finite prefix ledger.  The decomposition helper is
 \[
 \texttt{python scripts/analyze\_fullsplit\_prefix\_ridge.py}.
 \]
+The standard verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+also checks this ratio skeleton directly.
 This is not yet a theorem, because the interpolation envelope between sampled \(H\)-knots must be justified or replaced
 by a grid-plus-monotonicity certificate.  It does show that the prefix no longer has a broad hidden intermediate-\(h\)
 ridge once the episode-gap correction is included.  The envelope summation helper is
