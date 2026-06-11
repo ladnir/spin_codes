@@ -3177,6 +3177,45 @@ The peak row is \(h=32,r=1\) in the first early bucket, with inner exponent \(-1
 \log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\ge17}\le -305.738816.
 \]
 
+For the remaining early branch \(h>500\), high-density rows expose an important bookkeeping trap.  If one reuses the
+endpoint-placement interface above, the scan can look catastrophically positive: near \(h=1100001\) in the far early
+bucket, endpoint placement at \(T_{\max}\) paired with the inner survival bound at \(T_{\min}=27949\) gives a false
+high-density obstruction.  For \(H\) comparable with \(bT\), however, the placement mass in the bucket is concentrated
+near large \(T\), exactly where the survival exponent is stronger.
+
+The working replacement is therefore the \(T\)-paired sum
+\[
+\sum_{T=T_-}^{T_+}
+\binom{b}{r}\binom{bT}{H}\binom{N}{h}^{-1}
+\exp_2\{S(T)\},
+\]
+where \(S(T)\) is the fixed-\(\lambda\) survival exponent for \(T\) live blocks, with an episode multiplier attached
+afterwards.  The diagnostic
+\[
+\texttt{python scripts/probe\_fullsplit\_early\_paired\_survival.py}
+\]
+keeps this pairing.  On the representative formerly bad row \(h=1100001\), far early bucket, the paired no-turnoff
+sum is already
+\[
+\log_2 \mu_{\rm paired}^{e=0}\le -133084.867453,
+\]
+peaking at \(T=32767\).  Even after adding a deliberately pessimistic \(20000\)-bit episode allowance, the same row is
+\[
+\log_2 \mu_{\rm paired}^{\rm slack}\le -113084.867453.
+\]
+Sparse high-density probes with this \(20000\)-bit allowance give
+\[
+\begin{array}{c|c|c}
+h\text{ range sampled} & \text{sample step} & \log_2\text{ paired contribution}\\
+\hline
+300001\text{--}1200000 & 100000 & -112940.527337\\
+1200001\text{--}2097152 & 100000 & -111645.563005 .
+\end{array}
+\]
+These are probes, not yet a certificate over every \(h\).  They show that the apparent high-density early obstruction
+comes from separating endpoint placement from endpoint survival; the next theorem target is a paired
+placement-survival interval lemma, with a fixed-pole episode multiplier attached to the same \(T\)-sum.
+
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
 \[

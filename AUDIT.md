@@ -356,7 +356,60 @@ python scripts\sum_fullsplit_turnoff_tail.py --outer-prefix-csv scripts\block_ou
 Audit priority: medium. The crude tail is safe only after pushing the explicit uniform-survival grid to `e <= 16`;
 starting the crude tail at `e >= 9` fails badly in the far early bucket.
 
-### 5. Post-Prefix, All-Episode Wrapper
+### 5. Early High-Density Probe, Paired T
+
+Range under investigation:
+
+```text
+h > 500
+T > 17948
+```
+
+Important finding: the ordinary endpoint-placement interface is too pessimistic for high-density early rows because it
+pairs placement at `T_max` with survival at `T_min`. For large `H`, placement inside the bucket is dominated by large
+`T`, where the survival exponent is also stronger.
+
+New probe:
+
+```text
+scripts/probe_fullsplit_early_paired_survival.py
+```
+
+Representative formerly bad row:
+
+```powershell
+python scripts\probe_fullsplit_early_paired_survival.py --h-values 1100001 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --episode-slack-bits 20000 --lambdas 0.05:20:0.05
+```
+
+Current output:
+
+```text
+total_log2 = -113084.867453
+peak_h = 1100001
+peak_first_r = 34
+peak_T = 32767
+peak_lambda = 2.3
+```
+
+Sparse high-density probes with the same deliberately large `20000`-bit episode allowance:
+
+```powershell
+python scripts\probe_fullsplit_early_paired_survival.py --h-values 300001:1200000:100000,1200000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --episode-slack-bits 20000 --lambdas 0.05:20:0.05
+python scripts\probe_fullsplit_early_paired_survival.py --h-values 1200001:2097152:100000,2097152 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --episode-slack-bits 20000 --lambdas 0.05:20:0.05
+```
+
+Current outputs:
+
+```text
+300001..1200000 step 100000: log2 <= -112940.527337
+1200001..2097152 step 100000: log2 <= -111645.563005
+```
+
+Audit priority: high but theorem-facing, not finite-artifact yet. The next proof step is a paired placement-survival
+interval lemma plus a same-`T` episode multiplier. Do not use the separable endpoint-placement bound for this
+high-density early branch.
+
+### 6. Post-Prefix, All-Episode Wrapper
 
 Range:
 
@@ -394,7 +447,7 @@ python scripts\sum_fullsplit_piecewise_certificate.py --h-values 501:2000 --inne
 
 Audit priority: medium. This is now theorem-facing and no longer relies on an `e <= 1` caveat.
 
-### 6. Interval Certificate
+### 7. Interval Certificate
 
 Range:
 

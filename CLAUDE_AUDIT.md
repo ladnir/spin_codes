@@ -60,6 +60,12 @@ The `-34.767174` claim is for the audited window `5949 <= T <= 17948`. The verif
 
 Remaining coverage debt: the early region for `h > 500` and the post-prefix ultra-late cap beyond `h > 500`.
 
+Update: the early high-density branch has a clear bookkeeping hazard. A separable endpoint-placement scan can look
+positive because it pairs placement at `T_max` with survival at `T_min`. The new probe
+`scripts/probe_fullsplit_early_paired_survival.py` keeps `T` paired; with a deliberately pessimistic `20000`-bit
+episode allowance, sparse probes through `h=N` are still below `-111645` bits. This is evidence for the next theorem
+target, not yet a full interval certificate.
+
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
 Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.
