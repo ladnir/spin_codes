@@ -71,6 +71,35 @@ class HighInterval:
         )
 
 
+@dataclass(frozen=True)
+class ComplementHighInterval:
+    start: int
+    stop: int
+    rho: float
+    log2_value: float
+
+    @property
+    def label(self) -> str:
+        return f"{self.start}--{self.stop}"
+
+    def command(self) -> list[str]:
+        return [
+            sys.executable,
+            str(ROOT / "certify_fullsplit_high_density_interval.py"),
+            "--intervals",
+            f"{self.start}:{self.stop}:{self.rho:g}",
+            "--lambda-value",
+            "2.3",
+        ]
+
+    def display_command(self) -> str:
+        script = r"scripts\certify_fullsplit_high_density_interval.py"
+        return (
+            f"python {script} --intervals {self.start}:{self.stop}:{self.rho:g} "
+            "--lambda-value 2.3"
+        )
+
+
 HIGH_INTERVALS_RAW = [
     # Raw interval rows generated with the sharper finite-prefix p_term.  The
     # theorem-facing wrapper uses the global Bernstein p_term; the checked
@@ -96,6 +125,17 @@ HIGH_INTERVALS_RAW = [
 HIGH_INTERVALS = [
     (interval.label, interval.lam, interval.rho, interval.adjusted_log2)
     for interval in HIGH_INTERVALS_RAW
+]
+
+
+COMPLEMENT_HIGH_INTERVALS = [
+    ComplementHighInterval(1048577, 1148736, 1.0, -128915.315746),
+    ComplementHighInterval(1148737, 1300000, 1.0, -124889.651755),
+    ComplementHighInterval(1300001, 1500000, 1.0, -113710.357653),
+    ComplementHighInterval(1500001, 1700000, 1.0, -35150.097366),
+    ComplementHighInterval(1700001, 1900000, 10.0, -524628.366199),
+    ComplementHighInterval(1900001, 2097089, 10.0, -894140.350713),
+    ComplementHighInterval(2097090, 2097152, 10.0, -893792.285010),
 ]
 
 
@@ -258,6 +298,17 @@ def selected_high_intervals(selection: str) -> list[HighInterval]:
     return [interval for interval in HIGH_INTERVALS_RAW if interval.label in labels]
 
 
+def selected_complement_high_intervals(selection: str) -> list[ComplementHighInterval]:
+    if selection.lower() == "all":
+        return list(COMPLEMENT_HIGH_INTERVALS)
+    labels = {part.strip() for part in selection.split(",") if part.strip()}
+    by_label = {interval.label: interval for interval in COMPLEMENT_HIGH_INTERVALS}
+    missing = sorted(labels - set(by_label))
+    if missing:
+        raise SystemExit(f"unknown complement high interval label(s): {', '.join(missing)}")
+    return [interval for interval in COMPLEMENT_HIGH_INTERVALS if interval.label in labels]
+
+
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     result = subprocess.run(
         interval.command(),
@@ -269,6 +320,20 @@ def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     )
     actual = parse_piecewise_total(result.stdout)
     check_close(f"interval_{interval.label}_recompute", actual, interval.adjusted_log2, tolerance)
+    return actual
+
+
+def check_complement_high_interval(interval: ComplementHighInterval, tolerance: float) -> float:
+    result = subprocess.run(
+        interval.command(),
+        cwd=ROOT.parent,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    actual = parse_piecewise_total(result.stdout)
+    check_close(f"complement_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -329,6 +394,13 @@ def main() -> int:
             "Example: 2001--7858,550001--650000. This is opt-in because it is slower."
         ),
     )
+    parser.add_argument(
+        "--check-complement-high-intervals",
+        help=(
+            "Comma-separated complement-high interval labels to recompute, or 'all'. "
+            "Example: 1048577--1148736,1500001--1700000."
+        ),
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
 
@@ -336,7 +408,10 @@ def main() -> int:
         print("High-interval recomputation commands")
         for interval in HIGH_INTERVALS_RAW:
             print(f"interval_{interval.label}_command,{interval.display_command()}")
-        if not args.check_high_intervals:
+        print("Complement-high interval recomputation commands")
+        for interval in COMPLEMENT_HIGH_INTERVALS:
+            print(f"complement_interval_{interval.label}_command,{interval.display_command()}")
+        if not args.check_high_intervals and not args.check_complement_high_intervals:
             return 0
 
     csv_ledgers = [
@@ -440,14 +515,27 @@ def main() -> int:
     print(f"interval_2001_1148736_total_log2,{high_total:.6f}")
     print("feasible_far_bucket_cutoff_h,1148736")
 
+    complement_high_total = float("-inf")
+    for interval in COMPLEMENT_HIGH_INTERVALS:
+        complement_high_total = log2add(complement_high_total, interval.log2_value)
+        print(f"complement_interval_{interval.label}_rho,{interval.rho:g}")
+        print(f"complement_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+    print(f"complement_interval_1048577_2097152_total_log2,{complement_high_total:.6f}")
+
     if args.check_high_intervals:
         for interval in selected_high_intervals(args.check_high_intervals):
             actual = check_high_interval(interval, args.tolerance)
             print(f"interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"interval_{interval.label}_recompute_status,PASS")
 
+    if args.check_complement_high_intervals:
+        for interval in selected_complement_high_intervals(args.check_complement_high_intervals):
+            actual = check_complement_high_interval(interval, args.tolerance)
+            print(f"complement_interval_{interval.label}_recomputed_log2,{actual:.6f}")
+            print(f"complement_interval_{interval.label}_recompute_status,PASS")
+
     total = float("-inf")
-    for value in [prefix_all, early_all, parts["postprefix_501_2000_eall"], high_total]:
+    for value in [prefix_all, early_all, parts["postprefix_501_2000_eall"], high_total, complement_high_total]:
         total = log2add(total, value)
     print(f"finite_ledger_total_log2,{total:.6f}")
     print(f"finite_ledger_margin_bits,{-total:.6f}")

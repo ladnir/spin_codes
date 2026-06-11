@@ -78,8 +78,8 @@ wrapper, the latter differing by the expected bucket-size overcount.
 
 Paired all-episode update: `probe_fullsplit_early_paired_survival.py --inner-mode eallratio` now attaches the fixed
 all-episode wrapper to each exact `T` placement term. Sparse high-density checks with complement symmetry have the
-current sampled worst near `h=1200501`, local `r=32..43`, at `total_log2=-132647.058774`. This is not an interval
-certificate yet, but it strongly suggests the remaining high-density task is packaging, not a new obstruction.
+then-current sampled worst near `h=1200501`, local `r=32..43`, at `total_log2=-132647.058774`; this was later
+superseded by the interval checks below.
 Follow-up endpoint check: at `h=1200501`, freezing the dominant endpoint `T=32767` and summing all `r=1..64` gives
 `-132646.193762`, only `3.331383` bits above the peak `r=32` term. The single `r=32` all-`T` sum is only `0.003191`
 bits above its endpoint term. The intended proof split is therefore endpoint dominance in `T` plus a first-block
@@ -92,13 +92,18 @@ branch `ege1`. On the full far bucket `22001 <= gap <= 26819`, all `r=1..64`, an
 `h=1000501,1150501,1200501,1250501`, it gives total `-132646.190570`, dominated by
 `h=1200501`. The manuscript now includes Lemma `lem:fullsplit-paired-endpoint-dominance`, which proves the `T`
 endpoint reduction for the paired `e>=1` branch when `G>2`; in the dominant row `lambda=2.3,rho=1` gives
-`log2_g=8.821856` and a `0.003199`-bit geometric overhead bound. Thus the remaining high-density work is the
-first-block `r`-sum/tail and the `h` interval/complement-spectrum envelope, not a slow per-`T` enumeration problem.
+`log2_g=8.821856` and a `0.003199`-bit geometric overhead bound.
 Correction: a broader endpoint scan shows the sampled high-density peak is not at `h=1200501`. A step-one zoom over
 `1115101 <= h <= 1115201` finds the sampled endpoint peak at `h=1115146`, with endpoint total
 `-132529.972886`, peak `r=32`, and endpoint peak term `-132533.304269`; the full far bucket at this row is
-`-132529.969694`. This is still enormously safe, but the final certificate must close an `h` interval around this
-ridge rather than cite only the older four sampled rows.
+`-132529.969694`.
+
+Further update: `scripts/certify_fullsplit_high_density_interval.py` now closes the complement-side high branch by
+fixed-`z` interval endpoint bounds, the paired `T` endpoint lemma, and the crude full first-block sum
+`sum_r binom(64,r)rho^r`. The manifest covers `1048577 <= h <= 2097152` using `rho=1` through `1700000` and
+`rho=10` afterward; its total is `-35150.097366`, dominated by `1500001--1700000`. `verify_fullsplit_finite_ledger.py`
+records these as `complement_interval_*`, and `--check-complement-high-intervals all` recomputes all rows. Remaining
+audit focus: prose polish and overlap/overcount cleanup with the older `2001--1148736` table.
 
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 

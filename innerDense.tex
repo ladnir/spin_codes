@@ -3311,6 +3311,37 @@ with endpoint value \(-132529.972886\), \(T\)-overhead \(0.003192\) bits, and pe
 four-point table suggested, but still has the same structural explanation: endpoint dominance in \(T\), a small
 constant first-block \(r\)-sum, and a large remaining first-moment margin.
 
+The interval version of this argument is implemented in
+\[
+\texttt{scripts/certify\_fullsplit\_high\_density\_interval.py}.
+\]
+For a fixed outer Chernoff pole \(z\), the complement-side term
+\[
+\log A_{N-h}^{\rm out}(z)-\log\binom Nh-h\log_2\rho
+\]
+is linear in \(N-h\) plus \(-\log\binom{N}{N-h}\), hence convex on any \(h\)-interval.  The interval helper therefore
+checks only the endpoints for the outer/placement part, uses Lemma~\ref{lem:fullsplit-paired-endpoint-dominance} for
+the \(T\)-sum, and charges the whole first-block sum by
+\[
+\log_2\sum_{r=1}^{64}\binom{64}{r}\rho^r .
+\]
+With the RM512 complement-symmetric outer, this gives the following pessimistic complement-side certificate:
+\[
+\begin{array}{c|c|c}
+h\text{ range} & \rho & \log_2\mu\\
+\hline
+1048577\text{--}1148736 & 1 & -128915.315746\\
+1148737\text{--}1300000 & 1 & -124889.651755\\
+1300001\text{--}1500000 & 1 & -113710.357653\\
+1500001\text{--}1700000 & 1 & -35150.097366\\
+1700001\text{--}1900000 & 10 & -524628.366199\\
+1900001\text{--}2097089 & 10 & -894140.350713\\
+2097090\text{--}2097152 & 10 & -893792.285010 .
+\end{array}
+\]
+The combined complement-side total is \(-35150.097366\) bits.  This is much weaker than the sampled local peak, but it
+is summable and closes the high-density complement branch with only two coefficient poles, \(\rho=1\) and \(\rho=10\).
+
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
 \[
@@ -3898,6 +3929,13 @@ near \(h=862232\), and all are far below the target first-moment level.
 The cutoff is the feasibility edge of the current late-window split: the far bucket has
 \(T_{\max}=5949+12000-1=17948\), so \(H\le 64T_{\max}=1148672\), and hence no row with \(r\le64\) exists once
 \(h>1148736\).
+The complement-side interval table above is the replacement for this old feasible-cutoff limitation on the high-density
+early branch.  It uses the paired \(T\)-sum directly at the true far endpoint \(T=32767\), the complement symmetry
+\(A_h^{\rm out}=A_{N-h}^{\rm out}\), and fixed-\(z\) endpoint bounds over \(h\)-intervals.  The finite ledger records
+this as
+\[
+\log_2\mu_{1048577\le h\le N}^{\rm complement\ high}\le -35150.097366.
+\]
 
 The finite ledger is now checked by
 \[
@@ -3906,7 +3944,8 @@ The finite ledger is now checked by
 It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
 that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
 \(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, and the fixed-pole
-interval table above.  The reported combined finite late-window contribution is unchanged:
+interval tables above, including the complement-side high-density manifest.  The reported combined finite late-window
+contribution is unchanged:
 \[
 \log_2\mu_{\rm finite}^{\rm fullsplit}\le -34.767174,
 \]

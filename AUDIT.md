@@ -509,12 +509,33 @@ endpoint_total_log2 = -132529.972886
 full_minus_endpoint_bits = 0.003192
 ```
 
-This changes the honest bookkeeping but not the qualitative conclusion: the next missing proof is the `h` interval
-closure around the high-density peaks. The `T` and first-block `r` costs look small and stable.
+This changes the honest bookkeeping but not the qualitative conclusion: the `T` and first-block `r` costs look small
+and stable.
 
-Current interpretation: early high-density has ample numerical margin once `T` pairing and outer complement symmetry
-are both used. Remaining proof work is interval packaging: a paired placement-survival lemma over `h`, plus a local
-first-block `r`-sum/tail reduction so we do not have to enumerate all `r` in the theorem statement.
+The complement-side interval closure is now handled by:
+
+```text
+python scripts\certify_fullsplit_high_density_interval.py --intervals "1048577:1148736:1;1148737:1300000:1;1300001:1500000:1;1500001:1700000:1;1700001:1900000:10;1900001:2097089:10;2097090:2097152:10" --lambda-value 2.3
+```
+
+It gives:
+
+```text
+1048577--1148736, rho=1:  -128915.315746
+1148737--1300000, rho=1:  -124889.651755
+1300001--1500000, rho=1:  -113710.357653
+1500001--1700000, rho=1:   -35150.097366
+1700001--1900000, rho=10: -524628.366199
+1900001--2097089, rho=10: -894140.350713
+2097090--2097152, rho=10: -893792.285010
+total_log2 = -35150.097366
+```
+
+`verify_fullsplit_finite_ledger.py` now records these rows as `complement_interval_*`; the optional
+`--check-complement-high-intervals all` recomputes all seven rows and passes. Current interpretation: early
+high-density has ample numerical margin once `T` pairing, outer complement symmetry, and the fixed-`z` interval
+endpoint bound are used. The remaining work is to polish the proof prose and remove avoidable overcount/overlap with
+the older `2001--1148736` interval table.
 
 ### 6. Post-Prefix, All-Episode Wrapper
 
