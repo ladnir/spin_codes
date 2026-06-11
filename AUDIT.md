@@ -453,9 +453,39 @@ At the sampled worst `h=1200501`, the `r`-sum costs only `3.331383` bits over th
 `r=32` all-`T` sum is `-132649.521954`, only `0.003191` bits over the endpoint peak. This points to the final proof
 shape: endpoint dominance in `T`, plus an exact first-block hypergeometric `r`-tail bound.
 
+The theorem-facing fast helper is now `scripts/sum_fullsplit_paired_early_eall.py`. It splits the paired inner bound
+into an `e=0` branch and an `e>=1` fixed-pole Cauchy branch, then sums the same-`T` placement terms directly. This
+matches the endpoint/full-`r` probe exactly at displayed precision:
+
+```text
+python scripts\sum_fullsplit_paired_early_eall.py --h-values 1200501 --first-r-values 1:64 --gap-start 26819 --gap-stop 26819 --gap-step 5000 --outer-complement-symmetry --lambdas 2.3 --rhos 1
+total_log2 = -132646.193762
+peak_h = 1200501
+peak_first_r = 32
+peak_T = 32767
+peak_branch = ege1
+```
+
+It also makes the full far bucket cheap:
+
+```text
+python scripts\sum_fullsplit_paired_early_eall.py --h-values 1000501,1150501,1200501,1250501 --first-r-values 1:64 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --outer-complement-symmetry --lambdas 2.3 --rhos 1
+total_log2 = -132646.190570
+h=1000501: -133179.352477
+h=1150501: -132946.385366
+h=1200501: -132646.190570
+h=1250501: -132834.783733
+branch_e0_log2 = -136323.731114
+branch_ege1_log2 = -132646.190570
+```
+
+For `h=1200501`, the full far bucket is only `0.003192` bits above the endpoint/full-`r` value. The high-density
+proof target is therefore sharper than before: prove endpoint dominance in `T`, then handle the first-block
+hypergeometric `r`-sum or tails without a heuristic local-`r` window.
+
 Current interpretation: early high-density has ample numerical margin once `T` pairing and outer complement symmetry
 are both used. Remaining proof work is interval packaging: a paired placement-survival lemma over `h`, plus a local
-`r`-window/placement-ratio reduction so we do not have to enumerate all `r` in the theorem statement.
+first-block `r`-sum/tail reduction so we do not have to enumerate all `r` in the theorem statement.
 
 ### 6. Post-Prefix, All-Episode Wrapper
 

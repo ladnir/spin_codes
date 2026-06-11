@@ -85,6 +85,14 @@ Follow-up endpoint check: at `h=1200501`, freezing the dominant endpoint `T=3276
 bits above its endpoint term. The intended proof split is therefore endpoint dominance in `T` plus a first-block
 hypergeometric `r`-tail bound.
 
+Further update: `scripts/sum_fullsplit_paired_early_eall.py` now performs this split directly. It separates the
+paired all-episode wrapper into `e=0` and `e>=1` Cauchy branches and sums the exact same-`T` placement terms. It
+reproduces the endpoint/full-`r` check at `h=1200501` with `total_log2=-132646.193762`, peak `r=32`, `T=32767`,
+branch `ege1`. On the full far bucket `22001 <= gap <= 26819`, all `r=1..64`, and sampled high-density rows
+`h=1000501,1150501,1200501,1250501`, it gives total `-132646.190570`, dominated by
+`h=1200501`. Thus the remaining high-density work is an endpoint-dominance and first-block `r`-sum/tail lemma,
+not a slow per-`T` enumeration problem.
+
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
 Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.

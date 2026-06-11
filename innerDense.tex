@@ -3265,9 +3265,25 @@ h & \log_2\mu_{\rm paired}^{\rm eall}(T=32767,\;1\le r\le64)\\
 \]
 For the worst of these rows, \(h=1200501\), the single peak term is \(-132649.525145\) at \(r=32\), so the entire
 \(r\)-sum costs only \(3.331383\) bits.  Meanwhile the single-\(r=32\), all-\(T\) sum is
-\(-132649.521954\), only \(0.003191\) bits above the endpoint peak.  This strongly suggests that the final early
-high-density proof should be organized as an endpoint-dominance lemma in \(T\) plus an exact hypergeometric
-first-block \(r\)-tail bound.
+\(-132649.521954\), only \(0.003191\) bits above the endpoint peak.  The helper
+\texttt{sum\_fullsplit\_paired\_early\_eall.py} now packages this in the theorem-facing form: it splits the
+all-episode wrapper into the \(e=0\) branch and the \(e\ge1\) fixed-pole Cauchy branch, pairs each branch with the
+same \(T\)-placement term, and then sums \(T\) directly.  On the full far bucket \(22001\le g\le26819\), with all
+\(1\le r\le64\), it gives
+\[
+\begin{array}{c|c}
+h & \log_2\mu_{\rm paired}^{\rm eall}(22001\le g\le26819,\;1\le r\le64)\\
+\hline
+1000501 & -133179.352477\\
+1150501 & -132946.385366\\
+1200501 & -132646.190570\\
+1250501 & -132834.783733 .
+\end{array}
+\]
+At \(h=1200501\) this is only \(0.003192\) bits above the endpoint/full-\(r\) value, and the displayed total is
+entirely dominated by the \(e\ge1\) branch; the \(e=0\) branch contributes \(-136323.731114\).  This strongly suggests
+that the final early high-density proof should be organized as an endpoint-dominance lemma in \(T\) plus an exact
+hypergeometric first-block \(r\)-sum or \(r\)-tail bound.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
