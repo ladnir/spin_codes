@@ -3222,6 +3222,12 @@ extra heuristic slack term but a large-\(\rho\) (equivalently, deficit-side) pol
 \(T=32767,H=bT=2097088,\lambda=2.3\), the same eall-ratio wrapper changes from about
 \(-893425.892127\) with \(\rho=10\) to \(-1181735.473865\) with \(\rho=10^6\), matching the no-turnoff survival
 exponent.  Thus the near-full edge is also a coefficient-envelope issue, not a new episode obstruction.
+On the outer side, the concrete RM512 local spectrum is complement-symmetric, and hence the direct-sum outer satisfies
+\(A_h^{\rm out}=A_{N-h}^{\rm out}\).  The high-\(h\) early branch should therefore be certified by the same
+low/complement-weight outer table used below \(N/2\), together with the paired-\(T\) inner sum.  The current scripts
+expose this as the \texttt{--outer-complement-symmetry} option; at \(h=N,r=64,T=32767\) the paired survival smoke gives
+\(-1181735.473865\), while the endpoint piecewise form gives \(-1181723.239347\), differing only by the
+\(\log_2(4819)\) bucket-size overcount.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives

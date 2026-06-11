@@ -415,6 +415,18 @@ polynomial. For `T=32767`, `H=bT=2097088`, `lambda=2.3`, the eall-ratio inner bo
 full-density edge is a coefficient-envelope artifact, not a new episode obstruction. The wrapper default `rho` grid
 now includes large poles through `1e4`; a later theorem version may state this as a deficit-side occupancy bound.
 
+Outer high-weight hook: the RM512 local spectrum is complement-symmetric, so the direct-sum outer has
+`A_h = A_{N-h}`. The paired probe and piecewise certificate now have `--outer-complement-symmetry` to use this fact
+instead of building outer tables up to `h=N`. Smoke checks at `h=N`, `r=64`, far early bucket:
+
+```powershell
+python scripts\probe_fullsplit_early_paired_survival.py --h-values 2097152 --first-r-values 64 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --outer-complement-symmetry --episode-slack-bits 0 --lambdas 2.3
+python scripts\sum_fullsplit_piecewise_certificate.py --h-values 2097152 --first-r-values 64 --gap-start 22001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --outer-complement-symmetry --turnoff-log2 -62.4078758 --lambdas 2.3 --rhos 1000000
+```
+
+The paired smoke gives `total_log2 = -1181735.473865`; the endpoint piecewise smoke gives `-1181723.239347`, exactly
+adding the `log2(4819)` bucket overcount.
+
 ### 6. Post-Prefix, All-Episode Wrapper
 
 Range:

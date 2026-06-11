@@ -27,7 +27,12 @@ from analyze_fullsplit_all_episode_gf import (
     all_episode_cauchy_occupancy_log2,
     parse_float_list,
 )
-from block_outer_upgrade_probe import load_local_spectrum, outer_block_gf_bounds, z_grid
+from block_outer_upgrade_probe import (
+    load_local_spectrum,
+    local_spectrum_is_complement_symmetric,
+    outer_block_gf_bounds,
+    z_grid,
+)
 from bound_fullsplit_episode_gaps import load_spectrum, split_entries
 from dense_largek_eval import log2_binom, log2add
 from probe_block_recursive_inner import parse_int_list
@@ -331,13 +336,28 @@ def main() -> int:
     parser.add_argument("--z-min", type=float, default=1e-8)
     parser.add_argument("--z-max", type=float, default=0.999)
     parser.add_argument("--z-count", type=int, default=220)
+    parser.add_argument(
+        "--outer-complement-symmetry",
+        action="store_true",
+        help="Use A_h=A_{N-h} for complement-symmetric local spectra, avoiding high-weight outer tables.",
+    )
     parser.add_argument("--output-csv", type=Path)
     parser.add_argument("--output-h-summary-csv", type=Path)
     args = parser.parse_args()
 
     h_values = parse_int_list(args.h_values)
     r_values = parse_int_list(args.first_r_values)
-    h_max = max(h_values)
+    if args.outer_complement_symmetry:
+        if args.local_length * args.outer_blocks != args.N:
+            raise ValueError("--outer-complement-symmetry requires outer_blocks*local_length == N")
+        if not local_spectrum_is_complement_symmetric(
+            load_local_spectrum(str(args.local_spectrum_csv)),
+            args.local_length,
+        ):
+            raise ValueError("--outer-complement-symmetry requested, but local spectrum is not symmetric")
+        h_max = max(min(h, args.N - h) for h in h_values)
+    else:
+        h_max = max(h_values)
     d = math.floor(args.distance_delta * args.N)
 
     spectrum = load_local_spectrum(str(args.local_spectrum_csv))
@@ -486,7 +506,8 @@ def main() -> int:
     peak = None
 
     for h in h_values:
-        outer = outer_logs[h] if h < len(outer_logs) else float("-inf")
+        outer_h = min(h, args.N - h) if args.outer_complement_symmetry else h
+        outer = outer_logs[outer_h] if 0 <= outer_h < len(outer_logs) else float("-inf")
         if outer == float("-inf"):
             continue
         for r in r_values:
@@ -533,7 +554,7 @@ def main() -> int:
                     ),
                     "inner_mode": modes[idx],
                     "outer_log2_bound": outer,
-                    "outer_z": outer_z[h],
+                    "outer_z": outer_z[outer_h],
                     "placement_log2": placement,
                     "inner_log2": inner,
                     "best_lambda": best_lam,
@@ -620,6 +641,7 @@ def main() -> int:
     print(f"h_values,{args.h_values}")
     print(f"r_values,{args.first_r_values}")
     print(f"inner_modes,{','.join(modes)}")
+    print(f"outer_complement_symmetry,{int(args.outer_complement_symmetry)}")
     print(f"lambda_count,{len(lambdas)}")
     print(f"alpha_count,{len(alphas)}")
     print(f"rho_count,{len(rhos)}")

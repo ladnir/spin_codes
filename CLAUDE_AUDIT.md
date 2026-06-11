@@ -71,6 +71,11 @@ Further update: the forced near-full-density endpoint also exposed an occupancy-
 `-1181735.473865` with `rho=1e6`, equal to the no-turnoff survival value. This supports treating the endpoint by a
 large-`rho`/deficit-side coefficient envelope rather than by adding heuristic episode slack.
 
+Outer-side update: the RM512 local spectrum is complement-symmetric, so the direct-sum outer can use
+`A_h=A_{N-h}`. The paired probe and piecewise certificate now expose this via `--outer-complement-symmetry`; an
+`h=N`, `r=64` smoke gives `-1181735.473865` in the paired probe and `-1181723.239347` in the endpoint piecewise
+wrapper, the latter differing by the expected bucket-size overcount.
+
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
 Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.

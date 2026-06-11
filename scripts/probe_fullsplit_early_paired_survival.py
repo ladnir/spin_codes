@@ -22,7 +22,12 @@ import argparse
 import math
 from pathlib import Path
 
-from block_outer_upgrade_probe import load_local_spectrum, outer_block_gf_bounds, z_grid
+from block_outer_upgrade_probe import (
+    load_local_spectrum,
+    local_spectrum_is_complement_symmetric,
+    outer_block_gf_bounds,
+    z_grid,
+)
 from bound_fullsplit_episode_gaps import load_spectrum, split_entries
 from dense_largek_eval import log2_binom, log2add
 from probe_block_recursive_inner import parse_int_list
@@ -55,6 +60,11 @@ def main() -> int:
     parser.add_argument("--gap-step", type=int, default=5000)
     parser.add_argument("--lambdas", default="0.05:20:0.05")
     parser.add_argument("--episode-slack-bits", type=float, default=0.0)
+    parser.add_argument(
+        "--outer-complement-symmetry",
+        action="store_true",
+        help="Use A_h=A_{N-h} for complement-symmetric local spectra, avoiding high-weight outer tables.",
+    )
     parser.add_argument("--z-min", type=float, default=1e-8)
     parser.add_argument("--z-max", type=float, default=0.999)
     parser.add_argument("--z-count", type=int, default=220)
@@ -62,10 +72,18 @@ def main() -> int:
 
     h_values = parse_int_list(args.h_values)
     r_values = parse_int_list(args.first_r_values)
-    h_max = max(h_values)
+    if args.outer_complement_symmetry:
+        if args.outer_blocks * args.local_length != args.N:
+            raise ValueError("--outer-complement-symmetry requires outer_blocks*local_length == N")
+        local_spectrum = load_local_spectrum(str(args.local_spectrum_csv))
+        if not local_spectrum_is_complement_symmetric(local_spectrum, args.local_length):
+            raise ValueError("--outer-complement-symmetry requested, but local spectrum is not symmetric")
+        h_max = max(min(h, args.N - h) for h in h_values)
+    else:
+        local_spectrum = load_local_spectrum(str(args.local_spectrum_csv))
+        h_max = max(h_values)
     d = math.floor(args.distance_delta * args.N)
 
-    local_spectrum = load_local_spectrum(str(args.local_spectrum_csv))
     outer_logs, _outer_z = outer_block_gf_bounds(
         blocks=args.outer_blocks,
         block_bits=args.outer_block_bits,
@@ -109,7 +127,8 @@ def main() -> int:
     peak = None
     rows_by_h: dict[int, float] = {}
     for h in h_values:
-        outer = outer_logs[h] if h < len(outer_logs) else float("-inf")
+        outer_h = min(h, args.N - h) if args.outer_complement_symmetry else h
+        outer = outer_logs[outer_h] if 0 <= outer_h < len(outer_logs) else float("-inf")
         if outer == float("-inf"):
             continue
         denom = log2_binom(args.N, h)
@@ -148,6 +167,7 @@ def main() -> int:
     print(f"delta,{args.distance_delta}")
     print(f"d,{d}")
     print(f"h_values,{args.h_values}")
+    print(f"outer_complement_symmetry,{int(args.outer_complement_symmetry)}")
     print(f"episode_slack_bits,{args.episode_slack_bits:.6f}")
     print(f"total_log2,{total:.6f}")
     print(f"margin_bits,{-total:.6f}")

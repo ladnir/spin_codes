@@ -115,6 +115,16 @@ def load_local_spectrum(path: str | None) -> list[tuple[int, int]]:
     return rows
 
 
+def local_spectrum_is_complement_symmetric(
+    spectrum: list[tuple[int, int]],
+    local_length: int,
+) -> bool:
+    counts = {weight: count for weight, count in spectrum}
+    weights = set(counts)
+    weights.update(local_length - weight for weight in counts)
+    return all(counts.get(weight, 0) == counts.get(local_length - weight, 0) for weight in weights)
+
+
 def local_spectrum_log2(spectrum: list[tuple[int, int]], z: float) -> float:
     zero_count = 0
     nonzero = float("-inf")
@@ -146,6 +156,7 @@ def outer_block_gf_bounds(
 ) -> tuple[list[float], list[float]]:
     vals = [float("-inf")] * (h_max + 1)
     best_z = [float("nan")] * (h_max + 1)
+    vals[0] = 0.0
     local_logs: list[tuple[float, float]] = []
     for z in zs:
         if model == "floor-total":
