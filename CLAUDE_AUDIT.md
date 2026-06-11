@@ -60,9 +60,9 @@ The `-34.767174` claim is for the audited late-window split, not the entire dens
 
 The paper and audit packet should keep this qualifier visible.
 
-### F6 Medium: Product form for per-gap terminations needs a lemma
+### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
-The exact grids and crude tail use products like `p_term^e`. This needs a stated independence/conditioning lemma for per-block dense scramblers and gap terminations.
+Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. Remaining polish: the finite-prefix and global `p_term` verifiers should be cited as the numeric certificates for the local conditional atom used by that lemma.
 
 ### F7 Medium: Floating-point rigor
 
@@ -85,12 +85,12 @@ These are probably numerically tiny, but should be bounded explicitly or moved i
 1. Should the high-interval manifest remain command-reproducible, or should every interval be regenerated into checked artifacts?
 2. Should the opt-in high-interval recomputation be expanded into a scheduled/full certificate run?
 3. Should Lemma `lem:fullsplit-tiny-prefix-interiorT` remain as a finite certificate, or should it be replaced by analytic monotonicity?
-4. Where is the product/conditioning bound for multiple terminations proved?
+4. Should the finite-prefix and global `p_term` verifiers be packaged as one standalone termination-atom lemma?
 5. Which section covers first-active placements outside the audited late-window split?
 
 ## Suggested Next Fixes
 
-1. State the product/conditioning bound for multiple terminations.
-2. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
-3. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
-4. Add interval/rational arithmetic for the final ledger.
+1. Decide whether to keep the interval rows as a manifest with spot recomputation or regenerate all rows as explicit artifacts.
+2. Make `sum_fullsplit_piecewise_certificate.py` assert or use `feasible-min` when endpoint placement is paired with high `H`.
+3. Add interval/rational arithmetic for the final ledger.
+4. Package the local `p_term` verifiers as one theorem-facing termination-atom certificate.

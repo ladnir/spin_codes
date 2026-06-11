@@ -425,6 +425,7 @@ Currently checkable:
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the tiny-prefix interior-`T` finite certificate now stated as Lemma `lem:fullsplit-tiny-prefix-interiorT`
+- the selected-gap product/conditioning bound now stated as Lemma `lem:fullsplit-selected-gap-product`
 - the finite-prefix derivation of `log2 p_term <= -63.8926492`
 - the global wrapper derivation of `log2 p_term <= -62.4078758`
 
@@ -432,7 +433,8 @@ Still proof debt:
 
 - decide whether to keep Lemma `lem:fullsplit-tiny-prefix-interiorT` as a finite certificate or eventually replace it by
   analytic monotonicity
-- state the product/conditioning justification for multiplying per-gap termination atoms
+- connect the local `p_term` verifiers to Lemma `lem:fullsplit-selected-gap-product` as a single theorem-facing
+  termination-atom certificate
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - state the coverage of first-active placement regimes cleanly, including what is covered by the late-window split and

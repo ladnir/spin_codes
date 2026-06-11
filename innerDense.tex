@@ -3055,6 +3055,42 @@ The fast episode diagnostic, interpolation checker, and crude tail summation hel
 \end{gathered}
 \]
 
+\begin{lemma}[Product bound for selected full-split terminations]
+\label{lem:fullsplit-selected-gap-product}
+Fix the full-codeword random-split inner.  Suppose \(p_{\rm term}\) is a uniform conditional upper bound on the
+one-live-branch termination atom in the following sense: after exposing any earlier blocks, earlier scramblers and
+splits, the current state weight, and the remaining input-placement counts, the probability of the charged termination
+event at the next selected opportunity is at most \(p_{\rm term}\).  The charged event may be the split atom \(q'=0\), or
+an exact input/state cancellation atom bundled into the same opportunity.
+
+Then, for any fixed placement of the later input blocks and any fixed set \({\cal S}\) of \(e\) selected gaps in the
+episode decomposition,
+\[
+\Pr[\text{all selected opportunities in }{\cal S}\text{ terminate}\mid\text{placement}]
+\le
+p_{\rm term}^{e}.
+\]
+\end{lemma}
+
+\begin{proof}
+Order the selected opportunities from left to right and expose the process sequentially.  Let \({\cal F}_{j-1}\) be the
+history before the \(j\)-th selected opportunity, including the outcomes of all earlier selected and unselected blocks.
+On the event that the \(j\)-th opportunity is actually reached with a live state, the definition of \(p_{\rm term}\)
+gives
+\[
+\Pr[E_j\mid {\cal F}_{j-1}]\le p_{\rm term}.
+\]
+If the opportunity is not reached, the joint event that all selected opportunities terminate has conditional probability
+zero from that history.  Multiplying these conditional bounds by the chain rule gives the claimed \(p_{\rm term}^e\)
+bound.
+
+For the full-split construction the hypothesis is exactly the local exposure principle used above.  Conditional on a
+nonzero incoming state, the fresh scrambler makes the BCH codeword uniform over nonzero codewords, and the fresh split
+controls the \(q'=0\) atom independently of the past.  Conditional on a state support of size \(q\), the next input block
+support is uniform among supports with the exposed occupancy, giving the exact-cancellation atom.  The numerical
+finite-prefix and global values of \(p_{\rm term}\) are the corresponding union bounds for these two local atoms.
+\end{proof}
+
 \begin{lemma}[All-episode generating bound for the full-split inner]
 \label{lem:fullsplit-all-episode-gf-bound}
 Fix the full-codeword random-split inner with block size \(b\).  Let
@@ -3118,8 +3154,10 @@ with the endpoint conventions \(e=0\) and \(e=x+1\).  The factor
 \(\binom{T}{x}\) in the occupancy probability cancels the denominator
 \(\binom{G+x}{x}=\binom{T}{x}\) from the uniform gap-composition law.
 
-If the selected gaps have total length \(s\), then \(T-s\) live BCH split branches remain to be charged.  For fixed
-\(\lambda\),
+By Lemma~\ref{lem:fullsplit-selected-gap-product}, any fixed selected set contributes at most \(p_{\rm term}^e\).  If
+the selected gaps have total length \(s\), then \(T-s\) live BCH split branches remain to be charged.  For an exact
+cancellation charged to a preceding gap, deleting the intervening live branches is only pessimistic in the following
+Chernoff bound because \(M_+(\lambda)\le1\).  For fixed \(\lambda\),
 \[
 \Pr[\text{live output weight}\le d]
 \le e^{\lambda d}M_+(\lambda)^{T-s}
