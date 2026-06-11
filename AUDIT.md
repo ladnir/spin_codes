@@ -409,6 +409,12 @@ Audit priority: high but theorem-facing, not finite-artifact yet. The next proof
 interval lemma plus a same-`T` episode multiplier. Do not use the separable endpoint-placement bound for this
 high-density early branch.
 
+Follow-up diagnostic: the near-full-density endpoint also needs the occupancy Cauchy pole on the correct side of the
+polynomial. For `T=32767`, `H=bT=2097088`, `lambda=2.3`, the eall-ratio inner bound is `-893425.892127` at
+`rho=10`, but improves to `-1181735.473865` at `rho=1e6`, matching the no-turnoff survival exponent. So the
+full-density edge is a coefficient-envelope artifact, not a new episode obstruction. The wrapper default `rho` grid
+now includes large poles through `1e4`; a later theorem version may state this as a deficit-side occupancy bound.
+
 ### 6. Post-Prefix, All-Episode Wrapper
 
 Range:

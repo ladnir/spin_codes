@@ -73,6 +73,12 @@ def wrapper_default_rhos() -> list[float]:
         1.0,
         3.0,
         10.0,
+        30.0,
+        100.0,
+        300.0,
+        1000.0,
+        3000.0,
+        10000.0,
     ]
 
 
@@ -98,6 +104,8 @@ def log2_arith_geom_sum(log2_r: float, lo: int, hi: int) -> float:
 
     def finite_sums(q: float) -> tuple[float, float]:
         # A=sum q^i, B=sum i q^i, i=0..n, for 0<q<1.
+        if q == 0.0:
+            return 1.0, 0.0
         qn1 = 0.0 if (n + 1) * math.log(q) < -745.0 else q ** (n + 1)
         qn2 = qn1 * q
         one_minus = 1.0 - q

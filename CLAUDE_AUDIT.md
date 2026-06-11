@@ -66,6 +66,11 @@ positive because it pairs placement at `T_max` with survival at `T_min`. The new
 episode allowance, sparse probes through `h=N` are still below `-111645` bits. This is evidence for the next theorem
 target, not yet a full interval certificate.
 
+Further update: the forced near-full-density endpoint also exposed an occupancy-coefficient pole issue. At
+`T=32767`, `H=bT=2097088`, `lambda=2.3`, the eall-ratio inner bound improves from `-893425.892127` with `rho=10` to
+`-1181735.473865` with `rho=1e6`, equal to the no-turnoff survival value. This supports treating the endpoint by a
+large-`rho`/deficit-side coefficient envelope rather than by adding heuristic episode slack.
+
 ### F6 Medium: Product form for per-gap terminations now has a manuscript lemma
 
 Resolved in the current manuscript draft by Lemma `lem:fullsplit-selected-gap-product`, which uses sequential exposure and the chain rule rather than unconditional independence. The numeric local atoms are now packaged in Lemma `lem:fullsplit-certified-termination-atoms`.

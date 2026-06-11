@@ -3215,6 +3215,13 @@ h\text{ range sampled} & \text{sample step} & \log_2\text{ paired contribution}\
 These are probes, not yet a certificate over every \(h\).  They show that the apparent high-density early obstruction
 comes from separating endpoint placement from endpoint survival; the next theorem target is a paired
 placement-survival interval lemma, with a fixed-pole episode multiplier attached to the same \(T\)-sum.
+There is a second, separate bookkeeping lesson at the near-full-density edge.  If \(H\) nearly equals \(bT\), the
+moderate-\(\rho\) Cauchy coefficient bound in \eqref{eq:fullsplit-e1-cauchy-envelope} can also look much too large:
+it upper-bounds the exact coefficient of \(((1+z)^b-1)^x\) from the wrong side of the polynomial.  The fix is not an
+extra heuristic slack term but a large-\(\rho\) (equivalently, deficit-side) pole.  At the forced endpoint
+\(T=32767,H=bT=2097088,\lambda=2.3\), the same eall-ratio wrapper changes from about
+\(-893425.892127\) with \(\rho=10\) to \(-1181735.473865\) with \(\rho=10^6\), matching the no-turnoff survival
+exponent.  Thus the near-full edge is also a coefficient-envelope issue, not a new episode obstruction.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
@@ -3614,6 +3621,9 @@ where the near bucket is still charged only by placement, while the middle and f
 \eqref{eq:fullsplit-e1-cauchy-envelope} together with the same-\(\lambda\) multiplier
 \eqref{eq:fullsplit-e-tail-ht-multiplier}.  Thus this mode is an all-episode upper bound, not merely an \(e\le1\)
 diagnostic.
+The finite wrapper grid now also includes large \(\rho\)-poles up to \(10^4\).  These poles are mostly irrelevant in
+the ordinary sparse/intermediate occupancy range, but are essential near \(H=bT\), where they implement the same
+deficit-side control one would get by rewriting the occupancy coefficient in terms of missing coordinates.
 
 For fast high-weight exploration we also use the rigorous endpoint placement bound
 \[
