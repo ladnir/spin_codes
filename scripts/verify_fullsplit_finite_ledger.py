@@ -17,6 +17,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from certify_prefix_placement_ratio import compute_sums, decimal_fraction, ratio_float
+
 
 ROOT = Path(__file__).resolve().parent
 
@@ -152,6 +154,14 @@ class InteriorAuditSummary:
     rows: int
     worst: dict[str, str]
     worst_repro: dict[str, str]
+
+
+@dataclass(frozen=True)
+class PlacementRatioSummary:
+    peak_h: int
+    peak_ratio: float
+    endpoint_ratio_at_h_min: float
+    endpoint_slack_factor: float
 
 
 def log2_binom(n: int, k: int) -> float:
@@ -314,6 +324,49 @@ def prefix_ridge_ratio_summary(
         tail_outer_ratio=tail_outer_ratio,
         tail_placement_ratio=tail_placement_ratio,
         tail_inner_ratio=tail_inner_ratio,
+    )
+
+
+def exact_placement_ratio_summary(
+    *,
+    n: int,
+    b: int,
+    late_blocks: int,
+    gap_min: int,
+    gap_max: int,
+    h_min: int,
+    h_max: int,
+    threshold_text: str,
+) -> PlacementRatioSummary:
+    threshold = decimal_fraction(threshold_text)
+    sums = compute_sums(
+        b=b,
+        late_blocks=late_blocks,
+        gap_min=gap_min,
+        gap_max=gap_max,
+        h_max=h_max,
+    )
+    max_num = 0
+    max_den = 1
+    max_h = -1
+    for h in range(h_min, h_max):
+        numerator = sums[h] * (h + 1)
+        denominator = sums[h - 1] * (n - h)
+        if numerator * threshold.denominator > denominator * threshold.numerator:
+            raise SystemExit(f"prefix placement ratio: h={h}->{h + 1} exceeds {threshold_text}")
+        if numerator * max_den > max_num * denominator:
+            max_num = numerator
+            max_den = denominator
+            max_h = h
+
+    n_max = b * (late_blocks + gap_max - 1)
+    endpoint_num = (n_max - h_min + 1) * (h_min + 1)
+    endpoint_den = h_min * (n - h_min)
+    return PlacementRatioSummary(
+        peak_h=max_h,
+        peak_ratio=ratio_float(max_num, max_den),
+        endpoint_ratio_at_h_min=ratio_float(endpoint_num, endpoint_den),
+        endpoint_slack_factor=ratio_float(endpoint_num * max_den, endpoint_den * max_num),
     )
 
 
@@ -487,6 +540,12 @@ def main() -> int:
     parser.add_argument("--prefix-ridge-tail-outer-ratio-max", type=float, default=2.747)
     parser.add_argument("--prefix-ridge-placement-ratio-max", type=float, default=0.303594)
     parser.add_argument("--prefix-ridge-inner-ratio-max", type=float, default=1.000000001)
+    parser.add_argument("--skip-prefix-placement-ratio-cert", action="store_true")
+    parser.add_argument("--prefix-placement-ratio-threshold", default="0.303594")
+    parser.add_argument("--prefix-placement-gap-min", type=int, default=1)
+    parser.add_argument("--prefix-placement-gap-max", type=int, default=4000)
+    parser.add_argument("--prefix-placement-h-min", type=int, default=32)
+    parser.add_argument("--prefix-placement-h-max", type=int, default=500)
     parser.add_argument(
         "--print-high-interval-commands",
         action="store_true",
@@ -659,6 +718,23 @@ def main() -> int:
     print(f"prefix_ridge_total_ratio_bound_log2,{ridge_ratio.total_bound_log2:.6f}")
     print(f"prefix_ridge_total_ratio_bound_slack_bits,{ridge_ratio.total_bound_log2 - ridge_ratio.total_exact_log2:.12g}")
     print(f"prefix_ridge_inner_span_bits,{ridge_ratio.inner_span_bits:.12g}")
+
+    if not args.skip_prefix_placement_ratio_cert:
+        placement = exact_placement_ratio_summary(
+            n=args.N,
+            b=args.block_bits,
+            late_blocks=args.late_blocks,
+            gap_min=args.prefix_placement_gap_min,
+            gap_max=args.prefix_placement_gap_max,
+            h_min=args.prefix_placement_h_min,
+            h_max=args.prefix_placement_h_max,
+            threshold_text=args.prefix_placement_ratio_threshold,
+        )
+        print(f"prefix_placement_ratio_threshold,{args.prefix_placement_ratio_threshold}")
+        print(f"prefix_placement_ratio_peak_h,{placement.peak_h}")
+        print(f"prefix_placement_ratio_peak,{placement.peak_ratio:.12g}")
+        print(f"prefix_placement_endpoint_bound_at_h_min,{placement.endpoint_ratio_at_h_min:.12g}")
+        print(f"prefix_placement_endpoint_slack_factor,{placement.endpoint_slack_factor:.12g}")
 
     prefix_all = log2add(parts["prefix_32_500_e_le8"], parts["prefix_32_500_e_ge9_tail"])
     print(f"prefix_32_500_all_e_log2,{prefix_all:.6f}")

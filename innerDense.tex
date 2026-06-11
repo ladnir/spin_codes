@@ -3053,13 +3053,26 @@ The current finite component certificate checks
 h\ge33 & 2.746420 & .303594 & \le 1.000000001.
 \end{array}
 \]
-Thus the analytic replacement should prove these two component slope bounds, or a direct product bound, rather than
-re-summing all \(469\) ridge rows.
+The placement entry is now checked independently of the ledger CSV by an exact-integer cross-multiplication certificate:
+\[
+\max_{32\le h<500}\frac{S_h}{S_{h-1}}\frac{h+1}{N-h}
+\le .303594,
+\]
+with the maximum at \(h=32\).  The exact peak is \(0.303593738594\).  The naive endpoint bound
+\[
+\frac{\binom{64(5949+4000-1)}{h}}{\binom{64(5949+4000-1)}{h-1}}\frac{h+1}{N-h}
+\]
+is \(0.3130655524\) at \(h=32\), about \(1.0312\) times too large, so the proof must use the averaged-binomial sum
+\(S_H\) rather than endpoint domination.  Thus the analytic replacement should prove the outer slope bound and this
+averaged placement slope bound, or a direct product bound, rather than re-summing all \(469\) ridge rows.
 The standard verifier
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
 \]
-also checks this ratio skeleton directly.
+also checks this ratio skeleton directly, and the placement subcheck can be run alone as
+\[
+\texttt{python scripts/certify\_prefix\_placement\_ratio.py}.
+\]
 This is not yet a theorem, because the interpolation envelope between sampled \(H\)-knots must be justified or replaced
 by a grid-plus-monotonicity certificate.  It does show that the prefix no longer has a broad hidden intermediate-\(h\)
 ridge once the episode-gap correction is included.  The envelope summation helper is

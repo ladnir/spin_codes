@@ -211,6 +211,38 @@ The next analytic target is therefore small and explicit: prove either the
 direct product ratio, or the separate outer bounds `2.809`, `2.747` and
 placement bound `0.303594`, then attach the already-checked remainder.
 
+The placement slope is now checked independently of the row CSV by exact
+integer arithmetic:
+
+```powershell
+python scripts\certify_prefix_placement_ratio.py
+```
+
+Output:
+
+```text
+placement_ratio_threshold,0.303594
+placement_ratio_peak_h,32
+placement_ratio_peak_to_h,33
+placement_ratio_peak,0.303593738594
+endpoint_bound_at_h_min,0.3130655524
+endpoint_bound_slack_factor,1.03119897614
+```
+
+The verifier runs the same cross-multiplication check by default and prints:
+
+```text
+prefix_placement_ratio_threshold,0.303594
+prefix_placement_ratio_peak_h,32
+prefix_placement_ratio_peak,0.303593738594
+prefix_placement_endpoint_bound_at_h_min,0.3130655524
+prefix_placement_endpoint_slack_factor,1.03119897614
+```
+
+Interpretation: endpoint domination is too loose by about `3.12%`, so the
+eventual analytic proof must exploit the averaged binomial sum `S_H`; however,
+the finite placement component no longer depends on floating log-binomial rows.
+
 The per-`T` inner grids feeding this row are:
 
 ```text
@@ -768,6 +800,7 @@ Currently checkable:
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
+- the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
 - the tiny-prefix interior-`T` finite certificate now stated as Lemma `lem:fullsplit-tiny-prefix-interiorT`
 - the selected-gap product/conditioning bound now stated as Lemma `lem:fullsplit-selected-gap-product`
 - the finite-prefix and global termination atoms now stated as Lemma
@@ -778,8 +811,8 @@ Still proof debt:
 
 - decide whether to keep Lemma `lem:fullsplit-tiny-prefix-interiorT` as a finite certificate or eventually replace it by
   analytic monotonicity
-- replace the finite tiny-prefix ridge decomposition by an analytic summable bound: peak row, first adjacent step, and a
-  uniform ratio for the remaining `r=1`, first-gap `h`-sum
+- replace the finite tiny-prefix ridge decomposition by an analytic summable bound: peak row, first adjacent step,
+  averaged-binomial placement slope, and a uniform outer/inner product ratio for the remaining `r=1`, first-gap `h`-sum
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - cover the remaining first-active regimes: the early region `T > 17948, h > 500` and the post-prefix ultra-late cap
