@@ -4333,6 +4333,43 @@ The verifier prints and checks the same log-sum under the
 \(\texttt{current\_checked\_ledger}\) row, with value \(-37.278528\).
 \end{proof}
 
+\begin{theorem}[Checked finite RM/full-split first-moment certificate]
+\label{thm:fullsplit-rm-finite-certificate-009}
+Consider the finite checkpoint \(N=2^{21}\), \(b=64\), and \(\delta=.09\), so that
+\[
+d=\lfloor .09N\rfloor=188743 .
+\]
+Use the RM direct-sum outer from Lemma~\ref{lem:rm-prefix-support-split} and the full-split dense inner certified
+above.  Let \(Z_d\) be the number of nonzero concatenated codewords whose final weight is at most \(d\), with the
+expectation taken over the random choices of the inner construction.  The checked finite ledger gives
+\[
+\mathbb E Z_d\le 2^{-37.278528}.
+\]
+Consequently
+\[
+\Pr[d_{\min}\le d]\le 2^{-37.278528}.
+\]
+In particular, with positive probability a sampled code has \(d_{\min}\ge188744\), and hence relative distance
+\[
+\frac{d_{\min}}{N}\ge \frac{188744}{2^{21}}>.09 .
+\]
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:rm-prefix-support-split} verifies that the RM direct-sum outer has no positive weights below \(32\).
+Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} covers all supported weights \(32\le h\le500\) and all
+first-active positions by splitting them into the ultra-late, window, and early regimes.  Corollary~
+\ref{cor:fullsplit-postprefix-checked-ledger} covers the remaining outer weights \(h\ge501\): the ultra-late rows cover
+all feasible \(T<5949\) cases, the all-episode and fixed-pole interval rows cover the late window, the early endpoint
+and paired rows cover \(T>17948\) through \(N/2\), and the complement-high rows cover \(h>N/2\).  The overlap between
+the fixed-pole and complement-high rows is retained only as union-bound overcount.
+
+Thus every nonzero outer word is included in the row families defining \(\mu_{\rm checked}(.09)\).  Corollary~
+\ref{cor:fullsplit-current-finite-checkpoint} gives \(\log_2\mu_{\rm checked}(.09)\le -37.278528\), which is exactly
+the displayed bound on \(\mathbb E Z_d\).  The probability statement is Markov's inequality applied to the nonnegative
+integer random variable \(Z_d\).
+\end{proof}
+
 The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.

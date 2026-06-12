@@ -1154,11 +1154,40 @@ t_monotonicity_sufficient_min_slack_bits,0.154987
 t_monotonicity_sufficient_worst,h=7859--20550,bucket=gap_4001_8000,T=9949--13948,lambda=0.05,rho=0.03,slack=0.154987
 ```
 
-Audit priority: medium. The endpoint gap-sum dominance, the `T_eff=max(T_min,ceil(H/b))` cutoff, the safe
+Audit priority: medium-low. The endpoint gap-sum dominance, the `T_eff=max(T_min,ceil(H/b))` cutoff, the safe
 `eallratio` multiplier-tail truncation, independent finite samples of the fixed-pole branch formula, and the sufficient
-monotonicity reduction for the fixed-pole all-episode wrapper are now checked in the main ledger. The remaining audit
-target here is the symbolic/global packaging around Lemma `fullsplit-fixed-pole-eallratio`, especially turning the
-finite branch and monotonicity checks into a compact theorem statement for the whole interval ledger.
+monotonicity reduction for the fixed-pole all-episode wrapper are now checked in the main ledger. The manuscript now
+states the finite first-moment conclusion as Theorem `thm:fullsplit-rm-finite-certificate-009`; remaining work here is
+mainly independent review, interval-arithmetic hardening, and deciding which finite row helpers should be promoted into
+smaller reproducible artifacts.
+
+### `eallratio` Formula Map
+
+The production implementation is `eall_ratio_log2` in `scripts/sum_fullsplit_piecewise_certificate.py`. For `H > 0`,
+it matches Lemma `lem:fullsplit-fixed-pole-eallratio` term-by-term:
+
+- `denom = log2_binom(b * T, H)` is the placement denominator `log2 binom(bT,H)`.
+- `M = sum(p * exp(-lam*j) for j,q,p in entries if q > 0)` is `M_+(lambda)`.
+- `pref = lam * distance / log(2)` is the base-2 form of `exp(lambda d)`.
+- `e0 = pref + T * log2(M)` is `log2 E_0(lambda)`.
+- `log_block = log2_expm1_pos(b * log1p(rho))` is `log2(((1+rho)^b)-1)`.
+- `log_g = log_block + log2(M/(1-M))` is `log2 G_{lambda,rho}` for the Cauchy/suffix factor.
+- `log2_arith_geom_sum(log_g, ceil(H/b), min(H,T))` is
+  `log2 sum_x (x+1) G_{lambda,rho}^x`.
+- `e1 = term_log2 + pref - denom - H*log2(rho) + ...` is `log2 B_1(lambda,rho)`.
+- `tail_log2 = log2_ht_tail_envelope(H,T,term_log2 + log2(1-M))` is
+  `log2 R_{H,T}(lambda)`.
+- `tail_factor_log2 = log2_one_plus_pow2(tail_log2)` is `log2(1+R_{H,T}(lambda))`.
+- `e_ge1 = e1 + tail_factor_log2` is `log2(B_1(lambda,rho)(1+R_{H,T}(lambda)))`.
+- The loop computes `tail_log2` inside the fixed-`lambda` loop, so the `e=1` Cauchy envelope and the `e>=2`
+  multiplier use the same lambda. The `e=0` branch is optimized separately, which is safe because the branches are
+  summed after each has been independently upper-bounded.
+- `return min(0, log2add(best_e0, best_tail))` is the final probability cap by `1`.
+
+The verifier audits two implementation-sensitive pieces: `eallratio_tail_semantics` checks the positive multiplier
+series and its geometric omitted-tail bound against exact finite samples, while `eallratio_branch_semantics` recomputes
+the fixed-pole branch from exact nonempty-block coefficients and exact skipped-gap suffix sums on six samples, then
+compares the production singleton-lambda/rho output against an independent formula evaluator.
 
 ## Proof Objects To Inspect
 
@@ -1232,6 +1261,9 @@ Currently checkable:
   `501..2000`, ultra-late `501..380736`, early `501..N/2`, fixed-pole interval, and complement-high ledger rows
 - the paper-facing current finite checkpoint `cor:fullsplit-current-finite-checkpoint`, which combines the checked
   small-prefix and post-prefix row families
+- the paper-facing finite first-moment theorem `thm:fullsplit-rm-finite-certificate-009`, which states
+  `E[Z_d] <= 2^-37.278528` for `N=2^21`, `delta=.09`, and `d=floor(.09 N)=188743`, hence
+  `Pr[d_min <= d] <= 2^-37.278528`
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
