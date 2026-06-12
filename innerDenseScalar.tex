@@ -357,16 +357,6 @@ For $u\in\{0,1\}^N$, let $R(u)$ denote the number of runs of ones in $u$,
 i.e., the number of maximal contiguous substrings of $1$'s.
 \end{definition}
 
-\begin{definition}[Post-start OFF time]
-\label{def:post-start-off-time}
-For an input-output trajectory, let \(T=\min\{t:U_t=1\}\), and define
-\[
-\mathrm{OffAfter}(T)
-\;:=\;
-\bigl|\{\,t\in\{T+1,\dots,N\}: s_t=0\,\}\bigr|.
-\]
-\end{definition}
-
 \begin{lemma}[Exact run-count distribution under the uniform weight-$w$ model]
 \label{lem:run-count-distribution}
 Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$.

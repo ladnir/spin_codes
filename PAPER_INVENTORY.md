@@ -47,6 +47,9 @@ same scalar dense-inner refinement note.
 First-start-aware no-OFF tails, zero-gap survival, and the single-run base
 factor were also demoted to that note; they remain available for finite
 diagnostics but no longer interrupt the compiled dense theorem spine.
+The unused `OffAfter(T)` declaration has been removed from the compiled scalar
+dense section, and the original `innerDense.tex` and `integration.tex` files
+now have visible archival/provenance headers.
 
 ## Status Labels
 

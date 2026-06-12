@@ -51,6 +51,9 @@ First-start-aware no-OFF tails, zero-gap survival, and the single-run base
 factor have also been demoted to the scalar dense-inner refinement note because
 they are finite-diagnostic/calibration tools rather than dependencies of the
 current dense+dense theorem.
+The final unused scalar dense declaration in the compiled path,
+`OffAfter(T)`, has been removed, and the original monolithic `innerDense.tex`
+and `integration.tex` files now carry explicit archival/provenance headers.
 
 ## Summary
 
@@ -409,6 +412,9 @@ The first physical split is complete:
 13. First-start-aware and single-run scalar dense diagnostics were also moved
     out of the compiled theorem spine; `innerDenseScalar.tex` now proceeds from
     the three-term tail directly to forced-termination contraction.
+14. The stale `OffAfter(T)` declaration was removed from the compiled scalar
+    dense spine, and the original monolithic `innerDense.tex` and
+    `integration.tex` sources were marked archival.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
