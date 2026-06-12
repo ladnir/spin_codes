@@ -1205,6 +1205,17 @@ def main() -> int:
         "early_32_500_e_le16_uniformsurv": (-86.910458, -106.352289),
         "early_32_500_e_ge17_tail": (-1019.441595, -319.977808),
     }
+    dominant_prefix_expected = {
+        "prefix_32_500_e_le8": {
+            "selector": (32, 1, 31, 1, 4000, 5949),
+            "term_log2": -37.3857668415005,
+            "total_minus_peak_bits": 0.002422317512923655,
+            "total_remainder_log2": -46.602718187648264,
+            "split_minus_peak_bits": 0.0022846069119495382,
+            "split_remainder_log2": -46.68722908748783,
+            "above_split_gap_bits": 13.352485666805116,
+        },
+    }
     exact_outer_parts: dict[str, float] = {}
     for item in csv_ledgers:
         if item.name not in exact_outer_expected:
@@ -1232,6 +1243,63 @@ def main() -> int:
             f"outer_log2={summary.peak_outer_exact_log2:.6f},"
             f"term_log2={summary.peak_term_log2:.6f}"
         )
+        dom = summary.dominant
+        dominant_payload: dict[str, object] | None = None
+        if item.name in dominant_prefix_expected:
+            expected = dominant_prefix_expected[item.name]
+            selector = (dom.h, dom.first_r, dom.remaining_ones, dom.gap_min, dom.gap_max, dom.bucket_T)
+            if selector != expected["selector"]:
+                raise SystemExit(
+                    f"{item.name}_dominant: expected selector {expected['selector']}, got {selector}"
+                )
+            for field in [
+                "term_log2",
+                "total_minus_peak_bits",
+                "total_remainder_log2",
+                "split_minus_peak_bits",
+                "split_remainder_log2",
+                "above_split_gap_bits",
+            ]:
+                check_close(f"{item.name}_dominant_{field}", getattr(dom, field), expected[field], args.tolerance)
+            print(
+                f"{item.name}_dominant_row,"
+                f"outer_weight={dom.h},first_r={dom.first_r},"
+                f"remaining_ones={dom.remaining_ones},"
+                f"gap_min={dom.gap_min},gap_max={dom.gap_max},"
+                f"bucket_T={dom.bucket_T},inner_mode={dom.inner_mode}"
+            )
+            print(f"{item.name}_dominant_old_outer_log2,{dom.old_outer_log2:.6f}")
+            print(f"{item.name}_dominant_exact_outer_log2,{dom.exact_outer_log2:.6f}")
+            print(f"{item.name}_dominant_placement_log2,{dom.placement_log2:.6f}")
+            print(f"{item.name}_dominant_inner_log2,{dom.inner_log2:.6f}")
+            print(f"{item.name}_dominant_term_log2,{dom.term_log2:.6f}")
+            print(f"{item.name}_dominant_total_minus_peak_bits,{dom.total_minus_peak_bits:.6f}")
+            print(f"{item.name}_dominant_total_remainder_log2,{dom.total_remainder_log2:.6f}")
+            print(f"{item.name}_dominant_split_minus_peak_bits,{dom.split_minus_peak_bits:.6f}")
+            print(f"{item.name}_dominant_split_remainder_log2,{dom.split_remainder_log2:.6f}")
+            print(f"{item.name}_dominant_above_split_gap_bits,{dom.above_split_gap_bits:.6f}")
+            dominant_payload = {
+                "outer_weight": dom.h,
+                "first_r": dom.first_r,
+                "remaining_ones": dom.remaining_ones,
+                "gap_min": dom.gap_min,
+                "gap_max": dom.gap_max,
+                "bucket_T": dom.bucket_T,
+                "inner_mode": dom.inner_mode,
+                "old_outer_log2": dom.old_outer_log2,
+                "exact_outer_log2": dom.exact_outer_log2,
+                "placement_log2": dom.placement_log2,
+                "inner_log2": dom.inner_log2,
+                "term_log2": dom.term_log2,
+                "total_minus_peak_bits": dom.total_minus_peak_bits,
+                "total_remainder_log2": dom.total_remainder_log2,
+                "split_minus_peak_bits": dom.split_minus_peak_bits,
+                "split_remainder_log2": dom.split_remainder_log2,
+                "above_split_gap_bits": dom.above_split_gap_bits,
+            }
+        add_row_extra = {}
+        if dominant_payload is not None:
+            add_row_extra["dominant"] = dominant_payload
         add_row(
             manifest,
             name=f"{item.name}_exact_outer",
@@ -1250,6 +1318,7 @@ def main() -> int:
                 "outer_log2": summary.peak_outer_exact_log2,
                 "term_log2": summary.peak_term_log2,
             },
+            **add_row_extra,
         )
 
     ridge_ratio = prefix_ridge_ratio_summary(args.prefix_e_le8_csv)

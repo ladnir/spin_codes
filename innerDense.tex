@@ -3138,6 +3138,13 @@ inner/placement rows by exact RM direct-sum coefficients gives
 with the \(h=32\) slice alone contributing \(-37.383482\) and all supported \(h>32\) rows together contributing only
 \(-50.738253\).  The certificate also checks that there are \(114\) positive supported weights in this prefix and that
 the next supported weight after \(32\) is \(48\).
+Within the \(h=32\) slice, the dominant row is exactly
+\[
+h=32,\qquad r=1,\qquad 1\le g\le4000,\qquad T=5949,
+\]
+with exact-outer term \(-37.385767\).  The full exact-outer window prefix is only \(0.002422\) bits above this
+single row.  Removing this row leaves total log contribution \(-46.602718\); the remaining \(h=32\) part is
+\(-46.687229\), while all supported \(h>32\) rows are \(-50.738253\), i.e. \(13.352486\) bits below the dominant row.
 The exact ultra-late prefix is
 \[
 \log_2\mu_{32\le h\le500,\ T<5949}^{\rm exact\ outer}\le -41.113442,

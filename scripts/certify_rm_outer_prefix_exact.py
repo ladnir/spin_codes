@@ -32,6 +32,17 @@ def log2add(a: float, b: float) -> float:
     return a + math.log2(1.0 + 2.0 ** (b - a))
 
 
+def log2sub(a: float, b: float) -> float:
+    """Return log2(2**a - 2**b), requiring a >= b."""
+    if b == float("-inf"):
+        return a
+    if a == b:
+        return float("-inf")
+    if a < b:
+        raise ValueError(f"log2sub requires a >= b, got {a} < {b}")
+    return a + math.log2(1.0 - 2.0 ** (b - a))
+
+
 def log2_binom(n: int, k: int) -> float:
     if k < 0 or k > n:
         return float("-inf")
@@ -163,6 +174,31 @@ def prefix_coefficient_certificate(
 
 
 @dataclass(frozen=True)
+class DominantRowCertificate:
+    h: int
+    first_r: int
+    remaining_ones: int
+    gap_min: int
+    gap_max: int
+    bucket_T: int
+    inner_mode: str
+    old_outer_log2: float
+    exact_outer_log2: float
+    placement_log2: float
+    inner_log2: float
+    term_log2: float
+    total_log2: float
+    total_remainder_log2: float
+    total_minus_peak_bits: float
+    split_h: int
+    split_log2: float
+    split_remainder_log2: float
+    split_minus_peak_bits: float
+    above_split_log2: float
+    above_split_gap_bits: float
+
+
+@dataclass(frozen=True)
 class ReweightedLedgerSummary:
     rows: int
     live_rows: int
@@ -177,6 +213,7 @@ class ReweightedLedgerSummary:
     peak_gap_min: int
     peak_gap_max: int
     peak_outer_exact_log2: float
+    dominant: DominantRowCertificate
 
 
 def exact_outer_log2(coeffs: list[int], h: int) -> float:
@@ -211,7 +248,7 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int], *, split_h: int | None 
     exact_total = float("-inf")
     split_total = float("-inf")
     above_split_total = float("-inf")
-    peak: tuple[float, dict[str, str], float] | None = None
+    peak: tuple[float, dict[str, str], float, float] | None = None
     with path.open(newline="") as f:
         for row in csv.DictReader(f):
             rows += 1
@@ -231,10 +268,38 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int], *, split_h: int | None 
                 above_split_total = log2add(above_split_total, exact_term)
             live_rows += 1
             if peak is None or exact_term > peak[0]:
-                peak = (exact_term, row, outer)
+                peak = (exact_term, row, outer, old_outer)
     if peak is None:
         raise SystemExit(f"{path}: no live exact-outer rows")
-    peak_term, peak_row, peak_outer = peak
+    peak_term, peak_row, peak_outer, peak_old_outer = peak
+    split_remainder = split_total
+    if int(peak_row["outer_weight"]) == split_h:
+        split_remainder = log2sub(split_total, peak_term)
+    total_remainder = log2sub(exact_total, peak_term)
+    above_split_gap = peak_term - above_split_total if above_split_total != float("-inf") else float("inf")
+    dominant = DominantRowCertificate(
+        h=int(peak_row["outer_weight"]),
+        first_r=int(peak_row["first_r"]),
+        remaining_ones=int(peak_row.get("remaining_ones", "-1")),
+        gap_min=int(peak_row["gap_min"]),
+        gap_max=int(peak_row["gap_max"]),
+        bucket_T=int(peak_row.get("bucket_T", "-1")),
+        inner_mode=peak_row.get("inner_mode", ""),
+        old_outer_log2=peak_old_outer,
+        exact_outer_log2=peak_outer,
+        placement_log2=float(peak_row.get("placement_log2", "nan")),
+        inner_log2=float(peak_row.get("inner_log2", "nan")),
+        term_log2=peak_term,
+        total_log2=exact_total,
+        total_remainder_log2=total_remainder,
+        total_minus_peak_bits=exact_total - peak_term,
+        split_h=split_h,
+        split_log2=split_total,
+        split_remainder_log2=split_remainder,
+        split_minus_peak_bits=split_total - peak_term,
+        above_split_log2=above_split_total,
+        above_split_gap_bits=above_split_gap,
+    )
     return ReweightedLedgerSummary(
         rows=rows,
         live_rows=live_rows,
@@ -249,6 +314,7 @@ def reweighted_ledger_sum(path: Path, coeffs: list[int], *, split_h: int | None 
         peak_gap_min=int(peak_row["gap_min"]),
         peak_gap_max=int(peak_row["gap_max"]),
         peak_outer_exact_log2=peak_outer,
+        dominant=dominant,
     )
 
 
@@ -392,6 +458,23 @@ def main() -> int:
             f"outer_log2={summary.peak_outer_exact_log2:.6f},"
             f"term_log2={summary.peak_term_log2:.6f}"
         )
+        dom = summary.dominant
+        print(
+            "ledger_dominant_row,"
+            f"h={dom.h},r={dom.first_r},remaining_ones={dom.remaining_ones},"
+            f"gap={dom.gap_min}--{dom.gap_max},T={dom.bucket_T},"
+            f"inner_mode={dom.inner_mode}"
+        )
+        print(f"ledger_dominant_old_outer_log2,{dom.old_outer_log2:.6f}")
+        print(f"ledger_dominant_exact_outer_log2,{dom.exact_outer_log2:.6f}")
+        print(f"ledger_dominant_placement_log2,{dom.placement_log2:.6f}")
+        print(f"ledger_dominant_inner_log2,{dom.inner_log2:.6f}")
+        print(f"ledger_dominant_term_log2,{dom.term_log2:.6f}")
+        print(f"ledger_dominant_total_minus_peak_bits,{dom.total_minus_peak_bits:.6f}")
+        print(f"ledger_dominant_total_remainder_log2,{dom.total_remainder_log2:.6f}")
+        print(f"ledger_dominant_split_minus_peak_bits,{dom.split_minus_peak_bits:.6f}")
+        print(f"ledger_dominant_split_remainder_log2,{dom.split_remainder_log2:.6f}")
+        print(f"ledger_dominant_above_split_gap_bits,{dom.above_split_gap_bits:.6f}")
     return 0
 
 

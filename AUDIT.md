@@ -139,6 +139,13 @@ prefix_32_500_e_le8_log2,-34.767174
 prefix_32_500_e_le8_exact_outer_log2,-37.383345
 prefix_32_500_e_le8_exact_outer_split_log2,-37.383482
 prefix_32_500_e_le8_exact_outer_above_split_log2,-50.738253
+prefix_32_500_e_le8_dominant_row,outer_weight=32,first_r=1,remaining_ones=31,gap_min=1,gap_max=4000,bucket_T=5949,inner_mode=csv
+prefix_32_500_e_le8_dominant_term_log2,-37.385767
+prefix_32_500_e_le8_dominant_total_minus_peak_bits,0.002422
+prefix_32_500_e_le8_dominant_total_remainder_log2,-46.602718
+prefix_32_500_e_le8_dominant_split_minus_peak_bits,0.002285
+prefix_32_500_e_le8_dominant_split_remainder_log2,-46.687229
+prefix_32_500_e_le8_dominant_above_split_gap_bits,13.352486
 prefix_32_500_e_ge9_tail_log2,-269.335258
 prefix_32_500_e_ge9_tail_exact_outer_log2,-284.004805
 postprefix_501_2000_eall_log2,-182.259739
@@ -238,6 +245,12 @@ late_prefix_exact_above_split_log2,-66.416502
 ledger_exact_outer_log2,-37.383345   # fullsplit_piecewise_h32_500_csv.csv
 ledger_exact_split_log2,-37.383482   # h=32 slice of fullsplit_piecewise_h32_500_csv.csv
 ledger_exact_above_split_log2,-50.738253 # h>32 support remainder
+ledger_dominant_row,h=32,r=1,remaining_ones=31,gap=1--4000,T=5949,inner_mode=csv
+ledger_dominant_term_log2,-37.385767
+ledger_dominant_total_minus_peak_bits,0.002422
+ledger_dominant_total_remainder_log2,-46.602718
+ledger_dominant_split_remainder_log2,-46.687229
+ledger_dominant_above_split_gap_bits,13.352486
 ledger_exact_outer_log2,-284.004805  # fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv
 ledger_exact_outer_log2,-86.910456   # fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv
 ledger_exact_outer_log2,-319.977808  # fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv
@@ -247,6 +260,10 @@ Interpretation: the current live finite prefix is exact-support dominated by
 `h=32`, with the next possible weight only at `h=48`. The checked window split
 is `-37.383482` bits from `h=32` and `-50.738253` bits from all supported
 `h>32`; the checked ultra-late split is `-41.113442` and `-66.416502`.
+The dominant row inside the live prefix is now explicitly checked as
+`h=32,r=1,gap=1--4000,T=5949`, with term `-37.385767`; the whole exact
+window prefix is only `0.002422` bits above it, and deleting it leaves
+`-46.602718`.
 The exact coefficient build has one multiply step and twelve squaring steps
 for the `4096=2^12` direct sum, so the support gap is a finite integer
 polynomial statement rather than a floating Cauchy-envelope observation.
