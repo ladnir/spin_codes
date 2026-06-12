@@ -31,6 +31,7 @@ from certify_rm_outer_prefix_exact import (
     prefix_coefficient_certificate,
     reweighted_ledger_sum,
 )
+from sum_fullsplit_piecewise_certificate import log2_ht_tail_envelope as piecewise_ht_tail_envelope
 
 
 ROOT = Path(__file__).resolve().parent
@@ -38,6 +39,7 @@ ROOT = Path(__file__).resolve().parent
 
 GLOBAL_TURNOFF_LOG2 = -62.4078758
 HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS = 1.484774
+CURRENT_EALLRATIO_MAX_GAP = 26819
 
 
 @dataclass(frozen=True)
@@ -234,6 +236,14 @@ class EndpointGapSumSummary:
     sample_count: int
     max_bucket_loss_bits: float
     min_sample_slack_bits: float
+    max_sample_slack_bits: float
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
+class EallRatioTailSummary:
+    sample_count: int
+    max_current_adjacent_ratio_log2: float
     max_sample_slack_bits: float
     rows: list[dict[str, object]]
 
@@ -1160,6 +1170,93 @@ def check_endpoint_gap_sum_semantics(
     )
 
 
+def exact_ht_tail_multiplier_log2(*, H: int, T: int, log_q: float) -> float:
+    total = float("-inf")
+    for k in range(1, min(H, T) + 1):
+        term = (
+            log2_binom(H, k)
+            + log2_binom(T, k)
+            - math.log2(k + 1)
+            + k * log_q
+        )
+        total = log2add(total, term)
+    return total
+
+
+def check_eallratio_tail_semantics(
+    *,
+    inner_spectrum: Path,
+    b: int,
+    turnoff_log2: float,
+    max_t: int,
+    tolerance: float = 1e-9,
+) -> EallRatioTailSummary:
+    entries = split_inner_entries(load_inner_spectrum(inner_spectrum), b)
+    samples = [
+        (10, 10, 0.02),
+        (64, 64, 0.05),
+        (127, 128, 0.2),
+        (1000, 1000, 1.2),
+        (3000, 9949, 0.05),
+    ]
+    rows: list[dict[str, object]] = []
+    max_slack = float("-inf")
+    for H, T, lam in samples:
+        M = sum(p * math.exp(-lam * j) for j, q, p in entries if q > 0)
+        if not (0.0 < M < 1.0):
+            raise SystemExit(f"eallratio tail audit: invalid M={M} at lambda={lam:g}")
+        log_q = turnoff_log2 + math.log2(1.0 - M)
+        exact = exact_ht_tail_multiplier_log2(H=H, T=T, log_q=log_q)
+        checked = piecewise_ht_tail_envelope(H=H, T=T, log_q=log_q, cutoff_bits=20.0)
+        default_checked = piecewise_ht_tail_envelope(H=H, T=T, log_q=log_q)
+        if checked + tolerance < exact:
+            raise SystemExit(
+                f"eallratio tail audit: cutoff-20 bound is below exact sum at H={H}, T={T}, "
+                f"lambda={lam:g}: checked={checked:.12g}, exact={exact:.12g}"
+            )
+        if default_checked + tolerance < exact:
+            raise SystemExit(
+                f"eallratio tail audit: default bound is below exact sum at H={H}, T={T}, "
+                f"lambda={lam:g}: checked={default_checked:.12g}, exact={exact:.12g}"
+            )
+        slack = checked - exact
+        max_slack = max(max_slack, slack)
+        rows.append(
+            {
+                "H": H,
+                "T": T,
+                "lambda": lam,
+                "M": M,
+                "log_q": log_q,
+                "exact_log2": exact,
+                "checked_cutoff20_log2": checked,
+                "checked_default_log2": default_checked,
+                "cutoff20_slack_bits": slack,
+                "default_slack_bits": default_checked - exact,
+            }
+        )
+
+    max_feasible_H = b * max_t
+    max_ratio_log2 = (
+        turnoff_log2
+        + math.log2(max_feasible_H - 1)
+        + math.log2(max_t - 1)
+        - math.log2(2)
+        - math.log2(3)
+    )
+    if max_ratio_log2 >= 0.0:
+        raise SystemExit(
+            "eallratio tail audit: current feasible multiplier series is not decreasing from k=1; "
+            f"max adjacent ratio log2={max_ratio_log2:.12g}"
+        )
+    return EallRatioTailSummary(
+        sample_count=len(rows),
+        max_current_adjacent_ratio_log2=max_ratio_log2,
+        max_sample_slack_bits=max_slack,
+        rows=rows,
+    )
+
+
 def late_postprefix_reduced_log2(*, n: int, m: int, h: int, z: float) -> float:
     return -h * math.log2(z) + log2_binom(m, h) - log2_binom(n, h)
 
@@ -1570,6 +1667,8 @@ def main() -> int:
             "exact_outer_h_max": args.exact_outer_h_max,
             "global_turnoff_log2": GLOBAL_TURNOFF_LOG2,
             "high_interval_turnoff_adjustment_bits": HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
+            "current_eallratio_max_gap": CURRENT_EALLRATIO_MAX_GAP,
+            "current_eallratio_max_T": args.late_blocks + CURRENT_EALLRATIO_MAX_GAP - 1,
             "exact_outer_local_spectrum_csv": manifest_path(args.exact_outer_local_spectrum_csv),
             "inner_spectrum": manifest_path(args.inner_spectrum),
         },
@@ -2225,6 +2324,25 @@ def main() -> int:
         "min_sample_slack_bits": endpoint_gap_sum.min_sample_slack_bits,
         "max_sample_slack_bits": endpoint_gap_sum.max_sample_slack_bits,
         "rows": endpoint_gap_sum.rows,
+    }
+    eallratio_tail = check_eallratio_tail_semantics(
+        inner_spectrum=args.inner_spectrum,
+        b=args.block_bits,
+        turnoff_log2=GLOBAL_TURNOFF_LOG2,
+        max_t=args.late_blocks + CURRENT_EALLRATIO_MAX_GAP - 1,
+    )
+    print("eallratio_tail_status,PASS")
+    print(f"eallratio_tail_samples,{eallratio_tail.sample_count}")
+    print(f"eallratio_tail_max_current_adjacent_ratio_log2,{eallratio_tail.max_current_adjacent_ratio_log2:.6f}")
+    print(f"eallratio_tail_max_sample_slack_bits,{eallratio_tail.max_sample_slack_bits:.12g}")
+    manifest["checks"]["eallratio_tail_semantics"] = {  # type: ignore[index]
+        "status": "PASS",
+        "rule": "R_{H,T} truncation is closed by a decreasing-ratio geometric tail bound",
+        "sample_count": eallratio_tail.sample_count,
+        "max_current_T": args.late_blocks + CURRENT_EALLRATIO_MAX_GAP - 1,
+        "max_current_adjacent_ratio_log2": eallratio_tail.max_current_adjacent_ratio_log2,
+        "max_sample_slack_bits": eallratio_tail.max_sample_slack_bits,
+        "rows": eallratio_tail.rows,
     }
     t_mono = check_t_monotonicity_sufficient_reduction(
         inner_spectrum=args.inner_spectrum,

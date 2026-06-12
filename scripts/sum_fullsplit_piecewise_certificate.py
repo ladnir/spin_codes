@@ -138,11 +138,23 @@ def log2_one_plus_pow2(x: float) -> float:
     return math.log2(1.0 + 2.0 ** x)
 
 
+def log2_ratio_over_one_minus_from_log2(log2_r: float) -> float:
+    """Return log2(r/(1-r)) for 0 <= r < 1, with r supplied as log2(r)."""
+
+    if log2_r >= 0.0:
+        return float("inf")
+    if log2_r < -60.0:
+        return log2_r
+    r = 2.0 ** log2_r
+    return log2_r - math.log2(1.0 - r)
+
+
 def log2_ht_tail_envelope(*, H: int, T: int, log_q: float, cutoff_bits: float = 120.0) -> float:
     """Return log2(sum_{k>=1} binom(H,k) binom(T,k)/(k+1) q^k)."""
 
     total = float("-inf")
-    for k in range(1, min(H, T) + 1):
+    k_max = min(H, T)
+    for k in range(1, k_max + 1):
         term = (
             log2_binom(H, k)
             + log2_binom(T, k)
@@ -150,8 +162,21 @@ def log2_ht_tail_envelope(*, H: int, T: int, log_q: float, cutoff_bits: float = 
             + k * log_q
         )
         total = log2add(total, term)
-        if term < total - cutoff_bits and k > 4:
-            break
+        if k < k_max and term < total - cutoff_bits and k > 4:
+            # The adjacent ratio term_{k+1}/term_k is decreasing in k:
+            # q*(H-k)*(T-k)/((k+1)*(k+2)).  Once it is below one, the
+            # omitted suffix is bounded by a geometric tail.
+            log2_next_ratio = (
+                log_q
+                + math.log2(H - k)
+                + math.log2(T - k)
+                - math.log2(k + 1)
+                - math.log2(k + 2)
+            )
+            if log2_next_ratio < 0.0:
+                log_tail = term + log2_ratio_over_one_minus_from_log2(log2_next_ratio)
+                total = log2add(total, log_tail)
+                break
     return total
 
 

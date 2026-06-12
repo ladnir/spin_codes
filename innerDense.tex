@@ -3997,6 +3997,17 @@ T & H & \lambda & \log_2 R_{H,T}(\lambda)\\
 The sharper fixed-\(x\) multiplier is another \(1.5\)--\(2.7\) bits lower in these samples.  Thus the \(e\ge2\) tail
 should add a negligible multiplicative factor to the fixed-\(\lambda\) \(e=1\) envelope, provided the first-moment
 summation keeps the same \(\lambda\) when applying \eqref{eq:fullsplit-e-tail-ht-multiplier}.
+The verifier now also audits the numerical evaluation of \(R_{H,T}\).  The implementation truncates the positive
+\(k\)-sum only after adding a geometric upper bound for the omitted suffix, using the adjacent-ratio formula
+\[
+\frac{a_{k+1}}{a_k}
+=
+\frac{(H-k)(T-k)}{(k+1)(k+2)}\,p(1-M_+(\lambda)).
+\]
+For the current feasible \(e\)all-ratio range \(T\le32767\), this ratio is already below
+\(2^{-28.992971}\) after the first term, even under the crude bound \(1-M_+(\lambda)\le1\).  The finite-ledger
+manifest records exact finite-sum samples against this truncated evaluator as
+\(\texttt{eallratio\_tail\_status=PASS}\).
 
 The wrapper now has a theorem-facing mode
 \[

@@ -164,6 +164,10 @@ endpoint_gap_sum_samples,33
 endpoint_gap_sum_max_bucket_loss_bits,11.965784
 endpoint_gap_sum_min_sample_slack_bits,0.000000
 endpoint_gap_sum_max_sample_slack_bits,11.965784
+eallratio_tail_status,PASS
+eallratio_tail_samples,5
+eallratio_tail_max_current_adjacent_ratio_log2,-28.992971
+eallratio_tail_max_sample_slack_bits,0
 t_monotonicity_sufficient_status,PASS
 t_monotonicity_sufficient_rows,18
 t_monotonicity_sufficient_min_slack_bits,0.154987
@@ -1132,15 +1136,20 @@ endpoint_gap_sum_samples,33
 endpoint_gap_sum_max_bucket_loss_bits,11.965784
 endpoint_gap_sum_min_sample_slack_bits,0.000000
 endpoint_gap_sum_max_sample_slack_bits,11.965784
+eallratio_tail_status,PASS
+eallratio_tail_samples,5
+eallratio_tail_max_current_adjacent_ratio_log2,-28.992971
+eallratio_tail_max_sample_slack_bits,0
 t_monotonicity_sufficient_status,PASS
 t_monotonicity_sufficient_rows,18
 t_monotonicity_sufficient_min_slack_bits,0.154987
 t_monotonicity_sufficient_worst,h=7859--20550,bucket=gap_4001_8000,T=9949--13948,lambda=0.05,rho=0.03,slack=0.154987
 ```
 
-Audit priority: medium. The endpoint gap-sum dominance, the `T_eff=max(T_min,ceil(H/b))` cutoff, and the sufficient
-monotonicity reduction for the fixed-pole all-episode wrapper are now checked in the main ledger. The remaining audit
-target here is formula-level review of the fixed-pole reduction internals.
+Audit priority: medium. The endpoint gap-sum dominance, the `T_eff=max(T_min,ceil(H/b))` cutoff, the safe
+`eallratio` multiplier-tail truncation, and the sufficient monotonicity reduction for the fixed-pole all-episode
+wrapper are now checked in the main ledger. The remaining audit target here is formula-level review of the fixed-pole
+`e=1` suffix/coefficient derivation and branch combination.
 
 ## Proof Objects To Inspect
 
@@ -1195,6 +1204,8 @@ Currently checkable:
   opt-in recomputation checks
 - the endpoint gap-sum semantics used by the high-`h` piecewise wrapper, including boundary exact-sum samples and the
   `log2(4000)` bucket-size loss
+- the `eallratio` multiplier-tail evaluation, with exact finite samples and a global decreasing-ratio bound for the
+  current feasible `T <= 32767` range
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
 - the placement-only ultra-late post-prefix intervals `T < 5949`, `501 <= h <= 380736`, with log2 contribution
@@ -1251,7 +1262,8 @@ The following are useful context but should not be treated as proof:
 1. Run the three main verification commands.
 2. Check the exact formulas in `fast_fullsplit_episode_e01.py`, especially the selected-gap count and endpoint
    `e=x+1` case.
-3. Check the fixed-pole algebra in `sum_fullsplit_piecewise_certificate.py`, especially `eallratio`.
+3. Check the remaining fixed-pole algebra in `sum_fullsplit_piecewise_certificate.py`, especially the `e=1`
+   suffix/coefficient derivation and the branch combination in `eallratio`.
 4. Check `check_fullsplit_T_monotonicity.py` against the monotonicity argument in `innerDense.tex`.
 5. Check that the `32..500` finite CSV inputs are generated from formulas that are conservative upper bounds.
 6. Only then read the surrounding prose and decide what should become theorem text versus working-save-point text.
