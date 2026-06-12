@@ -4008,6 +4008,14 @@ For the current feasible \(e\)all-ratio range \(T\le32767\), this ratio is alrea
 \(2^{-28.992971}\) after the first term, even under the crude bound \(1-M_+(\lambda)\le1\).  The finite-ledger
 manifest records exact finite-sum samples against this truncated evaluator as
 \(\texttt{eallratio\_tail\_status=PASS}\).
+The same manifest now also includes a small implementation audit of the whole fixed-pole branch formula.  For six finite
+\((T,H,\lambda,\rho)\) samples, the verifier computes the selected-gap Chernoff sum directly from exact integer
+coefficients of \(((1+z)^b-1)^x\) and exact skipped-gap suffix sums, then checks that
+\eqref{eq:fullsplit-e1-cauchy-envelope} with the same-\(\lambda\) multiplier
+\eqref{eq:fullsplit-e-tail-ht-multiplier} dominates it.  It also compares the production
+\(\texttt{eallratio}\) evaluator against an independent fixed-pole formula evaluator, with maximum discrepancy
+\(2.9\cdot10^{-14}\) bits in the current manifest.  This is an implementation audit of the algebra; the proof object is
+still the displayed coefficient, suffix, and multiplier inequalities above.
 
 The wrapper now has a theorem-facing mode
 \[

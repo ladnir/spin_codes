@@ -31,7 +31,10 @@ from certify_rm_outer_prefix_exact import (
     prefix_coefficient_certificate,
     reweighted_ledger_sum,
 )
-from sum_fullsplit_piecewise_certificate import log2_ht_tail_envelope as piecewise_ht_tail_envelope
+from sum_fullsplit_piecewise_certificate import (
+    eall_ratio_log2 as piecewise_eall_ratio_log2,
+    log2_ht_tail_envelope as piecewise_ht_tail_envelope,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -245,6 +248,14 @@ class EallRatioTailSummary:
     sample_count: int
     max_current_adjacent_ratio_log2: float
     max_sample_slack_bits: float
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
+class EallRatioBranchSummary:
+    sample_count: int
+    min_formula_slack_bits: float
+    max_code_delta_bits: float
     rows: list[dict[str, object]]
 
 
@@ -1253,6 +1264,205 @@ def check_eallratio_tail_semantics(
         sample_count=len(rows),
         max_current_adjacent_ratio_log2=max_ratio_log2,
         max_sample_slack_bits=max_slack,
+        rows=rows,
+    )
+
+
+def exact_nonempty_block_coefficients(*, b: int, h: int, x_max: int) -> list[list[int]]:
+    choose = [0] * (min(b, h) + 1)
+    for r in range(1, len(choose)):
+        choose[r] = math.comb(b, r)
+    coeffs = [[0] * (h + 1) for _ in range(x_max + 1)]
+    coeffs[0][0] = 1
+    for x in range(1, x_max + 1):
+        prev = coeffs[x - 1]
+        cur = coeffs[x]
+        h_hi = min(h, b * x)
+        for total_h in range(x, h_hi + 1):
+            value = 0
+            r_lo = max(1, total_h - b * (x - 1))
+            r_hi = min(b, total_h)
+            for r in range(r_lo, r_hi + 1):
+                value += prev[total_h - r] * choose[r]
+            cur[total_h] = value
+    return coeffs
+
+
+def exact_all_episode_chernoff_log2(
+    *,
+    b: int,
+    T: int,
+    H: int,
+    distance: int,
+    term_log2: float,
+    entries: list[tuple[int, int, float]],
+    lam: float,
+) -> float:
+    M = sum(p * math.exp(-lam * j) for j, q, p in entries if q > 0)
+    if not (0.0 < M < 1.0):
+        return float("inf")
+    pref = lam * distance / math.log(2.0)
+    log_M = math.log2(M)
+    total = pref + T * log_M
+    x_min = 0 if H == 0 else max(1, (H + b - 1) // b)
+    x_max = min(H, T)
+    if x_min > x_max:
+        return min(0.0, total)
+    denom = log2_binom(b * T, H)
+    coeffs = exact_nonempty_block_coefficients(b=b, h=H, x_max=x_max)
+    for x in range(max(1, x_min), x_max + 1):
+        coeff = coeffs[x][H]
+        if coeff == 0:
+            continue
+        base = math.log2(coeff) - denom
+        for e in range(1, x + 1):
+            suffix = float("-inf")
+            for skipped in range(0, T - x + 1):
+                suffix = log2add(
+                    suffix,
+                    log2_binom(skipped + e - 1, e - 1)
+                    + log2_binom(T - skipped - e, x - e)
+                    + pref
+                    + (T - skipped) * log_M,
+                )
+            total = log2add(total, base + log2_binom(x + 1, e) + e * term_log2 + suffix)
+        endpoint = base + (x + 1) * term_log2 + log2_binom(T, x) + pref + x * log_M
+        total = log2add(total, endpoint)
+    return total
+
+
+def log2_one_plus_from_log2(x: float) -> float:
+    if x == float("-inf"):
+        return 0.0
+    if x > 50.0:
+        return x + math.log2(1.0 + 2.0 ** (-x))
+    return math.log2(1.0 + 2.0 ** x)
+
+
+def independent_eallratio_fixed_pole_log2(
+    *,
+    b: int,
+    T: int,
+    H: int,
+    distance: int,
+    term_log2: float,
+    entries: list[tuple[int, int, float]],
+    lam: float,
+    rho: float,
+) -> float:
+    M = sum(p * math.exp(-lam * j) for j, q, p in entries if q > 0)
+    if not (0.0 < M < 1.0):
+        return float("inf")
+    pref = lam * distance / math.log(2.0)
+    e0 = pref + T * math.log2(M)
+    x_min = 0 if H == 0 else max(1, (H + b - 1) // b)
+    x_max = min(H, T)
+    if x_min > x_max:
+        return e0
+    denom = log2_binom(b * T, H)
+    log_block = math.log2(math.expm1(b * math.log1p(rho)))
+    log_g = log_block + math.log2(M / (1.0 - M))
+    e1_sum = float("-inf")
+    for x in range(max(1, x_min), x_max + 1):
+        e1_sum = log2add(e1_sum, math.log2(x + 1) + x * log_g)
+    e1 = term_log2 + pref - denom - H * math.log2(rho) + e1_sum
+    tail = exact_ht_tail_multiplier_log2(H=H, T=T, log_q=term_log2 + math.log2(1.0 - M))
+    return log2add(e0, e1 + log2_one_plus_from_log2(tail))
+
+
+def check_eallratio_branch_semantics(
+    *,
+    inner_spectrum: Path,
+    b: int,
+    turnoff_log2: float,
+    tolerance: float = 1e-9,
+) -> EallRatioBranchSummary:
+    entries = split_inner_entries(load_inner_spectrum(inner_spectrum), b)
+    samples = [
+        {"T": 6, "H": 4, "lambda": 0.05, "rho": 0.03, "term_log2": turnoff_log2},
+        {"T": 9, "H": 12, "lambda": 0.2, "rho": 0.1, "term_log2": turnoff_log2},
+        {"T": 12, "H": 32, "lambda": 0.5, "rho": 0.1, "term_log2": turnoff_log2},
+        {"T": 10, "H": 60, "lambda": 0.5, "rho": 0.3, "term_log2": turnoff_log2},
+        {"T": 4, "H": 250, "lambda": 1.2, "rho": 30.0, "term_log2": turnoff_log2},
+        {"T": 8, "H": 20, "lambda": 0.2, "rho": 0.1, "term_log2": -20.0},
+    ]
+    rows: list[dict[str, object]] = []
+    min_slack = float("inf")
+    max_code_delta = 0.0
+    for sample in samples:
+        T = int(sample["T"])
+        H = int(sample["H"])
+        lam = float(sample["lambda"])
+        rho = float(sample["rho"])
+        term_log2 = float(sample["term_log2"])
+        exact = exact_all_episode_chernoff_log2(
+            b=b,
+            T=T,
+            H=H,
+            distance=0,
+            term_log2=term_log2,
+            entries=entries,
+            lam=lam,
+        )
+        formula = independent_eallratio_fixed_pole_log2(
+            b=b,
+            T=T,
+            H=H,
+            distance=0,
+            term_log2=term_log2,
+            entries=entries,
+            lam=lam,
+            rho=rho,
+        )
+        if formula + tolerance < exact:
+            raise SystemExit(
+                "eallratio branch audit: fixed-pole formula is below exact selected-gap Chernoff sum "
+                f"at T={T}, H={H}, lambda={lam:g}, rho={rho:g}: formula={formula:.12g}, exact={exact:.12g}"
+            )
+        code_value, code_lam, _code_alpha, code_rho = piecewise_eall_ratio_log2(
+            b=b,
+            T=T,
+            H=H,
+            distance=0,
+            term_log2=term_log2,
+            entries=entries,
+            lambdas=[lam],
+            rhos=[rho],
+        )
+        expected_code = min(0.0, formula)
+        code_delta = abs(code_value - expected_code)
+        if code_delta > tolerance:
+            raise SystemExit(
+                "eallratio branch audit: implementation does not match independent fixed-pole formula "
+                f"at T={T}, H={H}, lambda={lam:g}, rho={rho:g}: code={code_value:.12g}, "
+                f"formula={expected_code:.12g}"
+            )
+        if code_lam != lam or code_rho != rho:
+            raise SystemExit(
+                "eallratio branch audit: singleton lambda/rho grid did not round-trip through implementation "
+                f"at T={T}, H={H}: got lambda={code_lam}, rho={code_rho}"
+            )
+        slack = formula - exact
+        min_slack = min(min_slack, slack)
+        max_code_delta = max(max_code_delta, code_delta)
+        rows.append(
+            {
+                "T": T,
+                "H": H,
+                "lambda": lam,
+                "rho": rho,
+                "term_log2": term_log2,
+                "exact_selected_gap_chernoff_log2": exact,
+                "independent_formula_log2": formula,
+                "implementation_log2": code_value,
+                "formula_slack_bits": slack,
+                "implementation_delta_bits": code_delta,
+            }
+        )
+    return EallRatioBranchSummary(
+        sample_count=len(rows),
+        min_formula_slack_bits=min_slack,
+        max_code_delta_bits=max_code_delta,
         rows=rows,
     )
 
@@ -2343,6 +2553,23 @@ def main() -> int:
         "max_current_adjacent_ratio_log2": eallratio_tail.max_current_adjacent_ratio_log2,
         "max_sample_slack_bits": eallratio_tail.max_sample_slack_bits,
         "rows": eallratio_tail.rows,
+    }
+    eallratio_branch = check_eallratio_branch_semantics(
+        inner_spectrum=args.inner_spectrum,
+        b=args.block_bits,
+        turnoff_log2=GLOBAL_TURNOFF_LOG2,
+    )
+    print("eallratio_branch_status,PASS")
+    print(f"eallratio_branch_samples,{eallratio_branch.sample_count}")
+    print(f"eallratio_branch_min_formula_slack_bits,{eallratio_branch.min_formula_slack_bits:.12g}")
+    print(f"eallratio_branch_max_code_delta_bits,{eallratio_branch.max_code_delta_bits:.12g}")
+    manifest["checks"]["eallratio_branch_semantics"] = {  # type: ignore[index]
+        "status": "PASS",
+        "rule": "fixed-pole eallratio branch dominates exact finite selected-gap Chernoff sums in audit samples",
+        "sample_count": eallratio_branch.sample_count,
+        "min_formula_slack_bits": eallratio_branch.min_formula_slack_bits,
+        "max_code_delta_bits": eallratio_branch.max_code_delta_bits,
+        "rows": eallratio_branch.rows,
     }
     t_mono = check_t_monotonicity_sufficient_reduction(
         inner_spectrum=args.inner_spectrum,

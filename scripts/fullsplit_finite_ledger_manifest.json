@@ -158,6 +158,87 @@
       "min_convexity_growth_bits": 0.27644972356737024,
       "status": "PASS"
     },
+    "eallratio_branch_semantics": {
+      "max_code_delta_bits": 2.842170943040401e-14,
+      "min_formula_slack_bits": 0.0,
+      "rows": [
+        {
+          "H": 4,
+          "T": 6,
+          "exact_selected_gap_chernoff_log2": -13.67676701831034,
+          "formula_slack_bits": 0.0,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -13.67676701831034,
+          "independent_formula_log2": -13.67676701831034,
+          "lambda": 0.05,
+          "rho": 0.03,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 12,
+          "T": 9,
+          "exact_selected_gap_chernoff_log2": -78.9511791308498,
+          "formula_slack_bits": 3.3468639770717346e-06,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -78.95117578398582,
+          "independent_formula_log2": -78.95117578398582,
+          "lambda": 0.2,
+          "rho": 0.1,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 32,
+          "T": 12,
+          "exact_selected_gap_chernoff_log2": -187.51304135596433,
+          "formula_slack_bits": 32.866551215030114,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -154.64649014093422,
+          "independent_formula_log2": -154.64649014093422,
+          "lambda": 0.5,
+          "rho": 0.1,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 60,
+          "T": 10,
+          "exact_selected_gap_chernoff_log2": -202.2729507544939,
+          "formula_slack_bits": 4.599154761355919,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -197.673795993138,
+          "independent_formula_log2": -197.673795993138,
+          "lambda": 0.5,
+          "rho": 0.3,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 250,
+          "T": 4,
+          "exact_selected_gap_chernoff_log2": -158.76190475747208,
+          "formula_slack_bits": 0.0,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -158.76190475747208,
+          "independent_formula_log2": -158.76190475747208,
+          "lambda": 1.2,
+          "rho": 30.0,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 20,
+          "T": 8,
+          "exact_selected_gap_chernoff_log2": -69.85805257563521,
+          "formula_slack_bits": 3.6261066585991557,
+          "implementation_delta_bits": 2.842170943040401e-14,
+          "implementation_log2": -66.23194591703603,
+          "independent_formula_log2": -66.23194591703606,
+          "lambda": 0.2,
+          "rho": 0.1,
+          "term_log2": -20.0
+        }
+      ],
+      "rule": "fixed-pole eallratio branch dominates exact finite selected-gap Chernoff sums in audit samples",
+      "sample_count": 6,
+      "status": "PASS"
+    },
     "eallratio_tail_semantics": {
       "max_current_T": 32767,
       "max_current_adjacent_ratio_log2": -28.99297107470794,
