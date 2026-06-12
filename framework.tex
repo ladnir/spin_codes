@@ -65,7 +65,8 @@ such that for all sufficiently large \(n\):
 
 \noindent
 Later sections instantiate \(\Cone\) by two different families:
-a log-memory dense terminated convolutional outer, and a sparse-memory (local-expander / banded LDPC) outer.
+a log-memory dense terminated convolutional outer for the asymptotic theorem, and a direct sum of short local codes for
+the finite certificate.
 When we want tighter end-to-end constants, we will work directly with more refined envelopes for \(\enum_{\Cone,w}\)
 rather than insist on one global \(n^c\beta^w\) bound.
 
@@ -96,13 +97,13 @@ p_w(\delta)
 \Pr\bigl[\wt(\Ctwo(U))\le \delta n\ \big|\ \wt(U)=w\bigr].
 \end{equation}
 If \(\Ctwo\) itself is drawn from a random inner ensemble
-(e.g. the dense time-varying recursion of Section~\ref{sec:inner-dense},
-or the sparse recursion with refresh of Section~\ref{sec:sparse-refresh-inner}),
+(e.g. the dense time-varying recursion of Section~\ref{sec:inner-dense}
+or the full-split local-code inner of Section~\ref{sec:structured-local-code}),
 then the probability above is taken over both the inner randomness and \(U\).
 (Equivalently, one may interpret \(p_w(\delta)\) as the average slice-to-tail probability under the inner ensemble.)
 For example, later sections analyze the accumulator inner (Section~\ref{sec:inner-accumulator}),
 the dense time-varying recursive inner (Section~\ref{sec:inner-dense}),
-and the sparse recursive inner with periodic refresh (Section~\ref{sec:sparse-refresh-inner}).
+and the structured full-split inner used in the finite certificate (Section~\ref{sec:structured-local-code}).
 
 \paragraph{Optional: an inner input--output enumerator viewpoint.}
 When \(\Ctwo\) is deterministic and linear, one can also define the (slice) enumerator
@@ -351,7 +352,7 @@ From this point on, the paper decomposes into independent tasks:
 on the weight ranges of interest.
 \item \textbf{Inner instantiation(s):} prove bounds of the form \eqref{eq:inner-interface-pw}, or more sharply,
 weight-dependent upper envelopes for \(p_w(\delta)\), for each candidate inner
-(accumulator; dense time-varying recursion; sparse recursion with periodic refresh).
+(accumulator; dense time-varying recursion; full-split local-code recursion).
 \end{itemize}
 Each combination of a valid outer and a valid inner yields a linear-distance SC ensemble via
 Corollary~\ref{cor:framework-envelope}; the single-envelope criterion in

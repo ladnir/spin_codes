@@ -1,0 +1,295 @@
+% Main-spine structured local-code construction and finite full-split certificate.
+% Detailed development history is preserved in explorations/fullsplit_certificate_development.tex.
+
+\section{Structured local-code construction}
+\label{sec:structured-local-code}
+
+\subsection{Local-code outer certificate interface}
+\label{subsec:local-code-outer-interface}
+
+The structured construction replaces the sliding random-banded outer by a direct sum of short local codes.  The proof
+interface is local-code independent: the outer contributes a weight enumerator, the interleaver turns each outer word of
+weight \(h\) into a uniform slice input, and the inner contributes an upper bound \(p_h^{\rm in}(\delta)\) for that slice.
+Systematic form is not required for the outer code.
+
+\begin{lemma}[Block-outer first-moment interface]
+\label{lem:block-outer-first-moment-interface}
+Let \(C_{\mathrm{loc}}\subseteq\F_2^{n_0}\) be a binary linear \([n_0,b]\) code with homogeneous weight enumerator
+\[
+W_{\mathrm{loc}}(z)=\sum_j A^{\mathrm{loc}}_j z^j,
+\]
+and let \(C_{\mathrm{out}}=C_{\mathrm{loc}}^{\oplus M}\).  Its message length is \(k=Mb\), its outer/interleaver length is
+\(N=Mn_0\), and its weight enumerator is
+\[
+W_{\mathrm{out}}(z)=W_{\mathrm{loc}}(z)^M .
+\]
+Write \(A_h^{\mathrm{out}}=[z^h]W_{\mathrm{out}}(z)\), omitting the all-zero word from the nonzero-codeword sum.  If
+\(p_h^{\rm in}(\delta)\) is any valid upper bound on the chosen inner construction producing output weight at most
+\(\lfloor\delta N\rfloor\) from an interleaved outer word of weight \(h\), then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+\mu_{\mathrm{block}}(\delta)
+:=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}p_h^{\rm in}(\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+The direct-sum enumerator identity follows by multiplying the local generating functions block by block.  Conditional on
+any nonzero outer word of weight \(h\), the uniform interleaver randomizes only the support positions seen by the inner
+code, so the same inner bound \(p_h^{\rm in}(\delta)\) applies to every such word.  Summing these failure probabilities
+over all nonzero outer words gives \(\mu_{\mathrm{block}}(\delta)\), and Markov's inequality gives the minimum-distance
+bound.
+\end{proof}
+
+\begin{lemma}[Finite block-certificate template]
+\label{lem:finite-block-certificate-template}
+In the setting of Lemma~\ref{lem:block-outer-first-moment-interface}, suppose the nonzero outer weights are partitioned
+into a finite list of audited row families \(\mathcal R\).  For each row \(R\in\mathcal R\), suppose a verifier or proof
+establishes
+\[
+\sum_{h\in R} A_h^{\mathrm{out}}p_h^{\rm in}(\delta)\le 2^{-\lambda_R}.
+\]
+If the rows cover every nonzero outer word and every inner placement/episode case used by the bound, then
+\[
+\Pr[d_{\min}(\Csc)\le\lfloor\delta N\rfloor]
+\le
+\sum_{R\in\mathcal R}2^{-\lambda_R}.
+\]
+In particular, proving the right-hand side is at most \(2^{-\lambda}\) gives failure probability at most \(2^{-\lambda}\).
+\end{lemma}
+
+\begin{proof}
+This is bookkeeping after Lemma~\ref{lem:block-outer-first-moment-interface}.  The row hypotheses form a union-bound
+cover of the first-moment sum over all nonzero outer words and all inner cases, and summing the row bounds gives the
+claim.
+\end{proof}
+
+\subsection{Full-split local-code recursive inner}
+\label{subsec:fullsplit-local-code-inner}
+
+The full-split inner is also local-code independent.  Let \(C_{\rm in}\subseteq\F_2^{2b}\) be a binary linear
+\([2b,b,d_0]\) code with encoder \(E:\F_2^b\to C_{\rm in}\) and local weight enumerator
+\[
+W_{\rm in}(z)=\sum_{w=0}^{2b} A_w^{\rm in}z^w .
+\]
+Partition the interleaved outer word into blocks \(U_i\in\F_2^b\) and keep a state \(S_i\in\F_2^b\).  Starting from
+\(S_0=0\), form
+\[
+V_i=U_i+S_{i-1}.
+\]
+If \(V_i=0\), emit \(Y_i=0\) and set \(S_i=0\).  If \(V_i\ne0\), choose a fresh scrambler \(A_i\in GL_b(2)\), encode
+\(C_i=E(A_iV_i)\), choose a fresh random coordinate permutation \(\tau_i\) of the \(2b\) codeword coordinates, and split
+\[
+(Y_i,S_i)=\operatorname{split}_b(\tau_i C_i),
+\]
+where the first \(b\) coordinates are emitted and the last \(b\) coordinates become the next state.
+
+\begin{lemma}[One-step full-split law]
+\label{lem:fullsplit-one-step-law}
+Conditional on \(V_i\ne0\), the codeword \(C_i\) is uniform over the nonzero words of \(C_{\rm in}\).  Therefore the joint
+law of emitted weight \(Y=\wt(Y_i)\) and next-state weight \(Q=\wt(S_i)\) is
+\[
+\Pr[Y=y,Q=q]
+=
+\frac{A^{\rm in}_{y+q}}{2^b-1}
+\frac{\binom{b}{y}\binom{b}{q}}{\binom{2b}{y+q}}.
+\]
+If the incoming state has support size \(q\) and the next input block has support size \(r\), then the pre-encoding turnoff
+atom is
+\[
+\Pr[V_i=0\mid q,r]
+=
+\begin{cases}
+\binom{b}{q}^{-1}, & q=r,\\
+0, & q\ne r.
+\end{cases}
+\]
+\end{lemma}
+
+\begin{proof}
+For fixed nonzero \(V_i\), \(A_iV_i\) is uniform over \(\F_2^b\setminus\{0\}\), and \(E\) bijects this set with the
+nonzero codewords of \(C_{\rm in}\).  Conditional on a codeword of weight \(y+q\), the random coordinate split is
+hypergeometric, giving the displayed split law.  The turnoff atom \(V_i=0\) occurs exactly when the input support equals
+the state support; conditioned on the two support sizes this has probability \(\binom{b}{q}^{-1}\) if \(q=r\) and is
+impossible otherwise.
+\end{proof}
+
+Thus a full-split certificate needs the local inner spectrum \(A_w^{\rm in}\), the induced split law above, and a finite
+or analytic episode ledger for summing \(A_h^{\rm out}p_h^{\rm in}(\delta)\).  The current proved instance uses the exact
+extended-BCH \([128,64,22]\) spectrum, so \(b=64\).
+
+\subsection{Proved RM/EBCH finite instantiation}
+\label{subsec:rm-ebch-finite-instantiation}
+
+The current finite theorem uses a direct sum of \(4096\) copies of \(RM(4,9)\), a binary \([512,256,32]\) code, as the
+outer code.  Hence
+\[
+k=4096\cdot256=2^{20},\qquad N=4096\cdot512=2^{21}.
+\]
+The inner is the full-split construction above with the exact EBCH \([128,64,22]\) local spectrum.  The target relative
+distance is \(\delta=.09\), so
+\[
+d=\lfloor .09N\rfloor=188743.
+\]
+The authoritative verifier is
+\[
+\begin{gathered}
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}\\
+\texttt{--write-manifest-json scripts/fullsplit\_finite\_ledger\_manifest.json}.
+\end{gathered}
+\]
+
+\begin{lemma}[Exact RM prefix support split certificate]
+\label{lem:rm-prefix-support-split}
+For the direct-sum \(RM(4,9)\) outer, the exact local spectrum gives no nonzero outer weights below \(32\).  The verifier
+uses exact direct-sum RM coefficients for the prefix \(32\le h\le500\) and records the dominant supported term at
+\(h=32\), first-active regime \(r=1\), gap bucket \(1\le\mathrm{gap}\le4000\).
+\end{lemma}
+
+\begin{proof}
+The local \(RM(4,9)\) minimum distance is \(32\), so every nonzero direct-sum outer word has weight at least \(32\).  The
+coefficient extraction for \(W_{RM}(z)^{4096}\) through \(h=500\) is performed by the verifier and stored in the finite
+ledger manifest.
+\end{proof}
+
+\begin{corollary}[Checked small-prefix ledger]
+\label{cor:fullsplit-small-prefix-all-first-active}
+At \(N=2^{21}\) and \(\delta=.09\), the checked prefix contribution for the exact RM outer and full-split EBCH inner is
+\[
+\log_2\mu_{32\le h\le500}^{\rm fullsplit}\le -37.278528.
+\]
+This prefix cover includes all first-active placements for all supported weights \(32\le h\le500\).
+\end{corollary}
+
+\begin{corollary}[Checked post-prefix ledger rows]
+\label{cor:fullsplit-postprefix-checked-ledger}
+The checked \(h\ge501\) row families included in the finite ledger have union-bound total
+\[
+\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}
+\le -182.259739.
+\]
+The row families are
+\[
+\begin{array}{c|c}
+\text{row family} & \log_2\text{ contribution}\\
+\hline
+501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
+501\le h\le380736,\ T<5949\ \text{ultra-late placement rows} & -545.690526\\
+501\le h\le75000,\ T>17948\ \text{early endpoint rows} & -380.829185\\
+75001\le h\le350000,\ T>17948\ \text{accelerated endpoint rows} & -1056.187188\\
+350001\le h\le N/2,\ T>17948\ \text{paired accelerated rows} & -98386.449256\\
+2001\le h\le1148736\ \text{fixed-pole intervals} & -586.597103\\
+1048577\le h\le N\ \text{complement-high intervals} & -35150.097366 .
+\end{array}
+\]
+Overlaps between row families are retained only as harmless union-bound overcount.
+\end{corollary}
+
+\begin{proof}
+The manifest checks that these row families cover the post-prefix regimes used by the certificate: ultra-late placements,
+late-window all-episode/fixed-pole intervals, early endpoint and paired endpoint intervals through \(N/2\), and the
+complement-high region.  The displayed total is the log-sum of the audited row contributions.
+\end{proof}
+
+\begin{corollary}[Current finite first-moment checkpoint]
+\label{cor:fullsplit-current-finite-checkpoint}
+Let \(\mu_{\rm checked}(.09)\) denote the first-moment contribution of the checked row families above.  Then
+\[
+\log_2\mu_{\rm checked}(.09)
+\le -37.278528.
+\]
+\end{corollary}
+
+\begin{proof}
+Combine Corollaries~\ref{cor:fullsplit-small-prefix-all-first-active} and~\ref{cor:fullsplit-postprefix-checked-ledger}:
+\[
+\log_2\left(2^{-37.278528}+2^{-182.259739}\right)
+\le -37.278528.
+\]
+\end{proof}
+
+\begin{theorem}[Checked finite RM/full-split first-moment certificate]
+\label{thm:fullsplit-rm-finite-certificate-009}
+Consider the finite checkpoint \(N=2^{21}\), \(b=64\), and \(\delta=.09\), so that
+\[
+d=\lfloor .09N\rfloor=188743 .
+\]
+Use the direct-sum \(RM(4,9)\) outer and the full-split EBCH inner above.  Let \(Z_d\) be the number of nonzero
+concatenated codewords whose final weight is at most \(d\), with expectation taken over the random interleaver and the
+random choices of the inner construction.  The checked finite ledger gives
+\[
+\mathbb E Z_d\le 2^{-37.278528}.
+\]
+Consequently
+\[
+\Pr[d_{\min}\le d]\le 2^{-37.278528}.
+\]
+In particular, with positive probability a sampled code has \(d_{\min}\ge188744\), and hence relative distance
+\[
+\frac{d_{\min}}{N}\ge \frac{188744}{2^{21}}>.09 .
+\]
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure probability to the first moment
+\(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  Lemma~\ref{lem:rm-prefix-support-split} removes all positive weights below
+\(32\).  Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} covers \(32\le h\le500\), while
+Corollary~\ref{cor:fullsplit-postprefix-checked-ledger} covers \(h\ge501\).  Therefore every nonzero outer word is
+included in the row families defining \(\mu_{\rm checked}(.09)\), and
+Corollary~\ref{cor:fullsplit-current-finite-checkpoint} gives the displayed expectation bound.  Markov's inequality
+applied to the nonnegative integer random variable \(Z_d\) gives the probability statement.
+\end{proof}
+
+\subsection{Spectrum-model outer projections}
+\label{subsec:fullsplit-outer-spectrum-projections}
+
+The proved checkpoint above uses the exact RM \([512,256,32]\) local spectrum.  As a finite-\(N\) design diagnostic, we
+also compared two possible stronger outer floors while leaving the full-split EBCH inner ledger unchanged.  This is not a
+theorem upgrade: the BCH rows below use a spectrum model, not a certified local spectrum or a rigorous low-weight
+envelope.  The comparison script is
+\[
+\texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
+\]
+It writes the reports
+\[
+\begin{gathered}
+\texttt{scripts/outer\_mode\_comparison\_delta009.csv},\\
+\texttt{scripts/outer\_mode\_comparison\_delta009.md}.
+\end{gathered}
+\]
+
+The modeled local spectrum is
+\[
+A_w=0\quad(0<w<d_0),\qquad
+A_w\approx 2^{k_0-n_0}\binom{n_0}{w}\quad(w\ge d_0),
+\]
+with optional sensitivity inflation of \(+10,+20,+40\) bits on \(d_0\le w\le d_0+32\).  At \(N=2^{21}\), \(\delta=.09\),
+and \(d=188743\), the baseline projection rows are
+\[
+\begin{array}{c|c|c|c|c|c|c}
+\text{outer mode} & \text{status} & [n_0,k_0,d_0] & \text{blocks} &
+\log_2\mu & \text{margin bits} & \text{dominant }h\\
+\hline
+\text{RM exact} & \text{proved} & [512,256,32] & 4096 & -37.278528 & 37.278528 & 32\\
+\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089134 & 37.089134 & 59\\
+\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 119 .
+\end{array}
+\]
+All three rows are dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).  The rough outer
+work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit rows and \(16777216\) for the \(256\)-bit row.
+
+The sensitivity check is the warning sign.  The \([256,128,38]\) model remains near the RM margin with no inflation and
+has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
+positive under \(+20\) bits.  The \([512,256,\ge62]\) model is more robust in this diagnostic: its margins under
+\(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  These rows stay heuristic
+until an exact BCH spectrum or a rigorous low-weight envelope replaces the modeled spectrum.
+
+The development notes leading to the finite ledger and these projections are preserved in
+\[
+\begin{gathered}
+\texttt{explorations/fullsplit\_certificate\_development.tex},\\
+\texttt{explorations/bch\_outer\_spectra.tex}.
+\end{gathered}
+\]

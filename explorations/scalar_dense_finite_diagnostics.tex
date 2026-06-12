@@ -1,0 +1,1540 @@
+% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
+% Source: integration.tex, lines 606--2143. Preserved scalar dense finite diagnostics; not included in the main spine.
+
+\subsection{What must be sharpened next}
+\label{sec:integration-dense-dense-block}
+
+The dense proof is no longer merely existential.
+The baseline theorem proves linear distance in full generality, and
+Theorem~\ref{thm:dense-dense-explicit-constant} already certifies one explicit distance constant.
+What remains is to push that certified constant upward toward the finite-length behavior seen in the dense enumerator.
+At the analytic level, there are still two concrete bottlenecks.
+
+\paragraph{Outer bottleneck.}
+Corollary~\ref{lem:outer-dense-spectrum} gives only a global geometric envelope
+\[
+\EE[\enum_{\Cone,h}] \le \beta_{\mathrm{out}}^h.
+\]
+This is enough for the baseline theorem, but it is far too coarse for near-GV claims.
+The new explicit outer exponent already replaces it in the concrete explicit-constant theorem.
+To move further, one needs a sharper outer spectrum exponent in the moderate-weight regime,
+not merely a better global base \(\beta_{\mathrm{out}}\).
+
+\paragraph{Inner bottleneck.}
+On the inner side, Corollary~\ref{cor:dense-inner-constant-geometric} replaces the detailed run-aware behavior by a
+single geometric factor \(\rho^h\).
+Again, this is perfect for the low-linear splice used in Theorem~\ref{thm:dense-dense-explicit-constant},
+but it loses the linear-weight exponent information needed for stronger distance constants.
+The natural next sharpening is to use the full dense-inner exponent more aggressively below the current
+\(\eta_{\mathrm{crit}}\) splice point.
+
+\paragraph{Current sharp obstruction.}
+The present paper already certifies \(d_{\min}(\Csc)\ge 0.109n\) with high probability.
+The remaining blocker is therefore no longer linear distance itself, but rather the quantitative gap to the
+enumerator-guided curve.
+At the moment, the proof changes gears at \(\eta_{\mathrm{crit}}=1-2^{-1/2}\):
+below that point it uses the low-linear outer envelope together with the inner geometric tail, while above that point
+it uses the explicit exponent comparison.
+The next theorem should remove or lower that splice by comparing the explicit outer and inner exponents on a wider
+moderate-weight window.
+
+\paragraph{Linear-window ceiling for the current first-moment route.}
+After enforcing the constraint that a single ON episode has length at most \(n\), the old formal choice
+\((2+\xi)\delta>1\) no longer gives an exponent larger than the full-block fair-coin tail
+\[
+1-H_2(\delta).
+\]
+In the dangerous moderate-linear window the systematic dense outer has the random-code exponent
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12,
+\]
+whose maximum is \(1/2\) near \(\eta=1/2\). Thus this particular first-moment comparison can only pass while
+\[
+1-H_2(\delta)> \frac12,
+\]
+namely up to the rate-\(1/2\) random-linear threshold
+\[
+\delta_{\mathrm{GV},1/2}\approx 0.110027864.
+\]
+A position-aware first-start diagnostic is slightly stricter, because a moderately late first activation trades
+placement cost against a shorter fair-coin suffix; it places the practical sampled ceiling near
+\(\delta\approx 0.110\) on the no-OFF path when the exact first-start law is used. If one reserves an explicit
+post-start OFF budget of \(0.005n\), the same diagnostic still leaves room around \(\delta\approx 0.1085\).
+Consequently, pushing the certified constant back toward
+\(0.12\) cannot come from tuning \(\xi\) in the existing linear-window lemma. It would require either a genuinely
+smaller outer exponent in the dangerous moderate-weight window, or an inner linear-weight argument that beats the
+plain fair-coin suffix mechanism.
+
+\paragraph{Role of the enumerator.}
+The exact enumerator is therefore not the proof itself; it is the calibration tool that tells us where sharper
+analytic work is worth spending effort.
+In particular, it suggests which \((\sigma,k)\) regimes track the random-linear benchmark, and hence which parameter
+windows should be targeted when replacing the coarse pair \((\beta_{\mathrm{out}},\rho)\) by sharper exponents.
+
+\subsection{How the enumerator enters}
+\label{sec:integration-dense-dense-enumerator}
+
+The proof above is deliberately coarse.
+For concrete parameter choices, the exact concatenated enumerator is a calibration tool:
+it suggests which \((\sigma,k)\) regimes are promising, which low-weight windows actually dominate,
+and where the analytic proof is losing the most.
+In the main body we only use analytic bounds, but the exact enumerator can be recorded in an appendix and used to guide
+the sharpening of \eqref{eq:dense-dense-parameter-conditions}.
+
+\subsection{Dense+dense estimates (working save point)}
+\label{sec:integration-dense-dense-estimates}
+
+This subsection is a \emph{working estimates section}, not a theorem section.
+Its purpose is to record the current model we use to think about the dense+dense regime before the corresponding
+finite-length statements are turned into fully rigorous propositions.
+The guiding principle is still the first moment:
+\begin{equation}
+\label{eq:dense-dense-working-mu}
+\mu_{n,\sigma}(\delta)
+\;:=\;
+\EE\!\left[\#\{c\neq 0:\ \wt(c)\le \delta n\}\right]
+\;\approx\;
+\sum_{h=1}^{n}
+A_h^{\mathrm{out}}\,
+p_h^{\mathrm{in}}(\delta),
+\end{equation}
+where \(A_h^{\mathrm{out}}\) is the expected number of outer codewords of intermediate weight \(h\), and
+\(p_h^{\mathrm{in}}(\delta)\) is the inner low-tail probability from a uniformly random weight-\(h\) slice input.
+Whenever \(\mu_{n,\sigma}(\delta)<1\), Markov's inequality gives the useful surrogate
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]\le \mu_{n,\sigma}(\delta).
+\]
+
+\paragraph{Why we reparameterize by \(\sigma=\lceil \log_2 k\rceil+c\).}
+For the finite-length construction suggested by the enumerator, the natural design parameter is not raw \(\sigma\), but
+the offset
+\[
+\sigma=\lceil \log_2 k\rceil+c,
+\qquad c\in\{0,1,2,\dots\}.
+\]
+This is motivated by the small-weight formulas themselves.
+For fixed small \(h\), the exact outer low-weight contribution behaves like a polynomial in \(\sigma\) times
+\(k2^{-\sigma}\), hence mainly as a function of the offset \(c\).
+Likewise, in the inner small-weight bound the OFF term appears through \(L2^{-m}\), and when \(m\) is identified with
+\(\sigma\) and \(L\asymp n\asymp k\), this again behaves roughly like a constant times \(2^{-c}\).
+So the first-order question is:
+\emph{for a target \(\delta\), which offset \(c\) is enough?}
+
+\paragraph{The current finite-\(n\) model.}
+The working evaluator still splits \eqref{eq:dense-dense-working-mu} into three windows, but the philosophy has
+become more focused than when this section started.
+
+\medskip
+\noindent
+\textbf{1. Linear weights are no longer the mystery.}
+For \(h=\eta n\) with \(\eta\ge \eta_{\mathrm{crit}}\), we use the explicit exponent comparison already proved in the
+main text:
+\[
+A_h^{\mathrm{out}}\,p_h^{\mathrm{in}}(\delta)
+\;\lesssim\;
+n^{O(1)}\,2^{n(\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;\theta,\delta,\xi))}.
+\]
+This window is currently not the dominant obstruction in the parameter ranges suggested by the enumerator.
+The dense+dense proof problem is now much more localized than that.
+
+\medskip
+\noindent
+\textbf{2. The outer side is largely understood at low weight.}
+For the tiny-weight window we use the actual systematic-banded small-weight law suggested by the enumerator rather than
+the earlier convolutional proxy. With the fixed-tap outer, a message support whose band-union has size \(q\) and whose
+\(\sigma\)-clusters number \(r\) contributes a deterministic parity weight \(r\), and the remaining \(q-r\) active
+parity coordinates are fair. Thus the parity weight law on that slice is
+\[
+r+\Binomial(q-r,\tfrac12),
+\]
+instead of the older \(\Binomial(q,\tfrac12)\) law. In particular,
+\begin{equation}
+\label{eq:dense-dense-working-outer-small}
+A_1^{\mathrm{out,ft}}=0
+\end{equation}
+deterministically. Once this exact low-weight outer law is used, the dominant uncertainty shifts back onto the inner
+tiny/intermediate regime rather than the outer count itself.
+
+\medskip
+\noindent
+\textbf{3. The inner side should be built around exact late placement, not raw run tails.}
+The old pointwise run-tail picture
+\[
+\min_{1\le r\le h}
+\left(
+\mathrm{RunTail}_n(h,r)+(L2^{-\sigma})^r+r\,b_{\delta,\xi}(n)
+\right)
+\]
+is still useful as a baseline, but it is no longer the conceptual center.
+The current philosophy is:
+\begin{itemize}
+\item the one-run base factor \(q_1(\delta)\approx 2\delta\) is now analytically anchored by
+Corollary~\ref{cor:dense-inner-single-run};
+\item the conditioned late-start power \(q_1(\delta)^s\) is analytically anchored by
+Corollary~\ref{cor:first-run-late-qbase};
+\item the exact low-weight core should therefore be ``exact late placement plus a correction,'' not a direct promotion
+of the old \((L2^{-m})^r\) law.
+\end{itemize}
+
+With the fixed-tap dense recursive inner revived, the correction should be structurally smaller than the fully random
+tap ON/OFF heuristic suggested. The leading tap is fixed to one, so a genuine termination is not merely an all-zero output window:
+it is a \(10^m\) output pattern whose last zero is aligned with an input one. Thus early termination consumes one of
+the scarce weight-\(h\) input positions, which is exactly the kind of suppression needed for a summable isolated-slice
+upper bound.
+
+The first clean fixed-tap statistic is therefore not a raw early-start count, but a candidate-pair count: if an early
+isolated start is to terminate within a window of length \(L\), it must find a later input-one inside that window, and
+each such candidate costs \(2^{-(m-1)}\). Corollary~\ref{cor:fixedtap-isolated-pair-candidates} turns this into an
+explicit pair bound of order
+\[
+\binom{h}{2}\frac{L}{n}\,2^{-(m-1)}
+\]
+before any additional fair-coin lower-tail suppression is used.
+
+\paragraph{General philosophy of the current dense model.}
+The current working model is not trying to guess the minimum distance curve from scratch. It is trying to expose the
+\emph{smallest theorem-shaped object that still matches the exact overlap data}.
+At this point the philosophy is:
+\begin{enumerate}
+\item use exact or proved combinatorics whenever possible;
+\item isolate the first place where the proof stops matching the exact tables;
+\item treat the residual there as the real theorem target, rather than patching the whole first moment globally.
+\end{enumerate}
+This is why the current dense save point is organized around isolated low-weight slices and exact early-start
+statistics, not around increasingly elaborate global fit parameters.
+
+\paragraph{Current distance--memory ledger.}
+The finite-\(n\) evidence is now best read as a bracket rather than a single claim. Earlier sweeps at
+\(\delta=0.12\) suggested offsets \(c\approx 5\text{--}8\) in
+\(\sigma=\lceil\log_2 k\rceil+c\), but those lanes belonged to an older model and should not be treated as the
+current theorem target. The active target is the fixed-tap dense recursive inner at relative distance
+\[
+\delta=0.106.
+\]
+For \(k=2^{20}\), \(N=2k\), and \(d=\lfloor\delta N\rfloor\), the corrected crossover diagnostics now ask for the
+first-moment mass in the form
+\[
+\Pr[d_{\min}\le \delta N]\le \mu_{N,\sigma}(\delta),
+\qquad
+\log_2\mu_{N,\sigma}(\delta)\ \text{reported below.}
+\]
+For the corrected late-survival bridge, scanned through \(h\le2000\), the current calibration is
+\[
+\begin{array}{c|c|c|c}
+\sigma & \sigma-\lceil\log_2 k\rceil & \log_2\mu_{\le2000}^{\mathrm{surv}}(0.106) & \text{peak }h\\
+\hline
+16 & -4 & \phantom{-}44.79 & 200\\
+18 & -2 & \phantom{-}4.79  & 95\\
+20 & \phantom{-}0 & -13.04 & 46\\
+22 & \phantom{-}2 & -22.50 & 24\\
+24 & \phantom{-}4 & -28.63 & 16\\
+26 & \phantom{-}6 & -33.24 & 12\\
+28 & \phantom{-}8 & -37.00 & 10\\
+30 & 10 & -44.28 & 9
+\end{array}
+\]
+Thus the present \emph{crossover evidence} for this lane is near
+\[
+\sigma\approx \lceil\log_2 k\rceil,
+\]
+not near \(\lceil\log_2 k\rceil+10\). This table is only a calibration result for one now-corrected bridge, but the
+later checkpoint certificate upgrades the \(\sigma=25\) lane into a finite-\(n\) theorem.  The value of the table is
+that the contribution has negative slope after the small/intermediate hump, rather than remaining flat or rising into
+larger \(h\).
+
+\paragraph{What is solid versus what is still heuristic.}
+By now several parts of the picture are genuinely solid:
+\begin{itemize}
+\item the single-run law \(p_1^{\mathrm{in}}(\delta)\approx 2\delta\);
+\item the conditioned late-placement base
+\[
+\sum_{s=1}^{h}
+\pi_{N,h}(s)\,
+\frac{\binom{L-h+1}{s}}{\binom{N-h+1}{s}};
+\]
+\item the fact that fixed tiny weights are overwhelmingly supported on the isolated slice \(R(U)=h\);
+\item the fact that deterministic short-gap merging is not the dominant large-\(k\) correction in the
+\(h\approx 5\text{--}10\) window.
+\end{itemize}
+What remains heuristic is the \emph{correction around that proved base}. The key change since earlier drafts is that
+this correction is no longer an amorphous global fit. It is now concentrated on the isolated slice and on explicit
+early-start statistics there.
+
+There is a separate linear-window proof ledger. The capped fair-suffix exponent and the exact first-start/no-OFF
+bound are proved. The post-start OFF budget now splits into two proved pieces: long input gaps have exponentially
+small total mass on every fixed linear weight slice, while the short-gap part cannot support linear OFF time once
+\(m=\gamma\log_2 n\), because linearly many short OFF episodes would require too many disjoint \(m\)-zero witnesses.
+
+\paragraph{Current proof-oriented picture.}
+The isolated slice \(R(U)=h\) is now the natural theorem core.
+On that slice we have, in increasing order of sharpness:
+\begin{itemize}
+\item the exact late-placement base
+\[
+\PP[R(U)=h]\cdot \frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}};
+\]
+\item exact order-statistic control from Corollary~\ref{cor:isolated-order-late};
+\item the exact early-count law from Corollary~\ref{cor:isolated-early-count};
+\item the exact expected early-pair count from Corollary~\ref{cor:isolated-early-pair-mean}.
+\end{itemize}
+The important negative results are now just as useful as the positive ones:
+\begin{itemize}
+\item the one-episode correction is much too weak by itself;
+\item a uniform per-early-start penalty \(\tau\) already tracks the isolated slice fairly well locally, but is too loose
+as a large-\(k\) theorem lane;
+\item a position-sensitive one-run penalty
+\[
+\tau_y(\delta)\approx (N-y+1)2^{-m}+\PP[\Binomial(N-y+1,\tfrac12)\le \delta N]
+\]
+works well through roughly \(h\le 4\), but then starts to undershoot in the battleground window \(h\approx 5\text{--}7\).
+\end{itemize}
+So the remaining problem is no longer ``find a better global heuristic.'' It is to explain the residual after the
+position-sensitive one-run base.
+
+\paragraph{The current best residual target.}
+At the moment the cleanest residual statistic is the hypergeometric early-pair count on the isolated slice.
+After factoring out the position-sensitive one-run base, the exact overlap tables are well described by an affine law
+in
+\[
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+\;=\;
+\binom{h}{2}\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\]
+More specifically, on the current overlap set the residual coefficients themselves vary smoothly with
+\[
+q_1=\frac{2\lfloor \delta N\rfloor}{N}
+\qquad\text{and}\qquad \frac{1}{m},
+\]
+which makes this look much closer to a real analytic theorem target than to a one-off regression artifact.
+This should still be read as a working estimate, not as a proved law, but it is now the most principled target we have.
+
+\paragraph{Current save point.}
+The dense+dense picture is now the following.
+\begin{itemize}
+\item The outer side is largely under control in the tiny-weight regime.
+\item The linear-weight window is no longer the main bottleneck.
+\item Exact late placement on the isolated slice remains the right tiny-weight base.
+\item For the medium-weight bridge, the proof must keep the random interleaver visible and work only through
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).
+\item Every early/late episode decomposition must use a shared distance budget; no late tail or late termination may be
+left as a free bucket.
+\item The current crossover evidence for \(\delta=0.106\) at \(k=2^{20}\) puts the corrected survival bridge near
+\(\sigma=\lceil\log_2 k\rceil\), but this is still a calibration result rather than a theorem.
+\end{itemize}
+This should be read only as the current state of the model, not as a proved theorem. Its role is to preserve the
+current proof philosophy and identify the narrow next step.
+
+\paragraph{The theorem-shaped inner target suggested by the model.}
+The current computational evidence suggests that the right next proof target is not an arbitrary refinement of
+\eqref{eq:dense-inner-run-opt-envelope}, but an \emph{exact late-placement base plus a controlled correction}. Writing
+\[
+\pi_{N,h}(s)
+\;:=\;
+\PP[\#\mathrm{runs}(U)=s]
+\;=\;
+\frac{\binom{h-1}{s-1}\binom{N-h+1}{s}}{\binom{N}{h}},
+\]
+for \(U\) uniform on the weight-\(h\) slice, the natural target inequality is
+\begin{equation}
+\label{eq:dense-dense-working-pairwise-target}
+p_h^{\mathrm{in}}(\delta)
+\;\le\;
+\sum_{s=1}^{h}
+\pi_{N,h}(s)\,
+\frac{\binom{L-h+1}{s}}{\binom{N-h+1}{s}}
+\;+\; \mathrm{Corr}_{N,h}(\delta),
+\end{equation}
+where \(L=\lceil 2\delta N\rceil\) and the correction term \(\mathrm{Corr}_{N,h}(\delta)\) should be negligible on the
+tiny/intermediate window.
+The point is not that \eqref{eq:dense-dense-working-pairwise-target} is proved already, but that it is now a sharply
+formulated analytic target: the late-placement base itself is already proved, and what remains is to upper-bound the
+correction \(\mathrm{Corr}_{N,h}(\delta)\) coming from low-weight outcomes that are \emph{not} explained by pure
+late placement. The present overlap checks suggest that this correction is a genuine low-order term in the dominant
+tiny/intermediate window, rather than evidence for a qualitatively different small-weight law. The older pairwise
+run-mixture lanes should now be read only as structured candidate models for \(\mathrm{Corr}_{N,h}(\delta)\), not as
+the theorem core itself.
+
+\paragraph{Why the isolated slice is the right core.}
+At the smallest fixed weights, Corollary~\ref{cor:run-count-full} suggests that one should separate
+\(\mathrm{Corr}_{N,h}(\delta)\) into:
+\begin{itemize}
+\item an isolated-run correction on the dominant \(R(U)=h\) slice, and
+\item a lower-order adjacency correction from the event \(R(U)<h\).
+\end{itemize}
+That looks like the cleanest route if we later try to turn the current finite-\(h\) evidence into an actual proof.
+Numerically, the exact isolated-slice base
+\[
+\PP[R(U)=h]\cdot \frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}}
+\]
+already matches the exact one-run slice exactly and stays within a few bits through the dominant tiny weights on the
+current overlap tables. The remaining residual on that isolated slice is smooth and monotone enough that it looks
+like a real correction term, not a failure of the late-placement core itself.
+
+\paragraph{A concrete isolated-slice working target.}
+The simplest working version of that correction is
+\begin{equation}
+\label{eq:dense-dense-working-isolated-target}
+p_h^{\mathrm{in}}(\delta)
+\;\le\;
+\PP[R(U)=h]\,
+\frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}}\,
+2^{\beta_\delta \binom{h}{2}}
+\;+\;
+\PP[R(U)<h]
+\;+\;
+\mathrm{Err}^{\mathrm{iso}}_{N,h}(\delta),
+\end{equation}
+with \(\beta_\delta\) small on the tiny-weight window and \(\mathrm{Err}^{\mathrm{iso}}_{N,h}(\delta)\) ideally negligible
+there. This isolates the two real sources of loss that still have to be controlled: residual interaction between
+otherwise isolated early episodes, and the lower-order adjacency event \(R(U)<h\).
+
+\paragraph{Updated fixed-tap certificate target.}
+The fixed-tap termination rule suggests a stronger pessimistic bound that is structured for the first-moment sum.
+The first valid statistic is not just the number of early input ones, since many early ones can lie inside the same
+still-alive episode. Instead let
+\[
+\Delta_L(U)
+:=
+\operatorname{span}\bigl(\supp(U)\cap\{1,\dots,N-L\}\bigr)
+\]
+with \(\Delta_L(U)=0\) if the early set is empty. Corollary~\ref{cor:fixedtap-weight-slice-multiepisode}
+gives the theorem-shaped certificate
+\[
+p_h^{\mathrm{in}}(\delta)
+\le
+\Pi_{N,h,L}(0)
++
+\sum_{r\ge 1}
+\Pi_{N,h,L}(r)\binom{h}{r}2^{-r(m-1)}
+\;+\;
+\Pr[\Binomial(L,\tfrac12)\le \delta N],
+\]
+where
+\[
+\Pi_{N,h,L}(r)
+=
+\Pr\!\left[\left\lceil\Delta_L(U)/(L+1)\right\rceil=r\mid \wt(U)=h\right]
+\]
+has an exact full-slice formula. This is deliberately pessimistic: it ignores the fine geometry of candidate
+terminations and only uses the fact that \(r\) length-\(L\) episodes are needed to cover an early span of class \(r\)
+unless a surviving episode pays the binomial lower-tail cost. The important point is that this correction has powers of
+\(2^{-(m-1)}\) tied to the early span class, so it is designed to be summable in
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).
+
+This also changes how to view the adjacency remainder. A naked
+\(\Pr[R(U)<h]=O(h^2/N)\) is fine for fixed-\(h\) asymptotics but is too crude as a first-moment summand once
+multiplied by the low-weight outer enumerator. The next proof target should therefore avoid leaving adjacency as an
+unweighted remainder whenever possible; the full weight-slice version of the multi-episode bound is a candidate route
+because it applies before splitting into \(R(U)=h\) and \(R(U)<h\).
+
+The span certificate is the first valid version of this route, but it is not yet the final summable theorem. Its
+weakness is structural: one terminating episode can cover many early input-one positions if they occur while the
+episode is already alive. The span statistic charges the fixed-tap termination, but it does not yet charge the output
+weight produced inside that alive interval. Finite-\(n\) checks show that this is enough to stabilize the tiniest
+window, but too weak once the diagnostic cap is pushed deeper into intermediate weights. The next correction therefore
+has to combine the span/episode-cover statistic with an internal fair-output budget for the input ones swallowed by
+each live episode.
+
+The most promising refinement is a \emph{paired-cover} certificate. A no-survival trajectory decomposes the early
+support into short live intervals, each beginning at an input-one start and ending at an aligned fixed-tap termination.
+For \(r\) such intervals with total live length \(T\), Corollary~\ref{cor:fixedtap-weight-slice-paired-cover} gives the
+full weight-slice upper bound
+\[
+\begin{aligned}
+p_h^{\mathrm{in}}(\delta)
+\le\;&
+\frac{\binom{L}{h}}{\binom{N}{h}}
+\;+\;
+\Pr[\Binomial(L,\tfrac12)\le d]
+\\
+&+
+\sum_{r=1}^{\lfloor h/2\rfloor}
+\sum_{T=2r}^{\min\{N,r(L+1)\}}
+\frac{
+\binom{N-T+r}{r}
+\binom{T-r-1}{r-1}
+\binom{T+L-2r}{h-2r}
+}{
+\binom{N}{h}
+}
+2^{-r(m-1)}
+\Pr[\Binomial((T-rm)_+,\tfrac12)\le d].
+\end{aligned}
+\]
+Here \(d=\lfloor\delta N\rfloor\). The count is intentionally pessimistic: it counts disjoint intervals anywhere in the
+block and only then forces the remaining support into the interval interiors together with the last \(L\) positions.
+Thus it absorbs the adjacency cases directly instead of leaving a separate
+\(\Pr[R(U)<h]\) remainder. The proof pieces are now isolated: Lemma~\ref{lem:fixedtap-no-survival-paired-cover} turns a
+no-survival trajectory into paired start/termination intervals, Lemma~\ref{lem:fixedtap-paired-cover-charge} gives the
+fixed-cover stochastic cost, and Corollary~\ref{cor:fixedtap-weight-slice-paired-cover} performs the union bound over
+covers.
+
+The remaining question is no longer local validity but global summability: after multiplying this upper bound by the
+fixed-tap outer enumerator \(A_h^{\mathrm{out}}\), the double sum over \(r,T\) has to stay below one in the target
+\(\sigma=\lceil\log_2 k\rceil+c\) regime. The finite-\(n\) diagnostic currently says this paired-cover/internal-tail
+form has the right scale, but the next analytic step is to replace that diagnostic by a clean entropy envelope for the
+\((h,r,T)\) sum.
+
+\paragraph{What we learned from the failed medium-weight envelopes.}
+The paired-cover theorem above is locally valid, but several finite-\(n\) diagnostics based on it were misleading.
+The useful record is the sequence of mistakes, since each mistake identifies a condition the eventual theorem must
+enforce.
+
+\begin{enumerate}
+\item \emph{The interleaver must stay visible.}  The outer code only supplies the weight enumerator
+\(A_h^{\mathrm{out}}\).  After the random permutation, the inner support is uniform on the weight-\(h\) slice.
+Consequently, an outer-coordinate event such as ``the outer support lies in an early burst plus a late tail'' is not a
+proof object for the concatenated code.  The correct first-moment object remains
+\[
+\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta).
+\]
+
+\item \emph{A cap peak is a boundary warning.}  The early \(h\le64\) and \(h\le80\) blocked-cover checks had their
+largest terms at the right endpoint.  Such a line should be written \(64+\) or \(80+\), not interpreted as a true peak.
+Those computations showed that the raw envelope was unfinished; they did not locate the real crossover.
+
+\item \emph{The late tail is not free.}  A support pattern consisting of an early terminated burst and later support in
+the final tail cannot be charged only for the early burst.  If the encoder remains ON from the early burst to the tail,
+then the fair-output lower-tail must be paid over the combined live span.  If the early episode terminates and the tail
+starts a new episode, then the later episode must either survive, paying its suffix span, or terminate, paying an
+additional fixed-tap termination together with its own live span.
+
+\item \emph{Separated episodes share one distance budget.}  A second diagnostic was still too pessimistic because it
+allowed the early episode to spend \(d\) output ones and the late episode to spend another \(d\).  The distance event is
+\(\wt(Y)\le d\), so disjoint live intervals must be charged by a single binomial lower tail over their combined free
+times, or by an explicit convolution bounded by that shared-budget tail.
+
+\item \emph{A crude late-termination union is still a free bucket.}  The term
+\((j-1)2^{-(\sigma-1)}\) for a late termination is useful only after the late episode declares a live span.  Without
+that span it again permits many late support positions to hide without paying output weight.  The theorem should
+therefore be piecewise: surviving late episodes pay a combined suffix tail; terminated late episodes pay both a
+fixed-tap termination and a live-span output budget.
+\end{enumerate}
+
+After these corrections, the representative \(r=1\), \(T=2d\) lane at
+\[
+k=2^{20},\qquad N=2k,\qquad \delta=0.106,\qquad L=\lceil2.1d\rceil
+\]
+has a very different shape.  With exact fixed-tap outer counts through \(h\le80\), the early-burst plus properly
+charged late-survival lane at \(\sigma=34\) gives
+\[
+\log_2 \mu_{\le80}^{r=1,T=2d,\mathrm{surv}}\approx -22.36,
+\]
+with the largest checked term still at \(h=80+\), of size about \(2^{-25.24}\).  Extending the same corrected survival
+bridge with a fixed-tap banded outer generating-function envelope through \(h\le2000\) gives the crossover table in the
+previous paragraph: \(\sigma=18\) is still above one, while \(\sigma=20=\lceil\log_2 k\rceil\) is already below one for
+this lane.  A separate explicit two-terminated-episode span diagnostic is also strongly negative at
+\(k=2^{20}\), with totals roughly
+\[
+\log_2\mu^{\mathrm{2term}}_{\le2000}
+\approx -71.7,\ -76.9,\ -81.8
+\qquad
+\text{for }\sigma=30,32,34.
+\]
+These numbers were diagnostics rather than final certificates: at that stage the outer envelope past the exact prefix
+was still only a calibration bound and the all-episode decomposition had not yet been packaged as a theorem.  They do,
+however, change the expected memory scale: the current evidence points toward
+\[
+\sigma=\lceil\log_2 k\rceil+O(1),
+\]
+with the numerical crossover for the corrected survival bridge very close to offset \(0\).
+
+\paragraph{Piecewise theorem target.}
+The theorem target that emerged from these diagnostics is a pessimistic upper bound built for summation in the first
+moment, not a sharp fixed-\(h\) asymptotic.  The desired structure is:
+\begin{enumerate}
+\item exact or exact-enveloped outer counts for the tiny prefix;
+\item a corrected one-episode survival bound in which early and late live spans share the distance budget;
+\item a terminated-episode bound in which every fixed-tap termination declares a live span and pays the corresponding
+fair-output lower-tail cost;
+\item a multi-episode version of the same accounting, summed over the number of start/termination pairs and their
+total live length;
+\item a separate large-weight exponent window once \(h\) is large enough for the entropy bounds to dominate.
+\end{enumerate}
+This is the better way to think about the problem.  The bottleneck is not an uncontrolled linear-weight window, and it
+is not a free late tail.  The bottleneck is to make the episode decomposition auditable enough that no support mass can
+be hidden in a tail bucket without paying either a shared survival tail or a declared termination span.
+
+\paragraph{First global episode-cover certificate.}
+The first implementation of that target is a deliberately conservative global cover.  A low-weight trajectory is
+covered by \(r\) terminated ON intervals, with an optional final surviving interval.  If the total live length is \(U\),
+then all live intervals pay a single shared binomial tail
+\[
+\Pr[\Binomial((U-r\sigma)_+,\tfrac12)\le d],
+\]
+and the \(r\) fixed-tap terminations pay \(2^{-r(\sigma-1)}\).  The interval count is intentionally an overcount:
+the all-terminated part counts ordered disjoint intervals anywhere in the block.  For \(r\ge1\), its schematic summand
+is
+\[
+\frac{
+\binom{U-r-1}{r-1}
+\binom{N-U+r}{r}
+\binom{U-2r}{h-2r}
+}{\binom{N}{h}}
+2^{-r(\sigma-1)}
+\Pr[\Binomial((U-r\sigma)_+,\tfrac12)\le d]
+\]
+For the survivor part we now use the final-suffix geometry rather than treating the survivor as another arbitrary
+interval.  If the surviving suffix has length \(S\) and the terminated intervals before it have total length \(T\), the
+schematic summand is
+\[
+\sum_{S,T}
+\frac{
+\binom{T-r-1}{r-1}
+\binom{N-S-T+r}{r}
+\binom{S+T-2r-1}{h-2r-1}
+}{\binom{N}{h}}
+2^{-r(\sigma-1)}
+\Pr[\Binomial(S+(T-r\sigma)_+,\tfrac12)\le d].
+\]
+The \(r=0\) survivor-only case is counted by the suffix-start
+sum
+\[
+\sum_{U=h}^{N}
+\frac{\binom{U-1}{h-1}}{\binom{N}{h}}
+\Pr[\Binomial(U,\tfrac12)\le d].
+\]
+These expressions are then multiplied by the fixed-tap outer enumerator and summed over \(h\).
+
+At \(k=2^{20}\), \(N=2k\), and \(\delta=0.106\), using exact fixed-tap outer counts through \(h\le80\), the fixed-tap
+banded outer generating-function envelope beyond that, suffix-aware survivor counting, and a conservative
+Berry--Esseen binomial-tail upper bound near the central suffix edge, the first blocked finite-\(n\) certificate gave
+\[
+\begin{array}{c|c|c|c}
+\sigma & \sigma-\lceil\log_2 k\rceil & \log_2\mu_{\le500}^{\mathrm{glob,suf}}(0.106) & \text{peak }h\\
+\hline
+24 & \phantom{-}4 & \phantom{-}0.80 & 6\\
+25 & \phantom{-}5 & -0.096 & 7\\
+26 & \phantom{-}6 & -0.75 & 2\\
+28 & \phantom{-}8 & -1.64 & 2
+\end{array}
+\]
+Pushing the \(\sigma=25\) line to \(h\le2000\) leaves the same total,
+\[
+\log_2\mu_{\le2000}^{\mathrm{glob,suf}}(0.106)\approx -0.096,
+\]
+with no right-boundary peak; the terms are already below \(-800\) bits by \(h=2000\).  The older ordinary-survivor
+overcount crossed near offset \(8\), so simply respecting the final-suffix geometry buys about three taps.
+
+The first target was break-even, i.e. \(\log_2\mu<0\).  A later certificate with a prescribed larger
+\(-\lambda\)-bit margin should use the same ledger; the first task was to make every term in the zero-crossing
+auditable.  The dominant blocked terms all had \(r=0\), so the next tightening was to replace the blocked
+survivor-only sum by the exact suffix-start sum from Lemma~\ref{lem:fixedtap-final-survivor-suffix} for small \(h\):
+\[
+\sum_{U=h}^{N}
+\frac{\binom{U-1}{h-1}}{\binom{N}{h}}
+\Pr[\Binomial(U,\tfrac12)\le d].
+\]
+Using this exact survivor-only count through \(h\le30\), with the same outer data and the same Berry--Esseen tail
+upper bound, gives
+\[
+\begin{array}{c|c|c|c|c}
+\sigma & \sigma-\lceil\log_2 k\rceil & h_{\max} &
+\log_2\mu_{\le h_{\max}}^{\mathrm{glob,suf+ex0}}(0.106) & \text{peak }h\\
+\hline
+24 & \phantom{-}4 & 500  & \phantom{-}0.519 & 6\\
+25 & \phantom{-}5 & 2000 & -0.348 & 2
+\end{array}
+\]
+For \(\sigma=25\), the continuation beyond \(h=500\) does not change the displayed total at six decimals, and the
+\(h=2000\) term is about \(-841\) bits.  Thus the strengthened break-even certificate still crosses near
+\[
+\sigma\approx \lceil\log_2 k\rceil+5
+\]
+for the fixed \(k=2^{20}\), \(\delta=0.106\) test point, but with a healthier finite margin.  The sharper
+survival-only bridge crosses near offset \(0\), so the remaining proof slack is now visible: it is concentrated in the
+tiny \(h\) survivor/late-placement accounting and in the remaining conservative episode-cover overcount, not in a
+medium-weight tail obstruction.
+
+The remaining unbounded-\(h\) bookkeeping then became a tail lemma, not a new modeling step.  In the same
+\(\sigma=25\) certificate, the sampled contribution is already monotone decreasing after \(h=100\); after \(h=500\)
+the worst observed adjacent log-ratio through \(h=2000\) is below \(-0.36\) bits.  If that same ratio were proved
+uniformly for \(h>2000\), the residual tail would be below \(-839\) bits and the displayed break-even total would be
+unchanged at six decimals.  The residual split below is the auditable version of this target: prove uniform geometric
+domination beyond a finite prefix, separate the large-\(r\) low-slot ledger, and hand the high-slot part to the
+linear-window exponent.
+
+A piece decomposition of the same certificate shows where that ratio proof should start.  Past the exact-outer cutoff
+\(h=80\), the leading global-cover contribution is the \(r=1\) term; the \(r=0\) survivor piece has already fallen far
+below it, and the \(r\ge2\) pieces carry additional fixed-tap termination factors.  Thus the next local proof target is
+not an undifferentiated bound on the whole inner model, but a ratio estimate for the fixed-\(r\) block summands,
+beginning with \(r=1\), followed by a summable comparison over \(r\ge2\).
+
+\begin{lemma}[Low-slot \(r=1\) geometric ratio]
+\label{lem:r-one-low-slot-ratio}
+Fix an outer generating-function parameter \(z\in(0,1)\), so that
+\[
+A_h^{\mathrm{out}}\le W(z)z^{-h}.
+\]
+Consider either exact \(r=1\) global-cover subpiece: the all-terminated piece, whose support factor has the form
+\(\binom{M}{h-2}/\binom{N}{h}\), or the terminated-plus-final-survivor piece, whose support factor has the form
+\(\binom{M}{h-3}/\binom{N}{h}\).  All other factors in a fixed live-geometry summand are independent of \(h\).
+Restrict to summands with \(M\le \theta N\).  If \(h\ge H\ge3\), then each such summand satisfies
+\[
+\frac{\text{summand}_{h+1}}{\text{summand}_{h}}
+\le
+z^{-1}\,
+\frac{\theta N-h+3}{h-2}\,
+\frac{h+1}{N-h}.
+\]
+Consequently, if
+\[
+q_{H,\theta,z}
+:=
+z^{-1}\,
+\frac{\theta N-H+3}{H-2}\,
+\frac{H+1}{N-H}
+<1,
+\]
+then the low-slot \(r=1\) contribution is geometrically dominated beyond \(H\), up to the residual factor in
+Lemma~\ref{lem:geometric-residual-certificate}.
+\end{lemma}
+
+\begin{proof}
+For a fixed geometry, the only \(h\)-dependent factor after multiplying by the outer generating-function envelope is
+\[
+z^{-h}\frac{\binom{M}{h-c}}{\binom{N}{h}},
+\qquad c\in\{2,3\}.
+\]
+The adjacent ratio is
+\[
+z^{-1}
+\frac{M-h+c}{h+1-c}
+\frac{h+1}{N-h}.
+\]
+The case \(c=3\) is the larger of the two for \(h\ge3\).  Using \(M\le\theta N\) gives the displayed bound.  The right
+side is decreasing on the small-weight interval used here; taking \(h=H\) gives the uniform ratio \(q_{H,\theta,z}\).
+Summing the resulting geometric series is exactly Lemma~\ref{lem:geometric-residual-certificate}.
+\end{proof}
+
+For the current \(k=2^{20}\) checkpoint, \(N=2^{21}\).  Taking \(H=2000\), \(\theta=0.35\), and the tail outer
+parameter \(z=0.370884\) gives
+\[
+\log_2 q_{H,\theta,z}\approx -0.084.
+\]
+This proves the desired finite-prefix reduction for the low-slot part of the \(r=1\) tail.  The diagnostics place the
+dominant \(r=1\) saddle at slot length about \(0.265N\), so it lies safely inside this low-slot branch.  The high-slot
+branch \(M>\theta N\) is discharged by the large-deviation cost of the shared binomial lower tail in
+Lemma~\ref{lem:r-one-high-slot-suppression}; numerically this branch is already more than \(2^{24000}\) below the
+leading low-slot saddle in the \(h=500\) to \(h=2000\) range.
+
+\begin{lemma}[High-slot \(r=1\) suppression below the linear splice]
+\label{lem:r-one-high-slot-suppression}
+Fix constants \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  Consider the same \(r=1\) global-cover
+subpieces as Lemma~\ref{lem:r-one-low-slot-ratio}, but restrict to summands whose support-slot length \(M=xN\)
+satisfies \(x\ge\theta\).  Suppose the outer is bounded by \(A_h^{\mathrm{out}}\le W(z)z^{-h}\).  Then the total
+contribution of the high-slot \(r=1\) branch over \(H<h\le\eta N\) is at most
+\[
+N^{O(1)}W(z)\,
+2^{-N E_{\mathrm{hi}}(\delta,\theta,\eta,z)},
+\]
+where
+\[
+E_{\mathrm{hi}}(\delta,\theta,\eta,z)
+:=
+\inf_{x\in[\theta,1]}
+\left\{
+x\Bigl(1-H_2(\delta/x)\Bigr)
+-
+\eta\max\{0,\log_2(x/z)\}
+\right\}.
+\]
+In particular, whenever \(E_{\mathrm{hi}}>0\), this branch is exponentially negligible compared with the finite
+prefix.
+\end{lemma}
+
+\begin{proof}
+For either \(r=1\) subpiece, high slot length \(M=xN\) forces charged live length at least \(xN-O(m)\): for the
+all-terminated piece this is \((U-m)_+\) with \(M=U-2\), while for the final-survivor piece it is
+\(S+(T-m)_+\) with \(M=S+T-3\).  Hence the shared lower-tail factor is bounded by
+\[
+2^{-xN(1-H_2(\delta/x))+o(N)}
+\]
+uniformly over \(x\ge\theta\).
+
+The \(h\)-dependent support factor has the form
+\(\binom{M}{h-c}/\binom{N}{h}\), with \(c\in\{2,3\}\).  Using falling factorials,
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}
+\le
+\left(\frac{h}{N-h}\right)^c
+\left(\frac{M}{N}\right)^{h-c}.
+\]
+For \(h\le\eta N\), the polynomial-in-\(N\) prefactor absorbs the fixed \(c\), and after multiplying by the outer
+factor \(z^{-h}\) we get at most
+\[
+N^{O(1)}\,
+2^{\eta N\max\{0,\log_2(x/z)\}}.
+\]
+The remaining live-geometry choices for \(r=1\) contribute only another polynomial factor in \(N\).  Taking the worst
+\(x\in[\theta,1]\) proves the displayed bound.
+\end{proof}
+
+For the same checkpoint parameters, \(\delta=0.106\), \(\theta=0.35\), \(z=0.370884\), and even \(\eta=0.25\), the
+exponent satisfies
+\[
+E_{\mathrm{hi}}(\delta,\theta,\eta,z)>0.018.
+\]
+Thus the high-slot \(r=1\) branch is exponentially suppressed throughout the sublinear/intermediate window.  The
+remaining \(h>\eta N\) range belongs to the separate linear-window exponent comparison, not to the finite-prefix
+episode-cover certificate.
+
+Combining Lemmas~\ref{lem:r-one-low-slot-ratio}, \ref{lem:r-one-high-slot-suppression}, and
+\ref{lem:geometric-residual-certificate} gives the desired \(r=1\) conclusion for the bridge window: after computing a
+finite prefix through \(H\), the low-slot residual is a controlled geometric series, while the high-slot residual is
+exponentially small in \(N\).  Thus the \(r=1\) part no longer requires sampling beyond the prefix, except for the
+separate handoff to the established linear-window exponent bound.
+
+\begin{lemma}[Truncated-\(r\) low-slot geometric ratio]
+\label{lem:bounded-r-low-slot-ratio}
+Fix a truncation parameter \(R\ge1\).  Under the same outer generating-function bound
+\(A_h^{\mathrm{out}}\le W(z)z^{-h}\), consider any \(1\le r\le R\) global-cover subpiece.  Its support factor has the
+form
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}},
+\qquad
+c\in\{2r,2r+1\},
+\]
+with all other factors independent of \(h\) for a fixed live geometry.  Restrict to \(M\le\theta N\).  If
+\(h\ge H\ge2R+1\), then every such summand satisfies
+\[
+\frac{\text{summand}_{h+1}}{\text{summand}_{h}}
+\le
+z^{-1}\,
+\frac{\theta N-h+2R+1}{h-2R}\,
+\frac{h+1}{N-h}.
+\]
+Consequently, if
+\[
+q_{H,R,\theta,z}
+:=
+z^{-1}\,
+\frac{\theta N-H+2R+1}{H-2R}\,
+\frac{H+1}{N-H}
+<1,
+\]
+then the low-slot contribution of all \(1\le r\le R\) pieces is controlled by a finite sum of geometric residuals.
+The parameter \(R\) may be chosen with \(N\), provided \(2R<H\) and \(q_{H,R,\theta,z}<1\).
+\end{lemma}
+
+\begin{proof}
+For fixed \(r\) and fixed live geometry, the adjacent ratio is
+\[
+z^{-1}
+\frac{M-h+c}{h+1-c}
+\frac{h+1}{N-h}.
+\]
+The larger case is \(c=2r+1\le2R+1\).  Using \(M\le\theta N\) gives the displayed bound.  Summing over the finitely
+many \(r\le R\) and over the finite set of live-geometry blocks preserves the same geometric residual form, with only
+the finite prefactor already present in the computed prefix.
+\end{proof}
+
+\begin{lemma}[Truncated-\(r\) high-slot suppression below the linear splice]
+\label{lem:bounded-r-high-slot-suppression}
+Fix a truncation parameter \(R\ge1\), constants \(0<\delta<\theta/2<1/2\), \(z\in(0,1)\), and \(0<\eta<1\).  For
+any \(1\le r\le R\), restrict the global-cover subpieces to support-slot length \(M=xN\ge\theta N\).  Then their total
+contribution over \(H<h\le\eta N\) is at most
+\[
+N^{O_R(1)}W(z)\,
+2^{-N E_{\mathrm{hi}}(\delta,\theta,\eta,z)},
+\]
+with \(E_{\mathrm{hi}}\) as in Lemma~\ref{lem:r-one-high-slot-suppression}.  Thus, when \(E_{\mathrm{hi}}>0\), the
+combined high-slot contribution of all bounded \(1\le r\le R\) pieces is exponentially negligible.
+This remains an exponential suppression for any \(R=O(\log N)\), since then the factor \(N^{O_R(1)}\) is
+\(2^{O((\log N)^2)}=2^{o(N)}\).
+\end{lemma}
+
+\begin{proof}
+For fixed \(r\le R\), high slot length \(M=xN\) forces charged live length at least \(xN-O_R(m)\): the all-terminated
+piece has charged length \((U-rm)_+\) with \(M=U-2r\), while the final-survivor piece has charged length
+\(S+(T-rm)_+\) with \(M=S+T-2r-1\).  Hence the shared binomial lower tail contributes
+\[
+2^{-xN(1-H_2(\delta/x))+o(N)}
+\]
+uniformly over \(x\ge\theta\).  The support factor is
+\(\binom{M}{h-c}/\binom{N}{h}\) with \(c\le2R+1\), so the same falling-factorial estimate as in
+Lemma~\ref{lem:r-one-high-slot-suppression} gives, for \(h\le\eta N\),
+\[
+N^{O_R(1)}2^{\eta N\max\{0,\log_2(x/z)\}}.
+\]
+The remaining choices of \(r\) interval lengths and placements contribute only \(N^{O_R(1)}\).  Taking the worst
+\(x\in[\theta,1]\) and summing over \(r\le R\) proves the claim.
+\end{proof}
+
+The truncation \(R\) is therefore flexible.  The current evaluator used \(R=8\), mostly as a conservative constant
+split.  With \(H=2000\), \(\theta=0.35\), and \(z=0.370884\),
+\[
+\log_2 q_{H,8,\theta,z}\approx -0.072,
+\]
+so the low-slot residual remains geometric for every \(1\le r\le8\).  One could instead take a slowly growing split,
+for example \(R\asymp\log k\), as long as \(H\) is chosen so that \(2R<H\) and \(q_{H,R,\theta,z}<1\); the high-slot
+large-deviation lemma still has exponential room.  Thus \(R=8\) is not intrinsic.  It is just the current finite
+certificate cut, and the remaining proof task is to add a separate tail over \(r>R\), using the fixed-tap factor
+\(2^{-r(\sigma-1)}\) and the interval-count entropy.
+
+\begin{lemma}[Large-\(r\) fixed-tap candidate tail]
+\label{lem:large-r-fixedtap-candidate-tail}
+Let \(N=2k\), let \(\sigma=\lceil\log_2 k\rceil+s\), and put
+\[
+q_\sigma:=2^{-(\sigma-1)}.
+\]
+For any \(h\le\eta N\) and any integer \(R\ge0\),
+\[
+\sum_{r>R}\binom{h}{r}q_\sigma^r
+\le
+\frac{
+\left(\dfrac{e\eta 2^{2-s}}{R+1}\right)^{R+1}
+}{
+1-\dfrac{e\eta 2^{2-s}}{R+2}
+},
+\]
+provided \(e\eta 2^{2-s}<R+2\).
+\end{lemma}
+
+\begin{proof}
+Since \(2^{\lceil\log_2 k\rceil}\ge k=N/2\),
+\[
+q_\sigma
+=
+2^{-(\lceil\log_2 k\rceil+s-1)}
+\le
+\frac{2^{2-s}}{N}.
+\]
+Thus, for \(h\le\eta N\),
+\[
+\binom{h}{r}q_\sigma^r
+\le
+\left(\frac{ehq_\sigma}{r}\right)^r
+\le
+\left(\frac{e\eta2^{2-s}}{r}\right)^r.
+\]
+Writing \(A=e\eta2^{2-s}\), the adjacent ratio of \((A/r)^r\) satisfies
+\[
+\frac{(A/(r+1))^{r+1}}{(A/r)^r}
+=
+\frac{A}{r+1}\left(\frac{r}{r+1}\right)^r
+\le
+\frac{A}{r+1}.
+\]
+Therefore the tail beginning at \(r=R+1\) is dominated by a geometric series with ratio at most \(A/(R+2)\), proving
+the claim.
+\end{proof}
+
+For the same checkpoint parameters, \(\eta=1/4\), offset \(s=5\), and the natural split \(R=\log_2 k=20\), the right
+side of Lemma~\ref{lem:large-r-fixedtap-candidate-tail} is below \(2^{-166}\).  This estimate should not be mistaken
+for the full large-\(r\) first-moment tail: the global-cover interval entropy still has to be charged.  Its role is to
+isolate the remaining large-\(r\) task.  Once the live-geometry count is grouped by low slot and high slot, the
+termination-candidate part already has a rapidly summable \((\mathrm{const}/R)^R\) factor when \(R\asymp\log k\).
+
+\begin{lemma}[Large-\(r\) live-geometry ledger]
+\label{lem:large-r-low-slot-ledger}
+Let \(N=2k\), let \(\sigma=\lceil\log_2 k\rceil+s\), and assume
+\(A_h^{\mathrm{out}}\le W(z)z^{-h}\).  Consider a fixed global-cover subpiece with \(r\) terminated intervals and
+support-slot length \(M\le N\).  Let \(c=2r\) for the all-terminated piece and \(c=2r+1\) for the
+terminated-plus-final-survivor piece.  Ignoring the shared binomial lower-tail factor, which is at most \(1\), the
+corresponding first-moment summand is bounded by
+\[
+W(z)\,
+\left(
+\frac{e^2\,2^{2-s}(M+2r)}{r^2}
+\right)^r
+\left(\frac{h}{N-h}\right)^c
+\left(\frac{M}{N}\right)^{h-c}
+z^{-h}.
+\]
+The same bound holds for the suffix-survivor subpiece after taking \(M=S+T-2r-1\) and replacing \(M+2r\) by
+\(T+S+1\).
+\end{lemma}
+
+\begin{proof}
+For the all-terminated subpiece, the live-geometry count is
+\[
+\binom{U-r-1}{r-1}\binom{N-U+r}{r},
+\qquad U=M+2r.
+\]
+It is bounded by
+\[
+\left(\frac{eU}{r}\right)^r\left(\frac{eN}{r}\right)^r.
+\]
+Multiplying by the fixed-tap termination cost and using
+\[
+2^{-r(\sigma-1)}
+\le
+\left(\frac{2^{2-s}}{N}\right)^r
+\]
+leaves the prefactor
+\[
+\left(\frac{e^2\,2^{2-s}U}{r^2}\right)^r.
+\]
+
+It remains to bound the support probability after the interleaver.  The support factor has the form
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}.
+\]
+Since
+\[
+\binom{N}{h}
+=
+\binom{N}{h-c}\frac{(N-h+c)_c}{(h)_c},
+\]
+we have
+\[
+\frac{\binom{M}{h-c}}{\binom{N}{h}}
+\le
+\left(\frac{M}{N}\right)^{h-c}
+\left(\frac{h}{N-h}\right)^c.
+\]
+Multiplying by the outer factor \(W(z)z^{-h}\) proves the all-terminated claim.  The suffix-survivor geometry has the
+same two interval-placement binomials, with terminated length \(T\), suffix length \(S\), and support-slot length
+\(M=S+T-2r-1\); the same argument gives the displayed replacement.
+\end{proof}
+
+\begin{lemma}[Large-\(r\) low-slot finite certificate]
+\label{lem:large-r-low-slot-certificate}
+In the setting of Lemma~\ref{lem:large-r-low-slot-ledger}, fix \(H\), \(R\), \(\eta\), and \(\theta\).  Define
+\[
+\begin{aligned}
+\mathcal{L}(h,r,c,M)
+ &:=
+\log_2 W(z)
++r\log_2\!\left(\frac{e^2\,2^{2-s}(M+2r+2)}{r^2}\right)
++c\log_2\!\left(\frac{h}{N-h}\right)
+\\
+&\hspace{1cm}
++(h-c)\log_2\!\left(\frac{M}{N}\right)
+-h\log_2 z .
+\end{aligned}
+\]
+Suppose that
+\[
+\max
+\mathcal{L}(h,r,c,M)
+\le -B
+\]
+over all
+\[
+H\le h\le \eta N,\qquad
+R<r\le h/2,\qquad
+c\in\{2r,2r+1\},\qquad
+h-c\le M\le\theta N .
+\]
+Then the total low-slot contribution of all global-cover pieces with \(r>R\), \(H\le h\le\eta N\), and
+support-slot length at most \(\theta N\) is at most
+\[
+3N^4\,2^{-B}.
+\]
+Moreover, the displayed maximum may be checked with \(M=\lfloor\theta N\rfloor\).
+\end{lemma}
+
+\begin{proof}
+Lemma~\ref{lem:large-r-low-slot-ledger} bounds each all-terminated low-slot summand by
+\(2^{\mathcal{L}(h,r,2r,M)}\), since \(M+2r\le M+2r+2\), and each suffix-survivor low-slot summand by
+\(2^{\mathcal{L}(h,r,2r+1,M)}\), since \(T+S+1=M+2r+2\).  There are at most \(N\) choices of \(h\), at most \(N\)
+choices of \(r\), at most \(N\) choices of the all-terminated slot \(M\), and at most \(N^2\) choices of the suffix
+pair \((S,T)\).  The all-terminated family contributes at most \(N^3\) such terms and the suffix-survivor family at
+most \(N^4\); the harmless factor \(3\) absorbs these two families and endpoint conventions.  Summing every low-slot
+piece gives at most \(3N^4 2^{-B}\).
+
+For fixed \(h,r,c\), the function \(\mathcal{L}(h,r,c,M)\) is increasing in \(M\) on the feasible range: the term
+\(\log(M+2r+2)\) is increasing, and \(h-c\ge0\).  Therefore the maximum is attained at the largest allowed support
+slot, \(M=\lfloor\theta N\rfloor\).
+\end{proof}
+
+This ledger is the missing bookkeeping object for the large-\(r\) tail.  The important finite-\(n\) feature is the
+unrelaxed factor
+\[
+\left(\frac{h}{N-h}\right)^c.
+\]
+For the current prefix handoff \(h\approx2000\) and \(N=2^{21}\), replacing this by the linear-window bound
+\((\eta/(1-\eta))^c\) would throw away roughly \((700)^{2r}\) at \(r\approx20\).  Thus the large-\(r\) proof should not
+be organized as a pure linear-entropy estimate from the start.  It should first use
+Lemma~\ref{lem:large-r-low-slot-ledger} in the bridge window, then hand off to the high-slot/linear exponent only
+after the support slot is a genuine constant fraction of \(N\).
+
+At the current checkpoint this ledger has substantial slack.  With
+\[
+N=2^{21},\quad
+\sigma=25,\quad
+s=5,\quad
+z=0.370884,\quad
+\theta=0.35,\quad
+H=2000,\quad
+R=20,
+\]
+the worst low-slot value of the displayed bound over \(r>R\), \(h\ge H\), and \(h\le N/4\) occurs at the first omitted
+case \(r=21\), \(h=2000\), \(c=42\), and is about
+\[
+-176\ \text{bits}
+\]
+before summing the remaining live-slot indices.  Even a very coarse \(N^4\) union over \(h,r\) and the suffix
+geometry leaves roughly \(90\) bits of slack.  Lemma~\ref{lem:large-r-low-slot-certificate} packages exactly this
+calculation: the low-slot residual closes once \(R\) is taken near \(\log k\).
+
+The same ledger also audits the finite-prefix evaluator's internal \(r\)-cut.  The evaluator explicitly sums the
+global-cover pieces until the terms have fallen far below the current maximum; the proof certificate then adds a
+separate deterministic tail for the omitted \(r>20\) pieces.
+
+\begin{lemma}[Prefix large-\(r\) stopping tail]
+\label{lem:prefix-large-r-stopping-tail}
+For the checkpoint
+\[
+N=2^{21},\quad
+\sigma=25,\quad
+s=5,\quad
+z=0.370884,\quad
+\theta=0.35,\quad
+R=20,\quad
+H_{\mathrm{pre}}=2000,
+\]
+the total global-cover contribution with \(1\le h\le H_{\mathrm{pre}}\) and \(r>R\), omitted by the finite-prefix
+evaluator's \(r\)-stopping rule, is bounded by
+\[
+2^{-45}+2^{-80000}.
+\]
+\end{lemma}
+
+\begin{proof}
+Split by the same support-slot threshold \(M\le\theta N\) and \(M>\theta N\).  For the low-slot branch, apply
+Lemma~\ref{lem:large-r-low-slot-certificate} with \(H=1\) and \(\eta=1/4\), which only enlarges the finite-prefix range
+\(h\le H_{\mathrm{pre}}\).  The verification finds the maximum of
+\(\mathcal{L}\) at
+\[
+h=725,\qquad r=21,\qquad c=42,\qquad M=\lfloor0.35N\rfloor,
+\]
+with the \(3N^4\) union included giving a total below \(2^{-45}\).
+
+For the high-slot branch, use the same ledger with the support factor maximized by \(M=N\).  For fixed \(r,c\) this
+ledger is increasing in \(h\le H_{\mathrm{pre}}\), since \(z<1\) and \(h/(N-h)\) is increasing, so it is enough to check
+\(h=H_{\mathrm{pre}}\).  The shared live budget is minimized at the slot boundary: for both the all-terminated and
+final-suffix pieces, \(M>\theta N\) gives at least
+\[
+\lfloor\theta N\rfloor-r(\sigma-2)
+\]
+chargeable fair-output positions, up to harmless endpoint slack.  Multiplying the \(M=N,h=H_{\mathrm{pre}}\) ledger by
+the corresponding binomial lower-tail bound and taking the same \(3N^4\) union gives a total below \(2^{-80000}\).
+
+The displayed numerical maxima are checked by
+\[
+\texttt{python scripts/verify\_checkpoint\_prefix.py}.
+\]
+\end{proof}
+
+The complementary high-slot branch is subtler.  For bounded \(r\), Lemma~\ref{lem:bounded-r-high-slot-suppression}
+charges live length \(xN-O_R(m)\), so the ordinary binomial lower-tail exponent absorbs the support entropy.  For
+\(r>R\), this cannot simply be recycled: \(r\sigma\) may be a macroscopic subtraction from the charged live length.
+Thus the remaining large-\(r\) task is either to hand this branch to the established linear-weight exponent
+comparison, or to prove a new large-\(r\) entropy bound that keeps the interval count, the \(2^{-r(\sigma-1)}\)
+termination cost, and the reduced charged live length in the same exponent.  The low-slot certificate above removes
+the bridge-tail part of the problem; it does not by itself solve the high-slot large-\(r\) branch.
+
+\begin{lemma}[Low linear handoff for the \(0.106\) checkpoint]
+\label{lem:low-linear-handoff-0106}
+For \(\delta=0.106\), take \(\xi=8\) in Theorem~\ref{prop:dense-inner-linear-exponent} and take the run-fraction
+parameter there to be \(10^{-3}\).  Then
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+-
+E_{\mathrm{in}}(\eta;10^{-3},0.106,8)
+\le -0.009
+\qquad
+(9\cdot10^{-4}\le \eta\le \eta_{\mathrm{crit}}).
+\]
+\end{lemma}
+
+\begin{proof}
+On this interval \(\eta<\eta_{\mathrm{crit}}\), so Corollary~\ref{cor:outer-dense-highweight-exponent} gives
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=\eta\log_2(1+\sqrt2).
+\]
+The binomial exponent in Theorem~\ref{prop:dense-inner-linear-exponent} is
+\[
+E_{\mathrm{bin}}(0.106,8)=1-H_2(0.106)>0.512,
+\]
+so throughout this low-linear interval the minimum is attained by the run-deficit exponent.  Substituting
+\(10^{-3}\) in the explicit run rate function from Corollary~\ref{cor:run-lower-tail-alpha}, direct numerical
+evaluation of the resulting one-variable function on
+\(9\cdot10^{-4}\le\eta\le\eta_{\mathrm{crit}}\) gives the displayed gap.  The
+companion check is
+\[
+\begin{gathered}
+\texttt{python scripts/verify\_dense\_claims.py --delta 0.106 --theta 0.001 --xi 8}\\
+\texttt{--eta-lo 0.0009 --eta-hi 0.292893218813}.
+\end{gathered}
+\]
+At the left endpoint,
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(9\cdot10^{-4})\approx0.00114,
+\qquad
+E_{\mathrm{in}}(9\cdot10^{-4};10^{-3},0.106,8)\approx0.01037.
+\]
+\end{proof}
+
+Since \(2000/2^{21}\approx9.54\cdot10^{-4}\), Lemma~\ref{lem:low-linear-handoff-0106} overlaps the current finite
+prefix.  Thus, for the checkpoint certificate, the high-slot large-\(r\) branch can be treated as part of the
+already-proved linear-weight handoff once the finite prefix reaches \(H=2000\).
+
+\begin{lemma}[Geometric residual certificate]
+\label{lem:geometric-residual-certificate}
+Let \(b_h\ge0\), and suppose that for some \(H\) and \(\alpha>0\),
+\[
+b_{h+1}\le 2^{-\alpha}b_h
+\qquad(h\ge H).
+\]
+Then
+\[
+\sum_{h>H}b_h
+\le
+\frac{2^{-\alpha}}{1-2^{-\alpha}}\,b_H.
+\]
+Consequently, any finite first-moment prefix through \(H\) becomes a full first-moment certificate once the displayed
+ratio bound is proved for the residual terms.
+\end{lemma}
+
+\begin{proof}
+Iterate the ratio bound:
+\(b_{H+j}\le 2^{-j\alpha}b_H\) for \(j\ge1\), and sum the resulting geometric series.
+\end{proof}
+
+\begin{lemma}[Checkpoint residual split at \(\delta=0.106\)]
+\label{lem:checkpoint-residual-split-0106}
+For the checkpoint
+\[
+k=2^{20},\quad N=2^{21},\quad \sigma=25,\quad \delta=0.106,\quad
+H=2000,\quad R=20,\quad \theta=0.35,\quad z=0.370884,
+\]
+the residual first-moment contribution after the finite prefix \(h\le H\) is reduced to four explicit pieces:
+\[
+\begin{array}{ll}
+\text{\rm (i)} & 1\le r\le R,\ M\le\theta N,\\
+\text{\rm (ii)} & 1\le r\le R,\ M>\theta N,\\
+\text{\rm (iii)} & r>R,\ M\le\theta N,\\
+\text{\rm (iv)} & r>R,\ M>\theta N.
+\end{array}
+\]
+Piece \({\rm (i)}\) is geometrically dominated from the boundary \(h=H\), with
+\[
+\log_2 q_{H,R,\theta,z}<-0.056.
+\]
+Piece \({\rm (ii)}\) is exponentially suppressed by Lemma~\ref{lem:bounded-r-high-slot-suppression}.  Piece
+\({\rm (iii)}\) is at most
+\[
+3N^4\,2^{-176}<2^{-90}.
+\]
+Piece \({\rm (iv)}\), and in fact every linear-weight contribution with
+\(H/N\le\eta\le\eta_{\mathrm{crit}}\), is absorbed by Lemma~\ref{lem:low-linear-handoff-0106}, giving a first-moment exponent gap at
+least \(0.009N\).
+\end{lemma}
+
+\begin{proof}
+For \({\rm (i)}\), substitute the displayed parameters into Lemma~\ref{lem:bounded-r-low-slot-ratio}.  Since
+\[
+q_{H,R,\theta,z}
+=
+z^{-1}\,
+\frac{\theta N-H+2R+1}{H-2R}\,
+\frac{H+1}{N-H}
+<2^{-0.056},
+\]
+Lemma~\ref{lem:geometric-residual-certificate} controls the low-slot bounded-\(r\) tail from the finite-prefix
+boundary.
+
+For \({\rm (ii)}\), Lemma~\ref{lem:bounded-r-high-slot-suppression} applies with \(R=20=O(\log N)\).  At
+\(\eta=1/4\), the checkpoint verifier computes
+\[
+E_{\mathrm{hi}}(0.106,0.35,1/4,0.370884)>0.018,
+\]
+so this branch is exponentially small.
+
+For \({\rm (iii)}\), the large-\(r\) low-slot ledger gives a worst summand below \(2^{-176}\) over
+\(r>20\), \(H\le h\le N/4\), and \(M\le0.35N\).  Lemma~\ref{lem:large-r-low-slot-certificate} then contributes the
+coarse union factor \(3N^4\), and \(3(2^{21})^4 2^{-176}<2^{-90}\).
+
+For \({\rm (iv)}\), \(H/N=2000/2^{21}>9\cdot10^{-4}\), so Lemma~\ref{lem:low-linear-handoff-0106} covers the entire
+interval from the finite-prefix handoff through \(\eta_{\mathrm{crit}}\).  The polynomial number of weight slices is
+negligible compared with the \(2^{-0.009N}\) exponent gap.
+
+The companion verification command for the displayed checkpoint constants is
+\[
+\texttt{python scripts/verify\_checkpoint\_residual.py}.
+\]
+\end{proof}
+
+Thus the tail problem has become finite and auditable at the current checkpoint.  The phrase ``low-slot \(r>R\)''
+means precisely branch \({\rm (iii)}\): more than \(R\) terminated early episodes, but with the total support slot
+still shorter than \(\theta N\).  This was the dangerous bridge-tail case because the linear exponent loses the
+finite-\(h\) factor \((h/(N-h))^c\); Lemma~\ref{lem:large-r-low-slot-certificate} keeps that factor and closes the
+branch.  The complementary high-slot case is no longer a separate bridge phenomenon once \(H/N\) enters the
+low-linear window covered by Lemma~\ref{lem:low-linear-handoff-0106}.
+
+The break-even checkpoint is therefore no longer an unbounded \(h\)-search.  The finite prefix \(h\le2000\) and the
+numerical constants in Lemma~\ref{lem:checkpoint-residual-split-0106} are packaged as a single reproducible
+certificate artifact.  The theorem below is a finite-\(n\), computer-assisted certificate: the analytic reductions are
+the displayed lemmas, and the numerical inputs are the committed prefix and residual summaries checked by the verifier.
+The current top-level checkpoint verifier is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106.py}.
+\]
+
+\begin{theorem}[Finite dense+dense checkpoint at relative distance \(0.106\)]
+\label{thm:finite-dense-dense-checkpoint-0106}
+Consider the fixed-tap banded systematic outer ensemble with message length \(k=2^{20}\), parity length \(k\), and
+outer memory \(\sigma=25\), concatenated through a uniform interleaver with the fixed-tap dense recursive inner ensemble of
+blocklength
+\[
+N=2k=2^{21}
+\]
+and inner memory \(m=25\).  Let \(\Csc\) be the resulting serially concatenated code, and set
+\[
+d=\lfloor 0.106\,N\rfloor=222298.
+\]
+The checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}
+\le
+2^{-0.34}
+<0.8.
+\]
+Equivalently, with probability at least \(1-2^{-0.34}\) over the outer ensemble, interleaver, and inner ensemble,
+\[
+d_{\min}(\Csc)\ge222299,
+\]
+and hence the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+By the direct first-moment reduction, it is enough to upper-bound
+\[
+\mu_{N,25}(0.106)
+=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}\,p_h^{\mathrm{in}}(0.106).
+\]
+The finite prefix \(h\le2000\) is certified by the global episode-cover computation with exact survivor-only
+accounting through \(h\le30\), fixed-tap banded outer counts where available, and the fixed-tap banded generating
+function envelope thereafter.  The committed summary checked by
+\[
+\texttt{python scripts/verify\_checkpoint\_prefix.py}
+\]
+gives
+\[
+\log_2 \mu_{\le2000}\le -0.347781,
+\]
+with peak contribution at \(h=2\).  The same prefix verifier also audits the evaluator's internal \(r\)-stopping rule:
+the omitted \(r>20\) low-slot prefix tail is below \(2^{-45}\), while the corresponding high-slot prefix tail is below
+\(2^{-80000}\), as formalized in Lemma~\ref{lem:prefix-large-r-stopping-tail}.  Adding these tails does not change the
+displayed total at the shown precision.
+
+For \(h>2000\), Lemma~\ref{lem:checkpoint-residual-split-0106} supplies the residual split.  The bounded-\(r\)
+low-slot branch is a geometric residual from the boundary; the bounded-\(r\) high-slot branch is exponentially
+suppressed; the large-\(r\) low-slot branch is below \(2^{-90}\) after the coarse union over live geometry; and the
+large-\(r\) high-slot/linear handoff has exponent gap at least \(0.009N\) until the usual high-linear splice takes
+over.  The range \(\eta\ge\eta_{\mathrm{crit}}\) is covered by the already-proved linear-weight comparison
+Theorem~\ref{prop:dense-dense-highweight-gap} with the easier target \(\delta=0.106<0.109\), since
+\(p_h^{\mathrm{in}}(\delta)\) is nondecreasing in \(\delta\).  The top-weight range is handled by the same
+outer-exponent argument as in Theorem~\ref{thm:dense-dense-explicit-constant}; this part uses only the trivial
+inner bound \(p_h^{\mathrm{in}}\le1\), so it is independent of the choice of \(\delta\).
+
+The top-level verifier
+\[
+\texttt{python scripts/verify\_checkpoint\_0106.py}
+\]
+checks the finite prefix and the displayed residual constants together.  Its certified total is below \(2^{-0.34}\).
+Markov's inequality then gives the stated failure-probability bound.
+\end{proof}
+
+\begin{theorem}[Finite dense+dense margin checkpoint with one extra tap]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma26}
+Consider the same fixed-tap banded systematic outer / fixed-tap dense recursive inner construction as
+Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}, but with outer memory and inner memory both equal to
+\[
+\sigma=m=26.
+\]
+Keep \(k=2^{20}\), \(N=2^{21}\), and \(d=\lfloor0.106N\rfloor=222298\).  Then the stronger checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(26)}
+\le
+2^{-0.9}.
+\]
+Equivalently, with probability at least \(1-2^{-0.9}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+The first-moment reduction is the same as in Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}.  The finite prefix
+now uses \(H_{\mathrm{pre}}=600\), \(R=16\), exact survivor-only accounting through \(h\le30\), exact fixed-tap banded
+outer counts through \(h\le80\), and a coarser certified blocked grid with block ratios \(1.02\) and \(1.1\).  The
+prefix verifier reports
+\[
+\log_2\mu_{\le600}\le -0.967862,
+\]
+again with peak contribution at \(h=2\).  Its omitted \(r>16\) prefix tails are below \(2^{-52}\) on the low-slot side
+and below \(2^{-83000}\) on the high-slot side, so they do not change the displayed total.
+
+For \(h>600\), the residual split is the same four-way split as Lemma~\ref{lem:checkpoint-residual-split-0106}, with
+\[
+H=600,\qquad R=16,\qquad \sigma=26.
+\]
+The bounded-\(r\) low-slot ratio is already below one:
+\[
+\log_2 q_{600,16,0.35,0.370884}<-0.0028.
+\]
+The large-\(r\) low-slot ledger, after the same \(3N^4\) union, is below \(2^{-52}\).  The bounded-\(r\) high-slot
+branch and the linear handoff are unchanged in exponent and remain covered by
+Lemmas~\ref{lem:bounded-r-high-slot-suppression} and~\ref{lem:low-linear-handoff-0106}; the top-weight range is again
+handled by the outer-exponent argument using \(p_h^{\mathrm{in}}\le1\).
+
+The top-level verifier for this margin checkpoint is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig26.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(26)}\le -0.967862<-0.9\).  Markov's inequality gives the stated bound.
+\end{proof}
+
+\begin{theorem}[Finite dense+dense larger-margin checkpoint]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma32}
+Consider the same fixed-tap banded systematic outer / fixed-tap dense recursive inner construction as
+Theorem~\ref{thm:finite-dense-dense-checkpoint-0106}, but with
+\[
+\sigma=m=32.
+\]
+Keep \(k=2^{20}\), \(N=2^{21}\), and \(d=\lfloor0.106N\rfloor=222298\).  Then the larger-margin checkpoint certificate
+gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(32)}
+\le
+2^{-2.4}.
+\]
+Equivalently, with probability at least \(1-2^{-2.4}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+The certificate uses the same first-moment split as
+Theorems~\ref{thm:finite-dense-dense-checkpoint-0106} and~\ref{thm:finite-dense-dense-checkpoint-0106-sigma26}.  The
+finite prefix uses \(H_{\mathrm{pre}}=500\), \(R=12\), exact survivor-only accounting through \(h\le30\), exact fixed-tap
+banded outer counts through \(h\le80\), and the same certified blocked grid ratios \(1.02\) and \(1.1\) as the
+\(\sigma=26\) margin checkpoint.  The prefix verifier reports
+\[
+\log_2\mu_{\le500}\le -2.424512,
+\]
+with peak contribution still at \(h=2\).  The observed adjacent tail ratio on the computed prefix, checked from
+\(h=200\) through \(500\), is at most \(-0.685731\) bits, giving a geometric residual below \(2^{-351}\).
+
+For \(h>500\), the residual split uses
+\[
+H=500,\qquad R=12,\qquad \sigma=32.
+\]
+The bounded-\(r\) low-slot ratio satisfies
+\[
+\log_2 q_{500,12,0.35,0.370884}<-0.0103.
+\]
+The large-\(r\) low-slot ledger, after the \(3N^4\) union, is below \(2^{-154}\).  The high-slot branch, linear handoff,
+and top-weight range are handled by the same residual lemmas as before.
+
+The top-level verifier is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig32.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(32)}\le -2.424512<-2.4\).  Markov's inequality gives the stated bound.
+\end{proof}
+
+\begin{theorem}[Finite dense+dense checkpoint with terminated outer tail]
+\label{thm:finite-dense-dense-checkpoint-0106-sigma32-tail}
+Consider the fixed-tap banded systematic outer with message length \(k=2^{20}\), outer memory \(\sigma=32\), and a
+terminated parity tail of length \(\sigma\), so the outer/interleaver length is
+\[
+N=2k+\sigma=2097184.
+\]
+Concatenate it through the fixed-tap dense recursive inner with \(m=32\), and set
+\[
+d=\lfloor0.106N\rfloor=222301.
+\]
+Then the terminated-tail checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{(32,\mathrm{tail})}
+\le
+2^{-6.2}.
+\]
+Equivalently, with probability at least \(1-2^{-6.2}\), the relative minimum distance is larger than \(0.106\).
+\end{theorem}
+
+\begin{proof}
+This is the same certificate as Theorem~\ref{thm:finite-dense-dense-checkpoint-0106-sigma32}, except that the outer
+small-weight enumerator and generating-function envelope use parity length \(k+\sigma\) rather than \(k\), and the inner
+interleaver length is \(N=2k+\sigma\).  The finite prefix uses \(H_{\mathrm{pre}}=500\), \(R=12\), exact survivor-only
+accounting through \(h\le30\), exact fixed-tap banded outer counts through \(h\le80\), and blocked grid ratios \(1.02\)
+and \(1.1\).  The prefix verifier reports
+\[
+\log_2\mu_{\le500}\le -6.297944.
+\]
+The peak contribution moves from the truncated-boundary \(h=2\) mode to \(h=8\), with peak term \(-8.912531\).  The
+observed adjacent tail ratio from \(h=200\) through \(500\) is at most \(-0.685739\) bits, giving a geometric residual
+below \(2^{-354}\).  The omitted \(r>12\) prefix tails are below \(2^{-155}\) on the low-slot side and below \(2^{-83000}\)
+on the high-slot side.
+
+For \(h>500\), the residual split uses \(H=500\), \(R=12\), \(\sigma=32\), and \(N=2k+\sigma\).  The bounded-\(r\)
+low-slot ratio remains below one:
+\[
+\log_2 q_{500,12,0.35,0.370884}<-0.0103,
+\]
+and the large-\(r\) low-slot ledger after the \(3N^4\) union is below \(2^{-156}\).  The high-slot branch, linear
+handoff, and top-weight range are unchanged at this resolution.
+
+The top-level verifier is
+\[
+\texttt{python scripts/verify\_checkpoint\_0106\_sig32\_tail.py}.
+\]
+It checks the finite prefix, omitted prefix \(r\)-tail, residual constants, and the certified total
+\(\log_2\mu_{\mathrm{cert}}^{(32,\mathrm{tail})}\le -6.297944<-6.2\).  Markov's inequality gives the stated bound.
+\end{proof}
+
+\paragraph{Sigma-margin scan for the terminated-tail model.}
+The terminated-tail correction removes the artificial right-boundary \(h=2\) floor, but it does not by itself make a
+large finite-\(n\) safety margin cheap.  To calibrate the cost of a \(40\)-bit first-moment margin, we scanned
+\[
+\sigma=m\in\{24,32,40,\ldots\}
+\]
+at \(k=2^{20}\), with outer parity length \(k+\sigma\), interleaver length \(N=2k+\sigma\), and
+\(d=\lfloor \delta N\rfloor\).  The scan uses exact fixed-tap outer counts through \(h\le30\), exact final-survivor
+placement through the same window, and the global episode-cover inner bound.  It is therefore best read as a
+small-weight margin diagnostic, with the crossing point later checked by the larger prefix certificate when needed.
+
+\[
+\begin{array}{c|rrrrrrrr}
+\sigma & 24 & 32 & 40 & 48 & 56 & 64 & 72 & 80\\
+\hline
+-\log_2\mu_{\le30},\ \delta=.106
+&0.002&6.298&12.088&17.869&23.650&29.431&35.212&40.993\\
+h_*
+&6&8&9&10&12&13&15&16\\
+\hline
+-\log_2\mu_{\le30},\ \delta=.09
+&1.842&8.110&14.202&20.292&26.382&32.471&38.561&44.651\\
+h_*
+&5&7&8&9&10&12&13&14
+\end{array}
+\]
+
+Thus, on this \(+8\) grid, both \(\delta=0.106\) and \(\delta=0.09\) first cross \(40\) bits at \(\sigma=80\), although
+the \(\delta=0.09\) curve is already within about \(1.44\) bits of the target at \(\sigma=72\).  At \(\delta=0.106\),
+the crossing point was also checked with the larger prefix machinery at \(\sigma=80\): exact outer counts through
+\(h\le50\), global episode-cover terms through \(h\le500\), and the residual split beyond \(H=500\) give
+\[
+\log_2\mu_{\le500}\le -40.991450,
+\]
+with peak contribution at \(h=16\).  The large-\(r\) residual ledger after the \(3N^4\) union is below \(2^{-812}\).
+The diagnostic conclusion is that the corrected finite-\(k\) proof has a real small/intermediate ridge, not just a
+right-boundary artifact: increasing \(\sigma\) buys roughly \(0.7\) bits of margin per tap in this range, and the
+maximizing weight drifts from tiny \(h\) toward \(h\approx 0.2\sigma\).
+
+The reproducibility entry point for this scan is
+\[
+\texttt{python scripts/scan\_sigma\_margin\_tail.py}.
+\]

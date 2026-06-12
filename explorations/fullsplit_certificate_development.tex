@@ -1,0 +1,2039 @@
+% Preserved full-split certificate development ledger.
+% Source: localCodeStructured.tex before the compact main-spine rewrite.
+% This file is not included in main_permConv.tex.
+
+% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
+% Main-spine structured local-code construction and finite full-split certificate.
+
+\section{Structured local-code construction}
+\label{sec:structured-local-code}
+
+\subsection{Local-code outer certificate interface}
+\label{subsec:local-code-outer-interface}
+
+The structured construction replaces the sliding random-banded outer by a direct sum of short local codes.  The proof
+interface is intentionally local-code independent: the outer contributes only its weight enumerator, while the inner
+contributes slice bounds for interleaved words of a given weight.  Systematic form is not required for the outer code.
+
+\begin{lemma}[Block-outer first-moment interface]
+\label{lem:block-outer-first-moment-interface}
+Let \(C_{\mathrm{loc}}\subseteq\F_2^{n_0}\) be a binary linear \([n_0,b]\) code with homogeneous weight enumerator
+\[
+W_{\mathrm{loc}}(z)=\sum_j A^{\mathrm{loc}}_j z^j,
+\]
+and let \(C_{\mathrm{out}}=C_{\mathrm{loc}}^{\oplus M}\).  Its message length is \(k=Mb\), its
+outer/interleaver length is \(N=Mn_0\), and its weight enumerator is
+\[
+W_{\mathrm{out}}(z)=W_{\mathrm{loc}}(z)^M,
+\]
+where \(A_0^{\mathrm{out}}=1\) is omitted in the nonzero-codeword sum.  If \(p_h^{\mathrm{in}}(\delta)\) is any valid
+upper bound on the fixed-tap dense recursive inner producing output weight at most \(\lfloor\delta N\rfloor\) from an
+interleaved outer word of weight \(h\), then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+\mu_{\mathrm{block}}(\delta)
+:=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+The direct-sum enumerator identity follows by multiplying the local generating functions block by block.  Conditional
+on any nonzero outer word of weight \(h\), the uniform interleaver randomizes only the support positions seen by the
+inner code, so the same inner bound \(p_h^{\mathrm{in}}(\delta)\) applies to every such word.  Summing these failure
+probabilities over all nonzero outer words gives \(\mu_{\mathrm{block}}(\delta)\), and Markov's inequality gives the
+minimum-distance bound.
+\end{proof}
+
+\begin{lemma}[Finite block-certificate template]
+\label{lem:finite-block-certificate-template}
+In the setting of Lemma~\ref{lem:block-outer-first-moment-interface}, fix a prefix cutoff \(H\), an episode cutoff
+\(R\), and a live-slot cutoff \(\theta N\).  Suppose the prefix satisfies
+\[
+P_H:=\sum_{1\le h\le H} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\le P,
+\]
+and suppose the residual \(h>H\) is bounded by four audited pieces
+\[
+\begin{array}{ll}
+T_{\mathrm{lo},\le R} & (1\le r\le R,\ M\le\theta N),\\
+T_{\mathrm{hi},\le R} & (1\le r\le R,\ M>\theta N),\\
+T_{\mathrm{lo},>R} & (r>R,\ M\le\theta N),\\
+T_{\mathrm{hi},>R} & (r>R,\ M>\theta N).
+\end{array}
+\]
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+P+T_{\mathrm{lo},\le R}+T_{\mathrm{hi},\le R}+T_{\mathrm{lo},>R}+T_{\mathrm{hi},>R}.
+\]
+In particular, a finite certificate proving that the right-hand side is at most \(2^{-\lambda}\) gives failure
+probability at most \(2^{-\lambda}\).
+\end{lemma}
+
+\begin{proof}
+This is only bookkeeping.  Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure probability to the
+first moment over nonzero outer weights.  The prefix contributes \(P_H\), and the residual partition covers all
+post-prefix episode configurations.  Summing the audited upper bounds gives the displayed estimate.
+\end{proof}
+
+Thus a local code with a published or certified spectrum drops into exactly the same first-moment interface
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer; the
+block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short local
+spectrum certificate.
+
+
+\subsection{Full-split local-code recursive inner}
+\label{subsec:fullsplit-local-code-inner}
+
+The finite certificate below instantiates the inner interface with the full-split extended-BCH block inner used in the
+current checkpoint.  Its local-code-independent input is the short block spectrum and the random split law; the concrete
+checked theorem uses the EBCH \([128,64,22]\) spectrum.
+
+\paragraph{Full-codeword random-split variant.}
+There is a proof-friendlier variant that avoids the systematic split profile \(B_{j,q'}\).  After forming
+\[
+V_i=U_i+S_{i-1},
+\]
+if \(V_i\ne0\), apply a block scrambler \(A_i\in GL_b(2)\), encode \(Z_i=A_iV_i\) with the rate-half BCH block code,
+and randomly split the \(2b\) BCH coordinates into \(b\) emitted coordinates and \(b\) state coordinates:
+\[
+C_i=E_{\rm BCH}(A_iV_i),\qquad (Y_i,S_i)=\operatorname{split}_b(\tau_i C_i).
+\]
+For random \(A_i\), conditional on \(V_i\ne0\), the BCH codeword is uniform over nonzero BCH codewords.  Hence the
+ordinary full BCH weight spectrum \(A_w\) is sufficient.  If \(w=\wt(C_i)\), then
+\[
+\Pr[\wt(S_i)=q'\mid w]
+=
+\frac{\binom{b}{q'}\binom{b}{w-q'}}{\binom{2b}{w}},
+\qquad
+\wt(Y_i)=w-q'.
+\]
+The user's ``self turnoff'' concern is exactly the \(q'=0\) tail of this hypergeometric split:
+\[
+\Pr[q'=0\mid w]=\frac{\binom{b}{w}}{\binom{2b}{w}},
+\]
+and is therefore directly charged rather than hidden in a split-profile theorem.  Using the published
+EBCH \([128,64]\) spectrum table, the unconditional nonzero-codeword split tails are
+\[
+\begin{array}{c|c}
+\text{tail} & \log_2\Pr[\text{tail}]\\
+\hline
+q'=0 & -64.004574\\
+q'\le4 & -44.626752\\
+q'\le8 & -31.743503\\
+q'\le16 & -14.658598
+\end{array}
+\]
+Thus exact self-termination is tiny, while small-state tails remain explicit terms in the weight-chain transfer.
+There is also a useful exact local simplification.  Suppose the incoming state has support size \(q\), and the next
+input block contributes \(r\) permuted nonzero coordinates.  The only way to turn off before applying the BCH branch is
+exact cancellation of the two subsets.  Hence
+\[
+\Pr[V_i=0\mid q,r]
+=
+\begin{cases}
+\binom{b}{q}^{-1}, & q=r,\\
+0, & q\ne r.
+\end{cases}
+\]
+On the complementary event \(V_i\ne0\), the next \((\wt(Y_i),\wt(S_i))\) law is the same fixed full-spectrum split law,
+independent of \(q\), \(r\), and \(\wt(V_i)\).  Thus the transfer kernel is not a general two-parameter local profile:
+it is an exact-cancellation atom plus one weighted BCH split vector.  This is the main reason the full-split variant is
+cleaner than the systematic split model.
+
+The first bucketed diagnostics for this full-split variant are encouraging.  Against the same RM outer prefix at
+\(N=2^{21}\), \(\delta=.09\), \(L=5949\), and the EBCH full spectrum, the middle bucket
+\(4001\text{--}8000\) with \(r=1\), \(16\)-weight state buckets, gives
+\[
+\begin{array}{c|c}
+h & \log_2\text{ term}\\
+\hline
+32 & -23.40\\
+64 & -30.64\\
+80 & -27.80
+\end{array}
+\]
+using \(\lambda=0.0002\) for the latter two rows.  The \(h=32\) full coarse range \(1\text{--}12000\) is still
+dominated by the near-boundary placement bucket and gives about \(-17.38\) bits, so the boundary split remains real.
+However, unlike the systematic-split diagnostic, the intermediate \(h\) rows do not appear to drift toward failure in
+the tested bucket.
+
+After exploiting the exact-cancellation-plus-fixed-branch structure, the diagnostic can run with exact state weights
+\(q=0,\ldots,b\) rather than \(16\)-weight buckets.  The exact-\(q\) ridge check for
+\(h\in\{32,40,64,80\}\), \(r=1\), and the three coarse gap buckets
+\(1\text{--}4000\), \(4001\text{--}8000\), \(8001\text{--}12000\) gives total exponent about \(-17.56\) bits over
+this table.  The largest rows are
+\[
+\begin{array}{c|c|c|c}
+h & r & \text{gap bucket} & \log_2\text{ term}\\
+\hline
+32 & 1 & 1\text{--}4000 & -17.88\\
+40 & 1 & 1\text{--}4000 & -19.91\\
+64 & 1 & 1\text{--}4000 & -26.21\\
+80 & 1 & 4001\text{--}8000 & -28.33\\
+80 & 1 & 1\text{--}4000 & -30.41
+\end{array}
+\]
+For \(h=32\), exact-\(q\) and \(r=1,2,3,4\) over the same three buckets gives total exponent about \(-17.88\) bits,
+again dominated by the \(r=1\), \(1\text{--}4000\) boundary bucket.  In that near-boundary bucket the \(r=2,3,4\)
+terms are approximately \(-27.18\), \(-37.14\), and \(-47.58\), respectively.  Thus the present finite evidence says
+that the full-split bottleneck has moved from intermediate \(h\) to the first nonzero RM weight, one-coordinate
+first-active, boundary-placement branch.
+
+This is still a finite diagnostic, not a proof.  The proof target should now be an exact-\(q\) first-moment transfer
+using the cancellation formula above, followed by a tail domination lemma showing that the remaining \(h\)'s, larger
+first-block occupancies, and farther gap buckets are dominated by the checked ridge.  The diagnostic script is
+\[
+\texttt{python scripts/certify\_fullsplit\_inner\_bucket\_sum.py}.
+\]
+
+A subsequent prefix-summation check shows that the exact-\(q\) transfer cannot simply be used as one unconditional
+black-box exponent.  If one reuses the measured bucket exponents
+\[
+-0.475,\qquad -37.407,\qquad -74.323
+\]
+for the three buckets \(1\text{--}4000\), \(4001\text{--}8000\), and \(8001\text{--}12000\), and sums the RM outer
+prefix through \(h=500\), the far bucket is not summable; the pessimistic prefix sum is strongly positive and peaks at
+the artificial endpoint \(h=500\).  This should not be read as a counterexample to the construction, but it is a real
+warning about the proof method.  The one-shot Chernoff moment is capped by the \(q'=0\) self-turnoff atom: even a long
+live trajectory has a rare early-termination branch, and the unconditional exponential moment pays for that branch
+poorly when summed against many outer words.  Thus the full proof should split the inner event into survival/episode
+classes.  On a long-survival class the emitted BCH split weights should give a much stronger Chernoff exponent; on a
+short-episode class the proof must charge the probability of self-turnoff and then restart with the remaining input
+placement.  In other words, the full-split variant removes the unknown systematic split profile, but it does not remove
+the need for an episode-count or survival-conditioned correction.  The current bookkeeping helper is
+\[
+\texttt{python scripts/sum\_fullsplit\_uniform\_inner.py}.
+\]
+
+The survival-conditioned side of this split has very large slack.  Let
+\[
+p_0:=\Pr[q'=0]
+\]
+for one nonzero BCH split branch.  For the EBCH \([128,64]\) table,
+\[
+\log_2 p_0=-64.004574.
+\]
+If the \(q'=0\) atom is excluded for \(T\) consecutive live branches, the one-branch split law has essentially the same
+mean output \(32\), but no early absorbing off state.  Optimizing the Chernoff parameter for the three current live
+lengths gives
+\[
+\begin{array}{c|c|c}
+T & \log_2\text{ survival-conditioned Chernoff bound} & \lambda\\
+\hline
+5949 & -20.01 & .017\\
+9949 & -78398.76 & .864\\
+13949 & -228370.90 & 1.316
+\end{array}
+\]
+Using these as bucket exponents and summing the RM prefix through \(h=500\) gives total about \(-34.77\) bits, dominated
+by the near-boundary bucket.  Thus the long-survival branch is not the problem; the middle and far buckets essentially
+disappear once self-turnoff is excluded.
+
+The short-episode branch still needs real work.  A crude union charge \(T p_0\) for one self-turnoff, followed by
+discarding all remaining output, is far too weak: the same \(h\le500\) prefix remains strongly positive and again peaks
+at the artificial \(h=500\) endpoint.  The missing lemma must therefore be recursive or episode-counting: if an early
+episode self-terminates, the proof must restart with the remaining input placement and charge either another
+self-turnoff, a long-survival Chernoff event, or the event that all remaining input has moved into the late window.  The
+supporting diagnostic for the survival side is
+\[
+\texttt{python scripts/analyze\_fullsplit\_survival.py}.
+\]
+
+There is a clean candidate for this episode-counting lemma.  Fix the first active block and let \(T\) blocks remain
+after it.  Suppose \(H\) input symbols remain.  If exactly \(x\) of the \(T\) later blocks are occupied by these
+symbols, then the \(x\) occupied blocks and the terminal suffix define \(m=x+1\) zero-gaps after active blocks,
+including the gap after the first active block.  The occupancy law is exact:
+\[
+\Pr[X=x]
+=
+\frac{\binom{T}{x}\,[z^H]\big((1+z)^b-1\big)^x}{\binom{bT}{H}}.
+\]
+Conditional on \(X=x\), the gap vector is a uniform composition of \(G=T-x\) empty blocks into \(m=x+1\) nonnegative
+parts.  Therefore the expected number of \(e\)-subsets of gaps whose total skipped length is \(s\) is
+\[
+\binom{m}{e}\,
+\frac{\binom{s+e-1}{e-1}\binom{G-s+m-e-1}{m-e-1}}
+{\binom{G+m-1}{m-1}},
+\]
+with the obvious endpoint conventions for \(e=0\) and \(e=m\).  If those \(e\) gaps are skipped by \(q'=0\)
+self-turnoffs, their probability contribution is \(p_0^e\).  The remaining \(T-s\) live branches are then charged by
+the survival-conditioned Chernoff factor
+\[
+\inf_{\lambda>0}\exp(\lambda d)
+\left(\sum_{j,q>0}p_{j,q}e^{-\lambda j}\right)^{T-s},
+\]
+where \(p_{j,q}\) is the full BCH split law.  This gives a completely explicit self-turnoff episode upper bound:
+\[
+\sum_x \Pr[X=x]\sum_{e,s}
+p_0^e\,
+\mathbb{E}\big[\#\{e\text{-gap subsets with skipped length }s\}\mid X=x\big]\,
+\inf_{\lambda>0}e^{\lambda d}M_+(\lambda)^{T-s}.
+\]
+It is still missing exact input/state cancellation events \(V_i=0\), but it directly addresses the dominant
+self-turnoff/restart mechanism that broke the one-shot MGF.
+
+The first diagnostics for this explicit episode-gap bound are favorable.  They use \(r=1\) in the first active block,
+so \(H=h-1\), and charge only self-turnoffs \(q'=0\).  The near bucket \(T=5949\) is dominated by the no-self-turnoff
+survival term and gives about \(-20.01\) inner bits for both \(h=32\) and \(h=80\).  For the middle and far buckets,
+the bound strengthens with \(h\):
+\[
+\begin{array}{c|c|c}
+h & T=9949 & T=13949\\
+\hline
+32 & -82.30 & -97.42\\
+80 & -117.05 & -155.57\\
+160 & -176.17 & -253.70\\
+320 & -295.41 & -450.97\\
+500 & -430.02 & -673.38
+\end{array}
+\]
+The dominant middle/far terms in these samples select a single large skipped gap (\(e=1\)); allowing up to four skipped
+gaps did not change the \(h=500\) middle or far bound.  This is the missing shape: high \(h\) supplies many occupied
+blocks, so the probability of a very large skipped zero-gap decays rapidly enough to overcome the outer growth.
+The diagnostic is
+\[
+\texttt{python scripts/bound\_fullsplit\_episode\_gaps.py}.
+\]
+
+The remaining exact-cancellation hazard appears smaller than the self-turnoff atom in the finite range currently being
+certified.  If a live branch leaves state weight \(q\), then at the next block
+\[
+\Pr[V_i=0\mid q,H,T]
+=
+\frac{\binom{b(T-1)}{H-q}}{\binom{bT}{H}},
+\]
+where \(H\) input symbols remain over \(T\) blocks.  Averaging this over the full BCH split state-weight law gives the
+following one-step exact-hit exponents:
+\[
+\begin{array}{c|c|c|c}
+H & T=5949 & T=9949 & T=13949\\
+\hline
+31 & -71.59 & -72.33 & -72.82\\
+79 & -70.25 & -70.98 & -71.47\\
+159 & -69.25 & -69.98 & -70.46\\
+319 & -68.26 & -68.99 & -69.47\\
+499 & -67.64 & -68.35 & -68.83
+\end{array}
+\]
+The worst displayed value occurs at the smallest remaining span.  More generally, for fixed \(H,q\), the ratio
+\(\binom{b(T-1)}{H-q}/\binom{bT}{H}\) is decreasing in \(T\): adding more outside coordinates while keeping \(H\)
+fixed only lowers the chance that the distinguished next block contains exactly the prescribed \(q\)-set and no other
+selected coordinate.  Thus for the finite prefix \(H\le499\) and \(T\ge5949\), scanning the left endpoint gives
+\[
+\log_2 p_0=-64.00457432724919,\qquad
+\log_2\eta=-67.63641076470455,
+\]
+and hence
+\[
+\log_2(p_0+\eta)=-63.89264922047382.
+\]
+The finite certificate uses the slightly rounded-up atom
+\[
+\log_2 p_{\rm term}\le -63.8926492.
+\]
+Rerunning the \(h=500,T=13949\) episode-gap diagnostic with this inflated atom changes the inner exponent from
+\(-673.38\) to \(-673.27\), and the near \(h=32,T=5949\) ridge is unchanged because it is dominated by the
+no-termination survival branch.  Thus exact input/state cancellation can be folded into the same skipped-gap ledger,
+at least for the current \(h\le500\) finite prefix, by replacing \(p_0\) with
+\[
+p_{\mathrm{term}}:=p_0+\eta,\qquad
+\eta=\sup_{H,T}\sum_{q>0}\Pr[Q=q]\frac{\binom{b(T-1)}{H-q}}{\binom{bT}{H}}.
+\]
+The audit-grade cancellation verifier is
+\[
+\texttt{python scripts/verify\_fullsplit\_turnoff\_atom.py}.
+\]
+
+For theorem-facing wrappers outside this finite prefix we use a slightly looser global atom.  Let \(n=bT\),
+\(\alpha=H/n\), and \(T\ge5949\).  For a fixed \(q\)-set in the next block,
+\[
+\frac{\binom{n-b}{H-q}}{\binom{n}{H}}
+=\frac{(H)_q(n-H)_{b-q}}{(n)_b}
+\le
+\left(1-\frac{b-1}{b\cdot5949}\right)^{-b}
+\alpha^q(1-\alpha)^{b-q}.
+\]
+Averaging over \(Q\) gives a Bernstein polynomial:
+\[
+\sum_{q>0}\Pr[Q=q]\alpha^q(1-\alpha)^{b-q}
+=
+\sum_{q>0}\frac{\Pr[Q=q]}{\binom bq}B_{q,b}(\alpha).
+\]
+For the EBCH split law the largest nonzero Bernstein coefficient is the \(q=b\) coefficient, giving
+\[
+\log_2\eta_{\rm glob}\le -62.98700592417877,\qquad
+\log_2(p_0+\eta_{\rm glob})\le -62.4078758.
+\]
+The verifier is
+\[
+\texttt{python scripts/verify\_fullsplit\_global\_turnoff\_envelope.py}.
+\]
+
+\begin{lemma}[Certified full-split termination atoms]
+\label{lem:fullsplit-certified-termination-atoms}
+For the EBCH \([128,64]\) full-split law with \(b=64\), let \(Q\) denote the next-state weight after one nonzero BCH
+split branch.  The self-turnoff atom satisfies
+\[
+\log_2\Pr[Q=0]=-64.00457432724919.
+\]
+For every finite-prefix ledger state with \(0\le H\le499\) remaining input ones and \(T\ge5949\) remaining blocks, the
+episode-ledger exposure described in Lemma~\ref{lem:fullsplit-selected-gap-product} has a valid charged termination atom
+\[
+\log_2 p_{\rm term}^{\rm fin}\le -63.8926492.
+\]
+For every \(0\le H\le bT\) and \(T\ge5949\), the stronger global exposure has a valid charged termination atom
+\[
+\log_2 p_{\rm term}^{\rm glob}\le -62.4078758.
+\]
+The global atom is also safe after conditioning on any fixed next-block target support.
+\end{lemma}
+
+\begin{proof}
+The \(Q=0\) value is read from the EBCH split law.  For exact input/state cancellation in the finite-prefix ledger, a
+fixed state support of size \(q\) is hit by the next distinguished block with probability
+\[
+\frac{\binom{b(T-1)}{H-q}}{\binom{bT}{H}},
+\]
+and this ratio is decreasing in \(T\) for fixed \(H,q\).  Averaging over \(Q>0\), scanning \(0\le H\le499\) at
+\(T=5949\) gives
+\[
+\log_2\eta_{\rm fin}\le -67.63641076470455.
+\]
+Thus
+\[
+\log_2\bigl(\Pr[Q=0]+\eta_{\rm fin}\bigr)
+=-63.89264922047382
+\le -63.8926492.
+\]
+
+For the global atom, write \(n=bT\) and \(\alpha=H/n\).  For a fixed \(q\)-set in the next block,
+\[
+\frac{\binom{n-b}{H-q}}{\binom{n}{H}}
+=\frac{(H)_q(n-H)_{b-q}}{(n)_b}
+\le
+\left(1-\frac{b-1}{b\cdot5949}\right)^{-b}\alpha^q(1-\alpha)^{b-q}.
+\]
+Averaging over \(Q>0\) gives a Bernstein polynomial.  The verifier checks the finite coefficient inequality
+\[
+\max_{1\le q\le b}\frac{\Pr[Q=q]}{\binom bq}=\Pr[Q=b],
+\]
+so the exact-cancellation envelope is
+\[
+\log_2\eta_{\rm glob}\le -62.98700592417877.
+\]
+Adding the \(Q=0\) self-turnoff atom gives
+\[
+\log_2\bigl(\Pr[Q=0]+\eta_{\rm glob}\bigr)
+=-62.407875819071386
+\le -62.4078758.
+\]
+The same coefficient inequality also proves the fixed-support claim, since a fixed target support of size \(q\) is hit
+with probability \(\Pr[Q=q]/\binom bq\), which is at most the displayed maximum.
+\end{proof}
+
+\paragraph{First-active placement coverage.}
+For the finite checkpoint \(N=2^{21}\), \(b=64\), write \(M=N/b=32768\).  If the first active inner block is
+\(i_1\), define
+\[
+T:=M-i_1,\qquad r:=\wt(U_{i_1}),\qquad H:=h-r.
+\]
+Thus \(T\) is the number of later \(b\)-blocks after the first active block.  The current checked ledger uses the split
+\[
+\begin{array}{c|c|c}
+\text{regime} & T\text{ range} & \text{current status}\\
+\hline
+\text{ultra-late} & 0\le T<5949 & \text{placement cap checked}\\
+\text{audited window} & 5949\le T\le17948 & \text{episode ledger checked}\\
+\text{early} & T>17948 & \text{episode ledger checked}
+\end{array}
+\]
+The audited window is exactly the script parameterization
+\[
+T=5949+g-1,\qquad 1\le g\le12000,
+\]
+split into gap buckets \(1\text{--}4000\), \(4001\text{--}8000\), and \(8001\text{--}12000\).  Since \(r\le64\), the
+far endpoint \(T=17948\) implies the feasibility cutoff
+\[
+h=H+r\le 64\cdot17948+64=1148736.
+\]
+The verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+now also checks the placement-only ultra-late prefix
+\[
+\sum_{32\le h\le500} A_h^{\rm RM}
+\Pr[\text{first active block lies in the final }5949\text{ blocks}]
+\le 2^{-41.113442},
+\]
+using exact RM direct-sum outer coefficients through \(h=500\).  For \(h\ge501\), the same placement cap is handled by
+fixed-pole interval rows in Corollary~\ref{cor:fullsplit-postprefix-checked-ledger}; these rows contribute at most
+\(-545.690526\) bits.  The window ledger itself is
+\[
+\log_2\mu_{\rm window}^{\rm exact\ outer}\le -37.383345,
+\]
+and the union of this checked window with the checked ultra-late prefix has
+\[
+\log_2\mu_{\rm ultra\mbox{-}late\ prefix\ +\ window}^{\rm exact\ outer}\le -37.278528.
+\]
+The early \(h\le500\) part is now checked separately using the gap buckets
+\[
+12001\text{--}17000,\qquad 17001\text{--}22000,\qquad 22001\text{--}26819,
+\]
+equivalently \(17949\le T\le32767\).  The explicit \(e\le16\) bucket-uniform survival ledger gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\le16,\ {\rm exact\ outer}}\le -86.910456,
+\]
+and the crude \(e\ge17\) remainder gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\ge17,\ {\rm exact\ outer}}\le -319.977808.
+\]
+Thus the combined \(h\le500\) all-first-active-position value remains
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions,\ exact\ outer}\le -37.278528,
+\]
+still dominated by the audited window and ultra-late prefix.  The proof debt is therefore no longer the boundary slice
+\(T\approx5949\), nor the small-weight early slice.  The checked early rows now cover
+\[
+501\le h\le N/2,\qquad T>17948,
+\]
+with total \(-380.829185\) bits to displayed precision.  This combines the original endpoint table through
+\(h=75000\), an accelerated endpoint recurrence through \(h=350000\), and a paired-\(T\) high-density recurrence
+through \(h=N/2\).  The post-prefix part of the ultra-late cap beyond \(h=500\) is separately covered by the
+placement-only interval rows below.
+
+Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
+placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
+\(1\text{--}4000\), \(4001\text{--}8000\), \(8001\text{--}12000\), and
+\[
+h\in\{32,80,160,320,500\},
+\]
+the total over these sampled rows is about \(-37.41\) bits and is dominated by the near-boundary \(h=32\) row:
+\[
+\begin{array}{c|c|c|c}
+h & \text{gap bucket} & \log_2 p_{\rm inner}^{\rm episode} & \log_2\text{ full term}\\
+\hline
+32 & 1\text{--}4000 & -20.01 & -37.41\\
+80 & 1\text{--}4000 & -20.01 & -49.94\\
+160 & 1\text{--}4000 & -20.01 & -73.44\\
+32 & 4001\text{--}8000 & -82.19 & -83.99\\
+32 & 8001\text{--}12000 & -97.30 & -87.46\\
+80 & 4001\text{--}8000 & -116.93 & -107.86\\
+80 & 8001\text{--}12000 & -155.45 & -117.27\\
+320 & 1\text{--}4000 & -20.01 & -134.87\\
+500 & 1\text{--}4000 & -20.01 & -204.02
+\end{array}
+\]
+The omitted sampled middle/far \(h=160,320,500\) rows are lower still.  This is not yet a proof over all \(h\) and \(r\),
+but it confirms the intended decomposition: the near bucket is controlled mostly by placement plus the survival
+Chernoff at \(T=5949\), while the middle/far buckets require the episode-gap skipped-gap count and then become more
+negative as \(h\) grows.  The combined sweep wrapper is
+\[
+\texttt{python scripts/sweep\_fullsplit\_episode\_terms.py}.
+\]
+
+A faster envelope summation gives the first dense-prefix checkpoint.  Using the sampled episode bounds above as a
+piecewise-linear working envelope in \(H=h-r\), and summing exactly over
+\[
+32\le h\le 500,\qquad 1\le r\le 64,
+\]
+for the same three gap buckets gives
+\[
+\log_2 \sum_{\substack{32\le h\le500\\1\le r\le64\\\text{three buckets}}}
+A_h^{\rm RM}\,
+\Pr[\text{first active occupancy }r\text{ in bucket}]\,
+p_{\rm inner}^{\rm env}(h-r,\text{bucket})
+=-34.767174.
+\]
+The bucket contributions are
+\[
+\begin{array}{c|c}
+\text{gap bucket} & \log_2\text{ contribution}\\
+\hline
+1\text{--}4000 & -34.767174\\
+4001\text{--}8000 & -82.122759\\
+8001\text{--}12000 & -85.867481
+\end{array}
+\]
+and the first occupancy split begins
+\[
+\begin{array}{c|c}
+r & \log_2\text{ contribution}\\
+\hline
+1 & -34.769819\\
+2 & -43.861905\\
+3 & -53.569247\\
+4 & -63.713307
+\end{array}
+\]
+In the smoothed Cauchy-outer ledger, the peak row is still \(h=32,r=1\), gap \(1\text{--}4000\), with inner exponent
+\(-20.011735\) and full term \(-37.385767\).  Before using the exact RM support, the full prefix is not a shapeless
+table effect.  It is a narrow near-boundary ridge:
+\[
+\begin{array}{c|c}
+\text{slice} & \text{share of the }e\le8,\ 32\le h\le500\text{ prefix}\\
+\hline
+\text{gap }1\text{--}4000 & 1-O(10^{-14})\\
+r=1 & .998168813\\
+h\le64 & .997505683\\
+h\le80 & .999863886\\
+h\le96 & .999992575
+\end{array}
+\]
+The smoothed total prefix value is \(2.618593\) bits above the single peak row.  Along the dominant \(r=1\), first-gap ridge,
+the largest adjacent ratio is \(0.8526993\) from \(h=32\) to \(33\), and after that it is at most \(0.8337949\) in the
+audited range.  The smoothed finite version already has a summable form: replacing the ridge by the infinite
+geometric bound
+\[
+T_{32}\left(1+\frac{0.852700}{1-0.833795}\right)
+\]
+and adding the exact non-ridge remainder gives
+\[
+\log_2\mu_{\rm prefix}^{\rm ratio}\le -34.767141,
+\]
+only \(3.4\cdot10^{-5}\) bits above the exact finite prefix ledger.  The decomposition helper is
+\[
+\texttt{python scripts/analyze\_fullsplit\_prefix\_ridge.py}.
+\]
+The ratio itself factors into outer-spectrum growth, first-active placement, and the inner \(e\le8\) value.  On this
+ridge the inner span is only \(3.2\cdot10^{-12}\) bits.  If
+\[
+S_H:=\sum_{g=1}^{4000}\binom{64(5949+g-1)}{H},
+\]
+then the \(r=1\), first-gap placement contribution satisfies
+\[
+\frac{P_{h+1}}{P_h}
+=
+\frac{S_h}{S_{h-1}}\frac{h+1}{N-h}.
+\]
+The current finite component certificate checks
+\[
+\begin{array}{c|ccc}
+\text{step} & A_{h+1}^{\rm out}/A_h^{\rm out} & P_{h+1}/P_h & \text{inner ratio}\\
+\hline
+32\to33 & 2.808686 & .303594 & \le 1.000000001\\
+h\ge33 & 2.746420 & .303594 & \le 1.000000001.
+\end{array}
+\]
+The placement entry is now checked independently of the ledger CSV by an exact-integer cross-multiplication certificate:
+\[
+\max_{32\le h<500}\frac{S_h}{S_{h-1}}\frac{h+1}{N-h}
+\le .303594,
+\]
+where \(.303594=151797/500000\).  The certificate performs \(468\) exact comparisons, finds the maximum at
+\(h=32\), and verifies a positive rational slack of about \(2^{-21.8672}\) below the threshold.  The exact peak is
+\(0.303593738594\).  The naive endpoint bound
+\[
+\frac{\binom{64(5949+4000-1)}{h}}{\binom{64(5949+4000-1)}{h-1}}\frac{h+1}{N-h}
+\]
+is \(0.3130655524\) at \(h=32\), about \(1.0312\) times too large, so the proof must use the averaged-binomial sum
+\(S_H\) rather than endpoint domination if one works with the smoothed outer envelope.
+
+The exact RM direct-sum support gives a sharper and cleaner finite certificate.
+
+\begin{lemma}[Exact RM prefix support split certificate]
+\label{lem:rm-prefix-support-split}
+Consider the finite checkpoint \(N=2^{21}\), \(\delta=.09\), and the RM direct-sum outer consisting of \(4096\)
+copies of the local \([512,256]\) RM block whose weight enumerator is
+\[
+W_{\rm loc}(z)=\sum_{a=0}^{512} A_a^{\rm loc}z^a.
+\]
+Let
+\[
+A_h^{\rm RM}:=[z^h]\,W_{\rm loc}(z)^{4096}.
+\]
+The integer-truncated coefficient certificate through \(h\le500\) verifies that the positive support begins
+\[
+32,\ 48,\ 56,\ 60,\ 64,\ldots,
+\]
+has no positive weight below \(32\), has no positive weight in \(33\le h\le47\), and has \(114\) positive supported
+weights in \(1\le h\le500\).  The coefficient build uses exact truncated polynomial exponentiation: for the present
+\(4096=2^{12}\) direct sum, the certificate records one multiply step and twelve squaring steps.  The \(h=32\)
+coefficient has \(38\) bits, while the next supported coefficient at \(h=48\) has \(52\) bits.  Replacing the smoothed
+outer rows in the audited
+\(32\le h\le500\) ledgers by the exact coefficients \(A_h^{\rm RM}\) gives
+\[
+\begin{array}{c|ccc}
+\text{piece} & \log_2\text{ total} & \log_2(h=32) & \log_2(h>32)\\
+\hline
+\text{window }5949\le T\le17948 & -37.383345 & -37.383482 & -50.738253\\
+\text{ultra-late }T<5949 & -41.113442 & -41.113442 & -66.416502
+\end{array}
+\]
+The same exact-outer reweighting gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early},\ e\le16}^{\rm exact\ outer}\le -86.910456,
+\qquad
+\log_2\mu_{32\le h\le500,\ {\rm early},\ e\ge17}^{\rm exact\ outer}\le -319.977808.
+\]
+\end{lemma}
+
+\begin{proof}
+The local enumerator coefficients \(A_a^{\rm loc}\) are read as integers from the checked CSV spectrum file.  Since the
+outer is a direct sum of \(4096\) identical blocks, its weight enumerator is \(W_{\rm loc}(z)^{4096}\).  The certificate
+computes this polynomial modulo \(z^{501}\) by binary exponentiation with exact integer convolutions, so no
+floating-point or smoothing step enters the support calculation.  The split values are then obtained by reweighting each
+audited CSV row by
+\[
+\log_2 A_h^{\rm RM}-\log_2 A_h^{\rm smooth}
+\]
+and then partitioning the rows into the \(h=32\) slice and the supported \(h>32\) remainder before log-summing.  The
+verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+checks the first two positive support weights \(32,48\), the displayed split totals, and the final combined totals.
+\end{proof}
+
+Thus the apparent adjacent \(h=33,34,\ldots\) ridge is a Cauchy-smoothing artifact.  Reweighting the same audited
+inner/placement rows by exact RM direct-sum coefficients gives
+\[
+\log_2\mu_{32\le h\le500,\ {\rm window}}^{\rm exact\ outer}\le -37.383345,
+\]
+with the \(h=32\) slice alone contributing \(-37.383482\) and all supported \(h>32\) rows together contributing only
+\(-50.738253\).  The certificate also checks that there are \(114\) positive supported weights in this prefix and that
+the next supported weight after \(32\) is \(48\).
+Within the \(h=32\) slice, the dominant row is exactly
+\[
+h=32,\qquad r=1,\qquad 1\le g\le4000,\qquad T=5949,
+\]
+with exact-outer term \(-37.385767\).  The full exact-outer window prefix is only \(0.002422\) bits above this
+single row.  Removing this row leaves total log contribution \(-46.602718\); the remaining \(h=32\) part is
+\(-46.687229\), while all supported \(h>32\) rows are \(-50.738253\), i.e. \(13.352486\) bits below the dominant row.
+The exact ultra-late prefix is
+\[
+\log_2\mu_{32\le h\le500,\ T<5949}^{\rm exact\ outer}\le -41.113442,
+\]
+with supported \(h>32\) contributing only \(-66.416502\).
+The combined finite ledger becomes
+\[
+\log_2\mu_{\rm finite}^{\rm exact\ outer}\le -37.383345,\qquad
+\log_2\mu_{\rm late+window}^{\rm exact\ outer}\le -37.278528.
+\]
+Thus the current theorem target is no longer an analytic adjacent-\(h\) ridge for the smoothed outer bound; it is the
+exact-support \(h=32\) term plus a support-weight remainder.
+The standard verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+checks both the smoothed ratio skeleton and the exact-support replacement.  The exact RM prefix helper is
+\[
+\texttt{python scripts/certify\_rm\_outer\_prefix\_exact.py},
+\]
+and the placement subcheck can be run alone as
+\[
+\texttt{python scripts/certify\_prefix\_placement\_ratio.py}.
+\]
+This is not yet a theorem, because the interpolation envelope between sampled \(H\)-knots must be justified or replaced
+by a grid-plus-monotonicity certificate.  It does show that the prefix no longer has a broad hidden intermediate-\(h\)
+ridge once the episode-gap correction is included.  The envelope summation helper is
+\[
+\texttt{python scripts/sum\_fullsplit\_episode\_envelope.py}.
+\]
+
+The dominant middle/far episode term has \(e=1\) selected skipped gap, and it admits the closed form
+\[
+\Pr[X=x]\,
+\mathbb{E}[\#\{\text{one skipped gap of length }s\}\mid X=x]
+=
+\frac{[z^H]((1+z)^b-1)^x}{\binom{bT}{H}}\,(x+1)\binom{T-s-1}{x-1}.
+\]
+This fast formula matches the previous \(e\le4\) knot values at the tested points, because the \(e=0\) or \(e=1\) term
+dominates there.  The implementation now factors the skipped-gap suffix sum, which depends on \(x\) and \(T\) but not
+on \(H\), so denser interpolation audits are cheap.  It also includes the \(H=0\) endpoint explicitly: if no later input
+ones remain, the \(e=1\) branch is the single full zero gap and contributes exactly the effective termination atom
+\[
+\log_2 p_{\rm term}\le -63.8926492.
+\]
+Using full integer \(H=0,\ldots,499\) CSVs, with extrapolation disallowed in the envelope summation, removes the
+interpolation issue from the finite prefix.  The smoothed-outer \(e\le8\) ledger gives the total prefix value
+\[
+-34.767174,
+\]
+with middle/far bucket contributions
+\[
+4001\text{--}8000:\ -82.122759,\qquad
+8001\text{--}12000:\ -85.867481.
+\]
+Reweighting the same rows by exact RM direct-sum outer coefficients gives the current finite value
+\[
+\log_2\mu_{32\le h\le500,\ e\le8}^{\rm exact\ outer}\le -37.383345.
+\]
+\begin{lemma}[Tiny-prefix interior-\(T\) finite certificate]
+\label{lem:fullsplit-tiny-prefix-interiorT}
+Consider the finite checkpoint \(N=2^{21}\), \(\delta=.09\), \(b=64\), and the finite-prefix termination atom
+\(\log_2 p_{\rm term}\le -63.8926492\).  Let
+\[
+{\cal B}_1=[5949,9948],\qquad
+{\cal B}_2=[9949,13948],\qquad
+{\cal B}_3=[13949,17948]
+\]
+be the three residual-length buckets corresponding to gap ranges \(1\text{--}4000\),
+\(4001\text{--}8000\), and \(8001\text{--}12000\).  For \(0\le H\le499\), let
+\(p_{\le8}(H,T)\) denote the exact full-split selected-gap inner probability with at most eight charged
+terminations, computed from the closed-form fixed-\(e\) episode summands.  The tracked finite audit certifies that,
+for each bucket \({\cal B}_i=[T_i^-,T_i^+]\),
+\[
+\log_2 p_{\le8}(H,T)
+\le
+\log_2 p_{\le8}(H,T_i^-)+10^{-7}
+\qquad
+(0\le H\le499,\ T_i^-\le T\le T_i^+).
+\]
+The recorded maximum excess is \(2.19205276153\cdot 10^{-9}\), attained at the left endpoint itself; the largest
+left-endpoint reproduction error is \(5.52478240934\cdot 10^{-9}\) bits.  Consequently, for the current finite
+first-moment ledger, the left-endpoint CSVs at \(T=5949,9949,13949\) are valid representatives for the whole
+\(32\le h\le500,\ e\le8\) prefix up to the stated numerical tolerance.
+\end{lemma}
+
+\begin{proof}
+For fixed \(H\), \(T\), and selected-gap count \(e\), the exact episode summand is finite.  The skipped-gap suffix
+\[
+\sum_{L=x}^{T}\binom{T-L+e-1}{e-1}\binom{L-e}{x-e}\,S(L)
+\]
+depends on \(x,e,T\), but not on \(H\).  The audit implementation is
+\[
+\begin{gathered}
+\texttt{scripts/check\_fullsplit\_exact\_grid\_interior.py}\\
+\texttt{--h-values 0:499,\quad --sample-step 1,\quad --method combined}.
+\end{gathered}
+\]
+It sweeps all interior \(T\)'s by maintaining the short cumulative sums for these suffixes, rather than regenerating a
+separate CSV for every \(T\).  It checks all \(500\) values of \(H\) in all three buckets, writing one summary row for
+each \((H,{\cal B}_i)\), hence \(1500\) rows.  The standard ledger verifier
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}
+\]
+now reads the tracked artifact
+\[
+\texttt{scripts/fullsplit\_exact\_interior\_h0\_499\_allT.csv}
+\]
+and fails unless the row count is \(1500\), the worst interior excess is at most \(10^{-7}\), and the worst
+left-endpoint reproduction error is at most \(5\cdot10^{-6}\).  It also checks that the artifact is exactly the
+rectangle \(H=0,\ldots,499\) crossed with the three displayed buckets, that each row covers all \(4000\) integer
+values of \(T\) in its bucket, and that every row is maximized at the bucket's left endpoint.  The current artifact has
+the numerical maxima stated above, leaving \(9.78079472385\cdot10^{-8}\) bits of excess slack and
+\(4.99447521759\cdot10^{-6}\) bits of reproduction-error slack against the verifier thresholds.
+\end{proof}
+
+The same closed form extends to any fixed number \(e\) of selected skipped gaps:
+\[
+\Pr[X=x]\,
+\mathbb{E}[\#\{e\text{ skipped gaps of total length }s\}\mid X=x]
+=
+\frac{[z^H]((1+z)^b-1)^x}{\binom{bT}{H}}\,
+\binom{x+1}{e}\binom{s+e-1}{e-1}\binom{T-s-e}{x-e},
+\]
+for \(1\le e\le x\), with the endpoint \(e=x+1\) handled separately by selecting all gaps.  Running the full
+\(H=0,\ldots,499\) grid with \(e\le8\) gives the same displayed prefix value and bucket contributions.  On this full
+grid, the largest \(e=2\) contribution relative to \(e=1\) is already far below the dominant term:
+\[
+\begin{array}{c|c|c}
+T & \text{worst }H & \log_2(e=2)-\log_2(e=1)\\
+\hline
+5949 & 499 & -54.051865\\
+9949 & 499 & -47.632529\\
+13949 & 499 & -46.640982
+\end{array}
+\]
+and \(e=3,\ldots,8\) are lower still.  This is still a finite numerical checkpoint, not the desired theorem: the remaining
+episode proof debt is to dominate the all-\(e\) tail uniformly, or to choose a finite \(E\) and attach a certified
+tail bound for \(e>E\).
+
+The first such tail split is already adequate for the \(h\le500\) prefix.  The crude bound
+\[
+\sum_{e\ge e_{\min}}\binom{H+1}{e}p_{\rm term}^e
+\]
+controls the event that at least \(e_{\min}\) gaps terminate, using only the fact that at most \(H+1\) gaps exist after
+the first active block.  This bound is much too weak for \(e_{\min}=2\): it ignores the survival/output cost left after
+only a few skipped gaps, and the far \(h=500\) outer mass overwhelms it.  It is also the wrong shape for a post-prefix
+tail unless \(e_{\min}\) is large enough, because it discards the live-span Chernoff cost.  However, after the exact
+\(e\le8\) ledger is included, the same crude bound with \(e_{\min}=9\) gives
+\[
+\log_2\sum_{\substack{32\le h\le500\\1\le r\le64\\\text{three buckets}}}
+A_h^{\rm RM}\,
+\Pr[\text{first active occupancy }r\text{ in bucket}]\,
+\sum_{e\ge9}\binom{H+1}{e}p_{\rm term}^e
+=-284.004805
+\]
+after exact-outer reweighting.  The peak of this residual is again the far bucket at \(h=500,r=1\), but it is now far
+below the explicit \(e\le8\) ledger.  Combining the explicit \(e\le8\) ledger with this \(e\ge9\) residual leaves the
+current finite-prefix bound
+\[
+\log_2 \mu_{\le500}^{\rm fullsplit,\ exact\ outer}\le -37.383345.
+\]
+The tight part of this inequality is now exactly the \(h=32\) near-boundary row; the middle/far buckets, exact support
+weights \(h>32\), and the crude \(e\ge9\) tail are already much lower.
+
+For the early first-active buckets \(T>17948\), the same \(e\le8\) endpoint audit would be too expensive to promote
+directly over every interior \(T\).  Instead the checked finite certificate uses a bucket-uniform survival bound.  For a
+bucket \([T_-,T_+]\), remaining input weight \(H\), occupied remaining blocks \(x\), and selected skipped gaps \(e\),
+write \(S(L)\) for the Chernoff survival bound with \(L\) live blocks.  Since
+\[
+\binom{bT}{H}\ge \binom{bT_-}{H}
+\]
+and, after setting \(L=T-s\),
+\[
+\binom{T-L+e-1}{e-1}\binom{L-e}{x-e}
+\le
+\binom{T_+-L+e-1}{e-1}\binom{L-e}{x-e}
+\qquad (T_-\le T\le T_+),
+\]
+the whole bucket is bounded by replacing the skipped-gap suffix by
+\[
+\binom{x+1}{e}
+\sum_{L=x}^{T_+}
+\binom{T_+-L+e-1}{e-1}\binom{L-e}{x-e}S(L),
+\]
+with the endpoint \(e=x+1\) handled as \(\binom{T_+}{x}S(x)\).  This keeps the live-span Chernoff cost but removes the
+need for an all-interior \(T\) audit.  The generator is
+\[
+\texttt{python scripts/build\_fullsplit\_early\_uniform\_survival.py --e-max 16}.
+\]
+Using the three early buckets \(12001\text{--}17000\), \(17001\text{--}22000\), \(22001\text{--}26819\), the resulting
+row ledger gives
+\[
+\log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\le16}\le -85.403338,
+\]
+with bucket contributions
+\[
+12001\text{--}17000:\ -85.815880,\qquad
+17001\text{--}22000:\ -87.831441,\qquad
+22001\text{--}26819:\ -89.394315.
+\]
+The peak row is \(h=32,r=1\) in the first early bucket, with inner exponent \(-108.576588\) and full term
+\(-87.363392\).  The crude turnoff-count-only residual is then safe once started at \(e_{\min}=17\):
+\[
+\log_2 \mu_{32\le h\le500,\ {\rm early}}^{e\ge17}\le -305.738816.
+\]
+
+\begin{corollary}[Small-weight finite-prefix certificate]
+\label{cor:fullsplit-small-prefix-all-first-active}
+At the finite checkpoint \(N=2^{21}\), \(\delta=.09\), and the RM direct-sum outer from
+Lemma~\ref{lem:rm-prefix-support-split}, the contribution of all first-active positions for supported weights
+\(32\le h\le500\) satisfies
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active,\ exact\ outer}\le -37.278528.
+\]
+More explicitly, the three placement regimes obey
+\[
+\begin{array}{c|c}
+\text{first-active regime} & \log_2\text{ contribution}\\
+\hline
+T<5949 & -41.113442\\
+5949\le T\le17948 & -37.383345\\
+T>17948 & -86.910456
+\end{array}
+\]
+after exact RM outer reweighting.
+\end{corollary}
+
+\begin{proof}
+The ultra-late line \(T<5949\) is the placement-only exact-outer prefix in
+Lemma~\ref{lem:rm-prefix-support-split}.  The window line \(5949\le T\le17948\) is the log-sum of the explicit
+\(e\le8\) ledger, justified over the three window buckets by
+Lemma~\ref{lem:fullsplit-tiny-prefix-interiorT}, and the crude \(e\ge9\) residual
+\[
+\log_2\mu_{32\le h\le500,\ {\rm window}}^{e\ge9,\ {\rm exact\ outer}}\le -284.004805.
+\]
+The early line \(T>17948\) is the log-sum of the bucket-uniform \(e\le16\) ledger and the crude \(e\ge17\) residual:
+\[
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\le16,\ {\rm exact\ outer}}\le -86.910456,
+\qquad
+\log_2\mu_{32\le h\le500,\ {\rm early}}^{e\ge17,\ {\rm exact\ outer}}\le -319.977808.
+\]
+Finally,
+\[
+\log_2\!\left(2^{-41.113442}+2^{-37.383345}+2^{-86.910456}\right)\le -37.278528.
+\]
+The verifier \(\texttt{scripts/verify\_fullsplit\_finite\_ledger.py}\) checks each displayed numerical input and the
+final log-sum.
+\end{proof}
+
+For the remaining early branch \(h>500\), high-density rows expose an important bookkeeping trap.  If one reuses the
+endpoint-placement interface above, the scan can look catastrophically positive: near \(h=1100001\) in the far early
+bucket, endpoint placement at \(T_{\max}\) paired with the inner survival bound at \(T_{\min}=27949\) gives a false
+high-density obstruction.  For \(H\) comparable with \(bT\), however, the placement mass in the bucket is concentrated
+near large \(T\), exactly where the survival exponent is stronger.
+
+The working replacement is therefore the \(T\)-paired sum
+\[
+\sum_{T=T_-}^{T_+}
+\binom{b}{r}\binom{bT}{H}\binom{N}{h}^{-1}
+\exp_2\{S(T)\},
+\]
+where \(S(T)\) is the fixed-\(\lambda\) survival exponent for \(T\) live blocks, with an episode multiplier attached
+afterwards.  The diagnostic
+\[
+\texttt{python scripts/probe\_fullsplit\_early\_paired\_survival.py}
+\]
+keeps this pairing.  On the representative formerly bad row \(h=1100001\), far early bucket, the paired no-turnoff
+sum is already
+\[
+\log_2 \mu_{\rm paired}^{e=0}\le -133084.867453,
+\]
+peaking at \(T=32767\).  Even after adding a deliberately pessimistic \(20000\)-bit episode allowance, the same row is
+\[
+\log_2 \mu_{\rm paired}^{\rm slack}\le -113084.867453.
+\]
+Sparse high-density probes with this \(20000\)-bit allowance give
+\[
+\begin{array}{c|c|c}
+h\text{ range sampled} & \text{sample step} & \log_2\text{ paired contribution}\\
+\hline
+300001\text{--}1200000 & 100000 & -112940.527337\\
+1200001\text{--}2097152 & 100000 & -111645.563005 .
+\end{array}
+\]
+These are probes, not yet a certificate over every \(h\).  They show that the apparent high-density early obstruction
+comes from separating endpoint placement from endpoint survival; the next theorem target is a paired
+placement-survival interval lemma, with a fixed-pole episode multiplier attached to the same \(T\)-sum.
+There is a second, separate bookkeeping lesson at the near-full-density edge.  If \(H\) nearly equals \(bT\), the
+moderate-\(\rho\) Cauchy coefficient bound in \eqref{eq:fullsplit-e1-cauchy-envelope} can also look much too large:
+it upper-bounds the exact coefficient of \(((1+z)^b-1)^x\) from the wrong side of the polynomial.  The fix is not an
+extra heuristic slack term but a large-\(\rho\) (equivalently, deficit-side) pole.  At the forced endpoint
+\(T=32767,H=bT=2097088,\lambda=2.3\), the same eall-ratio wrapper changes from about
+\(-893425.892127\) with \(\rho=10\) to \(-1181735.473865\) with \(\rho=10^6\), matching the no-turnoff survival
+exponent.  Thus the near-full edge is also a coefficient-envelope issue, not a new episode obstruction.
+On the outer side, the concrete RM512 local spectrum is complement-symmetric, and hence the direct-sum outer satisfies
+\(A_h^{\rm out}=A_{N-h}^{\rm out}\).  The high-\(h\) early branch should therefore be certified by the same
+low/complement-weight outer table used below \(N/2\), together with the paired-\(T\) inner sum.  The current scripts
+expose this as the \texttt{--outer-complement-symmetry} option; at \(h=N,r=64,T=32767\) the paired survival smoke gives
+\(-1181735.473865\), while the endpoint piecewise form gives \(-1181723.239347\), differing only by the
+\(\log_2(4819)\) bucket-size overcount.
+
+The paired probe now also supports the same-\(T\) all-episode wrapper directly.  A sparse survival scan over
+\(h=501,100501,\ldots,2000501,N\), with complement-symmetric outer weights and all \(1\le r\le64\), peaks at
+\[
+h=1000501,\qquad r=31,\qquad T=32767,
+\qquad
+\log_2\mu^{e=0}_{\rm paired}\le -136323.731114.
+\]
+Attaching the all-episode \(e\)all-ratio bound at the same \(T\)-values and scanning local \(r\)-windows near the
+survival peaks gives
+\[
+\begin{array}{c|c|c|c}
+h & r\text{-window} & \log_2\mu_{\rm paired}^{\rm eall} & \text{peak }r\\
+\hline
+1000501 & 25\text{--}37 & -133179.527574 & 32\\
+1150501 & 30\text{--}42 & -132946.839848 & 32\\
+1200501 & 32\text{--}43 & -132647.058774 & 32\\
+1250501 & 33\text{--}45 & -132835.935679 & 33 .
+\end{array}
+\]
+This is still a sampled diagnostic, not a closed interval theorem.  Its value is that the remaining early
+high-density certificate no longer looks numerically tight: the proof debt is to package the paired \(T\)-sum and the
+local \(r\)-window reduction into interval lemmas.
+The first-block count direction also appears benign.  On the same four sampled \(h\)-values, if one freezes the
+dominating endpoint \(T=32767\) and sums over all \(1\le r\le64\), the paired all-episode totals are
+\[
+\begin{array}{c|c}
+h & \log_2\mu_{\rm paired}^{\rm eall}(T=32767,\;1\le r\le64)\\
+\hline
+1000501 & -133179.355669\\
+1150501 & -132946.388557\\
+1200501 & -132646.193762\\
+1250501 & -132834.786925 .
+\end{array}
+\]
+For the worst of these rows, \(h=1200501\), the single peak term is \(-132649.525145\) at \(r=32\), so the entire
+\(r\)-sum costs only \(3.331383\) bits.  Meanwhile the single-\(r=32\), all-\(T\) sum is
+\(-132649.521954\), only \(0.003191\) bits above the endpoint peak.  The helper
+\texttt{sum\_fullsplit\_paired\_early\_eall.py} now packages this in the theorem-facing form: it splits the
+all-episode wrapper into the \(e=0\) branch and the \(e\ge1\) fixed-pole Cauchy branch, pairs each branch with the
+same \(T\)-placement term, and then sums \(T\) directly.  On the full far bucket \(22001\le g\le26819\), with all
+\(1\le r\le64\), it gives
+\[
+\begin{array}{c|c}
+h & \log_2\mu_{\rm paired}^{\rm eall}(22001\le g\le26819,\;1\le r\le64)\\
+\hline
+1000501 & -133179.352477\\
+1150501 & -132946.385366\\
+1200501 & -132646.190570\\
+1250501 & -132834.783733 .
+\end{array}
+\]
+At \(h=1200501\) this is only \(0.003192\) bits above the endpoint/full-\(r\) value, and the displayed total is
+entirely dominated by the \(e\ge1\) branch; the \(e=0\) branch contributes \(-136323.731114\).  For the pole used in
+this row, \(\lambda=2.3,\rho=1\), one has
+\[
+\log_2 G_{\lambda,\rho}=8.821856,
+\]
+so Lemma~\ref{lem:fullsplit-paired-endpoint-dominance} gives a uniform \(T\)-bucket overhead of at most
+\[
+-\log_2\left(1-\frac{1}{G_{\lambda,\rho}-1}\right)=0.003199
+\]
+bits for the \(e\ge1\) branch.  This turns the observed endpoint dominance into a proof-shaped bound.  The remaining
+early high-density task is therefore an exact hypergeometric first-block \(r\)-sum or \(r\)-tail bound, plus an interval
+bound in \(h\) for the outer/complement spectrum.
+
+A broader endpoint scan shows why the \(h\)-interval step should not be skipped.  Scanning
+\[
+h=1100501,1105501,\ldots,1300501
+\]
+moves the sampled peak to the neighborhood of \(h=1115\)k.  A step-one zoom over \(1115101\le h\le1115201\) finds
+\[
+h=1115146
+\]
+as the sampled endpoint peak.  At this row, the full far bucket \(22001\le g\le26819\), all \(1\le r\le64\), gives
+\[
+\log_2\mu_{\rm paired}^{\rm eall}\le -132529.969694,
+\]
+with endpoint value \(-132529.972886\), \(T\)-overhead \(0.003192\) bits, and peak \(r=32\) endpoint term
+\(-132533.304269\).  Thus the corrected sampled high-density peak is about \(116\) bits larger than the earlier
+four-point table suggested, but still has the same structural explanation: endpoint dominance in \(T\), a small
+constant first-block \(r\)-sum, and a large remaining first-moment margin.
+
+The interval version of this argument is implemented in
+\[
+\texttt{scripts/certify\_fullsplit\_high\_density\_interval.py}.
+\]
+For a fixed outer Chernoff pole \(z\), the complement-side term
+\[
+\log A_{N-h}^{\rm out}(z)-\log\binom Nh-h\log_2\rho
+\]
+is linear in \(N-h\) plus \(-\log\binom{N}{N-h}\), hence convex on any \(h\)-interval.  The interval helper therefore
+checks only the endpoints for the outer/placement part, uses Lemma~\ref{lem:fullsplit-paired-endpoint-dominance} for
+the \(T\)-sum, and charges the whole first-block sum by
+\[
+\log_2\sum_{r=1}^{64}\binom{64}{r}\rho^r .
+\]
+With the RM512 complement-symmetric outer, this gives the following pessimistic complement-side certificate:
+\[
+\begin{array}{c|c|c}
+h\text{ range} & \rho & \log_2\mu\\
+\hline
+1048577\text{--}1148736 & 1 & -128915.315746\\
+1148737\text{--}1300000 & 1 & -124889.651755\\
+1300001\text{--}1500000 & 1 & -113710.357653\\
+1500001\text{--}1700000 & 1 & -35150.097366\\
+1700001\text{--}1900000 & 10 & -524628.366199\\
+1900001\text{--}2097089 & 10 & -894140.350713\\
+2097090\text{--}2097152 & 10 & -893792.285010 .
+\end{array}
+\]
+The combined complement-side total is \(-35150.097366\) bits.  This is much weaker than the sampled local peak, but it
+is summable and closes the high-density complement branch with only two coefficient poles, \(\rho=1\) and \(\rho=10\).
+The finite-ledger verifier records this endpoint reduction as
+\(\texttt{complement\_high\_shape\_status=PASS}\); the smallest discrete convexity-growth certificate over the listed
+intervals is \(0.276449723567\) bits.
+
+For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
+same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
+\[
+\log_2 \mu_{501\le h\le2000}^{(e\le1),{\rm gf}}
+\le -202.271474,
+\]
+with the aggregate peak already at \(h=501\), gap \(1\text{--}4000\).  Thus the exact episode branch is not developing
+a new intermediate-\(h\) ridge beyond the prefix.  By contrast, the crude turnoff-count-only \(e\ge9\) residual alone is
+not usable post-prefix: over the same \(501\le h\le2000\) window it becomes positive and peaks at the artificial
+endpoint, solely because it ignores the survival cost after the skipped gaps.  A high-end exact profile confirms the
+right target.  At \(H=1999,T=13949\),
+\[
+\begin{array}{c|cccc}
+e & 1 & 2 & 4 & 8\\
+\hline
+\log_2\text{ contribution} & -2529.389774 & -2572.382804 & -2662.541447 & -2850.958022
+\end{array}
+\]
+so the exact selected-gap terms still decay rapidly in \(e\).  The next theorem-shaped object should therefore be an
+\emph{exact episode-tail ratio} for the closed-form \(e\)-summands, not a tail bound that counts turnoffs without
+charging the remaining live span.  The product-GF post-prefix scanner is
+\[
+\texttt{python scripts/sum\_fullsplit\_episode\_outer\_gf.py}.
+\]
+The all-episode wrapper below now supplies this replacement on the same \(501\le h\le2000\) range.  With modes
+\[
+\texttt{cap,eallratio,eallratio},
+\]
+it gives
+\[
+\log_2 \mu_{501\le h\le2000}^{\rm all\mbox{-}episode}
+\le -182.259739,
+\]
+again peaking at \(h=501,r=1\) in the near bucket.  This is weaker than the \(e\le1\) diagnostic, but it removes the
+post-prefix multi-episode caveat.
+The fast episode diagnostic, interpolation checker, and crude tail summation helper are
+\[
+\begin{gathered}
+\texttt{python scripts/fast\_fullsplit\_episode\_e01.py},\\
+\texttt{python scripts/check\_fullsplit\_e\_tail\_ratio.py},\\
+\texttt{python scripts/check\_fullsplit\_interpolation\_slack.py},\\
+\texttt{python scripts/sum\_fullsplit\_turnoff\_tail.py}.
+\end{gathered}
+\]
+
+\begin{lemma}[Product bound for selected full-split terminations]
+\label{lem:fullsplit-selected-gap-product}
+Fix the full-codeword random-split inner.  Suppose \(p_{\rm term}\) is a uniform conditional upper bound on the
+one-live-branch termination atom under the exposure convention used by the episode ledger.  Namely, after exposing any
+earlier blocks, earlier scramblers and splits, the current state weight, the gap/occupancy skeleton being summed over,
+and the remaining input-placement counts, but before exposing the fresh random labels that can cause the next charged
+termination, the conditional probability of that charged event is at most \(p_{\rm term}\).  The charged event may be the
+split atom \(q'=0\), or an exact input/state cancellation atom bundled into the same opportunity.
+
+Then, for any fixed exposed gap/occupancy skeleton and any fixed set \({\cal S}\) of \(e\) selected gaps in the episode
+decomposition,
+\[
+\Pr[\text{all selected opportunities in }{\cal S}\text{ terminate}\mid\text{skeleton}]
+\le
+p_{\rm term}^{e}.
+\]
+\end{lemma}
+
+\begin{proof}
+Order the selected opportunities from left to right and expose the process sequentially.  Let \({\cal F}_{j-1}\) be the
+history before the \(j\)-th selected opportunity, including the outcomes of all earlier selected and unselected blocks.
+On the event that the \(j\)-th opportunity is actually reached with a live state, the definition of \(p_{\rm term}\)
+gives
+\[
+\Pr[E_j\mid {\cal F}_{j-1}]\le p_{\rm term}.
+\]
+If the opportunity is not reached, the joint event that all selected opportunities terminate has conditional probability
+zero from that history.  Multiplying these conditional bounds by the chain rule gives the claimed \(p_{\rm term}^e\)
+bound.
+
+For the full-split construction the hypothesis is exactly the local exposure principle used above.  Conditional on a
+nonzero incoming state, the fresh scrambler makes the BCH codeword uniform over nonzero codewords, and the fresh split
+controls the \(q'=0\) atom independently of the past.  The exact-cancellation part is whatever local random-placement
+atom has been left unexposed in the chosen ledger; the finite-prefix and global values of \(p_{\rm term}\) below are the
+corresponding certified union bounds for the split atom and that cancellation atom.  The global atom is pointwise in a
+fixed next-block support, while the sharper finite-prefix atom is used only with the finite ledger exposure for which it
+is verified.
+\end{proof}
+
+\begin{lemma}[All-episode generating bound for the full-split inner]
+\label{lem:fullsplit-all-episode-gf-bound}
+Fix the full-codeword random-split inner with block size \(b\).  Let
+\[
+p_{\rm term}
+\]
+be any valid upper bound on the one-live-branch termination atom, including both the \(q'=0\) split event and any
+exact input/state cancellation event being charged in the same step.  Let \(p_{j,q}\) be the nonzero BCH split law, and
+for \(\lambda>0\) set
+\[
+M_+(\lambda):=\sum_{j,q>0} p_{j,q}e^{-\lambda j}.
+\]
+Suppose the first active block has already been exposed, and \(H\) input ones remain to be placed uniformly in \(T\)
+later \(b\)-blocks.  Let
+\[
+C_{H,x}^{(b)}:=[z^H]\big((1+z)^b-1\big)^x
+\]
+be the number of placements of the remaining \(H\) ones using exactly \(x\) nonempty later blocks.  Then for every
+\(\lambda>0\), the full selected-gap episode contribution, summed over all numbers of terminating/skipped gaps, is at
+most
+\begin{equation}
+\label{eq:fullsplit-all-e-gf-exactcoeff}
+\sum_x
+\frac{C_{H,x}^{(b)}}{\binom{bT}{H}}\,
+e^{\lambda d}M_+(\lambda)^T\,
+[t^{T-x}]
+\left(
+\frac{1}{1-t}
++
+\frac{p_{\rm term}}{1-t/M_+(\lambda)}
+\right)^{x+1}.
+\end{equation}
+Equivalently, for any \(a\) with \(0<a<M_+(\lambda)\), the same contribution is bounded by
+\begin{equation}
+\label{eq:fullsplit-all-e-gf-cauchy}
+\sum_x
+\frac{C_{H,x}^{(b)}}{\binom{bT}{H}}\,
+e^{\lambda d}M_+(\lambda)^T\,
+a^{-(T-x)}
+\left(
+\frac{1}{1-a}
++
+\frac{p_{\rm term}}{1-a/M_+(\lambda)}
+\right)^{x+1}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Condition on exactly \(x\) nonempty later blocks.  The number of such placements is
+\(\binom{T}{x}C_{H,x}^{(b)}\), so the occupancy probability is
+\[
+\frac{\binom{T}{x}C_{H,x}^{(b)}}{\binom{bT}{H}}.
+\]
+Given \(x\), the \(G=T-x\) empty blocks are distributed uniformly among the \(x+1\) gaps after active blocks, including
+the terminal suffix.  Select \(e\) of these \(x+1\) gaps to be skipped by terminations.  If the selected gaps contain
+total length \(s\), then the number of gap compositions with this selected total is
+\[
+\binom{s+e-1}{e-1}\binom{T-s-e}{x-e}
+\]
+with the endpoint conventions \(e=0\) and \(e=x+1\).  The factor
+\(\binom{T}{x}\) in the occupancy probability cancels the denominator
+\(\binom{G+x}{x}=\binom{T}{x}\) from the uniform gap-composition law.
+
+By Lemma~\ref{lem:fullsplit-selected-gap-product}, any fixed selected set contributes at most \(p_{\rm term}^e\).  If
+the selected gaps have total length \(s\), then \(T-s\) live BCH split branches remain to be charged.  For an exact
+cancellation charged to a preceding gap, deleting the intervening live branches is only pessimistic in the following
+Chernoff bound because \(M_+(\lambda)\le1\).  For fixed \(\lambda\),
+\[
+\Pr[\text{live output weight}\le d]
+\le e^{\lambda d}M_+(\lambda)^{T-s}
+=e^{\lambda d}M_+(\lambda)^T\left(M_+(\lambda)^{-1}\right)^s.
+\]
+Thus one selected gap has ordinary generating function
+\((1-t/M_+(\lambda))^{-1}\) and contributes an additional factor \(p_{\rm term}\), while an unselected gap has
+generating function \((1-t)^{-1}\).  Summing over all selected subsets of all sizes gives the coefficient in
+\eqref{eq:fullsplit-all-e-gf-exactcoeff}.  The Cauchy bound
+\([t^G]F(t)\le a^{-G}F(a)\), valid for \(0<a<M_+(\lambda)\), gives
+\eqref{eq:fullsplit-all-e-gf-cauchy}.
+\end{proof}
+
+\begin{corollary}[Coefficient-free all-episode envelope]
+\label{cor:fullsplit-all-episode-coeff-free}
+In the setting of Lemma~\ref{lem:fullsplit-all-episode-gf-bound}, fix \(\lambda>0\), \(0<a<M_+(\lambda)\), and
+\(\rho>0\), and write
+\[
+\Gamma_{\lambda,a}:=
+\frac{1}{1-a}
++
+\frac{p_{\rm term}}{1-a/M_+(\lambda)}.
+\]
+Let
+\[
+x_0(H):=
+\begin{cases}
+0,&H=0,\\
+\lceil H/b\rceil,&H>0,
+\end{cases}
+\qquad
+x_1(H,T):=\min\{H,T\}.
+\]
+Then the all-episode contribution is at most
+\begin{equation}
+\label{eq:fullsplit-all-e-coeff-free}
+\frac{e^{\lambda d}M_+(\lambda)^T}{\binom{bT}{H}}\,
+\Gamma_{\lambda,a}\,a^{-T}\rho^{-H}
+\sum_{x=x_0(H)}^{x_1(H,T)}
+\left(a\Gamma_{\lambda,a}\big((1+\rho)^b-1\big)\right)^x .
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Starting from \eqref{eq:fullsplit-all-e-gf-cauchy}, factor
+\(\Gamma_{\lambda,a}a^{-T}\) from the summand.  The remaining occupancy sum is
+\[
+\sum_x C_{H,x}^{(b)}(a\Gamma_{\lambda,a})^x.
+\]
+For every \(\rho>0\),
+\[
+C_{H,x}^{(b)}
+= [z^H]\big((1+z)^b-1\big)^x
+\le
+\rho^{-H}\big((1+\rho)^b-1\big)^x,
+\]
+and \(C_{H,x}^{(b)}=0\) outside the displayed range of \(x\).  This gives
+\eqref{eq:fullsplit-all-e-coeff-free}.
+\end{proof}
+
+This corollary is the proof object that should replace the finite \(e\)-grid wherever a smooth tail envelope is needed.
+It is local-code agnostic except through the split law \(p_{j,q}\) and the termination upper bound \(p_{\rm term}\), and
+it interfaces with any outer code only through the usual first-moment sum over \(A_h^{\rm out}\).  In particular, RM,
+BCH-like block outers, and a random-banded outer with an analytic spectrum envelope can all use the same inner episode
+theorem.  The outer code supplies either exact coefficients or an envelope
+\[
+A_h^{\rm out}\le \mathcal A(h),
+\]
+and the dense+dense first moment then uses the same schematic sum
+\[
+\sum_h \mathcal A(h)\sum_r
+\Pr[\text{first active inner block has weight }r\mid h]\,
+\mathcal E(h-r,T_r,d),
+\]
+where \(\mathcal E\) is any certified inner envelope, such as
+\eqref{eq:fullsplit-all-e-coeff-free}.  Thus the RM block outer is a concrete calibration instance, not part of the
+inner theorem.
+
+The first coefficient-free diagnostic is mixed in exactly the useful way.  With the EBCH \([128,64]\) split law,
+the global theorem-facing termination atom \(p_{\rm term}=2^{-62.4078758}\), \(N=2^{21}\), \(b=64\), and \(\delta=.09\),
+optimizing a coarse
+\((\lambda,a,\rho)\)-grid gives
+\[
+\begin{array}{c|cc}
+T & H=499 & H=1999\\
+\hline
+5949 & 0 & 0\\
+9949 & -169.605380 & 0\\
+13949 & -355.018537 & -278.016997 .
+\end{array}
+\]
+The zeros mean that the probability cap \(1\) is the best value found by this smooth all-episode envelope.  Therefore
+the full proof should be explicitly piecewise: short remaining spans are handled by outer-spectrum and placement
+suppression, while middle/far spans use the all-episode inner envelope.  The remaining analytic task is to optimize
+\((\lambda,a,\rho)\) in \eqref{eq:fullsplit-all-e-coeff-free} and prove a post-prefix summable outer/inner product
+bound, rather than to extend the finite \(e\)-grid.
+
+The corresponding summation wrapper is
+\[
+\texttt{python scripts/sum\_fullsplit\_piecewise\_certificate.py}.
+\]
+It takes a local outer spectrum, first-active placement buckets, and a per-bucket inner mode.  The current theorem-shaped
+configuration is
+\[
+\texttt{cap,cauchy,cauchy},
+\]
+meaning that the near bucket uses the trivial inner probability bound \(1\), while the middle and far buckets use
+Corollary~\ref{cor:fullsplit-all-episode-coeff-free}.  This is intentionally a certificate interface rather than an
+RM-specific evaluator: replacing \(RM(4,9)\) by a BCH-like block outer, or by an analytic random-banded spectrum
+envelope, changes only the outer generating function supplied to the first-moment sum.
+
+The first run of this wrapper clarified the remaining proof split.  The pure smooth configuration
+\[
+\texttt{cap,cauchy,cauchy}
+\]
+is \emph{not} adequate on the small-\(H\) ridge: over \(32\le h\le80\) it gives
+\[
+\log_2\mu=37.549030,
+\]
+peaking at \(h=76,r=1\) in the far bucket, because the coefficient-free all-episode Cauchy bound is essentially capped
+there.  Replacing the middle and far buckets by the audited fixed-\(e\) grids fixes this ridge:
+\[
+\begin{array}{c|c|c}
+\text{range} & \text{inner modes} & \log_2\mu\\
+\hline
+32\le h\le80 & \texttt{csv,csv,csv} & -34.767371\\
+32\le h\le500 & \texttt{csv,csv,csv} & -34.767174\\
+501\le h\le2000 & \texttt{csv,csv,csv}\ (e\le1\text{ grids}) & -202.271474\\
+501\le h\le2000 & \texttt{cap,eallratio,eallratio} & -182.259739 .
+\end{array}
+\]
+The first two rows use the \(e\le8\) grids through \(H=499\); the sharper post-prefix diagnostic uses the \(e\le1\)
+grids through \(H=1999\), while the last row is the theorem-facing all-episode replacement.  In all cases the peak is
+at the left edge of the relevant range, so the finite-grid prefix is not hiding an intermediate-weight ridge.
+
+For the tail beyond the audited grid, the right smooth object is not the all-\(e\) Cauchy envelope but a fixed-\(e=1\)
+envelope.  For \(H>0\), the \(e=0\) branch is bounded by
+\[
+E_0(\lambda)=e^{\lambda d}M_+(\lambda)^T,
+\]
+while the one-skipped-gap branch admits, for every \(\rho>0\),
+\begin{equation}
+\label{eq:fullsplit-e1-cauchy-envelope}
+E_1(\lambda,\rho)
+\le
+\frac{p_{\rm term}e^{\lambda d}}{\binom{bT}{H}}\,
+\rho^{-H}
+\sum_{x=\lceil H/b\rceil}^{\min\{H,T\}}
+(x+1)
+\left(
+\big((1+\rho)^b-1\big)\frac{M_+(\lambda)}{1-M_+(\lambda)}
+\right)^x .
+\end{equation}
+This comes from the exact \(e=1\) suffix identity
+\[
+\sum_{\ell=x}^{T}\binom{\ell-1}{x-1}M_+(\lambda)^\ell
+\le
+\left(\frac{M_+(\lambda)}{1-M_+(\lambda)}\right)^x
+\]
+and the coefficient bound
+\[
+C_{H,x}^{(b)}\le \rho^{-H}\big((1+\rho)^b-1\big)^x.
+\]
+Numerically, at the bad middle-tail point \(T=9949,H=3000\), this gives
+\[
+\log_2 E_{\le1}\le -2163.662004,
+\]
+compared with the exact fixed-\(e\) value \(-2298.278345\).  Thus it preserves the important part of the exact
+episode-grid strength while avoiding a high-\(H\) coefficient table.
+
+The same fixed-pole calculation gives the desired multi-termination tail comparison.  Fix \(\lambda\) and write
+\[
+M=M_+(\lambda),\qquad p=p_{\rm term}.
+\]
+For fixed \(x\), let \(\widehat E_{e,x}^{(\lambda)}\) denote the contribution with exactly \(x\) occupied later blocks
+and \(e\) charged terminations, using the survival bound \(e^{\lambda d}M^L\) at live length \(L\).  Then
+\begin{equation}
+\label{eq:fullsplit-fixed-x-e-tail-ratio}
+\sum_{e\ge2}\widehat E_{e,x}^{(\lambda)}
+\le
+\widehat E_{1,x}^{(\lambda)}
+\sum_{k=1}^{x}
+\frac{\binom{x+1}{k+1}}{x+1}
+\binom{T-x+k}{k}
+\bigl(p(1-M)\bigr)^k .
+\end{equation}
+Consequently, after summing over \(x\),
+\begin{equation}
+\label{eq:fullsplit-e-tail-ht-multiplier}
+\widehat E_{\ge2}^{(\lambda)}
+\le
+\widehat E_{1}^{(\lambda)}\,
+R_{H,T}(\lambda),
+\qquad
+R_{H,T}(\lambda):=
+\sum_{k=1}^{\min\{H,T\}}
+\frac{\binom{H}{k}\binom{T}{k}}{k+1}
+\bigl(p(1-M_+(\lambda))\bigr)^k .
+\end{equation}
+Indeed, for \(1\le e\le x\), writing \(k=e-1\) and \(L=T-s\), the fixed-\(e\) suffix sum is bounded by
+\[
+\sum_{L=x}^{T}
+\binom{T-L+e-1}{e-1}
+\binom{L-e}{x-e}M^L
+\le
+\binom{T-x+e-1}{e-1}
+\frac{M^x}{(1-M)^{x-e+1}}.
+\]
+The \(e=1\) envelope has the same \(C_{H,x}^{(b)}\), occupancy denominator, and factor
+\[
+p\,e^{\lambda d}(x+1)\frac{M^x}{(1-M)^x}.
+\]
+Dividing gives the summand in \eqref{eq:fullsplit-fixed-x-e-tail-ratio}.  The endpoint \(e=x+1\), where all gaps are
+selected, gives the same \(k=x\) factor directly.  Finally,
+\[
+\frac{\binom{x+1}{k+1}}{x+1}=\frac{\binom{x}{k}}{k+1}\le \frac{\binom{H}{k}}{k+1},
+\qquad
+\binom{T-x+k}{k}\le \binom{T}{k},
+\]
+which gives \eqref{eq:fullsplit-e-tail-ht-multiplier}.
+
+The preceding derivation is the theorem-facing object used by the finite ledger:
+
+\begin{lemma}[Fixed-pole all-episode ratio envelope]
+\label{lem:fullsplit-fixed-pole-eallratio}
+In the setting of Lemma~\ref{lem:fullsplit-all-episode-gf-bound}, assume \(H>0\), fix \(\lambda>0\) with
+\(M:=M_+(\lambda)<1\), and fix \(\rho>0\).  Put
+\[
+E_0(\lambda):=e^{\lambda d}M^T,
+\]
+and
+\[
+B_1(\lambda,\rho):=
+\frac{p_{\rm term}e^{\lambda d}}{\binom{bT}{H}}\,
+\rho^{-H}
+\sum_{x=\lceil H/b\rceil}^{\min\{H,T\}}
+(x+1)
+\left(
+\big((1+\rho)^b-1\big)\frac{M}{1-M}
+\right)^x .
+\]
+With \(R_{H,T}(\lambda)\) defined in \eqref{eq:fullsplit-e-tail-ht-multiplier}, the full selected-gap episode
+contribution is at most
+\[
+E_0(\lambda)+B_1(\lambda,\rho)\bigl(1+R_{H,T}(\lambda)\bigr).
+\]
+Consequently the inner probability contribution may be capped by the minimum of this quantity and \(1\).
+\end{lemma}
+
+\begin{proof}
+The \(e=0\) branch has no charged termination and is bounded directly by \(E_0(\lambda)\).  For \(e=1\), conditioning on
+the number \(x\) of occupied later blocks gives the exact suffix sum
+\[
+(x+1)\sum_{\ell=x}^{T}\binom{\ell-1}{x-1}M^\ell
+\le
+(x+1)\left(\frac{M}{1-M}\right)^x,
+\]
+while Cauchy's coefficient bound gives
+\[
+C_{H,x}^{(b)}
+\le
+\rho^{-H}\big((1+\rho)^b-1\big)^x .
+\]
+Summing over \(x\) gives \(B_1(\lambda,\rho)\).  Finally,
+\eqref{eq:fullsplit-e-tail-ht-multiplier} compares the \(e\ge2\) contribution to the same fixed-\(\lambda\) \(e=1\)
+contribution by the multiplier \(R_{H,T}(\lambda)\).  Adding the three branches gives the claim.
+\end{proof}
+
+\begin{lemma}[Right-endpoint dominance for paired early sums]
+\label{lem:fullsplit-paired-endpoint-dominance}
+Fix \(b,H,\lambda,\rho\), and write
+\[
+G_{\lambda,\rho}:=
+\big((1+\rho)^b-1\big)\frac{M_+(\lambda)}{1-M_+(\lambda)}.
+\]
+Assume \(G_{\lambda,\rho}>2\).  Let \(T_0\le T_1 < H\), and put
+\[
+T_*:=\max\{T_0,\lceil H/b\rceil\},\qquad
+S_T(H;\lambda,\rho):=
+\sum_{x=\lceil H/b\rceil}^{T}(x+1)G_{\lambda,\rho}^x .
+\]
+Then
+\begin{equation}
+\label{eq:fullsplit-paired-endpoint-dominance}
+\sum_{T=T_*}^{T_1}
+S_T(H;\lambda,\rho)\bigl(1+R_{H,T}(\lambda)\bigr)
+\le
+\frac{
+S_{T_1}(H;\lambda,\rho)\bigl(1+R_{H,T_1}(\lambda)\bigr)
+}{
+1-(G_{\lambda,\rho}-1)^{-1}
+}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For \(T\ge T_*\),
+\[
+S_{T-1}
+\le
+\sum_{x=\lceil H/b\rceil}^{T-1}T\,G_{\lambda,\rho}^x
+\le
+\frac{T\,G_{\lambda,\rho}^{T}}{G_{\lambda,\rho}-1},
+\qquad
+S_T\ge (T+1)G_{\lambda,\rho}^{T}.
+\]
+Thus \(S_{T-1}/S_T\le (G_{\lambda,\rho}-1)^{-1}\).  Iterating this adjacent-ratio bound gives a geometric tail
+from the right endpoint.  The multiplier \(R_{H,T}(\lambda)\) in
+\eqref{eq:fullsplit-e-tail-ht-multiplier} is nondecreasing in \(T\), since every summand contains
+\(\binom{T}{k}\).  Replacing all \(1+R_{H,T}\) by the endpoint value \(1+R_{H,T_1}\) and summing the geometric series
+gives \eqref{eq:fullsplit-paired-endpoint-dominance}.
+\end{proof}
+
+The multiplier is tiny in the finite regimes that currently matter.  The audit helper
+\[
+\texttt{python scripts/check\_fullsplit\_e\_tail\_multiplier.py}
+\]
+reports, for example, the following conservative \(R_{H,T}\) exponents:
+\[
+\begin{array}{c|c|c|c}
+T & H & \lambda & \log_2 R_{H,T}(\lambda)\\
+\hline
+5949 & 10000 & .05 & -39.399491\\
+9949 & 10000 & .05 & -38.657489\\
+13949 & 10000 & .05 & -38.169806 .
+\end{array}
+\]
+The sharper fixed-\(x\) multiplier is another \(1.5\)--\(2.7\) bits lower in these samples.  Thus the \(e\ge2\) tail
+should add a negligible multiplicative factor to the fixed-\(\lambda\) \(e=1\) envelope, provided the first-moment
+summation keeps the same \(\lambda\) when applying \eqref{eq:fullsplit-e-tail-ht-multiplier}.
+The verifier now also audits the numerical evaluation of \(R_{H,T}\).  The implementation truncates the positive
+\(k\)-sum only after adding a geometric upper bound for the omitted suffix, using the adjacent-ratio formula
+\[
+\frac{a_{k+1}}{a_k}
+=
+\frac{(H-k)(T-k)}{(k+1)(k+2)}\,p(1-M_+(\lambda)).
+\]
+For the current feasible \(e\)all-ratio range \(T\le32767\), this ratio is already below
+\(2^{-28.992971}\) after the first term, even under the crude bound \(1-M_+(\lambda)\le1\).  The finite-ledger
+manifest records exact finite-sum samples against this truncated evaluator as
+\(\texttt{eallratio\_tail\_status=PASS}\).
+The same manifest now also includes a small implementation audit of the whole fixed-pole branch formula.  For six finite
+\((T,H,\lambda,\rho)\) samples, the verifier computes the selected-gap Chernoff sum directly from exact integer
+coefficients of \(((1+z)^b-1)^x\) and exact skipped-gap suffix sums, then checks that
+\eqref{eq:fullsplit-e1-cauchy-envelope} with the same-\(\lambda\) multiplier
+\eqref{eq:fullsplit-e-tail-ht-multiplier} dominates it.  It also compares the production
+\(\texttt{eallratio}\) evaluator against an independent fixed-pole formula evaluator, with maximum discrepancy
+\(2.9\cdot10^{-14}\) bits in the current manifest.  This is an implementation audit of the algebra; the proof object is
+still the displayed coefficient, suffix, and multiplier inequalities above.
+
+The wrapper now has a theorem-facing mode
+\[
+\texttt{cap,eallratio,eallratio},
+\]
+where the near bucket is still charged only by placement, while the middle and far buckets use
+Lemma~\ref{lem:fullsplit-fixed-pole-eallratio}, namely \eqref{eq:fullsplit-e1-cauchy-envelope} together with the
+same-\(\lambda\) multiplier \eqref{eq:fullsplit-e-tail-ht-multiplier}.  Thus this mode is an all-episode upper bound,
+not merely an \(e\le1\) diagnostic.
+The finite wrapper grid now also includes large \(\rho\)-poles up to \(10^4\).  These poles are mostly irrelevant in
+the ordinary sparse/intermediate occupancy range, but are essential near \(H=bT\), where they implement the same
+deficit-side control one would get by rewriting the occupancy coefficient in terms of missing coordinates.
+
+For fast high-weight exploration we also use the rigorous endpoint placement bound
+\[
+\sum_{g=g_0}^{g_1}\binom{b(T_0+g-1)}{H}
+\le
+(g_1-g_0+1)\binom{b(T_0+g_1-1)}{H}.
+\]
+This loses at most \(\log_2 4000<12\) bits per bucket in the current three-bucket split, but avoids millions of
+independent binomial evaluations.  The finite-ledger verifier also samples exact bucket sums at the feasibility
+boundaries and records the endpoint dominance check; the largest advertised bucket-size loss is \(11.965784\) bits.
+The matching inner endpoint must be handled with some care: if the left endpoint \(T_{\min}\) has \(H>bT_{\min}\),
+then early gaps in the bucket are impossible but later gaps are not.  The corrected working rule is therefore to use
+the earliest feasible block count
+\[
+T_{\rm eff}(H;T_{\min},T_{\max})
+:=\max\{T_{\min},\lceil H/b\rceil\},
+\]
+discarding the bucket only when \(T_{\rm eff}>T_{\max}\).  Turning this into a theorem requires the mild monotonicity
+lemma that the fixed-pole envelope is nonincreasing in \(T\) for \(T\ge \lceil H/b\rceil\); otherwise one should split
+the bucket further.
+
+Here is the exact monotonicity condition now used for audits.  For fixed \((\lambda,\rho)\), put
+\[
+M=M_+(\lambda),\qquad
+G_{\lambda,\rho}:=
+\big((1+\rho)^b-1\big)\frac{M}{1-M},
+\]
+and define
+\[
+S_T(H;\lambda,\rho):=
+\sum_{x=\lceil H/b\rceil}^{\min\{H,T\}}(x+1)G_{\lambda,\rho}^x.
+\]
+The \(e\ge1\) part of the fixed-pole envelope is monotone from \(T\) to \(T+1\) whenever
+\[
+\log_2\frac{\binom{b(T+1)}{H}}{\binom{bT}{H}}
+\ge
+\log_2\frac{S_{T+1}(H;\lambda,\rho)}{S_T(H;\lambda,\rho)}
++
+\log_2\frac{1+R_{H,T+1}(\lambda)}{1+R_{H,T}(\lambda)}.
+\]
+The \(e=0\) part is already monotone because it is proportional to \(M^T\) and \(M<1\).  The audit script
+\[
+\texttt{scripts/check\_fullsplit\_T\_monotonicity.py}
+\]
+checks this one-step inequality on the interval certificate.
+
+There is a simple sufficient endpoint reduction.  Write
+\[
+D_{H,T}:=\frac{\binom{b(T+1)}{H}}{\binom{bT}{H}}
+=\prod_{i=1}^{b}\frac{bT+i}{bT+i-H}.
+\]
+Each factor is increasing in \(H\) and decreasing in \(T\).  Thus the no-new-occupancy case \(T\ge H\), where
+\(S_{T+1}=S_T\), is worst at the smallest \(H\) in the interval and the largest \(T\) in the bucket.  In the
+new-occupancy case \(T<H\), the smallest feasible \(H\) is \(\max\{H_{\min},T+1\}\), and
+\[
+\frac{S_{T+1}}{S_T}
+=
+1+\frac{(T+2)G_{\lambda,\rho}^{T+1}}{S_T}
+\le
+1+\frac{T+2}{T+1}G_{\lambda,\rho},
+\]
+since \(S_T\ge (T+1)G_{\lambda,\rho}^T\).  Finally \(R_{H,T}(\lambda)\) is increasing in both \(H\) and \(T\), so
+\[
+\log_2\frac{1+R_{H,T+1}(\lambda)}{1+R_{H,T}(\lambda)}
+\le
+\log_2\bigl(1+R_{H_{\max},T_{\max}}(\lambda)\bigr).
+\]
+The command
+\[
+\texttt{python scripts/check\_fullsplit\_T\_monotonicity.py --sufficient-reduction}
+\]
+checks these sufficient endpoint inequalities.  With the interval poles below, every middle/far bucket has positive
+slack:
+\[
+\begin{array}{c|c|c|c}
+h\text{ range} & (\lambda,\rho) & \text{middle slack} & \text{far slack}\\
+\hline
+2001\text{--}7858 & (.02,.01) & .200576 & .155836\\
+7859\text{--}20550 & (.05,.03) & .154987 & .154991\\
+20551\text{--}75000 & (.2,.1) & 1.129733 & .647617\\
+75001\text{--}250000 & (.5,.3) & 4.010933 & 2.144089\\
+250001\text{--}350000 & (1.2,.5) & 30.056467 & 22.381864\\
+350001\text{--}650000 & (1.2,1) & 21.636936 & 9.238901\\
+650001\text{--}725000 & (1.2,2) & 58.501371 & 15.287874\\
+725001\text{--}950000 & (1.2,3) & 66.069027 & 3.773620\\
+950001\text{--}1148736 & (1.2,3) & \infty & 73.689638 .
+\end{array}
+\]
+This is now a finite endpoint certificate rather than a dense scan over \(H,T\): the denominator growth beats the
+new occupancy term and the \(R_{H,T}\) correction by a visible margin in every interval.
+The finite-ledger verifier runs this sufficient-reduction audit by default; its manifest records the worst row as
+\(7859\text{--}20550\) in the middle bucket, with slack \(0.154987\) bits.
+
+With the endpoint placement bound, the all-episode wrapper gives the following dense checked ranges:
+\[
+\begin{array}{c|c|c}
+\text{range} & \log_2\mu & \text{dominant bucket}\\
+\hline
+2001\le h\le5000 & -750.899709 & \text{near, cap}\\
+5001\le h\le10000 & -1916.794192 & \text{near, cap}\\
+10001\le h\le20000 & -3622.467998 & \text{middle, }e\text{-all}\\
+20001\le h\le50000 & -6021.761195 & \text{middle, }e\text{-all}.
+\end{array}
+\]
+Using the corrected \(T_{\rm eff}\) rule and the current adaptive pole grid, a coarse sanity scan over
+\(250000\le h\le1000000\) in steps of \(25000\) gives \(\log_2\mu=-78531.366918\), peaking at \(h=250000\).
+This is only a sanity scan: the dense interval table below is the relevant certificate, since a coarse step can miss an
+interior peak.  The corrected scan replaces the earlier misleading high-tail ``impossible bucket'' observation, which
+came from pairing endpoint placement with the bucket's left endpoint \(T\).
+
+Even before optimizing the high tail, a fixed-pole interval certificate already works through the feasible far-bucket
+tail \(h=1148736\):
+\[
+\begin{array}{c|c|c}
+h\text{ range} & (\lambda,\rho) & \log_2\mu\\
+\hline
+2001\text{--}7858 & (.02,.01) & -586.597103\\
+7859\text{--}20550 & (.05,.03) & -2655.944828\\
+20551\text{--}75000 & (.2,.1) & -6025.574047\\
+75001\text{--}250000 & (.5,.3) & -12844.868837\\
+250001\text{--}350000 & (1.2,.5) & -28476.640541\\
+350001\text{--}400000 & (1.2,1) & -81555.594538\\
+400001\text{--}450000 & (1.2,1) & -91421.772986\\
+450001\text{--}550000 & (1.2,1) & -82081.961328\\
+550001\text{--}650000 & (1.2,1) & -1518.493461\\
+650001\text{--}725000 & (1.2,2) & -116328.133946\\
+725001\text{--}750000 & (1.2,3) & -169887.902921\\
+750001\text{--}850000 & (1.2,3) & -134523.583646\\
+850001\text{--}950000 & (1.2,3) & -117534.843530\\
+950001\text{--}1050000 & (1.2,3) & -285052.550668\\
+1050001\text{--}1148736 & (1.2,3) & -562860.716638 .
+\end{array}
+\]
+The displayed high-interval rows are the raw finite-prefix interval constants with a checked \(1.484774\)-bit
+adjustment for replacing the finite-prefix termination atom by the global Bernstein termination atom.  The helper
+\(\texttt{verify\_fullsplit\_high\_interval\_adjustment.py}\) computes the required adjustment as
+\(1.484773404861\) bits, including a negligible tail-multiplier allowance.  The ledger helper
+\(\texttt{verify\_fullsplit\_finite\_ledger.py}\) can print the exact fixed-pole regeneration command for each interval
+and can spot-recompute selected intervals using \(\texttt{--check-high-intervals}\).
+The tight row remains the upper transition interval \(550001\text{--}650000\), not the multi-episode correction itself.
+Above this transition the feasible far-bucket tail quickly falls away; the later peaks are either at the left endpoint or
+near \(h=862232\), and all are far below the target first-moment level.
+The cutoff is the feasibility edge of the current late-window split: the far bucket has
+\(T_{\max}=5949+12000-1=17948\), so \(H\le 64T_{\max}=1148672\), and hence no row with \(r\le64\) exists once
+\(h>1148736\).
+The complement-side interval table above is the replacement for this old feasible-cutoff limitation on the high-density
+early branch.  It uses the paired \(T\)-sum directly at the true far endpoint \(T=32767\), the complement symmetry
+\(A_h^{\rm out}=A_{N-h}^{\rm out}\), and fixed-\(z\) endpoint bounds over \(h\)-intervals.  The finite ledger records
+this as
+\[
+\log_2\mu_{1048577\le h\le N}^{\rm complement\ high}\le -35150.097366.
+\]
+
+It remains to include the post-prefix part of the ultra-late branch \(T<5949\).  Here no inner episode estimate is
+needed: all \(h\) nonzero coordinates must lie in the final \(m=64\cdot5949=380736\) inner coordinates.  For a fixed
+outer Cauchy pole \(z\),
+\[
+A_h^{\rm out}\frac{\binom{m}{h}}{\binom Nh}
+\le
+\left(W_{\rm loc}(z)^{4096}-1\right)z^{-h}\frac{\binom{m}{h}}{\binom Nh}.
+\]
+The logarithm of the right-hand side has adjacent ratio \((m-h)/(N-h)z^{-1}\), hence is concave in \(h\).  Therefore
+each interval is certified by checking its endpoints and the critical point
+\[
+h_*=\frac{m-zN}{1-z}.
+\]
+With \(z=0.39605985943459426\), the checked intervals
+\[
+\begin{array}{c}
+501\text{--}2000,\quad 2001\text{--}7858,\quad 7859\text{--}20550,\\
+20551\text{--}75000,\quad 75001\text{--}150000,\quad 150001\text{--}250000,\\
+250001\text{--}380736
+\end{array}
+\]
+have union-bound total
+\[
+\log_2\mu_{501\le h\le380736,\ T<5949}^{\rm placement}\le -545.690526.
+\]
+The finite-ledger verifier also checks the adjacent-ratio shape reduction.  For this pole all seven intervals are
+maximized at their left endpoint.  The verifier flag \(\texttt{--print-late-postprefix-commands}\) prints the
+regeneration commands.
+
+\begin{corollary}[Checked post-prefix ledger rows]
+\label{cor:fullsplit-postprefix-checked-ledger}
+The checked \(h\ge501\) row families currently included in the finite ledger have union-bound total
+\[
+\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}\le -182.259739.
+\]
+These rows are
+\[
+\begin{array}{c|c}
+\text{row family} & \log_2\text{ contribution}\\
+\hline
+501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
+501\le h\le380736,\ T<5949\ \text{ultra-late placement rows} & -545.690526\\
+501\le h\le75000,\ T>17948\ \text{early endpoint rows} & -380.829185\\
+75001\le h\le350000,\ T>17948\ \text{accelerated endpoint rows} & -1056.187188\\
+350001\le h\le N/2,\ T>17948\ \text{paired accelerated rows} & -98386.449256\\
+2001\le h\le1148736\ \text{fixed-pole intervals} & -586.597103\\
+1048577\le h\le N\ \text{complement-high intervals} & -35150.097366 .
+\end{array}
+\]
+\end{corollary}
+
+\begin{proof}
+The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact for the late window.  The second row is
+the ultra-late placement cap for \(h>500\).  Since \(64\cdot5949=380736\), no ultra-late placement row exists above
+\(h=380736\).  The third row is the checked early endpoint table for \(T>17948\) through \(h=75000\).  The fourth row is
+the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row is the paired-\(T\) extension for
+\(350001\le h\le N/2\).  The verifier checks that these accelerated early intervals form a contiguous cover
+\(75001,\ldots,N/2\), split into seven endpoint-helper rows on \(75001,\ldots,350000\) and three paired-helper rows on
+\(350001,\ldots,N/2\), with no gap or overlap.  The verifier also checks that the ultra-late placement rows cover
+\(501,\ldots,380736=64\cdot5949\).  The sixth row is the fixed-pole interval table through the feasible far-bucket
+cutoff \(h=1148736\); its verifier entry checks a contiguous \(2001,\ldots,1148736\) cover and the common
+\(1.484774\)-bit turnoff adjustment.  It also checks that the feasible-min rule
+\(T_{\rm eff}=\max(T_{\min},\lceil H/64\rceil)\) gives far-bucket cutoff \(64\cdot17948+64=1148736\), and records the
+endpoint gap-sum audit and sufficient \(T\)-monotonicity audit, with monotonicity minimum slack \(0.154987\) bits.  The
+seventh row is the complement-side high-density table, checked as a contiguous \(1048577,\ldots,N\) cover with the
+convex endpoint reduction above.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger records
+this overlap and deliberately keeps it as harmless union-bound overcount.  Therefore the combined contribution is
+bounded by
+\[
+\begin{aligned}
+&\log_2\!\left(2^{-182.259739}+2^{-545.690526}+2^{-380.829185}+2^{-1056.187188}\right.\\
+&\qquad\left.+2^{-98386.449256}+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
+\end{aligned}
+\]
+The verifier prints and checks this as
+\(\texttt{h501\_plus\_checked\_rows\_log2=-182.259739}\).
+\end{proof}
+
+\begin{corollary}[Current finite first-moment checkpoint]
+\label{cor:fullsplit-current-finite-checkpoint}
+Let \(\mu_{\rm checked}(.09)\) denote the first-moment contribution of the row families covered by
+Corollaries~\ref{cor:fullsplit-small-prefix-all-first-active} and~\ref{cor:fullsplit-postprefix-checked-ledger}.
+Then
+\[
+\log_2 \mu_{\rm checked}(.09)\le -37.278528.
+\]
+\end{corollary}
+
+\begin{proof}
+Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} gives
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active,\ exact\ outer}\le -37.278528,
+\]
+and Corollary~\ref{cor:fullsplit-postprefix-checked-ledger} gives
+\[
+\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}\le -182.259739.
+\]
+Thus
+\[
+\log_2\!\left(2^{-37.278528}+2^{-182.259739}\right)\le -37.278528.
+\]
+The verifier prints and checks the same log-sum under the
+\(\texttt{current\_checked\_ledger}\) row, with value \(-37.278528\).
+\end{proof}
+
+\begin{theorem}[Checked finite RM/full-split first-moment certificate]
+\label{thm:fullsplit-rm-finite-certificate-009}
+Consider the finite checkpoint \(N=2^{21}\), \(b=64\), and \(\delta=.09\), so that
+\[
+d=\lfloor .09N\rfloor=188743 .
+\]
+Use the RM direct-sum outer from Lemma~\ref{lem:rm-prefix-support-split} and the full-split dense inner certified
+above.  Let \(Z_d\) be the number of nonzero concatenated codewords whose final weight is at most \(d\), with the
+expectation taken over the random choices of the inner construction.  The checked finite ledger gives
+\[
+\mathbb E Z_d\le 2^{-37.278528}.
+\]
+Consequently
+\[
+\Pr[d_{\min}\le d]\le 2^{-37.278528}.
+\]
+In particular, with positive probability a sampled code has \(d_{\min}\ge188744\), and hence relative distance
+\[
+\frac{d_{\min}}{N}\ge \frac{188744}{2^{21}}>.09 .
+\]
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:rm-prefix-support-split} verifies that the RM direct-sum outer has no positive weights below \(32\).
+Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} covers all supported weights \(32\le h\le500\) and all
+first-active positions by splitting them into the ultra-late, window, and early regimes.  Corollary~
+\ref{cor:fullsplit-postprefix-checked-ledger} covers the remaining outer weights \(h\ge501\): the ultra-late rows cover
+all feasible \(T<5949\) cases, the all-episode and fixed-pole interval rows cover the late window, the early endpoint
+and paired rows cover \(T>17948\) through \(N/2\), and the complement-high rows cover \(h>N/2\).  The overlap between
+the fixed-pole and complement-high rows is retained only as union-bound overcount.
+
+Thus every nonzero outer word is included in the row families defining \(\mu_{\rm checked}(.09)\).  Corollary~
+\ref{cor:fullsplit-current-finite-checkpoint} gives \(\log_2\mu_{\rm checked}(.09)\le -37.278528\), which is exactly
+the displayed bound on \(\mathbb E Z_d\).  The probability statement is Markov's inequality applied to the nonnegative
+integer random variable \(Z_d\).
+\end{proof}
+
+\subsection{Spectrum-model outer projections}
+\label{subsec:fullsplit-outer-spectrum-projections}
+
+The proved checkpoint above uses the exact RM \([512,256,32]\) local spectrum.  As a finite-\(N\) design diagnostic, we
+also compared two possible stronger outer floors while leaving the full-split EBCH inner ledger unchanged.  This is not
+a theorem upgrade: the BCH rows below use a spectrum model, not a certified local spectrum or a rigorous low-weight
+envelope.  The comparison script is
+\[
+\texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
+\]
+It writes the CSV and Markdown reports
+\[
+\begin{gathered}
+\texttt{scripts/outer\_mode\_comparison\_delta009.csv},\\
+\texttt{scripts/outer\_mode\_comparison\_delta009.md}.
+\end{gathered}
+\]
+The RM row reproduces the checked ledger value
+\(-37.278528\), while the BCH rows are marked heuristic in both outputs.  The modeled local spectrum is
+\[
+A_w=0\quad(0<w<d_0),\qquad
+A_w\approx 2^{k_0-n_0}\binom{n_0}{w}\quad(w\ge d_0),
+\]
+with optional sensitivity inflation of \(+10,+20,+40\) bits on the low-weight window
+\(d_0\le w\le d_0+32\).
+
+At \(N=2^{21}\), \(\delta=.09\), and \(d=188743\), the baseline projection rows are:
+\[
+\begin{array}{c|c|c|c|c|c|c}
+\text{outer mode} & \text{status} & [n_0,k_0,d_0] & \text{blocks} &
+\log_2\mu & \text{margin bits} & \text{dominant }h\\
+\hline
+\text{RM exact} & \text{proved} & [512,256,32] & 4096 & -37.278528 & 37.278528 & 32\\
+\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089134 & 37.089134 & 59\\
+\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 119 .
+\end{array}
+\]
+All three baseline rows are still dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).
+The rough work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit rows and \(16777216\) for the \(256\)-bit
+row, so the shorter-block projection has similar or slightly lower nominal outer work.
+
+The sensitivity check is the warning sign.  The \([256,128,38]\) model remains near the RM margin with no inflation and
+has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
+positive under \(+20\) bits.  The \([512,256,\ge62]\) model is much more robust in this diagnostic: its margins under
+\(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  Thus the projection
+suggests that a real \(512\)-bit BCH-like outer spectrum could be a meaningful constant-factor upgrade, whereas the
+\(256\)-bit option depends sensitively on the actual low-weight spectrum.
+
+This subsection should be read only as a spectrum-model projection.  To make any BCH row theorem-facing, we still need
+either the exact local weight distribution or a proved low-weight envelope, plus a recomputation of the \(h>2000\) tail
+under that same outer model.  The report records the external pointers used for the projection notes: the CodeTables
+\([256,128]\) construction record, the Kusaka/Okayama weight-distribution index, and the BCH designed-distance bound.
+
+The finite ledger is now checked by
+\[
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.
+\]
+The same verifier writes a machine-readable snapshot by passing \(\texttt{--write-manifest-json}\) with target
+\(\texttt{scripts/fullsplit\_finite\_ledger\_manifest.json}\).
+That manifest records the checked row families, fixed poles, recomputation commands, and log-sum totals under schema
+version \(v1\).
+It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
+that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
+\(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, the checked
+ultra-late post-prefix placement rows, the checked early endpoint rows through \(h=75000\), the accelerated early rows
+through \(h=N/2\), and the fixed-pole interval tables above, including the complement-side high-density manifest.
+Reweighting the \(h\le500\) pieces by exact
+RM direct-sum outer coefficients gives the reported combined finite late-window contribution
+\[
+\log_2\mu_{\rm finite}^{\rm fullsplit,\ exact\ outer}\le -37.383345,
+\]
+dominated by the tiny-prefix row \(h=32,r=1\) in the near bucket; the exact-outer \(e\ge9\) prefix residual is already
+\(-284.004805\) bits, the exact-outer early \(h\le500\) contribution is \(-86.910456\) bits, and the entire \(h\ge501\)
+checked ledger is below \(-182.259739\) bits.  Including the checked exact-outer ultra-late placement prefix, the
+all-position \(32\le h\le500\) value is
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions,\ exact\ outer}\le -37.278528.
+\]
+
+The per-\(h\) summary output also gives a compact active-pole map through \(h=50000\).  The dominant row is:
+\[
+\begin{array}{c|c|c|c}
+h\text{ range} & \text{dominant bucket} & (\lambda,\rho) & \text{dominant }r\\
+\hline
+2001\text{--}7357 & \text{near, cap} & - & 1\\
+7358\text{--}7858 & \text{middle} & (.02,.01) & 1\\
+7859\text{--}10748 & \text{middle} & (.05,.03) & 1\\
+10749\text{--}13781 & \text{near, cap} & - & 1\\
+13782\text{--}17314 & \text{far} & (.05,.03) & 1\\
+17315\text{--}20550 & \text{middle} & (.05,.03) & 1\text{--}4\\
+20551\text{--}22707 & \text{middle} & (.2,.1) & 4\\
+22708\text{--}50000 & \text{near, cap} & - & 2\text{--}5 .
+\end{array}
+\]
+Thus, through the main dense checked band, only four all-episode pole choices ever dominate:
+\[
+(.02,.01),\quad (.05,.03),\quad (.2,.1),\quad (.5,.3)
+\]
+with larger occupancy poles appearing only in the corrected high-tail scan.  This makes the next theorem target
+plausibly finite: prove the \(T_{\rm eff}\)-monotonicity lemma, then prove a small interval certificate for these pole
+choices using the endpoint placement bound and the outer generating-function envelope.
+
+The important lesson from these scans is methodological.  The \(e\ge2\) tail is no longer the blocker once it is
+charged against the same fixed pole as the \(e=1\) branch.  The remaining proof obligation is to replace the finite
+adaptive pole grid by a clean analytic split in \(H/T\): small \(H\) wants small \(\lambda,\rho\), intermediate \(H\)
+wants \(\lambda\approx .05\text{--}.2\), and high \(H\) wants \(\lambda\approx .5\text{--}1.2\) with larger occupancy
+poles.  This is a standard Chernoff-envelope bookkeeping problem, rather than a new episode-combinatorics problem.
+
+% ============================================================

@@ -44,44 +44,43 @@ and the inner recursion supplies contraction  and large-deviation behavior.
 
 
 \paragraph{Outer instantiations.}
-We instantiate the outer interface in one of two ways.
+We keep two outer viewpoints in the main paper.
 \begin{enumerate}
-\item \textbf{Dense log-memory outer.}
-A terminated, feedforward convolutional outer with memory \(M=\Theta(\log n)\) and dense taps within the band.
-It is encoding-friendly and satisfies both the logarithmic distance and the required spectrum shape.
-\item \textbf{Encodable banded LDPC outer (local expander on a cycle).}
-A banded LDPC parity-check matrix \(H=[A\mid B]\) with locality window \(W=o(n)\), where \(B\) is a staircase+gap parity part
-(enabling linear-time encoding) and \(A\) contributes random local edges that yield local expansion.
-This outer achieves the same interface guarantees while supporting linear-work encoding.
+\item \textbf{Random sliding dense outer.}
+A terminated, feedforward convolutional outer with logarithmic memory and dense taps within the band.  This is the
+analytic baseline for the asymptotic dense+dense theorem.
+\item \textbf{Structured local-code outer.}
+A direct sum of short local codes, used through its exact or certified weight spectrum.  This is the current finite
+certificate route; the proved checkpoint uses \(4096\) copies of \(RM(4,9)\).
 \end{enumerate}
 
 \paragraph{Inner instantiations.}
-We likewise give three inner encoders, organized by work and by the strength of the contraction bound \(p_w(\delta)\).
+We likewise organize the inner side by what proof role it serves.
 \begin{enumerate}
 \item \textbf{Accumulator inner.}
 The simplest recursive rate-$1$ inner.  It admits an exact input--output enumerator via a spacing/compositions count.
-This provides a clean baseline proof vehicle, but its certified \(\delta\) is limited.
+This provides a clean warmup proof vehicle, but its certified constants are weak.
 \item \textbf{Dense time-varying recursive inner (log memory).}
 A log-memory streaming recursion with fresh dense random taps at each time step.
 While the encoder is \(O(n\log n)\)-work, it yields a strong three-mechanism tail bound for \(p_w(\delta)\)
 (early-first-one, rare ON\(\to\)OFF termination, and a large-deviation term),
 and a forced-termination refinement that turns termination into a geometric-in-\(w\) contraction for small/intermediate weights.
-\item \textbf{Sparse-tap recursive inner with periodic refresh (linear work).}
-A streaming recursion that uses only \(d=O(1)\) taps per step and applies a periodic linear refresh on the state.
-We prove a refresh-to-balance property, exchangeable period starts, and between-refresh stability, giving a linear-work
-inner that supports the same modular framework.
+\item \textbf{Full-split local-code recursive inner.}
+A block recursion whose active block is encoded by a short rate-half local code and randomly split between emitted
+coordinates and next state.  The current finite certificate uses the exact EBCH \([128,64,22]\) spectrum.
 \end{enumerate}
 
 \paragraph{Putting the modules together.}
-The framework immediately yields a family of end-to-end concatenated ensembles, obtained by pairing any outer instantiation
-with any inner instantiation.  The most practically relevant combination is the linear-work pairing:
-banded-LDPC outer + sparse-refresh inner, which achieves linear encoding work with a single random interleaver
-and provable linear minimum distance.
+The framework yields two main results in the current paper.  First, the random sliding dense outer paired with the dense
+recursive inner gives a clean asymptotic linear-distance theorem, including the concrete \(0.109\) relative-distance
+checkpoint.  Second, the structured local-code construction gives a finite certificate: \(RM(4,9)\) direct-sum outer plus
+the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with first moment at most \(2^{-37.278528}\).
 
 \paragraph{Organization.}
 Section~\ref{sec:sc-framework} states the modular serial-concatenation framework theorem and isolates the required outer and inner interfaces.
-Sections~\ref{sec:outer-dense-logmem} and \ref{sec:outer-local-expander} instantiate the outer interface (dense log-memory and banded LDPC).
-Sections~\ref{sec:inner-accumulator}, \ref{sec:inner-dense}, and \ref{sec:sparse-refresh-inner} instantiate the inner interface
-(accumulator, dense time-varying recursion, and sparse recursion with periodic refresh).
-Section~\ref{sec:integrations} begins the end-to-end synthesis, starting with a dense outer + dense inner validation theorem
-and setting up the later flagship sparse+sparse integration.
+Section~\ref{sec:outer-dense-logmem} proves the random sliding dense outer bounds.
+Section~\ref{sec:inner-accumulator} records the accumulator warmup, and Section~\ref{sec:inner-dense} proves the scalar dense
+recursive inner interface.  Section~\ref{sec:integrations} gives the analytic dense+dense integration theorem.
+Section~\ref{sec:structured-local-code} develops the structured local-code certificate interface and the current
+RM/EBCH finite checkpoint.  Sparse, expander-accumulator, block-recursive BCH, and BCH-spectrum explorations are preserved
+outside the main spine for later refinement.

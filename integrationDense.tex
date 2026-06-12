@@ -1,0 +1,618 @@
+% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
+% Source: integration.tex, analytic dense+dense integration prefix.
+
+\section{End-to-End Integrations}
+\label{sec:integrations}
+
+This section focuses only on the dense validation pair:
+a systematic dense banded outer together with the dense time-varying recursive inner.
+The proof is a direct first-moment argument.
+The outer contributes an expected spectrum envelope, while the inner contributes two analytic tails:
+one for low/intermediate weights and one geometric tail above a logarithmic cutoff.
+
+\subsection{Direct first-moment reduction}
+\label{sec:integration-dense-dense}
+
+Take as outer code the systematic dense log-memory construction of
+Section~\ref{sec:outer-dense-logmem}, with memory
+\[
+M=\lceil c\log_2 n\rceil,
+\]
+and as inner code the dense time-varying recursive construction of
+Section~\ref{sec:inner-dense}, with memory
+\[
+m=\lceil \gamma \log_2 n\rceil.
+\]
+The serial concatenation still has one random interleaver and \(O(\log n)\) taps per symbol in both stages,
+hence \(O(n\log n)\) encoding work.
+
+\begin{theorem}[Direct dense+dense first-moment bound]
+\label{thm:dense-dense-direct-first-moment}
+Fix \(\delta\in(0,1/2)\).
+Suppose the outer ensemble satisfies
+\[
+\EE[\enum_{\Cone,h}] \le A_h
+\qquad (1\le h\le n),
+\]
+and the inner satisfies
+\[
+p_h(\delta)
+:=
+\Pr[\wt(\Enc_{\mathrm{in}}(U))\le \delta n\mid \wt(U)=h]
+\le B_h
+\qquad (1\le h\le n),
+\]
+where \(U\) is uniform on the weight-\(h\) slice of \(\{0,1\}^n\).
+Then
+\begin{equation}
+\label{eq:dense-dense-direct-first-moment}
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\sum_{h=1}^{n} A_h\,B_h.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By the standard first-moment reduction,
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\le
+\sum_{h=1}^{n}\EE[\enum_{\Cone,h}]\,p_h(\delta),
+\]
+because the interleaver makes every fixed weight-\(h\) outer codeword uniform on the weight-\(h\) slice before entering the inner code.
+Apply the envelopes \(A_h\) and \(B_h\).
+\end{proof}
+
+\subsection{A baseline linear-distance theorem}
+\label{sec:integration-dense-dense-baseline}
+
+We now combine the global systematic-outer spectrum envelope with the two dense-inner bounds.
+
+\begin{theorem}[Systematic dense outer + dense inner have linear distance]
+\label{thm:dense-dense-integration}
+Fix any \(z\in(0,\sqrt2-1)\), and define
+\[
+a(z):=\frac{1+z}{2}.
+\]
+Choose the outer memory constant \(c\) so that
+\begin{equation}
+\label{eq:dense-c-condition}
+c>\frac{1}{\log_2(1/a(z))}.
+\end{equation}
+Let \(\beta_{\mathrm{out}}>1\) be the corresponding outer spectrum constant from
+Corollary~\ref{lem:outer-dense-spectrum}.
+
+Next choose constants \(\kappa>0\), \(\rho\in(0,1)\), \(\delta\in(0,1/2)\), and \(\gamma>1\) such that
+\begin{equation}
+\label{eq:dense-dense-parameter-conditions}
+\kappa\log_2(\beta_{\mathrm{out}})<1,
+\qquad
+2\delta<\rho<\beta_{\mathrm{out}}^{-1},
+\qquad
+\gamma>1+\kappa\log_2\!\Bigl(\frac{1}{\rho}\Bigr).
+\end{equation}
+Then the resulting dense outer + dense inner concatenation satisfies
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability.
+\end{theorem}
+
+\begin{proof}
+Set
+\[
+h_\star:=\lfloor \kappa\log_2 n\rfloor.
+\]
+We split the first-moment sum from Theorem~\ref{thm:dense-dense-direct-first-moment} into
+\[
+S_{\mathrm{low}}
+:=
+\sum_{h=1}^{h_\star} \EE[\enum_{\Cone,h}]\,p_h(\delta),
+\qquad
+S_{\mathrm{high}}
+:=
+\sum_{h=h_\star+1}^{n} \EE[\enum_{\Cone,h}]\,p_h(\delta).
+\]
+
+\paragraph{Outer side.}
+Corollary~\ref{lem:outer-dense-spectrum} gives
+\[
+\EE[\enum_{\Cone,h}] \le \beta_{\mathrm{out}}^h
+\qquad (1\le h\le n).
+\]
+
+\paragraph{Low-weight inner bound.}
+Fix any \(\xi>0\) and let
+\[
+L:=\lceil(2+\xi)\delta n\rceil,
+\qquad
+b_{\delta,\xi}(n):=
+\PP\!\left[\Binomial(L,\tfrac12)\le \delta n\right].
+\]
+Apply the small-weight envelope \eqref{eq:dense-inner-smallw-envelope} from
+Corollary~\ref{cor:dense-inner-piecewise}:
+\[
+p_h(\delta)
+\le
+\frac{h(h-1)}{n-1}
+\;+\;
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
+\;+\;
+h2^{-(m-1)}
+\;+\;
+b_{\delta,\xi}(n)
+\qquad (1\le h\le h_\star).
+\]
+Therefore
+\[
+S_{\mathrm{low}}
+\le
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h\frac{h(h-1)}{n-1}
+\;+\;
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
+\;+\;
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h h2^{-(m-1)}
+\;+\;
+b_{\delta,\xi}(n)\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h.
+\]
+
+For the first term,
+\[
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h\frac{h(h-1)}{n-1}
+\le
+\frac{h_\star^2}{n}\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h
+\le
+n^{\kappa\log_2(\beta_{\mathrm{out}})-1}(\log n)^{O(1)}
+=o(1)
+\]
+by the first condition in \eqref{eq:dense-dense-parameter-conditions}.
+
+For the fixed-tap dense outer, the tiny-weight law is more explicit than the global geometric envelope: if a message
+support has band-union size \(q\) and \(\sigma\)-cluster count \(r\), then its parity contribution has law
+\[
+r+\Binomial(q-r,\tfrac12).
+\]
+In particular,
+\begin{equation}
+\label{eq:dense-dense-working-outer-small}
+A_1^{\mathrm{out,ft}}=0
+\end{equation}
+deterministically.
+
+The fixed-tap replacement exposes the same phenomenon seen in the finite-\(n\) evaluator: the late-placement term
+cannot be controlled by the coarse global geometric outer envelope alone, since already \(h=1\) has inner probability
+\(\approx L/n\). This low/tiny window must use the explicit dense outer low-weight law
+\eqref{eq:dense-dense-working-outer-small}, rather than only \(\EE[\enum_{\Cone,h}]\le\beta_{\mathrm{out}}^h\).
+With that explicit outer law, the late-placement contribution is the same summable tiny-window term used in the
+preserved scalar dense diagnostics.
+
+For the fixed-tap candidate term, since \(m=\gamma\log_2 n\),
+\[
+h2^{-(m-1)}\le (\log n)^{O(1)}n^{-\gamma}
+\]
+throughout \(h\le h_\star\), and therefore
+\[
+\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h h2^{-(m-1)}
+\le
+(\log n)^{O(1)}n^{\kappa\log_2(\beta_{\mathrm{out}})-\gamma}
+=o(1).
+\]
+
+For the binomial term, \(b_{\delta,\xi}(n)\) is exponentially small in \(n\), while
+\[
+\sum_{h=1}^{h_\star} \beta_{\mathrm{out}}^h
+\le
+(\log n)^{O(1)}\,n^{\kappa\log_2(\beta_{\mathrm{out}})},
+\]
+so this contribution is also \(o(1)\).
+Thus
+\[
+S_{\mathrm{low}}=o(1).
+\]
+
+\paragraph{High-weight inner bound.}
+By Corollary~\ref{cor:dense-inner-constant-geometric}, the conditions
+\[
+2\delta<\rho,
+\qquad
+\gamma>1+\kappa\log_2(1/\rho)
+\]
+imply that for all \(h\ge h_\star+1\),
+\[
+p_h(\delta)\le 3\rho^h.
+\]
+Therefore
+\[
+S_{\mathrm{high}}
+\le
+3\sum_{h=h_\star+1}^{n}(\beta_{\mathrm{out}}\rho)^h.
+\]
+Since \(\beta_{\mathrm{out}}\rho<1\), this is a geometric tail, and
+\[
+S_{\mathrm{high}}
+\le
+O(1)\,(\beta_{\mathrm{out}}\rho)^{h_\star}
+=
+n^{-\kappa\log_2(1/(\beta_{\mathrm{out}}\rho))+o(1)}
+=o(1).
+\]
+
+Combining the low- and high-weight windows proves
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\le
+S_{\mathrm{low}}+S_{\mathrm{high}}
+=
+o(1).
+\]
+\end{proof}
+\paragraph{What this baseline theorem buys us.}
+Theorem~\ref{thm:dense-dense-integration} is fully analytic and already matches the qualitative picture from the
+enumerator experiments:
+\begin{itemize}
+\item the systematic outer removes collapse to tiny intermediate weights,
+\item the outer contributes a global geometric spectrum envelope,
+\item the inner handles small weights by the run-aware bound and large weights by a geometric cutoff.
+\end{itemize}
+This is the baseline dense+dense theorem. The next quantitative question is how close one can push \(\delta\) toward
+the random-linear benchmark while remaining within the admissible parameter region
+\eqref{eq:dense-dense-parameter-conditions}.
+
+\begin{corollary}[Explicit admissible dense+dense parameter region]
+\label{cor:dense-dense-explicit-region}
+Fix any \(z\in(0,\sqrt2-1)\), and choose
+\[
+c>\frac{1}{\log_2(2/(1+z))}.
+\]
+Let \(\kappa>0\), \(\rho\in(0,z)\), \(\delta\in(0,\rho/2)\), and \(\gamma>1\) satisfy
+\[
+\kappa\log_2(1/z)<1,
+\qquad
+\gamma>1+\kappa\log_2\!\Bigl(\frac{1}{\rho}\Bigr).
+\]
+Then the systematic dense outer with memory \(M=\lceil c\log_2 n\rceil\) concatenated with the dense inner of memory
+\(m=\lceil \gamma\log_2 n\rceil\) satisfies
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+\end{corollary}
+
+\begin{proof}
+For all sufficiently large \(n\), Corollary~\ref{lem:outer-dense-spectrum} gives
+\[
+\EE[\enum_{\Cone,h}] \le z^{-h},
+\]
+so Theorem~\ref{thm:dense-dense-integration} applies with \(\beta_{\mathrm{out}}=z^{-1}\).
+The stated conditions are exactly the theorem's hypotheses rewritten in terms of \(z\).
+\end{proof}
+
+\begin{corollary}[One concrete baseline choice]
+\label{cor:dense-dense-concrete-choice}
+Choose
+\[
+z=\frac13,
+\qquad
+\kappa=\frac12,
+\qquad
+\rho=\frac14.
+\]
+If
+\[
+c>\frac{1}{\log_2(3/2)},
+\qquad
+\gamma>2,
+\qquad
+\delta<\frac18,
+\]
+then the systematic dense outer with memory \(M=\lceil c\log_2 n\rceil\) and the dense inner with memory
+\(m=\lceil \gamma\log_2 n\rceil\) satisfy
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+\end{corollary}
+
+\begin{proof}
+For \(z=\tfrac13\), we have \(a(z)=\tfrac23\), so the outer condition becomes
+\[
+c>\frac{1}{\log_2(3/2)}.
+\]
+Also,
+\[
+\kappa\log_2(1/z)=\frac12\log_2 3<1,
+\]
+and
+\[
+1+\kappa\log_2(1/\rho)
+=
+1+\frac12\log_2 4
+=2.
+\]
+Finally, \(\delta<1/8\) implies \(2\delta<1/4=\rho<z=1/3\).
+Thus Corollary~\ref{cor:dense-dense-explicit-region} applies.
+\end{proof}
+
+\begin{remark}[Memory-vs.-blocklength interpretation]
+\label{rem:dense-dense-memory-scaling}
+The concrete choice in Corollary~\ref{cor:dense-dense-concrete-choice} can be restated directly in terms of the
+log-memory parameter.
+If the outer memory is
+\[
+M=\lceil c\log_2 n\rceil
+\]
+with
+\[
+c>\frac{1}{\log_2(3/2)}\approx 1.71,
+\]
+and the inner memory is
+\[
+m=\lceil \gamma\log_2 n\rceil
+\qquad\text{with}\qquad \gamma>2,
+\]
+then the dense serial concatenation has linear minimum distance with high probability for every \(\delta<1/8\).
+Equivalently, fixing a memory budget \(M\), the baseline proof certifies linear distance throughout the regime
+\[
+n \le 2^{M/c}
+\]
+for any fixed \(c>1/\log_2(3/2)\).
+This does not yet match the stronger finite-length trend suggested by the enumerator, but it gives a rigorous
+logarithmic-memory scaling window from which sharper dense bounds can now be pursued.
+\end{remark}
+
+\subsection{A linear-weight exponent criterion}
+\label{sec:integration-dense-dense-linear}
+
+The next sharpening step is to replace the coarse high-weight geometric tail by a direct comparison of the outer and
+inner linear-weight exponents.
+
+\begin{theorem}[Dense+dense linear-weight criterion]
+\label{thm:dense-dense-linear-weight-criterion}
+Fix constants \(\eta_0\in(0,1)\), \(\delta\in(0,1/2)\), \(\xi>0\), and \(\theta\in(0,1-\eta_0)\).
+For \(\eta\in[\eta_0,1-\theta]\), let
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+\]
+be the outer exponent from Theorem~\ref{thm:outer-dense-linear-exponent}, and let
+\[
+E_{\mathrm{in}}(\eta;\theta,\delta,\xi)
+\]
+be the dense-inner exponent from Theorem~\ref{prop:dense-inner-linear-exponent}.
+Assume there exists \(\tau>0\) such that
+\begin{equation}
+\label{eq:dense-dense-linear-gap}
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+\;-\;
+E_{\mathrm{in}}(\eta;\theta,\delta,\xi)
+\;\le\;
+-\tau
+\qquad\text{for every }\eta\in[\eta_0,1-\theta].
+\end{equation}
+Then the total first-moment contribution from outer weights \(h\ge \eta_0 n\) satisfies
+\[
+\sum_{h=\lceil \eta_0 n\rceil}^{\lfloor (1-\theta)n\rfloor}
+\EE[\enum_{\Cone,h}]\,p_h(\delta)
+\;\le\;
+n^{O(1)}\,2^{-\tau n}.
+\]
+\end{theorem}
+
+\begin{proof}
+For \(h=\lfloor \eta n\rfloor\) with \(\eta\in[\eta_0,1-\theta]\), Theorem~\ref{thm:outer-dense-linear-exponent} gives
+\[
+\EE[\enum_{\Cone,h}]
+\le
+n^{O(1)}\,2^{n\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)}.
+\]
+Theorem~\ref{prop:dense-inner-linear-exponent} gives
+\[
+p_h(\delta)
+\le
+n^{O(1)}\,2^{-nE_{\mathrm{in}}(\eta;\theta,\delta,\xi)}.
+\]
+Multiplying and using \eqref{eq:dense-dense-linear-gap},
+\[
+\EE[\enum_{\Cone,h}]\,p_h(\delta)
+\le
+n^{O(1)}\,2^{-\tau n}.
+\]
+There are only \(O(n)\) such weights \(h\), so summing over
+\(h\in[\eta_0 n,(1-\theta)n]\) preserves the same exponential rate.
+\end{proof}
+
+\paragraph{Meaning of the criterion.}
+Theorem~\ref{thm:dense-dense-linear-weight-criterion} isolates the real quantitative problem left by the baseline proof.
+Once the low and intermediate weights are handled by the coarse argument, the only remaining analytic task is to show
+that the outer exponent \(\Phi_{\mathrm{out}}^{\mathrm{sys}}\) sits below the dense-inner exponent
+\(E_{\mathrm{in}}\) on the linear-weight window of interest.
+
+\begin{theorem}[A concrete moderate-to-high-weight exponent gap]
+\label{prop:dense-dense-highweight-gap}
+Take
+\[
+\delta=0.109,
+\qquad
+\theta=0.005,
+\qquad
+\xi=8.
+\]
+Then direct evaluation of the explicit rate functions from
+Corollary~\ref{cor:outer-dense-highweight-exponent} and
+Theorem~\ref{prop:dense-inner-linear-exponent} shows that
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
+\;
+-\;
+E_{\mathrm{in}}(\eta;0.005,0.109,8)
+\le -0.003
+\qquad
+\text{for every }\eta\in[\eta_{\mathrm{crit}},0.99],
+\]
+where
+\[
+\eta_{\mathrm{crit}}:=1-\frac{1}{\sqrt2}.
+\]
+Consequently,
+\[
+\sum_{h=\lceil \eta_{\mathrm{crit}}n\rceil}^{\lfloor 0.99n\rfloor}
+\EE[\enum_{\Cone,h}]\,p_h(0.109)
+\le
+n^{O(1)}\,2^{-0.003n}.
+\]
+\end{theorem}
+
+\begin{proof}
+The inner exponent is
+\[
+E_{\mathrm{in}}(\eta;0.005,0.109,8)
+=
+\min\!\left\{
+\Psi_{\mathrm{run}}^{(w)}(\eta,0.005),\
+1-H_2(0.109)
+\right\}.
+\]
+The explicit binomial term equals
+\[
+1-H_2(0.109)\approx 0.5031.
+\]
+On \([\eta_{\mathrm{crit}},0.99]\), Corollary~\ref{cor:outer-dense-highweight-exponent} gives
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12.
+\]
+A direct numerical evaluation of the explicit formulas on \([\eta_{\mathrm{crit}},0.99]\) then shows that the gap
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)-E_{\mathrm{in}}(\eta;0.005,0.109,8)
+\]
+never exceeds \(-0.003\); the worst point occurs near \(\eta\approx 0.5\).
+This verification is reproduced by the companion script
+\texttt{scripts/verify\_dense\_claims.py}, which for the present parameters reports a worst sampled gap
+of approximately \(-0.0031\) near \(\eta=0.5000\).
+The final summation bound is then exactly Theorem~\ref{thm:dense-dense-linear-weight-criterion}.
+\end{proof}
+
+\begin{theorem}[A concrete 10.9-percent dense+dense theorem]
+\label{thm:dense-dense-explicit-constant}
+Assume
+\[
+c>\frac{1}{\log_2(3/2)},
+\qquad
+\gamma>2.
+\]
+Then the systematic dense outer with memory
+\[
+M=\lceil c\log_2 n\rceil
+\]
+concatenated with the dense inner of memory
+\[
+m=\lceil \gamma\log_2 n\rceil
+\]
+satisfies
+\[
+\Pr[d_{\min}(\Csc)\le 0.109 n]=o(1).
+\]
+\end{theorem}
+
+\begin{proof}
+Set
+\[
+\delta=0.109,
+\qquad
+\kappa=\frac12,
+\qquad
+\rho=\frac14,
+\qquad
+\theta=0.005,
+\qquad
+\xi=8,
+\qquad
+h_0:=\lfloor \kappa\log_2 n\rfloor,
+\]
+and let \(\eta_{\mathrm{crit}}:=1-2^{-1/2}\).
+Split the first-moment sum into four windows:
+\[
+S_{\mathrm{tiny}}
+:=
+\sum_{h=1}^{h_0}\EE[\enum_{\Cone,h}]\,p_h(0.109),
+\]
+\[
+S_{\mathrm{low}}
+:=
+\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.109),
+\]
+\[
+S_{\mathrm{lin}}
+:=
+\sum_{h=\lceil \eta_{\mathrm{crit}}n\rceil}^{\lfloor 0.99n\rfloor}\EE[\enum_{\Cone,h}]\,p_h(0.109),
+\]
+and
+\[
+S_{\mathrm{top}}
+:=
+\sum_{h=\lceil 0.99n\rceil}^{n}\EE[\enum_{\Cone,h}]\,p_h(0.109).
+\]
+
+For \(S_{\mathrm{tiny}}\), the proof of Corollary~\ref{cor:dense-dense-concrete-choice} already applies verbatim,
+since \(0.109<1/8\), and gives \(S_{\mathrm{tiny}}=o(1)\).
+
+For \(S_{\mathrm{low}}\), Corollary~\ref{cor:outer-dense-lowlinear-envelope} gives
+\[
+\EE[\enum_{\Cone,h}] \le n^{O(1)}(1+\sqrt2)^h
+\qquad(h\le \eta_{\mathrm{crit}}n).
+\]
+Also, Corollary~\ref{cor:dense-inner-constant-geometric} applies with \(\rho=1/4\), \(\kappa=1/2\), and \(\gamma>2\),
+so for all \(h\ge h_0+1\),
+\[
+p_h(0.109)\le 3\cdot 4^{-h}.
+\]
+Therefore
+\[
+S_{\mathrm{low}}
+\le
+n^{O(1)}\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}
+\left(\frac{1+\sqrt2}{4}\right)^h.
+\]
+Since \((1+\sqrt2)/4<1\), this is a geometric tail beginning at \(h_0=\tfrac12\log_2 n+O(1)\), hence
+\[
+S_{\mathrm{low}}
+\le
+n^{-\frac12\log_2(4/(1+\sqrt2))+o(1)}
+=
+o(1).
+\]
+
+For \(S_{\mathrm{lin}}\), Theorem~\ref{prop:dense-dense-highweight-gap} gives
+\[
+S_{\mathrm{lin}}\le n^{O(1)}2^{-0.003n}=o(1).
+\]
+
+For \(S_{\mathrm{top}}\), use only the outer exponent and the trivial bound \(p_h(0.109)\le 1\).
+If \(h=\lfloor \eta n\rfloor\) with \(\eta\in[0.99,1]\), then Corollary~\ref{cor:outer-dense-highweight-exponent} gives
+\[
+\Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12
+\le
+H_2(0.99)-\frac12
+< -0.41.
+\]
+Hence Theorem~\ref{thm:outer-dense-linear-exponent} gives
+\[
+\EE[\enum_{\Cone,h}]
+\le
+n^{O(1)}2^{-0.41n},
+\]
+uniformly over \(h\in[0.99n,n]\), and so
+\[
+S_{\mathrm{top}}
+\le
+n^{O(1)}2^{-0.41n}
+=
+o(1).
+\]
+
+Combining the four windows proves
+\[
+\Pr[d_{\min}(\Csc)\le 0.109 n]
+\le
+S_{\mathrm{tiny}}+S_{\mathrm{low}}+S_{\mathrm{lin}}+S_{\mathrm{top}}
+=
+o(1).
+\]
+\end{proof}
