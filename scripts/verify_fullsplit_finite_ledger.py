@@ -164,6 +164,38 @@ class EarlyPostprefixInterval:
         return cmd
 
 
+@dataclass(frozen=True)
+class EarlyAcceleratedInterval:
+    start: int
+    stop: int
+    lam: float
+    rho: float
+    log2_value: float
+    script_name: str
+
+    @property
+    def label(self) -> str:
+        return f"{self.start}--{self.stop}"
+
+    @property
+    def kind(self) -> str:
+        if "paired" in self.script_name:
+            return "paired"
+        return "endpoint"
+
+    def command(self) -> list[str]:
+        return [
+            sys.executable,
+            str(ROOT / self.script_name),
+            "--intervals",
+            f"{self.start}:{self.stop}:{self.lam:g}:{self.rho:g}",
+        ]
+
+    def display_command(self) -> str:
+        script = rf"scripts\{self.script_name}"
+        return f"python {script} --intervals {self.start}:{self.stop}:{self.lam:g}:{self.rho:g}"
+
+
 HIGH_INTERVALS_RAW = [
     # Raw interval rows generated with the sharper finite-prefix p_term.  The
     # theorem-facing wrapper uses the global Bernstein p_term; the checked
@@ -210,6 +242,20 @@ EARLY_POSTPREFIX_INTERVALS = [
     EarlyPostprefixInterval(20551, 30000, -8614.382763, "0.2", "0.1"),
     EarlyPostprefixInterval(30001, 50000, -21332.131033, "0.2", "0.1"),
     EarlyPostprefixInterval(50001, 75000, -34847.929043, "0.2", "0.1"),
+]
+
+
+EARLY_ACCELERATED_INTERVALS = [
+    EarlyAcceleratedInterval(75001, 90000, 0.2, 0.1, -28574.869802, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(90001, 100000, 0.2, 0.1, -22149.918612, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(100001, 110000, 0.5, 0.3, -1056.187188, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(110001, 125000, 0.5, 0.3, -10362.025949, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(125001, 160000, 0.8, 0.3, -45589.980049, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(160001, 250000, 1.2, 0.5, -60293.751685, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(250001, 350000, 1.2, 0.5, -94682.265141, "certify_fullsplit_early_endpoint_interval.py"),
+    EarlyAcceleratedInterval(350001, 524288, 2.0, 0.8, -181215.853042, "certify_fullsplit_early_paired_interval.py"),
+    EarlyAcceleratedInterval(524289, 750000, 2.0, 0.8, -194565.849984, "certify_fullsplit_early_paired_interval.py"),
+    EarlyAcceleratedInterval(750001, 1048576, 2.0, 0.8, -98386.449256, "certify_fullsplit_early_paired_interval.py"),
 ]
 
 
@@ -542,6 +588,17 @@ def selected_early_postprefix_intervals(selection: str) -> list[EarlyPostprefixI
     return [interval for interval in EARLY_POSTPREFIX_INTERVALS if interval.label in labels]
 
 
+def selected_early_accelerated_intervals(selection: str) -> list[EarlyAcceleratedInterval]:
+    if selection.lower() == "all":
+        return list(EARLY_ACCELERATED_INTERVALS)
+    labels = {part.strip() for part in selection.split(",") if part.strip()}
+    by_label = {interval.label: interval for interval in EARLY_ACCELERATED_INTERVALS}
+    missing = sorted(labels - set(by_label))
+    if missing:
+        raise SystemExit(f"unknown early-accelerated interval label(s): {', '.join(missing)}")
+    return [interval for interval in EARLY_ACCELERATED_INTERVALS if interval.label in labels]
+
+
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     result = subprocess.run(
         interval.command(),
@@ -581,6 +638,20 @@ def check_early_postprefix_interval(interval: EarlyPostprefixInterval, tolerance
     )
     actual = parse_piecewise_total(result.stdout)
     check_close(f"early_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    return actual
+
+
+def check_early_accelerated_interval(interval: EarlyAcceleratedInterval, tolerance: float) -> float:
+    result = subprocess.run(
+        interval.command(),
+        cwd=ROOT.parent,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    actual = parse_piecewise_total(result.stdout)
+    check_close(f"early_accelerated_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -657,6 +728,11 @@ def main() -> int:
         help="Print the recomputation command for every checked early post-prefix interval.",
     )
     parser.add_argument(
+        "--print-early-accelerated-commands",
+        action="store_true",
+        help="Print the recomputation command for every accelerated early interval.",
+    )
+    parser.add_argument(
         "--check-high-intervals",
         help=(
             "Comma-separated high-interval labels to recompute, or 'all'. "
@@ -677,16 +753,27 @@ def main() -> int:
             "Example: 501--2000,2001--7858."
         ),
     )
+    parser.add_argument(
+        "--check-early-accelerated-intervals",
+        help=(
+            "Comma-separated accelerated early interval labels to recompute, or 'all'. "
+            "Example: 100001--110000,750001--1048576."
+        ),
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
 
-    if args.print_high_interval_commands or args.print_early_postprefix_commands:
+    if args.print_high_interval_commands or args.print_early_postprefix_commands or args.print_early_accelerated_commands:
         if args.print_early_postprefix_commands:
             print("Early post-prefix interval recomputation commands")
             for interval in EARLY_POSTPREFIX_INTERVALS:
                 print(f"early_postprefix_interval_{interval.label}_command,{interval.display_command()}")
+        if args.print_early_accelerated_commands:
+            print("Accelerated early interval recomputation commands")
+            for interval in EARLY_ACCELERATED_INTERVALS:
+                print(f"early_accelerated_interval_{interval.label}_command,{interval.display_command()}")
         if not args.print_high_interval_commands:
-            if not args.check_early_postprefix_intervals:
+            if not args.check_early_postprefix_intervals and not args.check_early_accelerated_intervals:
                 return 0
         else:
             print("High-interval recomputation commands")
@@ -699,6 +786,7 @@ def main() -> int:
             not args.check_high_intervals
             and not args.check_complement_high_intervals
             and not args.check_early_postprefix_intervals
+            and not args.check_early_accelerated_intervals
         ):
             return 0
 
@@ -984,6 +1072,24 @@ def main() -> int:
     check_close("early_postprefix_501_75000", early_postprefix_total, -380.829185, args.tolerance)
     print(f"early_postprefix_501_75000_total_log2,{early_postprefix_total:.6f}")
 
+    early_accelerated_total = float("-inf")
+    endpoint_total = float("-inf")
+    paired_total = float("-inf")
+    for interval in EARLY_ACCELERATED_INTERVALS:
+        early_accelerated_total = log2add(early_accelerated_total, interval.log2_value)
+        if interval.kind == "endpoint":
+            endpoint_total = log2add(endpoint_total, interval.log2_value)
+        else:
+            paired_total = log2add(paired_total, interval.log2_value)
+        print(f"early_accelerated_interval_{interval.label}_kind,{interval.kind}")
+        print(f"early_accelerated_interval_{interval.label}_lambda,{interval.lam:g}")
+        print(f"early_accelerated_interval_{interval.label}_rho,{interval.rho:g}")
+        print(f"early_accelerated_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+    check_close("early_accelerated_75001_1048576", early_accelerated_total, -1056.187188, args.tolerance)
+    print(f"early_accelerated_endpoint_75001_350000_total_log2,{endpoint_total:.6f}")
+    print(f"early_accelerated_paired_350001_1048576_total_log2,{paired_total:.6f}")
+    print(f"early_accelerated_75001_1048576_total_log2,{early_accelerated_total:.6f}")
+
     if args.check_high_intervals:
         for interval in selected_high_intervals(args.check_high_intervals):
             actual = check_high_interval(interval, args.tolerance)
@@ -1002,8 +1108,20 @@ def main() -> int:
             print(f"early_postprefix_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"early_postprefix_interval_{interval.label}_recompute_status,PASS")
 
+    if args.check_early_accelerated_intervals:
+        for interval in selected_early_accelerated_intervals(args.check_early_accelerated_intervals):
+            actual = check_early_accelerated_interval(interval, args.tolerance)
+            print(f"early_accelerated_interval_{interval.label}_recomputed_log2,{actual:.6f}")
+            print(f"early_accelerated_interval_{interval.label}_recompute_status,PASS")
+
     h501_plus_checked = float("-inf")
-    for value in [parts["postprefix_501_2000_eall"], early_postprefix_total, high_total, complement_high_total]:
+    for value in [
+        parts["postprefix_501_2000_eall"],
+        early_postprefix_total,
+        early_accelerated_total,
+        high_total,
+        complement_high_total,
+    ]:
         h501_plus_checked = log2add(h501_plus_checked, value)
     check_close("h501_plus_checked_rows", h501_plus_checked, -182.259739, args.tolerance)
     print(f"h501_plus_checked_rows_log2,{h501_plus_checked:.6f}")
