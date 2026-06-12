@@ -1,5 +1,145 @@
 {
   "checks": {
+    "early_accelerated_cover": {
+      "cover_range": [
+        75001,
+        1048576
+      ],
+      "endpoint_interval_count": 7,
+      "endpoint_range": [
+        75001,
+        350000
+      ],
+      "interval_count": 10,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 75001:90000:0.2:0.1",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.2,
+          "log2": -28574.869802,
+          "range": [
+            75001,
+            90000
+          ],
+          "rho": 0.1
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 90001:100000:0.2:0.1",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.2,
+          "log2": -22149.918612,
+          "range": [
+            90001,
+            100000
+          ],
+          "rho": 0.1
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 100001:110000:0.5:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.5,
+          "log2": -1056.187188,
+          "range": [
+            100001,
+            110000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 110001:125000:0.5:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.5,
+          "log2": -10362.025949,
+          "range": [
+            110001,
+            125000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 125001:160000:0.8:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.8,
+          "log2": -45589.980049,
+          "range": [
+            125001,
+            160000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 160001:250000:1.2:0.5",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 1.2,
+          "log2": -60293.751685,
+          "range": [
+            160001,
+            250000
+          ],
+          "rho": 0.5
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 250001:350000:1.2:0.5",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 1.2,
+          "log2": -94682.265141,
+          "range": [
+            250001,
+            350000
+          ],
+          "rho": 0.5
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 350001:524288:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -181215.853042,
+          "range": [
+            350001,
+            524288
+          ],
+          "rho": 0.8
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 524289:750000:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -194565.849984,
+          "range": [
+            524289,
+            750000
+          ],
+          "rho": 0.8
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 750001:1048576:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -98386.449256,
+          "range": [
+            750001,
+            1048576
+          ],
+          "rho": 0.8
+        }
+      ],
+      "paired_interval_count": 3,
+      "paired_range": [
+        350001,
+        1048576
+      ],
+      "status": "PASS"
+    },
     "exact_outer_support": {
       "coefficient_build_exponent": 4096,
       "coefficient_build_max_coefficient_bits": 663,

@@ -693,6 +693,22 @@ Current accelerated rows:
 750001--1048576:   -98386.449256   paired-T recurrence
 ```
 
+The finite-ledger verifier now checks this accelerated table as a contiguous
+cover before summing it:
+
+```text
+early_accelerated_cover_status,PASS
+early_accelerated_cover_range,75001--1048576
+early_accelerated_interval_count,10
+early_accelerated_endpoint_cover,75001--350000
+early_accelerated_endpoint_interval_count,7
+early_accelerated_paired_cover,350001--1048576
+early_accelerated_paired_interval_count,3
+```
+
+It also records each row's helper, pole parameters, log contribution, and
+recompute command in `fullsplit_finite_ledger_manifest.json`.
+
 Combined totals:
 
 ```text

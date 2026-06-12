@@ -4210,7 +4210,9 @@ The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact 
 the ultra-late placement cap for \(h>500\).  Since \(64\cdot5949=380736\), no ultra-late placement row exists above
 \(h=380736\).  The third row is the checked early endpoint table for \(T>17948\) through \(h=75000\).  The fourth row is
 the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row is the paired-\(T\) extension for
-\(350001\le h\le N/2\).  The sixth row is the fixed-pole interval table through the feasible far-bucket cutoff
+\(350001\le h\le N/2\).  The verifier checks that these accelerated early intervals form a contiguous cover
+\(75001,\ldots,N/2\), split into seven endpoint-helper rows on \(75001,\ldots,350000\) and three paired-helper rows on
+\(350001,\ldots,N/2\), with no gap or overlap.  The sixth row is the fixed-pole interval table through the feasible far-bucket cutoff
 \(h=1148736\).  The seventh row is the complement-side high-density table.  The last two row families overlap on
 \(1048577\le h\le1148736\); the ledger deliberately keeps this harmless overcount as a union bound.  Therefore the
 combined contribution is bounded by

@@ -197,6 +197,19 @@ class EarlyAcceleratedInterval:
 
 
 @dataclass(frozen=True)
+class EarlyAcceleratedCoverSummary:
+    count: int
+    cover_start: int
+    cover_stop: int
+    endpoint_start: int
+    endpoint_stop: int
+    endpoint_count: int
+    paired_start: int
+    paired_stop: int
+    paired_count: int
+
+
+@dataclass(frozen=True)
 class LatePostprefixInterval:
     start: int
     stop: int
@@ -826,6 +839,77 @@ def selected_early_accelerated_intervals(selection: str) -> list[EarlyAccelerate
     if missing:
         raise SystemExit(f"unknown early-accelerated interval label(s): {', '.join(missing)}")
     return [interval for interval in EARLY_ACCELERATED_INTERVALS if interval.label in labels]
+
+
+def check_early_accelerated_cover(
+    intervals: list[EarlyAcceleratedInterval],
+    *,
+    expected_start: int,
+    expected_stop: int,
+    expected_endpoint_stop: int,
+    expected_paired_start: int,
+) -> EarlyAcceleratedCoverSummary:
+    if not intervals:
+        raise SystemExit("early accelerated cover: no intervals configured")
+    ordered = sorted(intervals, key=lambda interval: interval.start)
+    if ordered[0].start != expected_start or ordered[-1].stop != expected_stop:
+        raise SystemExit(
+            "early accelerated cover: expected "
+            f"{expected_start}--{expected_stop}, got {ordered[0].start}--{ordered[-1].stop}"
+        )
+    previous_stop = expected_start - 1
+    for interval in ordered:
+        if interval.start != previous_stop + 1:
+            raise SystemExit(
+                "early accelerated cover: gap or overlap before "
+                f"{interval.start}--{interval.stop}; previous stop was {previous_stop}"
+            )
+        previous_stop = interval.stop
+        expected_helper = (
+            "certify_fullsplit_early_endpoint_interval.py"
+            if interval.kind == "endpoint"
+            else "certify_fullsplit_early_paired_interval.py"
+        )
+        if interval.script_name != expected_helper:
+            raise SystemExit(
+                f"early accelerated cover: interval {interval.label} has helper "
+                f"{interval.script_name}, expected {expected_helper}"
+            )
+        if interval.lam <= 0.0 or interval.rho <= 0.0:
+            raise SystemExit(f"early accelerated cover: interval {interval.label} has nonpositive pole")
+
+    endpoint = [interval for interval in ordered if interval.kind == "endpoint"]
+    paired = [interval for interval in ordered if interval.kind == "paired"]
+    if not endpoint or not paired:
+        raise SystemExit("early accelerated cover: both endpoint and paired regions are required")
+    if endpoint[0].start != expected_start or endpoint[-1].stop != expected_endpoint_stop:
+        raise SystemExit(
+            "early accelerated endpoint cover: expected "
+            f"{expected_start}--{expected_endpoint_stop}, got {endpoint[0].start}--{endpoint[-1].stop}"
+        )
+    if paired[0].start != expected_paired_start or paired[-1].stop != expected_stop:
+        raise SystemExit(
+            "early accelerated paired cover: expected "
+            f"{expected_paired_start}--{expected_stop}, got {paired[0].start}--{paired[-1].stop}"
+        )
+    if expected_paired_start != expected_endpoint_stop + 1:
+        raise SystemExit("early accelerated cover: endpoint/paired split is not adjacent")
+    if any(interval.kind != "endpoint" for interval in ordered[: len(endpoint)]):
+        raise SystemExit("early accelerated cover: endpoint intervals are not a prefix")
+    if any(interval.kind != "paired" for interval in ordered[len(endpoint) :]):
+        raise SystemExit("early accelerated cover: paired intervals are not a suffix")
+
+    return EarlyAcceleratedCoverSummary(
+        count=len(ordered),
+        cover_start=ordered[0].start,
+        cover_stop=ordered[-1].stop,
+        endpoint_start=endpoint[0].start,
+        endpoint_stop=endpoint[-1].stop,
+        endpoint_count=len(endpoint),
+        paired_start=paired[0].start,
+        paired_stop=paired[-1].stop,
+        paired_count=len(paired),
+    )
 
 
 def selected_late_postprefix_intervals(selection: str) -> list[LatePostprefixInterval]:
@@ -1689,6 +1773,51 @@ def main() -> int:
         )
     check_close("early_postprefix_501_75000", early_postprefix_total, -380.829185, args.tolerance)
     print(f"early_postprefix_501_75000_total_log2,{early_postprefix_total:.6f}")
+
+    early_accelerated_cover = check_early_accelerated_cover(
+        EARLY_ACCELERATED_INTERVALS,
+        expected_start=75001,
+        expected_stop=1048576,
+        expected_endpoint_stop=350000,
+        expected_paired_start=350001,
+    )
+    print("early_accelerated_cover_status,PASS")
+    print(
+        "early_accelerated_cover_range,"
+        f"{early_accelerated_cover.cover_start}--{early_accelerated_cover.cover_stop}"
+    )
+    print(f"early_accelerated_interval_count,{early_accelerated_cover.count}")
+    print(
+        "early_accelerated_endpoint_cover,"
+        f"{early_accelerated_cover.endpoint_start}--{early_accelerated_cover.endpoint_stop}"
+    )
+    print(f"early_accelerated_endpoint_interval_count,{early_accelerated_cover.endpoint_count}")
+    print(
+        "early_accelerated_paired_cover,"
+        f"{early_accelerated_cover.paired_start}--{early_accelerated_cover.paired_stop}"
+    )
+    print(f"early_accelerated_paired_interval_count,{early_accelerated_cover.paired_count}")
+    manifest["checks"]["early_accelerated_cover"] = {  # type: ignore[index]
+        "status": "PASS",
+        "cover_range": [early_accelerated_cover.cover_start, early_accelerated_cover.cover_stop],
+        "interval_count": early_accelerated_cover.count,
+        "endpoint_range": [early_accelerated_cover.endpoint_start, early_accelerated_cover.endpoint_stop],
+        "endpoint_interval_count": early_accelerated_cover.endpoint_count,
+        "paired_range": [early_accelerated_cover.paired_start, early_accelerated_cover.paired_stop],
+        "paired_interval_count": early_accelerated_cover.paired_count,
+        "intervals": [
+            {
+                "range": [interval.start, interval.stop],
+                "kind": interval.kind,
+                "helper": interval.script_name,
+                "lambda": interval.lam,
+                "rho": interval.rho,
+                "log2": interval.log2_value,
+                "command": interval.display_command(),
+            }
+            for interval in EARLY_ACCELERATED_INTERVALS
+        ],
+    }
 
     early_accelerated_total = float("-inf")
     endpoint_total = float("-inf")
