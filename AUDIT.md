@@ -129,6 +129,8 @@ finite_ledger_total_log2,-37.383345
 finite_ledger_margin_bits,37.383345
 late_plus_window_total_log2,-37.278528
 late_plus_window_margin_bits,37.278528
+current_checked_ledger_total_log2,-37.278528
+current_checked_ledger_margin_bits,37.278528
 ```
 
 For the monotonicity audit, every reported middle/far bucket slack should be positive. The smallest current slack is
@@ -872,6 +874,8 @@ Currently checkable:
   ultra-late, window, and early `h <= 500` pieces
 - the paper-facing checked post-prefix row corollary `cor:fullsplit-postprefix-checked-ledger`, which combines the
   `501..2000`, fixed-pole interval, and complement-high ledger rows
+- the paper-facing current finite checkpoint `cor:fullsplit-current-finite-checkpoint`, which combines the checked
+  small-prefix and post-prefix row families
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication

@@ -4161,6 +4161,33 @@ The verifier prints and checks this as
 \(\texttt{h501\_plus\_checked\_rows\_log2=-182.259739}\).
 \end{proof}
 
+\begin{corollary}[Current finite first-moment checkpoint]
+\label{cor:fullsplit-current-finite-checkpoint}
+Let \(\mu_{\rm checked}(.09)\) denote the first-moment contribution of the row families covered by
+Corollaries~\ref{cor:fullsplit-small-prefix-all-first-active} and~\ref{cor:fullsplit-postprefix-checked-ledger}.
+Then
+\[
+\log_2 \mu_{\rm checked}(.09)\le -37.278528.
+\]
+\end{corollary}
+
+\begin{proof}
+Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} gives
+\[
+\log_2\mu_{32\le h\le500}^{\rm all\ first\ active,\ exact\ outer}\le -37.278528,
+\]
+and Corollary~\ref{cor:fullsplit-postprefix-checked-ledger} gives
+\[
+\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}\le -182.259739.
+\]
+Thus
+\[
+\log_2\!\left(2^{-37.278528}+2^{-182.259739}\right)\le -37.278528.
+\]
+The verifier prints and checks the same log-sum under the
+\(\texttt{current\_checked\_ledger}\) row, with value \(-37.278528\).
+\end{proof}
+
 The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.

@@ -888,6 +888,10 @@ def main() -> int:
     h32_500_all_positions = log2add(exact_late_prefix.total_log2, log2add(prefix_all, early_all))
     print(f"h32_500_all_first_active_positions_log2,{h32_500_all_positions:.6f}")
     print(f"h32_500_all_first_active_positions_margin_bits,{-h32_500_all_positions:.6f}")
+    current_checked = log2add(h32_500_all_positions, h501_plus_checked)
+    check_close("current_checked_ledger", current_checked, -37.278528, args.tolerance)
+    print(f"current_checked_ledger_total_log2,{current_checked:.6f}")
+    print(f"current_checked_ledger_margin_bits,{-current_checked:.6f}")
     return 0
 
 
