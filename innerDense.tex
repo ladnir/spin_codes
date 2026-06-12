@@ -4017,9 +4017,11 @@ For fast high-weight exploration we also use the rigorous endpoint placement bou
 (g_1-g_0+1)\binom{b(T_0+g_1-1)}{H}.
 \]
 This loses at most \(\log_2 4000<12\) bits per bucket in the current three-bucket split, but avoids millions of
-independent binomial evaluations.  The matching inner endpoint must be handled with some care: if the left endpoint
-\(T_{\min}\) has \(H>bT_{\min}\), then early gaps in the bucket are impossible but later gaps are not.  The corrected
-working rule is therefore to use the earliest feasible block count
+independent binomial evaluations.  The finite-ledger verifier also samples exact bucket sums at the feasibility
+boundaries and records the endpoint dominance check; the largest advertised bucket-size loss is \(11.965784\) bits.
+The matching inner endpoint must be handled with some care: if the left endpoint \(T_{\min}\) has \(H>bT_{\min}\),
+then early gaps in the bucket are impossible but later gaps are not.  The corrected working rule is therefore to use
+the earliest feasible block count
 \[
 T_{\rm eff}(H;T_{\min},T_{\max})
 :=\max\{T_{\min},\lceil H/b\rceil\},
@@ -4223,10 +4225,11 @@ the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row
 cutoff \(h=1148736\); its verifier entry checks a contiguous \(2001,\ldots,1148736\) cover and the common
 \(1.484774\)-bit turnoff adjustment.  It also checks that the feasible-min rule
 \(T_{\rm eff}=\max(T_{\min},\lceil H/64\rceil)\) gives far-bucket cutoff \(64\cdot17948+64=1148736\), and records the
-sufficient \(T\)-monotonicity audit with minimum slack \(0.154987\) bits.  The seventh row is the complement-side
-high-density table, checked as a contiguous \(1048577,\ldots,N\) cover with the convex endpoint reduction above.  The
-last two row families overlap on \(1048577\le h\le1148736\); the ledger records this overlap and deliberately keeps it
-as harmless union-bound overcount.  Therefore the combined contribution is bounded by
+endpoint gap-sum audit and sufficient \(T\)-monotonicity audit, with monotonicity minimum slack \(0.154987\) bits.  The
+seventh row is the complement-side high-density table, checked as a contiguous \(1048577,\ldots,N\) cover with the
+convex endpoint reduction above.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger records
+this overlap and deliberately keeps it as harmless union-bound overcount.  Therefore the combined contribution is
+bounded by
 \[
 \begin{aligned}
 &\log_2\!\left(2^{-182.259739}+2^{-545.690526}+2^{-380.829185}+2^{-1056.187188}\right.\\

@@ -229,6 +229,16 @@ class HighFeasibleMinSummary:
 
 
 @dataclass(frozen=True)
+class EndpointGapSumSummary:
+    bucket_count: int
+    sample_count: int
+    max_bucket_loss_bits: float
+    min_sample_slack_bits: float
+    max_sample_slack_bits: float
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
 class LatePostprefixShapeSummary:
     interval_count: int
     peak_h_min: int
@@ -1029,6 +1039,125 @@ def check_high_feasible_min_t(
             f"far cutoff {far_cutoff_h}, got {high_cover.cover_stop}"
         )
     return HighFeasibleMinSummary(bucket_cutoffs=bucket_cutoffs, far_cutoff_h=far_cutoff_h)
+
+
+def exact_gap_sum_log2(*, b: int, t_min: int, t_max: int, H: int) -> float:
+    total = float("-inf")
+    for t in range(t_min, t_max + 1):
+        total = log2add(total, log2_binom(b * t, H))
+    return total
+
+
+def endpoint_gap_sum_log2(*, b: int, t_min: int, t_max: int, H: int) -> float:
+    endpoint = log2_binom(b * t_max, H)
+    if endpoint == float("-inf"):
+        return float("-inf")
+    return math.log2(t_max - t_min + 1) + endpoint
+
+
+def check_endpoint_gap_sum_semantics(
+    *,
+    b: int,
+    buckets: tuple[InteriorAuditBucket, ...],
+    tolerance: float = 1e-8,
+) -> EndpointGapSumSummary:
+    rows: list[dict[str, object]] = []
+    sample_count = 0
+    max_bucket_loss = float("-inf")
+    min_sample_slack = float("inf")
+    max_sample_slack = float("-inf")
+    for bucket in buckets:
+        if bucket.t_min > bucket.t_max:
+            raise SystemExit(f"endpoint gap-sum audit: malformed bucket {bucket.name}")
+        gap_count = bucket.t_max - bucket.t_min + 1
+        if gap_count <= 0:
+            raise SystemExit(f"endpoint gap-sum audit: empty bucket {bucket.name}")
+        endpoint_loss = math.log2(gap_count)
+        max_bucket_loss = max(max_bucket_loss, endpoint_loss)
+        candidates = {
+            0,
+            1,
+            b - 1,
+            b,
+            b + 1,
+            b * bucket.t_min - 1,
+            b * bucket.t_min,
+            b * bucket.t_min + 1,
+            b * bucket.t_max - 1,
+            b * bucket.t_max,
+            b * bucket.t_max + 1,
+        }
+        samples: list[dict[str, object]] = []
+        for H in sorted(candidate for candidate in candidates if candidate >= 0):
+            exact = exact_gap_sum_log2(b=b, t_min=bucket.t_min, t_max=bucket.t_max, H=H)
+            endpoint = endpoint_gap_sum_log2(b=b, t_min=bucket.t_min, t_max=bucket.t_max, H=H)
+            if exact == float("-inf"):
+                if endpoint != float("-inf"):
+                    raise SystemExit(
+                        f"endpoint gap-sum audit: bucket {bucket.name}, H={H} has finite endpoint "
+                        "but no exact support"
+                    )
+                samples.append(
+                    {
+                        "H": H,
+                        "exact_log2": None,
+                        "endpoint_log2": None,
+                        "slack_bits": None,
+                    }
+                )
+                sample_count += 1
+                continue
+            if endpoint + tolerance < exact:
+                raise SystemExit(
+                    f"endpoint gap-sum audit: endpoint bound fails on {bucket.name}, H={H}: "
+                    f"endpoint={endpoint:.12g}, exact={exact:.12g}"
+                )
+            slack = endpoint - exact
+            if slack > endpoint_loss + tolerance:
+                raise SystemExit(
+                    f"endpoint gap-sum audit: endpoint slack {slack:.12g} exceeds bucket-size loss "
+                    f"{endpoint_loss:.12g} on {bucket.name}, H={H}"
+                )
+            min_sample_slack = min(min_sample_slack, slack)
+            max_sample_slack = max(max_sample_slack, slack)
+            samples.append(
+                {
+                    "H": H,
+                    "exact_log2": exact,
+                    "endpoint_log2": endpoint,
+                    "slack_bits": slack,
+                }
+            )
+            sample_count += 1
+        finite_slacks = [
+            float(sample["slack_bits"])
+            for sample in samples
+            if sample["slack_bits"] is not None
+        ]
+        rows.append(
+            {
+                "name": bucket.name,
+                "T_range": [bucket.t_min, bucket.t_max],
+                "gap_count": gap_count,
+                "endpoint_loss_bits": endpoint_loss,
+                "support_cutoff_H": b * bucket.t_max,
+                "support_cutoff_h": b * bucket.t_max + b,
+                "sample_count": len(samples),
+                "min_sample_slack_bits": min(finite_slacks) if finite_slacks else None,
+                "max_sample_slack_bits": max(finite_slacks) if finite_slacks else None,
+                "samples": samples,
+            }
+        )
+    if sample_count == 0 or not math.isfinite(min_sample_slack) or not math.isfinite(max_sample_slack):
+        raise SystemExit("endpoint gap-sum audit: no finite sample slack was measured")
+    return EndpointGapSumSummary(
+        bucket_count=len(buckets),
+        sample_count=sample_count,
+        max_bucket_loss_bits=max_bucket_loss,
+        min_sample_slack_bits=min_sample_slack,
+        max_sample_slack_bits=max_sample_slack,
+        rows=rows,
+    )
 
 
 def late_postprefix_reduced_log2(*, n: int, m: int, h: int, z: float) -> float:
@@ -2076,6 +2205,26 @@ def main() -> int:
             }
             for name, t_min, t_max, cutoff_h in high_feasible_t.bucket_cutoffs
         ],
+    }
+    endpoint_gap_sum = check_endpoint_gap_sum_semantics(
+        b=args.block_bits,
+        buckets=INTERIOR_AUDIT_BUCKETS,
+    )
+    print("endpoint_gap_sum_status,PASS")
+    print(f"endpoint_gap_sum_buckets,{endpoint_gap_sum.bucket_count}")
+    print(f"endpoint_gap_sum_samples,{endpoint_gap_sum.sample_count}")
+    print(f"endpoint_gap_sum_max_bucket_loss_bits,{endpoint_gap_sum.max_bucket_loss_bits:.6f}")
+    print(f"endpoint_gap_sum_min_sample_slack_bits,{endpoint_gap_sum.min_sample_slack_bits:.6f}")
+    print(f"endpoint_gap_sum_max_sample_slack_bits,{endpoint_gap_sum.max_sample_slack_bits:.6f}")
+    manifest["checks"]["endpoint_gap_sum_semantics"] = {  # type: ignore[index]
+        "status": "PASS",
+        "rule": "sum over a gap bucket is bounded by bucket_size times the right-endpoint binomial",
+        "bucket_count": endpoint_gap_sum.bucket_count,
+        "sample_count": endpoint_gap_sum.sample_count,
+        "max_bucket_loss_bits": endpoint_gap_sum.max_bucket_loss_bits,
+        "min_sample_slack_bits": endpoint_gap_sum.min_sample_slack_bits,
+        "max_sample_slack_bits": endpoint_gap_sum.max_sample_slack_bits,
+        "rows": endpoint_gap_sum.rows,
     }
     t_mono = check_t_monotonicity_sufficient_reduction(
         inner_spectrum=args.inner_spectrum,
