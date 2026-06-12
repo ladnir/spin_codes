@@ -1276,6 +1276,9 @@ Currently checkable:
   checks
 - the accelerated early endpoint and paired interval rows through `h = N/2`, with printed recomputation commands and
   selected opt-in recomputation checks
+- the outer-mode projection driver `scripts/compare_outer_modes_fullsplit.py`, which leaves the full-split EBCH inner
+  ledger fixed, reproduces the proved RM `[512,256,32]` checkpoint at `-37.278528`, and writes the generated comparison
+  reports `scripts/outer_mode_comparison_delta009.csv` and `scripts/outer_mode_comparison_delta009.md`
 
 Still proof debt:
 
@@ -1288,6 +1291,8 @@ Still proof debt:
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
+- before any BCH-like outer row becomes theorem text, replace the random-like spectrum projection with an exact local
+  spectrum or a proved low-weight envelope, and recompute the `h>2000` tail under that same outer model
 
 ## Do Not Trust Yet
 
@@ -1295,7 +1300,9 @@ The following are useful context but should not be treated as proof:
 
 - old scalar fixed-tap dense-inner conclusions
 - old random-banded outer `sigma` plots
-- BCH/RM replacement speculation outside the RM `[512,256,32]` checkpoint
+- BCH/RM replacement speculation outside the RM `[512,256,32]` checkpoint, including the BCH rows in
+  `outer_mode_comparison_delta009.*`, until a real spectrum or rigorous low-weight envelope replaces the modeled
+  spectrum
 - fit-based residual laws
 - any `tmp_*` CSV or PNG unless it is explicitly named above
 - fixed-`h` asymptotic heuristics that are not connected to the first-moment sum
