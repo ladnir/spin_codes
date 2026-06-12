@@ -3065,7 +3065,9 @@ The placement entry is now checked independently of the ledger CSV by an exact-i
 \max_{32\le h<500}\frac{S_h}{S_{h-1}}\frac{h+1}{N-h}
 \le .303594,
 \]
-with the maximum at \(h=32\).  The exact peak is \(0.303593738594\).  The naive endpoint bound
+where \(.303594=151797/500000\).  The certificate performs \(468\) exact comparisons, finds the maximum at
+\(h=32\), and verifies a positive rational slack of about \(2^{-21.8672}\) below the threshold.  The exact peak is
+\(0.303593738594\).  The naive endpoint bound
 \[
 \frac{\binom{64(5949+4000-1)}{h}}{\binom{64(5949+4000-1)}{h-1}}\frac{h+1}{N-h}
 \]

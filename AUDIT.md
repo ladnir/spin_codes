@@ -283,10 +283,20 @@ Output:
 
 ```text
 placement_ratio_threshold,0.303594
+placement_ratio_threshold_num,151797
+placement_ratio_threshold_den,500000
+placement_ratio_exact_cross_multiply_status,PASS
+placement_ratio_exact_comparisons,468
 placement_ratio_peak_h,32
 placement_ratio_peak_to_h,33
 placement_ratio_peak,0.303593738594
+placement_ratio_peak_log2,-1.71978605839
+placement_ratio_peak_num_bits,513
+placement_ratio_peak_den_bits,515
+placement_ratio_threshold_slack_bits,512
+placement_ratio_threshold_gap_log2,-21.8672036595
 endpoint_bound_at_h_min,0.3130655524
+endpoint_bound_at_h_min_log2,-1.67546332201
 endpoint_bound_slack_factor,1.03119897614
 ```
 
@@ -294,15 +304,28 @@ The verifier runs the same cross-multiplication check by default and prints:
 
 ```text
 prefix_placement_ratio_threshold,0.303594
+prefix_placement_ratio_threshold_num,151797
+prefix_placement_ratio_threshold_den,500000
+prefix_placement_ratio_exact_cross_multiply_status,PASS
+prefix_placement_ratio_exact_comparisons,468
 prefix_placement_ratio_peak_h,32
+prefix_placement_ratio_peak_to_h,33
 prefix_placement_ratio_peak,0.303593738594
+prefix_placement_ratio_peak_log2,-1.71978605839
+prefix_placement_ratio_peak_num_bits,513
+prefix_placement_ratio_peak_den_bits,515
+prefix_placement_ratio_threshold_slack_bits,512
+prefix_placement_ratio_threshold_gap_log2,-21.8672036595
 prefix_placement_endpoint_bound_at_h_min,0.3130655524
+prefix_placement_endpoint_bound_at_h_min_log2,-1.67546332201
 prefix_placement_endpoint_slack_factor,1.03119897614
 ```
 
 Interpretation: endpoint domination is too loose by about `3.12%`, so the
 eventual analytic proof must exploit the averaged binomial sum `S_H`; however,
 the finite placement component no longer depends on floating log-binomial rows.
+The threshold itself is the rational `151797/500000`, and the exact peak ratio
+is below it by about `2^-21.8672`.
 
 The per-`T` inner grids feeding this row are:
 

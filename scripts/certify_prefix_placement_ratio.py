@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import math
+from dataclasses import dataclass
 from fractions import Fraction
 
 
@@ -39,6 +40,103 @@ def ratio_float(num: int, den: int) -> float:
     return math.exp(math.log(num) - math.log(den))
 
 
+@dataclass(frozen=True)
+class PlacementRatioCertificate:
+    threshold: Fraction
+    comparisons: int
+    peak_h: int
+    peak_num: int
+    peak_den: int
+    threshold_slack: int
+    endpoint_num: int
+    endpoint_den: int
+
+    @property
+    def peak_to_h(self) -> int:
+        return self.peak_h + 1
+
+    @property
+    def peak_ratio(self) -> float:
+        return ratio_float(self.peak_num, self.peak_den)
+
+    @property
+    def peak_log2(self) -> float:
+        return math.log2(self.peak_num) - math.log2(self.peak_den)
+
+    @property
+    def threshold_gap_log2(self) -> float:
+        gap_num = self.threshold_slack
+        gap_den = self.threshold.denominator * self.peak_den
+        return math.log2(gap_num) - math.log2(gap_den)
+
+    @property
+    def endpoint_ratio(self) -> float:
+        return ratio_float(self.endpoint_num, self.endpoint_den)
+
+    @property
+    def endpoint_log2(self) -> float:
+        return math.log2(self.endpoint_num) - math.log2(self.endpoint_den)
+
+    @property
+    def endpoint_slack_factor(self) -> float:
+        return ratio_float(self.endpoint_num * self.peak_den, self.endpoint_den * self.peak_num)
+
+
+def certify_placement_ratio(
+    *,
+    N: int,
+    b: int,
+    late_blocks: int,
+    gap_min: int,
+    gap_max: int,
+    h_min: int,
+    h_max: int,
+    threshold_text: str,
+) -> PlacementRatioCertificate:
+    if h_min < 1 or h_max <= h_min:
+        raise ValueError("h_min must be positive and h_max must be larger")
+    threshold = decimal_fraction(threshold_text)
+    sums = compute_sums(
+        b=b,
+        late_blocks=late_blocks,
+        gap_min=gap_min,
+        gap_max=gap_max,
+        h_max=h_max,
+    )
+
+    max_num = 0
+    max_den = 1
+    max_h = -1
+    comparisons = 0
+    for h in range(h_min, h_max):
+        numerator = sums[h] * (h + 1)
+        denominator = sums[h - 1] * (N - h)
+        comparisons += 1
+        if numerator * threshold.denominator > denominator * threshold.numerator:
+            raise SystemExit(f"placement ratio h={h}->{h + 1} exceeds {threshold_text}")
+        if numerator * max_den > max_num * denominator:
+            max_num = numerator
+            max_den = denominator
+            max_h = h
+
+    n_max = b * (late_blocks + gap_max - 1)
+    endpoint_num = (n_max - h_min + 1) * (h_min + 1)
+    endpoint_den = h_min * (N - h_min)
+    threshold_slack = max_den * threshold.numerator - max_num * threshold.denominator
+    if threshold_slack <= 0:
+        raise SystemExit("placement ratio peak has no positive threshold slack")
+    return PlacementRatioCertificate(
+        threshold=threshold,
+        comparisons=comparisons,
+        peak_h=max_h,
+        peak_num=max_num,
+        peak_den=max_den,
+        threshold_slack=threshold_slack,
+        endpoint_num=endpoint_num,
+        endpoint_den=endpoint_den,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--N", type=int, default=2**21)
@@ -51,35 +149,16 @@ def main() -> int:
     parser.add_argument("--max-placement-ratio", default="0.303594")
     args = parser.parse_args()
 
-    if args.h_min < 1 or args.h_max <= args.h_min:
-        raise SystemExit("--h-min must be positive and --h-max must be larger")
-    threshold = decimal_fraction(args.max_placement_ratio)
-    sums = compute_sums(
+    cert = certify_placement_ratio(
+        N=args.N,
         b=args.block_bits,
         late_blocks=args.late_blocks,
         gap_min=args.gap_min,
         gap_max=args.gap_max,
+        h_min=args.h_min,
         h_max=args.h_max,
+        threshold_text=args.max_placement_ratio,
     )
-
-    max_num = 0
-    max_den = 1
-    max_h = -1
-    for h in range(args.h_min, args.h_max):
-        numerator = sums[h] * (h + 1)
-        denominator = sums[h - 1] * (args.N - h)
-        if numerator * threshold.denominator > denominator * threshold.numerator:
-            raise SystemExit(
-                f"placement ratio h={h}->{h + 1} exceeds {args.max_placement_ratio}"
-            )
-        if numerator * max_den > max_num * denominator:
-            max_num = numerator
-            max_den = denominator
-            max_h = h
-
-    n_max = args.block_bits * (args.late_blocks + args.gap_max - 1)
-    endpoint_num = (n_max - args.h_min + 1) * (args.h_min + 1)
-    endpoint_den = args.h_min * (args.N - args.h_min)
 
     print("Prefix first-gap placement ratio certificate")
     print(f"N,{args.N}")
@@ -90,13 +169,21 @@ def main() -> int:
     print(f"h_min,{args.h_min}")
     print(f"h_max,{args.h_max}")
     print(f"placement_ratio_threshold,{args.max_placement_ratio}")
-    print(f"placement_ratio_peak_h,{max_h}")
-    print(f"placement_ratio_peak_to_h,{max_h + 1}")
-    print(f"placement_ratio_peak,{ratio_float(max_num, max_den):.12g}")
-    print(f"placement_ratio_peak_log2,{math.log2(max_num) - math.log2(max_den):.12g}")
-    print(f"endpoint_bound_at_h_min,{ratio_float(endpoint_num, endpoint_den):.12g}")
-    print(f"endpoint_bound_at_h_min_log2,{math.log2(endpoint_num) - math.log2(endpoint_den):.12g}")
-    print(f"endpoint_bound_slack_factor,{ratio_float(endpoint_num * max_den, endpoint_den * max_num):.12g}")
+    print(f"placement_ratio_threshold_num,{cert.threshold.numerator}")
+    print(f"placement_ratio_threshold_den,{cert.threshold.denominator}")
+    print("placement_ratio_exact_cross_multiply_status,PASS")
+    print(f"placement_ratio_exact_comparisons,{cert.comparisons}")
+    print(f"placement_ratio_peak_h,{cert.peak_h}")
+    print(f"placement_ratio_peak_to_h,{cert.peak_to_h}")
+    print(f"placement_ratio_peak,{cert.peak_ratio:.12g}")
+    print(f"placement_ratio_peak_log2,{cert.peak_log2:.12g}")
+    print(f"placement_ratio_peak_num_bits,{cert.peak_num.bit_length()}")
+    print(f"placement_ratio_peak_den_bits,{cert.peak_den.bit_length()}")
+    print(f"placement_ratio_threshold_slack_bits,{cert.threshold_slack.bit_length()}")
+    print(f"placement_ratio_threshold_gap_log2,{cert.threshold_gap_log2:.12g}")
+    print(f"endpoint_bound_at_h_min,{cert.endpoint_ratio:.12g}")
+    print(f"endpoint_bound_at_h_min_log2,{cert.endpoint_log2:.12g}")
+    print(f"endpoint_bound_slack_factor,{cert.endpoint_slack_factor:.12g}")
     return 0
 
 

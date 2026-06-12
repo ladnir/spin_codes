@@ -18,7 +18,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from certify_prefix_placement_ratio import compute_sums, decimal_fraction, ratio_float
+from certify_prefix_placement_ratio import certify_placement_ratio
 from certify_rm_outer_prefix_exact import (
     direct_sum_coefficients,
     exact_late_prefix_sum,
@@ -314,8 +314,18 @@ class InteriorAuditSummary:
 @dataclass(frozen=True)
 class PlacementRatioSummary:
     peak_h: int
+    peak_to_h: int
     peak_ratio: float
+    peak_log2: float
+    threshold_num: int
+    threshold_den: int
+    exact_comparisons: int
+    peak_num_bits: int
+    peak_den_bits: int
+    threshold_slack_bits: int
+    threshold_gap_log2: float
     endpoint_ratio_at_h_min: float
+    endpoint_ratio_at_h_min_log2: float
     endpoint_slack_factor: float
 
 
@@ -539,35 +549,31 @@ def exact_placement_ratio_summary(
     h_max: int,
     threshold_text: str,
 ) -> PlacementRatioSummary:
-    threshold = decimal_fraction(threshold_text)
-    sums = compute_sums(
+    cert = certify_placement_ratio(
+        N=n,
         b=b,
         late_blocks=late_blocks,
         gap_min=gap_min,
         gap_max=gap_max,
+        h_min=h_min,
         h_max=h_max,
+        threshold_text=threshold_text,
     )
-    max_num = 0
-    max_den = 1
-    max_h = -1
-    for h in range(h_min, h_max):
-        numerator = sums[h] * (h + 1)
-        denominator = sums[h - 1] * (n - h)
-        if numerator * threshold.denominator > denominator * threshold.numerator:
-            raise SystemExit(f"prefix placement ratio: h={h}->{h + 1} exceeds {threshold_text}")
-        if numerator * max_den > max_num * denominator:
-            max_num = numerator
-            max_den = denominator
-            max_h = h
-
-    n_max = b * (late_blocks + gap_max - 1)
-    endpoint_num = (n_max - h_min + 1) * (h_min + 1)
-    endpoint_den = h_min * (n - h_min)
     return PlacementRatioSummary(
-        peak_h=max_h,
-        peak_ratio=ratio_float(max_num, max_den),
-        endpoint_ratio_at_h_min=ratio_float(endpoint_num, endpoint_den),
-        endpoint_slack_factor=ratio_float(endpoint_num * max_den, endpoint_den * max_num),
+        peak_h=cert.peak_h,
+        peak_to_h=cert.peak_to_h,
+        peak_ratio=cert.peak_ratio,
+        peak_log2=cert.peak_log2,
+        threshold_num=cert.threshold.numerator,
+        threshold_den=cert.threshold.denominator,
+        exact_comparisons=cert.comparisons,
+        peak_num_bits=cert.peak_num.bit_length(),
+        peak_den_bits=cert.peak_den.bit_length(),
+        threshold_slack_bits=cert.threshold_slack.bit_length(),
+        threshold_gap_log2=cert.threshold_gap_log2,
+        endpoint_ratio_at_h_min=cert.endpoint_ratio,
+        endpoint_ratio_at_h_min_log2=cert.endpoint_log2,
+        endpoint_slack_factor=cert.endpoint_slack_factor,
     )
 
 
@@ -1278,17 +1284,39 @@ def main() -> int:
             threshold_text=args.prefix_placement_ratio_threshold,
         )
         print(f"prefix_placement_ratio_threshold,{args.prefix_placement_ratio_threshold}")
+        print(f"prefix_placement_ratio_threshold_num,{placement.threshold_num}")
+        print(f"prefix_placement_ratio_threshold_den,{placement.threshold_den}")
+        print("prefix_placement_ratio_exact_cross_multiply_status,PASS")
+        print(f"prefix_placement_ratio_exact_comparisons,{placement.exact_comparisons}")
         print(f"prefix_placement_ratio_peak_h,{placement.peak_h}")
+        print(f"prefix_placement_ratio_peak_to_h,{placement.peak_to_h}")
         print(f"prefix_placement_ratio_peak,{placement.peak_ratio:.12g}")
+        print(f"prefix_placement_ratio_peak_log2,{placement.peak_log2:.12g}")
+        print(f"prefix_placement_ratio_peak_num_bits,{placement.peak_num_bits}")
+        print(f"prefix_placement_ratio_peak_den_bits,{placement.peak_den_bits}")
+        print(f"prefix_placement_ratio_threshold_slack_bits,{placement.threshold_slack_bits}")
+        print(f"prefix_placement_ratio_threshold_gap_log2,{placement.threshold_gap_log2:.12g}")
         print(f"prefix_placement_endpoint_bound_at_h_min,{placement.endpoint_ratio_at_h_min:.12g}")
+        print(f"prefix_placement_endpoint_bound_at_h_min_log2,{placement.endpoint_ratio_at_h_min_log2:.12g}")
         print(f"prefix_placement_endpoint_slack_factor,{placement.endpoint_slack_factor:.12g}")
         manifest["checks"]["prefix_placement_ratio"] = {  # type: ignore[index]
             "threshold": args.prefix_placement_ratio_threshold,
+            "threshold_num": placement.threshold_num,
+            "threshold_den": placement.threshold_den,
+            "exact_cross_multiply_status": "PASS",
+            "exact_comparisons": placement.exact_comparisons,
             "gap_range": [args.prefix_placement_gap_min, args.prefix_placement_gap_max],
             "h_range": [args.prefix_placement_h_min, args.prefix_placement_h_max],
             "peak_h": placement.peak_h,
+            "peak_to_h": placement.peak_to_h,
             "peak_ratio": placement.peak_ratio,
+            "peak_log2": placement.peak_log2,
+            "peak_num_bits": placement.peak_num_bits,
+            "peak_den_bits": placement.peak_den_bits,
+            "threshold_slack_bits": placement.threshold_slack_bits,
+            "threshold_gap_log2": placement.threshold_gap_log2,
             "endpoint_bound_at_h_min": placement.endpoint_ratio_at_h_min,
+            "endpoint_bound_at_h_min_log2": placement.endpoint_ratio_at_h_min_log2,
             "endpoint_slack_factor": placement.endpoint_slack_factor,
         }
 
