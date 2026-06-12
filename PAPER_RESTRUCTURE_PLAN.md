@@ -47,6 +47,10 @@ The same scalar dense pass now demotes unused fixed-tap finite-diagnostic
 bookkeeping from the compiled spine: exact final-survivor averaging, episode
 budgeting, multi-candidate termination, and isolated-pair candidate counts live
 in the scalar dense-inner refinement note instead of `innerDenseScalar.tex`.
+First-start-aware no-OFF tails, zero-gap survival, and the single-run base
+factor have also been demoted to the scalar dense-inner refinement note because
+they are finite-diagnostic/calibration tools rather than dependencies of the
+current dense+dense theorem.
 
 ## Summary
 
@@ -402,6 +406,9 @@ The first physical split is complete:
 12. Fixed-tap finite-diagnostic bookkeeping lemmas not consumed by the
     dense+dense theorem were moved from `innerDenseScalar.tex` to
     `explorations/scalar_dense_inner_refinements.tex`.
+13. First-start-aware and single-run scalar dense diagnostics were also moved
+    out of the compiled theorem spine; `innerDenseScalar.tex` now proceeds from
+    the three-term tail directly to forced-termination contraction.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 

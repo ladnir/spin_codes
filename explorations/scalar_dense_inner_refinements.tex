@@ -167,6 +167,129 @@ unordered pair of selected shifted coordinates, the probability that their dista
 Since \(x_b-x_a\le L\) implies \(z_b-z_a\le L\), linearity of expectation proves the displayed bound.
 \end{proof}
 
+\subsection{Demoted first-start and single-run diagnostics}
+
+These position-sensitive scalar dense diagnostics are useful for finite calibration and for understanding why the
+\(h=1\) inner slice has a \(2\delta\)-type late-start base. They are not used by the current analytic dense+dense
+theorem, so the compiled main spine keeps only the coarser three-term tail and the run/forced-termination envelopes.
+
+\begin{corollary}[Zero-input gaps survive in the fixed-tap inner]
+\label{cor:dense-gap-survival}
+Fix an interval of \(g\ge0\) consecutive zero inputs, and condition on the event that the encoder is ON at the start of
+that interval. Then the encoder remains ON throughout the whole gap:
+\begin{equation}
+\label{eq:dense-gap-survival}
+\PP[\text{survive a zero gap of length }g \mid \ON]
+\;=\;
+1,
+\end{equation}
+apart from the harmless convention at the block boundary after time \(N\).
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:fixedtap-termination-needs-input-one}, a genuine ON\(\to\)OFF transition requires the final zero of
+the terminating \(10^m\) pattern to be aligned with an input one. Inside a zero-input gap no such aligned one exists,
+so no ON\(\to\)OFF transition can occur there.
+\end{proof}
+
+\begin{lemma}[First-start-aware no-OFF tail]
+\label{lem:dense-first-start-nooff-tail}
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=w\ge 1\), and let
+\[
+T:=\min\{t:U_t=1\}.
+\]
+Let \(Y=\Enc_{\mathrm{in}}(U)\), and let \(\mathcal{E}_{\mathrm{off}}\) be the event that after the first activation
+at time \(T\), the encoder later returns to \(\OFF\). Then for every integer \(d\ge 0\),
+\begin{equation}
+\label{eq:dense-first-start-nooff-tail}
+\PP[\wt(Y)\le d\ \wedge\ \mathcal{E}_{\mathrm{off}}^c\mid \wt(U)=w]
+\;\le\;
+\sum_{t=1}^{N-w+1}
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}}\,
+\PP[\Binomial(N-t,\tfrac12)\le d].
+\end{equation}
+Consequently,
+\begin{equation}
+\label{eq:dense-first-start-with-off-remainder}
+p_w(\delta)
+\;\le\;
+\sum_{t=1}^{N-w+1}
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}}\,
+\PP[\Binomial(N-t,\tfrac12)\le \lfloor\delta N\rfloor]
+\;+\;
+\PP[\mathcal{E}_{\mathrm{off}}\mid \wt(U)=w].
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The exact first-start law under the uniform weight-\(w\) model is
+\[
+\PP[T=t\mid \wt(U)=w]
+=
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}},
+\qquad 1\le t\le N-w+1.
+\]
+Condition on \(T=t\). At time \(t\), the encoder is still \(\OFF\), so \(Y_t=U_t=1\) and the next state is nonzero.
+On \(\mathcal{E}_{\mathrm{off}}^c\), the encoder remains \(\ON\) throughout the suffix \(t+1,\dots,N\). Hence
+Lemma~\ref{lem:dense-on-time-domination} bounds the joint probability that the suffix has at most \(d\) ones by
+\(\PP[\Binomial(N-t,\tfrac12)\le d]\). Average over \(T\), then add the OFF event for the final display.
+\end{proof}
+
+\paragraph{Position-aware first-start tail.}
+For \(w=\eta N\) and \(t=\alpha N\), the summand in
+\eqref{eq:dense-first-start-nooff-tail} has exponent
+\[
+H_2(\eta)
+-
+(1-\alpha)H_2\!\left(\frac{\eta}{1-\alpha}\right)
+\;+\;
+(1-\alpha)
+\left[
+1-H_2\!\left(\frac{\delta}{1-\alpha}\right)
+\right],
+\]
+whenever \(\alpha\le 1-\eta\) and \(\delta/(1-\alpha)<1/2\). Optimizing over \(\alpha\) gives the correct
+first-start-aware replacement for the earlier coarse \((1-\varepsilon)^w\) splice. The remaining linear-window task is
+to replace the raw OFF remainder in \eqref{eq:dense-first-start-with-off-remainder} by an exponentially small
+restart/episode bound.
+
+\begin{corollary}[Single-run base factor]
+\label{cor:dense-inner-single-run}
+Fix \(\delta\in(0,1/2)\) and let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=1\).
+Let \(Y=\Enc_{\mathrm{in}}(U)\) be produced by \eqref{eq:dense-inner-def}. Then
+\begin{equation}
+\label{eq:dense-inner-single-run}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+\frac{\lceil 2\delta N\rceil}{N}
+\;+\;
+N2^{-m}
+\;+\;
+\PP[\Binomial(\lceil 2\delta N\rceil,\tfrac12)\le \delta N].
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:dense-inner-single-run-asym}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+2\delta
+\;+\;
+O\!\left(\frac{1}{N}\right)
+\;+\;
+N2^{-m}
+\;+\;
+2^{-\Omega_\delta(N)}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Let \(T\) be the unique index with \(U_T=1\). Under the uniform weight-\(1\) model, \(T\) is uniform on \(\{1,\dots,N\}\).
+If there is no later ON\(\to\)OFF transition and \(N-T\ge \lceil2\delta N\rceil\), the low-weight suffix event is bounded
+by the displayed binomial tail. The complementary late-start event has probability at most \(\lceil2\delta N\rceil/N\).
+Finally, Lemma~\ref{lem:dense-off-requires-mzeros} and the same union bound as in Lemma~\ref{lem:dense-three-term-tail}
+give the \(N2^{-m}\) OFF term.
+\end{proof}
+
 \subsection{Gap, isolated-slice, and paired-cover refinements}
 \begin{lemma}[Gap composition conditioned on weight and run count]
 \label{lem:gap-composition-given-runs}
