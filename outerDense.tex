@@ -40,6 +40,8 @@ Encoding cost is \(O(kM)=O(n\log n)\).
 
 The fixed leading parity tap is the outer analogue of the fixed-tap dense recursive inner. In particular, a weight-one
 message can no longer have zero parity response: the diagonal parity coordinate is forced to be one.
+The detailed tiny-weight parity law for this fixed tap is preserved in the random sliding outer exploration note; the
+main dense+dense theorem below only needs the span generating bound and the resulting spectrum envelopes.
 
 \paragraph{Spectrum notation.}
 For \(h\in\{0,\dots,n\}\), write
@@ -78,38 +80,6 @@ Independence across \(t\) follows from independence of the tap vectors \(g_t\).
 For a fair parity bit, the contribution to the \(z\)-generating function is \((1+z)/2\). For a deterministic one, it
 is \(z\), which is at most \((1+z)/2\) when \(z\in(0,1)\). Multiplying over the \(\ell+M\) active parity positions and
 including the systematic factor \(z^w\) proves the bound.
-\end{proof}
-
-\begin{lemma}[Fixed-tap outer removes weight one]
-\label{lem:outer-fixedtap-no-weight-one}
-For the fixed-tap systematic banded outer,
-\[
-\enum_{\Cone,1}=0
-\]
-deterministically.
-\end{lemma}
-
-\begin{proof}
-A nonzero systematic outer codeword of weight one would have to come from a weight-one message \(x=e_i\) whose parity
-part is zero. But the fixed diagonal tap gives \(p_i=1\), so the parity part has weight at least one.
-\end{proof}
-
-\begin{lemma}[Fixed-tap banded low-weight parity law]
-\label{lem:outer-fixedtap-banded-lowweight-law}
-Fix a message word \(x\) of weight \(w\). Let \(q(x)\) be the size of the union of the parity-band intervals touched by
-the support of \(x\), and let \(r(x)\) be the number of band-clusters of that support, where adjacent support positions
-are in the same cluster when their separation is at most \(M\). Then the fixed-tap parity weight
-has the form
-\[
-r(x)+\Binomial(q(x)-r(x),\tfrac12).
-\]
-\end{lemma}
-
-\begin{proof}
-The first support position in each \(\sigma\)-cluster has a parity coordinate where only its fixed diagonal tap is
-active, so that coordinate contributes a deterministic one. These give \(r(x)\) parity ones. Every other active parity
-coordinate sees at least one random tap from the band, so its output is an independent fair bit. There are
-\(q(x)-r(x)\) such coordinates.
 \end{proof}
 
 \subsection{A global geometric spectrum envelope}

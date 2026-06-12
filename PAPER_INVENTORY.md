@@ -21,6 +21,10 @@ out of `innerDenseScalar.tex` and into
 `explorations/scalar_dense_inner_refinements.tex`, leaving the compiled dense
 inner section focused on the theorem-facing envelopes consumed by
 `integrationDense.tex`.
+The random sliding outer section has also been trimmed so fixed-tap tiny-weight
+diagnostics live in `explorations/random_sliding_outer_low_weight_notes.tex`;
+the compiled `outerDense.tex` now keeps the span generating law, geometric
+spectrum envelope, and linear-weight exponent used by `integrationDense.tex`.
 
 ## Status Labels
 
@@ -202,6 +206,9 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
 - `explorations/scalar_dense_inner_refinements.tex`
   - exact gap-composition laws, isolated-slice order statistics, paired-cover
     bounds, and linear OFF-budget refinements moved out of the compiled spine.
+- `explorations/random_sliding_outer_low_weight_notes.tex`
+  - fixed-tap no-weight-one and band-cluster low-weight parity law for scalar
+    dense diagnostics.
 - `explorations/accumulator_warmup_notes.tex`
   - optional accumulator sharpness improvements and non-main TODOs.
 - `explorations/fullsplit_certificate_development.tex`

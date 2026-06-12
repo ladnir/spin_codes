@@ -6,6 +6,7 @@ landing points for later splitting/polish.
 
 - `scalar_dense_finite_diagnostics.tex`: dense-band finite diagnostics and working-save-point material.
 - `scalar_dense_inner_refinements.tex`: positional, isolated-slice, paired-cover, and OFF-budget dense-inner refinements.
+- `random_sliding_outer_low_weight_notes.tex`: fixed-tap low-weight outer facts used for scalar diagnostics.
 - `accumulator_warmup_notes.tex`: optional accumulator sharpness improvements and non-main TODOs.
 - `fullsplit_certificate_development.tex`: preserved full-split finite-certificate development ledger.
 - `block_recursive_bch_inner.tex`: prospective block-recursive BCH inner.

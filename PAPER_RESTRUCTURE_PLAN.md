@@ -27,6 +27,9 @@ not consumed by the analytic theorem now live in
 `explorations/scalar_dense_inner_refinements.tex`, while
 `innerDenseScalar.tex` keeps the ON/OFF lemmas, run-tail exponent,
 forced-termination contraction, and packaged inner envelopes.
+The random sliding outer has likewise been tightened: fixed-tap tiny-weight
+facts now live in `explorations/random_sliding_outer_low_weight_notes.tex`, and
+`outerDense.tex` keeps only the theorem-facing span law and spectrum envelopes.
 
 ## Summary
 
@@ -365,12 +368,15 @@ The first physical split is complete:
    paper; those notes live in `explorations/accumulator_warmup_notes.tex`.
 7. Scalar dense-inner refinement lemmas not needed by the theorem-facing
    integration now live in `explorations/scalar_dense_inner_refinements.tex`.
+8. Random sliding outer tiny-weight diagnostics now live in
+   `explorations/random_sliding_outer_low_weight_notes.tex`.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
 - continue compressing the scalar dense inner proof presentation, especially
   the long ON/OFF lemma chain;
-- shorten dense outer proof machinery if the main paper remains too long;
+- shorten dense outer proof machinery further only if the main paper remains
+  too long;
 - harden finite-certificate row explanations and manifests for external audit;
 - replace BCH projections with exact spectra or rigorous envelopes before any
   theorem upgrade.
