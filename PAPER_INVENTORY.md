@@ -36,6 +36,10 @@ warmup theorem: the random sliding dense outer plus accumulator inner has
 linear distance for sufficiently small constants.  Remaining uses of
 "diagnostic", "projection", and "heuristic" are intentional status boundaries
 for non-theorem projection rows.
+The scalar dense inner section has begun its proof-facing compression pass:
+the run-tail exponent proof is now shorter in the compiled spine, the
+monotonicity sign in that proof has been corrected, and the expanded Stirling
+calculation is preserved in `explorations/scalar_dense_inner_refinements.tex`.
 
 ## Status Labels
 

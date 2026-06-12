@@ -39,6 +39,10 @@ framework in the compiled paper and added the missing combined theorem:
 random sliding dense outer plus accumulator inner gives linear distance for
 sufficiently small constants.  Thus the warmup is now a real proof example, not
 just an isolated accumulator enumerator.
+The scalar dense inner proof has also started its proof-polish pass: the
+run-tail exponent proof in the main spine was compressed, its derivative sign
+was corrected, and the expanded Stirling derivation was preserved in
+`explorations/scalar_dense_inner_refinements.tex`.
 
 ## Summary
 
@@ -388,6 +392,9 @@ The first physical split is complete:
     working-save-point wording, and the final framework overfull. Remaining
     diagnostic/projection/heuristic language marks explicit non-theorem status
     boundaries.
+11. The scalar dense run-tail exponent proof was shortened in the main spine,
+    the monotonicity sign was corrected, and the expanded derivation was moved
+    to the scalar dense-inner refinement note.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 

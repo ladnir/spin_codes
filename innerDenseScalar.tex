@@ -695,45 +695,21 @@ H_2(\omega)
 \end{lemma}
 
 \begin{proof}
-By \eqref{eq:run-lower-tail-exact},
+Insert the exact tail formula \eqref{eq:run-lower-tail-exact}.  For \(s=\lfloor\sigma N\rfloor\), Stirling's formula
+bounds each summand by
 \[
-\PP[R(U)<r]
-\;=\;
-\frac{1}{\binom{N}{w}}
-\sum_{s=1}^{r-1}
-\binom{w-1}{s-1}\binom{N-w+1}{s}.
+N^{O(1)}2^{-N\Psi_{\mathrm{run}}(\omega,\sigma)}.
 \]
-For \(s=\lfloor \sigma N\rfloor\) with \(0<\sigma<\rho\), Stirling's formula gives
+On \(0<\sigma<\omega(1-\omega)\),
 \[
-\log_2 \binom{w-1}{s-1}
+\frac{\partial}{\partial\sigma}\Psi_{\mathrm{run}}(\omega,\sigma)
 =
-\omega N\,H_2\!\Bigl(\frac{\sigma}{\omega}\Bigr) + O(\log N),
+\log_2\!\left(\frac{\sigma^2}{(\omega-\sigma)(1-\omega-\sigma)}\right)<0.
 \]
-\[
-\log_2 \binom{N-w+1}{s}
-=
-(1-\omega)N\,H_2\!\Bigl(\frac{\sigma}{1-\omega}\Bigr) + O(\log N),
-\]
-and
-\[
-\log_2 \binom{N}{w}
-=
-N H_2(\omega) + O(\log N).
-\]
-Thus each summand has the form
-\[
-N^{O(1)}\,2^{-N\Psi_{\mathrm{run}}(\omega,\sigma)}.
-\]
-Moreover,
-\[
-\frac{\partial}{\partial \sigma}\Psi_{\mathrm{run}}(\omega,\sigma)
-=
-\log_2\!\left(\frac{(\omega-\sigma)(1-\omega-\sigma)}{\sigma^2}\right),
-\]
-which is positive throughout the lower-tail regime \(\sigma<\omega(1-\omega)\).
-Hence \(\Psi_{\mathrm{run}}(\omega,\sigma)\) is increasing on \((0,\rho)\), so the largest summand occurs at the boundary
-\(\sigma\approx \rho\).
-Since the sum contains at most \(N\) terms, \eqref{eq:run-lower-tail-entropy} follows.
+Thus \(\Psi_{\mathrm{run}}(\omega,\sigma)\) decreases on the lower-tail range, so the largest summand for
+\(s<r=\lfloor\rho N\rfloor\) occurs at the boundary \(\sigma=\rho+O(1/N)\).  Summing at most \(N\) terms gives
+\eqref{eq:run-lower-tail-entropy}.  The expanded Stirling derivation is preserved in the scalar dense-inner refinement
+note.
 \end{proof}
 
 \begin{corollary}[Run lower-tail exponent with \(r\) proportional to \(w\)]

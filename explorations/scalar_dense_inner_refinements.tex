@@ -6,6 +6,60 @@ work, but are not part of the current compiled main proof spine. The main paper 
 random sliding dense asymptotic theorem: the three-term tail, run lower-tail exponent, forced-termination contraction,
 and the packaged inner interface.
 
+\subsection{Run-tail exponent derivation}
+
+This note preserves the expanded Stirling calculation behind the run lower-tail exponent used in the main scalar dense
+inner section.  Let \(U\) be uniform over weight-\(w\) words in \(\{0,1\}^N\), set
+\[
+w=\lfloor\omega N\rfloor,\qquad r=\lfloor\rho N\rfloor,
+\]
+and assume \(0<\rho<\omega(1-\omega)\).  The exact run-count formula gives
+\[
+\Pr[R(U)<r]
+=
+\frac{1}{\binom{N}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
+For \(s=\lfloor\sigma N\rfloor\), Stirling's formula gives
+\[
+\log_2\binom{w-1}{s-1}
+=
+\omega N H_2\!\left(\frac{\sigma}{\omega}\right)+O(\log N),
+\]
+\[
+\log_2\binom{N-w+1}{s}
+=
+(1-\omega)N H_2\!\left(\frac{\sigma}{1-\omega}\right)+O(\log N),
+\]
+and
+\[
+\log_2\binom{N}{w}=NH_2(\omega)+O(\log N).
+\]
+Thus the summand exponent is
+\[
+-N\Psi_{\rm run}(\omega,\sigma)+O(\log N),
+\]
+where
+\[
+\Psi_{\rm run}(\omega,\sigma)
+:=
+H_2(\omega)
+-\omega H_2\!\left(\frac{\sigma}{\omega}\right)
+-(1-\omega)H_2\!\left(\frac{\sigma}{1-\omega}\right).
+\]
+The derivative is
+\[
+\frac{\partial}{\partial\sigma}\Psi_{\rm run}(\omega,\sigma)
+=
+\log_2\!\left(\frac{\sigma^2}{(\omega-\sigma)(1-\omega-\sigma)}\right),
+\]
+which is negative for \(\sigma<\omega(1-\omega)\).  Hence the largest summand in the lower tail occurs at the boundary
+\(\sigma=\rho+O(1/N)\), and the whole sum is bounded by
+\[
+N^{O(1)}2^{-N\Psi_{\rm run}(\omega,\rho)}.
+\]
+
 \subsection{Gap, isolated-slice, and paired-cover refinements}
 \begin{lemma}[Gap composition conditioned on weight and run count]
 \label{lem:gap-composition-given-runs}
