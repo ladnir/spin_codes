@@ -43,6 +43,10 @@ The scalar dense inner proof has also started its proof-polish pass: the
 run-tail exponent proof in the main spine was compressed, its derivative sign
 was corrected, and the expanded Stirling derivation was preserved in
 `explorations/scalar_dense_inner_refinements.tex`.
+The same scalar dense pass now demotes unused fixed-tap finite-diagnostic
+bookkeeping from the compiled spine: exact final-survivor averaging, episode
+budgeting, multi-candidate termination, and isolated-pair candidate counts live
+in the scalar dense-inner refinement note instead of `innerDenseScalar.tex`.
 
 ## Summary
 
@@ -395,6 +399,9 @@ The first physical split is complete:
 11. The scalar dense run-tail exponent proof was shortened in the main spine,
     the monotonicity sign was corrected, and the expanded derivation was moved
     to the scalar dense-inner refinement note.
+12. Fixed-tap finite-diagnostic bookkeeping lemmas not consumed by the
+    dense+dense theorem were moved from `innerDenseScalar.tex` to
+    `explorations/scalar_dense_inner_refinements.tex`.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 

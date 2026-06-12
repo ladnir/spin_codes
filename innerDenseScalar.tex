@@ -170,48 +170,6 @@ being \(1\) at least \(1/2\). The usual induction for Bernoulli stochastic domin
 bound.
 \end{proof}
 
-\begin{lemma}[Exact final-survivor suffix average]
-\label{lem:fixedtap-final-survivor-suffix}
-Let \(U\) be uniform on the weight-\(h\) slice of \(\{0,1\}^N\), and let
-\[
-\tau(U):=\min\supp(U),\qquad S(U):=N-\tau(U)+1.
-\]
-Let \(\mathcal{S}_{\mathrm{fin}}\) be the event that the ON episode started by the first input one survives through the
-end of the block. Then, for every \(d\ge 0\),
-\[
-\PP\!\left[
-\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d
-\middle| \wt(U)=h
-\right]
-\le
-\sum_{S=h}^{N}
-\frac{\binom{S-1}{h-1}}{\binom{N}{h}}\,
-\PP[\Binomial(S,\tfrac12)\le d].
-\]
-\end{lemma}
-
-\begin{proof}
-Condition on the first input-one position \(\tau=t\), and put \(S=N-t+1\). The bit \(y_t\) is deterministically \(1\),
-because the encoder is still \(\OFF\) before the first input one. On \(\mathcal{S}_{\mathrm{fin}}\), the remaining
-outputs \(y_{t+1},\dots,y_N\) stay on a surviving ON episode. By the same stochastic-domination argument as
-Lemma~\ref{lem:fixedtap-surviving-episode-tail}, the suffix output weight
-\(\sum_{i=t}^{N}Y_i\) dominates \(\Binomial(S,\tfrac12)\) in the lower-tail direction. Hence, for this fixed value of
-\(t\),
-\[
-\PP[\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d\mid U,\tau=t]
-\le
-\PP[\Binomial(S,\tfrac12)\le d].
-\]
-Finally, under the uniform weight-\(h\) law,
-\[
-\PP[S(U)=S\mid \wt(U)=h]
-=
-\frac{\binom{S-1}{h-1}}{\binom{N}{h}},
-\]
-since the first one is at position \(N-S+1\) and the remaining \(h-1\) ones are chosen from the later \(S-1\) positions.
-Averaging over \(S\) proves the claim.
-\end{proof}
-
 \begin{lemma}[ON$\to$OFF requires an $m$-run of zeros in the output]
 \label{lem:dense-off-requires-mzeros}
 If $\OFF_q$ holds at some time $q\ge 2$, then the preceding $m$ outputs are all zero:
@@ -270,34 +228,9 @@ last output time in \(I\) is at most
 
 \begin{proof}
 By Lemma~\ref{lem:fixedtap-termination-needs-input-one}, a transition with last output time \(t\) requires \(u_t=1\)
-and \(s_t=(1,0,\dots,0)\). For a fixed such \(t\), the state condition requires the preceding \(m-1\) outputs after
-the leading \(1\) in the state to be zero. None of these zero outputs can be produced from the critical state without
-having already terminated earlier: if the input is zero, the critical state forces output \(1\); if the input is one,
-the critical state would terminate. Hence those \(m-1\) zero outputs occur at free times. Applying
-Lemma~\ref{lem:dense-on-time-domination} to those predictable free times gives probability at most \(2^{-(m-1)}\).
-Union bound over the input-one positions in \(I\).
-\end{proof}
-
-\begin{lemma}[Fixed-tap episode budget]
-\label{lem:fixedtap-episode-budget}
-For a fixed input-output trajectory of the fixed-tap dense recursive inner, let
-\[
-S:=|\{t:\OFF_t,\ \ON_{t+1}\}|,
-\qquad
-D:=|\{t:\ON_t,\ \OFF_{t+1}\}|
-\]
-be the number of genuine starts and genuine terminations inside the block. Then
-\[
-S+D \le \wt(U).
-\]
-Moreover, each termination time is an input-one position that is not a start time.
-\end{lemma}
-
-\begin{proof}
-If \(\OFF_t\) and \(\ON_{t+1}\), then \(s_t=0\), so \(y_t=u_t\). Therefore a genuine start requires \(u_t=1\).
-If \(\ON_t\) and \(\OFF_{t+1}\), Lemma~\ref{lem:fixedtap-termination-needs-input-one} gives \(u_t=1\) as well.
-The two cases are disjoint at a fixed time \(t\), since \(s_t\) cannot be both zero and nonzero. Thus starts and
-terminations inject into disjoint subsets of the support of \(U\), proving \(S+D\le \wt(U)\).
+and \(s_t=(1,0,\dots,0)\). For fixed \(t\), this imposes \(m-1\) predictable free-time zero constraints after the
+leading state one, so Lemma~\ref{lem:dense-on-time-domination} gives probability at most \(2^{-(m-1)}\). Union bound
+over the input-one positions in \(I\).
 \end{proof}
 
 \begin{lemma}[One fixed-tap episode can terminate only at later input ones]
@@ -319,62 +252,6 @@ By Lemma~\ref{lem:fixedtap-termination-needs-input-one}, a termination whose las
 \(\{i+1,\dots,i+L\}\) must be aligned with an input-one position in that interval. There are \(B_i(u;L)\) such
 positions. For each fixed candidate, Lemma~\ref{lem:fixedtap-termination-candidates} gives probability at most
 \(2^{-(m-1)}\), and the claim follows by a union bound.
-\end{proof}
-
-\begin{lemma}[Fixed-tap multi-candidate termination bound]
-\label{lem:fixedtap-multicandidate-termination}
-Fix an input word \(u\), and fix \(r\) distinct input-one positions
-\[
-t_1<\cdots<t_r.
-\]
-The probability that all \(r\) of these positions are genuine fixed-tap termination times is at most
-\[
-2^{-r(m-1)}.
-\]
-\end{lemma}
-
-\begin{proof}
-Expose the trajectory from left to right. At a genuine fixed-tap termination time \(t_a\),
-Lemma~\ref{lem:fixedtap-termination-needs-input-one} forces the state just before output \(t_a\) to be
-\((1,0,\dots,0)\). Equivalently, after the leading \(1\) in the state, the next \(m-1\) relevant outputs must be zero
-while the encoder is not already terminated. These are free-time zero constraints in the sense of
-Lemma~\ref{lem:dense-on-time-domination}, except on histories where the requested termination pattern is already
-impossible. Thus, conditional on any past compatible with the earlier requested terminations, the next requested
-termination costs at most \(2^{-(m-1)}\). Multiplying over \(a=1,\dots,r\) gives the claim.
-\end{proof}
-
-\begin{corollary}[Isolated fixed-tap termination candidates are pair-controlled]
-\label{cor:fixedtap-isolated-pair-candidates}
-Let \(U\) be uniform on the isolated slice \(\{\wt(U)=h,\ R(U)=h\}\). Let
-\[
-\mathcal{P}_L(U)
-:=
-|\{(i,j): i<j,\ U_i=U_j=1,\ j-i\le L\}|
-\]
-be the number of isolated input-one pairs with separation at most \(L\). Then
-\[
-\EE[\mathcal{P}_L(U)\mid \wt(U)=h,\ R(U)=h]
-\le
-\binom{h}{2}\frac{2L}{N-h}.
-\]
-Consequently, the expected number of possible within-\(L\) fixed-tap termination candidates over all isolated starts is
-bounded by the same quantity.
-\end{corollary}
-
-\begin{proof}
-On the isolated slice, write the support positions as
-\[
-1\le x_1<\cdots<x_h\le N,
-\qquad x_{a+1}-x_a\ge 2.
-\]
-The shifted coordinates \(z_a:=x_a-(a-1)\) form a uniformly random \(h\)-subset of \([M]\), where \(M=N-h+1\). For any
-unordered pair of selected shifted coordinates, the probability that their distance is at most \(L\) is at most
-\[
-\frac{ML}{\binom{M}{2}}\le \frac{2L}{M-1}=\frac{2L}{N-h},
-\]
-because there are at most \(ML\) unordered pairs in \([M]\) with separation at most \(L\). Since
-\(x_b-x_a=(z_b-z_a)+(b-a)\), the event \(x_b-x_a\le L\) is contained in \(z_b-z_a\le L\). Linearity of expectation
-then proves the displayed bound.
 \end{proof}
 
 % ============================================================

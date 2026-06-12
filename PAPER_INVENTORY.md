@@ -40,6 +40,10 @@ The scalar dense inner section has begun its proof-facing compression pass:
 the run-tail exponent proof is now shorter in the compiled spine, the
 monotonicity sign in that proof has been corrected, and the expanded Stirling
 calculation is preserved in `explorations/scalar_dense_inner_refinements.tex`.
+Unused fixed-tap finite-diagnostic bookkeeping lemmas have also been moved out
+of `innerDenseScalar.tex`; exact final-survivor averaging, episode budgeting,
+multi-candidate termination, and isolated-pair candidate counts now live in the
+same scalar dense-inner refinement note.
 
 ## Status Labels
 

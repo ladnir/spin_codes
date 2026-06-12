@@ -60,6 +60,113 @@ which is negative for \(\sigma<\omega(1-\omega)\).  Hence the largest summand in
 N^{O(1)}2^{-N\Psi_{\rm run}(\omega,\rho)}.
 \]
 
+\subsection{Demoted fixed-tap candidate bookkeeping}
+
+The following fixed-tap lemmas are useful for finite scalar diagnostics and for the older isolated-slice correction
+program, but they are not consumed by the current random sliding dense asymptotic theorem. They were therefore moved out
+of the compiled scalar dense spine during the cleanup pass.
+
+\begin{lemma}[Exact final-survivor suffix average]
+\label{lem:fixedtap-final-survivor-suffix}
+Let \(U\) be uniform on the weight-\(h\) slice of \(\{0,1\}^N\), and let
+\[
+\tau(U):=\min\supp(U),\qquad S(U):=N-\tau(U)+1.
+\]
+Let \(\mathcal{S}_{\mathrm{fin}}\) be the event that the ON episode started by the first input one survives through the
+end of the block. Then, for every \(d\ge 0\),
+\[
+\PP\!\left[
+\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d
+\middle| \wt(U)=h
+\right]
+\le
+\sum_{S=h}^{N}
+\frac{\binom{S-1}{h-1}}{\binom{N}{h}}\,
+\PP[\Binomial(S,\tfrac12)\le d].
+\]
+\end{lemma}
+
+\begin{proof}
+Condition on the first input-one position \(\tau=t\), and put \(S=N-t+1\). The first output is deterministically one,
+and on \(\mathcal{S}_{\mathrm{fin}}\) the remaining suffix stays on a surviving ON episode, so the suffix lower tail is
+bounded by the corresponding fair-coin tail. Under the uniform weight-\(h\) law,
+\[
+\PP[S(U)=S\mid \wt(U)=h]=\frac{\binom{S-1}{h-1}}{\binom{N}{h}},
+\]
+and averaging over \(S\) gives the displayed bound.
+\end{proof}
+
+\begin{lemma}[Fixed-tap episode budget]
+\label{lem:fixedtap-episode-budget}
+For a fixed input-output trajectory of the fixed-tap dense recursive inner, let
+\[
+S:=|\{t:\OFF_t,\ \ON_{t+1}\}|,
+\qquad
+D:=|\{t:\ON_t,\ \OFF_{t+1}\}|
+\]
+be the number of genuine starts and genuine terminations inside the block. Then
+\[
+S+D \le \wt(U).
+\]
+Moreover, each termination time is an input-one position that is not a start time.
+\end{lemma}
+
+\begin{proof}
+Both a genuine start and a genuine termination require \(u_t=1\); the termination statement follows from
+Lemma~\ref{lem:fixedtap-termination-needs-input-one}. The two cases are disjoint at a fixed time because \(s_t\)
+cannot be both zero and nonzero.
+\end{proof}
+
+\begin{lemma}[Fixed-tap multi-candidate termination bound]
+\label{lem:fixedtap-multicandidate-termination}
+Fix an input word \(u\), and fix \(r\) distinct input-one positions
+\[
+t_1<\cdots<t_r.
+\]
+The probability that all \(r\) of these positions are genuine fixed-tap termination times is at most
+\[
+2^{-r(m-1)}.
+\]
+\end{lemma}
+
+\begin{proof}
+Expose the trajectory from left to right. Each requested termination imposes \(m-1\) predictable free-time zero
+constraints after the leading one in the critical state, unless the requested pattern is already impossible. By
+Lemma~\ref{lem:dense-on-time-domination}, each requested termination costs at most \(2^{-(m-1)}\) conditional on the
+compatible past. Multiplying over the \(r\) requested positions gives the claim.
+\end{proof}
+
+\begin{corollary}[Isolated fixed-tap termination candidates are pair-controlled]
+\label{cor:fixedtap-isolated-pair-candidates}
+Let \(U\) be uniform on the isolated slice \(\{\wt(U)=h,\ R(U)=h\}\). Let
+\[
+\mathcal{P}_L(U)
+:=
+|\{(i,j): i<j,\ U_i=U_j=1,\ j-i\le L\}|
+\]
+be the number of isolated input-one pairs with separation at most \(L\). Then
+\[
+\EE[\mathcal{P}_L(U)\mid \wt(U)=h,\ R(U)=h]
+\le
+\binom{h}{2}\frac{2L}{N-h}.
+\]
+Consequently, the expected number of possible within-\(L\) fixed-tap termination candidates over all isolated starts is
+bounded by the same quantity.
+\end{corollary}
+
+\begin{proof}
+On the isolated slice, write the support positions as
+\[
+1\le x_1<\cdots<x_h\le N,\qquad x_{a+1}-x_a\ge 2.
+\]
+The shifted coordinates \(z_a:=x_a-(a-1)\) form a uniformly random \(h\)-subset of \([M]\), where \(M=N-h+1\). For any
+unordered pair of selected shifted coordinates, the probability that their distance is at most \(L\) is at most
+\[
+\frac{ML}{\binom{M}{2}}\le \frac{2L}{M-1}=\frac{2L}{N-h}.
+\]
+Since \(x_b-x_a\le L\) implies \(z_b-z_a\le L\), linearity of expectation proves the displayed bound.
+\end{proof}
+
 \subsection{Gap, isolated-slice, and paired-cover refinements}
 \begin{lemma}[Gap composition conditioned on weight and run count]
 \label{lem:gap-composition-given-runs}
