@@ -192,27 +192,17 @@ The checked \(h\ge501\) row families included in the finite ledger have union-bo
 \log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}
 \le -182.259739.
 \]
-The row families are
-\[
-\begin{array}{c|c}
-\text{row family} & \log_2\text{ contribution}\\
-\hline
-501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
-501\le h\le380736,\ T<5949\ \text{ultra-late placement rows} & -545.690526\\
-501\le h\le75000,\ T>17948\ \text{early endpoint rows} & -380.829185\\
-75001\le h\le350000,\ T>17948\ \text{accelerated endpoint rows} & -1056.187188\\
-350001\le h\le N/2,\ T>17948\ \text{paired accelerated rows} & -98386.449256\\
-2001\le h\le1148736\ \text{fixed-pole intervals} & -586.597103\\
-1048577\le h\le N\ \text{complement-high intervals} & -35150.097366 .
-\end{array}
-\]
-Overlaps between row families are retained only as harmless union-bound overcount.
+The dominant post-prefix row is the \(501\le h\le2000\) all-episode wrapper.  The remaining audited families cover
+ultra-late placements, early endpoint rows, accelerated endpoint rows, paired accelerated rows, fixed-pole intervals,
+and the complement-high range.  The full row table is preserved in the full-split exploration note and in the audit
+packet.  Overlaps between row families are retained only as harmless union-bound overcount.
 \end{corollary}
 
 \begin{proof}
 The manifest checks that these row families cover the post-prefix regimes used by the certificate: ultra-late placements,
 late-window all-episode/fixed-pole intervals, early endpoint and paired endpoint intervals through \(N/2\), and the
-complement-high region.  The displayed total is the log-sum of the audited row contributions.
+complement-high region.  The displayed total is the log-sum of the audited row contributions, whose maximum is the
+\(-182.259739\)-bit all-episode wrapper row.
 \end{proof}
 
 \begin{corollary}[Current finite first-moment checkpoint]

@@ -30,6 +30,10 @@ forced-termination contraction, and packaged inner envelopes.
 The random sliding outer has likewise been tightened: fixed-tap tiny-weight
 facts now live in `explorations/random_sliding_outer_low_weight_notes.tex`, and
 `outerDense.tex` keeps only the theorem-facing span law and spectrum envelopes.
+The structured local-code section now treats the finite RM/EBCH result as a
+certificate theorem: the main spine keeps the certificate inputs, prefix and
+post-prefix totals, and final first-moment theorem, while detailed post-prefix
+row tables remain in the full-split exploration/audit notes.
 
 ## Summary
 
@@ -370,6 +374,9 @@ The first physical split is complete:
    integration now live in `explorations/scalar_dense_inner_refinements.tex`.
 8. Random sliding outer tiny-weight diagnostics now live in
    `explorations/random_sliding_outer_low_weight_notes.tex`.
+9. Structured local-code post-prefix row details are delegated to the
+   full-split exploration/audit notes; the main spine keeps compact audited
+   totals and row-cover categories.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
@@ -377,7 +384,7 @@ Remaining cleanup is proof-facing polish, not the initial physical split:
   the long ON/OFF lemma chain;
 - shorten dense outer proof machinery further only if the main paper remains
   too long;
-- harden finite-certificate row explanations and manifests for external audit;
+- harden finite-certificate manifests for external audit;
 - replace BCH projections with exact spectra or rigorous envelopes before any
   theorem upgrade.
 

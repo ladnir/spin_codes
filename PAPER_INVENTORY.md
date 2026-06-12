@@ -25,6 +25,10 @@ The random sliding outer section has also been trimmed so fixed-tap tiny-weight
 diagnostics live in `explorations/random_sliding_outer_low_weight_notes.tex`;
 the compiled `outerDense.tex` now keeps the span generating law, geometric
 spectrum envelope, and linear-weight exponent used by `integrationDense.tex`.
+The structured local-code certificate section has been tightened so the main
+paper states the RM/EBCH finite certificate and compact row-cover facts, while
+the full post-prefix row table remains in
+`explorations/fullsplit_certificate_development.tex` and the audit packet.
 
 ## Status Labels
 
