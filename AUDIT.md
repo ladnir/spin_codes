@@ -114,10 +114,24 @@ Expected key outputs:
 prefix_interior_audit_rows,1500
 prefix_interior_audit_worst,bucket=gap_8001_12000,H=75,diff=2.19205276153e-09,T=13949
 late_prefix_T_lt_5949_cap_log2,-40.115431
+exact_outer_local_nonzero_terms,106
+exact_outer_local_min_positive,32
+exact_outer_local_first_positive,32;48;56;60;64;68;72;76;80
+exact_outer_coefficient_build_exponent,4096
+exact_outer_coefficient_build_multiply_steps,1
+exact_outer_coefficient_build_square_steps,12
+exact_outer_coefficient_build_max_coefficient_bits,663
+exact_outer_coefficient_build_max_coefficient_weight,500
+exact_outer_support_count,115
 exact_outer_support_positive_count,114
 exact_outer_support_min_positive,32
 exact_outer_support_next_positive_after_min,48
+exact_outer_support_zero_prefix,1--31
+exact_outer_support_gap_after_min,33--47
 exact_outer_support_first_positive,32;48;56;60;64;68;72;76;80
+exact_outer_support_split_h,32
+exact_outer_support_split_coefficient_bits,38
+exact_outer_support_next_coefficient_bits,52
 late_prefix_T_lt_5949_exact_outer_log2,-41.113442
 late_prefix_T_lt_5949_exact_outer_split_log2,-41.113442
 late_prefix_T_lt_5949_exact_outer_above_split_log2,-66.416502
@@ -200,10 +214,24 @@ python scripts\certify_rm_outer_prefix_exact.py --ledger-csv scripts\fullsplit_p
 Key output:
 
 ```text
+local_nonzero_terms,106
+local_min_positive,32
+local_first_positive,32;48;56;60;64;68;72;76;80
+coefficient_build_exponent,4096
+coefficient_build_multiply_steps,1
+coefficient_build_square_steps,12
+coefficient_build_max_coefficient_bits,663
+coefficient_build_max_coefficient_weight,500
+support_count,115
 support_positive_count,114
 support_min_positive,32
 support_next_positive_after_min,48
+support_zero_prefix,1--31
+support_gap_after_min,33--47
 support_first_positive,32;48;56;60;64;68;72;76;80
+support_split_h,32
+support_split_coefficient_bits,38
+support_next_coefficient_bits,52
 late_prefix_exact_log2,-41.113442
 late_prefix_exact_split_log2,-41.113442
 late_prefix_exact_above_split_log2,-66.416502
@@ -219,6 +247,9 @@ Interpretation: the current live finite prefix is exact-support dominated by
 `h=32`, with the next possible weight only at `h=48`. The checked window split
 is `-37.383482` bits from `h=32` and `-50.738253` bits from all supported
 `h>32`; the checked ultra-late split is `-41.113442` and `-66.416502`.
+The exact coefficient build has one multiply step and twelve squaring steps
+for the `4096=2^12` direct sum, so the support gap is a finite integer
+polynomial statement rather than a floating Cauchy-envelope observation.
 The old adjacent `h=33,34,...` ridge below is a useful diagnostic for the
 smoothed Cauchy outer envelope, but it is not the current bottleneck once the
 exact RM direct-sum support is used.

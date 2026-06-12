@@ -61,17 +61,105 @@ def truncated_convolution(a: list[int], b: list[int], h_max: int) -> list[int]:
     return out
 
 
-def direct_sum_coefficients(local: list[int], *, blocks: int, h_max: int) -> list[int]:
+@dataclass(frozen=True)
+class CoefficientBuildTrace:
+    exponent: int
+    multiply_steps: int
+    square_steps: int
+    max_coefficient_bits: int
+    max_coefficient_weight: int
+
+
+@dataclass(frozen=True)
+class PrefixCoefficientCertificate:
+    coeffs: list[int]
+    blocks: int
+    h_max: int
+    local_nonzero_terms: int
+    local_min_positive: int
+    local_first_positive_le_80: list[int]
+    trace: CoefficientBuildTrace
+    support_count: int
+    positive_count: int
+    min_positive: int
+    next_positive_after_min: int
+    first_positive_le_80: list[int]
+    zero_prefix_stop: int
+    gap_after_min_start: int
+    gap_after_min_stop: int
+    split_h: int
+    split_coefficient_bits: int
+    next_coefficient_bits: int
+
+
+def direct_sum_coefficients_with_trace(
+    local: list[int],
+    *,
+    blocks: int,
+    h_max: int,
+) -> tuple[list[int], CoefficientBuildTrace]:
     poly = [1] + [0] * h_max
     base = local
     exponent = blocks
+    multiply_steps = 0
+    square_steps = 0
     while exponent:
         if exponent & 1:
             poly = truncated_convolution(poly, base, h_max)
+            multiply_steps += 1
         exponent >>= 1
         if exponent:
             base = truncated_convolution(base, base, h_max)
-    return poly
+            square_steps += 1
+    max_weight, max_coeff = max(enumerate(poly), key=lambda item: item[1].bit_length())
+    trace = CoefficientBuildTrace(
+        exponent=blocks,
+        multiply_steps=multiply_steps,
+        square_steps=square_steps,
+        max_coefficient_bits=max_coeff.bit_length(),
+        max_coefficient_weight=max_weight,
+    )
+    return poly, trace
+
+
+def direct_sum_coefficients(local: list[int], *, blocks: int, h_max: int) -> list[int]:
+    coeffs, _trace = direct_sum_coefficients_with_trace(local, blocks=blocks, h_max=h_max)
+    return coeffs
+
+
+def prefix_coefficient_certificate(
+    local: list[int],
+    *,
+    blocks: int,
+    h_max: int,
+) -> PrefixCoefficientCertificate:
+    coeffs, trace = direct_sum_coefficients_with_trace(local, blocks=blocks, h_max=h_max)
+    positive = positive_support(coeffs, h_max)
+    if len(positive) < 2:
+        raise SystemExit("exact RM prefix: need at least two positive weights")
+    local_positive = positive_support(local, h_max)
+    if not local_positive:
+        raise SystemExit("exact RM prefix: local spectrum has no positive support")
+    return PrefixCoefficientCertificate(
+        coeffs=coeffs,
+        blocks=blocks,
+        h_max=h_max,
+        local_nonzero_terms=sum(1 for coeff in local if coeff),
+        local_min_positive=local_positive[0],
+        local_first_positive_le_80=[h for h in local_positive if h <= 80],
+        trace=trace,
+        support_count=sum(1 for coeff in coeffs if coeff),
+        positive_count=len(positive),
+        min_positive=positive[0],
+        next_positive_after_min=positive[1],
+        first_positive_le_80=[h for h in positive if h <= 80],
+        zero_prefix_stop=positive[0] - 1,
+        gap_after_min_start=positive[0] + 1,
+        gap_after_min_stop=positive[1] - 1,
+        split_h=positive[0],
+        split_coefficient_bits=coeffs[positive[0]].bit_length(),
+        next_coefficient_bits=coeffs[positive[1]].bit_length(),
+    )
 
 
 @dataclass(frozen=True)
@@ -244,19 +332,30 @@ def main() -> int:
     args = parser.parse_args()
 
     local = load_local_spectrum(args.local_spectrum_csv, args.h_max)
-    coeffs = direct_sum_coefficients(local, blocks=args.blocks, h_max=args.h_max)
-    support = [h for h, coeff in enumerate(coeffs) if coeff]
-    positive = positive_support(coeffs, args.h_max)
+    cert = prefix_coefficient_certificate(local, blocks=args.blocks, h_max=args.h_max)
+    coeffs = cert.coeffs
     print("Exact RM outer prefix")
     print(f"local_spectrum_csv,{args.local_spectrum_csv}")
     print(f"blocks,{args.blocks}")
     print(f"h_max,{args.h_max}")
-    print(f"support_count,{len(support)}")
-    print(f"support_positive_count,{len(positive)}")
-    print(f"support_min_positive,{positive[0]}")
-    if len(positive) > 1:
-        print(f"support_next_positive_after_min,{positive[1]}")
-    print(f"support_first_positive,{';'.join(str(h) for h in positive if h <= 80)}")
+    print(f"local_nonzero_terms,{cert.local_nonzero_terms}")
+    print(f"local_min_positive,{cert.local_min_positive}")
+    print(f"local_first_positive,{';'.join(str(h) for h in cert.local_first_positive_le_80)}")
+    print(f"coefficient_build_exponent,{cert.trace.exponent}")
+    print(f"coefficient_build_multiply_steps,{cert.trace.multiply_steps}")
+    print(f"coefficient_build_square_steps,{cert.trace.square_steps}")
+    print(f"coefficient_build_max_coefficient_bits,{cert.trace.max_coefficient_bits}")
+    print(f"coefficient_build_max_coefficient_weight,{cert.trace.max_coefficient_weight}")
+    print(f"support_count,{cert.support_count}")
+    print(f"support_positive_count,{cert.positive_count}")
+    print(f"support_min_positive,{cert.min_positive}")
+    print(f"support_next_positive_after_min,{cert.next_positive_after_min}")
+    print(f"support_zero_prefix,1--{cert.zero_prefix_stop}")
+    print(f"support_gap_after_min,{cert.gap_after_min_start}--{cert.gap_after_min_stop}")
+    print(f"support_first_positive,{';'.join(str(h) for h in cert.first_positive_le_80)}")
+    print(f"support_split_h,{cert.split_h}")
+    print(f"support_split_coefficient_bits,{cert.split_coefficient_bits}")
+    print(f"support_next_coefficient_bits,{cert.next_coefficient_bits}")
 
     late = exact_late_prefix_sum(
         coeffs,

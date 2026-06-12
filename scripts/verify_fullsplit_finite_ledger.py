@@ -20,10 +20,9 @@ from pathlib import Path
 
 from certify_prefix_placement_ratio import certify_placement_ratio
 from certify_rm_outer_prefix_exact import (
-    direct_sum_coefficients,
     exact_late_prefix_sum,
     load_local_spectrum,
-    positive_support,
+    prefix_coefficient_certificate,
     reweighted_ledger_sum,
 )
 
@@ -1048,27 +1047,83 @@ def main() -> int:
         peak=late_peak,
     )
 
-    exact_outer_coeffs = direct_sum_coefficients(
+    exact_outer_certificate = prefix_coefficient_certificate(
         load_local_spectrum(args.exact_outer_local_spectrum_csv, args.exact_outer_h_max),
         blocks=args.exact_outer_blocks,
         h_max=args.exact_outer_h_max,
     )
-    exact_support = positive_support(exact_outer_coeffs, args.exact_outer_h_max)
-    if len(exact_support) < 2 or exact_support[0] != 32 or exact_support[1] != 48:
+    exact_outer_coeffs = exact_outer_certificate.coeffs
+    exact_support = exact_outer_certificate.first_positive_le_80
+    if exact_outer_certificate.min_positive != 32 or exact_outer_certificate.next_positive_after_min != 48:
         raise SystemExit(
             "exact RM support: expected first positive weights 32,48; "
-            f"got {exact_support[:2]}"
+            f"got {exact_outer_certificate.min_positive},"
+            f"{exact_outer_certificate.next_positive_after_min}"
+        )
+    if exact_outer_certificate.zero_prefix_stop != 31:
+        raise SystemExit(
+            "exact RM support: expected zero prefix through h=31; "
+            f"got h={exact_outer_certificate.zero_prefix_stop}"
+        )
+    if (exact_outer_certificate.gap_after_min_start, exact_outer_certificate.gap_after_min_stop) != (33, 47):
+        raise SystemExit(
+            "exact RM support: expected gap h=33--47; "
+            f"got {exact_outer_certificate.gap_after_min_start}--"
+            f"{exact_outer_certificate.gap_after_min_stop}"
         )
     manifest["checks"]["exact_outer_support"] = {  # type: ignore[index]
-        "positive_count": len(exact_support),
-        "min_positive": exact_support[0],
-        "next_positive_after_min": exact_support[1],
-        "first_positive_le_80": [h for h in exact_support if h <= 80],
+        "local_nonzero_terms": exact_outer_certificate.local_nonzero_terms,
+        "local_min_positive": exact_outer_certificate.local_min_positive,
+        "local_first_positive_le_80": exact_outer_certificate.local_first_positive_le_80,
+        "coefficient_build_exponent": exact_outer_certificate.trace.exponent,
+        "coefficient_build_multiply_steps": exact_outer_certificate.trace.multiply_steps,
+        "coefficient_build_square_steps": exact_outer_certificate.trace.square_steps,
+        "coefficient_build_max_coefficient_bits": exact_outer_certificate.trace.max_coefficient_bits,
+        "coefficient_build_max_coefficient_weight": exact_outer_certificate.trace.max_coefficient_weight,
+        "support_count": exact_outer_certificate.support_count,
+        "positive_count": exact_outer_certificate.positive_count,
+        "min_positive": exact_outer_certificate.min_positive,
+        "next_positive_after_min": exact_outer_certificate.next_positive_after_min,
+        "zero_prefix": [1, exact_outer_certificate.zero_prefix_stop],
+        "gap_after_min": [
+            exact_outer_certificate.gap_after_min_start,
+            exact_outer_certificate.gap_after_min_stop,
+        ],
+        "first_positive_le_80": exact_outer_certificate.first_positive_le_80,
+        "split_h": exact_outer_certificate.split_h,
+        "split_coefficient_bits": exact_outer_certificate.split_coefficient_bits,
+        "next_coefficient_bits": exact_outer_certificate.next_coefficient_bits,
     }
-    print(f"exact_outer_support_positive_count,{len(exact_support)}")
-    print(f"exact_outer_support_min_positive,{exact_support[0]}")
-    print(f"exact_outer_support_next_positive_after_min,{exact_support[1]}")
-    print(f"exact_outer_support_first_positive,{';'.join(str(h) for h in exact_support if h <= 80)}")
+    print(f"exact_outer_local_nonzero_terms,{exact_outer_certificate.local_nonzero_terms}")
+    print(f"exact_outer_local_min_positive,{exact_outer_certificate.local_min_positive}")
+    print(
+        "exact_outer_local_first_positive,"
+        f"{';'.join(str(h) for h in exact_outer_certificate.local_first_positive_le_80)}"
+    )
+    print(f"exact_outer_coefficient_build_exponent,{exact_outer_certificate.trace.exponent}")
+    print(f"exact_outer_coefficient_build_multiply_steps,{exact_outer_certificate.trace.multiply_steps}")
+    print(f"exact_outer_coefficient_build_square_steps,{exact_outer_certificate.trace.square_steps}")
+    print(
+        "exact_outer_coefficient_build_max_coefficient_bits,"
+        f"{exact_outer_certificate.trace.max_coefficient_bits}"
+    )
+    print(
+        "exact_outer_coefficient_build_max_coefficient_weight,"
+        f"{exact_outer_certificate.trace.max_coefficient_weight}"
+    )
+    print(f"exact_outer_support_count,{exact_outer_certificate.support_count}")
+    print(f"exact_outer_support_positive_count,{exact_outer_certificate.positive_count}")
+    print(f"exact_outer_support_min_positive,{exact_outer_certificate.min_positive}")
+    print(f"exact_outer_support_next_positive_after_min,{exact_outer_certificate.next_positive_after_min}")
+    print(f"exact_outer_support_zero_prefix,1--{exact_outer_certificate.zero_prefix_stop}")
+    print(
+        "exact_outer_support_gap_after_min,"
+        f"{exact_outer_certificate.gap_after_min_start}--{exact_outer_certificate.gap_after_min_stop}"
+    )
+    print(f"exact_outer_support_first_positive,{';'.join(str(h) for h in exact_support)}")
+    print(f"exact_outer_support_split_h,{exact_outer_certificate.split_h}")
+    print(f"exact_outer_support_split_coefficient_bits,{exact_outer_certificate.split_coefficient_bits}")
+    print(f"exact_outer_support_next_coefficient_bits,{exact_outer_certificate.next_coefficient_bits}")
     exact_late_prefix = exact_late_prefix_sum(
         exact_outer_coeffs,
         n=args.N,

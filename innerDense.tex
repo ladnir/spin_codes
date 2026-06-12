@@ -3091,7 +3091,11 @@ The integer-truncated coefficient certificate through \(h\le500\) verifies that 
 \[
 32,\ 48,\ 56,\ 60,\ 64,\ldots,
 \]
-and has \(114\) positive supported weights in \(1\le h\le500\).  Replacing the smoothed outer rows in the audited
+has no positive weight below \(32\), has no positive weight in \(33\le h\le47\), and has \(114\) positive supported
+weights in \(1\le h\le500\).  The coefficient build uses exact truncated polynomial exponentiation: for the present
+\(4096=2^{12}\) direct sum, the certificate records one multiply step and twelve squaring steps.  The \(h=32\)
+coefficient has \(38\) bits, while the next supported coefficient at \(h=48\) has \(52\) bits.  Replacing the smoothed
+outer rows in the audited
 \(32\le h\le500\) ledgers by the exact coefficients \(A_h^{\rm RM}\) gives
 \[
 \begin{array}{c|ccc}
