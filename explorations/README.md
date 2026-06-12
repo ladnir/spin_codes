@@ -5,6 +5,7 @@ Nothing has been deleted: the original source files remain at the repository roo
 landing points for later splitting/polish.
 
 - `scalar_dense_finite_diagnostics.tex`: dense-band finite diagnostics and working-save-point material.
+- `scalar_dense_inner_refinements.tex`: positional, isolated-slice, paired-cover, and OFF-budget dense-inner refinements.
 - `accumulator_warmup_notes.tex`: optional accumulator sharpness improvements and non-main TODOs.
 - `fullsplit_certificate_development.tex`: preserved full-split finite-certificate development ledger.
 - `block_recursive_bch_inner.tex`: prospective block-recursive BCH inner.

@@ -16,6 +16,11 @@ A follow-up cleanup pass removed the accumulator TODO subsection from the
 compiled main path and preserved it in
 `explorations/accumulator_warmup_notes.tex`; it also renamed the dense
 integration and structured local-code sections to match the intended paper flow.
+A second spine-tightening pass moved scalar dense-inner positional refinements
+out of `innerDenseScalar.tex` and into
+`explorations/scalar_dense_inner_refinements.tex`, leaving the compiled dense
+inner section focused on the theorem-facing envelopes consumed by
+`integrationDense.tex`.
 
 ## Status Labels
 
@@ -194,6 +199,9 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
   - old fixed-tap dense finite scans;
   - isolated-slice and early-pair diagnostics;
   - sigma-margin scans and scalar proof-target notes.
+- `explorations/scalar_dense_inner_refinements.tex`
+  - exact gap-composition laws, isolated-slice order statistics, paired-cover
+    bounds, and linear OFF-budget refinements moved out of the compiled spine.
 - `explorations/accumulator_warmup_notes.tex`
   - optional accumulator sharpness improvements and non-main TODOs.
 - `explorations/fullsplit_certificate_development.tex`

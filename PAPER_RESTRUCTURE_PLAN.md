@@ -22,6 +22,11 @@ compiled spine: the accumulator TODOs now live in
 named around the random sliding dense construction, and the local-code section
 explicitly separates the checked RM/EBCH certificate from spectrum-model
 projections.
+The scalar dense inner has also been tightened: positional refinements that are
+not consumed by the analytic theorem now live in
+`explorations/scalar_dense_inner_refinements.tex`, while
+`innerDenseScalar.tex` keeps the ON/OFF lemmas, run-tail exponent,
+forced-termination contraction, and packaged inner envelopes.
 
 ## Summary
 
@@ -358,11 +363,13 @@ The first physical split is complete:
    `innerSparse.tex`.
 6. The accumulator warmup no longer exposes its optional TODO list in the main
    paper; those notes live in `explorations/accumulator_warmup_notes.tex`.
+7. Scalar dense-inner refinement lemmas not needed by the theorem-facing
+   integration now live in `explorations/scalar_dense_inner_refinements.tex`.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
-- tighten the long scalar dense inner section into a theorem-plus-appendix
-  shape;
+- continue compressing the scalar dense inner proof presentation, especially
+  the long ON/OFF lemma chain;
 - shorten dense outer proof machinery if the main paper remains too long;
 - harden finite-certificate row explanations and manifests for external audit;
 - replace BCH projections with exact spectra or rigorous envelopes before any
