@@ -4212,10 +4212,13 @@ the ultra-late placement cap for \(h>500\).  Since \(64\cdot5949=380736\), no ul
 the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row is the paired-\(T\) extension for
 \(350001\le h\le N/2\).  The verifier checks that these accelerated early intervals form a contiguous cover
 \(75001,\ldots,N/2\), split into seven endpoint-helper rows on \(75001,\ldots,350000\) and three paired-helper rows on
-\(350001,\ldots,N/2\), with no gap or overlap.  The sixth row is the fixed-pole interval table through the feasible far-bucket cutoff
-\(h=1148736\).  The seventh row is the complement-side high-density table.  The last two row families overlap on
-\(1048577\le h\le1148736\); the ledger deliberately keeps this harmless overcount as a union bound.  Therefore the
-combined contribution is bounded by
+\(350001,\ldots,N/2\), with no gap or overlap.  The verifier also checks that the ultra-late placement rows cover
+\(501,\ldots,380736=64\cdot5949\).  The sixth row is the fixed-pole interval table through the feasible far-bucket
+cutoff \(h=1148736\); its verifier entry checks a contiguous \(2001,\ldots,1148736\) cover and the common
+\(1.484774\)-bit turnoff adjustment.  The seventh row is the complement-side high-density table, checked as a
+contiguous \(1048577,\ldots,N\) cover.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger
+records this overlap and deliberately keeps it as harmless union-bound overcount.  Therefore the combined contribution
+is bounded by
 \[
 \begin{aligned}
 &\log_2\!\left(2^{-182.259739}+2^{-545.690526}+2^{-380.829185}+2^{-1056.187188}\right.\\

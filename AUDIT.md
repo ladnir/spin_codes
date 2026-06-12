@@ -149,11 +149,25 @@ prefix_32_500_e_le8_dominant_above_split_gap_bits,13.352486
 prefix_32_500_e_ge9_tail_log2,-269.335258
 prefix_32_500_e_ge9_tail_exact_outer_log2,-284.004805
 postprefix_501_2000_eall_log2,-182.259739
+high_interval_cover_status,PASS
+high_interval_cover_range,2001--1148736
+high_interval_count,15
+high_interval_turnoff_adjustment_bits,1.484774
 interval_2001_1148736_total_log2,-586.597103
+complement_high_cover_status,PASS
+complement_high_cover_range,1048577--2097152
+complement_high_interval_count,7
+high_complement_overlap_range,1048577--1148736
+high_complement_overlap_count,100160
 early_postprefix_501_75000_total_log2,-380.829185
 early_accelerated_endpoint_75001_350000_total_log2,-1056.187188
 early_accelerated_paired_350001_1048576_total_log2,-98386.449256
 early_accelerated_75001_1048576_total_log2,-1056.187188
+late_postprefix_cover_status,PASS
+late_postprefix_cover_range,501--380736
+late_postprefix_interval_count,7
+late_postprefix_feasible_cutoff_h,380736
+late_postprefix_z,0.39605985943459426
 late_postprefix_501_380736_total_log2,-545.690526
 h501_plus_checked_rows_log2,-182.259739
 finite_ledger_total_log2,-37.383345
@@ -641,6 +655,16 @@ Combined total:
 log2 mu_late_postprefix_501_380736 = -545.690526
 ```
 
+The finite-ledger verifier also checks the structural cover:
+
+```text
+late_postprefix_cover_status,PASS
+late_postprefix_cover_range,501--380736
+late_postprefix_interval_count,7
+late_postprefix_feasible_cutoff_h,380736
+late_postprefix_z,0.39605985943459426
+```
+
 Print the recomputation commands with:
 
 ```powershell
@@ -918,10 +942,19 @@ total_log2 = -35150.097366
 ```
 
 `verify_fullsplit_finite_ledger.py` now records these rows as `complement_interval_*`; the optional
-`--check-complement-high-intervals all` recomputes all seven rows and passes. Current interpretation: early
-high-density has ample numerical margin once `T` pairing, outer complement symmetry, and the fixed-`z` interval
-endpoint bound are used. The remaining work is to polish the proof prose and remove avoidable overcount/overlap with
-the older `2001--1148736` interval table.
+`--check-complement-high-intervals all` recomputes all seven rows and passes. The manifest also checks:
+
+```text
+complement_high_cover_status,PASS
+complement_high_cover_range,1048577--2097152
+complement_high_interval_count,7
+high_complement_overlap_range,1048577--1148736
+high_complement_overlap_count,100160
+```
+
+Current interpretation: early high-density has ample numerical margin once `T` pairing, outer complement symmetry,
+and the fixed-`z` interval endpoint bound are used. The overlap with the older `2001--1148736` table is deliberate
+union-bound overcount, not a gap in the cover.
 
 ### 8. Post-Prefix, All-Episode Wrapper
 
@@ -1047,6 +1080,16 @@ The cutoff `h = 1148736` is the feasibility edge for the current far bucket:
 T_max = 5949 + 12000 - 1 = 17948
 64*T_max = 1148672
 h <= H + r <= 1148672 + 64 = 1148736
+```
+
+The finite-ledger verifier checks the high interval family as a contiguous cover and records the global turnoff
+adjustment attached to every row:
+
+```text
+high_interval_cover_status,PASS
+high_interval_cover_range,2001--1148736
+high_interval_count,15
+high_interval_turnoff_adjustment_bits,1.484774
 ```
 
 Audit priority: medium. Check the endpoint placement bound, the `T_eff=max(T_min,ceil(H/b))` rule, and the sufficient

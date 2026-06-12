@@ -1,5 +1,84 @@
 {
   "checks": {
+    "complement_high_cover": {
+      "cover_range": [
+        1048577,
+        2097152
+      ],
+      "high_overlap_count": 100160,
+      "high_overlap_range": [
+        1048577,
+        1148736
+      ],
+      "interval_count": 7,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1048577:1148736:1 --lambda-value 2.3",
+          "log2": -128915.315746,
+          "range": [
+            1048577,
+            1148736
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1148737:1300000:1 --lambda-value 2.3",
+          "log2": -124889.651755,
+          "range": [
+            1148737,
+            1300000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1300001:1500000:1 --lambda-value 2.3",
+          "log2": -113710.357653,
+          "range": [
+            1300001,
+            1500000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1500001:1700000:1 --lambda-value 2.3",
+          "log2": -35150.097366,
+          "range": [
+            1500001,
+            1700000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1700001:1900000:10 --lambda-value 2.3",
+          "log2": -524628.366199,
+          "range": [
+            1700001,
+            1900000
+          ],
+          "rho": 10.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1900001:2097089:10 --lambda-value 2.3",
+          "log2": -894140.350713,
+          "range": [
+            1900001,
+            2097089
+          ],
+          "rho": 10.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 2097090:2097152:10 --lambda-value 2.3",
+          "log2": -893792.28501,
+          "range": [
+            2097090,
+            2097152
+          ],
+          "rho": 10.0
+        }
+      ],
+      "overlap_treatment": "deliberate union-bound overcount",
+      "status": "PASS"
+    },
     "early_accelerated_cover": {
       "cover_range": [
         75001,
@@ -185,6 +264,258 @@
         1,
         31
       ]
+    },
+    "high_interval_cover": {
+      "cover_range": [
+        2001,
+        1148736
+      ],
+      "interval_count": 15,
+      "intervals": [
+        {
+          "adjusted_log2": -586.597103,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+          "lambda": 0.02,
+          "range": [
+            2001,
+            7858
+          ],
+          "raw_log2": -588.081877,
+          "rho": 0.01
+        },
+        {
+          "adjusted_log2": -2655.944828,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+          "lambda": 0.05,
+          "range": [
+            7859,
+            20550
+          ],
+          "raw_log2": -2657.429602,
+          "rho": 0.03
+        },
+        {
+          "adjusted_log2": -6025.574047,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:75000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+          "lambda": 0.2,
+          "range": [
+            20551,
+            75000
+          ],
+          "raw_log2": -6027.058821,
+          "rho": 0.1
+        },
+        {
+          "adjusted_log2": -12844.868837,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 75001:250000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.5 --rhos 0.3",
+          "lambda": 0.5,
+          "range": [
+            75001,
+            250000
+          ],
+          "raw_log2": -12846.353611,
+          "rho": 0.3
+        },
+        {
+          "adjusted_log2": -28476.640541,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 250001:350000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 0.5",
+          "lambda": 1.2,
+          "range": [
+            250001,
+            350000
+          ],
+          "raw_log2": -28478.125315,
+          "rho": 0.5
+        },
+        {
+          "adjusted_log2": -81555.594538,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 350001:400000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            350001,
+            400000
+          ],
+          "raw_log2": -81557.079312,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -91421.772986,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 400001:450000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            400001,
+            450000
+          ],
+          "raw_log2": -91423.25776,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -82081.961328,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 450001:550000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            450001,
+            550000
+          ],
+          "raw_log2": -82083.446102,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -1518.493461,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 550001:650000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            550001,
+            650000
+          ],
+          "raw_log2": -1519.978235,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -116328.133946,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 650001:725000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 2",
+          "lambda": 1.2,
+          "range": [
+            650001,
+            725000
+          ],
+          "raw_log2": -116329.61872,
+          "rho": 2.0
+        },
+        {
+          "adjusted_log2": -169887.902921,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 725001:750000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            725001,
+            750000
+          ],
+          "raw_log2": -169889.387695,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -134523.58364599998,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 750001:850000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            750001,
+            850000
+          ],
+          "raw_log2": -134525.06842,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -117534.84353,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 850001:950000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            850001,
+            950000
+          ],
+          "raw_log2": -117536.328304,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -285052.550668,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 950001:1050000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            950001,
+            1050000
+          ],
+          "raw_log2": -285054.035442,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -562860.716638,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 1050001:1148736 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            1050001,
+            1148736
+          ],
+          "raw_log2": -562862.201412,
+          "rho": 3.0
+        }
+      ],
+      "status": "PASS",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    "late_postprefix_cover": {
+      "cover_range": [
+        501,
+        380736
+      ],
+      "cutoff_reason": "block_bits * late_blocks",
+      "feasible_cutoff_h": 380736,
+      "interval_count": 7,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 501:2000:0.39605985943459426",
+          "log2": -545.690526,
+          "range": [
+            501,
+            2000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 2001:7858:0.39605985943459426",
+          "log2": -2237.593414,
+          "range": [
+            2001,
+            7858
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 7859:20550:0.39605985943459426",
+          "log2": -8919.160723,
+          "range": [
+            7859,
+            20550
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 20551:75000:0.39605985943459426",
+          "log2": -23772.761808,
+          "range": [
+            20551,
+            75000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 75001:150000:0.39605985943459426",
+          "log2": -93856.032305,
+          "range": [
+            75001,
+            150000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 150001:250000:0.39605985943459426",
+          "log2": -210536.528296,
+          "range": [
+            150001,
+            250000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 250001:380736:0.39605985943459426",
+          "log2": -417970.896784,
+          "range": [
+            250001,
+            380736
+          ],
+          "z": 0.39605985943459426
+        }
+      ],
+      "status": "PASS",
+      "z": 0.39605985943459426
     },
     "prefix_interior_audit": {
       "buckets": [

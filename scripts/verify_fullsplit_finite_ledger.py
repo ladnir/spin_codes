@@ -210,6 +210,13 @@ class EarlyAcceleratedCoverSummary:
 
 
 @dataclass(frozen=True)
+class IntervalCoverSummary:
+    count: int
+    cover_start: int
+    cover_stop: int
+
+
+@dataclass(frozen=True)
 class LatePostprefixInterval:
     start: int
     stop: int
@@ -921,6 +928,49 @@ def selected_late_postprefix_intervals(selection: str) -> list[LatePostprefixInt
     if missing:
         raise SystemExit(f"unknown late-postprefix interval label(s): {', '.join(missing)}")
     return [interval for interval in LATE_POSTPREFIX_INTERVALS if interval.label in labels]
+
+
+def check_contiguous_cover(
+    name: str,
+    intervals,
+    *,
+    expected_start: int,
+    expected_stop: int,
+) -> IntervalCoverSummary:
+    if not intervals:
+        raise SystemExit(f"{name}: no intervals configured")
+    ordered = sorted(intervals, key=lambda interval: interval.start)
+    if ordered[0].start != expected_start or ordered[-1].stop != expected_stop:
+        raise SystemExit(
+            f"{name}: expected cover {expected_start}--{expected_stop}, "
+            f"got {ordered[0].start}--{ordered[-1].stop}"
+        )
+    previous_stop = expected_start - 1
+    for interval in ordered:
+        if interval.start != previous_stop + 1:
+            raise SystemExit(
+                f"{name}: gap or overlap before {interval.start}--{interval.stop}; "
+                f"previous stop was {previous_stop}"
+            )
+        if interval.stop < interval.start:
+            raise SystemExit(f"{name}: malformed interval {interval.start}--{interval.stop}")
+        previous_stop = interval.stop
+    return IntervalCoverSummary(
+        count=len(ordered),
+        cover_start=ordered[0].start,
+        cover_stop=ordered[-1].stop,
+    )
+
+
+def interval_overlap(
+    left: IntervalCoverSummary,
+    right: IntervalCoverSummary,
+) -> tuple[int, int] | None:
+    start = max(left.cover_start, right.cover_start)
+    stop = min(left.cover_stop, right.cover_stop)
+    if start > stop:
+        return None
+    return (start, stop)
 
 
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
@@ -1716,6 +1766,43 @@ def main() -> int:
     )
     print(f"early_32_500_all_e_exact_outer_log2,{early_all:.6f}")
 
+    high_cover = check_contiguous_cover(
+        "high interval cover",
+        HIGH_INTERVALS_RAW,
+        expected_start=2001,
+        expected_stop=1148736,
+    )
+    for interval in HIGH_INTERVALS_RAW:
+        if interval.lam <= 0.0 or interval.rho <= 0.0:
+            raise SystemExit(f"high interval cover: interval {interval.label} has nonpositive pole")
+        check_close(
+            f"interval_{interval.label}_turnoff_adjustment",
+            interval.adjusted_log2 - interval.raw_log2,
+            HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
+            1e-9,
+        )
+    print("high_interval_cover_status,PASS")
+    print(f"high_interval_cover_range,{high_cover.cover_start}--{high_cover.cover_stop}")
+    print(f"high_interval_count,{high_cover.count}")
+    print(f"high_interval_turnoff_adjustment_bits,{HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS:.6f}")
+    manifest["checks"]["high_interval_cover"] = {  # type: ignore[index]
+        "status": "PASS",
+        "cover_range": [high_cover.cover_start, high_cover.cover_stop],
+        "interval_count": high_cover.count,
+        "turnoff_adjustment_bits": HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
+        "intervals": [
+            {
+                "range": [interval.start, interval.stop],
+                "lambda": interval.lam,
+                "rho": interval.rho,
+                "raw_log2": interval.raw_log2,
+                "adjusted_log2": interval.adjusted_log2,
+                "command": interval.display_command(),
+            }
+            for interval in HIGH_INTERVALS_RAW
+        ],
+    }
+
     high_total = float("-inf")
     for label, lam, rho, value in HIGH_INTERVALS:
         high_total = log2add(high_total, value)
@@ -1736,6 +1823,45 @@ def main() -> int:
         )
     print(f"interval_2001_1148736_total_log2,{high_total:.6f}")
     print("feasible_far_bucket_cutoff_h,1148736")
+
+    complement_cover = check_contiguous_cover(
+        "complement high interval cover",
+        COMPLEMENT_HIGH_INTERVALS,
+        expected_start=args.N // 2 + 1,
+        expected_stop=args.N,
+    )
+    for interval in COMPLEMENT_HIGH_INTERVALS:
+        if interval.rho <= 0.0:
+            raise SystemExit(f"complement high interval cover: interval {interval.label} has nonpositive rho")
+    high_complement_overlap = interval_overlap(high_cover, complement_cover)
+    if high_complement_overlap != (args.N // 2 + 1, high_cover.cover_stop):
+        raise SystemExit(
+            "high/complement cover: expected deliberate overlap "
+            f"{args.N // 2 + 1}--{high_cover.cover_stop}, got {high_complement_overlap}"
+        )
+    overlap_count = high_complement_overlap[1] - high_complement_overlap[0] + 1
+    print("complement_high_cover_status,PASS")
+    print(f"complement_high_cover_range,{complement_cover.cover_start}--{complement_cover.cover_stop}")
+    print(f"complement_high_interval_count,{complement_cover.count}")
+    print(f"high_complement_overlap_range,{high_complement_overlap[0]}--{high_complement_overlap[1]}")
+    print(f"high_complement_overlap_count,{overlap_count}")
+    manifest["checks"]["complement_high_cover"] = {  # type: ignore[index]
+        "status": "PASS",
+        "cover_range": [complement_cover.cover_start, complement_cover.cover_stop],
+        "interval_count": complement_cover.count,
+        "high_overlap_range": [high_complement_overlap[0], high_complement_overlap[1]],
+        "high_overlap_count": overlap_count,
+        "overlap_treatment": "deliberate union-bound overcount",
+        "intervals": [
+            {
+                "range": [interval.start, interval.stop],
+                "rho": interval.rho,
+                "log2": interval.log2_value,
+                "command": interval.display_command(),
+            }
+            for interval in COMPLEMENT_HIGH_INTERVALS
+        ],
+    }
 
     complement_high_total = float("-inf")
     for interval in COMPLEMENT_HIGH_INTERVALS:
@@ -1847,6 +1973,38 @@ def main() -> int:
     print(f"early_accelerated_endpoint_75001_350000_total_log2,{endpoint_total:.6f}")
     print(f"early_accelerated_paired_350001_1048576_total_log2,{paired_total:.6f}")
     print(f"early_accelerated_75001_1048576_total_log2,{early_accelerated_total:.6f}")
+
+    late_postprefix_cover = check_contiguous_cover(
+        "late post-prefix cover",
+        LATE_POSTPREFIX_INTERVALS,
+        expected_start=501,
+        expected_stop=args.block_bits * args.late_blocks,
+    )
+    for interval in LATE_POSTPREFIX_INTERVALS:
+        if interval.z != LATE_POSTPREFIX_Z:
+            raise SystemExit(f"late post-prefix cover: interval {interval.label} has z={interval.z}")
+    print("late_postprefix_cover_status,PASS")
+    print(f"late_postprefix_cover_range,{late_postprefix_cover.cover_start}--{late_postprefix_cover.cover_stop}")
+    print(f"late_postprefix_interval_count,{late_postprefix_cover.count}")
+    print(f"late_postprefix_feasible_cutoff_h,{args.block_bits * args.late_blocks}")
+    print(f"late_postprefix_z,{LATE_POSTPREFIX_Z:.17g}")
+    manifest["checks"]["late_postprefix_cover"] = {  # type: ignore[index]
+        "status": "PASS",
+        "cover_range": [late_postprefix_cover.cover_start, late_postprefix_cover.cover_stop],
+        "interval_count": late_postprefix_cover.count,
+        "feasible_cutoff_h": args.block_bits * args.late_blocks,
+        "cutoff_reason": "block_bits * late_blocks",
+        "z": LATE_POSTPREFIX_Z,
+        "intervals": [
+            {
+                "range": [interval.start, interval.stop],
+                "z": interval.z,
+                "log2": interval.log2_value,
+                "command": interval.display_command(),
+            }
+            for interval in LATE_POSTPREFIX_INTERVALS
+        ],
+    }
 
     late_postprefix_total = float("-inf")
     for interval in LATE_POSTPREFIX_INTERVALS:
