@@ -410,7 +410,19 @@ value is at the left endpoint itself and is numerical roundoff, not an interior
 increase. This is a finite audit, not the eventual analytic monotonicity lemma,
 but it removes the dominant `T`-reuse assumption from the current finite ledger.
 The standard finite-ledger verifier now checks this tracked audit artifact by
-default before summing the prefix rows.
+default before summing the prefix rows. In particular it verifies the finite
+rectangle structure, not just the row count:
+
+```text
+prefix_interior_audit_rows,1500
+prefix_interior_audit_h_range,0--499
+prefix_interior_audit_buckets,gap_1_4000:5949--9948:4000;gap_4001_8000:9949--13948:4000;gap_8001_12000:13949--17948:4000
+prefix_interior_audit_left_endpoint_maxima,PASS
+prefix_interior_audit_tolerance_bits,1e-07
+prefix_interior_audit_worst_slack_bits,9.78079472385e-08
+prefix_interior_audit_reproduction_tolerance_bits,5e-06
+prefix_interior_audit_worst_repro_slack_bits,4.99447521759e-06
+```
 
 The row-level prefix sum can be regenerated with:
 

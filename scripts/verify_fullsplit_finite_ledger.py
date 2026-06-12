@@ -304,8 +304,41 @@ class CsvLedger:
 
 
 @dataclass(frozen=True)
+class InteriorAuditBucket:
+    name: str
+    t_min: int
+    t_max: int
+
+    @property
+    def t_count(self) -> int:
+        return self.t_max - self.t_min + 1
+
+    @property
+    def label(self) -> str:
+        return f"{self.name}:{self.t_min}--{self.t_max}:{self.t_count}"
+
+
+INTERIOR_AUDIT_BUCKETS = (
+    InteriorAuditBucket("gap_1_4000", 5949, 9948),
+    InteriorAuditBucket("gap_4001_8000", 9949, 13948),
+    InteriorAuditBucket("gap_8001_12000", 13949, 17948),
+)
+INTERIOR_AUDIT_BUCKET_BY_NAME = {bucket.name: bucket for bucket in INTERIOR_AUDIT_BUCKETS}
+
+
+@dataclass(frozen=True)
 class InteriorAuditSummary:
     rows: int
+    h_min: int
+    h_max: int
+    h_count: int
+    bucket_counts: dict[str, int]
+    bucket_t_counts: dict[str, int]
+    left_endpoint_maxima: bool
+    worst_diff: float
+    worst_diff_slack: float
+    worst_reproduction_abs: float
+    worst_reproduction_slack: float
     worst: dict[str, str]
     worst_repro: dict[str, str]
 
@@ -576,38 +609,146 @@ def exact_placement_ratio_summary(
     )
 
 
-def read_interior_audit_summary(path: Path) -> InteriorAuditSummary:
+def read_interior_audit_summary(
+    path: Path,
+    *,
+    expected_h_min: int,
+    expected_h_max: int,
+    tolerance: float,
+    reproduction_tolerance: float,
+) -> InteriorAuditSummary:
     rows: list[dict[str, str]]
     with path.open(newline="") as f:
         rows = list(csv.DictReader(f))
     if not rows:
         raise SystemExit(f"{path}: no interior-audit rows")
+
+    required_columns = {
+        "bucket",
+        "H",
+        "T_count",
+        "max_log2_minus_left",
+        "T_at_max",
+        "left_log2",
+        "max_log2",
+        "left_reproduction_delta",
+    }
+    missing_columns = required_columns - set(rows[0])
+    if missing_columns:
+        raise SystemExit(f"{path}: missing interior-audit columns {sorted(missing_columns)}")
+
+    expected_h_values = set(range(expected_h_min, expected_h_max + 1))
+    bucket_counts = {bucket.name: 0 for bucket in INTERIOR_AUDIT_BUCKETS}
+    bucket_t_counts: dict[str, int] = {}
+    seen: set[tuple[str, int]] = set()
+    left_endpoint_maxima = True
+
+    for row in rows:
+        bucket_name = row["bucket"]
+        bucket = INTERIOR_AUDIT_BUCKET_BY_NAME.get(bucket_name)
+        if bucket is None:
+            raise SystemExit(f"{path}: unexpected interior-audit bucket {bucket_name!r}")
+        try:
+            h = int(row["H"])
+            t_count = int(row["T_count"])
+            t_at_max = int(row["T_at_max"])
+            float(row["left_log2"])
+            float(row["max_log2"])
+            float(row["max_log2_minus_left"])
+            float(row["left_reproduction_delta"])
+        except ValueError as exc:
+            raise SystemExit(f"{path}: malformed interior-audit row {row}") from exc
+        if h not in expected_h_values:
+            raise SystemExit(
+                f"{path}: interior-audit H={h} is outside "
+                f"{expected_h_min}--{expected_h_max}"
+            )
+        key = (bucket_name, h)
+        if key in seen:
+            raise SystemExit(f"{path}: duplicate interior-audit row for bucket={bucket_name}, H={h}")
+        seen.add(key)
+        bucket_counts[bucket_name] += 1
+        if t_count != bucket.t_count:
+            raise SystemExit(
+                f"{path}: bucket={bucket_name}, H={h} has T_count={t_count}, "
+                f"expected {bucket.t_count}"
+            )
+        bucket_t_counts[bucket_name] = t_count
+        if not (bucket.t_min <= t_at_max <= bucket.t_max):
+            raise SystemExit(
+                f"{path}: bucket={bucket_name}, H={h} has T_at_max={t_at_max}, "
+                f"outside {bucket.t_min}--{bucket.t_max}"
+            )
+        if t_at_max != bucket.t_min:
+            left_endpoint_maxima = False
+
+    missing_pairs = [
+        f"{bucket.name}:H={h}"
+        for bucket in INTERIOR_AUDIT_BUCKETS
+        for h in range(expected_h_min, expected_h_max + 1)
+        if (bucket.name, h) not in seen
+    ]
+    if missing_pairs:
+        preview = ", ".join(missing_pairs[:5])
+        suffix = "" if len(missing_pairs) <= 5 else f", ... ({len(missing_pairs)} total)"
+        raise SystemExit(f"{path}: missing interior-audit rows {preview}{suffix}")
+
     worst = max(rows, key=lambda row: float(row["max_log2_minus_left"]))
     worst_repro = max(rows, key=lambda row: abs(float(row["left_reproduction_delta"])))
-    return InteriorAuditSummary(rows=len(rows), worst=worst, worst_repro=worst_repro)
+    worst_diff = float(worst["max_log2_minus_left"])
+    worst_reproduction_abs = abs(float(worst_repro["left_reproduction_delta"]))
+    return InteriorAuditSummary(
+        rows=len(rows),
+        h_min=expected_h_min,
+        h_max=expected_h_max,
+        h_count=expected_h_max - expected_h_min + 1,
+        bucket_counts=bucket_counts,
+        bucket_t_counts=bucket_t_counts,
+        left_endpoint_maxima=left_endpoint_maxima,
+        worst_diff=worst_diff,
+        worst_diff_slack=tolerance - worst_diff,
+        worst_reproduction_abs=worst_reproduction_abs,
+        worst_reproduction_slack=reproduction_tolerance - worst_reproduction_abs,
+        worst=worst,
+        worst_repro=worst_repro,
+    )
 
 
 def check_interior_audit(
     path: Path,
     *,
     expected_rows: int,
+    expected_h_min: int,
+    expected_h_max: int,
     tolerance: float,
     reproduction_tolerance: float,
 ) -> InteriorAuditSummary:
-    summary = read_interior_audit_summary(path)
+    summary = read_interior_audit_summary(
+        path,
+        expected_h_min=expected_h_min,
+        expected_h_max=expected_h_max,
+        tolerance=tolerance,
+        reproduction_tolerance=reproduction_tolerance,
+    )
     if summary.rows != expected_rows:
         raise SystemExit(f"prefix interior audit: expected {expected_rows} rows, got {summary.rows}")
-    worst_diff = float(summary.worst["max_log2_minus_left"])
-    if worst_diff > tolerance:
+    expected_rows_from_grid = len(INTERIOR_AUDIT_BUCKETS) * summary.h_count
+    if summary.rows != expected_rows_from_grid:
         raise SystemExit(
-            f"prefix interior audit: worst interior increase {worst_diff:.12g} "
+            f"prefix interior audit: expected {expected_rows_from_grid} rows from "
+            f"{summary.h_count} H-values and {len(INTERIOR_AUDIT_BUCKETS)} buckets, got {summary.rows}"
+        )
+    if not summary.left_endpoint_maxima:
+        raise SystemExit("prefix interior audit: an interior row is maximized away from the left endpoint")
+    if summary.worst_diff > tolerance:
+        raise SystemExit(
+            f"prefix interior audit: worst interior increase {summary.worst_diff:.12g} "
             f"exceeds tolerance {tolerance:.12g}"
         )
-    worst_repro = abs(float(summary.worst_repro["left_reproduction_delta"]))
-    if worst_repro > reproduction_tolerance:
+    if summary.worst_reproduction_abs > reproduction_tolerance:
         raise SystemExit(
             f"prefix interior audit: worst left-endpoint reproduction error "
-            f"{worst_repro:.12g} exceeds tolerance {reproduction_tolerance:.12g}"
+            f"{summary.worst_reproduction_abs:.12g} exceeds tolerance {reproduction_tolerance:.12g}"
         )
     return summary
 
@@ -814,6 +955,8 @@ def main() -> int:
     parser.add_argument("--late-prefix-h-max", type=int, default=500)
     parser.add_argument("--skip-prefix-interior-audit", action="store_true")
     parser.add_argument("--prefix-interior-rows", type=int, default=1500)
+    parser.add_argument("--prefix-interior-h-min", type=int, default=0)
+    parser.add_argument("--prefix-interior-h-max", type=int, default=499)
     parser.add_argument("--prefix-interior-tolerance", type=float, default=1e-7)
     parser.add_argument("--prefix-interior-reproduction-tolerance", type=float, default=5e-6)
     parser.add_argument("--prefix-ridge-first-ratio-max", type=float, default=0.852700)
@@ -995,10 +1138,28 @@ def main() -> int:
         interior = check_interior_audit(
             args.prefix_interior_audit_csv,
             expected_rows=args.prefix_interior_rows,
+            expected_h_min=args.prefix_interior_h_min,
+            expected_h_max=args.prefix_interior_h_max,
             tolerance=args.prefix_interior_tolerance,
             reproduction_tolerance=args.prefix_interior_reproduction_tolerance,
         )
         print(f"prefix_interior_audit_rows,{interior.rows}")
+        print(f"prefix_interior_audit_h_range,{interior.h_min}--{interior.h_max}")
+        print(
+            "prefix_interior_audit_buckets,"
+            + ";".join(bucket.label for bucket in INTERIOR_AUDIT_BUCKETS)
+        )
+        print("prefix_interior_audit_left_endpoint_maxima,PASS")
+        print(f"prefix_interior_audit_tolerance_bits,{args.prefix_interior_tolerance:.12g}")
+        print(f"prefix_interior_audit_worst_slack_bits,{interior.worst_diff_slack:.12g}")
+        print(
+            "prefix_interior_audit_reproduction_tolerance_bits,"
+            f"{args.prefix_interior_reproduction_tolerance:.12g}"
+        )
+        print(
+            "prefix_interior_audit_worst_repro_slack_bits,"
+            f"{interior.worst_reproduction_slack:.12g}"
+        )
         print(
             "prefix_interior_audit_worst,"
             f"bucket={interior.worst['bucket']},"
@@ -1014,6 +1175,22 @@ def main() -> int:
         )
         manifest["checks"]["prefix_interior_audit"] = {  # type: ignore[index]
             "rows": interior.rows,
+            "h_range": [interior.h_min, interior.h_max],
+            "h_count": interior.h_count,
+            "buckets": [
+                {
+                    "name": bucket.name,
+                    "T_range": [bucket.t_min, bucket.t_max],
+                    "T_count": bucket.t_count,
+                    "rows": interior.bucket_counts[bucket.name],
+                }
+                for bucket in INTERIOR_AUDIT_BUCKETS
+            ],
+            "left_endpoint_maxima": interior.left_endpoint_maxima,
+            "tolerance_bits": args.prefix_interior_tolerance,
+            "worst_slack_bits": interior.worst_diff_slack,
+            "reproduction_tolerance_bits": args.prefix_interior_reproduction_tolerance,
+            "worst_reproduction_slack_bits": interior.worst_reproduction_slack,
             "worst": interior.worst,
             "worst_reproduction": interior.worst_repro,
         }

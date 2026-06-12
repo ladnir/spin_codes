@@ -47,7 +47,44 @@
       ]
     },
     "prefix_interior_audit": {
+      "buckets": [
+        {
+          "T_count": 4000,
+          "T_range": [
+            5949,
+            9948
+          ],
+          "name": "gap_1_4000",
+          "rows": 500
+        },
+        {
+          "T_count": 4000,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "name": "gap_4001_8000",
+          "rows": 500
+        },
+        {
+          "T_count": 4000,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "name": "gap_8001_12000",
+          "rows": 500
+        }
+      ],
+      "h_count": 500,
+      "h_range": [
+        0,
+        499
+      ],
+      "left_endpoint_maxima": true,
+      "reproduction_tolerance_bits": 5e-06,
       "rows": 1500,
+      "tolerance_bits": 1e-07,
       "worst": {
         "H": "75",
         "T_at_max": "13949",
@@ -67,7 +104,9 @@
         "left_reproduction_delta": "-5.52478240934e-09",
         "max_log2": "-285.570795153",
         "max_log2_minus_left": "-5.52478240934e-09"
-      }
+      },
+      "worst_reproduction_slack_bits": 4.99447521759066e-06,
+      "worst_slack_bits": 9.780794723847e-08
     },
     "prefix_placement_ratio": {
       "endpoint_bound_at_h_min": 0.31306555240043515,

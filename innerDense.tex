@@ -3254,8 +3254,11 @@ now reads the tracked artifact
 \texttt{scripts/fullsplit\_exact\_interior\_h0\_499\_allT.csv}
 \]
 and fails unless the row count is \(1500\), the worst interior excess is at most \(10^{-7}\), and the worst
-left-endpoint reproduction error is at most \(5\cdot10^{-6}\).  The current artifact has the numerical maxima stated
-above.
+left-endpoint reproduction error is at most \(5\cdot10^{-6}\).  It also checks that the artifact is exactly the
+rectangle \(H=0,\ldots,499\) crossed with the three displayed buckets, that each row covers all \(4000\) integer
+values of \(T\) in its bucket, and that every row is maximized at the bucket's left endpoint.  The current artifact has
+the numerical maxima stated above, leaving \(9.78079472385\cdot10^{-8}\) bits of excess slack and
+\(4.99447521759\cdot10^{-6}\) bits of reproduction-error slack against the verifier thresholds.
 \end{proof}
 
 The same closed form extends to any fixed number \(e\) of selected skipped gaps:
