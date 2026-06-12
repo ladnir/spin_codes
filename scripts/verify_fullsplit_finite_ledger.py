@@ -109,6 +109,61 @@ class ComplementHighInterval:
         )
 
 
+@dataclass(frozen=True)
+class EarlyPostprefixInterval:
+    start: int
+    stop: int
+    log2_value: float
+    lambdas: str | None = None
+    rhos: str | None = None
+
+    @property
+    def label(self) -> str:
+        return f"{self.start}--{self.stop}"
+
+    def command(self) -> list[str]:
+        cmd = [
+            sys.executable,
+            str(ROOT / "sum_fullsplit_piecewise_certificate.py"),
+            "--h-values",
+            f"{self.start}:{self.stop}",
+            "--gap-start",
+            "12001",
+            "--gap-stop",
+            "26819",
+            "--gap-step",
+            "5000",
+            "--inner-mode-by-gap",
+            "eallratio,eallratio,eallratio",
+            "--gap-sum-mode",
+            "endpoint",
+            "--inner-T-by-gap",
+            "feasible-min",
+            "--turnoff-log2",
+            f"{GLOBAL_TURNOFF_LOG2:.7f}",
+        ]
+        if self.lambdas is not None:
+            cmd.extend(["--lambdas", self.lambdas])
+        if self.rhos is not None:
+            cmd.extend(["--rhos", self.rhos])
+        return cmd
+
+    def display_command(self) -> str:
+        script = r"scripts\sum_fullsplit_piecewise_certificate.py"
+        cmd = (
+            f"python {script} --h-values {self.start}:{self.stop} "
+            "--gap-start 12001 --gap-stop 26819 --gap-step 5000 "
+            "--inner-mode-by-gap eallratio,eallratio,eallratio "
+            "--gap-sum-mode endpoint --inner-T-by-gap feasible-min "
+            f"--turnoff-log2 {GLOBAL_TURNOFF_LOG2:.7f}"
+        )
+        if self.lambdas is not None:
+            cmd += f" --lambdas {self.lambdas}"
+        if self.rhos is not None:
+            cmd += f" --rhos {self.rhos}"
+        return cmd
+
+
 HIGH_INTERVALS_RAW = [
     # Raw interval rows generated with the sharper finite-prefix p_term.  The
     # theorem-facing wrapper uses the global Bernstein p_term; the checked
@@ -145,6 +200,16 @@ COMPLEMENT_HIGH_INTERVALS = [
     ComplementHighInterval(1700001, 1900000, 10.0, -524628.366199),
     ComplementHighInterval(1900001, 2097089, 10.0, -894140.350713),
     ComplementHighInterval(2097090, 2097152, 10.0, -893792.285010),
+]
+
+
+EARLY_POSTPREFIX_INTERVALS = [
+    EarlyPostprefixInterval(501, 2000, -380.829185),
+    EarlyPostprefixInterval(2001, 7858, -852.998772, "0.02", "0.01"),
+    EarlyPostprefixInterval(7859, 20550, -3712.365087, "0.05", "0.03"),
+    EarlyPostprefixInterval(20551, 30000, -8614.382763, "0.2", "0.1"),
+    EarlyPostprefixInterval(30001, 50000, -21332.131033, "0.2", "0.1"),
+    EarlyPostprefixInterval(50001, 75000, -34847.929043, "0.2", "0.1"),
 ]
 
 
@@ -466,6 +531,17 @@ def selected_complement_high_intervals(selection: str) -> list[ComplementHighInt
     return [interval for interval in COMPLEMENT_HIGH_INTERVALS if interval.label in labels]
 
 
+def selected_early_postprefix_intervals(selection: str) -> list[EarlyPostprefixInterval]:
+    if selection.lower() == "all":
+        return list(EARLY_POSTPREFIX_INTERVALS)
+    labels = {part.strip() for part in selection.split(",") if part.strip()}
+    by_label = {interval.label: interval for interval in EARLY_POSTPREFIX_INTERVALS}
+    missing = sorted(labels - set(by_label))
+    if missing:
+        raise SystemExit(f"unknown early-postprefix interval label(s): {', '.join(missing)}")
+    return [interval for interval in EARLY_POSTPREFIX_INTERVALS if interval.label in labels]
+
+
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     result = subprocess.run(
         interval.command(),
@@ -491,6 +567,20 @@ def check_complement_high_interval(interval: ComplementHighInterval, tolerance: 
     )
     actual = parse_piecewise_total(result.stdout)
     check_close(f"complement_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    return actual
+
+
+def check_early_postprefix_interval(interval: EarlyPostprefixInterval, tolerance: float) -> float:
+    result = subprocess.run(
+        interval.command(),
+        cwd=ROOT.parent,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    actual = parse_piecewise_total(result.stdout)
+    check_close(f"early_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -562,6 +652,11 @@ def main() -> int:
         help="Print the theorem-facing recomputation command for every high interval.",
     )
     parser.add_argument(
+        "--print-early-postprefix-commands",
+        action="store_true",
+        help="Print the recomputation command for every checked early post-prefix interval.",
+    )
+    parser.add_argument(
         "--check-high-intervals",
         help=(
             "Comma-separated high-interval labels to recompute, or 'all'. "
@@ -575,17 +670,36 @@ def main() -> int:
             "Example: 1048577--1148736,1500001--1700000."
         ),
     )
+    parser.add_argument(
+        "--check-early-postprefix-intervals",
+        help=(
+            "Comma-separated early post-prefix interval labels to recompute, or 'all'. "
+            "Example: 501--2000,2001--7858."
+        ),
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
 
-    if args.print_high_interval_commands:
-        print("High-interval recomputation commands")
-        for interval in HIGH_INTERVALS_RAW:
-            print(f"interval_{interval.label}_command,{interval.display_command()}")
-        print("Complement-high interval recomputation commands")
-        for interval in COMPLEMENT_HIGH_INTERVALS:
-            print(f"complement_interval_{interval.label}_command,{interval.display_command()}")
-        if not args.check_high_intervals and not args.check_complement_high_intervals:
+    if args.print_high_interval_commands or args.print_early_postprefix_commands:
+        if args.print_early_postprefix_commands:
+            print("Early post-prefix interval recomputation commands")
+            for interval in EARLY_POSTPREFIX_INTERVALS:
+                print(f"early_postprefix_interval_{interval.label}_command,{interval.display_command()}")
+        if not args.print_high_interval_commands:
+            if not args.check_early_postprefix_intervals:
+                return 0
+        else:
+            print("High-interval recomputation commands")
+            for interval in HIGH_INTERVALS_RAW:
+                print(f"interval_{interval.label}_command,{interval.display_command()}")
+            print("Complement-high interval recomputation commands")
+            for interval in COMPLEMENT_HIGH_INTERVALS:
+                print(f"complement_interval_{interval.label}_command,{interval.display_command()}")
+        if (
+            not args.check_high_intervals
+            and not args.check_complement_high_intervals
+            and not args.check_early_postprefix_intervals
+        ):
             return 0
 
     csv_ledgers = [
@@ -859,6 +973,17 @@ def main() -> int:
         print(f"complement_interval_{interval.label}_log2,{interval.log2_value:.6f}")
     print(f"complement_interval_1048577_2097152_total_log2,{complement_high_total:.6f}")
 
+    early_postprefix_total = float("-inf")
+    for interval in EARLY_POSTPREFIX_INTERVALS:
+        early_postprefix_total = log2add(early_postprefix_total, interval.log2_value)
+        if interval.lambdas is not None:
+            print(f"early_postprefix_interval_{interval.label}_lambda,{interval.lambdas}")
+        if interval.rhos is not None:
+            print(f"early_postprefix_interval_{interval.label}_rho,{interval.rhos}")
+        print(f"early_postprefix_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+    check_close("early_postprefix_501_75000", early_postprefix_total, -380.829185, args.tolerance)
+    print(f"early_postprefix_501_75000_total_log2,{early_postprefix_total:.6f}")
+
     if args.check_high_intervals:
         for interval in selected_high_intervals(args.check_high_intervals):
             actual = check_high_interval(interval, args.tolerance)
@@ -871,8 +996,14 @@ def main() -> int:
             print(f"complement_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"complement_interval_{interval.label}_recompute_status,PASS")
 
+    if args.check_early_postprefix_intervals:
+        for interval in selected_early_postprefix_intervals(args.check_early_postprefix_intervals):
+            actual = check_early_postprefix_interval(interval, args.tolerance)
+            print(f"early_postprefix_interval_{interval.label}_recomputed_log2,{actual:.6f}")
+            print(f"early_postprefix_interval_{interval.label}_recompute_status,PASS")
+
     h501_plus_checked = float("-inf")
-    for value in [parts["postprefix_501_2000_eall"], high_total, complement_high_total]:
+    for value in [parts["postprefix_501_2000_eall"], early_postprefix_total, high_total, complement_high_total]:
         h501_plus_checked = log2add(h501_plus_checked, value)
     check_close("h501_plus_checked_rows", h501_plus_checked, -182.259739, args.tolerance)
     print(f"h501_plus_checked_rows_log2,{h501_plus_checked:.6f}")

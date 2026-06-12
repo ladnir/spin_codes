@@ -2936,8 +2936,12 @@ Thus the combined \(h\le500\) all-first-active-position value remains
 \log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions,\ exact\ outer}\le -37.278528,
 \]
 still dominated by the audited window and ultra-late prefix.  The proof debt is therefore no longer the boundary slice
-\(T\approx5949\), nor the small-weight early slice; it is the remaining first-active coverage for \(h>500\), together
-with the post-prefix part of the ultra-late cap.
+\(T\approx5949\), nor the small-weight early slice.  The checked endpoint early rows now also cover
+\[
+501\le h\le75000,\qquad T>17948,
+\]
+with total \(-380.829185\) bits.  The remaining first-active coverage is the early middle/high range
+\(75001\le h\le N/2\), together with the post-prefix part of the ultra-late cap.
 
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
@@ -4143,6 +4147,7 @@ These rows are
 \text{row family} & \log_2\text{ contribution}\\
 \hline
 501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
+501\le h\le75000,\ T>17948\ \text{early endpoint rows} & -380.829185\\
 2001\le h\le1148736\ \text{fixed-pole intervals} & -586.597103\\
 1048577\le h\le N\ \text{complement-high intervals} & -35150.097366 .
 \end{array}
@@ -4150,12 +4155,13 @@ These rows are
 \end{corollary}
 
 \begin{proof}
-The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact.  The second row is the fixed-pole
-interval table through the feasible far-bucket cutoff \(h=1148736\).  The third row is the complement-side high-density
-table.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger deliberately keeps this harmless
-overcount as a union bound.  Therefore the combined contribution is bounded by
+The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact for the late window.  The second row is
+the checked early endpoint table for \(T>17948\) through \(h=75000\).  The third row is the fixed-pole interval table
+through the feasible far-bucket cutoff \(h=1148736\).  The fourth row is the complement-side high-density table.  The
+last two row families overlap on \(1048577\le h\le1148736\); the ledger deliberately keeps this harmless overcount as a
+union bound.  Therefore the combined contribution is bounded by
 \[
-\log_2\!\left(2^{-182.259739}+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
+\log_2\!\left(2^{-182.259739}+2^{-380.829185}+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
 \]
 The verifier prints and checks this as
 \(\texttt{h501\_plus\_checked\_rows\_log2=-182.259739}\).
@@ -4194,15 +4200,16 @@ The finite ledger is now checked by
 \]
 It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
 that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
-\(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, and the fixed-pole
-interval tables above, including the complement-side high-density manifest.  Reweighting the \(h\le500\) pieces by exact
+\(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, the checked
+early endpoint rows through \(h=75000\), and the fixed-pole interval tables above, including the complement-side
+high-density manifest.  Reweighting the \(h\le500\) pieces by exact
 RM direct-sum outer coefficients gives the reported combined finite late-window contribution
 \[
 \log_2\mu_{\rm finite}^{\rm fullsplit,\ exact\ outer}\le -37.383345,
 \]
 dominated by the tiny-prefix row \(h=32,r=1\) in the near bucket; the exact-outer \(e\ge9\) prefix residual is already
 \(-284.004805\) bits, the exact-outer early \(h\le500\) contribution is \(-86.910456\) bits, and the entire \(h\ge501\)
-late-window ledger is below \(-182.259739\) bits.  Including the checked exact-outer ultra-late placement prefix, the
+checked ledger is below \(-182.259739\) bits.  Including the checked exact-outer ultra-late placement prefix, the
 all-position \(32\le h\le500\) value is
 \[
 \log_2\mu_{32\le h\le500}^{\rm all\ first\ active\ positions,\ exact\ outer}\le -37.278528.
