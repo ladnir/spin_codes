@@ -1157,8 +1157,8 @@ t_monotonicity_sufficient_worst,h=7859--20550,bucket=gap_4001_8000,T=9949--13948
 Audit priority: medium. The endpoint gap-sum dominance, the `T_eff=max(T_min,ceil(H/b))` cutoff, the safe
 `eallratio` multiplier-tail truncation, independent finite samples of the fixed-pole branch formula, and the sufficient
 monotonicity reduction for the fixed-pole all-episode wrapper are now checked in the main ledger. The remaining audit
-target here is the symbolic/global packaging of the fixed-pole algebra, especially turning the finite branch and
-monotonicity checks into a compact theorem statement.
+target here is the symbolic/global packaging around Lemma `fullsplit-fixed-pole-eallratio`, especially turning the
+finite branch and monotonicity checks into a compact theorem statement for the whole interval ledger.
 
 ## Proof Objects To Inspect
 
@@ -1273,8 +1273,8 @@ The following are useful context but should not be treated as proof:
 1. Run the three main verification commands.
 2. Check the exact formulas in `fast_fullsplit_episode_e01.py`, especially the selected-gap count and endpoint
    `e=x+1` case.
-3. Convert the fixed-pole algebra in `sum_fullsplit_piecewise_certificate.py` into a compact theorem statement, using the
-   finite branch samples as implementation checks rather than as the proof itself.
+3. Check Lemma `fullsplit-fixed-pole-eallratio` against `sum_fullsplit_piecewise_certificate.py`, using the finite branch
+   samples as implementation checks rather than as the proof itself.
 4. Check `check_fullsplit_T_monotonicity.py` against the monotonicity argument in `innerDense.tex`.
 5. Check that the `32..500` finite CSV inputs are generated from formulas that are conservative upper bounds.
 6. Only then read the surrounding prose and decide what should become theorem text versus working-save-point text.

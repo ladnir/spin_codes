@@ -3935,6 +3935,53 @@ selected, gives the same \(k=x\) factor directly.  Finally,
 \]
 which gives \eqref{eq:fullsplit-e-tail-ht-multiplier}.
 
+The preceding derivation is the theorem-facing object used by the finite ledger:
+
+\begin{lemma}[Fixed-pole all-episode ratio envelope]
+\label{lem:fullsplit-fixed-pole-eallratio}
+In the setting of Lemma~\ref{lem:fullsplit-all-episode-gf-bound}, assume \(H>0\), fix \(\lambda>0\) with
+\(M:=M_+(\lambda)<1\), and fix \(\rho>0\).  Put
+\[
+E_0(\lambda):=e^{\lambda d}M^T,
+\]
+and
+\[
+B_1(\lambda,\rho):=
+\frac{p_{\rm term}e^{\lambda d}}{\binom{bT}{H}}\,
+\rho^{-H}
+\sum_{x=\lceil H/b\rceil}^{\min\{H,T\}}
+(x+1)
+\left(
+\big((1+\rho)^b-1\big)\frac{M}{1-M}
+\right)^x .
+\]
+With \(R_{H,T}(\lambda)\) defined in \eqref{eq:fullsplit-e-tail-ht-multiplier}, the full selected-gap episode
+contribution is at most
+\[
+E_0(\lambda)+B_1(\lambda,\rho)\bigl(1+R_{H,T}(\lambda)\bigr).
+\]
+Consequently the inner probability contribution may be capped by the minimum of this quantity and \(1\).
+\end{lemma}
+
+\begin{proof}
+The \(e=0\) branch has no charged termination and is bounded directly by \(E_0(\lambda)\).  For \(e=1\), conditioning on
+the number \(x\) of occupied later blocks gives the exact suffix sum
+\[
+(x+1)\sum_{\ell=x}^{T}\binom{\ell-1}{x-1}M^\ell
+\le
+(x+1)\left(\frac{M}{1-M}\right)^x,
+\]
+while Cauchy's coefficient bound gives
+\[
+C_{H,x}^{(b)}
+\le
+\rho^{-H}\big((1+\rho)^b-1\big)^x .
+\]
+Summing over \(x\) gives \(B_1(\lambda,\rho)\).  Finally,
+\eqref{eq:fullsplit-e-tail-ht-multiplier} compares the \(e\ge2\) contribution to the same fixed-\(\lambda\) \(e=1\)
+contribution by the multiplier \(R_{H,T}(\lambda)\).  Adding the three branches gives the claim.
+\end{proof}
+
 \begin{lemma}[Right-endpoint dominance for paired early sums]
 \label{lem:fullsplit-paired-endpoint-dominance}
 Fix \(b,H,\lambda,\rho\), and write
@@ -4022,9 +4069,9 @@ The wrapper now has a theorem-facing mode
 \texttt{cap,eallratio,eallratio},
 \]
 where the near bucket is still charged only by placement, while the middle and far buckets use
-\eqref{eq:fullsplit-e1-cauchy-envelope} together with the same-\(\lambda\) multiplier
-\eqref{eq:fullsplit-e-tail-ht-multiplier}.  Thus this mode is an all-episode upper bound, not merely an \(e\le1\)
-diagnostic.
+Lemma~\ref{lem:fullsplit-fixed-pole-eallratio}, namely \eqref{eq:fullsplit-e1-cauchy-envelope} together with the
+same-\(\lambda\) multiplier \eqref{eq:fullsplit-e-tail-ht-multiplier}.  Thus this mode is an all-episode upper bound,
+not merely an \(e\le1\) diagnostic.
 The finite wrapper grid now also includes large \(\rho\)-poles up to \(10^4\).  These poles are mostly irrelevant in
 the ordinary sparse/intermediate occupancy range, but are essential near \(H=bT\), where they implement the same
 deficit-side control one would get by rewriting the occupancy coefficient in terms of missing coordinates.
