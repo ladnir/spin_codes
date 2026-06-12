@@ -3,10 +3,9 @@
 
 This section is the theorem-facing integration of the random sliding dense construction:
 a systematic dense banded outer together with the random dense recursive inner.
-It deliberately omits the finite scalar diagnostics and working-save-point calculations, which are preserved in
-\texttt{explorations/scalar\_dense\_finite\_diagnostics.tex}.  The proof here is a direct first-moment argument: the outer
-contributes an expected spectrum envelope, while the inner contributes a low/intermediate-weight contraction and a
-linear-weight large-deviation tail.
+It deliberately omits the finite scalar calibration calculations, which are preserved in the scalar dense diagnostics
+note.  The proof here is a direct first-moment argument: the outer contributes an expected spectrum envelope, while the
+inner contributes a low/intermediate-weight contraction and a linear-weight large-deviation tail.
 
 \subsection{Direct first-moment reduction}
 \label{sec:integration-dense-dense}
@@ -166,22 +165,18 @@ n^{\kappa\log_2(\beta_{\mathrm{out}})-1}(\log n)^{O(1)}
 \]
 by the first condition in \eqref{eq:dense-dense-parameter-conditions}.
 
-For the fixed-tap dense outer, the tiny-weight law is more explicit than the global geometric envelope: if a message
-support has band-union size \(q\) and \(\sigma\)-cluster count \(r\), then its parity contribution has law
-\[
-r+\Binomial(q-r,\tfrac12).
-\]
-In particular,
+For the fixed-tap dense outer, the only tiny-weight fact needed here is that weight-one outer codewords are impossible:
 \begin{equation}
-\label{eq:dense-dense-working-outer-small}
+\label{eq:dense-dense-fixedtap-no-weight-one}
 A_1^{\mathrm{out,ft}}=0
 \end{equation}
-deterministically.
+deterministically.  Indeed, a weight-one message has its systematic one and also the forced diagonal parity one, while a
+higher-weight message already has systematic weight at least two.
 
 The fixed-tap replacement exposes the same phenomenon seen in the finite-\(n\) evaluator: the late-placement term
 cannot be controlled by the coarse global geometric outer envelope alone, since already \(h=1\) has inner probability
 \(\approx L/n\). This low/tiny window must use the explicit dense outer low-weight law
-\eqref{eq:dense-dense-working-outer-small}, rather than only \(\EE[\enum_{\Cone,h}]\le\beta_{\mathrm{out}}^h\).
+\eqref{eq:dense-dense-fixedtap-no-weight-one}, rather than only \(\EE[\enum_{\Cone,h}]\le\beta_{\mathrm{out}}^h\).
 With that explicit outer law, the late-placement contribution is the same summable tiny-window term used in the
 preserved scalar dense diagnostics.
 

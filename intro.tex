@@ -3,7 +3,8 @@
 
 \paragraph{Motivation.}
 A central goal in coding theory and in cryptography-facing applications is to obtain linear minimum distance together with
-streaming encodability, i.e., the ability to compute the encoding in a single pass over the input while producing output symbols incrementally and using only small working memory \stan{Peter: check if i explained correctly}, and near-linear work.  Classical turbo-style constructions suggest that random interleaving
+streaming encodability: the encoder should process the input in one pass, produce output symbols incrementally, and use
+small working memory together with near-linear work.  Classical turbo-style constructions suggest that random interleaving
 and recursion can produce excellent distance behavior in practice, but converting this intuition into
 clean, modular, proof-driven guarantees, especially under stringent work and locality constraints, remains subtle.
 
@@ -14,7 +15,8 @@ We study depth-2 serial concatenation with a random interleaver:
 \qquad
 G_{\mathrm{sc}} \;=\; \Gone \cdot \Pi \cdot \Gtwo,
 \]
-where \(\Cone\) is an outer code, \(\Pi\) is a uniform random interleaver on \([n]\), and \(\Ctwo\) is a rate-1 recursive inner encoder. \stan{we need to add what G is}
+where \(\Gone\) and \(\Gtwo\) are generator matrices for the outer map \(\Cone\) and rate-\(1\) recursive inner map
+\(\Ctwo\), and \(\Pi\) is a uniform random interleaver on \([n]\).
 Our main conceptual contribution is to separate the minimum-distance proof into two independently verifiable interfaces:
 
 \begin{itemize}
@@ -30,9 +32,6 @@ where \(U\) is uniform over the Hamming slice \(\{0,1\}^n\) conditioned on \(\wt
 Once these interfaces are established, a short first-moment calculation yields linear minimum distance for \(\Csc\) with high probability
 (over \(\Pi\) and any inner randomness).
 
-\stan{Add to prelims - spectrum bound, first moment argument}
-\stan{seems like standard terms, but i had to parse the second bullet point with chatgpt}
-
 \paragraph{Target performance characteristics.}
 Our design goals are the following.
 We want (i) provable linear minimum distance \(d_{\min}(\Csc)=\Omega(n)\) with high probability over the randomized construction
@@ -40,7 +39,7 @@ We want (i) provable linear minimum distance \(d_{\min}(\Csc)=\Omega(n)\) with h
 and (iii) near-linear work, measured by tap complexity: the number of state coordinates read/XORed per output symbol.
 Concretely, we aim for \(O(1)\) taps per symbol (hence \(O(n)\) total taps) with a single random interleaver.
 Our modular framework makes these tradeoffs explicit: the outer code controls the low-weight spectrum, the interleaver randomizes support,
-and the inner recursion supplies contraction  and large-deviation behavior.
+and the inner recursion supplies contraction and large-deviation behavior.
 
 
 \paragraph{Outer instantiations.}
@@ -71,16 +70,18 @@ coordinates and next state.  The current finite certificate uses the exact EBCH 
 \end{enumerate}
 
 \paragraph{Putting the modules together.}
-The framework yields two main results in the current paper.  First, the random sliding dense outer paired with the dense
-recursive inner gives a clean asymptotic linear-distance theorem, including the concrete \(0.109\) relative-distance
-checkpoint.  Second, the structured local-code construction gives a finite certificate: \(RM(4,9)\) direct-sum outer plus
-the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with first moment at most \(2^{-37.278528}\).
+The framework first gives a warmup theorem: the random sliding dense outer paired with the accumulator inner already has
+linear distance, although with weak constants.  The two main construction lines then improve this baseline.  The random
+sliding dense outer paired with the dense recursive inner gives a clean asymptotic linear-distance theorem, including the
+concrete \(0.109\) relative-distance checkpoint.  The structured local-code construction gives a finite certificate:
+\(RM(4,9)\) direct-sum outer plus the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with first moment at most
+\(2^{-37.278528}\).
 
 \paragraph{Organization.}
 Section~\ref{sec:sc-framework} states the modular serial-concatenation framework theorem and isolates the required outer and inner interfaces.
-Section~\ref{sec:outer-dense-logmem} proves the random sliding dense outer bounds.
-Section~\ref{sec:inner-accumulator} records the accumulator warmup, and Section~\ref{sec:inner-dense} proves the scalar dense
-recursive inner interface.  Section~\ref{sec:integrations} gives the analytic dense+dense integration theorem.
+Section~\ref{sec:inner-accumulator} records the accumulator warmup.  Section~\ref{sec:outer-dense-logmem} proves the
+random sliding dense outer bounds, Section~\ref{sec:inner-dense} proves the scalar dense recursive inner interface, and
+Section~\ref{sec:integrations} gives the analytic dense+dense integration theorem.
 Section~\ref{sec:structured-local-code} develops the structured local-code certificate interface and the current
 RM/EBCH finite checkpoint.  Sparse, expander-accumulator, block-recursive BCH, and BCH-spectrum explorations are preserved
 outside the main spine for later refinement.

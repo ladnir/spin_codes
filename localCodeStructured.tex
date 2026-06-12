@@ -1,6 +1,3 @@
-% Main-spine structured local-code construction and finite full-split certificate.
-% Detailed development history is preserved in explorations/fullsplit_certificate_development.tex.
-
 \section{Structured local-code construction and finite certificate}
 \label{sec:structured-local-code}
 
@@ -295,13 +292,13 @@ and \(d=188743\), the baseline projection rows are
 All three rows are dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).  The rough outer
 work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit rows and \(16777216\) for the \(256\)-bit row.
 
-The sensitivity check is the warning sign.  The \([256,128,38]\) model remains near the RM margin with no inflation and
+The sensitivity check is important.  The \([256,128,38]\) model remains near the RM margin with no inflation and
 has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
 positive under \(+20\) bits.  The \([512,256,\ge62]\) model is more robust in this diagnostic: its margins under
 \(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  These rows stay heuristic
 until an exact BCH spectrum or a rigorous low-weight envelope replaces the modeled spectrum.
 
-The development notes leading to the finite ledger and these projections are preserved in
+Detailed finite-ledger and projection notes are preserved in
 \[
 \begin{gathered}
 \texttt{explorations/fullsplit\_certificate\_development.tex},\\

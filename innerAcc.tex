@@ -1,5 +1,5 @@
 
-\section{Accumulator warmup: exact enumerator and contraction}
+\section{Accumulator warmup: exact enumerator and linear-distance contraction}
 \label{sec:inner-accumulator}
 
 This section instantiates the inner encoder \(\Ctwo\) as the length-\(n\) binary accumulator.
@@ -160,8 +160,74 @@ In particular, the inner-interface bound \(p_w(\delta)\le \rho^w\) holds for \(w
 \]
 \end{corollary}
 
+\begin{theorem}[Log-memory dense outer plus accumulator inner has linear distance]
+\label{thm:accumulator-warmup-linear-distance}
+Fix \(\delta>0\) and set
+\[
+\rho_\delta:=\sqrt{4e\delta}.
+\]
+Assume
+\[
+\rho_\delta<\sqrt2-1.
+\]
+Use the random sliding dense outer of Section~\ref{sec:outer-dense-logmem} with memory
+\[
+M=\lceil c\log_2 n\rceil,
+\qquad
+c>\frac{1}{\log_2(2/(1+\rho_\delta))},
+\]
+followed by a uniform interleaver and the accumulator inner \(\Acc_n\).  Then
+\[
+\Pr[d_{\min}(\Acc_n\circ\Pi\circ\Cone)\le \delta n]=o(1).
+\]
+In particular, the serially concatenated code has linear minimum distance with high probability.
+\end{theorem}
+
+\begin{proof}
+Let \(Z_\delta\) be the number of nonzero concatenated codewords of weight at most \(\lfloor\delta n\rfloor\).
+By the first-moment framework,
+\[
+\EE Z_\delta
+\le
+\sum_{w=1}^{n}\EE[\enum_{\Cone,w}]\,p_w(\delta).
+\]
+For the accumulator, Lemma~\ref{lem:acc-enumerator-exact} implies
+\[
+p_w(\delta)=0
+\qquad\text{whenever}\qquad
+\lceil w/2\rceil>\delta n,
+\]
+since every accumulator output produced by a weight-\(w\) input has weight at least \(\lceil w/2\rceil\).
+Thus only \(w\le 2\delta n\) contribute.  The assumption \(\rho_\delta<\sqrt2-1<1/2\) implies
+\(\delta<1/4\), so every contributing \(w\) lies in the range of Corollary~\ref{cor:acc-inner-interface}; hence
+\[
+p_w(\delta)\le \rho_\delta^w.
+\]
+Therefore
+\[
+\EE Z_\delta
+\le
+\sum_w \EE[\enum_{\Cone,w}]\rho_\delta^w
+=
+W_{\mathrm{out}}(\rho_\delta).
+\]
+Here \(W_{\mathrm{out}}\) is the expected outer weight generating function.  The generating-function bound of
+Theorem~\ref{thm:outer-dense-generating}, evaluated at \(z=\rho_\delta\), gives
+\[
+W_{\mathrm{out}}(\rho_\delta)
+\le
+C_{\mathrm{out}}(\rho_\delta)n\,a(\rho_\delta)^M
+=
+O\!\left(n^{1-c\log_2(1/a(\rho_\delta))}\right)
+=o(1),
+\]
+where \(a(\rho_\delta)=(1+\rho_\delta)/2\) and the final inequality is exactly the assumed lower bound on \(c\).
+Markov's inequality gives the claim. \(\square\)
+\end{proof}
+
 \paragraph{Discussion (why the accumulator is structurally useful but distance-limited).}
 The contraction exponent is only \(\Theta(w)\) through \(\lceil w/2\rceil\), reflecting the fact that the accumulator output weight
-is controlled by about half of the spacing variables. In practice this leads to a relatively weak certified \(\delta\) compared
-to the stronger recursive inner constructions in later sections.
+is controlled by about half of the spacing variables.  The warmup theorem above therefore certifies only small constants
+\(\delta<(\sqrt2-1)^2/(4e)\), before the memory-constant slack in the outer is even optimized.  In practice this is much
+weaker than the dense and full-split recursive inner constructions in later sections.
 Nevertheless, the accumulator case is valuable as a baseline because the enumerator is exact and the framework algebra is completely transparent.

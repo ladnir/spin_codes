@@ -15,6 +15,7 @@ performance.
 Primary locations:
 
 - `innerAcc.tex`: exact accumulator input-output enumerator and contraction.
+- `outerDense.tex`: random sliding dense outer generating-function envelope.
 - `framework.tex`: generic inner-interface first-moment consumption.
 
 Locked claims:
@@ -24,9 +25,9 @@ Locked claims:
   over the feasible range.
 - For `delta < 1/4` and `w <= n/2`,
   `p_w(delta) <= (4e delta)^{ceil(w/2)}`.
-- Combined with a log-memory outer spectrum envelope, this gives a clean
-  linear-distance warmup theorem for sufficiently small `delta`, but with a
-  weak constant compared with the dense recursive inner.
+- Combined with the random sliding dense outer generating-function envelope,
+  this gives a clean linear-distance warmup theorem for sufficiently small
+  `delta`, but with a weak constant compared with the dense recursive inner.
 
 ### Analytic dense-band outer x dense recursive inner
 

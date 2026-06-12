@@ -529,7 +529,7 @@ Lemma~\ref{lem:dense-on-time-domination} bounds the joint probability that the s
 The final displayed bound follows by adding the OFF event.
 \end{proof}
 
-\paragraph{Why this replaces the old linear diagnostic.}
+\paragraph{Position-aware first-start tail.}
 For \(w=\eta N\) and \(t=\alpha N\), the summand in
 \eqref{eq:dense-first-start-nooff-tail} has exponent
 \[
@@ -1195,7 +1195,7 @@ Thus the dense inner conforms to the single inner interface without weakening th
 Each step computes $\langle k_t,s_t\rangle$ with a \emph{dense} $m$-bit mask, i.e.\ $\Theta(m)$ taps per symbol.
 Thus total inner work is $\Theta(Nm)=\Theta(N\log N)$ for $m=\gamma\log N$.
 
-\paragraph{Design notes (how the parameters are meant to be used later).}
+\paragraph{Parameter-use summary.}
 \begin{itemize}
 \item The term $(1-\varepsilon)^w$ is the clean exponential-in-$w$ contraction for intermediate weights.
 \item The term $N2^{-m}$ is the rare ON$\to$OFF event. In tight finite-$N$ bounds, it is better to \emph{budget}

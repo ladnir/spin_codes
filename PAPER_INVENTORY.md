@@ -5,9 +5,9 @@ Generated: 2026-06-12
 Purpose: classify the current manuscript before restructuring. This inventory
 is a cleanup guide, not a proof artifact.
 
-Implementation update: the first split has been applied.  The current compiled
-main spine is `intro.tex`, `prelim.tex`, `framework.tex`, `outerDense.tex`,
-`innerAcc.tex`, `innerDenseScalar.tex`, `integrationDense.tex`, and
+Implementation update: the split has been applied.  The current compiled
+main spine is `intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`,
+`outerDense.tex`, `innerDenseScalar.tex`, `integrationDense.tex`, and
 `localCodeStructured.tex`.  The original `innerDense.tex` and `integration.tex`
 remain preserved sources.  The full-split certificate development ledger now
 lives in `explorations/fullsplit_certificate_development.tex`, with the compact
@@ -29,6 +29,13 @@ The structured local-code certificate section has been tightened so the main
 paper states the RM/EBCH finite certificate and compact row-cover facts, while
 the full post-prefix row table remains in
 `explorations/fullsplit_certificate_development.tex` and the audit packet.
+A main-spine audit removed compiled `\stan{...}` comments, stale
+working-save-point wording, and the last layout warning in the framework
+first-moment proof.  The accumulator section now includes the promised combined
+warmup theorem: the random sliding dense outer plus accumulator inner has
+linear distance for sufficiently small constants.  Remaining uses of
+"diagnostic", "projection", and "heuristic" are intentional status boundaries
+for non-theorem projection rows.
 
 ## Status Labels
 
@@ -50,6 +57,7 @@ the full post-prefix row table remains in
 | `intro.tex` | Short motivation and paper framing. | Keep main, later rewrite after theorem/certificate split stabilizes. |
 | `prelim.tex` | Basic notation and combinatorial preliminaries. | Keep main. |
 | `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main, possibly tighten prose. |
+| `innerAcc.tex` | Accumulator exact enumerator, contraction, and combined warmup theorem with the log-memory dense outer. | `MAIN_THEOREM` warmup; keep main immediately after the framework. |
 | `outerDense.tex` | Dense/banded outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
 | `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
@@ -57,7 +65,6 @@ the full post-prefix row table remains in
 | `innerDense.tex` | Original monolithic dense-inner workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `integration.tex` | Original monolithic dense integration workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `outerExpandAcc.tex` | Alternate expander/accumulator outer construction. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
-| `innerAcc.tex` | Accumulator inner instantiation with exact enumerator. | Promote as a warmup theorem/example after the framework. |
 | `innerSparse.tex` | Sparse recursive inner with refresh. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
 | `AUDIT.md` | Dense+Dense audit packet and proof-state ledger. | Preserve as audit packet; use as source, not main-paper prose. |
 

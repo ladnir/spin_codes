@@ -8,7 +8,7 @@ the current implementation status of the split.
 
 Implementation checkpoint: the first real split and compact structured-section
 rewrite have now been applied.  The compiled main spine is
-`intro.tex`, `prelim.tex`, `framework.tex`, `outerDense.tex`, `innerAcc.tex`,
+`intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`, `outerDense.tex`,
 `innerDenseScalar.tex`, `integrationDense.tex`, and
 `localCodeStructured.tex`.  The original large source files are preserved, and
 the demoted working material has been copied under `explorations/`.  In
@@ -34,6 +34,11 @@ The structured local-code section now treats the finite RM/EBCH result as a
 certificate theorem: the main spine keeps the certificate inputs, prefix and
 post-prefix totals, and final first-moment theorem, while detailed post-prefix
 row tables remain in the full-split exploration/audit notes.
+A final structural pass moved the accumulator warmup immediately after the
+framework in the compiled paper and added the missing combined theorem:
+random sliding dense outer plus accumulator inner gives linear distance for
+sufficiently small constants.  Thus the warmup is now a real proof example, not
+just an isolated accumulator enumerator.
 
 ## Summary
 
@@ -92,7 +97,9 @@ Locked result:
   p_w(delta) <= (4e delta)^{ceil(w/2)}.
   ```
 - With a log-memory outer spectrum envelope, this gives a simple
-  linear-distance theorem for sufficiently small `delta`.
+  linear-distance theorem for sufficiently small `delta`; in the compiled
+  paper this is stated as the random sliding dense outer plus accumulator
+  inner warmup theorem.
 
 Main-paper role:
 
@@ -377,6 +384,10 @@ The first physical split is complete:
 9. Structured local-code post-prefix row details are delegated to the
    full-split exploration/audit notes; the main spine keeps compact audited
    totals and row-cover categories.
+10. A main-spine language audit removed compiled `\stan{...}` comments, stale
+    working-save-point wording, and the final framework overfull. Remaining
+    diagnostic/projection/heuristic language marks explicit non-theorem status
+    boundaries.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
@@ -390,7 +401,7 @@ Remaining cleanup is proof-facing polish, not the initial physical split:
 
 ## Verification Plan
 
-After the actual restructure, run sequentially:
+For full restructure verification, run sequentially:
 
 ```powershell
 python scripts\verify_dense_claims.py --delta 0.109
@@ -402,8 +413,6 @@ pdflatex -interaction=nonstopmode main_permConv.tex
 
 Expected caveats:
 
-- Existing undefined references and multiply-defined labels may remain unless
-  directly touched by the split.
 - The bare `verify_dense_claims.py` default checks `delta=0.12` and is not the
   current theorem check.
 - Do not run multiple long verification/benchmark commands at the same time.
