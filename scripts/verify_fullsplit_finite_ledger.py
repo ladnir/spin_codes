@@ -217,6 +217,30 @@ class IntervalCoverSummary:
 
 
 @dataclass(frozen=True)
+class HighFeasibleMinSummary:
+    bucket_cutoffs: list[tuple[str, int, int, int]]
+    far_cutoff_h: int
+
+
+@dataclass(frozen=True)
+class LatePostprefixShapeSummary:
+    interval_count: int
+    peak_h_min: int
+    peak_h_max: int
+    left_endpoint_peaks: int
+    right_endpoint_peaks: int
+    critical_peaks: int
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
+class ComplementHighShapeSummary:
+    interval_count: int
+    min_convexity_growth_bits: float
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
 class LatePostprefixInterval:
     start: int
     stop: int
@@ -971,6 +995,143 @@ def interval_overlap(
     if start > stop:
         return None
     return (start, stop)
+
+
+def check_high_feasible_min_t(
+    *,
+    b: int,
+    high_cover: IntervalCoverSummary,
+) -> HighFeasibleMinSummary:
+    bucket_cutoffs: list[tuple[str, int, int, int]] = []
+    for bucket in INTERIOR_AUDIT_BUCKETS:
+        cutoff_h = b * bucket.t_max + b
+        bucket_cutoffs.append((bucket.name, bucket.t_min, bucket.t_max, cutoff_h))
+    far_cutoff_h = max(cutoff for _, _, _, cutoff in bucket_cutoffs)
+    if high_cover.cover_stop != far_cutoff_h:
+        raise SystemExit(
+            "high feasible-min T audit: expected high cover to stop at "
+            f"far cutoff {far_cutoff_h}, got {high_cover.cover_stop}"
+        )
+    return HighFeasibleMinSummary(bucket_cutoffs=bucket_cutoffs, far_cutoff_h=far_cutoff_h)
+
+
+def late_postprefix_reduced_log2(*, n: int, m: int, h: int, z: float) -> float:
+    return -h * math.log2(z) + log2_binom(m, h) - log2_binom(n, h)
+
+
+def late_postprefix_adjacent_ratio_log2(*, n: int, m: int, h: int, z: float) -> float:
+    if h < 0 or h >= min(m, n):
+        raise ValueError(f"late post-prefix adjacent ratio is undefined at h={h}")
+    return math.log2(m - h) - math.log2(n - h) - math.log2(z)
+
+
+def check_late_postprefix_shapes(
+    intervals: list[LatePostprefixInterval],
+    *,
+    n: int,
+    m: int,
+    tolerance: float = 1e-10,
+) -> LatePostprefixShapeSummary:
+    rows: list[dict[str, object]] = []
+    left_endpoint_peaks = 0
+    right_endpoint_peaks = 0
+    critical_peaks = 0
+    peak_h_values: list[int] = []
+    for interval in intervals:
+        if not (0.0 < interval.z < 1.0):
+            raise SystemExit(f"late post-prefix shape: {interval.label} has z outside (0,1)")
+        if interval.start < 0 or interval.stop > min(n, m):
+            raise SystemExit(
+                f"late post-prefix shape: {interval.label} is outside feasible placement range 0--{min(n, m)}"
+            )
+        critical = (m - interval.z * n) / (1.0 - interval.z)
+        candidates = {interval.start, interval.stop}
+        for h in (math.floor(critical), math.ceil(critical)):
+            if interval.start <= h <= interval.stop:
+                candidates.add(h)
+        best_h = max(
+            candidates,
+            key=lambda h: late_postprefix_reduced_log2(n=n, m=m, h=h, z=interval.z),
+        )
+        if best_h > interval.start:
+            left_ratio = late_postprefix_adjacent_ratio_log2(n=n, m=m, h=best_h - 1, z=interval.z)
+            if left_ratio < -tolerance:
+                raise SystemExit(
+                    f"late post-prefix shape: {interval.label} peak {best_h} is below its left neighbor"
+                )
+        if best_h < interval.stop:
+            right_ratio = late_postprefix_adjacent_ratio_log2(n=n, m=m, h=best_h, z=interval.z)
+            if right_ratio > tolerance:
+                raise SystemExit(
+                    f"late post-prefix shape: {interval.label} peak {best_h} is below its right neighbor"
+                )
+        if best_h == interval.start:
+            peak_source = "left_endpoint"
+            left_endpoint_peaks += 1
+        elif best_h == interval.stop:
+            peak_source = "right_endpoint"
+            right_endpoint_peaks += 1
+        else:
+            peak_source = "critical"
+            critical_peaks += 1
+        peak_h_values.append(best_h)
+        rows.append(
+            {
+                "range": [interval.start, interval.stop],
+                "z": interval.z,
+                "critical_h": critical,
+                "peak_h": best_h,
+                "peak_source": peak_source,
+            }
+        )
+    return LatePostprefixShapeSummary(
+        interval_count=len(intervals),
+        peak_h_min=min(peak_h_values),
+        peak_h_max=max(peak_h_values),
+        left_endpoint_peaks=left_endpoint_peaks,
+        right_endpoint_peaks=right_endpoint_peaks,
+        critical_peaks=critical_peaks,
+        rows=rows,
+    )
+
+
+def check_complement_high_shapes(
+    intervals: list[ComplementHighInterval],
+    *,
+    n: int,
+) -> ComplementHighShapeSummary:
+    rows: list[dict[str, object]] = []
+    min_growth = float("inf")
+    for interval in intervals:
+        if interval.start <= n // 2 or interval.stop > n:
+            raise SystemExit(f"complement high shape: {interval.label} is not inside N/2<h<=N")
+        if interval.rho <= 0.0:
+            raise SystemExit(f"complement high shape: {interval.label} has nonpositive rho")
+        if interval.stop > interval.start:
+            first_ratio = (n - interval.start) / (interval.start + 1)
+            last_ratio = (n - (interval.stop - 1)) / interval.stop
+            if last_ratio > first_ratio:
+                raise SystemExit(
+                    f"complement high shape: binomial adjacent ratio increases on {interval.label}"
+                )
+            growth_bits = math.log2(first_ratio / last_ratio)
+            min_growth = min(min_growth, growth_bits)
+        else:
+            growth_bits = float("inf")
+        rows.append(
+            {
+                "range": [interval.start, interval.stop],
+                "rho": interval.rho,
+                "e0_endpoint": interval.start,
+                "ege1_outer_volume_maxima": "endpoints",
+                "convexity_growth_bits": finite_float(growth_bits),
+            }
+        )
+    return ComplementHighShapeSummary(
+        interval_count=len(intervals),
+        min_convexity_growth_bits=min_growth,
+        rows=rows,
+    )
 
 
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
@@ -1802,6 +1963,25 @@ def main() -> int:
             for interval in HIGH_INTERVALS_RAW
         ],
     }
+    high_feasible_t = check_high_feasible_min_t(b=args.block_bits, high_cover=high_cover)
+    print("high_feasible_min_T_status,PASS")
+    print(f"high_feasible_min_T_far_cutoff_h,{high_feasible_t.far_cutoff_h}")
+    for name, t_min, t_max, cutoff_h in high_feasible_t.bucket_cutoffs:
+        print(f"high_feasible_min_T_{name}_range,{t_min}--{t_max}")
+        print(f"high_feasible_min_T_{name}_cutoff_h,{cutoff_h}")
+    manifest["checks"]["high_feasible_min_T"] = {  # type: ignore[index]
+        "status": "PASS",
+        "far_cutoff_h": high_feasible_t.far_cutoff_h,
+        "rule": "T_eff=max(T_min,ceil(H/block_bits)); h cutoff is block_bits*T_max+block_bits",
+        "buckets": [
+            {
+                "name": name,
+                "T_range": [t_min, t_max],
+                "cutoff_h": cutoff_h,
+            }
+            for name, t_min, t_max, cutoff_h in high_feasible_t.bucket_cutoffs
+        ],
+    }
 
     high_total = float("-inf")
     for label, lam, rho, value in HIGH_INTERVALS:
@@ -1861,6 +2041,18 @@ def main() -> int:
             }
             for interval in COMPLEMENT_HIGH_INTERVALS
         ],
+    }
+    complement_shape = check_complement_high_shapes(COMPLEMENT_HIGH_INTERVALS, n=args.N)
+    print("complement_high_shape_status,PASS")
+    print(f"complement_high_shape_interval_count,{complement_shape.interval_count}")
+    print(f"complement_high_shape_min_convexity_growth_bits,{complement_shape.min_convexity_growth_bits:.12g}")
+    manifest["checks"]["complement_high_shape"] = {  # type: ignore[index]
+        "status": "PASS",
+        "interval_count": complement_shape.interval_count,
+        "e0_outer_endpoint_rule": "z<1 makes complement-side e=0 outer bound largest at h_min",
+        "ege1_outer_volume_rule": "discrete convexity makes the outer/volume/rho term largest at an endpoint",
+        "min_convexity_growth_bits": complement_shape.min_convexity_growth_bits,
+        "intervals": complement_shape.rows,
     }
 
     complement_high_total = float("-inf")
@@ -2004,6 +2196,27 @@ def main() -> int:
             }
             for interval in LATE_POSTPREFIX_INTERVALS
         ],
+    }
+    late_shape = check_late_postprefix_shapes(
+        LATE_POSTPREFIX_INTERVALS,
+        n=args.N,
+        m=args.block_bits * args.late_blocks,
+    )
+    print("late_postprefix_shape_status,PASS")
+    print(f"late_postprefix_shape_interval_count,{late_shape.interval_count}")
+    print(f"late_postprefix_shape_peak_h_range,{late_shape.peak_h_min}--{late_shape.peak_h_max}")
+    print(f"late_postprefix_shape_left_endpoint_peaks,{late_shape.left_endpoint_peaks}")
+    print(f"late_postprefix_shape_right_endpoint_peaks,{late_shape.right_endpoint_peaks}")
+    print(f"late_postprefix_shape_critical_peaks,{late_shape.critical_peaks}")
+    manifest["checks"]["late_postprefix_shape"] = {  # type: ignore[index]
+        "status": "PASS",
+        "interval_count": late_shape.interval_count,
+        "peak_h_range": [late_shape.peak_h_min, late_shape.peak_h_max],
+        "left_endpoint_peaks": late_shape.left_endpoint_peaks,
+        "right_endpoint_peaks": late_shape.right_endpoint_peaks,
+        "critical_peaks": late_shape.critical_peaks,
+        "shape_rule": "adjacent ratio ((m-h)/(N-h))/z is decreasing, so each row is checked at endpoints and the critical point",
+        "intervals": late_shape.rows,
     }
 
     late_postprefix_total = float("-inf")

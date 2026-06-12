@@ -3559,6 +3559,9 @@ h\text{ range} & \rho & \log_2\mu\\
 \]
 The combined complement-side total is \(-35150.097366\) bits.  This is much weaker than the sampled local peak, but it
 is summable and closes the high-density complement branch with only two coefficient poles, \(\rho=1\) and \(\rho=10\).
+The finite-ledger verifier records this endpoint reduction as
+\(\texttt{complement\_high\_shape\_status=PASS}\); the smallest discrete convexity-growth certificate over the listed
+intervals is \(0.276449723567\) bits.
 
 For the post-prefix direction, a product-generating-function RM outer scan was run with \(h=501,\ldots,2000\), the
 same three gap buckets and \(1\le r\le64\), and full integer \(H=0,\ldots,1999\) \(e\le1\) episode grids.  This gives
@@ -4180,8 +4183,9 @@ have union-bound total
 \[
 \log_2\mu_{501\le h\le380736,\ T<5949}^{\rm placement}\le -545.690526.
 \]
-The verifier flag \(\texttt{--print-late-postprefix-commands}\) prints the regeneration commands; the row helper is
-\(\texttt{certify\_fullsplit\_late\_prefix\_interval.py}\).
+The finite-ledger verifier also checks the adjacent-ratio shape reduction.  For this pole all seven intervals are
+maximized at their left endpoint.  The verifier flag \(\texttt{--print-late-postprefix-commands}\) prints the
+regeneration commands.
 
 \begin{corollary}[Checked post-prefix ledger rows]
 \label{cor:fullsplit-postprefix-checked-ledger}
@@ -4215,10 +4219,11 @@ the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row
 \(350001,\ldots,N/2\), with no gap or overlap.  The verifier also checks that the ultra-late placement rows cover
 \(501,\ldots,380736=64\cdot5949\).  The sixth row is the fixed-pole interval table through the feasible far-bucket
 cutoff \(h=1148736\); its verifier entry checks a contiguous \(2001,\ldots,1148736\) cover and the common
-\(1.484774\)-bit turnoff adjustment.  The seventh row is the complement-side high-density table, checked as a
-contiguous \(1048577,\ldots,N\) cover.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger
-records this overlap and deliberately keeps it as harmless union-bound overcount.  Therefore the combined contribution
-is bounded by
+\(1.484774\)-bit turnoff adjustment.  It also checks that the feasible-min rule
+\(T_{\rm eff}=\max(T_{\min},\lceil H/64\rceil)\) gives far-bucket cutoff \(64\cdot17948+64=1148736\).  The seventh row
+is the complement-side high-density table, checked as a contiguous \(1048577,\ldots,N\) cover with the convex endpoint
+reduction above.  The last two row families overlap on \(1048577\le h\le1148736\); the ledger records this overlap and
+deliberately keeps it as harmless union-bound overcount.  Therefore the combined contribution is bounded by
 \[
 \begin{aligned}
 &\log_2\!\left(2^{-182.259739}+2^{-545.690526}+2^{-380.829185}+2^{-1056.187188}\right.\\

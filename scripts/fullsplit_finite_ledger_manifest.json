@@ -79,6 +79,85 @@
       "overlap_treatment": "deliberate union-bound overcount",
       "status": "PASS"
     },
+    "complement_high_shape": {
+      "e0_outer_endpoint_rule": "z<1 makes complement-side e=0 outer bound largest at h_min",
+      "ege1_outer_volume_rule": "discrete convexity makes the outer/volume/rho term largest at an endpoint",
+      "interval_count": 7,
+      "intervals": [
+        {
+          "convexity_growth_bits": 0.27644972356737024,
+          "e0_endpoint": 1048577,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1048577,
+            1148736
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.42912366123339646,
+          "e0_endpoint": 1148737,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1148737,
+            1300000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.6232010699197045,
+          "e0_endpoint": 1300001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1300001,
+            1500000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.7689712090490578,
+          "e0_endpoint": 1500001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1500001,
+            1700000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 1.1708349472808788,
+          "e0_endpoint": 1700001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1700001,
+            1900000
+          ],
+          "rho": 10.0
+        },
+        {
+          "convexity_growth_bits": 11.731328655832206,
+          "e0_endpoint": 1900001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1900001,
+            2097089
+          ],
+          "rho": 10.0
+        },
+        {
+          "convexity_growth_bits": 5.954238274763999,
+          "e0_endpoint": 2097090,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            2097090,
+            2097152
+          ],
+          "rho": 10.0
+        }
+      ],
+      "min_convexity_growth_bits": 0.27644972356737024,
+      "status": "PASS"
+    },
     "early_accelerated_cover": {
       "cover_range": [
         75001,
@@ -264,6 +343,37 @@
         1,
         31
       ]
+    },
+    "high_feasible_min_T": {
+      "buckets": [
+        {
+          "T_range": [
+            5949,
+            9948
+          ],
+          "cutoff_h": 636736,
+          "name": "gap_1_4000"
+        },
+        {
+          "T_range": [
+            9949,
+            13948
+          ],
+          "cutoff_h": 892736,
+          "name": "gap_4001_8000"
+        },
+        {
+          "T_range": [
+            13949,
+            17948
+          ],
+          "cutoff_h": 1148736,
+          "name": "gap_8001_12000"
+        }
+      ],
+      "far_cutoff_h": 1148736,
+      "rule": "T_eff=max(T_min,ceil(H/block_bits)); h cutoff is block_bits*T_max+block_bits",
+      "status": "PASS"
     },
     "high_interval_cover": {
       "cover_range": [
@@ -516,6 +626,90 @@
       ],
       "status": "PASS",
       "z": 0.39605985943459426
+    },
+    "late_postprefix_shape": {
+      "critical_peaks": 0,
+      "interval_count": 7,
+      "intervals": [
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 501,
+          "peak_source": "left_endpoint",
+          "range": [
+            501,
+            2000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 2001,
+          "peak_source": "left_endpoint",
+          "range": [
+            2001,
+            7858
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 7859,
+          "peak_source": "left_endpoint",
+          "range": [
+            7859,
+            20550
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 20551,
+          "peak_source": "left_endpoint",
+          "range": [
+            20551,
+            75000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 75001,
+          "peak_source": "left_endpoint",
+          "range": [
+            75001,
+            150000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 150001,
+          "peak_source": "left_endpoint",
+          "range": [
+            150001,
+            250000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 250001,
+          "peak_source": "left_endpoint",
+          "range": [
+            250001,
+            380736
+          ],
+          "z": 0.39605985943459426
+        }
+      ],
+      "left_endpoint_peaks": 7,
+      "peak_h_range": [
+        501,
+        250001
+      ],
+      "right_endpoint_peaks": 0,
+      "shape_rule": "adjacent ratio ((m-h)/(N-h))/z is decreasing, so each row is checked at endpoints and the critical point",
+      "status": "PASS"
     },
     "prefix_interior_audit": {
       "buckets": [

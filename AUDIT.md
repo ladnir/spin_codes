@@ -153,12 +153,19 @@ high_interval_cover_status,PASS
 high_interval_cover_range,2001--1148736
 high_interval_count,15
 high_interval_turnoff_adjustment_bits,1.484774
+high_feasible_min_T_status,PASS
+high_feasible_min_T_far_cutoff_h,1148736
+high_feasible_min_T_gap_1_4000_cutoff_h,636736
+high_feasible_min_T_gap_4001_8000_cutoff_h,892736
+high_feasible_min_T_gap_8001_12000_cutoff_h,1148736
 interval_2001_1148736_total_log2,-586.597103
 complement_high_cover_status,PASS
 complement_high_cover_range,1048577--2097152
 complement_high_interval_count,7
 high_complement_overlap_range,1048577--1148736
 high_complement_overlap_count,100160
+complement_high_shape_status,PASS
+complement_high_shape_min_convexity_growth_bits,0.276449723567
 early_postprefix_501_75000_total_log2,-380.829185
 early_accelerated_endpoint_75001_350000_total_log2,-1056.187188
 early_accelerated_paired_350001_1048576_total_log2,-98386.449256
@@ -168,6 +175,11 @@ late_postprefix_cover_range,501--380736
 late_postprefix_interval_count,7
 late_postprefix_feasible_cutoff_h,380736
 late_postprefix_z,0.39605985943459426
+late_postprefix_shape_status,PASS
+late_postprefix_shape_peak_h_range,501--250001
+late_postprefix_shape_left_endpoint_peaks,7
+late_postprefix_shape_right_endpoint_peaks,0
+late_postprefix_shape_critical_peaks,0
 late_postprefix_501_380736_total_log2,-545.690526
 h501_plus_checked_rows_log2,-182.259739
 finite_ledger_total_log2,-37.383345
@@ -663,6 +675,12 @@ late_postprefix_cover_range,501--380736
 late_postprefix_interval_count,7
 late_postprefix_feasible_cutoff_h,380736
 late_postprefix_z,0.39605985943459426
+late_postprefix_shape_status,PASS
+late_postprefix_shape_interval_count,7
+late_postprefix_shape_peak_h_range,501--250001
+late_postprefix_shape_left_endpoint_peaks,7
+late_postprefix_shape_right_endpoint_peaks,0
+late_postprefix_shape_critical_peaks,0
 ```
 
 Print the recomputation commands with:
@@ -678,8 +696,8 @@ python scripts\verify_fullsplit_finite_ledger.py --check-late-postprefix-interva
 python scripts\verify_fullsplit_finite_ledger.py --check-late-postprefix-intervals 250001--380736
 ```
 
-Audit priority: medium-high. This closes the remaining first-active placement gap. The main thing to audit is the
-fixed-pole interval helper `scripts/certify_fullsplit_late_prefix_interval.py` and its concavity reduction.
+Audit priority: medium. This closes the remaining first-active placement gap. The finite-ledger verifier now checks
+the fixed-pole concavity reduction directly: for the current pole all seven row maxima occur at the left endpoint.
 
 ### 6. Early Post-Prefix Rows
 
@@ -950,11 +968,14 @@ complement_high_cover_range,1048577--2097152
 complement_high_interval_count,7
 high_complement_overlap_range,1048577--1148736
 high_complement_overlap_count,100160
+complement_high_shape_status,PASS
+complement_high_shape_min_convexity_growth_bits,0.276449723567
 ```
 
 Current interpretation: early high-density has ample numerical margin once `T` pairing, outer complement symmetry,
-and the fixed-`z` interval endpoint bound are used. The overlap with the older `2001--1148736` table is deliberate
-union-bound overcount, not a gap in the cover.
+and the fixed-`z` interval endpoint bound are used. The shape audit checks that the complement-side outer/volume/rho
+term is endpoint-dominated by discrete convexity on every interval. The overlap with the older `2001--1148736` table
+is deliberate union-bound overcount, not a gap in the cover.
 
 ### 8. Post-Prefix, All-Episode Wrapper
 
@@ -1090,10 +1111,15 @@ high_interval_cover_status,PASS
 high_interval_cover_range,2001--1148736
 high_interval_count,15
 high_interval_turnoff_adjustment_bits,1.484774
+high_feasible_min_T_status,PASS
+high_feasible_min_T_far_cutoff_h,1148736
+high_feasible_min_T_gap_1_4000_cutoff_h,636736
+high_feasible_min_T_gap_4001_8000_cutoff_h,892736
+high_feasible_min_T_gap_8001_12000_cutoff_h,1148736
 ```
 
-Audit priority: medium. Check the endpoint placement bound, the `T_eff=max(T_min,ceil(H/b))` rule, and the sufficient
-monotonicity reduction.
+Audit priority: medium. The `T_eff=max(T_min,ceil(H/b))` cutoff is now checked in the main ledger. The remaining
+audit target here is the sufficient monotonicity reduction for the fixed-pole all-episode wrapper.
 
 ## Proof Objects To Inspect
 
