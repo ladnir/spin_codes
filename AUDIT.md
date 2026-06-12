@@ -8,7 +8,7 @@ The intended audit target is narrow:
 - finite checkpoint: `N = 2^21`, relative distance `delta = 0.09`, `d = floor(delta N) = 188743`
 - outer model: direct sum of `4096` copies of the binary `RM(4,9)` block code, i.e. local `[512,256,32]`
 - inner model: full-codeword random-split dense recursive inner with block size `b = 64`, using the EBCH `[128,64]` weight distribution
-- quantity being certified: a first-moment upper bound for the currently isolated dense+dense contribution, with full first-active-position coverage for `32 <= h <= 500`, checked early rows through `h = N/2`, complement-high rows above `N/2`, and late-window coverage beyond the small prefix
+- quantity being certified: a first-moment upper bound for the currently isolated dense+dense contribution, with full first-active-position coverage for `32 <= h <= 500`, checked ultra-late post-prefix rows through the placement cutoff, checked early rows through `h = N/2`, complement-high rows above `N/2`, and late-window coverage beyond the small prefix
 
 The current finite ledger reports
 
@@ -22,9 +22,11 @@ These values use exact RM direct-sum outer coefficients for the `h <= 500`
 prefix. The first line is still dominated by the audited window
 `5949 <= T <= 17948`. The second also includes the checked placement-only
 ultra-late prefix `T < 5949`, through `h <= 500`; the third records that the
-early `T > 17948`, `h <= 500` slice is included as well. The checked early
-post-prefix tables now cover `501 <= h <= N/2` with `log2 <= -380.829185`
-to displayed precision, and the complement-high table covers `N/2 < h <= N`.
+early `T > 17948`, `h <= 500` slice is included as well. The checked
+post-prefix ultra-late table covers `501 <= h <= 380736` with
+`log2 <= -545.690526`, the checked early post-prefix tables cover
+`501 <= h <= N/2` with `log2 <= -380.829185` to displayed precision, and the
+complement-high table covers `N/2 < h <= N`.
 It is not yet a polished global theorem.
 
 ## Construction Under Audit
@@ -130,6 +132,7 @@ early_postprefix_501_75000_total_log2,-380.829185
 early_accelerated_endpoint_75001_350000_total_log2,-1056.187188
 early_accelerated_paired_350001_1048576_total_log2,-98386.449256
 early_accelerated_75001_1048576_total_log2,-1056.187188
+late_postprefix_501_380736_total_log2,-545.690526
 h501_plus_checked_rows_log2,-182.259739
 finite_ledger_total_log2,-37.383345
 finite_ledger_margin_bits,37.383345
@@ -515,7 +518,61 @@ python scripts\sum_fullsplit_turnoff_tail.py --outer-prefix-csv scripts\block_ou
 Audit priority: medium. The crude tail is safe only after pushing the explicit uniform-survival grid to `e <= 16`;
 starting the crude tail at `e >= 9` fails badly in the far early bucket.
 
-### 5. Early Post-Prefix Rows
+### 5. Ultra-Late Post-Prefix Placement Rows
+
+Range:
+
+```text
+501 <= h <= 380736
+T < 5949
+```
+
+Here `380736 = 64 * 5949`; for larger `h`, placing all nonzero coordinates in the final `5949` inner blocks is
+impossible. The bound is placement-only:
+
+```text
+A_h^out * binom(64*5949, h) / binom(N, h)
+```
+
+For a fixed outer Cauchy pole `z`, the logarithm is concave in `h`, with adjacent ratio
+`((m-h)/(N-h))/z`. Thus each interval is certified by checking endpoints and the critical point
+`h* = (m - zN)/(1-z)`.
+
+Current interval rows, all with `z = 0.39605985943459426`:
+
+```text
+501--2000:      -545.690526
+2001--7858:     -2237.593414
+7859--20550:    -8919.160723
+20551--75000:   -23772.761808
+75001--150000:  -93856.032305
+150001--250000: -210536.528296
+250001--380736: -417970.896784
+```
+
+Combined total:
+
+```text
+log2 mu_late_postprefix_501_380736 = -545.690526
+```
+
+Print the recomputation commands with:
+
+```powershell
+python scripts\verify_fullsplit_finite_ledger.py --print-late-postprefix-commands
+```
+
+Spot-check selected rows with:
+
+```powershell
+python scripts\verify_fullsplit_finite_ledger.py --check-late-postprefix-intervals 501--2000
+python scripts\verify_fullsplit_finite_ledger.py --check-late-postprefix-intervals 250001--380736
+```
+
+Audit priority: medium-high. This closes the remaining first-active placement gap. The main thing to audit is the
+fixed-pole interval helper `scripts/certify_fullsplit_late_prefix_interval.py` and its concavity reduction.
+
+### 6. Early Post-Prefix Rows
 
 Range:
 
@@ -584,7 +641,7 @@ accelerated endpoint helper is a vectorized recurrence version of the same row b
 placement length `T` attached to the survival cost. The main audit task is now to inspect these two accelerators and add
 interval-arithmetic or rational safeguards where needed.
 
-### 6. Early High-Density Probe, Paired T
+### 7. Early High-Density Probe, Paired T
 
 Range under investigation:
 
@@ -765,7 +822,7 @@ high-density has ample numerical margin once `T` pairing, outer complement symme
 endpoint bound are used. The remaining work is to polish the proof prose and remove avoidable overcount/overlap with
 the older `2001--1148736` interval table.
 
-### 7. Post-Prefix, All-Episode Wrapper
+### 8. Post-Prefix, All-Episode Wrapper
 
 Range:
 
@@ -803,7 +860,7 @@ python scripts\sum_fullsplit_piecewise_certificate.py --h-values 501:2000 --inne
 
 Audit priority: medium. This is now theorem-facing and no longer relies on an `e <= 1` caveat.
 
-### 8. Interval Certificate
+### 9. Interval Certificate
 
 Range:
 
@@ -901,6 +958,9 @@ Core scripts:
 ```text
 scripts/verify_fullsplit_finite_ledger.py
 scripts/sum_fullsplit_piecewise_certificate.py
+scripts/certify_fullsplit_late_prefix_interval.py
+scripts/certify_fullsplit_early_endpoint_interval.py
+scripts/certify_fullsplit_early_paired_interval.py
 scripts/check_fullsplit_T_monotonicity.py
 scripts/fast_fullsplit_episode_e01.py
 scripts/sum_fullsplit_turnoff_tail.py
@@ -940,6 +1000,8 @@ Currently checkable:
   opt-in recomputation checks
 - the sufficient endpoint monotonicity inequalities for the listed intervals
 - the placement-only ultra-late prefix cap `T < 5949`, `h <= 500`, with log2 contribution `-40.115431`
+- the placement-only ultra-late post-prefix intervals `T < 5949`, `501 <= h <= 380736`, with log2 contribution
+  `-545.690526`
 - the finite `32..500` row-level sum from the existing CSV artifacts
 - the exact RM direct-sum outer prefix coefficients and exact-outer reweighting in
   `certify_rm_outer_prefix_exact.py`
@@ -948,7 +1010,7 @@ Currently checkable:
 - the paper-facing small-weight prefix corollary `cor:fullsplit-small-prefix-all-first-active`, which combines the
   ultra-late, window, and early `h <= 500` pieces
 - the paper-facing checked post-prefix row corollary `cor:fullsplit-postprefix-checked-ledger`, which combines the
-  `501..2000`, early `501..N/2`, fixed-pole interval, and complement-high ledger rows
+  `501..2000`, ultra-late `501..380736`, early `501..N/2`, fixed-pole interval, and complement-high ledger rows
 - the paper-facing current finite checkpoint `cor:fullsplit-current-finite-checkpoint`, which combines the checked
   small-prefix and post-prefix row families
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
@@ -959,6 +1021,8 @@ Currently checkable:
 - the finite-prefix and global termination atoms now stated as Lemma
   `lem:fullsplit-certified-termination-atoms`
 - the current first-active placement partition: ultra-late prefix, audited window, and checked early rows
+- the ultra-late post-prefix placement rows, with printed recomputation commands and selected opt-in recomputation
+  checks
 - the accelerated early endpoint and paired interval rows through `h = N/2`, with printed recomputation commands and
   selected opt-in recomputation checks
 
@@ -970,7 +1034,6 @@ Still proof debt:
   exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide whether the high-interval manifest should remain command-reproducible or be regenerated into checked artifacts
 - add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
-- cover the remaining first-active regime not yet in the row ledger: the post-prefix ultra-late cap beyond `h > 500`
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 

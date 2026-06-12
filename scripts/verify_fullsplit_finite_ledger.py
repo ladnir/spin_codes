@@ -196,6 +196,30 @@ class EarlyAcceleratedInterval:
         return f"python {script} --intervals {self.start}:{self.stop}:{self.lam:g}:{self.rho:g}"
 
 
+@dataclass(frozen=True)
+class LatePostprefixInterval:
+    start: int
+    stop: int
+    z: float
+    log2_value: float
+
+    @property
+    def label(self) -> str:
+        return f"{self.start}--{self.stop}"
+
+    def command(self) -> list[str]:
+        return [
+            sys.executable,
+            str(ROOT / "certify_fullsplit_late_prefix_interval.py"),
+            "--intervals",
+            f"{self.start}:{self.stop}:{self.z:.17g}",
+        ]
+
+    def display_command(self) -> str:
+        script = r"scripts\certify_fullsplit_late_prefix_interval.py"
+        return f"python {script} --intervals {self.start}:{self.stop}:{self.z:.17g}"
+
+
 HIGH_INTERVALS_RAW = [
     # Raw interval rows generated with the sharper finite-prefix p_term.  The
     # theorem-facing wrapper uses the global Bernstein p_term; the checked
@@ -256,6 +280,18 @@ EARLY_ACCELERATED_INTERVALS = [
     EarlyAcceleratedInterval(350001, 524288, 2.0, 0.8, -181215.853042, "certify_fullsplit_early_paired_interval.py"),
     EarlyAcceleratedInterval(524289, 750000, 2.0, 0.8, -194565.849984, "certify_fullsplit_early_paired_interval.py"),
     EarlyAcceleratedInterval(750001, 1048576, 2.0, 0.8, -98386.449256, "certify_fullsplit_early_paired_interval.py"),
+]
+
+
+LATE_POSTPREFIX_Z = 0.39605985943459426
+LATE_POSTPREFIX_INTERVALS = [
+    LatePostprefixInterval(501, 2000, LATE_POSTPREFIX_Z, -545.690526),
+    LatePostprefixInterval(2001, 7858, LATE_POSTPREFIX_Z, -2237.593414),
+    LatePostprefixInterval(7859, 20550, LATE_POSTPREFIX_Z, -8919.160723),
+    LatePostprefixInterval(20551, 75000, LATE_POSTPREFIX_Z, -23772.761808),
+    LatePostprefixInterval(75001, 150000, LATE_POSTPREFIX_Z, -93856.032305),
+    LatePostprefixInterval(150001, 250000, LATE_POSTPREFIX_Z, -210536.528296),
+    LatePostprefixInterval(250001, 380736, LATE_POSTPREFIX_Z, -417970.896784),
 ]
 
 
@@ -599,6 +635,17 @@ def selected_early_accelerated_intervals(selection: str) -> list[EarlyAccelerate
     return [interval for interval in EARLY_ACCELERATED_INTERVALS if interval.label in labels]
 
 
+def selected_late_postprefix_intervals(selection: str) -> list[LatePostprefixInterval]:
+    if selection.lower() == "all":
+        return list(LATE_POSTPREFIX_INTERVALS)
+    labels = {part.strip() for part in selection.split(",") if part.strip()}
+    by_label = {interval.label: interval for interval in LATE_POSTPREFIX_INTERVALS}
+    missing = sorted(labels - set(by_label))
+    if missing:
+        raise SystemExit(f"unknown late-postprefix interval label(s): {', '.join(missing)}")
+    return [interval for interval in LATE_POSTPREFIX_INTERVALS if interval.label in labels]
+
+
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     result = subprocess.run(
         interval.command(),
@@ -652,6 +699,20 @@ def check_early_accelerated_interval(interval: EarlyAcceleratedInterval, toleran
     )
     actual = parse_piecewise_total(result.stdout)
     check_close(f"early_accelerated_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    return actual
+
+
+def check_late_postprefix_interval(interval: LatePostprefixInterval, tolerance: float) -> float:
+    result = subprocess.run(
+        interval.command(),
+        cwd=ROOT.parent,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    actual = parse_piecewise_total(result.stdout)
+    check_close(f"late_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -733,6 +794,11 @@ def main() -> int:
         help="Print the recomputation command for every accelerated early interval.",
     )
     parser.add_argument(
+        "--print-late-postprefix-commands",
+        action="store_true",
+        help="Print the recomputation command for every ultra-late post-prefix interval.",
+    )
+    parser.add_argument(
         "--check-high-intervals",
         help=(
             "Comma-separated high-interval labels to recompute, or 'all'. "
@@ -760,10 +826,22 @@ def main() -> int:
             "Example: 100001--110000,750001--1048576."
         ),
     )
+    parser.add_argument(
+        "--check-late-postprefix-intervals",
+        help=(
+            "Comma-separated ultra-late post-prefix interval labels to recompute, or 'all'. "
+            "Example: 501--2000,250001--380736."
+        ),
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
 
-    if args.print_high_interval_commands or args.print_early_postprefix_commands or args.print_early_accelerated_commands:
+    if (
+        args.print_high_interval_commands
+        or args.print_early_postprefix_commands
+        or args.print_early_accelerated_commands
+        or args.print_late_postprefix_commands
+    ):
         if args.print_early_postprefix_commands:
             print("Early post-prefix interval recomputation commands")
             for interval in EARLY_POSTPREFIX_INTERVALS:
@@ -772,8 +850,16 @@ def main() -> int:
             print("Accelerated early interval recomputation commands")
             for interval in EARLY_ACCELERATED_INTERVALS:
                 print(f"early_accelerated_interval_{interval.label}_command,{interval.display_command()}")
+        if args.print_late_postprefix_commands:
+            print("Ultra-late post-prefix interval recomputation commands")
+            for interval in LATE_POSTPREFIX_INTERVALS:
+                print(f"late_postprefix_interval_{interval.label}_command,{interval.display_command()}")
         if not args.print_high_interval_commands:
-            if not args.check_early_postprefix_intervals and not args.check_early_accelerated_intervals:
+            if (
+                not args.check_early_postprefix_intervals
+                and not args.check_early_accelerated_intervals
+                and not args.check_late_postprefix_intervals
+            ):
                 return 0
         else:
             print("High-interval recomputation commands")
@@ -787,6 +873,7 @@ def main() -> int:
             and not args.check_complement_high_intervals
             and not args.check_early_postprefix_intervals
             and not args.check_early_accelerated_intervals
+            and not args.check_late_postprefix_intervals
         ):
             return 0
 
@@ -1090,6 +1177,14 @@ def main() -> int:
     print(f"early_accelerated_paired_350001_1048576_total_log2,{paired_total:.6f}")
     print(f"early_accelerated_75001_1048576_total_log2,{early_accelerated_total:.6f}")
 
+    late_postprefix_total = float("-inf")
+    for interval in LATE_POSTPREFIX_INTERVALS:
+        late_postprefix_total = log2add(late_postprefix_total, interval.log2_value)
+        print(f"late_postprefix_interval_{interval.label}_z,{interval.z:.17g}")
+        print(f"late_postprefix_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+    check_close("late_postprefix_501_380736", late_postprefix_total, -545.690526, args.tolerance)
+    print(f"late_postprefix_501_380736_total_log2,{late_postprefix_total:.6f}")
+
     if args.check_high_intervals:
         for interval in selected_high_intervals(args.check_high_intervals):
             actual = check_high_interval(interval, args.tolerance)
@@ -1114,9 +1209,16 @@ def main() -> int:
             print(f"early_accelerated_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"early_accelerated_interval_{interval.label}_recompute_status,PASS")
 
+    if args.check_late_postprefix_intervals:
+        for interval in selected_late_postprefix_intervals(args.check_late_postprefix_intervals):
+            actual = check_late_postprefix_interval(interval, args.tolerance)
+            print(f"late_postprefix_interval_{interval.label}_recomputed_log2,{actual:.6f}")
+            print(f"late_postprefix_interval_{interval.label}_recompute_status,PASS")
+
     h501_plus_checked = float("-inf")
     for value in [
         parts["postprefix_501_2000_eall"],
+        late_postprefix_total,
         early_postprefix_total,
         early_accelerated_total,
         high_total,

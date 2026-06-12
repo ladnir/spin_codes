@@ -2887,9 +2887,9 @@ Thus \(T\) is the number of later \(b\)-blocks after the first active block.  Th
 \begin{array}{c|c|c}
 \text{regime} & T\text{ range} & \text{current status}\\
 \hline
-\text{ultra-late} & 0\le T<5949 & \text{placement cap checked for }h\le500\\
+\text{ultra-late} & 0\le T<5949 & \text{placement cap checked}\\
 \text{audited window} & 5949\le T\le17948 & \text{episode ledger checked}\\
-\text{early} & T>17948 & \text{episode ledger checked for }h\le500
+\text{early} & T>17948 & \text{episode ledger checked}
 \end{array}
 \]
 The audited window is exactly the script parameterization
@@ -2911,7 +2911,9 @@ now also checks the placement-only ultra-late prefix
 \Pr[\text{first active block lies in the final }5949\text{ blocks}]
 \le 2^{-41.113442},
 \]
-using exact RM direct-sum outer coefficients through \(h=500\).  The window ledger itself is
+using exact RM direct-sum outer coefficients through \(h=500\).  For \(h\ge501\), the same placement cap is handled by
+fixed-pole interval rows in Corollary~\ref{cor:fullsplit-postprefix-checked-ledger}; these rows contribute at most
+\(-545.690526\) bits.  The window ledger itself is
 \[
 \log_2\mu_{\rm window}^{\rm exact\ outer}\le -37.383345,
 \]
@@ -2942,8 +2944,8 @@ still dominated by the audited window and ultra-late prefix.  The proof debt is 
 \]
 with total \(-380.829185\) bits to displayed precision.  This combines the original endpoint table through
 \(h=75000\), an accelerated endpoint recurrence through \(h=350000\), and a paired-\(T\) high-density recurrence
-through \(h=N/2\).  The remaining first-active coverage gap is the post-prefix part of the ultra-late cap beyond
-\(h=500\).
+through \(h=N/2\).  The post-prefix part of the ultra-late cap beyond \(h=500\) is separately covered by the
+placement-only interval rows below.
 
 Putting the inflated termination atom into the episode-gap sweep and multiplying by the RM outer and exact first-active
 placement gives the first combined \(h\)-dependent checkpoint.  For \(r=1\), gap buckets
@@ -4137,6 +4139,34 @@ this as
 \log_2\mu_{1048577\le h\le N}^{\rm complement\ high}\le -35150.097366.
 \]
 
+It remains to include the post-prefix part of the ultra-late branch \(T<5949\).  Here no inner episode estimate is
+needed: all \(h\) nonzero coordinates must lie in the final \(m=64\cdot5949=380736\) inner coordinates.  For a fixed
+outer Cauchy pole \(z\),
+\[
+A_h^{\rm out}\frac{\binom{m}{h}}{\binom Nh}
+\le
+\left(W_{\rm loc}(z)^{4096}-1\right)z^{-h}\frac{\binom{m}{h}}{\binom Nh}.
+\]
+The logarithm of the right-hand side has adjacent ratio \((m-h)/(N-h)z^{-1}\), hence is concave in \(h\).  Therefore
+each interval is certified by checking its endpoints and the critical point
+\[
+h_*=\frac{m-zN}{1-z}.
+\]
+With \(z=0.39605985943459426\), the checked intervals
+\[
+\begin{array}{c}
+501\text{--}2000,\quad 2001\text{--}7858,\quad 7859\text{--}20550,\\
+20551\text{--}75000,\quad 75001\text{--}150000,\quad 150001\text{--}250000,\\
+250001\text{--}380736
+\end{array}
+\]
+have union-bound total
+\[
+\log_2\mu_{501\le h\le380736,\ T<5949}^{\rm placement}\le -545.690526.
+\]
+The verifier flag \(\texttt{--print-late-postprefix-commands}\) prints the regeneration commands; the row helper is
+\(\texttt{certify\_fullsplit\_late\_prefix\_interval.py}\).
+
 \begin{corollary}[Checked post-prefix ledger rows]
 \label{cor:fullsplit-postprefix-checked-ledger}
 The checked \(h\ge501\) row families currently included in the finite ledger have union-bound total
@@ -4149,6 +4179,7 @@ These rows are
 \text{row family} & \log_2\text{ contribution}\\
 \hline
 501\le h\le2000\ \text{all-episode wrapper} & -182.259739\\
+501\le h\le380736,\ T<5949\ \text{ultra-late placement rows} & -545.690526\\
 501\le h\le75000,\ T>17948\ \text{early endpoint rows} & -380.829185\\
 75001\le h\le350000,\ T>17948\ \text{accelerated endpoint rows} & -1056.187188\\
 350001\le h\le N/2,\ T>17948\ \text{paired accelerated rows} & -98386.449256\\
@@ -4160,16 +4191,17 @@ These rows are
 
 \begin{proof}
 The first row is the tracked \(501\le h\le2000\) all-episode h-summary artifact for the late window.  The second row is
-the checked early endpoint table for \(T>17948\) through \(h=75000\).  The third row is the vectorized endpoint
-extension for \(75001\le h\le350000\), and the fourth row is the paired-\(T\) extension for
-\(350001\le h\le N/2\).  The fifth row is the fixed-pole interval table through the feasible far-bucket cutoff
-\(h=1148736\).  The sixth row is the complement-side high-density table.  The last two row families overlap on
+the ultra-late placement cap for \(h>500\).  Since \(64\cdot5949=380736\), no ultra-late placement row exists above
+\(h=380736\).  The third row is the checked early endpoint table for \(T>17948\) through \(h=75000\).  The fourth row is
+the vectorized endpoint extension for \(75001\le h\le350000\), and the fifth row is the paired-\(T\) extension for
+\(350001\le h\le N/2\).  The sixth row is the fixed-pole interval table through the feasible far-bucket cutoff
+\(h=1148736\).  The seventh row is the complement-side high-density table.  The last two row families overlap on
 \(1048577\le h\le1148736\); the ledger deliberately keeps this harmless overcount as a union bound.  Therefore the
 combined contribution is bounded by
 \[
 \begin{aligned}
-&\log_2\!\left(2^{-182.259739}+2^{-380.829185}+2^{-1056.187188}+2^{-98386.449256}\right.\\
-&\qquad\left.+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
+&\log_2\!\left(2^{-182.259739}+2^{-545.690526}+2^{-380.829185}+2^{-1056.187188}\right.\\
+&\qquad\left.+2^{-98386.449256}+2^{-586.597103}+2^{-35150.097366}\right)\le -182.259739.
 \end{aligned}
 \]
 The verifier prints and checks this as
@@ -4210,8 +4242,9 @@ The finite ledger is now checked by
 It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
 that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
 \(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, the checked
-early endpoint rows through \(h=75000\), the accelerated early rows through \(h=N/2\), and the fixed-pole interval
-tables above, including the complement-side high-density manifest.  Reweighting the \(h\le500\) pieces by exact
+ultra-late post-prefix placement rows, the checked early endpoint rows through \(h=75000\), the accelerated early rows
+through \(h=N/2\), and the fixed-pole interval tables above, including the complement-side high-density manifest.
+Reweighting the \(h\le500\) pieces by exact
 RM direct-sum outer coefficients gives the reported combined finite late-window contribution
 \[
 \log_2\mu_{\rm finite}^{\rm fullsplit,\ exact\ outer}\le -37.383345,
