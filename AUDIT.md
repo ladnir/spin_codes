@@ -158,6 +158,10 @@ high_feasible_min_T_far_cutoff_h,1148736
 high_feasible_min_T_gap_1_4000_cutoff_h,636736
 high_feasible_min_T_gap_4001_8000_cutoff_h,892736
 high_feasible_min_T_gap_8001_12000_cutoff_h,1148736
+t_monotonicity_sufficient_status,PASS
+t_monotonicity_sufficient_rows,18
+t_monotonicity_sufficient_min_slack_bits,0.154987
+t_monotonicity_sufficient_worst,h=7859--20550,bucket=gap_4001_8000,T=9949--13948,lambda=0.05,rho=0.03,slack=0.154987
 interval_2001_1148736_total_log2,-586.597103
 complement_high_cover_status,PASS
 complement_high_cover_range,1048577--2097152
@@ -191,8 +195,8 @@ current_checked_ledger_margin_bits,37.278528
 manifest_json,C:\Users\peter\repo\permute_conv\scripts\fullsplit_finite_ledger_manifest.json
 ```
 
-For the monotonicity audit, every reported middle/far bucket slack should be positive. The smallest current slack is
-the far-bucket row for `725001--950000`, about `3.773620` bits.
+The finite-ledger verifier now runs the sufficient monotonicity audit by default. Every reported middle/far bucket
+slack is positive; the smallest current slack is the middle-bucket row for `7859--20550`, about `0.154987` bits.
 
 ## Ledger Pieces
 
@@ -1116,10 +1120,15 @@ high_feasible_min_T_far_cutoff_h,1148736
 high_feasible_min_T_gap_1_4000_cutoff_h,636736
 high_feasible_min_T_gap_4001_8000_cutoff_h,892736
 high_feasible_min_T_gap_8001_12000_cutoff_h,1148736
+t_monotonicity_sufficient_status,PASS
+t_monotonicity_sufficient_rows,18
+t_monotonicity_sufficient_min_slack_bits,0.154987
+t_monotonicity_sufficient_worst,h=7859--20550,bucket=gap_4001_8000,T=9949--13948,lambda=0.05,rho=0.03,slack=0.154987
 ```
 
-Audit priority: medium. The `T_eff=max(T_min,ceil(H/b))` cutoff is now checked in the main ledger. The remaining
-audit target here is the sufficient monotonicity reduction for the fixed-pole all-episode wrapper.
+Audit priority: medium. The `T_eff=max(T_min,ceil(H/b))` cutoff and the sufficient monotonicity reduction for the
+fixed-pole all-episode wrapper are now checked in the main ledger. The remaining audit target here is formula-level
+review of the reduction internals.
 
 ## Proof Objects To Inspect
 

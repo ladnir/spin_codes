@@ -47,6 +47,21 @@ class Interval:
     rho: float
 
 
+@dataclass(frozen=True)
+class SufficientReductionRow:
+    h_min: int
+    h_max: int
+    lam: float
+    rho: float
+    bucket_t_min: int
+    bucket_t_max: int
+    no_new_slack: float
+    new_slack: float
+    min_slack: float
+    h_new: int | None
+    t_new: int | None
+
+
 DEFAULT_INTERVALS = [
     Interval(2001, 7858, 0.02, 0.01),
     Interval(7859, 20550, 0.05, 0.03),
@@ -107,20 +122,15 @@ def denominator_log_ratio(*, b: int, H: int, T: int) -> float:
     return log2_binom(b * (T + 1), H) - log2_binom(b * T, H)
 
 
-def print_sufficient_reduction(
+def sufficient_reduction_rows(
     *,
     intervals: list[Interval],
     buckets: list[tuple[int, int]],
     entries: list[tuple[int, int, float]],
     b: int,
     turnoff_log2: float,
-) -> None:
-    print("Full-split T-monotonicity sufficient endpoint reduction", flush=True)
-    print(
-        "h_min,h_max,lambda,rho,bucket_T_min,bucket_T_max,"
-        "no_new_slack,new_slack,min_slack,H_new,T_new",
-        flush=True,
-    )
+) -> list[SufficientReductionRow]:
+    rows: list[SufficientReductionRow] = []
     for interval in intervals:
         M = sum(p * math.exp(-interval.lam * j) for j, q, p in entries if q > 0)
         G = math.expm1(b * math.log1p(interval.rho)) * M / (1.0 - M)
@@ -148,14 +158,53 @@ def print_sufficient_reduction(
                     new_arg = (H, T)
 
             min_slack = min(no_new_slack, new_slack)
-            H_new = "" if new_arg is None else str(new_arg[0])
-            T_new = "" if new_arg is None else str(new_arg[1])
-            print(
-                f"{interval.h_min},{interval.h_max},{interval.lam:g},{interval.rho:g},"
-                f"{t_min},{t_max},{no_new_slack:.6f},{new_slack:.6f},"
-                f"{min_slack:.6f},{H_new},{T_new}",
-                flush=True,
+            rows.append(
+                SufficientReductionRow(
+                    h_min=interval.h_min,
+                    h_max=interval.h_max,
+                    lam=interval.lam,
+                    rho=interval.rho,
+                    bucket_t_min=t_min,
+                    bucket_t_max=t_max,
+                    no_new_slack=no_new_slack,
+                    new_slack=new_slack,
+                    min_slack=min_slack,
+                    h_new=None if new_arg is None else new_arg[0],
+                    t_new=None if new_arg is None else new_arg[1],
+                )
             )
+    return rows
+
+
+def print_sufficient_reduction(
+    *,
+    intervals: list[Interval],
+    buckets: list[tuple[int, int]],
+    entries: list[tuple[int, int, float]],
+    b: int,
+    turnoff_log2: float,
+) -> None:
+    print("Full-split T-monotonicity sufficient endpoint reduction", flush=True)
+    print(
+        "h_min,h_max,lambda,rho,bucket_T_min,bucket_T_max,"
+        "no_new_slack,new_slack,min_slack,H_new,T_new",
+        flush=True,
+    )
+    for row in sufficient_reduction_rows(
+        intervals=intervals,
+        buckets=buckets,
+        entries=entries,
+        b=b,
+        turnoff_log2=turnoff_log2,
+    ):
+        H_new = "" if row.h_new is None else str(row.h_new)
+        T_new = "" if row.t_new is None else str(row.t_new)
+        print(
+            f"{row.h_min},{row.h_max},{row.lam:g},{row.rho:g},"
+            f"{row.bucket_t_min},{row.bucket_t_max},{row.no_new_slack:.6f},{row.new_slack:.6f},"
+            f"{row.min_slack:.6f},{H_new},{T_new}",
+            flush=True,
+        )
 
 
 def main() -> int:

@@ -18,6 +18,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from bound_fullsplit_episode_gaps import load_spectrum as load_inner_spectrum
+from bound_fullsplit_episode_gaps import split_entries as split_inner_entries
+from check_fullsplit_T_monotonicity import (
+    DEFAULT_INTERVALS as T_MONOTONICITY_INTERVALS,
+    sufficient_reduction_rows,
+)
 from certify_prefix_placement_ratio import certify_placement_ratio
 from certify_rm_outer_prefix_exact import (
     exact_late_prefix_sum,
@@ -237,6 +243,16 @@ class LatePostprefixShapeSummary:
 class ComplementHighShapeSummary:
     interval_count: int
     min_convexity_growth_bits: float
+    rows: list[dict[str, object]]
+
+
+@dataclass(frozen=True)
+class TMonotonicitySummary:
+    interval_count: int
+    bucket_count: int
+    row_count: int
+    min_slack_bits: float
+    worst_row: dict[str, object]
     rows: list[dict[str, object]]
 
 
@@ -1134,6 +1150,83 @@ def check_complement_high_shapes(
     )
 
 
+def check_t_monotonicity_sufficient_reduction(
+    *,
+    inner_spectrum: Path,
+    b: int,
+    turnoff_log2: float,
+) -> TMonotonicitySummary:
+    ordered = sorted(T_MONOTONICITY_INTERVALS, key=lambda interval: interval.h_min)
+    previous_stop = 2000
+    for interval in ordered:
+        if interval.h_min != previous_stop + 1:
+            raise SystemExit(
+                "T monotonicity audit: interval cover gap or overlap before "
+                f"{interval.h_min}--{interval.h_max}"
+            )
+        if interval.h_max < interval.h_min:
+            raise SystemExit(f"T monotonicity audit: malformed interval {interval.h_min}--{interval.h_max}")
+        if interval.lam <= 0.0 or interval.rho <= 0.0:
+            raise SystemExit(f"T monotonicity audit: nonpositive pole on {interval.h_min}--{interval.h_max}")
+        previous_stop = interval.h_max
+    if previous_stop != 1148736:
+        raise SystemExit(f"T monotonicity audit: expected cover through 1148736, got {previous_stop}")
+
+    buckets = [
+        (bucket.t_min, bucket.t_max)
+        for bucket in INTERIOR_AUDIT_BUCKETS
+        if bucket.name in {"gap_4001_8000", "gap_8001_12000"}
+    ]
+    bucket_names = {(bucket.t_min, bucket.t_max): bucket.name for bucket in INTERIOR_AUDIT_BUCKETS}
+    entries = split_inner_entries(load_inner_spectrum(inner_spectrum), b)
+    raw_rows = sufficient_reduction_rows(
+        intervals=list(T_MONOTONICITY_INTERVALS),
+        buckets=buckets,
+        entries=entries,
+        b=b,
+        turnoff_log2=turnoff_log2,
+    )
+    if len(raw_rows) != len(T_MONOTONICITY_INTERVALS) * len(buckets):
+        raise SystemExit(
+            "T monotonicity audit: expected "
+            f"{len(T_MONOTONICITY_INTERVALS) * len(buckets)} rows, got {len(raw_rows)}"
+        )
+
+    rows: list[dict[str, object]] = []
+    for row in raw_rows:
+        if row.min_slack <= 0.0:
+            raise SystemExit(
+                "T monotonicity audit: nonpositive slack on "
+                f"{row.h_min}--{row.h_max}, T={row.bucket_t_min}--{row.bucket_t_max}: {row.min_slack}"
+            )
+        rows.append(
+            {
+                "h_range": [row.h_min, row.h_max],
+                "lambda": row.lam,
+                "rho": row.rho,
+                "bucket": bucket_names[(row.bucket_t_min, row.bucket_t_max)],
+                "T_range": [row.bucket_t_min, row.bucket_t_max],
+                "no_new_slack_bits": finite_float(row.no_new_slack),
+                "new_slack_bits": finite_float(row.new_slack),
+                "min_slack_bits": finite_float(row.min_slack),
+                "H_new": row.h_new,
+                "T_new": row.t_new,
+            }
+        )
+    finite_rows = [row for row in rows if row["min_slack_bits"] is not None]
+    if not finite_rows:
+        raise SystemExit("T monotonicity audit: no finite slack row found")
+    worst = min(finite_rows, key=lambda row: float(row["min_slack_bits"]))
+    return TMonotonicitySummary(
+        interval_count=len(T_MONOTONICITY_INTERVALS),
+        bucket_count=len(buckets),
+        row_count=len(rows),
+        min_slack_bits=float(worst["min_slack_bits"]),
+        worst_row=worst,
+        rows=rows,
+    )
+
+
 def check_high_interval(interval: HighInterval, tolerance: float) -> float:
     result = subprocess.run(
         interval.command(),
@@ -1242,6 +1335,7 @@ def main() -> int:
         default=ROOT / "block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv",
     )
     parser.add_argument("--exact-outer-local-spectrum-csv", type=Path, default=ROOT / "rm512_256_spectrum.csv")
+    parser.add_argument("--inner-spectrum", type=Path, default=ROOT / "EBCH128_64.wd")
     parser.add_argument("--exact-outer-blocks", type=int, default=4096)
     parser.add_argument("--exact-outer-h-max", type=int, default=500)
     parser.add_argument("--N", type=int, default=2**21)
@@ -1348,6 +1442,7 @@ def main() -> int:
             "global_turnoff_log2": GLOBAL_TURNOFF_LOG2,
             "high_interval_turnoff_adjustment_bits": HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
             "exact_outer_local_spectrum_csv": manifest_path(args.exact_outer_local_spectrum_csv),
+            "inner_spectrum": manifest_path(args.inner_spectrum),
         },
         "checks": {},
         "row_families": [],
@@ -1981,6 +2076,35 @@ def main() -> int:
             }
             for name, t_min, t_max, cutoff_h in high_feasible_t.bucket_cutoffs
         ],
+    }
+    t_mono = check_t_monotonicity_sufficient_reduction(
+        inner_spectrum=args.inner_spectrum,
+        b=args.block_bits,
+        turnoff_log2=GLOBAL_TURNOFF_LOG2,
+    )
+    worst_t = t_mono.worst_row["T_range"]
+    worst_h = t_mono.worst_row["h_range"]
+    print("t_monotonicity_sufficient_status,PASS")
+    print(f"t_monotonicity_sufficient_rows,{t_mono.row_count}")
+    print(f"t_monotonicity_sufficient_min_slack_bits,{t_mono.min_slack_bits:.6f}")
+    print(
+        "t_monotonicity_sufficient_worst,"
+        f"h={worst_h[0]}--{worst_h[1]},"
+        f"bucket={t_mono.worst_row['bucket']},"
+        f"T={worst_t[0]}--{worst_t[1]},"
+        f"lambda={t_mono.worst_row['lambda']:g},"
+        f"rho={t_mono.worst_row['rho']:g},"
+        f"slack={t_mono.min_slack_bits:.6f}"
+    )
+    manifest["checks"]["t_monotonicity_sufficient_reduction"] = {  # type: ignore[index]
+        "status": "PASS",
+        "interval_count": t_mono.interval_count,
+        "bucket_count": t_mono.bucket_count,
+        "row_count": t_mono.row_count,
+        "min_slack_bits": t_mono.min_slack_bits,
+        "worst_row": t_mono.worst_row,
+        "rule": "two-case sufficient endpoint reduction for fixed-pole e>=1 envelope monotonicity in T",
+        "rows": t_mono.rows,
     }
 
     high_total = float("-inf")
