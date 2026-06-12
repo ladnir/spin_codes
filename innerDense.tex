@@ -4239,6 +4239,10 @@ The finite ledger is now checked by
 \[
 \texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}.
 \]
+The same verifier writes a machine-readable snapshot by passing \(\texttt{--write-manifest-json}\) with target
+\(\texttt{scripts/fullsplit\_finite\_ledger\_manifest.json}\).
+That manifest records the checked row families, fixed poles, recomputation commands, and log-sum totals under schema
+version \(v1\).
 It first checks the tracked interior-\(T\) audit artifact for the \(32\le h\le500\), \(e\le8\) window prefix, then combines
 that explicit CSV ledger with the crude \(e\ge9\) window residual, the bucket-uniform early \(h\le500\) ledger
 \(e\le16\), the crude early \(e\ge17\) residual, the all-episode \(501\le h\le2000\) wrapper row, the checked

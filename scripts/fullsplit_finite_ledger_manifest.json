@@ -1,0 +1,907 @@
+{
+  "checks": {
+    "exact_outer_support": {
+      "first_positive_le_80": [
+        32,
+        48,
+        56,
+        60,
+        64,
+        68,
+        72,
+        76,
+        80
+      ],
+      "min_positive": 32,
+      "next_positive_after_min": 48,
+      "positive_count": 114
+    },
+    "prefix_interior_audit": {
+      "rows": 1500,
+      "worst": {
+        "H": "75",
+        "T_at_max": "13949",
+        "T_count": "4000",
+        "bucket": "gap_8001_12000",
+        "left_log2": "-150.568129429",
+        "left_reproduction_delta": "2.19205276153e-09",
+        "max_log2": "-150.568129427",
+        "max_log2_minus_left": "2.19205276153e-09"
+      },
+      "worst_reproduction": {
+        "H": "185",
+        "T_at_max": "13949",
+        "T_count": "4000",
+        "bucket": "gap_8001_12000",
+        "left_log2": "-285.570795148",
+        "left_reproduction_delta": "-5.52478240934e-09",
+        "max_log2": "-285.570795153",
+        "max_log2_minus_left": "-5.52478240934e-09"
+      }
+    },
+    "prefix_placement_ratio": {
+      "endpoint_bound_at_h_min": 0.31306555240043515,
+      "endpoint_slack_factor": 1.0311989761397868,
+      "gap_range": [
+        1,
+        4000
+      ],
+      "h_range": [
+        32,
+        500
+      ],
+      "peak_h": 32,
+      "peak_ratio": 0.3035937385938729,
+      "threshold": "0.303594"
+    },
+    "prefix_ridge_ratio": {
+      "first_inner_ratio": 1.0000000000000393,
+      "first_outer_ratio": 2.808685390696199,
+      "first_placement_ratio": 0.3035937391739889,
+      "first_ratio": 0.8526992999248486,
+      "geometric_bound_log2": -34.76978522910598,
+      "inner_span_bits": 3.147704319417244e-12,
+      "remainder_exact_log2": -43.86017926542517,
+      "ridge_exact_log2": -34.76981855267534,
+      "ridge_rows": 469,
+      "rows": 88464,
+      "tail_inner_ratio": 1.0000000000000393,
+      "tail_outer_ratio": 2.7464194576751995,
+      "tail_placement_ratio": 0.3035934024219713,
+      "tail_ratio": 0.8337948276335436,
+      "total_ratio_bound_log2": -34.76714102358159,
+      "total_ratio_bound_slack_bits": 3.3262548498669275e-05
+    }
+  },
+  "construction": "RM512_256 block outer with full-split dense inner",
+  "parameters": {
+    "block_bits": 64,
+    "exact_outer_blocks": 4096,
+    "exact_outer_h_max": 500,
+    "exact_outer_local_spectrum_csv": "scripts\\rm512_256_spectrum.csv",
+    "global_turnoff_log2": -62.4078758,
+    "high_interval_turnoff_adjustment_bits": 1.484774,
+    "late_blocks": 5949,
+    "late_coordinates": 380736
+  },
+  "row_families": [
+    {
+      "h_range": [
+        1,
+        500
+      ],
+      "log2": -40.11543146973484,
+      "name": "late_prefix_T_lt_5949_cap_h_le_500",
+      "notes": "Placement-only ultra-late cap using the outer-prefix CSV coefficients.",
+      "peak": {
+        "h": 32.0,
+        "late_log2": -78.77173147792081,
+        "outer_log2": 37.629712,
+        "term_log2": -41.14201947792081
+      },
+      "role": "diagnostic_cap",
+      "rows": 469
+    },
+    {
+      "above_split_log2": -66.4165021170476,
+      "h_range": [
+        1,
+        500
+      ],
+      "log2": -41.1134419333902,
+      "name": "late_prefix_T_lt_5949_exact_outer_h_le_500",
+      "notes": "Exact RM direct-sum outer coefficients for the ultra-late prefix.",
+      "peak": {
+        "h": 32,
+        "late_log2": -78.77173147792081,
+        "outer_log2": 37.65828950968128,
+        "term_log2": -41.11344196823953
+      },
+      "role": "active_h_le_500",
+      "rows": 114,
+      "split_h": 32,
+      "split_log2": -41.11344196823953
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -34.767174,
+      "log2": -34.767174286130086,
+      "name": "prefix_32_500_e_le8",
+      "peak": {
+        "best_alpha": "nan",
+        "best_lambda": "nan",
+        "best_rho": "nan",
+        "bucket_T": "5949",
+        "first_r": "1",
+        "gap_max": "4000",
+        "gap_min": "1",
+        "inner_log2": "-20.011734892645514",
+        "inner_mode": "csv",
+        "outer_log2_bound": "37.65828950968125",
+        "outer_weight": "32",
+        "outer_z": "9.999999999999982e-09",
+        "placement_log2": "-55.03232145853627",
+        "remaining_ones": "31",
+        "term_log2": "-37.38576684150053"
+      },
+      "role": "raw_csv_check",
+      "rows": 88464,
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -269.335258,
+      "log2": -269.3352579715279,
+      "name": "prefix_32_500_e_ge9_tail",
+      "peak": {
+        "first_r": "1",
+        "gap_max": "12000",
+        "gap_min": "8001",
+        "outer_log2": "676.056993",
+        "outer_weight": "500",
+        "placement_log2": "-434.2827771434713",
+        "remaining_ones": "499",
+        "tail_log2": "-512.915384957545",
+        "term_log2": "-271.1411691010163"
+      },
+      "role": "raw_csv_check",
+      "rows": 87588,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -85.403338,
+      "log2": -85.40333786206811,
+      "name": "early_32_500_e_le16_uniformsurv",
+      "peak": {
+        "best_alpha": "nan",
+        "best_lambda": "nan",
+        "best_rho": "nan",
+        "bucket_T": "17949",
+        "first_r": "1",
+        "gap_max": "17000",
+        "gap_min": "12001",
+        "inner_log2": "-108.57658824597326",
+        "inner_mode": "csv",
+        "outer_log2_bound": "37.65828950968125",
+        "outer_weight": "32",
+        "outer_z": "9.999999999999982e-09",
+        "placement_log2": "-16.445093443249107",
+        "remaining_ones": "31",
+        "term_log2": "-87.36339217954111"
+      },
+      "role": "raw_csv_check",
+      "rows": 88464,
+      "source_csv": "scripts\\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -305.738816,
+      "log2": -305.7388164635216,
+      "name": "early_32_500_e_ge17_tail",
+      "peak": {
+        "first_r": "1",
+        "gap_max": "26819",
+        "gap_min": "22001",
+        "outer_log2": "676.056993",
+        "outer_weight": "500",
+        "placement_log2": "-0.010850246336303826",
+        "remaining_ones": "499",
+        "tail_log2": "-982.4911090629782",
+        "term_log2": "-306.4449663093145"
+      },
+      "role": "raw_csv_check",
+      "rows": 86520,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv"
+    },
+    {
+      "column": "aggregate_log2",
+      "expected_log2": -182.259739,
+      "log2": -182.25973862499328,
+      "name": "postprefix_501_2000_eall",
+      "peak": {
+        "aggregate_log2": "-184.35624892645725",
+        "outer_weight": "501",
+        "peak_best_alpha": "nan",
+        "peak_best_lambda": "nan",
+        "peak_best_rho": "nan",
+        "peak_first_r": "1",
+        "peak_gap_max": "4000",
+        "peak_gap_min": "1",
+        "peak_inner_log2": "0.0",
+        "peak_inner_mode": "cap",
+        "peak_outer_log2_bound": "677.3932024505685",
+        "peak_placement_log2": "-861.7853757248122",
+        "peak_remaining_ones": "500",
+        "peak_term_log2": "-184.39217327424365"
+      },
+      "role": "raw_csv_check",
+      "rows": 1500,
+      "source_csv": "scripts\\fullsplit_piecewise_h501_2000_eall_hsummary.csv"
+    },
+    {
+      "above_split_log2": -50.738252508305614,
+      "log2": -37.383344523987574,
+      "name": "prefix_32_500_e_le8_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "outer_log2": 37.65828950968128,
+        "outer_weight": 32,
+        "term_log2": -37.3857668415005
+      },
+      "role": "active_h_le_500",
+      "rows": 21708,
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv",
+      "split_h": 32,
+      "split_log2": -37.38348223458855
+    },
+    {
+      "above_split_log2": -284.00480466197814,
+      "log2": -284.00480466197814,
+      "name": "prefix_32_500_e_ge9_tail_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 12000,
+        "gap_min": 8001,
+        "outer_log2": 662.4660134755578,
+        "outer_weight": 500,
+        "term_log2": -284.73214862545854
+      },
+      "role": "active_h_le_500",
+      "rows": 21576,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv",
+      "split_h": 32,
+      "split_log2": -540.4230482869045
+    },
+    {
+      "above_split_log2": -106.3522886081795,
+      "log2": -86.91045616174831,
+      "name": "early_32_500_e_le16_uniformsurv_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 17000,
+        "gap_min": 12001,
+        "outer_log2": 37.65828950968128,
+        "outer_weight": 32,
+        "term_log2": -87.36339217954108
+      },
+      "role": "active_h_le_500",
+      "rows": 21708,
+      "source_csv": "scripts\\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv",
+      "split_h": 32,
+      "split_log2": -86.9104581875648
+    },
+    {
+      "above_split_log2": -319.97780844645155,
+      "log2": -319.97780844645155,
+      "name": "early_32_500_e_ge17_tail_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 26819,
+        "gap_min": 22001,
+        "outer_log2": 662.4660134755578,
+        "outer_weight": 500,
+        "term_log2": -320.0359458337567
+      },
+      "role": "active_h_le_500",
+      "rows": 21396,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv",
+      "split_h": 32,
+      "split_log2": -1019.4415954617978
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "lambda_value": 0.02,
+      "log2": -586.597103,
+      "name": "interval_2001--7858",
+      "raw_log2": -588.081877,
+      "rho": 0.01,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "lambda_value": 0.05,
+      "log2": -2655.944828,
+      "name": "interval_7859--20550",
+      "raw_log2": -2657.429602,
+      "rho": 0.03,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:75000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        20551,
+        75000
+      ],
+      "lambda_value": 0.2,
+      "log2": -6025.574047,
+      "name": "interval_20551--75000",
+      "raw_log2": -6027.058821,
+      "rho": 0.1,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 75001:250000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.5 --rhos 0.3",
+      "h_range": [
+        75001,
+        250000
+      ],
+      "lambda_value": 0.5,
+      "log2": -12844.868837,
+      "name": "interval_75001--250000",
+      "raw_log2": -12846.353611,
+      "rho": 0.3,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 250001:350000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 0.5",
+      "h_range": [
+        250001,
+        350000
+      ],
+      "lambda_value": 1.2,
+      "log2": -28476.640541,
+      "name": "interval_250001--350000",
+      "raw_log2": -28478.125315,
+      "rho": 0.5,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 350001:400000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        350001,
+        400000
+      ],
+      "lambda_value": 1.2,
+      "log2": -81555.594538,
+      "name": "interval_350001--400000",
+      "raw_log2": -81557.079312,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 400001:450000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        400001,
+        450000
+      ],
+      "lambda_value": 1.2,
+      "log2": -91421.772986,
+      "name": "interval_400001--450000",
+      "raw_log2": -91423.25776,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 450001:550000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        450001,
+        550000
+      ],
+      "lambda_value": 1.2,
+      "log2": -82081.961328,
+      "name": "interval_450001--550000",
+      "raw_log2": -82083.446102,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 550001:650000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        550001,
+        650000
+      ],
+      "lambda_value": 1.2,
+      "log2": -1518.493461,
+      "name": "interval_550001--650000",
+      "raw_log2": -1519.978235,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 650001:725000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 2",
+      "h_range": [
+        650001,
+        725000
+      ],
+      "lambda_value": 1.2,
+      "log2": -116328.133946,
+      "name": "interval_650001--725000",
+      "raw_log2": -116329.61872,
+      "rho": 2.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 725001:750000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        725001,
+        750000
+      ],
+      "lambda_value": 1.2,
+      "log2": -169887.902921,
+      "name": "interval_725001--750000",
+      "raw_log2": -169889.387695,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 750001:850000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        750001,
+        850000
+      ],
+      "lambda_value": 1.2,
+      "log2": -134523.58364599998,
+      "name": "interval_750001--850000",
+      "raw_log2": -134525.06842,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 850001:950000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        850001,
+        950000
+      ],
+      "lambda_value": 1.2,
+      "log2": -117534.84353,
+      "name": "interval_850001--950000",
+      "raw_log2": -117536.328304,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 950001:1050000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        950001,
+        1050000
+      ],
+      "lambda_value": 1.2,
+      "log2": -285052.550668,
+      "name": "interval_950001--1050000",
+      "raw_log2": -285054.035442,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 1050001:1148736 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        1050001,
+        1148736
+      ],
+      "lambda_value": 1.2,
+      "log2": -562860.716638,
+      "name": "interval_1050001--1148736",
+      "raw_log2": -562862.201412,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1048577:1148736:1 --lambda-value 2.3",
+      "h_range": [
+        1048577,
+        1148736
+      ],
+      "log2": -128915.315746,
+      "name": "complement_interval_1048577--1148736",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1148737:1300000:1 --lambda-value 2.3",
+      "h_range": [
+        1148737,
+        1300000
+      ],
+      "log2": -124889.651755,
+      "name": "complement_interval_1148737--1300000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1300001:1500000:1 --lambda-value 2.3",
+      "h_range": [
+        1300001,
+        1500000
+      ],
+      "log2": -113710.357653,
+      "name": "complement_interval_1300001--1500000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1500001:1700000:1 --lambda-value 2.3",
+      "h_range": [
+        1500001,
+        1700000
+      ],
+      "log2": -35150.097366,
+      "name": "complement_interval_1500001--1700000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1700001:1900000:10 --lambda-value 2.3",
+      "h_range": [
+        1700001,
+        1900000
+      ],
+      "log2": -524628.366199,
+      "name": "complement_interval_1700001--1900000",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1900001:2097089:10 --lambda-value 2.3",
+      "h_range": [
+        1900001,
+        2097089
+      ],
+      "log2": -894140.350713,
+      "name": "complement_interval_1900001--2097089",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 2097090:2097152:10 --lambda-value 2.3",
+      "h_range": [
+        2097090,
+        2097152
+      ],
+      "log2": -893792.28501,
+      "name": "complement_interval_2097090--2097152",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 501:2000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758",
+      "h_range": [
+        501,
+        2000
+      ],
+      "lambdas": null,
+      "log2": -380.829185,
+      "name": "early_postprefix_interval_501--2000",
+      "rhos": null,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "lambdas": "0.02",
+      "log2": -852.998772,
+      "name": "early_postprefix_interval_2001--7858",
+      "rhos": "0.01",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "lambdas": "0.05",
+      "log2": -3712.365087,
+      "name": "early_postprefix_interval_7859--20550",
+      "rhos": "0.03",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:30000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        20551,
+        30000
+      ],
+      "lambdas": "0.2",
+      "log2": -8614.382763,
+      "name": "early_postprefix_interval_20551--30000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 30001:50000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        30001,
+        50000
+      ],
+      "lambdas": "0.2",
+      "log2": -21332.131033,
+      "name": "early_postprefix_interval_30001--50000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 50001:75000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        50001,
+        75000
+      ],
+      "lambdas": "0.2",
+      "log2": -34847.929043,
+      "name": "early_postprefix_interval_50001--75000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 75001:90000:0.2:0.1",
+      "h_range": [
+        75001,
+        90000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.2,
+      "log2": -28574.869802,
+      "name": "early_accelerated_interval_75001--90000",
+      "rho": 0.1,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 90001:100000:0.2:0.1",
+      "h_range": [
+        90001,
+        100000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.2,
+      "log2": -22149.918612,
+      "name": "early_accelerated_interval_90001--100000",
+      "rho": 0.1,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 100001:110000:0.5:0.3",
+      "h_range": [
+        100001,
+        110000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.5,
+      "log2": -1056.187188,
+      "name": "early_accelerated_interval_100001--110000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 110001:125000:0.5:0.3",
+      "h_range": [
+        110001,
+        125000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.5,
+      "log2": -10362.025949,
+      "name": "early_accelerated_interval_110001--125000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 125001:160000:0.8:0.3",
+      "h_range": [
+        125001,
+        160000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.8,
+      "log2": -45589.980049,
+      "name": "early_accelerated_interval_125001--160000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 160001:250000:1.2:0.5",
+      "h_range": [
+        160001,
+        250000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 1.2,
+      "log2": -60293.751685,
+      "name": "early_accelerated_interval_160001--250000",
+      "rho": 0.5,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 250001:350000:1.2:0.5",
+      "h_range": [
+        250001,
+        350000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 1.2,
+      "log2": -94682.265141,
+      "name": "early_accelerated_interval_250001--350000",
+      "rho": 0.5,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 350001:524288:2:0.8",
+      "h_range": [
+        350001,
+        524288
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -181215.853042,
+      "name": "early_accelerated_interval_350001--524288",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 524289:750000:2:0.8",
+      "h_range": [
+        524289,
+        750000
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -194565.849984,
+      "name": "early_accelerated_interval_524289--750000",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 750001:1048576:2:0.8",
+      "h_range": [
+        750001,
+        1048576
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -98386.449256,
+      "name": "early_accelerated_interval_750001--1048576",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 501:2000:0.39605985943459426",
+      "h_range": [
+        501,
+        2000
+      ],
+      "log2": -545.690526,
+      "name": "late_postprefix_interval_501--2000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 2001:7858:0.39605985943459426",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "log2": -2237.593414,
+      "name": "late_postprefix_interval_2001--7858",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 7859:20550:0.39605985943459426",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "log2": -8919.160723,
+      "name": "late_postprefix_interval_7859--20550",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 20551:75000:0.39605985943459426",
+      "h_range": [
+        20551,
+        75000
+      ],
+      "log2": -23772.761808,
+      "name": "late_postprefix_interval_20551--75000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 75001:150000:0.39605985943459426",
+      "h_range": [
+        75001,
+        150000
+      ],
+      "log2": -93856.032305,
+      "name": "late_postprefix_interval_75001--150000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 150001:250000:0.39605985943459426",
+      "h_range": [
+        150001,
+        250000
+      ],
+      "log2": -210536.528296,
+      "name": "late_postprefix_interval_150001--250000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 250001:380736:0.39605985943459426",
+      "h_range": [
+        250001,
+        380736
+      ],
+      "log2": -417970.896784,
+      "name": "late_postprefix_interval_250001--380736",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    }
+  ],
+  "schema": "fullsplit_finite_ledger.v1",
+  "target": {
+    "N": 2097152,
+    "delta": 0.09,
+    "quantity": "first-moment upper bound for checked finite dense+dense rows"
+  },
+  "totals": {
+    "complement_interval_1048577_2097152_total_log2": -35150.097366,
+    "current_checked_ledger_margin_bits": 37.27852762602124,
+    "current_checked_ledger_total_log2": -37.27852762602124,
+    "early_32_500_all_e_exact_outer_log2": -86.91045616174831,
+    "early_accelerated_75001_1048576_total_log2": -1056.187188,
+    "early_accelerated_endpoint_75001_350000_total_log2": -1056.187188,
+    "early_accelerated_paired_350001_1048576_total_log2": -98386.449256,
+    "early_postprefix_501_75000_total_log2": -380.829185,
+    "finite_ledger_margin_bits": 37.383344523987574,
+    "finite_ledger_total_log2": -37.383344523987574,
+    "h32_500_all_first_active_positions_log2": -37.27852762602124,
+    "h32_500_all_first_active_positions_margin_bits": 37.27852762602124,
+    "h501_plus_checked_rows_log2": -182.25973862499328,
+    "interval_2001_1148736_total_log2": -586.597103,
+    "late_plus_window_margin_bits": 37.27852762602124,
+    "late_plus_window_total_log2": -37.27852762602124,
+    "late_postprefix_501_380736_total_log2": -545.690526,
+    "prefix_32_500_all_e_exact_outer_log2": -37.383344523987574
+  }
+}

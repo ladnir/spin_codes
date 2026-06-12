@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import math
 import subprocess
 import sys
@@ -332,6 +333,52 @@ def log2add(a: float, b: float) -> float:
     if a < b:
         a, b = b, a
     return a + math.log2(1.0 + 2.0 ** (b - a))
+
+
+def finite_float(value: float) -> float | None:
+    if math.isinf(value) or math.isnan(value):
+        return None
+    return value
+
+
+def interval_range(start: int, stop: int) -> list[int]:
+    return [start, stop]
+
+
+def manifest_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(ROOT.parent))
+    except ValueError:
+        return str(path)
+
+
+def add_row(
+    manifest: dict[str, object],
+    *,
+    name: str,
+    log2_value: float,
+    role: str,
+    h_range: tuple[int, int] | None = None,
+    rows: int | None = None,
+    command: str | None = None,
+    notes: str | None = None,
+    **extra: object,
+) -> None:
+    row: dict[str, object] = {
+        "name": name,
+        "role": role,
+        "log2": finite_float(log2_value),
+    }
+    if h_range is not None:
+        row["h_range"] = interval_range(*h_range)
+    if rows is not None:
+        row["rows"] = rows
+    if command is not None:
+        row["command"] = command
+    if notes is not None:
+        row["notes"] = notes
+    row.update(extra)
+    manifest["row_families"].append(row)  # type: ignore[index,union-attr]
 
 
 def late_prefix_cap_log2(
@@ -833,8 +880,36 @@ def main() -> int:
             "Example: 501--2000,250001--380736."
         ),
     )
+    parser.add_argument(
+        "--write-manifest-json",
+        type=Path,
+        help="Write a machine-readable manifest of the checked row families, constants, and totals.",
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
+
+    manifest: dict[str, object] = {
+        "schema": "fullsplit_finite_ledger.v1",
+        "construction": "RM512_256 block outer with full-split dense inner",
+        "target": {
+            "N": args.N,
+            "delta": 0.09,
+            "quantity": "first-moment upper bound for checked finite dense+dense rows",
+        },
+        "parameters": {
+            "block_bits": args.block_bits,
+            "late_blocks": args.late_blocks,
+            "late_coordinates": args.block_bits * args.late_blocks,
+            "exact_outer_blocks": args.exact_outer_blocks,
+            "exact_outer_h_max": args.exact_outer_h_max,
+            "global_turnoff_log2": GLOBAL_TURNOFF_LOG2,
+            "high_interval_turnoff_adjustment_bits": HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
+            "exact_outer_local_spectrum_csv": manifest_path(args.exact_outer_local_spectrum_csv),
+        },
+        "checks": {},
+        "row_families": [],
+        "totals": {},
+    }
 
     if (
         args.print_high_interval_commands
@@ -932,6 +1007,11 @@ def main() -> int:
             f"H={interior.worst_repro['H']},"
             f"delta={interior.worst_repro['left_reproduction_delta']}"
         )
+        manifest["checks"]["prefix_interior_audit"] = {  # type: ignore[index]
+            "rows": interior.rows,
+            "worst": interior.worst,
+            "worst_reproduction": interior.worst_repro,
+        }
 
     late_prefix, late_rows, late_peak = late_prefix_cap_log2(
         args.outer_prefix_csv,
@@ -951,6 +1031,16 @@ def main() -> int:
             f"late_log2={late_peak['late_log2']:.6f},"
             f"term_log2={late_peak['term_log2']:.6f}"
         )
+    add_row(
+        manifest,
+        name=f"late_prefix_T_lt_{args.late_blocks}_cap_h_le_{args.late_prefix_h_max}",
+        role="diagnostic_cap",
+        h_range=(1, args.late_prefix_h_max),
+        rows=late_rows,
+        log2_value=late_prefix,
+        notes="Placement-only ultra-late cap using the outer-prefix CSV coefficients.",
+        peak=late_peak,
+    )
 
     exact_outer_coeffs = direct_sum_coefficients(
         load_local_spectrum(args.exact_outer_local_spectrum_csv, args.exact_outer_h_max),
@@ -963,6 +1053,12 @@ def main() -> int:
             "exact RM support: expected first positive weights 32,48; "
             f"got {exact_support[:2]}"
         )
+    manifest["checks"]["exact_outer_support"] = {  # type: ignore[index]
+        "positive_count": len(exact_support),
+        "min_positive": exact_support[0],
+        "next_positive_after_min": exact_support[1],
+        "first_positive_le_80": [h for h in exact_support if h <= 80],
+    }
     print(f"exact_outer_support_positive_count,{len(exact_support)}")
     print(f"exact_outer_support_min_positive,{exact_support[0]}")
     print(f"exact_outer_support_next_positive_after_min,{exact_support[1]}")
@@ -997,6 +1093,24 @@ def main() -> int:
         f"late_log2={exact_late_prefix.peak_late_log2:.6f},"
         f"term_log2={exact_late_prefix.peak_term_log2:.6f}"
     )
+    add_row(
+        manifest,
+        name=f"late_prefix_T_lt_{args.late_blocks}_exact_outer_h_le_{args.late_prefix_h_max}",
+        role="active_h_le_500",
+        h_range=(1, args.late_prefix_h_max),
+        rows=exact_late_prefix.rows,
+        log2_value=exact_late_prefix.total_log2,
+        notes="Exact RM direct-sum outer coefficients for the ultra-late prefix.",
+        split_h=exact_late_prefix.split_h,
+        split_log2=exact_late_prefix.split_log2,
+        above_split_log2=exact_late_prefix.above_split_log2,
+        peak={
+            "h": exact_late_prefix.peak_h,
+            "outer_log2": exact_late_prefix.peak_outer_log2,
+            "late_log2": exact_late_prefix.peak_late_log2,
+            "term_log2": exact_late_prefix.peak_term_log2,
+        },
+    )
 
     parts: dict[str, float] = {}
     for item in csv_ledgers:
@@ -1006,6 +1120,17 @@ def main() -> int:
         print(f"{item.name}_rows,{rows}")
         print(f"{item.name}_log2,{total:.6f}")
         print_peak(item.name, peak, item.column)
+        add_row(
+            manifest,
+            name=item.name,
+            role="raw_csv_check",
+            rows=rows,
+            log2_value=total,
+            source_csv=manifest_path(item.path),
+            column=item.column,
+            expected_log2=item.expected_log2,
+            peak=peak,
+        )
 
     exact_outer_expected = {
         "prefix_32_500_e_le8": -37.383345,
@@ -1045,6 +1170,25 @@ def main() -> int:
             f"gap_min={summary.peak_gap_min},gap_max={summary.peak_gap_max},"
             f"outer_log2={summary.peak_outer_exact_log2:.6f},"
             f"term_log2={summary.peak_term_log2:.6f}"
+        )
+        add_row(
+            manifest,
+            name=f"{item.name}_exact_outer",
+            role="active_h_le_500",
+            rows=summary.live_rows,
+            log2_value=summary.exact_log2,
+            source_csv=manifest_path(item.path),
+            split_h=summary.split_h,
+            split_log2=summary.split_log2,
+            above_split_log2=summary.above_split_log2,
+            peak={
+                "outer_weight": summary.peak_h,
+                "first_r": summary.peak_first_r,
+                "gap_min": summary.peak_gap_min,
+                "gap_max": summary.peak_gap_max,
+                "outer_log2": summary.peak_outer_exact_log2,
+                "term_log2": summary.peak_term_log2,
+            },
         )
 
     ridge_ratio = prefix_ridge_ratio_summary(args.prefix_e_le8_csv)
@@ -1103,6 +1247,24 @@ def main() -> int:
     print(f"prefix_ridge_total_ratio_bound_log2,{ridge_ratio.total_bound_log2:.6f}")
     print(f"prefix_ridge_total_ratio_bound_slack_bits,{ridge_ratio.total_bound_log2 - ridge_ratio.total_exact_log2:.12g}")
     print(f"prefix_ridge_inner_span_bits,{ridge_ratio.inner_span_bits:.12g}")
+    manifest["checks"]["prefix_ridge_ratio"] = {  # type: ignore[index]
+        "rows": ridge_ratio.rows,
+        "ridge_rows": ridge_ratio.ridge_rows,
+        "ridge_exact_log2": ridge_ratio.ridge_exact_log2,
+        "remainder_exact_log2": ridge_ratio.remainder_exact_log2,
+        "first_ratio": ridge_ratio.first_ratio,
+        "tail_ratio": ridge_ratio.tail_ratio,
+        "first_outer_ratio": ridge_ratio.first_outer_ratio,
+        "first_placement_ratio": ridge_ratio.first_placement_ratio,
+        "first_inner_ratio": ridge_ratio.first_inner_ratio,
+        "tail_outer_ratio": ridge_ratio.tail_outer_ratio,
+        "tail_placement_ratio": ridge_ratio.tail_placement_ratio,
+        "tail_inner_ratio": ridge_ratio.tail_inner_ratio,
+        "geometric_bound_log2": ridge_ratio.geometric_log2,
+        "total_ratio_bound_log2": ridge_ratio.total_bound_log2,
+        "total_ratio_bound_slack_bits": ridge_ratio.total_bound_log2 - ridge_ratio.total_exact_log2,
+        "inner_span_bits": ridge_ratio.inner_span_bits,
+    }
 
     if not args.skip_prefix_placement_ratio_cert:
         placement = exact_placement_ratio_summary(
@@ -1120,6 +1282,15 @@ def main() -> int:
         print(f"prefix_placement_ratio_peak,{placement.peak_ratio:.12g}")
         print(f"prefix_placement_endpoint_bound_at_h_min,{placement.endpoint_ratio_at_h_min:.12g}")
         print(f"prefix_placement_endpoint_slack_factor,{placement.endpoint_slack_factor:.12g}")
+        manifest["checks"]["prefix_placement_ratio"] = {  # type: ignore[index]
+            "threshold": args.prefix_placement_ratio_threshold,
+            "gap_range": [args.prefix_placement_gap_min, args.prefix_placement_gap_max],
+            "h_range": [args.prefix_placement_h_min, args.prefix_placement_h_max],
+            "peak_h": placement.peak_h,
+            "peak_ratio": placement.peak_ratio,
+            "endpoint_bound_at_h_min": placement.endpoint_ratio_at_h_min,
+            "endpoint_slack_factor": placement.endpoint_slack_factor,
+        }
 
     prefix_all = log2add(
         exact_outer_parts["prefix_32_500_e_le8"],
@@ -1138,6 +1309,18 @@ def main() -> int:
         print(f"interval_{label}_lambda,{lam:g}")
         print(f"interval_{label}_rho,{rho:g}")
         print(f"interval_{label}_log2,{value:.6f}")
+        add_row(
+            manifest,
+            name=f"interval_{label}",
+            role="active_postprefix_late_window_fixed_pole",
+            h_range=tuple(int(x) for x in label.split("--")),  # type: ignore[arg-type]
+            log2_value=value,
+            command=next(interval.display_command() for interval in HIGH_INTERVALS_RAW if interval.label == label),
+            lambda_value=lam,
+            rho=rho,
+            raw_log2=next(interval.raw_log2 for interval in HIGH_INTERVALS_RAW if interval.label == label),
+            turnoff_adjustment_bits=HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS,
+        )
     print(f"interval_2001_1148736_total_log2,{high_total:.6f}")
     print("feasible_far_bucket_cutoff_h,1148736")
 
@@ -1146,6 +1329,15 @@ def main() -> int:
         complement_high_total = log2add(complement_high_total, interval.log2_value)
         print(f"complement_interval_{interval.label}_rho,{interval.rho:g}")
         print(f"complement_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+        add_row(
+            manifest,
+            name=f"complement_interval_{interval.label}",
+            role="active_complement_high_density",
+            h_range=(interval.start, interval.stop),
+            log2_value=interval.log2_value,
+            command=interval.display_command(),
+            rho=interval.rho,
+        )
     print(f"complement_interval_1048577_2097152_total_log2,{complement_high_total:.6f}")
 
     early_postprefix_total = float("-inf")
@@ -1156,6 +1348,16 @@ def main() -> int:
         if interval.rhos is not None:
             print(f"early_postprefix_interval_{interval.label}_rho,{interval.rhos}")
         print(f"early_postprefix_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+        add_row(
+            manifest,
+            name=f"early_postprefix_interval_{interval.label}",
+            role="active_postprefix_early_endpoint",
+            h_range=(interval.start, interval.stop),
+            log2_value=interval.log2_value,
+            command=interval.display_command(),
+            lambdas=interval.lambdas,
+            rhos=interval.rhos,
+        )
     check_close("early_postprefix_501_75000", early_postprefix_total, -380.829185, args.tolerance)
     print(f"early_postprefix_501_75000_total_log2,{early_postprefix_total:.6f}")
 
@@ -1172,6 +1374,17 @@ def main() -> int:
         print(f"early_accelerated_interval_{interval.label}_lambda,{interval.lam:g}")
         print(f"early_accelerated_interval_{interval.label}_rho,{interval.rho:g}")
         print(f"early_accelerated_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+        add_row(
+            manifest,
+            name=f"early_accelerated_interval_{interval.label}",
+            role=f"active_postprefix_early_{interval.kind}",
+            h_range=(interval.start, interval.stop),
+            log2_value=interval.log2_value,
+            command=interval.display_command(),
+            lambda_value=interval.lam,
+            rho=interval.rho,
+            helper=interval.script_name,
+        )
     check_close("early_accelerated_75001_1048576", early_accelerated_total, -1056.187188, args.tolerance)
     print(f"early_accelerated_endpoint_75001_350000_total_log2,{endpoint_total:.6f}")
     print(f"early_accelerated_paired_350001_1048576_total_log2,{paired_total:.6f}")
@@ -1182,6 +1395,15 @@ def main() -> int:
         late_postprefix_total = log2add(late_postprefix_total, interval.log2_value)
         print(f"late_postprefix_interval_{interval.label}_z,{interval.z:.17g}")
         print(f"late_postprefix_interval_{interval.label}_log2,{interval.log2_value:.6f}")
+        add_row(
+            manifest,
+            name=f"late_postprefix_interval_{interval.label}",
+            role="active_postprefix_ultralate_placement",
+            h_range=(interval.start, interval.stop),
+            log2_value=interval.log2_value,
+            command=interval.display_command(),
+            z=interval.z,
+        )
     check_close("late_postprefix_501_380736", late_postprefix_total, -545.690526, args.tolerance)
     print(f"late_postprefix_501_380736_total_log2,{late_postprefix_total:.6f}")
 
@@ -1243,6 +1465,33 @@ def main() -> int:
     check_close("current_checked_ledger", current_checked, -37.278528, args.tolerance)
     print(f"current_checked_ledger_total_log2,{current_checked:.6f}")
     print(f"current_checked_ledger_margin_bits,{-current_checked:.6f}")
+    manifest["totals"] = {  # type: ignore[index]
+        "prefix_32_500_all_e_exact_outer_log2": prefix_all,
+        "early_32_500_all_e_exact_outer_log2": early_all,
+        "interval_2001_1148736_total_log2": high_total,
+        "complement_interval_1048577_2097152_total_log2": complement_high_total,
+        "early_postprefix_501_75000_total_log2": early_postprefix_total,
+        "early_accelerated_endpoint_75001_350000_total_log2": endpoint_total,
+        "early_accelerated_paired_350001_1048576_total_log2": paired_total,
+        "early_accelerated_75001_1048576_total_log2": early_accelerated_total,
+        "late_postprefix_501_380736_total_log2": late_postprefix_total,
+        "h501_plus_checked_rows_log2": h501_plus_checked,
+        "finite_ledger_total_log2": total,
+        "finite_ledger_margin_bits": -total,
+        "late_plus_window_total_log2": late_plus_window,
+        "late_plus_window_margin_bits": -late_plus_window,
+        "h32_500_all_first_active_positions_log2": h32_500_all_positions,
+        "h32_500_all_first_active_positions_margin_bits": -h32_500_all_positions,
+        "current_checked_ledger_total_log2": current_checked,
+        "current_checked_ledger_margin_bits": -current_checked,
+    }
+    if args.write_manifest_json:
+        output_manifest_path = args.write_manifest_json
+        if not output_manifest_path.is_absolute():
+            output_manifest_path = (Path.cwd() / output_manifest_path).resolve()
+        output_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        output_manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+        print(f"manifest_json,{output_manifest_path}")
     return 0
 
 
