@@ -1,5 +1,5 @@
 
-\section{Inner instantiation I: the accumulator (enumerator-based contraction)}
+\section{Accumulator warmup: exact enumerator and contraction}
 \label{sec:inner-accumulator}
 
 This section instantiates the inner encoder \(\Ctwo\) as the length-\(n\) binary accumulator.
@@ -165,16 +165,3 @@ The contraction exponent is only \(\Theta(w)\) through \(\lceil w/2\rceil\), ref
 is controlled by about half of the spacing variables. In practice this leads to a relatively weak certified \(\delta\) compared
 to the stronger recursive inner constructions in later sections.
 Nevertheless, the accumulator case is valuable as a baseline because the enumerator is exact and the framework algebra is completely transparent.
-
-\subsection{TODOs}
-\label{subsec:acc-todos}
-
-If we want to sharpen constants (or extend the statement beyond \(w\le n/2\)), the remaining work is purely optional:
-\begin{enumerate}
-\item Derive a symmetric upper-tail analogue (for \(\Pr[\wt(\Acc_n(U))\ge (1-\delta)n]\)) and combine the two tails in a single bound.
-\item Optimize the \((4e\delta)^k\) constant by tightening the ratio \(\binom{n}{w-k}/\binom{n}{w}\) and using a sharper bound on
-      \(\sum_{h\le \delta n}\binom{h-1}{k-1}\).
-\item If needed for a particular region of the outer spectrum, extend the contraction bound to all \(w\le \mu n\) for any fixed \(\mu<1\)
-      by tracking \(\prod_{i=0}^{k-1}\frac{w-i}{n-w+i+1}\) as \((w/(n-w))^k\) instead of \((2w/n)^k\).
-\end{enumerate}
-```

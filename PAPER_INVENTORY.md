@@ -12,6 +12,10 @@ main spine is `intro.tex`, `prelim.tex`, `framework.tex`, `outerDense.tex`,
 remain preserved sources.  The full-split certificate development ledger now
 lives in `explorations/fullsplit_certificate_development.tex`, with the compact
 main certificate in `localCodeStructured.tex`.
+A follow-up cleanup pass removed the accumulator TODO subsection from the
+compiled main path and preserved it in
+`explorations/accumulator_warmup_notes.tex`; it also renamed the dense
+integration and structured local-code sections to match the intended paper flow.
 
 ## Status Labels
 
@@ -33,9 +37,12 @@ main certificate in `localCodeStructured.tex`.
 | `intro.tex` | Short motivation and paper framing. | Keep main, later rewrite after theorem/certificate split stabilizes. |
 | `prelim.tex` | Basic notation and combinatorial preliminaries. | Keep main. |
 | `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main, possibly tighten prose. |
-| `outerDense.tex` | Dense/banded outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or appendix split. |
-| `innerDense.tex` | Scalar dense inner, block-recursive exploration, full-split EBCH certificate, projections, TODOs. | Split by topic; this is the highest-priority cleanup target. |
-| `integration.tex` | Dense+dense integration, finite scalar diagnostics, block outer history, BCH spectra exploration. | Split by topic; keep analytic theorem and selected current finite context. |
+| `outerDense.tex` | Dense/banded outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
+| `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
+| `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
+| `localCodeStructured.tex` | Compact local-code interface, RM/EBCH certificate, and BCH projections. | `MAIN_CERTIFICATE` plus `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
+| `innerDense.tex` | Original monolithic dense-inner workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
+| `integration.tex` | Original monolithic dense integration workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `outerExpandAcc.tex` | Alternate expander/accumulator outer construction. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
 | `innerAcc.tex` | Accumulator inner instantiation with exact enumerator. | Promote as a warmup theorem/example after the framework. |
 | `innerSparse.tex` | Sparse recursive inner with refresh. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
@@ -187,6 +194,8 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
   - old fixed-tap dense finite scans;
   - isolated-slice and early-pair diagnostics;
   - sigma-margin scans and scalar proof-target notes.
+- `explorations/accumulator_warmup_notes.tex`
+  - optional accumulator sharpness improvements and non-main TODOs.
 - `explorations/fullsplit_certificate_development.tex`
   - development history of the full-split certificate;
   - row-family derivation notes too detailed for main paper.

@@ -36,8 +36,11 @@ Primary locations:
 
 - `framework.tex`: serial-concatenation first-moment framework.
 - `outerDense.tex`: systematic dense/banded outer spectrum interface.
-- `innerDense.tex`: scalar dense recursive inner interface.
-- `integration.tex`: dense+dense integration theorem.
+- `innerDenseScalar.tex`: scalar dense recursive inner interface in the current
+  compiled spine.
+- `integrationDense.tex`: dense+dense integration theorem in the current
+  compiled spine.
+- `innerDense.tex` and `integration.tex`: preserved original sources.
 
 Locked claims:
 
@@ -63,12 +66,16 @@ Status: current main finite construction and checked certificate.
 
 Primary locations:
 
-- `innerDense.tex`, especially labels:
+- `localCodeStructured.tex`, especially labels:
   - `lem:rm-prefix-support-split`
   - `cor:fullsplit-small-prefix-all-first-active`
   - `cor:fullsplit-postprefix-checked-ledger`
   - `cor:fullsplit-current-finite-checkpoint`
   - `thm:fullsplit-rm-finite-certificate-009`
+- `explorations/fullsplit_certificate_development.tex`: detailed development
+  notes copied from the original dense-inner workspace.
+- `innerDense.tex`: preserved original source containing the pre-cleanup
+  full-split ledger material.
 - `AUDIT.md`: full audit packet and command log.
 - `scripts/fullsplit_finite_ledger_manifest.json`: machine-readable checked
   ledger snapshot.

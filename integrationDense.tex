@@ -1,14 +1,12 @@
-% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
-% Source: integration.tex, analytic dense+dense integration prefix.
-
-\section{End-to-End Integrations}
+\section{Random sliding dense construction and asymptotics}
 \label{sec:integrations}
 
-This section focuses only on the dense validation pair:
-a systematic dense banded outer together with the dense time-varying recursive inner.
-The proof is a direct first-moment argument.
-The outer contributes an expected spectrum envelope, while the inner contributes two analytic tails:
-one for low/intermediate weights and one geometric tail above a logarithmic cutoff.
+This section is the theorem-facing integration of the random sliding dense construction:
+a systematic dense banded outer together with the random dense recursive inner.
+It deliberately omits the finite scalar diagnostics and working-save-point calculations, which are preserved in
+\texttt{explorations/scalar\_dense\_finite\_diagnostics.tex}.  The proof here is a direct first-moment argument: the outer
+contributes an expected spectrum envelope, while the inner contributes a low/intermediate-weight contraction and a
+linear-weight large-deviation tail.
 
 \subsection{Direct first-moment reduction}
 \label{sec:integration-dense-dense}

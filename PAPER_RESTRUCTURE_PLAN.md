@@ -16,6 +16,12 @@ particular, the long full-split finite-ledger development was preserved in
 `explorations/fullsplit_certificate_development.tex`, while
 `localCodeStructured.tex` now contains the compact local-code interface,
 RM/EBCH certificate, and heuristic BCH projection table.
+The follow-up cleanup pass removed visible research-log residue from the
+compiled spine: the accumulator TODOs now live in
+`explorations/accumulator_warmup_notes.tex`, the dense integration section is
+named around the random sliding dense construction, and the local-code section
+explicitly separates the checked RM/EBCH certificate from spectrum-model
+projections.
 
 ## Summary
 
@@ -338,20 +344,29 @@ Status: heuristic except the RM row.
 - Keep generated scratch files and `__pycache__` out of the paper flow unless
   explicitly named as canonical artifacts.
 
-## Implementation Order
+## Implemented Checkpoint
 
-1. Review this plan.
-2. Create the exploration directory and empty/topic-note files.
-3. Split `innerDense.tex` first:
-   - scalar dense theorem material;
-   - full-split local-code certificate material;
-   - block-recursive BCH and diagnostic material.
-4. Split `integration.tex` second:
-   - keep analytic dense+dense theorem;
-   - move finite scalar diagnostics and BCH spectra exploration.
-5. Update `main_permConv.tex` include order to the cleaned spine.
-6. Compile twice and fix only breakages caused by the split.
-7. Leave style polish and narrative rewrite for a later pass.
+The first physical split is complete:
+
+1. `explorations/` exists and contains topic notes for the demoted branches.
+2. Scalar dense theorem material now compiles from `innerDenseScalar.tex`.
+3. Analytic dense+dense integration now compiles from `integrationDense.tex`.
+4. The local-code interface, RM/EBCH certificate, and BCH projection table now
+   compile from `localCodeStructured.tex`.
+5. `main_permConv.tex` uses the cleaned spine and no longer inputs the original
+   monolithic `innerDense.tex`, `integration.tex`, `outerExpandAcc.tex`, or
+   `innerSparse.tex`.
+6. The accumulator warmup no longer exposes its optional TODO list in the main
+   paper; those notes live in `explorations/accumulator_warmup_notes.tex`.
+
+Remaining cleanup is proof-facing polish, not the initial physical split:
+
+- tighten the long scalar dense inner section into a theorem-plus-appendix
+  shape;
+- shorten dense outer proof machinery if the main paper remains too long;
+- harden finite-certificate row explanations and manifests for external audit;
+- replace BCH projections with exact spectra or rigorous envelopes before any
+  theorem upgrade.
 
 ## Verification Plan
 
@@ -375,8 +390,7 @@ Expected caveats:
 
 ## Assumptions
 
-- This plan becomes the working cleanup source of truth.
+- This plan remains the working cleanup source of truth.
 - `RESULTS_LOCK.md` and `PAPER_INVENTORY.md` remain present for provenance.
-- No LaTeX prose is moved until this plan is reviewed.
 - The current main finite construction is RM outer plus EBCH full-split inner.
 - BCH and other stronger local-code rows remain projections until certified.
