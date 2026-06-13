@@ -87,6 +87,9 @@ The framework section has now been shortened as well: optional IOWE and
 piecewise/single-envelope bookkeeping variants were moved to
 `explorations/framework_flexible_corollaries.tex`, leaving the compiled source
 focused on the first-moment theorem and reusable envelope corollary.
+The random sliding outer section now keeps the concise fixed-tap band-cluster
+low-weight law in the compiled proof path, because the dense integration theorem
+uses it for the tiny-window late-placement contribution.
 
 ## Status Labels
 

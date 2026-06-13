@@ -81,6 +81,40 @@ is \(z\), which is at most \((1+z)/2\) when \(z\in(0,1)\). Multiplying over the 
 including the systematic factor \(z^w\) proves the bound.
 \end{proof}
 
+\begin{lemma}[Fixed-tap band-cluster parity law]
+\label{lem:outer-fixedtap-banded-lowweight-law}
+Fix a message word \(x\) of weight \(w\).  Let \(q(x)\) be the size of the union
+of parity-band intervals touched by \(\supp(x)\), and let \(r(x)\) be the number
+of band-clusters of \(\supp(x)\), where adjacent support positions are in the
+same cluster when their separation is at most \(M\).  In the fixed-tap outer,
+the parity weight has distribution
+\[
+r(x)+\Binomial(q(x)-r(x),\tfrac12).
+\]
+\end{lemma}
+
+\begin{proof}
+The first support position in each band-cluster has a parity coordinate where
+only its fixed diagonal tap is active, hence contributes a deterministic one.
+These give \(r(x)\) parity ones.  Every other active parity coordinate sees at
+least one random tap from the band, so its output is an independent fair bit.
+\end{proof}
+
+\begin{corollary}[No weight-one outer codewords]
+\label{cor:outer-fixedtap-no-weight-one}
+For the fixed-tap systematic dense outer,
+\[
+\enum_{\Cone,1}=0
+\]
+deterministically.
+\end{corollary}
+
+\begin{proof}
+A weight-one message has its systematic one and, by the fixed diagonal tap, at
+least one parity one.  Any higher-weight message has systematic weight at least
+two.
+\end{proof}
+
 \subsection{A global geometric spectrum envelope}
 \label{sec:outer-dense-spectrum}
 

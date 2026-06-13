@@ -96,6 +96,9 @@ The framework section was also tightened: optional IOWE viewpoint and the
 piecewise/single-envelope bookkeeping corollaries now live in
 `explorations/framework_flexible_corollaries.tex`, while the compiled
 `framework.tex` keeps the first-moment theorem and basic envelope corollary.
+The random sliding outer section now keeps the concise fixed-tap band-cluster
+low-weight law because `integrationDense.tex` consumes it in the tiny-window
+late-placement bound; the exploration note keeps only auxiliary diagnostics.
 
 ## Summary
 
@@ -469,6 +472,9 @@ The first physical split is complete:
 17. Framework optional corollaries were demoted from `framework.tex` to
     `explorations/framework_flexible_corollaries.tex`, leaving only the core
     first-moment reduction and reusable envelope corollary in the compiled spine.
+18. The fixed-tap band-cluster low-weight law was promoted back into
+    `outerDense.tex`, and the dense integration proof now references it directly
+    instead of relying on cleanup/provenance prose.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
