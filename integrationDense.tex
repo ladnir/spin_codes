@@ -36,7 +36,7 @@ Choose the outer memory constant \(c\) so that
 \label{eq:dense-c-condition}
 c>\frac{1}{\log_2(1/a(z))}.
 \end{equation}
-Let \(\beta_{\mathrm{out}}>1\) be the corresponding outer spectrum constant from
+Set \(\beta_{\mathrm{out}}:=z^{-1}\), the outer spectrum constant supplied by
 Corollary~\ref{lem:outer-dense-spectrum}.
 
 Next choose constants \(\kappa>0\), \(\rho\in(0,1)\), \(\delta\in(0,1/2)\), and \(\gamma>1\) such that
@@ -79,7 +79,11 @@ Corollary~\ref{lem:outer-dense-spectrum} gives
 \]
 
 \paragraph{Low-weight inner bound.}
-Fix any \(\xi>0\) and let
+Choose \(\xi>0\) small enough that
+\[
+\lambda_\xi:=(2+\xi)\delta<\rho.
+\]
+Let
 \[
 L:=\lceil(2+\xi)\delta n\rceil,
 \qquad
@@ -106,7 +110,7 @@ S_{\mathrm{low}}
 \le
 \sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h\frac{h(h-1)}{n-1}
 \;+\;
-\sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h
+\sum_{h=1}^{h_\star}\EE[\enum_{\Cone,h}]
 \frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
 \;+\;
 \sum_{h=1}^{h_\star}\beta_{\mathrm{out}}^h h2^{-(m-1)}
@@ -125,17 +129,31 @@ n^{\kappa\log_2(\beta_{\mathrm{out}})-1}(\log n)^{O(1)}
 \]
 by the first condition in \eqref{eq:dense-dense-parameter-conditions}.
 
-The late-placement summand in the tiny window uses the fixed-tap low-weight
-outer law, not only the coarse global envelope.  In particular,
-Corollary~\ref{cor:outer-fixedtap-no-weight-one} gives
-\begin{equation}
-\label{eq:dense-dense-fixedtap-no-weight-one}
-A_1^{\mathrm{out,ft}}=0
-\end{equation}
-deterministically, while Lemma~\ref{lem:outer-fixedtap-banded-lowweight-law}
-gives the corresponding band-cluster law for the remaining fixed small weights.
-This is the outer input that makes the late-placement contribution summable in
-the tiny-weight window.
+For the late-placement term, choose a constant \(\lambda\) with
+\[
+\lambda_\xi<\lambda<\rho.
+\]
+Since \(h\le h_\star=O(\log n)\), for all sufficiently large \(n\),
+\[
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
+\le
+\left(\frac{L}{n-h+1}\right)^h
+\le
+\lambda^h .
+\]
+Because \(\lambda<\rho<\beta_{\mathrm{out}}^{-1}=z\), the outer generating
+bound applies at \(\lambda\), and
+\[
+\sum_{h=1}^{h_\star}\EE[\enum_{\Cone,h}]
+\frac{\binom{L-h+1}{h}}{\binom{n-h+1}{h}}
+\le
+W_{\mathrm{out}}(\lambda)
+\le
+C_{\mathrm{out}}(\lambda)\,k\,a(\lambda)^M
+=o(1).
+\]
+Here \(a(\lambda)=(1+\lambda)/2<a(z)\), and the condition
+\eqref{eq:dense-c-condition} was imposed at \(z\).
 
 For the fixed-tap candidate term, since \(m=\gamma\log_2 n\),
 \[
