@@ -90,6 +90,9 @@ focused on the first-moment theorem and reusable envelope corollary.
 The dense integration proof now handles the tiny-window late-placement summand
 directly with the outer generating function \(W_{\mathrm{out}}(\lambda)\), while
 fixed-tap band-cluster diagnostics remain outside the compiled theorem path.
+The concrete `0.109` theorem now explicitly chooses a valid tiny-window
+\(\xi_{\mathrm{tiny}}=1/4\), keeping it separate from the linear-window
+\(\xi=8\) numerical gap check.
 
 ## Status Labels
 

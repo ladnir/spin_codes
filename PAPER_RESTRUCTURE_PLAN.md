@@ -101,6 +101,9 @@ explicit: it chooses \(\xi\) with \((2+\xi)\delta<\rho\), bounds the
 late-placement factor by \(\lambda^h\), and sums with the outer generating
 function \(W_{\mathrm{out}}(\lambda)\).  The fixed-tap band-cluster facts remain
 in the random sliding outer exploration note as finite-diagnostic context.
+The concrete \(0.109\) theorem now mirrors that handoff explicitly: its tiny
+window uses a separate \(\xi_{\mathrm{tiny}}=1/4\), while the linear-window
+numerical gap remains the independent \(\xi=8\) check.
 
 ## Summary
 
@@ -477,6 +480,9 @@ The first physical split is complete:
 18. The dense integration tiny-window late-placement step was made explicit via
     the outer generating function at an intermediate \(\lambda<\rho\), avoiding
     a heuristic appeal to fixed-tap finite diagnostics.
+19. The concrete `0.109` theorem was patched to choose a valid tiny-window
+    \(\xi_{\mathrm{tiny}}\) instead of reusing or hiding the linear-window
+    \(\xi=8\) parameter.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
