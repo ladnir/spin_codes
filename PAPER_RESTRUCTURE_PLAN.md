@@ -69,6 +69,10 @@ The structured projection subsection has now been tightened as well:
 a compact qualitative summary of BCH-like outer projections, while the detailed
 BCH256/BCH512 table and low-weight inflation stress tests live in
 `explorations/outer_spectrum_comparison.tex`.
+The random sliding outer section has been renamed and tightened:
+`outerDense.tex` is now headed as the random sliding dense outer, and duplicated
+orientation/summary prose was moved to
+`explorations/random_sliding_outer_low_weight_notes.tex`.
 
 ## Summary
 

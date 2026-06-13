@@ -59,6 +59,9 @@ The structured local-code projection material has also been demoted: the
 compiled paper now keeps only a compact BCH projection status note, while the
 detailed BCH256/BCH512 comparison table and low-weight inflation stress tests
 live in `explorations/outer_spectrum_comparison.tex`.
+The random sliding outer section has been renamed to match the main-paper flow,
+and duplicated interpretation/summary prose now lives in
+`explorations/random_sliding_outer_low_weight_notes.tex`.
 The scalar dense inner section was tightened again by moving the unused
 polynomial-prefactor geometric envelope, the ON-to-OFF explanatory remark, and
 the parameter-use summary into
@@ -86,7 +89,7 @@ the constant-factor geometric envelope consumed by the dense+dense theorem.
 | `prelim.tex` | Basic notation and combinatorial preliminaries. | Keep main. |
 | `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main, possibly tighten prose. |
 | `innerAcc.tex` | Accumulator exact enumerator, contraction, and combined warmup theorem with the log-memory dense outer. | `MAIN_THEOREM` warmup; keep main immediately after the framework. |
-| `outerDense.tex` | Dense/banded outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
+| `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
 | `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
 | `localCodeStructured.tex` | Compact local-code interface, RM/EBCH certificate, and short BCH projection status note. | `MAIN_CERTIFICATE` plus brief `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
@@ -250,6 +253,7 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
 - `explorations/random_sliding_outer_low_weight_notes.tex`
   - fixed-tap no-weight-one and band-cluster low-weight parity law for scalar
     dense diagnostics.
+  - demoted dense-outer interpretation and theorem-interface summary notes.
 - `explorations/accumulator_warmup_notes.tex`
   - optional accumulator sharpness improvements and non-main TODOs.
 - `explorations/fullsplit_certificate_development.tex`

@@ -1,4 +1,4 @@
-\section{Outer code instantiation I: a systematic dense log-memory convolutional outer}
+\section{Random sliding dense outer (log-memory)}
 \label{sec:outer-dense-logmem}
 
 For the dense validation pair, the outer code is now taken to be a \emph{systematic}
@@ -205,12 +205,6 @@ A_h \le \frac{W_{\mathrm{out}}(z)}{z^h}\le z^{-h}.
 \]
 \end{proof}
 
-\paragraph{Interpretation.}
-The parameter \(z\) is the spectrum-control knob.
-Choosing \(z\) closer to \(\sqrt2-1\) improves the exponential base \(\beta_{\mathrm{out}}=O(1/z)\), but requires a larger
-memory constant \(c\) to make \(ka(z)^M\) decay.
-This tradeoff is exactly what later dense+dense proofs optimize against the inner contraction factor.
-
 \subsection{A linear-weight outer exponent}
 \label{sec:outer-dense-linear-exponent}
 
@@ -311,11 +305,6 @@ n^{O(1)}\,
 Summing over the at most \(n\) admissible spans \(\ell\) only changes the polynomial prefactor, yielding
 \eqref{eq:outer-dense-linear-exponent}.
 \end{proof}
-
-\paragraph{Why this matters.}
-The baseline theorem only needs the crude global envelope \(A_h\le z^{-h}\).
-Theorem~\ref{thm:outer-dense-linear-exponent} is the sharper object that interfaces naturally with the dense-inner
-linear-weight exponent, and it is the right analytic substitute for the guidance coming from the exact enumerator.
 
 \begin{corollary}[Explicit formula for the outer exponent]
 \label{cor:outer-dense-highweight-exponent}
@@ -426,16 +415,3 @@ n^{O(1)}(1+\sqrt2)^h,
 \]
 after absorbing the floor/ceiling discrepancy into the polynomial factor.
 \end{proof}
-
-\subsection{Dense-outer summary}
-\label{sec:outer-dense-summary}
-
-For the systematic dense outer we now have:
-\begin{enumerate}
-\item a fixed-word law from Lemma~\ref{lem:outer-span-binomial},
-\item a global generating-function bound from Theorem~\ref{thm:outer-dense-generating},
-\item the resulting geometric expected-spectrum envelope from Corollary~\ref{lem:outer-dense-spectrum},
-\item the explicit linear-weight spectrum exponent from Theorem~\ref{thm:outer-dense-linear-exponent} and Corollary~\ref{cor:outer-dense-highweight-exponent},
-\item and the low-linear-weight envelope from Corollary~\ref{cor:outer-dense-lowlinear-envelope}.
-\end{enumerate}
-These are the only outer ingredients needed for the baseline dense+dense linear-distance proof.
