@@ -415,12 +415,12 @@ conditions are
 \]
 and \(c>1/\log_2(3/2)\), so \(S_{\mathrm{tiny}}=o(1)\).
 
-For \(S_{\mathrm{low}}\), Corollary~\ref{cor:outer-dense-lowlinear-envelope} gives
+For \(S_{\mathrm{low}}\), use the global geometric outer envelope from
+Corollary~\ref{lem:outer-dense-spectrum} at \(z=1/3\):
 \[
-\EE[\enum_{\Cone,h}] \le n^{O(1)}(1+\sqrt2)^h
-\qquad(h\le \eta_{\mathrm{crit}}n).
+\EE[\enum_{\Cone,h}]\le 3^h .
 \]
-Also, Corollary~\ref{cor:dense-inner-constant-geometric} applies with \(\rho=1/4\), \(\kappa=1/2\), and \(\gamma>2\),
+Corollary~\ref{cor:dense-inner-constant-geometric} applies with \(\rho=1/4\), \(\kappa=1/2\), and \(\gamma>2\),
 so for all \(h\ge h_0+1\),
 \[
 p_h(0.109)\le 3\cdot 4^{-h}.
@@ -429,14 +429,14 @@ Therefore
 \[
 S_{\mathrm{low}}
 \le
-n^{O(1)}\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}
-\left(\frac{1+\sqrt2}{4}\right)^h.
+3\sum_{h=h_0+1}^{\lfloor \eta_{\mathrm{crit}}n\rfloor}
+\left(\frac34\right)^h.
 \]
-Since \((1+\sqrt2)/4<1\), this is a geometric tail beginning at \(h_0=\tfrac12\log_2 n+O(1)\), hence
+This is a geometric tail beginning at \(h_0=\tfrac12\log_2 n+O(1)\), hence
 \[
 S_{\mathrm{low}}
 \le
-n^{-\frac12\log_2(4/(1+\sqrt2))+o(1)}
+n^{-\frac12\log_2(4/3)+o(1)}
 =
 o(1).
 \]

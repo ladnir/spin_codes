@@ -1,8 +1,17 @@
-% Compatibility wrapper for the original combined structured local-code source.
-% The compiled paper now inputs the split files directly:
-% localCodeOuter.tex, localCodeInner.tex, localCodeCertificate.tex, and
-% localCodeProjections.tex.  Do not input this wrapper together with those
-% files, since the theorem labels would be duplicated.
+\section{Structured local-code construction}
+\label{sec:structured-local-code}
+
+The second main construction line is local-code independent.  The outer is
+specified by a short local code and its spectrum, the inner is specified by a
+short rate-half local code and its full-split transition law, and the global
+distance statement is a finite first-moment certificate of the form
+\[
+\sum_h A_h^{\rm out}p_h^{\rm in}(\delta).
+\]
+The RM/EBCH checkpoint below is the current proved instantiation.  BCH-like
+and other stronger local codes are treated only as upgrade projections until
+their spectra or low-weight envelopes are certified.
+
 \input{localCodeOuter}
 \input{localCodeInner}
 \input{localCodeCertificate}

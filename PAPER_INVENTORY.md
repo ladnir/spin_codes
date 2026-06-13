@@ -8,8 +8,10 @@ is a cleanup guide, not a proof artifact.
 Implementation update: the split has been applied.  The current compiled
 main spine is `intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`,
 `outerDense.tex`, `innerDenseScalar.tex`, `integrationDense.tex`,
-`localCodeOuter.tex`, `localCodeInner.tex`, `localCodeCertificate.tex`, and
-`localCodeProjections.tex`.  The original `innerDense.tex` and
+and `localCodeStructured.tex`.  The structured file is now a real compiled
+parent section; it inputs `localCodeOuter.tex`, `localCodeInner.tex`,
+`localCodeCertificate.tex`, and `localCodeProjections.tex` as subsections.
+The original `innerDense.tex` and
 `integration.tex` remain preserved sources.  The full-split certificate
 development ledger now lives in
 `explorations/fullsplit_certificate_development.tex`, with the compact main
@@ -93,6 +95,8 @@ fixed-tap band-cluster diagnostics remain outside the compiled theorem path.
 The concrete `0.109` theorem now explicitly chooses a valid tiny-window
 \(\xi_{\mathrm{tiny}}=1/4\), keeping it separate from the linear-window
 \(\xi=8\) numerical gap check.
+Its low-weight window also now uses the global outer envelope \(A_h\le3^h\),
+avoiding the loose \(n^{O(1)}\) prefactor in the low-linear outer bound.
 
 ## Status Labels
 
@@ -118,11 +122,11 @@ The concrete `0.109` theorem now explicitly chooses a valid tiny-window
 | `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
 | `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
-| `localCodeOuter.tex` | Direct-sum local-code outer interface and finite certificate template. | `MAIN_CERTIFICATE` interface; current compiled source for the structured outer line. |
-| `localCodeInner.tex` | Full-split local-code recursive inner interface and one-step split law. | `MAIN_CERTIFICATE` interface; current compiled source for the structured inner line. |
-| `localCodeCertificate.tex` | Manifest-backed RM/EBCH finite certificate. | `MAIN_CERTIFICATE`; current compiled source for the proved finite checkpoint. |
-| `localCodeProjections.tex` | Short BCH/local-code projection status note. | Brief `HEURISTIC_PROJECTION`; current compiled source for upgrade paths. |
-| `localCodeStructured.tex` | Compatibility wrapper for the old combined structured section. | Preserve for provenance; not used by `main_permConv.tex`. |
+| `localCodeStructured.tex` | Parent section for the local-code independent structured construction. | `MAIN_CERTIFICATE` spine; compiled by `main_permConv.tex`. |
+| `localCodeOuter.tex` | Direct-sum local-code outer interface and finite certificate template. | `MAIN_CERTIFICATE` interface; compiled as a subsection of `localCodeStructured.tex`. |
+| `localCodeInner.tex` | Full-split local-code recursive inner interface and one-step split law. | `MAIN_CERTIFICATE` interface; compiled as a subsection of `localCodeStructured.tex`. |
+| `localCodeCertificate.tex` | Manifest-backed RM/EBCH finite certificate. | `MAIN_CERTIFICATE`; compiled as the proved instantiation subsection. |
+| `localCodeProjections.tex` | Short BCH/local-code projection status note. | Brief `HEURISTIC_PROJECTION`; compiled as the upgrade-path subsection. |
 | `innerDense.tex` | Original monolithic dense-inner workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `integration.tex` | Original monolithic dense integration workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `outerExpandAcc.tex` | Alternate expander/accumulator outer construction. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |

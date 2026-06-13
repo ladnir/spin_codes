@@ -9,9 +9,11 @@ the current implementation status of the split.
 Implementation checkpoint: the first real split and compact structured-section
 rewrite have now been applied.  The compiled main spine is
 `intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`, `outerDense.tex`,
-`innerDenseScalar.tex`, `integrationDense.tex`, `localCodeOuter.tex`,
-`localCodeInner.tex`, `localCodeCertificate.tex`, and
-`localCodeProjections.tex`.  The original large source files are preserved, and
+`innerDenseScalar.tex`, `integrationDense.tex`, and
+`localCodeStructured.tex`.  The structured wrapper is now a real parent
+section which inputs `localCodeOuter.tex`, `localCodeInner.tex`,
+`localCodeCertificate.tex`, and `localCodeProjections.tex` as subsections.
+The original large source files are preserved, and
 the demoted working material has been copied under `explorations/`.  In
 particular, the long full-split finite-ledger development was preserved in
 `explorations/fullsplit_certificate_development.tex`, while the structured
@@ -104,6 +106,9 @@ in the random sliding outer exploration note as finite-diagnostic context.
 The concrete \(0.109\) theorem now mirrors that handoff explicitly: its tiny
 window uses a separate \(\xi_{\mathrm{tiny}}=1/4\), while the linear-window
 numerical gap remains the independent \(\xi=8\) check.
+The concrete theorem's low-weight window was also corrected to use the global
+outer envelope \(A_h\le3^h\), avoiding an unjustified \(n^{O(1)}\) prefactor
+from the low-linear outer exponent.
 
 ## Summary
 
@@ -236,8 +241,9 @@ Main source files:
 
 - local-code interface material from `integration.tex`;
 - full-split definition and certificate-interface material from `innerDense.tex`.
-- implemented split spine: `localCodeOuter.tex`, `localCodeInner.tex`,
-  `localCodeCertificate.tex`, and `localCodeProjections.tex`.
+- implemented split spine: `localCodeStructured.tex` is the compiled parent
+  section, and it inputs `localCodeOuter.tex`, `localCodeInner.tex`,
+  `localCodeCertificate.tex`, and `localCodeProjections.tex` as subsections.
 - implemented demotion: detailed modeled BCH projection rows live in
   `explorations/outer_spectrum_comparison.tex`, with only a short status note
   remaining in the compiled paper.
@@ -440,8 +446,9 @@ The first physical split is complete:
 2. Scalar dense theorem material now compiles from `innerDenseScalar.tex`.
 3. Analytic dense+dense integration now compiles from `integrationDense.tex`.
 4. The local-code interface, RM/EBCH certificate, and BCH projection note now
-   compile from `localCodeOuter.tex`, `localCodeInner.tex`,
-   `localCodeCertificate.tex`, and `localCodeProjections.tex`.
+   compile under the parent `localCodeStructured.tex` section, which inputs
+   `localCodeOuter.tex`, `localCodeInner.tex`, `localCodeCertificate.tex`,
+   and `localCodeProjections.tex`.
 5. `main_permConv.tex` uses the cleaned spine and no longer inputs the original
    monolithic `innerDense.tex`, `integration.tex`, `outerExpandAcc.tex`, or
    `innerSparse.tex`.
@@ -483,6 +490,9 @@ The first physical split is complete:
 19. The concrete `0.109` theorem was patched to choose a valid tiny-window
     \(\xi_{\mathrm{tiny}}\) instead of reusing or hiding the linear-window
     \(\xi=8\) parameter.
+20. The concrete `0.109` low-weight window now uses the polynomial-free global
+    outer envelope \(3^h\) rather than the low-linear \(n^{O(1)}(1+\sqrt2)^h\)
+    bound.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
