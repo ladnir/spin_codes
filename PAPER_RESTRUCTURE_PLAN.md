@@ -43,6 +43,11 @@ The scalar dense inner proof has also started its proof-polish pass: the
 run-tail exponent proof in the main spine was compressed, its derivative sign
 was corrected, and the expanded Stirling derivation was preserved in
 `explorations/scalar_dense_inner_refinements.tex`.
+The scalar dense inner was tightened again: the unused polynomial-prefactor
+geometric envelope, the ON-to-OFF explanatory remark, and the parameter-use
+summary were demoted to `explorations/scalar_dense_inner_refinements.tex`;
+`innerDenseScalar.tex` keeps the constant-factor geometric envelope that is
+actually consumed by the dense+dense theorem.
 The same scalar dense pass now demotes unused fixed-tap finite-diagnostic
 bookkeeping from the compiled spine: exact final-survivor averaging, episode
 budgeting, multi-candidate termination, and isolated-pair candidate counts live

@@ -6,6 +6,78 @@ work, but are not part of the current compiled main proof spine. The main paper 
 random sliding dense asymptotic theorem: the three-term tail, run lower-tail exponent, forced-termination contraction,
 and the packaged inner interface.
 
+\subsection{Demoted geometric-envelope bookkeeping}
+
+The compiled scalar dense-inner section keeps the constant-factor geometric envelope because it is the form consumed by
+the dense+dense integration theorem.  The more general polynomial-prefactor variant and the explanatory OFF-term remark
+are preserved here.
+
+\begin{corollary}[Geometric dense-inner envelope above a logarithmic cutoff]
+\label{cor:dense-inner-geometric-cutoff}
+Consider the dense time-varying recursive inner encoder with memory
+\[
+m \;:=\; \gamma \log_2 n
+\qquad\text{for a constant }\gamma>1.
+\]
+Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
+Let $p_w(\delta)$ denote the slice-to-tail probability from the dense-inner global envelope.
+Assume the dense-inner tail bound gives
+\begin{equation}
+\label{eq:dense-three-term-recall}
+p_w(\delta)
+\;\le\;
+(1-\varepsilon)^w \;+\; n\,2^{-m} \;+\; q_{\delta,\varepsilon}(n),
+\end{equation}
+where $q_{\delta,\varepsilon}(n)\le 2^{-c n}$ for some $c=c(\delta,\varepsilon)>0$.
+
+Then there exist constants $\rho\in(0,1)$, $a\ge 0$, and $\kappa>0$
+(depending only on $\delta,\varepsilon,\gamma$) such that
+for every fixed cutoff $w_0(n)\ge \kappa\log_2 n$,
+for all sufficiently large $n$, and for all $w\ge w_0(n)$,
+\[
+p_w(\delta)\;\le\; n^{a}\,\rho^{\,w}.
+\]
+\end{corollary}
+
+\begin{proof}
+Let $\rho:=1-\varepsilon\in(0,1)$.
+We bound each term in \eqref{eq:dense-three-term-recall} by a common expression $n^a\rho^w$ for all
+$w\ge w_0(n)\ge \kappa\log_2 n$.
+
+\paragraph{Term 1.}
+$(1-\varepsilon)^w=\rho^w\le n^a\rho^w$ for any $a\ge 0$.
+
+\paragraph{Term 2.}
+Since $m=\gamma\log_2 n$, we have $n\,2^{-m}=n\cdot n^{-\gamma}=n^{1-\gamma}$.
+Then for all $w\ge w_0(n)\ge \kappa\log_2 n$,
+\[
+\rho^{\,w}\ \le\ \rho^{\,\kappa\log_2 n}
+\ =\ n^{-\kappa\log_2(1/\rho)}.
+\]
+Choose any constant $a$ such that
+\[
+a - \kappa\log_2(1/\rho)\ \ge\ 1-\gamma.
+\]
+Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge w_0(n)$.
+
+\paragraph{Term 3.}
+Since $q_{\delta,\varepsilon}(n)\le 2^{-cn}$ and $\rho^w\ge \rho^n$ is exponentially small in $n$ as well,
+we have $q_{\delta,\varepsilon}(n)\le n^{a}\rho^{\,w}$ for all sufficiently large $n$ after increasing $a$ by an absolute constant if needed.
+
+Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge w_0(n)$.
+\end{proof}
+
+\begin{remark}[The ON$\to$OFF term and why it is harmless in the framework]
+\label{rem:dense-off-harmless}
+The term $n2^{-m}$ in \eqref{eq:dense-three-term-recall} corresponds to the event that, while ON, the output stream
+contains a length-$m$ all-zero window, causing an ON$\to$OFF transition.
+For dense taps the expected ON lifetime under zero input is $\Theta(2^m)$, hence this term is unavoidable in a pointwise bound.
+However, the serial concatenation framework never uses $p_w(\delta)$ for $w<d_{\min}(\Cone)$,
+and for $w\ge d_{\min}(\Cone)=\Omega(\log n)$ the geometric factor $\rho^w$ yields an additional $n^{-\Omega(1)}$
+that easily absorbs $n2^{-m}=n^{1-\gamma}$ as soon as $\gamma>1$.
+Thus the dense inner conforms to the single inner interface without weakening the end-to-end guarantee.
+\end{remark}
+
 \subsection{Run-tail exponent derivation}
 
 This note preserves the expanded Stirling calculation behind the run lower-tail exponent used in the main scalar dense

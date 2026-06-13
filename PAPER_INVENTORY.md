@@ -59,6 +59,11 @@ The structured local-code projection material has also been demoted: the
 compiled paper now keeps only a compact BCH projection status note, while the
 detailed BCH256/BCH512 comparison table and low-weight inflation stress tests
 live in `explorations/outer_spectrum_comparison.tex`.
+The scalar dense inner section was tightened again by moving the unused
+polynomial-prefactor geometric envelope, the ON-to-OFF explanatory remark, and
+the parameter-use summary into
+`explorations/scalar_dense_inner_refinements.tex`; the compiled source keeps
+the constant-factor geometric envelope consumed by the dense+dense theorem.
 
 ## Status Labels
 
@@ -240,6 +245,8 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
 - `explorations/scalar_dense_inner_refinements.tex`
   - exact gap-composition laws, isolated-slice order statistics, paired-cover
     bounds, and linear OFF-budget refinements moved out of the compiled spine.
+  - polynomial-prefactor geometric envelope and ON-to-OFF bookkeeping remark
+    demoted from the compiled scalar dense-inner source.
 - `explorations/random_sliding_outer_low_weight_notes.tex`
   - fixed-tap no-weight-one and band-cluster low-weight parity law for scalar
     dense diagnostics.

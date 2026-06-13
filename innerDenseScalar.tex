@@ -378,20 +378,15 @@ Consequently, for every $r\in\{1,\dots,w\}$,
 \end{lemma}
 
 \begin{proof}
-A binary word of length $N$ with weight $w$ and exactly $s$ runs of ones is described by two independent choices.
-First choose the $s$ positive run lengths whose sum is $w$, which gives $\binom{w-1}{s-1}$ possibilities.
-Next place the $N-w$ zeros into the $s+1$ zero-gaps around those runs, with the $s-1$ internal gaps required to
-receive at least one zero so that adjacent runs remain distinct.
-After reserving one zero for each internal gap, the remaining $N-w-(s-1)$ zeros are distributed freely over the
-$s+1$ gaps, giving
+A word with weight \(w\) and \(s\) one-runs is obtained by choosing the positive run lengths and then the zero gaps.
+The run lengths contribute \(\binom{w-1}{s-1}\).  After reserving one zero for each of the \(s-1\) internal gaps, the
+remaining zeros are distributed among the \(s+1\) gaps in
 \[
 \binom{N-w-(s-1)+s}{s}
 \;=\;
 \binom{N-w+1}{s}
 \]
-choices.
-Dividing by the total number $\binom{N}{w}$ of weight-$w$ words yields the stated probability formula,
-and summing over $s<r$ gives \eqref{eq:run-lower-tail-exact}.
+ways.  Divide by \(\binom{N}{w}\) and sum over \(s<r\).
 \end{proof}
 
 \paragraph{Refinements outside the theorem spine.}
@@ -791,61 +786,6 @@ Combining the three terms in \eqref{eq:dense-inner-run-envelope} yields
 
 
 
-\begin{corollary}[Geometric dense-inner envelope above a logarithmic cutoff]
-\label{cor:dense-inner-geometric-cutoff}
-Consider the dense time-varying recursive inner encoder with memory
-\[
-m \;:=\; \gamma \log_2 n
-\qquad\text{for a constant }\gamma>1.
-\]
-Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
-Let $p_w(\delta)$ denote the slice-to-tail probability from \eqref{eq:dense-inner-global-envelope}.
-Assume the dense-inner tail bound (proved earlier in this section) gives
-\begin{equation}
-\label{eq:dense-three-term-recall}
-p_w(\delta)
-\;\le\;
-(1-\varepsilon)^w \;+\; n\,2^{-m} \;+\; q_{\delta,\varepsilon}(n),
-\end{equation}
-where $q_{\delta,\varepsilon}(n)\le 2^{-c n}$ for some $c=c(\delta,\varepsilon)>0$.
-
-Then there exist constants $\rho\in(0,1)$, $a\ge 0$, and $\kappa>0$
-(depending only on $\delta,\varepsilon,\gamma$) such that
-for every fixed cutoff $w_0(n)\ge \kappa\log_2 n$,
-for all sufficiently large $n$, and for all $w\ge w_0(n)$,
-\[
-p_w(\delta)\;\le\; n^{a}\,\rho^{\,w}.
-\]
-\end{corollary}
-
-\begin{proof}
-Let $\rho:=1-\varepsilon\in(0,1)$.
-We bound each term in \eqref{eq:dense-three-term-recall} by a common expression $n^a\rho^w$ for all
-$w\ge w_0(n)\ge \kappa\log_2 n$.
-
-\paragraph{Term 1.}
-$(1-\varepsilon)^w=\rho^w\le n^a\rho^w$ for any $a\ge 0$.
-
-\paragraph{Term 2.}
-Since $m=\gamma\log_2 n$, we have $n\,2^{-m}=n\cdot n^{-\gamma}=n^{1-\gamma}$.
-Then for all $w\ge w_0(n)\ge \kappa\log_2 n$,
-\[
-\rho^{\,w}\ \le\ \rho^{\,\kappa\log_2 n}
-\ =\ n^{-\kappa\log_2(1/\rho)}.
-\]
-Choose any constant $a$ such that
-\[
-a - \kappa\log_2(1/\rho)\ \ge\ 1-\gamma.
-\]
-Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge w_0(n)$.
-
-\paragraph{Term 3.}
-Since $q_{\delta,\varepsilon}(n)\le 2^{-cn}$ and $\rho^w\ge \rho^n$ is exponentially small in $n$ as well,
-we have $q_{\delta,\varepsilon}(n)\le n^{a}\rho^{\,w}$ for all sufficiently large $n$ after increasing $a$ by an absolute constant if needed.
-
-Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge w_0(n)$.
-\end{proof}
-
 \begin{corollary}[Constant-factor geometric envelope]
 \label{cor:dense-inner-constant-geometric}
 Fix \(\delta\in(0,1/2)\) and choose \(\rho\in(0,1)\) with \(2\delta<\rho\).
@@ -884,33 +824,12 @@ for all \(w\ge w_0(n)\), where the first inequality uses
 Summing the three terms proves the claim.
 \end{proof}
 
-\begin{remark}[The ON$\to$OFF term and why it is harmless in the framework]
-\label{rem:dense-off-harmless}
-The term $n2^{-m}$ in \eqref{eq:dense-three-term-recall} corresponds to the event that, while ON, the output stream
-contains a length-$m$ all-zero window, causing an ON$\to$OFF transition.
-For dense taps the expected ON lifetime under zero input is $\Theta(2^m)$, hence this term is unavoidable in a pointwise bound.
-However, the serial concatenation framework never uses $p_w(\delta)$ for $w<d_{\min}(\Cone)$,
-and for $w\ge d_{\min}(\Cone)=\Omega(\log n)$ the geometric factor $\rho^w$ yields an additional $n^{-\Omega(1)}$
-that easily absorbs $n2^{-m}=n^{1-\gamma}$ as soon as $\gamma>1$.
-Thus the dense inner conforms to the single inner interface without weakening the end-to-end guarantee.
-\end{remark}
-
-
-
+\paragraph{Optional variants.}
+The scalar dense-inner refinement note preserves the polynomial-prefactor variant and OFF-term bookkeeping.  The
+constant-factor envelope above is the version consumed by the dense+dense integration theorem.
 
 \paragraph{Work complexity (why this is the ``dense'' baseline).}
 Each step computes $\langle k_t,s_t\rangle$ with a \emph{dense} $m$-bit mask, i.e.\ $\Theta(m)$ taps per symbol.
 Thus total inner work is $\Theta(Nm)=\Theta(N\log N)$ for $m=\gamma\log N$.
-
-\paragraph{Parameter-use summary.}
-\begin{itemize}
-\item The term $(1-\varepsilon)^w$ is the clean exponential-in-$w$ contraction for intermediate weights.
-\item The term $N2^{-m}$ is the rare ON$\to$OFF event. In tight finite-$N$ bounds, it is better to \emph{budget}
-its cumulative contribution in the weight sum (rather than carry it pointwise for every $w$).
-\item The binomial tail $q_{\delta,\varepsilon}(N)$ provides the exponentially small-in-$N$ large-deviation behavior
-needed for the linear-weight regime when union bounding over exponentially many outer codewords.
-\item Lemma~\ref{lem:dense-forced-termination} replaces the pointwise $N2^{-m}$ by $(L2^{-m})^r$ for small $w$,
-using the fact that a random interleaver typically spreads $w$ ones into $\approx w$ runs when $w\ll \sqrt N$.
-\end{itemize}
 
 % ============================================================
