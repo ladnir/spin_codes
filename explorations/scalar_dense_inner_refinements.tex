@@ -6,6 +6,23 @@ work, but are not part of the current compiled main proof spine. The main paper 
 random sliding dense asymptotic theorem: the three-term tail, run lower-tail exponent, forced-termination contraction,
 and the packaged inner interface.
 
+\subsection{Envelope interpretation note}
+
+The compiled dense-inner section keeps the packaged global, run-aware, and
+small-weight envelopes.  Their roles are:
+\begin{itemize}
+\item the global envelope is designed for the linear-weight regime; its first
+term decays exponentially in the input weight, its second term exposes the
+ON\(\to\)OFF memory penalty \(N2^{-m}\), and its third term is a pure
+large-deviation term in \(N\);
+\item the run-aware envelope preserves the exact interleaved run-count
+combinatorics and turns the OFF mechanism into the multiplicative term
+\((L2^{-m})^r\);
+\item the fixed-tap small-weight envelope specializes the isolated-start regime,
+where genuine termination candidates must be aligned with later input-one
+positions.
+\end{itemize}
+
 \subsection{Demoted geometric-envelope bookkeeping}
 
 The compiled scalar dense-inner section keeps the constant-factor geometric envelope because it is the form consumed by

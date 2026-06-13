@@ -389,10 +389,6 @@ remaining zeros are distributed among the \(s+1\) gaps in
 ways.  Divide by \(\binom{N}{w}\) and sum over \(s<r\).
 \end{proof}
 
-\paragraph{Refinements outside the theorem spine.}
-Sharper positional refinements for isolated starts, early pairs, multi-episode paths, and paired covers are not used by
-the analytic dense+dense theorem below.
-
 \begin{lemma}[Entropy bound for the run lower tail]
 \label{lem:run-lower-tail-entropy}
 Fix constants \(0<\omega<1\) and \(0<\rho<\min(\omega,1-\omega)\), and let
@@ -539,10 +535,6 @@ Therefore $\EE[A]=(N-1)\cdot \frac{w(w-1)}{N(N-1)}=\frac{w(w-1)}{N}$, which impl
 (up to the minor $N$ vs.\ $N-1$ normalization).
 \end{proof}
 
-\paragraph{Linear OFF-budget refinement.}
-A sharper linear-weight route can try to bound the total post-start OFF time directly by separating long zero gaps from
-short-gap witness packings. The main theorem below only uses the run-tail and forced-termination envelopes.
-
 % ============================================================
 \subsection{Inner interface theorem (what the outer+interleaver proof consumes)}
 \label{subsec:inner-dense-interface}
@@ -671,19 +663,6 @@ terminates within \(L\) steps, Lemma~\ref{lem:fixedtap-one-episode-termination} 
 \eqref{eq:dense-inner-smallw-envelope}.
 The best-envelope form \eqref{eq:dense-inner-best-envelope} is then immediate.
 \end{proof}
-
-\paragraph{Why these are the right envelopes to optimize.}
-The bound \eqref{eq:dense-inner-global-envelope} is designed for the linear-weight regime:
-its first term decays exponentially in $w$, its second term exposes the ON$\to$OFF memory penalty $N2^{-m}$,
-and its third term is a pure large-deviation term in $N$.
-The run-aware bound \eqref{eq:dense-inner-run-opt-envelope} is the legacy fully-random-tap tool for finite-length
-comparison:
-it keeps the exact combinatorics of the interleaved run count,
-it turns the OFF mechanism into the genuinely multiplicative term $(L2^{-m})^r$,
-and it can be optimized over $r$ separately for each weight $w$.
-The simpler bound \eqref{eq:dense-inner-smallw-envelope} is a convenient specialization for
-the fixed-tap regime where random interleaving typically creates nearly \(w\) isolated starts and genuine termination
-candidates must be aligned with later input-one positions.
 
 \begin{theorem}[Dense-inner linear-weight exponent]
 \label{prop:dense-inner-linear-exponent}

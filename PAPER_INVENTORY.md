@@ -79,6 +79,10 @@ polynomial-prefactor geometric envelope, the ON-to-OFF explanatory remark, and
 the parameter-use summary into
 `explorations/scalar_dense_inner_refinements.tex`; the compiled source keeps
 the constant-factor geometric envelope consumed by the dense+dense theorem.
+Another scalar dense-inner polish pass removed remaining commentary paragraphs
+about non-main refinements, linear OFF-budget directions, and envelope
+interpretation from the compiled source; the useful interpretation text now
+lives in `explorations/scalar_dense_inner_refinements.tex`.
 
 ## Status Labels
 

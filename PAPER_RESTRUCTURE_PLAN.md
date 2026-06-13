@@ -88,6 +88,10 @@ The random sliding outer section has been renamed and tightened:
 `outerDense.tex` is now headed as the random sliding dense outer, and duplicated
 orientation/summary prose was moved to
 `explorations/random_sliding_outer_low_weight_notes.tex`.
+The scalar dense inner was tightened again: remaining compiled commentary about
+non-main refinements, linear OFF-budget directions, and envelope interpretation
+was moved out of `innerDenseScalar.tex`; the useful interpretation note now
+lives in `explorations/scalar_dense_inner_refinements.tex`.
 
 ## Summary
 
@@ -456,6 +460,8 @@ The first physical split is complete:
     `integration.tex` sources were marked archival.
 15. Baseline dense+dense parameter-bookkeeping corollaries were demoted from
     `integrationDense.tex` to `explorations/scalar_dense_finite_diagnostics.tex`.
+16. Scalar dense-inner commentary paragraphs not used by the proof were removed
+    from `innerDenseScalar.tex` and preserved as exploration context where useful.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
