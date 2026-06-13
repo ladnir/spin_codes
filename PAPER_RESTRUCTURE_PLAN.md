@@ -8,11 +8,13 @@ the current implementation status of the split.
 
 Implementation checkpoint: the first real split and compact structured-section
 rewrite have now been applied.  The compiled main spine is
-`intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`, `outerDense.tex`,
-`innerDenseScalar.tex`, `integrationDense.tex`, and
-`localCodeStructured.tex`.  The structured wrapper is now a real parent
-section which inputs `localCodeOuter.tex`, `localCodeInner.tex`,
-`localCodeCertificate.tex`, and `localCodeProjections.tex` as subsections.
+`intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`,
+`randomDenseConstruction.tex`, and `localCodeStructured.tex`.  The random dense
+wrapper is now a real parent section which inputs `outerDense.tex`,
+`innerDenseScalar.tex`, and `integrationDense.tex` as subsections.  The
+structured wrapper is also a real parent section which inputs
+`localCodeOuter.tex`, `localCodeInner.tex`, `localCodeCertificate.tex`, and
+`localCodeProjections.tex` as subsections.
 The original large source files are preserved, and
 the demoted working material has been copied under `explorations/`.  In
 particular, the long full-split finite-ledger development was preserved in
@@ -109,6 +111,9 @@ numerical gap remains the independent \(\xi=8\) check.
 The concrete theorem's low-weight window was also corrected to use the global
 outer envelope \(A_h\le3^h\), avoiding an unjustified \(n^{O(1)}\) prefactor
 from the low-linear outer exponent.
+The random sliding dense construction has now been physically wrapped as well:
+`randomDenseConstruction.tex` is the compiled parent section, with the random
+outer, random inner, and dense+dense asymptotics demoted to subsections.
 
 ## Summary
 
@@ -184,6 +189,7 @@ This is the original dense-band outer x dense recursive inner theory line.
 
 Main source files:
 
+- `randomDenseConstruction.tex`
 - `outerDense.tex`
 - scalar/theorem-facing parts of `innerDense.tex`
 - theorem-facing parts of `integration.tex`
@@ -417,6 +423,7 @@ Status: heuristic except the RM row.
 | `prelim.tex` | Keep main. |
 | `framework.tex` | Keep main as first-moment framework. |
 | `innerAcc.tex` | Promote as accumulator warmup. |
+| `randomDenseConstruction.tex` | Parent section for the random sliding dense construction. |
 | `outerDense.tex` | Keep dense outer theorem/interface. |
 | `innerDense.tex` | Preserve original source. Scalar dense theorem extracted to `innerDenseScalar.tex`; full-split development copied to `explorations/fullsplit_certificate_development.tex`; block-recursive BCH copied to `explorations/block_recursive_bch_inner.tex`. |
 | `integration.tex` | Preserve original source. Analytic dense+dense theorem extracted to `integrationDense.tex`; scalar finite scans copied to `explorations/scalar_dense_finite_diagnostics.tex`; BCH spectra/history copied to `explorations/bch_outer_spectra.tex`. |
@@ -443,8 +450,11 @@ Status: heuristic except the RM row.
 The first physical split is complete:
 
 1. `explorations/` exists and contains topic notes for the demoted branches.
-2. Scalar dense theorem material now compiles from `innerDenseScalar.tex`.
-3. Analytic dense+dense integration now compiles from `integrationDense.tex`.
+2. The random sliding dense line now compiles under parent
+   `randomDenseConstruction.tex`, which inputs `outerDense.tex`,
+   `innerDenseScalar.tex`, and `integrationDense.tex` as subsections.
+3. Scalar dense theorem material now compiles from `innerDenseScalar.tex`, and
+   analytic dense+dense integration compiles from `integrationDense.tex`.
 4. The local-code interface, RM/EBCH certificate, and BCH projection note now
    compile under the parent `localCodeStructured.tex` section, which inputs
    `localCodeOuter.tex`, `localCodeInner.tex`, `localCodeCertificate.tex`,

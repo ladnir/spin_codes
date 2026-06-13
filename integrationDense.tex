@@ -1,7 +1,7 @@
-\section{Random sliding dense construction and asymptotics}
+\subsection{Dense+dense integration and asymptotics}
 \label{sec:integrations}
 
-This section is the theorem-facing integration of the random sliding dense construction:
+This subsection is the theorem-facing integration of the random sliding dense construction:
 a systematic dense banded outer together with the random dense recursive inner.
 Finite scalar estimates are not used in the proof.  The argument is a direct first-moment calculation:
 the outer contributes an expected spectrum envelope, while the inner contributes a low/intermediate-weight contraction
@@ -20,7 +20,7 @@ m=\lceil \gamma \log_2 n\rceil.
 The serial concatenation still has one random interleaver and \(O(\log n)\) taps per symbol in both stages,
 hence \(O(n\log n)\) encoding work.
 
-\subsection{A baseline linear-distance theorem}
+\subsubsection{A baseline linear-distance theorem}
 \label{sec:integration-dense-dense-baseline}
 
 We now combine the global systematic-outer spectrum envelope with the two dense-inner bounds.
@@ -215,7 +215,7 @@ S_{\mathrm{low}}+S_{\mathrm{high}}
 o(1).
 \]
 \end{proof}
-\subsection{A linear-weight exponent criterion}
+\subsubsection{A linear-weight exponent criterion}
 \label{sec:integration-dense-dense-linear}
 
 The next sharpening step is to replace the coarse high-weight geometric tail by a direct comparison of the outer and

@@ -1,4 +1,4 @@
-\section{Random sliding dense outer (log-memory)}
+\subsection{Random sliding dense outer (log-memory)}
 \label{sec:outer-dense-logmem}
 
 For the dense validation pair, the outer code is now taken to be a \emph{systematic}
@@ -7,7 +7,7 @@ This is the analytically natural object suggested by the enumerator experiments:
 the systematic stream prevents the dangerous collapse of a moderate message weight into a tiny
 intermediate weight, while the parity stream retains the same local dense-tap structure.
 
-\subsection{Construction}
+\subsubsection{Construction}
 \label{sec:outer-dense-construction}
 
 We work at outer rate \(R_o=\tfrac12\).
@@ -51,7 +51,7 @@ For \(h\in\{0,\dots,n\}\), write
 \]
 As in the framework, \(\EE[\enum_{\Cone,h}]\) denotes expectation over the random taps.
 
-\subsection{A fixed-word parity law}
+\subsubsection{A fixed-word parity law}
 \label{sec:outer-dense-fixedword}
 
 \begin{definition}[Span]
@@ -81,7 +81,7 @@ is \(z\), which is at most \((1+z)/2\) when \(z\in(0,1)\). Multiplying over the 
 including the systematic factor \(z^w\) proves the bound.
 \end{proof}
 
-\subsection{A global geometric spectrum envelope}
+\subsubsection{A global geometric spectrum envelope}
 \label{sec:outer-dense-spectrum}
 
 The systematic structure makes it possible to control the \emph{entire} expected outer spectrum by a single geometric
@@ -204,7 +204,7 @@ A_h \le \frac{W_{\mathrm{out}}(z)}{z^h}\le z^{-h}.
 \]
 \end{proof}
 
-\subsection{A linear-weight outer exponent}
+\subsubsection{A linear-weight outer exponent}
 \label{sec:outer-dense-linear-exponent}
 
 The global geometric envelope is enough for the baseline theorem, but for sharper dense+dense claims we also want

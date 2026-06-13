@@ -1,0 +1,13 @@
+\section{Random sliding dense construction}
+\label{sec:random-sliding-dense-construction}
+
+This construction line is the analytic dense-band/dense-recursive baseline.
+The outer is a systematic random sliding dense band, the inner is a
+time-varying fixed-tap dense recursion, and the integration theorem proves
+linear minimum distance by summing the outer spectrum against the inner
+slice-to-tail bounds.  The concrete theorem in this section is the current
+asymptotic \(0.109\) checkpoint.
+
+\input{outerDense}
+\input{innerDenseScalar}
+\input{integrationDense}

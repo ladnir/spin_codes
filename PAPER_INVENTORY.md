@@ -7,10 +7,12 @@ is a cleanup guide, not a proof artifact.
 
 Implementation update: the split has been applied.  The current compiled
 main spine is `intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`,
-`outerDense.tex`, `innerDenseScalar.tex`, `integrationDense.tex`,
-and `localCodeStructured.tex`.  The structured file is now a real compiled
-parent section; it inputs `localCodeOuter.tex`, `localCodeInner.tex`,
-`localCodeCertificate.tex`, and `localCodeProjections.tex` as subsections.
+`randomDenseConstruction.tex`, and `localCodeStructured.tex`.  The random
+dense file is now a real compiled parent section; it inputs `outerDense.tex`,
+`innerDenseScalar.tex`, and `integrationDense.tex` as subsections.  The
+structured file is also a real compiled parent section; it inputs
+`localCodeOuter.tex`, `localCodeInner.tex`, `localCodeCertificate.tex`, and
+`localCodeProjections.tex` as subsections.
 The original `innerDense.tex` and
 `integration.tex` remain preserved sources.  The full-split certificate
 development ledger now lives in
@@ -97,6 +99,9 @@ The concrete `0.109` theorem now explicitly chooses a valid tiny-window
 \(\xi=8\) numerical gap check.
 Its low-weight window also now uses the global outer envelope \(A_h\le3^h\),
 avoiding the loose \(n^{O(1)}\) prefactor in the low-linear outer bound.
+The random dense section has also been physically wrapped: compiled prose now
+has one parent random sliding dense construction section with outer, inner, and
+integration subsections.
 
 ## Status Labels
 
@@ -119,9 +124,10 @@ avoiding the loose \(n^{O(1)}\) prefactor in the low-linear outer bound.
 | `prelim.tex` | Basic notation and combinatorial preliminaries. | Keep main. |
 | `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main with optional variants demoted. |
 | `innerAcc.tex` | Accumulator exact enumerator, contraction, and combined warmup theorem with the log-memory dense outer. | `MAIN_THEOREM` warmup; keep main immediately after the framework. |
-| `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
-| `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
-| `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
+| `randomDenseConstruction.tex` | Parent section for the random sliding dense construction. | `MAIN_THEOREM` spine; compiled by `main_permConv.tex`. |
+| `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; compiled as a subsection of `randomDenseConstruction.tex`. |
+| `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; compiled as the random dense inner subsection. |
+| `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; compiled as the dense+dense asymptotics subsection. |
 | `localCodeStructured.tex` | Parent section for the local-code independent structured construction. | `MAIN_CERTIFICATE` spine; compiled by `main_permConv.tex`. |
 | `localCodeOuter.tex` | Direct-sum local-code outer interface and finite certificate template. | `MAIN_CERTIFICATE` interface; compiled as a subsection of `localCodeStructured.tex`. |
 | `localCodeInner.tex` | Full-split local-code recursive inner interface and one-step split law. | `MAIN_CERTIFICATE` interface; compiled as a subsection of `localCodeStructured.tex`. |

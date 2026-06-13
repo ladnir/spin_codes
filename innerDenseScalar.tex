@@ -1,4 +1,4 @@
-\section{Random dense recursive inner (log-memory baseline)}
+\subsection{Random dense recursive inner (log-memory baseline)}
 \label{sec:inner-dense}
 
 \paragraph{Role in the modular serial concatenation framework.}
@@ -25,7 +25,7 @@ term for small/intermediate $w$.
 These are the only inner facts later sections need.
 
 % ============================================================
-\subsection{Inner ensemble definition (fixed-tap dense recursive, rate 1)}
+\subsubsection{Inner ensemble definition (fixed-tap dense recursive, rate 1)}
 \label{subsec:inner-dense-def}
 
 Fix blocklength $N$ and a memory parameter
@@ -89,7 +89,7 @@ y_t = u_t\oplus 1.
 Thus a fixed-tap ON episode can terminate only when the input has a \(1\) exactly at a critical time.
 
 % ============================================================
-\subsection{Core ON/OFF lemmas}
+\subsubsection{Core ON/OFF lemmas}
 \label{subsec:inner-dense-onoff}
 
 Let $\mathcal{F}_{t-1}:=\sigma(u_1^t,k_1^{t-1},y_1^{t-1})$ be the natural past up to time $t-1$.
@@ -255,7 +255,7 @@ positions. For each fixed candidate, Lemma~\ref{lem:fixedtap-termination-candida
 \end{proof}
 
 % ============================================================
-\subsection{A general three-term tail bound for $p_w(\delta)$}
+\subsubsection{A general three-term tail bound for $p_w(\delta)$}
 \label{subsec:inner-dense-three-term}
 
 We first prove a bound that is convenient for large $w$ and for the linear-weight regime:
@@ -344,7 +344,7 @@ The three terms in \eqref{eq:dense-three-term} correspond to:
 $\wt(Y)$ has a large-deviation tail $q_{\delta,\varepsilon}(N)$.
 
 % ============================================================
-\subsection{Forced-termination contraction (tightening the small-$w$ regime)}
+\subsubsection{Forced-termination contraction (tightening the small-$w$ regime)}
 \label{subsec:inner-dense-forced-termination}
 
 For small/intermediate weights, the pointwise polynomial term $N2^{-m}$ in Lemma~\ref{lem:dense-three-term-tail}
@@ -536,7 +536,7 @@ Therefore $\EE[A]=(N-1)\cdot \frac{w(w-1)}{N(N-1)}=\frac{w(w-1)}{N}$, which impl
 \end{proof}
 
 % ============================================================
-\subsection{Inner interface theorem (what the outer+interleaver proof consumes)}
+\subsubsection{Inner interface theorem (what the outer+interleaver proof consumes)}
 \label{subsec:inner-dense-interface}
 
 We package the previous lemmas into an explicit interface for Section~\ref{sec:framework}.
