@@ -1,6 +1,62 @@
 % Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
 % Source: integration.tex, lines 606--2143. Preserved scalar dense finite diagnostics; not included in the main spine.
 
+\subsection{Demoted local first-moment restatement}
+
+The compiled integration section now cites the modular framework theorem directly.  The following local restatement was
+removed from the main dense+dense integration section because it duplicated Theorem~\ref{thm:sc-framework}.
+
+\begin{theorem}[Direct dense+dense first-moment bound]
+\label{thm:dense-dense-direct-first-moment}
+Fix \(\delta\in(0,1/2)\).
+Suppose the outer ensemble satisfies
+\[
+\EE[\enum_{\Cone,h}] \le A_h
+\qquad (1\le h\le n),
+\]
+and the inner satisfies
+\[
+p_h(\delta)
+:=
+\Pr[\wt(\Enc_{\mathrm{in}}(U))\le \delta n\mid \wt(U)=h]
+\le B_h
+\qquad (1\le h\le n),
+\]
+where \(U\) is uniform on the weight-\(h\) slice of \(\{0,1\}^n\).
+Then
+\begin{equation}
+\label{eq:dense-dense-direct-first-moment}
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\sum_{h=1}^{n} A_h\,B_h.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By the standard first-moment reduction,
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\le
+\sum_{h=1}^{n}\EE[\enum_{\Cone,h}]\,p_h(\delta),
+\]
+because the interleaver makes every fixed weight-\(h\) outer codeword uniform on the weight-\(h\) slice before entering
+the inner code. Apply the envelopes \(A_h\) and \(B_h\).
+\end{proof}
+
+\subsection{Demoted integration orientation notes}
+
+\paragraph{Baseline role.}
+The qualitative dense+dense theorem says that the systematic outer removes collapse to tiny intermediate weights, the
+outer contributes a global geometric spectrum envelope, and the inner handles small weights by the run-aware bound and
+larger weights by a geometric cutoff.  Baseline parameter corollaries and memory-scaling interpretations are preserved
+in this note; the sharper main proof uses a linear-weight exponent comparison.
+
+\paragraph{Meaning of the linear-weight criterion.}
+The dense+dense linear-weight criterion isolates the quantitative problem left by the baseline proof.  Once the low and
+intermediate weights are handled by the coarse argument, the remaining analytic task is to show that the outer exponent
+\(\Phi_{\mathrm{out}}^{\mathrm{sys}}\) sits below the dense-inner exponent \(E_{\mathrm{in}}\) on the relevant
+linear-weight window.
+
 \subsection{Demoted dense+dense baseline parameter bookkeeping}
 
 The following corollaries are useful for checking the baseline dense+dense parameter region, but they are not needed in

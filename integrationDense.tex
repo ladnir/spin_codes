@@ -7,9 +7,6 @@ It deliberately omits the finite scalar calibration calculations, which are pres
 note.  The proof here is a direct first-moment argument: the outer contributes an expected spectrum envelope, while the
 inner contributes a low/intermediate-weight contraction and a linear-weight large-deviation tail.
 
-\subsection{Direct first-moment reduction}
-\label{sec:integration-dense-dense}
-
 Take as outer code the systematic dense log-memory construction of
 Section~\ref{sec:outer-dense-logmem}, with memory
 \[
@@ -22,43 +19,6 @@ m=\lceil \gamma \log_2 n\rceil.
 \]
 The serial concatenation still has one random interleaver and \(O(\log n)\) taps per symbol in both stages,
 hence \(O(n\log n)\) encoding work.
-
-\begin{theorem}[Direct dense+dense first-moment bound]
-\label{thm:dense-dense-direct-first-moment}
-Fix \(\delta\in(0,1/2)\).
-Suppose the outer ensemble satisfies
-\[
-\EE[\enum_{\Cone,h}] \le A_h
-\qquad (1\le h\le n),
-\]
-and the inner satisfies
-\[
-p_h(\delta)
-:=
-\Pr[\wt(\Enc_{\mathrm{in}}(U))\le \delta n\mid \wt(U)=h]
-\le B_h
-\qquad (1\le h\le n),
-\]
-where \(U\) is uniform on the weight-\(h\) slice of \(\{0,1\}^n\).
-Then
-\begin{equation}
-\label{eq:dense-dense-direct-first-moment}
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;\le\;
-\sum_{h=1}^{n} A_h\,B_h.
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-By the standard first-moment reduction,
-\[
-\Pr[d_{\min}(\Csc)\le \delta n]
-\le
-\sum_{h=1}^{n}\EE[\enum_{\Cone,h}]\,p_h(\delta),
-\]
-because the interleaver makes every fixed weight-\(h\) outer codeword uniform on the weight-\(h\) slice before entering the inner code.
-Apply the envelopes \(A_h\) and \(B_h\).
-\end{proof}
 
 \subsection{A baseline linear-distance theorem}
 \label{sec:integration-dense-dense-baseline}
@@ -100,7 +60,7 @@ Set
 \[
 h_\star:=\lfloor \kappa\log_2 n\rfloor.
 \]
-We split the first-moment sum from Theorem~\ref{thm:dense-dense-direct-first-moment} into
+By Theorem~\ref{thm:sc-framework}, it is enough to show that the expected first-moment sum is \(o(1)\).  Split it into
 \[
 S_{\mathrm{low}}
 :=
@@ -240,13 +200,6 @@ S_{\mathrm{low}}+S_{\mathrm{high}}
 o(1).
 \]
 \end{proof}
-\paragraph{Baseline role.}
-Theorem~\ref{thm:dense-dense-integration} is the qualitative dense+dense theorem: the systematic outer removes collapse
-to tiny intermediate weights, the outer contributes a global geometric spectrum envelope, and the inner handles small
-weights by the run-aware bound and larger weights by a geometric cutoff.  Baseline parameter corollaries and
-memory-scaling interpretations are preserved in the scalar dense diagnostics note; the next main-step proof uses a
-sharper linear-weight exponent comparison.
-
 \subsection{A linear-weight exponent criterion}
 \label{sec:integration-dense-dense-linear}
 
@@ -306,12 +259,6 @@ n^{O(1)}\,2^{-\tau n}.
 There are only \(O(n)\) such weights \(h\), so summing over
 \(h\in[\eta_0 n,(1-\theta)n]\) preserves the same exponential rate.
 \end{proof}
-
-\paragraph{Meaning of the criterion.}
-Theorem~\ref{thm:dense-dense-linear-weight-criterion} isolates the real quantitative problem left by the baseline proof.
-Once the low and intermediate weights are handled by the coarse argument, the only remaining analytic task is to show
-that the outer exponent \(\Phi_{\mathrm{out}}^{\mathrm{sys}}\) sits below the dense-inner exponent
-\(E_{\mathrm{in}}\) on the linear-weight window of interest.
 
 \begin{theorem}[A concrete moderate-to-high-weight exponent gap]
 \label{prop:dense-dense-highweight-gap}

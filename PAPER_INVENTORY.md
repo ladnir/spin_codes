@@ -55,6 +55,10 @@ region and memory-scaling corollaries now live in
 `explorations/scalar_dense_finite_diagnostics.tex`, leaving the compiled
 integration spine focused on the qualitative theorem, linear-weight criterion,
 and concrete `0.109` theorem.
+The local direct first-moment restatement and integration-orientation
+paragraphs have also been moved to
+`explorations/scalar_dense_finite_diagnostics.tex`; the compiled integration
+section now cites the framework theorem directly.
 The structured local-code projection material has also been demoted: the
 compiled paper now keeps only a compact BCH projection status note, while the
 detailed BCH256/BCH512 comparison table and low-weight inflation stress tests
@@ -148,7 +152,8 @@ Destination:
 
 Classification by section cluster:
 
-- `Direct first-moment reduction`: `MAIN_THEOREM`; keep.
+- `Direct first-moment reduction`: already handled by `framework.tex`; the
+  duplicate local restatement has been demoted.
 - `A baseline linear-distance theorem`: `MAIN_THEOREM`; keep.
 - `A concrete 10.9-percent dense+dense theorem`: `MAIN_THEOREM`; keep and
   cross-reference `RESULTS_LOCK.md` verification note.

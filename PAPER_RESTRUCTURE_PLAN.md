@@ -64,6 +64,10 @@ baseline region, one concrete baseline choice, and memory-scaling interpretation
 were moved to `explorations/scalar_dense_finite_diagnostics.tex`, while
 `integrationDense.tex` keeps the qualitative dense+dense theorem, the
 linear-weight criterion, and the concrete \(0.109\) theorem.
+The integration spine has been tightened again: the duplicate local
+first-moment theorem and explanatory role/criterion paragraphs were moved to
+`explorations/scalar_dense_finite_diagnostics.tex`; `integrationDense.tex`
+now cites the framework theorem directly.
 The structured projection subsection has now been tightened as well:
 `localCodeStructured.tex` keeps only the theorem/projection status boundary and
 a compact qualitative summary of BCH-like outer projections, while the detailed
