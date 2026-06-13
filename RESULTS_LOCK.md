@@ -36,11 +36,13 @@ Status: proved asymptotic theorem in the current manuscript.
 Primary locations:
 
 - `framework.tex`: serial-concatenation first-moment framework.
+- `randomDenseConstruction.tex`: compiled parent section for the random
+  sliding dense construction.
 - `outerDense.tex`: systematic dense/banded outer spectrum interface.
 - `innerDenseScalar.tex`: scalar dense recursive inner interface in the current
-  compiled spine.
+  compiled spine, nested under `randomDenseConstruction.tex`.
 - `integrationDense.tex`: dense+dense integration theorem in the current
-  compiled spine.
+  compiled spine, nested under `randomDenseConstruction.tex`.
 - `innerDense.tex` and `integration.tex`: preserved original sources.
 
 Locked claims:
@@ -67,6 +69,8 @@ Status: current main finite construction and checked certificate.
 
 Primary locations:
 
+- `localCodeStructured.tex`: compiled parent section for the structured
+  local-code construction.
 - `localCodeOuter.tex`: direct-sum outer first-moment interface.
 - `localCodeInner.tex`: full-split local-code recursive inner definition and
   one-step split law.
@@ -259,7 +263,35 @@ Results:
 - Full-split finite ledger verifier: passed and wrote the manifest.
 - Outer-mode comparison: refreshed reports.
 - LaTeX: compiled twice and produced `main_permConv.pdf`; existing undefined
-  references and multiply-defined labels remain.
+  references and multiply-defined labels were present in the initial lock pass.
+
+## Current Restructure Verification Addendum
+
+After the physical section-wrapper cleanup, the compiled paper spine is:
+
+1. `intro.tex`
+2. `prelim.tex`
+3. `framework.tex`
+4. `innerAcc.tex`
+5. `randomDenseConstruction.tex`, which inputs `outerDense.tex`,
+   `innerDenseScalar.tex`, and `integrationDense.tex`
+6. `localCodeStructured.tex`, which inputs `localCodeOuter.tex`,
+   `localCodeInner.tex`, `localCodeCertificate.tex`, and
+   `localCodeProjections.tex`
+
+The latest cleanup verification ran:
+
+```powershell
+pdflatex -interaction=nonstopmode main_permConv.tex
+pdflatex -interaction=nonstopmode main_permConv.tex
+python scripts\verify_dense_claims.py --delta 0.109
+python scripts\verify_fullsplit_finite_ledger.py --write-manifest-json scripts\fullsplit_finite_ledger_manifest.json
+```
+
+The LaTeX log scan for `Warning`, `Overfull`, `Underfull`, `undefined`,
+`multiply defined`, and `Rerun` is now clean after the second pass.  The dense
+`0.109` verifier still reports worst gap `-0.003107731647`, and the full-split
+finite ledger still reports `current_checked_ledger_total_log2,-37.278528`.
 
 ## Exclusions
 
