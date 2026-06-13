@@ -3,10 +3,6 @@
 \label{sec:framework}
 \label{sec:sccc-framework}
 
-% Uses notation/macros from the current Section 3:
-% \Cone,\Ctwo,\Gone,\Gtwo,\enum.
-
-
 We study depth-2 serially concatenated convolutional codes
 \[
 \Csc \;:=\; \Ctwo \circ \Pi \circ \Cone \;\subseteq\; \{0,1\}^n,
@@ -98,26 +94,12 @@ p_w(\delta)
 \end{equation}
 If \(\Ctwo\) itself is drawn from a random inner ensemble
 (e.g. the dense time-varying recursion of Section~\ref{sec:inner-dense}
-or the full-split local-code inner of Section~\ref{sec:structured-local-code}),
+or the full-split local-code inner of Section~\ref{sec:fullsplit-local-code-inner}),
 then the probability above is taken over both the inner randomness and \(U\).
 (Equivalently, one may interpret \(p_w(\delta)\) as the average slice-to-tail probability under the inner ensemble.)
 For example, later sections analyze the accumulator inner (Section~\ref{sec:inner-accumulator}),
 the dense time-varying recursive inner (Section~\ref{sec:inner-dense}),
-and the structured full-split inner used in the finite certificate (Section~\ref{sec:structured-local-code}).
-
-\paragraph{Optional: an inner input--output enumerator viewpoint.}
-When \(\Ctwo\) is deterministic and linear, one can also define the (slice) enumerator
-\[
-\enum^{\Ctwo}_{w,h}
-\;:=\;
-\bigl|\{u\in\{0,1\}^n:\ \wt(u)=w,\ \wt(\Ctwo(u))=h\}\bigr|,
-\]
-so that
-\(
-\Pr[\wt(\Ctwo(U))=h\mid \wt(U)=w] = \enum^{\Ctwo}_{w,h}/\binom{n}{w}
-\)
-and \(p_w(\delta)=\sum_{h\le \delta n}\enum^{\Ctwo}_{w,h}/\binom{n}{w}\).
-Our accumulator analysis will proceed in this style; the other inners are analyzed directly via martingales / mixing.
+and the structured full-split inner used in the finite certificate (Section~\ref{sec:fullsplit-local-code-inner}).
 
 \begin{assumption}[Inner interface]
 \label{ass:inner-interface}
@@ -197,12 +179,7 @@ which depends only on \(w\). Summing over all codewords of each weight yields
 and \eqref{eq:first-moment-master} follows. \(\square\)
 \end{proof}
 
-\paragraph{Why this avoids a union bound over messages.}
-Equation \eqref{eq:first-moment-master} is a first-moment bound over codewords of \(\Cone\),
-organized by the outer spectrum \(\enum_{\Cone,w}\). This is the mechanism that prevents an explicit union bound over
-\(2^k\) messages in later minimum-distance arguments.
-
-\subsection{Flexible corollaries for later instantiations}
+\subsection{Reusable envelope corollary}
 \label{sec:framework-corollary}
 
 \begin{corollary}[Envelope corollary]
@@ -257,106 +234,8 @@ Take expectation over \(\Cone\) and use the assumed envelopes:
 Adding \(\Pr[\mathcal{G}_{\mathrm{out}}^{c}]\le \varepsilon_{\mathrm{out}}(n)\) proves the claim.
 \end{proof}
 
-\begin{corollary}[Piecewise evaluation of the framework sum]
-\label{cor:framework-piecewise}
-Under the hypotheses of Corollary~\ref{cor:framework-envelope}, let
-\[
-\{w_0,\dots,n\} \;=\; I_1 \sqcup I_2 \sqcup \cdots \sqcup I_J
-\]
-be any partition into weight ranges.
-Suppose that for each \(j\in[J]\), and each \(w\in I_j\), we have
-\[
-\EE[\enum_{\Cone,w}] \;\le\; A^{(j)}_w,
-\qquad
-p_w(\delta)\;\le\; B^{(j)}_w.
-\]
-Then
-\[
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;\le\;
-\varepsilon_{\mathrm{out}}(n)
-\;+\;
-\sum_{j=1}^{J}\ \sum_{w\in I_j} A^{(j)}_w\,B^{(j)}_w.
-\]
-\end{corollary}
-
-\noindent
-This corollary is only bookkeeping, but it captures the intended use later in the paper:
-the framework theorem itself does \emph{not} need to know about ``low/intermediate/linear'' weight regimes;
-those regimes enter only through whichever outer and inner envelopes are most effective on the corresponding ranges.
-
-\begin{corollary}[Single-envelope specialization]
-\label{cor:linear-dist-from-interfaces}
-Assume the outer interface (Assumption~\ref{ass:outer-interface}) and the inner interface
-(Assumption~\ref{ass:inner-interface}) hold with parameters \((\alpha,c,\beta)\) and \((a,\rho)\), respectively.
-If \(\beta\rho<1\) and
-\begin{equation}
-\label{eq:poly-beating-condition}
-\alpha\cdot \log\Big(\frac{1}{\beta\rho}\Big) \;>\; a+c,
-\end{equation}
-then
-\[
-\Pr\bigl[d_{\min}(\Csc)\le \delta n\bigr] \;=\; o(1)
-\qquad\text{as }n\to\infty.
-\]
-In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability (over the interleaver and any inner randomness).
-\end{corollary}
-
-\begin{proof}
-Apply Corollary~\ref{cor:framework-envelope} with
-\[
-w_0:=\lceil \alpha\log n\rceil,
-\qquad
-\varepsilon_{\mathrm{out}}(n):=\Pr[d_{\min}(\Cone)<\alpha\log n]=o(1),
-\]
-and envelopes
-\[
-A_w:=n^c\beta^w,
-\qquad
-B_w:=n^a\rho^w.
-\]
-This gives
-\[
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;\le\;
-o(1)\;+\;n^{a+c}\sum_{w=w_0}^{n} (\beta\rho)^w.
-\]
-Since \(\beta\rho<1\), the geometric series is bounded by
-\[
-\sum_{w=w_0}^{n}(\beta\rho)^w
-\;\le\;
-\frac{(\beta\rho)^{w_0}}{1-\beta\rho}
-\;\le\;
-O(1)\cdot (\beta\rho)^{\alpha\log n}
-\;=\;
-O(1)\cdot n^{-\alpha\log(1/(\beta\rho))},
-\]
-using \(w_0\ge \alpha\log n\).
-Thus
-\[
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;\le\;
-O(1)\cdot n^{a+c-\alpha\log(1/(\beta\rho))},
-\]
-plus an additional \(o(1)\) term from the outer cutoff event.
-This tends to \(0\) exactly under \eqref{eq:poly-beating-condition}.
-\end{proof}
-
-
-
-
-
-
 \paragraph{How the rest of the paper uses the framework.}
-From this point on, the paper decomposes into independent tasks:
-\begin{itemize}
-\item \textbf{Outer instantiation(s):} construct outer ensembles satisfying Assumption~\ref{ass:outer-interface}
-(logarithmic distance and spectral growth), or more sharply, produce explicit envelopes for \(\EE[\enum_{\Cone,w}]\)
-on the weight ranges of interest.
-\item \textbf{Inner instantiation(s):} prove bounds of the form \eqref{eq:inner-interface-pw}, or more sharply,
-weight-dependent upper envelopes for \(p_w(\delta)\), for each candidate inner
-(accumulator; dense time-varying recursion; full-split local-code recursion).
-\end{itemize}
-Each combination of a valid outer and a valid inner yields a linear-distance SC ensemble via
-Corollary~\ref{cor:framework-envelope}; the single-envelope criterion in
-Corollary~\ref{cor:linear-dist-from-interfaces} is just the simplest special case.
+Later sections prove outer spectrum bounds and inner slice-to-tail bounds, then plug them into
+Theorem~\ref{thm:sc-framework} or Corollary~\ref{cor:framework-envelope}.  The accumulator warmup and random sliding
+dense theorem use analytic envelopes; the RM/EBCH finite construction uses a manifest-backed ledger for the same
+first-moment sum.

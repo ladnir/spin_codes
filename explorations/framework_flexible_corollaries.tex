@@ -1,0 +1,107 @@
+\section{Framework flexible corollaries}
+\label{sec:framework-flexible-corollaries}
+
+This note preserves framework variants that are useful for bookkeeping and
+future construction lines but are not needed in the compiled main spine.  The
+main paper keeps the first-moment theorem and the basic envelope corollary.
+
+\subsection{Input--output enumerator viewpoint}
+
+When the inner code \(\Ctwo\) is deterministic and linear, one can define the
+slice enumerator
+\[
+\enum^{\Ctwo}_{w,h}
+\;:=\;
+\bigl|\{u\in\{0,1\}^n:\ \wt(u)=w,\ \wt(\Ctwo(u))=h\}\bigr|.
+\]
+Then
+\[
+\Pr[\wt(\Ctwo(U))=h\mid \wt(U)=w]
+=
+\frac{\enum^{\Ctwo}_{w,h}}{\binom{n}{w}},
+\qquad
+p_w(\delta)
+=
+\sum_{h\le \delta n}
+\frac{\enum^{\Ctwo}_{w,h}}{\binom{n}{w}} .
+\]
+The accumulator warmup uses this viewpoint directly; the dense and full-split
+inners are analyzed through direct slice-to-tail bounds.
+
+\subsection{Piecewise evaluation}
+
+\begin{corollary}[Piecewise evaluation of the framework sum]
+\label{cor:framework-piecewise}
+Under the hypotheses of Corollary~\ref{cor:framework-envelope}, let
+\[
+\{w_0,\dots,n\} \;=\; I_1 \sqcup I_2 \sqcup \cdots \sqcup I_J
+\]
+be any partition into weight ranges.
+Suppose that for each \(j\in[J]\), and each \(w\in I_j\), we have
+\[
+\EE[\enum_{\Cone,w}] \;\le\; A^{(j)}_w,
+\qquad
+p_w(\delta)\;\le\; B^{(j)}_w.
+\]
+Then
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+\varepsilon_{\mathrm{out}}(n)
+\;+\;
+\sum_{j=1}^{J}\ \sum_{w\in I_j} A^{(j)}_w\,B^{(j)}_w.
+\]
+\end{corollary}
+
+This is only bookkeeping: low, intermediate, and linear weight regimes enter
+through whichever outer and inner envelopes are most effective on those ranges.
+
+\subsection{Single-envelope specialization}
+
+\begin{corollary}[Single-envelope specialization]
+\label{cor:linear-dist-from-interfaces}
+Assume the outer interface (Assumption~\ref{ass:outer-interface}) and the inner
+interface (Assumption~\ref{ass:inner-interface}) hold with parameters
+\((\alpha,c,\beta)\) and \((a,\rho)\), respectively.  If \(\beta\rho<1\) and
+\begin{equation}
+\label{eq:poly-beating-condition}
+\alpha\cdot \log\Big(\frac{1}{\beta\rho}\Big) \;>\; a+c,
+\end{equation}
+then
+\[
+\Pr\bigl[d_{\min}(\Csc)\le \delta n\bigr] \;=\; o(1)
+\qquad\text{as }n\to\infty.
+\]
+In particular, \(d_{\min}(\Csc)=\Omega(n)\) with high probability.
+\end{corollary}
+
+\begin{proof}
+Apply Corollary~\ref{cor:framework-envelope} with
+\[
+w_0:=\lceil \alpha\log n\rceil,
+\qquad
+\varepsilon_{\mathrm{out}}(n):=\Pr[d_{\min}(\Cone)<\alpha\log n]=o(1),
+\]
+and envelopes
+\[
+A_w:=n^c\beta^w,
+\qquad
+B_w:=n^a\rho^w.
+\]
+This gives
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]
+\;\le\;
+o(1)\;+\;n^{a+c}\sum_{w=w_0}^{n} (\beta\rho)^w.
+\]
+Since \(\beta\rho<1\),
+\[
+\sum_{w=w_0}^{n}(\beta\rho)^w
+\;\le\;
+\frac{(\beta\rho)^{w_0}}{1-\beta\rho}
+\;\le\;
+O(1)\cdot n^{-\alpha\log(1/(\beta\rho))}.
+\]
+The exponent is negative exactly under
+\eqref{eq:poly-beating-condition}.
+\end{proof}

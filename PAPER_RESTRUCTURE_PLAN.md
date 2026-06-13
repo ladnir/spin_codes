@@ -92,6 +92,10 @@ The scalar dense inner was tightened again: remaining compiled commentary about
 non-main refinements, linear OFF-budget directions, and envelope interpretation
 was moved out of `innerDenseScalar.tex`; the useful interpretation note now
 lives in `explorations/scalar_dense_inner_refinements.tex`.
+The framework section was also tightened: optional IOWE viewpoint and the
+piecewise/single-envelope bookkeeping corollaries now live in
+`explorations/framework_flexible_corollaries.tex`, while the compiled
+`framework.tex` keeps the first-moment theorem and basic envelope corollary.
 
 ## Summary
 
@@ -462,6 +466,9 @@ The first physical split is complete:
     `integrationDense.tex` to `explorations/scalar_dense_finite_diagnostics.tex`.
 16. Scalar dense-inner commentary paragraphs not used by the proof were removed
     from `innerDenseScalar.tex` and preserved as exploration context where useful.
+17. Framework optional corollaries were demoted from `framework.tex` to
+    `explorations/framework_flexible_corollaries.tex`, leaving only the core
+    first-moment reduction and reusable envelope corollary in the compiled spine.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 

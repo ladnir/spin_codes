@@ -83,6 +83,10 @@ Another scalar dense-inner polish pass removed remaining commentary paragraphs
 about non-main refinements, linear OFF-budget directions, and envelope
 interpretation from the compiled source; the useful interpretation text now
 lives in `explorations/scalar_dense_inner_refinements.tex`.
+The framework section has now been shortened as well: optional IOWE and
+piecewise/single-envelope bookkeeping variants were moved to
+`explorations/framework_flexible_corollaries.tex`, leaving the compiled source
+focused on the first-moment theorem and reusable envelope corollary.
 
 ## Status Labels
 
@@ -103,7 +107,7 @@ lives in `explorations/scalar_dense_inner_refinements.tex`.
 | --- | --- | --- |
 | `intro.tex` | Short motivation and paper framing. | Keep main, later rewrite after theorem/certificate split stabilizes. |
 | `prelim.tex` | Basic notation and combinatorial preliminaries. | Keep main. |
-| `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main, possibly tighten prose. |
+| `framework.tex` | Modular first-moment serial-concatenation framework. | `MAIN_THEOREM`; keep main with optional variants demoted. |
 | `innerAcc.tex` | Accumulator exact enumerator, contraction, and combined warmup theorem with the log-memory dense outer. | `MAIN_THEOREM` warmup; keep main immediately after the framework. |
 | `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
