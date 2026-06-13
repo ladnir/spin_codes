@@ -67,9 +67,12 @@ Status: current main finite construction and checked certificate.
 
 Primary locations:
 
-- `localCodeStructured.tex`, especially:
-  - the manifest-backed checked ledger summary in the RM/EBCH instantiation
-    subsection;
+- `localCodeOuter.tex`: direct-sum outer first-moment interface.
+- `localCodeInner.tex`: full-split local-code recursive inner definition and
+  one-step split law.
+- `localCodeCertificate.tex`, especially:
+  - the manifest-backed checked ledger summary in the RM/EBCH certificate
+    section;
   - `thm:fullsplit-rm-finite-certificate-009`.
 - `explorations/fullsplit_certificate_development.tex`: detailed development
   notes copied from the original dense-inner workspace, including the former

@@ -9,13 +9,15 @@ the current implementation status of the split.
 Implementation checkpoint: the first real split and compact structured-section
 rewrite have now been applied.  The compiled main spine is
 `intro.tex`, `prelim.tex`, `framework.tex`, `innerAcc.tex`, `outerDense.tex`,
-`innerDenseScalar.tex`, `integrationDense.tex`, and
-`localCodeStructured.tex`.  The original large source files are preserved, and
+`innerDenseScalar.tex`, `integrationDense.tex`, `localCodeOuter.tex`,
+`localCodeInner.tex`, `localCodeCertificate.tex`, and
+`localCodeProjections.tex`.  The original large source files are preserved, and
 the demoted working material has been copied under `explorations/`.  In
 particular, the long full-split finite-ledger development was preserved in
-`explorations/fullsplit_certificate_development.tex`, while
-`localCodeStructured.tex` now contains the compact local-code interface,
-RM/EBCH certificate, and heuristic BCH projection table.
+`explorations/fullsplit_certificate_development.tex`, while the structured
+construction now has separate compiled files for the local-code outer
+interface, full-split inner interface, RM/EBCH certificate, and BCH/local-code
+projection path.
 The follow-up cleanup pass removed visible research-log residue from the
 compiled spine: the accumulator TODOs now live in
 `explorations/accumulator_warmup_notes.tex`, the dense integration section is
@@ -36,8 +38,13 @@ post-prefix totals, and final first-moment theorem, while detailed post-prefix
 row tables remain in the full-split exploration/audit notes.
 The structured certificate has now been tightened further: the row-level
 RM-prefix/post-prefix wrapper statements were collapsed into a manifest-backed
-checked ledger summary in `localCodeStructured.tex`, while the former wrappers
+checked ledger summary in `localCodeCertificate.tex`, while the former wrappers
 remain in `explorations/fullsplit_certificate_development.tex`.
+The compiled main spine has also had a language-audit cleanup: cleanup-era
+phrases such as "preserved in notes", "former wrappers", and visible TODO
+configuration were removed or rewritten as paper-facing references, while the
+BCH spectrum-model subsection still explicitly marks heuristic projections as
+non-theorem material.
 A final structural pass moved the accumulator warmup immediately after the
 framework in the compiled paper and added the missing combined theorem:
 random sliding dense outer plus accumulator inner gives linear distance for
@@ -72,11 +79,11 @@ The integration spine has been tightened again: the duplicate local
 first-moment theorem and explanatory role/criterion paragraphs were moved to
 `explorations/scalar_dense_finite_diagnostics.tex`; `integrationDense.tex`
 now cites the framework theorem directly.
-The structured projection subsection has now been tightened as well:
-`localCodeStructured.tex` keeps only the theorem/projection status boundary and
-a compact qualitative summary of BCH-like outer projections, while the detailed
-BCH256/BCH512 table and low-weight inflation stress tests live in
-`explorations/outer_spectrum_comparison.tex`.
+The structured projection subsection has now been tightened and physically
+split as well: `localCodeProjections.tex` keeps only the theorem/projection
+status boundary and a compact qualitative summary of BCH-like outer
+projections, while the detailed BCH256/BCH512 table and low-weight inflation
+stress tests live in `explorations/outer_spectrum_comparison.tex`.
 The random sliding outer section has been renamed and tightened:
 `outerDense.tex` is now headed as the random sliding dense outer, and duplicated
 orientation/summary prose was moved to
@@ -213,7 +220,8 @@ Main source files:
 
 - local-code interface material from `integration.tex`;
 - full-split definition and certificate-interface material from `innerDense.tex`.
-- implemented compact spine: `localCodeStructured.tex`.
+- implemented split spine: `localCodeOuter.tex`, `localCodeInner.tex`,
+  `localCodeCertificate.tex`, and `localCodeProjections.tex`.
 - implemented demotion: detailed modeled BCH projection rows live in
   `explorations/outer_spectrum_comparison.tex`, with only a short status note
   remaining in the compiled paper.
@@ -415,8 +423,9 @@ The first physical split is complete:
 1. `explorations/` exists and contains topic notes for the demoted branches.
 2. Scalar dense theorem material now compiles from `innerDenseScalar.tex`.
 3. Analytic dense+dense integration now compiles from `integrationDense.tex`.
-4. The local-code interface, RM/EBCH certificate, and BCH projection table now
-   compile from `localCodeStructured.tex`.
+4. The local-code interface, RM/EBCH certificate, and BCH projection note now
+   compile from `localCodeOuter.tex`, `localCodeInner.tex`,
+   `localCodeCertificate.tex`, and `localCodeProjections.tex`.
 5. `main_permConv.tex` uses the cleaned spine and no longer inputs the original
    monolithic `innerDense.tex`, `integration.tex`, `outerExpandAcc.tex`, or
    `innerSparse.tex`.

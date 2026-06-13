@@ -1,0 +1,92 @@
+\section{Finite RM/EBCH certificate}
+\label{sec:rm-ebch-finite-certificate}
+
+The current finite theorem uses a direct sum of \(4096\) copies of \(RM(4,9)\),
+a binary \([512,256,32]\) code, as the outer code.  Hence
+\[
+k=4096\cdot256=2^{20},\qquad N=4096\cdot512=2^{21}.
+\]
+The inner is the full-split construction of
+Section~\ref{sec:fullsplit-local-code-inner} with the exact EBCH
+\([128,64,22]\) local spectrum.  The target relative distance is
+\(\delta=.09\), so
+\[
+d=\lfloor .09N\rfloor=188743.
+\]
+The authoritative verifier is
+\[
+\begin{gathered}
+\texttt{python scripts/verify\_fullsplit\_finite\_ledger.py}\\
+\texttt{--write-manifest-json scripts/fullsplit\_finite\_ledger\_manifest.json}.
+\end{gathered}
+\]
+The verifier is part of the finite certificate.  It checks the exact local
+spectra used in the outer and inner models, the finite row-family bounds in the
+first-moment ledger, and the coverage bookkeeping that every nonzero outer
+weight and every inner placement regime used by the certificate is included.
+
+The finite certificate input data are
+\[
+\begin{array}{c|c}
+\text{component} & \text{certified object}\\
+\hline
+\text{outer spectrum} & RM(4,9)\ [512,256,32]\ \text{exact local spectrum}\\
+\text{outer direct sum} & 4096\ \text{blocks},\ N=2^{21}\\
+\text{inner split law} & EBCH\ [128,64,22]\ \text{exact local spectrum},\ b=64\\
+\text{target} & \delta=.09,\ d=188743\\
+\text{manifest} & \texttt{scripts/fullsplit\_finite\_ledger\_manifest.json}.
+\end{array}
+\]
+
+\paragraph{Checked ledger summary.}
+The manifest records the exact RM support floor, the exact-prefix ledger, and
+the post-prefix row cover.  The paper-facing values are
+\[
+\begin{array}{c|c}
+\text{checked item} & \text{manifest value}\\
+\hline
+\text{minimum positive outer weight} & 32\\
+\text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.278528\\
+\text{checked row families for }h\ge501 & \log_2\mu\le -182.259739\\
+\text{total checked first moment} & \log_2\mu\le -37.278528 .
+\end{array}
+\]
+The dominant row is \(h=32\), first-active regime \(r=1\), gap bucket
+\(1\le\mathrm{gap}\le4000\).  The detailed row family table is recorded in the
+manifest and supporting certificate notes.
+
+\begin{theorem}[Checked finite RM/full-split first-moment certificate]
+\label{thm:fullsplit-rm-finite-certificate-009}
+Consider the finite checkpoint \(N=2^{21}\), \(b=64\), and \(\delta=.09\), so
+that
+\[
+d=\lfloor .09N\rfloor=188743 .
+\]
+Use the direct-sum \(RM(4,9)\) outer and the full-split EBCH inner above.  Let
+\(Z_d\) be the number of nonzero concatenated codewords whose final weight is
+at most \(d\), with expectation taken over the random interleaver and the
+random choices of the inner construction.  The checked finite ledger gives
+\[
+\mathbb E Z_d\le 2^{-37.278528}.
+\]
+Consequently
+\[
+\Pr[d_{\min}\le d]\le 2^{-37.278528}.
+\]
+In particular, with positive probability a sampled code has
+\(d_{\min}\ge188744\), and hence relative distance
+\[
+\frac{d_{\min}}{N}\ge \frac{188744}{2^{21}}>.09 .
+\]
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure
+probability to the first moment \(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  The
+manifest-backed ledger summary above removes all positive weights below \(32\),
+covers all first-active placements for \(32\le h\le500\), and covers the
+checked \(h\ge501\) row families.  Its log-sum gives
+\(\log_2\mu_{\rm checked}(.09)\le -37.278528\), which is the displayed
+expectation bound.  Markov's inequality applied to the nonnegative integer
+random variable \(Z_d\) gives the probability statement.
+\end{proof}

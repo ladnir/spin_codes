@@ -1,0 +1,32 @@
+\section{BCH and local-code upgrade projections}
+\label{sec:local-code-projections}
+
+The RM/EBCH theorem above is the checked finite certificate.  The material in
+this section is not a theorem upgrade; it is a spectrum-model design
+comparison.
+
+The proved checkpoint uses the exact RM \([512,256,32]\) local spectrum.  As a
+finite-\(N\) design comparison, we also tested two possible stronger outer
+floors while leaving the full-split EBCH inner ledger unchanged.  The BCH rows
+use a spectrum model, not a certified local spectrum or a rigorous low-weight
+envelope.
+The comparison script is
+\[
+\texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
+\]
+It writes the reports
+\[
+\begin{gathered}
+\texttt{scripts/outer\_mode\_comparison\_delta009.csv},\\
+\texttt{scripts/outer\_mode\_comparison\_delta009.md}.
+\end{gathered}
+\]
+At the locked checkpoint \(N=2^{21}\), \(\delta=.09\), and \(d=188743\), the
+modeled rows suggest that replacing the RM outer by a BCH-like
+\([512,256,\ge62]\) local code could substantially improve the margin, while a
+\([256,128,38]\) model is roughly comparable to the proved RM row and sensitive
+to low-weight-spectrum inflation.  This conclusion is only a projection until
+an exact spectrum or proved low-weight envelope is supplied.
+
+Additional comparison tables, inflation stress tests, and BCH spectrum notes
+are kept with the generated comparison artifacts.

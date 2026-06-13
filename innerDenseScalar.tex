@@ -391,8 +391,7 @@ ways.  Divide by \(\binom{N}{w}\) and sum over \(s<r\).
 
 \paragraph{Refinements outside the theorem spine.}
 Sharper positional refinements for isolated starts, early pairs, multi-episode paths, and paired covers are not used by
-the analytic dense+dense theorem below. They are preserved in the scalar dense-inner refinement note together with the
-finite scalar diagnostics.
+the analytic dense+dense theorem below.
 
 \begin{lemma}[Entropy bound for the run lower tail]
 \label{lem:run-lower-tail-entropy}
@@ -434,8 +433,7 @@ On \(0<\sigma<\omega(1-\omega)\),
 \]
 Thus \(\Psi_{\mathrm{run}}(\omega,\sigma)\) decreases on the lower-tail range, so the largest summand for
 \(s<r=\lfloor\rho N\rfloor\) occurs at the boundary \(\sigma=\rho+O(1/N)\).  Summing at most \(N\) terms gives
-\eqref{eq:run-lower-tail-entropy}.  The expanded Stirling derivation is preserved in the scalar dense-inner refinement
-note.
+\eqref{eq:run-lower-tail-entropy}.
 \end{proof}
 
 \begin{corollary}[Run lower-tail exponent with \(r\) proportional to \(w\)]
@@ -543,8 +541,7 @@ Therefore $\EE[A]=(N-1)\cdot \frac{w(w-1)}{N(N-1)}=\frac{w(w-1)}{N}$, which impl
 
 \paragraph{Linear OFF-budget refinement.}
 A sharper linear-weight route can try to bound the total post-start OFF time directly by separating long zero gaps from
-short-gap witness packings. That proof target is also preserved in
-the scalar dense-inner refinement note; the main theorem below only uses the run-tail and forced-termination envelopes.
+short-gap witness packings. The main theorem below only uses the run-tail and forced-termination envelopes.
 
 % ============================================================
 \subsection{Inner interface theorem (what the outer+interleaver proof consumes)}
@@ -823,10 +820,6 @@ for all \(w\ge w_0(n)\), where the first inequality uses
 \(\gamma>1+\kappa\log_2(1/\rho)\).
 Summing the three terms proves the claim.
 \end{proof}
-
-\paragraph{Optional variants.}
-The scalar dense-inner refinement note preserves the polynomial-prefactor variant and OFF-term bookkeeping.  The
-constant-factor envelope above is the version consumed by the dense+dense integration theorem.
 
 \paragraph{Work complexity (why this is the ``dense'' baseline).}
 Each step computes $\langle k_t,s_t\rangle$ with a \emph{dense} $m$-bit mask, i.e.\ $\Theta(m)$ taps per symbol.

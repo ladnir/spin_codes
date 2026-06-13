@@ -3,9 +3,9 @@
 
 This section is the theorem-facing integration of the random sliding dense construction:
 a systematic dense banded outer together with the random dense recursive inner.
-It deliberately omits the finite scalar calibration calculations, which are preserved in the scalar dense diagnostics
-note.  The proof here is a direct first-moment argument: the outer contributes an expected spectrum envelope, while the
-inner contributes a low/intermediate-weight contraction and a linear-weight large-deviation tail.
+Finite scalar estimates are not used in the proof.  The argument is a direct first-moment calculation:
+the outer contributes an expected spectrum envelope, while the inner contributes a low/intermediate-weight contraction
+and a linear-weight large-deviation tail.
 
 Take as outer code the systematic dense log-memory construction of
 Section~\ref{sec:outer-dense-logmem}, with memory
@@ -137,8 +137,7 @@ The fixed-tap replacement exposes the same phenomenon seen in the finite-\(n\) e
 cannot be controlled by the coarse global geometric outer envelope alone, since already \(h=1\) has inner probability
 \(\approx L/n\). This low/tiny window must use the explicit dense outer low-weight law
 \eqref{eq:dense-dense-fixedtap-no-weight-one}, rather than only \(\EE[\enum_{\Cone,h}]\le\beta_{\mathrm{out}}^h\).
-With that explicit outer law, the late-placement contribution is the same summable tiny-window term used in the
-preserved scalar dense diagnostics.
+With that explicit outer law, the late-placement contribution is summable in the tiny-weight window.
 
 For the fixed-tap candidate term, since \(m=\gamma\log_2 n\),
 \[

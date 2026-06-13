@@ -1,0 +1,86 @@
+\section{Structured local-code outer interface}
+\label{sec:structured-local-code}
+\label{sec:local-code-outer}
+
+The second main construction line replaces sliding random bands by short local
+codes supplied through explicit spectra or certified spectrum envelopes.  This
+section defines the local-code-independent outer interface and the finite
+certificate template used by the later RM/EBCH instantiation.  The local code is
+an input to the theorem; RM, BCH, or another code with a certified spectrum are
+possible choices.
+
+\subsection{Direct-sum outer spectrum}
+\label{subsec:local-code-outer-interface}
+
+The structured outer is a direct sum of short local codes.  The proof interface
+is deliberately local-code independent: the outer contributes a weight
+enumerator, the interleaver turns each outer word of weight \(h\) into a uniform
+slice input, and the inner contributes an upper bound
+\(p_h^{\rm in}(\delta)\) for that slice.  Systematic form is not required for
+the outer code.
+
+\begin{lemma}[Block-outer first-moment interface]
+\label{lem:block-outer-first-moment-interface}
+Let \(C_{\mathrm{loc}}\subseteq\F_2^{n_0}\) be a binary linear \([n_0,b]\) code
+with homogeneous weight enumerator
+\[
+W_{\mathrm{loc}}(z)=\sum_j A^{\mathrm{loc}}_j z^j,
+\]
+and let \(C_{\mathrm{out}}=C_{\mathrm{loc}}^{\oplus M}\).  Its message length
+is \(k=Mb\), its outer/interleaver length is \(N=Mn_0\), and its weight
+enumerator is
+\[
+W_{\mathrm{out}}(z)=W_{\mathrm{loc}}(z)^M .
+\]
+Write \(A_h^{\mathrm{out}}=[z^h]W_{\mathrm{out}}(z)\), omitting the all-zero
+word from the nonzero-codeword sum.  If \(p_h^{\rm in}(\delta)\) is any valid
+upper bound on the chosen inner construction producing output weight at most
+\(\lfloor\delta N\rfloor\) from an interleaved outer word of weight \(h\), then
+\[
+\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\le
+\mu_{\mathrm{block}}(\delta)
+:=
+\sum_{h=1}^{N} A_h^{\mathrm{out}}p_h^{\rm in}(\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+The direct-sum enumerator identity follows by multiplying the local generating
+functions block by block.  Conditional on any nonzero outer word of weight
+\(h\), the uniform interleaver randomizes only the support positions seen by
+the inner code, so the same inner bound \(p_h^{\rm in}(\delta)\) applies to
+every such word.  Summing these failure probabilities over all nonzero outer
+words gives \(\mu_{\mathrm{block}}(\delta)\), and Markov's inequality gives the
+minimum-distance bound.
+\end{proof}
+
+\subsection{Finite certificate template}
+\label{subsec:local-code-certificate-template}
+
+\begin{lemma}[Finite block-certificate template]
+\label{lem:finite-block-certificate-template}
+In the setting of Lemma~\ref{lem:block-outer-first-moment-interface}, suppose
+the nonzero outer weights are partitioned into a finite list of audited row
+families \(\mathcal R\).  For each row \(R\in\mathcal R\), suppose a verifier or
+proof establishes
+\[
+\sum_{h\in R} A_h^{\mathrm{out}}p_h^{\rm in}(\delta)\le 2^{-\lambda_R}.
+\]
+If the rows cover every nonzero outer word and every inner placement/episode
+case used by the bound, then
+\[
+\Pr[d_{\min}(\Csc)\le\lfloor\delta N\rfloor]
+\le
+\sum_{R\in\mathcal R}2^{-\lambda_R}.
+\]
+In particular, proving the right-hand side is at most \(2^{-\lambda}\) gives
+failure probability at most \(2^{-\lambda}\).
+\end{lemma}
+
+\begin{proof}
+This is bookkeeping after Lemma~\ref{lem:block-outer-first-moment-interface}.
+The row hypotheses form a union-bound cover of the first-moment sum over all
+nonzero outer words and all inner cases, and summing the row bounds gives the
+claim.
+\end{proof}

@@ -1,0 +1,60 @@
+\section{Full-split local-code recursive inner}
+\label{sec:fullsplit-local-code-inner}
+
+The structured inner is also local-code independent.  Let
+\(C_{\rm in}\subseteq\F_2^{2b}\) be a binary linear \([2b,b,d_0]\) code with
+encoder \(E:\F_2^b\to C_{\rm in}\) and local weight enumerator
+\[
+W_{\rm in}(z)=\sum_{w=0}^{2b} A_w^{\rm in}z^w .
+\]
+Partition the interleaved outer word into blocks \(U_i\in\F_2^b\) and keep a
+state \(S_i\in\F_2^b\).  Starting from \(S_0=0\), form
+\[
+V_i=U_i+S_{i-1}.
+\]
+If \(V_i=0\), emit \(Y_i=0\) and set \(S_i=0\).  If \(V_i\ne0\), choose a fresh
+scrambler \(A_i\in GL_b(2)\), encode \(C_i=E(A_iV_i)\), choose a fresh random
+coordinate permutation \(\tau_i\) of the \(2b\) codeword coordinates, and split
+\[
+(Y_i,S_i)=\operatorname{split}_b(\tau_i C_i),
+\]
+where the first \(b\) coordinates are emitted and the last \(b\) coordinates
+become the next state.
+
+\begin{lemma}[One-step full-split law]
+\label{lem:fullsplit-one-step-law}
+Conditional on \(V_i\ne0\), the codeword \(C_i\) is uniform over the nonzero
+words of \(C_{\rm in}\).  Therefore the joint law of emitted weight
+\(Y=\wt(Y_i)\) and next-state weight \(Q=\wt(S_i)\) is
+\[
+\Pr[Y=y,Q=q]
+=
+\frac{A^{\rm in}_{y+q}}{2^b-1}
+\frac{\binom{b}{y}\binom{b}{q}}{\binom{2b}{y+q}}.
+\]
+If the incoming state has support size \(q\) and the next input block has
+support size \(r\), then the pre-encoding turnoff atom is
+\[
+\Pr[V_i=0\mid q,r]
+=
+\begin{cases}
+\binom{b}{q}^{-1}, & q=r,\\
+0, & q\ne r.
+\end{cases}
+\]
+\end{lemma}
+
+\begin{proof}
+For fixed nonzero \(V_i\), \(A_iV_i\) is uniform over
+\(\F_2^b\setminus\{0\}\), and \(E\) bijects this set with the nonzero codewords
+of \(C_{\rm in}\).  Conditional on a codeword of weight \(y+q\), the random
+coordinate split is hypergeometric, giving the displayed split law.  The
+turnoff atom \(V_i=0\) occurs exactly when the input support equals the state
+support; conditioned on the two support sizes this has probability
+\(\binom{b}{q}^{-1}\) if \(q=r\) and is impossible otherwise.
+\end{proof}
+
+Thus a full-split certificate needs the local inner spectrum \(A_w^{\rm in}\),
+the induced split law above, and a finite or analytic episode ledger for
+summing \(A_h^{\rm out}p_h^{\rm in}(\delta)\).  The current proved instance
+uses the exact extended-BCH \([128,64,22]\) spectrum, so \(b=64\).

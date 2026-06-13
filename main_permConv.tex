@@ -3,7 +3,7 @@
 % 1 for submission
 % 0 for full version
 \def\submission{0}
-\def\showTodos{1}
+\def\showTodos{0}
 
 \input{packages}
 \input{preamble}
@@ -21,9 +21,13 @@
 
 \input{innerDenseScalar}
 \input{integrationDense}
-\input{localCodeStructured}
+\input{localCodeOuter}
+\input{localCodeInner}
+\input{localCodeCertificate}
+\input{localCodeProjections}
 
-% Preserved research branches are kept outside the current main spine:
+% Uncompiled construction branches:
+% \input{localCodeStructured}
 % \input{outerExpandAcc}
 % \input{innerSparse}
 % \input{innerDense}
