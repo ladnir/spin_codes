@@ -7,3 +7,44 @@ This note is reserved for the RM/BCH/random-like outer-mode comparison thread.  
 \texttt{RESULTS\_LOCK.md}; the working comparison script is
 \texttt{scripts/compare\_outer\_modes\_fullsplit.py}.  BCH rows remain heuristic projections until a real spectrum or a
 rigorous low-weight envelope replaces the modeled spectrum.
+
+\subsection{Locked \(\delta=.09\) projection table}
+
+The comparison holds the full-split EBCH inner ledger fixed and swaps only the local outer model.  The script invocation
+is
+\[
+\texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
+\]
+It writes
+\[
+\begin{gathered}
+\texttt{scripts/outer\_mode\_comparison\_delta009.csv},\\
+\texttt{scripts/outer\_mode\_comparison\_delta009.md}.
+\end{gathered}
+\]
+
+The modeled BCH-like local spectrum used in the projection is
+\[
+A_w=0\quad(0<w<d_0),\qquad
+A_w\approx 2^{k_0-n_0}\binom{n_0}{w}\quad(w\ge d_0),
+\]
+with optional sensitivity inflation of \(+10,+20,+40\) bits on \(d_0\le w\le d_0+32\).  At \(N=2^{21}\),
+\(\delta=.09\), and \(d=188743\), the baseline projection rows are
+\[
+\begin{array}{c|c|c|c|c|c|c}
+\text{outer mode} & \text{status} & [n_0,k_0,d_0] & \text{blocks} &
+\log_2\mu & \text{margin bits} & \text{dominant }h\\
+\hline
+\text{RM exact} & \text{proved} & [512,256,32] & 4096 & -37.278528 & 37.278528 & 32\\
+\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089134 & 37.089134 & 59\\
+\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 119 .
+\end{array}
+\]
+All three rows are dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).  The rough outer
+work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit rows and \(16777216\) for the \(256\)-bit row.
+
+The sensitivity check is important.  The \([256,128,38]\) model remains near the RM margin with no inflation and
+has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
+positive under \(+20\) bits.  The \([512,256,\ge62]\) model is more robust in this diagnostic: its margins under
+\(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  These rows stay heuristic
+until an exact BCH spectrum or a rigorous low-weight envelope replaces the modeled spectrum.

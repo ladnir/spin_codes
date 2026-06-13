@@ -1,6 +1,89 @@
 % Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
 % Source: integration.tex, lines 606--2143. Preserved scalar dense finite diagnostics; not included in the main spine.
 
+\subsection{Demoted dense+dense baseline parameter bookkeeping}
+
+The following corollaries are useful for checking the baseline dense+dense parameter region, but they are not needed in
+the main theorem spine now that the paper states the qualitative dense+dense theorem and the concrete \(0.109\)
+theorem directly.
+
+\begin{corollary}[Explicit admissible dense+dense parameter region]
+\label{cor:dense-dense-explicit-region}
+Fix any \(z\in(0,\sqrt2-1)\), and choose
+\[
+c>\frac{1}{\log_2(2/(1+z))}.
+\]
+Let \(\kappa>0\), \(\rho\in(0,z)\), \(\delta\in(0,\rho/2)\), and \(\gamma>1\) satisfy
+\[
+\kappa\log_2(1/z)<1,
+\qquad
+\gamma>1+\kappa\log_2\!\Bigl(\frac{1}{\rho}\Bigr).
+\]
+Then the systematic dense outer with memory \(M=\lceil c\log_2 n\rceil\) concatenated with the dense inner of memory
+\(m=\lceil \gamma\log_2 n\rceil\) satisfies
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+\end{corollary}
+
+\begin{proof}
+For all sufficiently large \(n\), Corollary~\ref{lem:outer-dense-spectrum} gives
+\[
+\EE[\enum_{\Cone,h}] \le z^{-h},
+\]
+so Theorem~\ref{thm:dense-dense-integration} applies with \(\beta_{\mathrm{out}}=z^{-1}\).
+The stated conditions are exactly the theorem's hypotheses rewritten in terms of \(z\).
+\end{proof}
+
+\begin{corollary}[One concrete baseline choice]
+\label{cor:dense-dense-concrete-choice}
+Choose
+\[
+z=\frac13,
+\qquad
+\kappa=\frac12,
+\qquad
+\rho=\frac14.
+\]
+If
+\[
+c>\frac{1}{\log_2(3/2)},
+\qquad
+\gamma>2,
+\qquad
+\delta<\frac18,
+\]
+then the systematic dense outer with memory \(M=\lceil c\log_2 n\rceil\) and the dense inner with memory
+\(m=\lceil \gamma\log_2 n\rceil\) satisfy
+\[
+\Pr[d_{\min}(\Csc)\le \delta n]=o(1).
+\]
+\end{corollary}
+
+\begin{proof}
+For \(z=\tfrac13\), the outer condition becomes \(c>1/\log_2(3/2)\).  Also
+\(\frac12\log_2 3<1\), \(1+\frac12\log_2 4=2\), and \(\delta<1/8\) implies
+\(2\delta<1/4=\rho<z=1/3\).  Thus the explicit admissible-region corollary applies.
+\end{proof}
+
+\begin{remark}[Memory-vs.-blocklength interpretation]
+\label{rem:dense-dense-memory-scaling}
+The concrete baseline choice can be restated directly in terms of the log-memory parameter.  If the outer memory is
+\[
+M=\lceil c\log_2 n\rceil,\qquad c>\frac{1}{\log_2(3/2)}\approx 1.71,
+\]
+and the inner memory is
+\[
+m=\lceil \gamma\log_2 n\rceil,\qquad \gamma>2,
+\]
+then the dense serial concatenation has linear minimum distance with high probability for every \(\delta<1/8\).
+Equivalently, fixing a memory budget \(M\), the baseline proof certifies linear distance throughout
+\[
+n \le 2^{M/c}
+\]
+for any fixed \(c>1/\log_2(3/2)\).
+\end{remark}
+
 \subsection{What must be sharpened next}
 \label{sec:integration-dense-dense-block}
 

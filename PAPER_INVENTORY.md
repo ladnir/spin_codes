@@ -50,6 +50,15 @@ diagnostics but no longer interrupt the compiled dense theorem spine.
 The unused `OffAfter(T)` declaration has been removed from the compiled scalar
 dense section, and the original `innerDense.tex` and `integration.tex` files
 now have visible archival/provenance headers.
+The dense integration section has also been compressed: baseline admissible
+region and memory-scaling corollaries now live in
+`explorations/scalar_dense_finite_diagnostics.tex`, leaving the compiled
+integration spine focused on the qualitative theorem, linear-weight criterion,
+and concrete `0.109` theorem.
+The structured local-code projection material has also been demoted: the
+compiled paper now keeps only a compact BCH projection status note, while the
+detailed BCH256/BCH512 comparison table and low-weight inflation stress tests
+live in `explorations/outer_spectrum_comparison.tex`.
 
 ## Status Labels
 
@@ -75,7 +84,7 @@ now have visible archival/provenance headers.
 | `outerDense.tex` | Dense/banded outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
 | `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
-| `localCodeStructured.tex` | Compact local-code interface, RM/EBCH certificate, and BCH projections. | `MAIN_CERTIFICATE` plus `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
+| `localCodeStructured.tex` | Compact local-code interface, RM/EBCH certificate, and short BCH projection status note. | `MAIN_CERTIFICATE` plus brief `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
 | `innerDense.tex` | Original monolithic dense-inner workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `integration.tex` | Original monolithic dense integration workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `outerExpandAcc.tex` | Alternate expander/accumulator outer construction. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
@@ -246,7 +255,9 @@ Do not move prose until this inventory is reviewed. Proposed destinations:
   - BCH spectrum search, MacWilliams/affine-coset program, public tables.
 - `explorations/outer_spectrum_comparison.tex`
   - banded versus direct-sum block enumerator comparison;
-  - random-block, RM, BCH-like, and sliding-structured outer sanity checks.
+  - random-block, RM, BCH-like, and sliding-structured outer sanity checks;
+  - detailed BCH256/BCH512 projection table and low-weight inflation stress
+    tests moved out of the compiled local-code section.
 - `explorations/outer_expand_accumulator.tex`
   - preserved expander/accumulator outer material from `outerExpandAcc.tex`.
 - `explorations/inner_sparse.tex`

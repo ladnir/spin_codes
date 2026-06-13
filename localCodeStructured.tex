@@ -259,8 +259,8 @@ is a spectrum-model design comparison.
 
 The proved checkpoint above uses the exact RM \([512,256,32]\) local spectrum.  As a finite-\(N\) design diagnostic, we
 also compared two possible stronger outer floors while leaving the full-split EBCH inner ledger unchanged.  This is not a
-theorem upgrade: the BCH rows below use a spectrum model, not a certified local spectrum or a rigorous low-weight
-envelope.  The comparison script is
+theorem upgrade: the BCH rows use a spectrum model, not a certified local spectrum or a rigorous low-weight envelope.
+The comparison script is
 \[
 \texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
 \]
@@ -271,37 +271,10 @@ It writes the reports
 \texttt{scripts/outer\_mode\_comparison\_delta009.md}.
 \end{gathered}
 \]
+At the locked checkpoint \(N=2^{21}\), \(\delta=.09\), and \(d=188743\), the modeled rows suggest that replacing the
+RM outer by a BCH-like \([512,256,\ge62]\) local code could substantially improve the margin, while a \([256,128,38]\)
+model is roughly comparable to the proved RM row and sensitive to low-weight-spectrum inflation.  This conclusion is
+only a projection until an exact spectrum or proved low-weight envelope is supplied.
 
-The modeled local spectrum is
-\[
-A_w=0\quad(0<w<d_0),\qquad
-A_w\approx 2^{k_0-n_0}\binom{n_0}{w}\quad(w\ge d_0),
-\]
-with optional sensitivity inflation of \(+10,+20,+40\) bits on \(d_0\le w\le d_0+32\).  At \(N=2^{21}\), \(\delta=.09\),
-and \(d=188743\), the baseline projection rows are
-\[
-\begin{array}{c|c|c|c|c|c|c}
-\text{outer mode} & \text{status} & [n_0,k_0,d_0] & \text{blocks} &
-\log_2\mu & \text{margin bits} & \text{dominant }h\\
-\hline
-\text{RM exact} & \text{proved} & [512,256,32] & 4096 & -37.278528 & 37.278528 & 32\\
-\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089134 & 37.089134 & 59\\
-\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 119 .
-\end{array}
-\]
-All three rows are dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).  The rough outer
-work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit rows and \(16777216\) for the \(256\)-bit row.
-
-The sensitivity check is important.  The \([256,128,38]\) model remains near the RM margin with no inflation and
-has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
-positive under \(+20\) bits.  The \([512,256,\ge62]\) model is more robust in this diagnostic: its margins under
-\(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  These rows stay heuristic
-until an exact BCH spectrum or a rigorous low-weight envelope replaces the modeled spectrum.
-
-Detailed finite-ledger and projection notes are preserved in
-\[
-\begin{gathered}
-\texttt{explorations/fullsplit\_certificate\_development.tex},\\
-\texttt{explorations/bch\_outer\_spectra.tex}.
-\end{gathered}
-\]
+The detailed comparison table, inflation stress tests, and BCH spectrum notes are preserved in the outer-spectrum
+comparison and BCH-spectra exploration notes.

@@ -54,6 +54,16 @@ current dense+dense theorem.
 The final unused scalar dense declaration in the compiled path,
 `OffAfter(T)`, has been removed, and the original monolithic `innerDense.tex`
 and `integration.tex` files now carry explicit archival/provenance headers.
+The dense integration spine has also been tightened: the explicit admissible
+baseline region, one concrete baseline choice, and memory-scaling interpretation
+were moved to `explorations/scalar_dense_finite_diagnostics.tex`, while
+`integrationDense.tex` keeps the qualitative dense+dense theorem, the
+linear-weight criterion, and the concrete \(0.109\) theorem.
+The structured projection subsection has now been tightened as well:
+`localCodeStructured.tex` keeps only the theorem/projection status boundary and
+a compact qualitative summary of BCH-like outer projections, while the detailed
+BCH256/BCH512 table and low-weight inflation stress tests live in
+`explorations/outer_spectrum_comparison.tex`.
 
 ## Summary
 
@@ -187,6 +197,9 @@ Main source files:
 - local-code interface material from `integration.tex`;
 - full-split definition and certificate-interface material from `innerDense.tex`.
 - implemented compact spine: `localCodeStructured.tex`.
+- implemented demotion: detailed modeled BCH projection rows live in
+  `explorations/outer_spectrum_comparison.tex`, with only a short status note
+  remaining in the compiled paper.
 
 Main-paper role:
 
@@ -415,6 +428,8 @@ The first physical split is complete:
 14. The stale `OffAfter(T)` declaration was removed from the compiled scalar
     dense spine, and the original monolithic `innerDense.tex` and
     `integration.tex` sources were marked archival.
+15. Baseline dense+dense parameter-bookkeeping corollaries were demoted from
+    `integrationDense.tex` to `explorations/scalar_dense_finite_diagnostics.tex`.
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
