@@ -160,64 +160,21 @@ The finite certificate input data are
 \end{array}
 \]
 
-\begin{lemma}[Exact RM prefix support split certificate]
-\label{lem:rm-prefix-support-split}
-For the direct-sum \(RM(4,9)\) outer, the exact local spectrum gives no nonzero outer weights below \(32\).  The verifier
-uses exact direct-sum RM coefficients for the prefix \(32\le h\le500\) and records the dominant supported term at
-\(h=32\), first-active regime \(r=1\), gap bucket \(1\le\mathrm{gap}\le4000\).
-\end{lemma}
-
-\begin{proof}
-The local \(RM(4,9)\) minimum distance is \(32\), so every nonzero direct-sum outer word has weight at least \(32\).  The
-coefficient extraction for \(W_{RM}(z)^{4096}\) through \(h=500\) is performed by the verifier and stored in the finite
-ledger manifest.
-\end{proof}
-
-\begin{corollary}[Checked small-prefix ledger]
-\label{cor:fullsplit-small-prefix-all-first-active}
-At \(N=2^{21}\) and \(\delta=.09\), the checked prefix contribution for the exact RM outer and full-split EBCH inner is
+\paragraph{Checked ledger summary.}
+The manifest records the exact RM support floor, the exact-prefix ledger, and the post-prefix row cover.  The
+paper-facing values are
 \[
-\log_2\mu_{32\le h\le500}^{\rm fullsplit}\le -37.278528.
+\begin{array}{c|c}
+\text{checked item} & \text{manifest value}\\
+\hline
+\text{minimum positive outer weight} & 32\\
+\text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.278528\\
+\text{checked row families for }h\ge501 & \log_2\mu\le -182.259739\\
+\text{total checked first moment} & \log_2\mu\le -37.278528 .
+\end{array}
 \]
-This prefix cover includes all first-active placements for all supported weights \(32\le h\le500\).
-\end{corollary}
-
-\begin{corollary}[Checked post-prefix ledger rows]
-\label{cor:fullsplit-postprefix-checked-ledger}
-The checked \(h\ge501\) row families included in the finite ledger have union-bound total
-\[
-\log_2\mu_{\rm checked,\ h\ge501}^{\rm fullsplit}
-\le -182.259739.
-\]
-The dominant post-prefix row is the \(501\le h\le2000\) all-episode wrapper.  The remaining audited families cover
-ultra-late placements, early endpoint rows, accelerated endpoint rows, paired accelerated rows, fixed-pole intervals,
-and the complement-high range.  The full row table is preserved in the full-split exploration note and in the audit
-packet.  Overlaps between row families are retained only as harmless union-bound overcount.
-\end{corollary}
-
-\begin{proof}
-The manifest checks that these row families cover the post-prefix regimes used by the certificate: ultra-late placements,
-late-window all-episode/fixed-pole intervals, early endpoint and paired endpoint intervals through \(N/2\), and the
-complement-high region.  The displayed total is the log-sum of the audited row contributions, whose maximum is the
-\(-182.259739\)-bit all-episode wrapper row.
-\end{proof}
-
-\begin{corollary}[Current finite first-moment checkpoint]
-\label{cor:fullsplit-current-finite-checkpoint}
-Let \(\mu_{\rm checked}(.09)\) denote the first-moment contribution of the checked row families above.  Then
-\[
-\log_2\mu_{\rm checked}(.09)
-\le -37.278528.
-\]
-\end{corollary}
-
-\begin{proof}
-Combine Corollaries~\ref{cor:fullsplit-small-prefix-all-first-active} and~\ref{cor:fullsplit-postprefix-checked-ledger}:
-\[
-\log_2\left(2^{-37.278528}+2^{-182.259739}\right)
-\le -37.278528.
-\]
-\end{proof}
+The dominant row is \(h=32\), first-active regime \(r=1\), gap bucket \(1\le\mathrm{gap}\le4000\).  The detailed row
+family table and the former row-level wrappers are preserved in the full-split exploration note and in the audit packet.
 
 \begin{theorem}[Checked finite RM/full-split first-moment certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}
@@ -243,12 +200,10 @@ In particular, with positive probability a sampled code has \(d_{\min}\ge188744\
 
 \begin{proof}
 Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure probability to the first moment
-\(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  Lemma~\ref{lem:rm-prefix-support-split} removes all positive weights below
-\(32\).  Corollary~\ref{cor:fullsplit-small-prefix-all-first-active} covers \(32\le h\le500\), while
-Corollary~\ref{cor:fullsplit-postprefix-checked-ledger} covers \(h\ge501\).  Therefore every nonzero outer word is
-included in the row families defining \(\mu_{\rm checked}(.09)\), and
-Corollary~\ref{cor:fullsplit-current-finite-checkpoint} gives the displayed expectation bound.  Markov's inequality
-applied to the nonnegative integer random variable \(Z_d\) gives the probability statement.
+\(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  The manifest-backed ledger summary above removes all positive weights below
+\(32\), covers all first-active placements for \(32\le h\le500\), and covers the checked \(h\ge501\) row families.
+Its log-sum gives \(\log_2\mu_{\rm checked}(.09)\le -37.278528\), which is the displayed expectation bound.
+Markov's inequality applied to the nonnegative integer random variable \(Z_d\) gives the probability statement.
 \end{proof}
 
 \subsection{Spectrum-model outer projections}

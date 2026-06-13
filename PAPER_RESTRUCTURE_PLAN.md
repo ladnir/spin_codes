@@ -34,6 +34,10 @@ The structured local-code section now treats the finite RM/EBCH result as a
 certificate theorem: the main spine keeps the certificate inputs, prefix and
 post-prefix totals, and final first-moment theorem, while detailed post-prefix
 row tables remain in the full-split exploration/audit notes.
+The structured certificate has now been tightened further: the row-level
+RM-prefix/post-prefix wrapper statements were collapsed into a manifest-backed
+checked ledger summary in `localCodeStructured.tex`, while the former wrappers
+remain in `explorations/fullsplit_certificate_development.tex`.
 A final structural pass moved the accumulator warmup immediately after the
 framework in the compiled paper and added the missing combined theorem:
 random sliding dense outer plus accumulator inner gives linear distance for

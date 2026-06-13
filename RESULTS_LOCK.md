@@ -67,14 +67,17 @@ Status: current main finite construction and checked certificate.
 
 Primary locations:
 
-- `localCodeStructured.tex`, especially labels:
+- `localCodeStructured.tex`, especially:
+  - the manifest-backed checked ledger summary in the RM/EBCH instantiation
+    subsection;
+  - `thm:fullsplit-rm-finite-certificate-009`.
+- `explorations/fullsplit_certificate_development.tex`: detailed development
+  notes copied from the original dense-inner workspace, including the former
+  row-level wrappers:
   - `lem:rm-prefix-support-split`
   - `cor:fullsplit-small-prefix-all-first-active`
   - `cor:fullsplit-postprefix-checked-ledger`
   - `cor:fullsplit-current-finite-checkpoint`
-  - `thm:fullsplit-rm-finite-certificate-009`
-- `explorations/fullsplit_certificate_development.tex`: detailed development
-  notes copied from the original dense-inner workspace.
 - `innerDense.tex`: preserved original source containing the pre-cleanup
   full-split ledger material.
 - `AUDIT.md`: full audit packet and command log.

@@ -29,6 +29,9 @@ The structured local-code certificate section has been tightened so the main
 paper states the RM/EBCH finite certificate and compact row-cover facts, while
 the full post-prefix row table remains in
 `explorations/fullsplit_certificate_development.tex` and the audit packet.
+The row-level RM-prefix/post-prefix wrapper statements have now been collapsed
+into a manifest-backed ledger summary in `localCodeStructured.tex`; the former
+formal wrappers remain preserved in the full-split exploration note.
 A main-spine audit removed compiled `\stan{...}` comments, stale
 working-save-point wording, and the last layout warning in the framework
 first-moment proof.  The accumulator section now includes the promised combined
@@ -96,7 +99,7 @@ the constant-factor geometric envelope consumed by the dense+dense theorem.
 | `outerDense.tex` | Random sliding dense outer construction and spectrum bounds. | `MAIN_THEOREM` plus `SUPPORTING_LEMMA`; keep main or later appendix split. |
 | `innerDenseScalar.tex` | Extracted scalar dense inner theorem material. | `MAIN_THEOREM`; current compiled source for the random dense inner interface. |
 | `integrationDense.tex` | Extracted analytic dense+dense integration material. | `MAIN_THEOREM`; current compiled source for random sliding dense construction and asymptotics. |
-| `localCodeStructured.tex` | Compact local-code interface, RM/EBCH certificate, and short BCH projection status note. | `MAIN_CERTIFICATE` plus brief `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
+| `localCodeStructured.tex` | Compact local-code interface, manifest-backed RM/EBCH certificate, and short BCH projection status note. | `MAIN_CERTIFICATE` plus brief `HEURISTIC_PROJECTION`; current compiled source for the structured construction line. |
 | `innerDense.tex` | Original monolithic dense-inner workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `integration.tex` | Original monolithic dense integration workspace. | Preserve as provenance; active content has been split into compiled spine and exploration notes. |
 | `outerExpandAcc.tex` | Alternate expander/accumulator outer construction. | Preserve as a separate exploration/construction note; do not keep in the main paper spine for this cleanup pass. |
