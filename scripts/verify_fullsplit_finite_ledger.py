@@ -2297,6 +2297,7 @@ def main() -> int:
             "prefix_interior_audit_buckets,"
             + ";".join(bucket.label for bucket in INTERIOR_AUDIT_BUCKETS)
         )
+        print("prefix_interior_audit_status,PASS")
         print("prefix_interior_audit_left_endpoint_maxima,PASS")
         print(f"prefix_interior_audit_tolerance_bits,{args.prefix_interior_tolerance:.12g}")
         print(f"prefix_interior_audit_worst_slack_bits,{interior.worst_diff_slack:.12g}")
@@ -2322,6 +2323,7 @@ def main() -> int:
             f"delta={interior.worst_repro['left_reproduction_delta']}"
         )
         manifest["checks"]["prefix_interior_audit"] = {  # type: ignore[index]
+            "status": "PASS",
             "rows": interior.rows,
             "h_range": [interior.h_min, interior.h_max],
             "h_count": interior.h_count,
@@ -2397,6 +2399,7 @@ def main() -> int:
             f"{exact_outer_certificate.gap_after_min_stop}"
         )
     manifest["checks"]["exact_outer_support"] = {  # type: ignore[index]
+        "status": "PASS",
         "local_nonzero_terms": exact_outer_certificate.local_nonzero_terms,
         "local_min_positive": exact_outer_certificate.local_min_positive,
         "local_first_positive_le_80": exact_outer_certificate.local_first_positive_le_80,
@@ -2437,6 +2440,7 @@ def main() -> int:
         f"{exact_outer_certificate.trace.max_coefficient_weight}"
     )
     print(f"exact_outer_support_count,{exact_outer_certificate.support_count}")
+    print("exact_outer_support_status,PASS")
     print(f"exact_outer_support_positive_count,{exact_outer_certificate.positive_count}")
     print(f"exact_outer_support_min_positive,{exact_outer_certificate.min_positive}")
     print(f"exact_outer_support_next_positive_after_min,{exact_outer_certificate.next_positive_after_min}")
@@ -3029,6 +3033,7 @@ def main() -> int:
         print(f"prefix_placement_ratio_threshold,{args.prefix_placement_ratio_threshold}")
         print(f"prefix_placement_ratio_threshold_num,{placement.threshold_num}")
         print(f"prefix_placement_ratio_threshold_den,{placement.threshold_den}")
+        print("prefix_placement_ratio_status,PASS")
         print("prefix_placement_ratio_exact_cross_multiply_status,PASS")
         print(f"prefix_placement_ratio_exact_comparisons,{placement.exact_comparisons}")
         print(f"prefix_placement_ratio_peak_h,{placement.peak_h}")
@@ -3043,6 +3048,7 @@ def main() -> int:
         print(f"prefix_placement_endpoint_bound_at_h_min_log2,{placement.endpoint_ratio_at_h_min_log2:.12g}")
         print(f"prefix_placement_endpoint_slack_factor,{placement.endpoint_slack_factor:.12g}")
         manifest["checks"]["prefix_placement_ratio"] = {  # type: ignore[index]
+            "status": "PASS",
             "threshold": args.prefix_placement_ratio_threshold,
             "threshold_num": placement.threshold_num,
             "threshold_den": placement.threshold_den,
