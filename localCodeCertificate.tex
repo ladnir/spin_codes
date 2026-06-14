@@ -42,11 +42,16 @@ fully interval-formal proof artifact.  The verifier constructs the
 low-weight RM direct-sum outer coefficients by exact integer polynomial
 arithmetic, checks the RM support floor and the first support gap, verifies the
 prefix placement-ratio step by exact cross multiplication, checks row-family
-coverage, and recomputes all locked row totals within the manifest tolerance.
+coverage, and re-sums the committed row-family artifacts within the manifest
+tolerance.  Some heavier interval families are treated as command-reproducible
+manifest rows in the default pass rather than regenerated every time; the
+verifier exposes opt-in flags to recompute the high, complement-high, early
+post-prefix, early-accelerated, and ultra-late post-prefix interval rows.
 The remaining hardening step, before treating the ledger as a fully formal
 computer-assisted proof, is to replace the floating logarithmic row arithmetic
-by interval, rational, or exact-integer upper bounds.  In the present paper this
-is the intended status of the word ``checked.''
+by interval, rational, or exact-integer upper bounds, and to store or require
+full regeneration of those heavier interval rows if desired.  In the present
+paper this is the intended status of the word ``checked.''
 
 The finite certificate input data are
 \[

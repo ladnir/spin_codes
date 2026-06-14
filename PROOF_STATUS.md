@@ -117,6 +117,10 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   RM support check, the prefix interior audit, and the prefix placement-ratio
   certificate, rather than leaving those checks implicit in successful
   execution.
+- The finite certificate prose now distinguishes the default manifest verifier
+  from full regeneration: the default pass re-sums committed row artifacts and
+  manifest interval constants, while the high/complement/early/late interval
+  families have opt-in recomputation flags.
 - The dominant RM/EBCH prefix mechanism is now isolated in the manifest:
   after exact RM reweighting the \(h=32,r=1,\mathrm{gap}=1..4000\) row is the
   peak, the full \(32\le h\le500,e\le8\) prefix family is only about
@@ -160,6 +164,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   certificate to fully formal computer-assisted theorem, replace the floating
   logarithmic row arithmetic in the manifest ledger by outward-rounded
   interval bounds or exact rational/integer inequalities.
+- For a stronger audit packet, either run/store regenerated artifacts for every
+  opt-in high/complement/early/late interval family or make the full verifier
+  require those recomputations.
 - Replace the sampled-grid dense `0.109` exponent-gap check by an interval
   certificate if a fully formal computer-assisted proof is needed.
 - Further compress the scalar dense inner ON/OFF proof chain if the main paper
