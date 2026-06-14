@@ -20,6 +20,10 @@ coordinate permutation \(\tau_i\) of the \(2b\) codeword coordinates, and split
 \]
 where the first \(b\) coordinates are emitted and the last \(b\) coordinates
 become the next state.
+For a length-\(N\) inner instance we take \(B=N/b\) blocks, emit
+\((Y_1,\dots,Y_B)\), and stop.  The terminal state \(S_B\) is not emitted and
+is not constrained.  Thus the inner remains rate \(1\) at the global level:
+it maps \(N\) interleaved outer bits to exactly \(N\) output bits.
 
 \begin{lemma}[One-step full-split law]
 \label{lem:fullsplit-one-step-law}

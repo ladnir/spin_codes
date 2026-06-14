@@ -104,6 +104,10 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The dense integration handoff now uses an explicit checked endpoint
   `eta_1=0.99` in the linear-window criterion and treats the top endpoint
   `h=n` separately instead of applying the outer linear exponent at `eta=1`.
+- The full-split finite certificate now states the block-time convention
+  (`T=B-i+1` from the first active block), the `late_blocks=5949` split, and
+  the unconstrained terminal-state convention in both paper prose and manifest
+  metadata.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
@@ -118,8 +122,6 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
 - Keep the BCH projection rows visibly heuristic until the two items above are
   done.
-- Clarify the full-split construction and boundary convention enough that the
-  paper, manifest, and scripts visibly evaluate the same object.
 - Decide whether the finite exact-support prefix rows remain accepted numerical
   certificates or are replaced by analytic monotonicity/support lemmas.
 

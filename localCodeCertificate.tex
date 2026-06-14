@@ -24,6 +24,19 @@ The verifier is part of the finite certificate.  It checks the exact local
 spectra used in the outer and inner models, the finite row-family bounds in the
 first-moment ledger, and the coverage bookkeeping that every nonzero outer
 weight and every inner placement regime used by the certificate is included.
+Its block-time convention is the one in
+Section~\ref{sec:fullsplit-local-code-inner}: \(B=N/b=32768\) inner blocks,
+initial state \(S_0=0\), and no terminal-state constraint.  If the first active
+inner block is \(i\), the ledger writes
+\[
+T:=B-i+1
+\]
+for the number of output blocks from that block through the end.  The
+parameter \(\texttt{late\_blocks}=5949\) is the split point: \(T<5949\) is the
+ultra-late prefix, while the named gap buckets use
+\[
+T=5949+\mathrm{gap}-1 .
+\]
 
 The finite certificate input data are
 \[
@@ -33,6 +46,7 @@ The finite certificate input data are
 \text{outer spectrum} & RM(4,9)\ [512,256,32]\ \text{exact local spectrum}\\
 \text{outer direct sum} & 4096\ \text{blocks},\ N=2^{21}\\
 \text{inner split law} & EBCH\ [128,64,22]\ \text{exact local spectrum},\ b=64\\
+\text{inner boundary} & S_0=0,\ S_{32768}\ \text{discarded and unconstrained}\\
 \text{target} & \delta=.09,\ d=188743\\
 \text{manifest} & \texttt{scripts/fullsplit\_finite\_ledger\_manifest.json}.
 \end{array}

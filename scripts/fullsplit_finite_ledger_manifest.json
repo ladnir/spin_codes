@@ -1578,7 +1578,7 @@
       }
     }
   },
-  "construction": "RM512_256 block outer with full-split dense inner",
+  "construction": "RM512_256 block outer with full-split EBCH inner",
   "parameters": {
     "block_bits": 64,
     "current_eallratio_max_T": 32767,
@@ -1586,11 +1586,16 @@
     "exact_outer_blocks": 4096,
     "exact_outer_h_max": 500,
     "exact_outer_local_spectrum_csv": "scripts\\rm512_256_spectrum.csv",
+    "first_active_T_convention": "if the first active inner block is i, T=B-i+1 remaining output blocks",
+    "gap_to_T_convention": "for named gap buckets, T=late_blocks+gap-1; T<late_blocks is the ultra-late prefix",
     "global_turnoff_log2": -62.4078758,
     "high_interval_turnoff_adjustment_bits": 1.484774,
+    "initial_state": "S_0=0",
+    "inner_blocks": 32768,
     "inner_spectrum": "scripts\\EBCH128_64.wd",
     "late_blocks": 5949,
-    "late_coordinates": 380736
+    "late_coordinates": 380736,
+    "terminal_state_convention": "S_B is discarded and unconstrained; it is not emitted"
   },
   "row_families": [
     {

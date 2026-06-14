@@ -1860,10 +1860,13 @@ def main() -> int:
     )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
+    if args.N % args.block_bits != 0:
+        raise SystemExit(f"N={args.N} is not divisible by block_bits={args.block_bits}")
+    inner_blocks = args.N // args.block_bits
 
     manifest: dict[str, object] = {
         "schema": "fullsplit_finite_ledger.v1",
-        "construction": "RM512_256 block outer with full-split dense inner",
+        "construction": "RM512_256 block outer with full-split EBCH inner",
         "target": {
             "N": args.N,
             "delta": 0.09,
@@ -1871,8 +1874,13 @@ def main() -> int:
         },
         "parameters": {
             "block_bits": args.block_bits,
+            "inner_blocks": inner_blocks,
+            "initial_state": "S_0=0",
+            "terminal_state_convention": "S_B is discarded and unconstrained; it is not emitted",
+            "first_active_T_convention": "if the first active inner block is i, T=B-i+1 remaining output blocks",
             "late_blocks": args.late_blocks,
             "late_coordinates": args.block_bits * args.late_blocks,
+            "gap_to_T_convention": "for named gap buckets, T=late_blocks+gap-1; T<late_blocks is the ultra-late prefix",
             "exact_outer_blocks": args.exact_outer_blocks,
             "exact_outer_h_max": args.exact_outer_h_max,
             "global_turnoff_log2": GLOBAL_TURNOFF_LOG2,
