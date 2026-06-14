@@ -24,6 +24,18 @@ term for small/intermediate $w$.
 \end{enumerate}
 These are the only inner facts later sections need.
 
+\paragraph{Dependency map.}
+The ON/OFF lemmas below are local proof machinery.  They have two outputs.  First,
+Lemma~\ref{lem:dense-on-time-domination} and
+Lemma~\ref{lem:dense-off-requires-mzeros} give the three-term tail bound
+Lemma~\ref{lem:dense-three-term-tail}.  Second, the fixed-tap termination
+lemmas identify the only possible OFF candidates, which gives the
+forced-termination contraction in Lemma~\ref{lem:dense-forced-termination}.
+The integration section consumes only the packaged envelopes in
+Corollary~\ref{cor:dense-inner-piecewise},
+Theorem~\ref{thm:inner-dense-interface}, and
+Corollary~\ref{cor:dense-inner-constant-geometric}.
+
 % ============================================================
 \subsubsection{Inner ensemble definition (fixed-tap dense recursive, rate 1)}
 \label{subsec:inner-dense-def}
@@ -91,6 +103,12 @@ Thus a fixed-tap ON episode can terminate only when the input has a \(1\) exactl
 % ============================================================
 \subsubsection{Core ON/OFF lemmas}
 \label{subsec:inner-dense-onoff}
+
+This subsection proves two elementary structural facts about the fixed-tap
+recursion: while the state is noncritical, fresh dense taps expose fair coins;
+and a genuine transition back to zero state can only occur at a later input one
+aligned with a \(10^m\) output pattern.  The subsequent tail bounds are just
+union bounds and binomial lower tails built from these two facts.
 
 Let $\mathcal{F}_{t-1}:=\sigma(u_1^t,k_1^{t-1},y_1^{t-1})$ be the natural past up to time $t-1$.
 

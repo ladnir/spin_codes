@@ -98,6 +98,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   `xi_tiny=1/4` handoff instead of hiding the linear-window `xi=8`.
 - The dense `0.109` low-weight window now uses the polynomial-free global
   outer envelope `A_h <= 3^h`, avoiding the loose `n^{O(1)}` prefactor.
+- The scalar dense inner section now includes a dependency map identifying the
+  ON/OFF lemmas as local machinery and pointing to the packaged envelopes
+  consumed by the integration theorem.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
@@ -123,8 +126,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   or exact-integer safeguards.
 - Audit the dense integration high-weight and linear-window handoff one more
   time after the recent tiny-window and low-window fixes.
-- Compress the scalar dense inner ON/OFF proof chain so the narrative exposes
-  only the lemmas consumed by the integration theorem.
+- Further compress the scalar dense inner ON/OFF proof chain if the main paper
+  remains too long; the current narrative now marks which lemmas are local
+  scaffolding versus consumed interfaces.
 - Keep the bare `verify_dense_claims.py` default from being confused with the
   manuscript theorem: the current theorem check is explicitly
   `--delta 0.109`.
