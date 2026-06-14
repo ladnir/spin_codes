@@ -15,6 +15,9 @@
     "focused_numerical_recomputations": [
       "dominant T=5949,H=31 inner knot from EBCH spectrum"
     ],
+    "focused_threshold_checks": [
+      "dominant prefix peak-to-family inflation"
+    ],
     "level": "checked finite numerical certificate",
     "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
     "tolerance": 5e-06
@@ -231,6 +234,29 @@
       "status": "PASS",
       "term_log2": -37.38576684234531,
       "threshold_log2": -37.38575
+    },
+    "dominant_prefix_inflation": {
+      "interpretation": "Thresholded audit that the dominant peak row controls the entire exact-RM-reweighted prefix family.",
+      "observed": {
+        "above_split_gap_bits": 13.352485666805116,
+        "above_split_to_peak_ratio": 9.560955517109951e-05,
+        "split_inflation_factor": 1.0015848233469529,
+        "split_minus_peak_bits": 0.0022846069119495382,
+        "split_remainder_log2": -46.68722908748783,
+        "total_inflation_factor": 1.001680432902098,
+        "total_minus_peak_bits": 0.002422317512923655,
+        "total_remainder_log2": -46.602718187648264,
+        "total_remainder_to_peak_ratio": 0.0016804329020979284
+      },
+      "row_family": "prefix_32_500_e_le8",
+      "status": "PASS",
+      "thresholds": {
+        "above_split_min_gap_bits": 13.35,
+        "split_minus_peak_max_bits": 0.00229,
+        "split_remainder_max_log2": -46.68,
+        "total_minus_peak_max_bits": 0.00243,
+        "total_remainder_max_log2": -46.6
+      }
     },
     "dominant_prefix_row": {
       "above_split_gap_bits": 13.352485666805116,

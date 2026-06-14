@@ -2045,6 +2045,11 @@ def main() -> int:
     parser.add_argument("--prefix-ridge-tail-outer-ratio-max", type=float, default=2.747)
     parser.add_argument("--prefix-ridge-placement-ratio-max", type=float, default=0.303594)
     parser.add_argument("--prefix-ridge-inner-ratio-max", type=float, default=1.000000001)
+    parser.add_argument("--dominant-prefix-total-minus-peak-max-bits", type=float, default=0.00243)
+    parser.add_argument("--dominant-prefix-total-remainder-max-log2", type=float, default=-46.60)
+    parser.add_argument("--dominant-prefix-split-minus-peak-max-bits", type=float, default=0.00229)
+    parser.add_argument("--dominant-prefix-split-remainder-max-log2", type=float, default=-46.68)
+    parser.add_argument("--dominant-prefix-above-split-min-gap-bits", type=float, default=13.35)
     parser.add_argument(
         "--dominant-peak-inner-knot-csv",
         type=Path,
@@ -2173,6 +2178,9 @@ def main() -> int:
             ],
             "focused_numerical_recomputations": [
                 "dominant T=5949,H=31 inner knot from EBCH spectrum",
+            ],
+            "focused_threshold_checks": [
+                "dominant prefix peak-to-family inflation",
             ],
             "remaining_formalization": (
                 "replace floating logarithmic row arithmetic by interval, "
@@ -2683,6 +2691,31 @@ def main() -> int:
                 "above_split_gap_bits",
             ]:
                 check_close(f"{item.name}_dominant_{field}", getattr(dom, field), expected[field], args.tolerance)
+            if dom.total_minus_peak_bits > args.dominant_prefix_total_minus_peak_max_bits:
+                raise SystemExit(
+                    f"{item.name}_dominant_total_minus_peak_bits={dom.total_minus_peak_bits:.12g} exceeds "
+                    f"{args.dominant_prefix_total_minus_peak_max_bits:.12g}"
+                )
+            if dom.total_remainder_log2 > args.dominant_prefix_total_remainder_max_log2:
+                raise SystemExit(
+                    f"{item.name}_dominant_total_remainder_log2={dom.total_remainder_log2:.12g} exceeds "
+                    f"{args.dominant_prefix_total_remainder_max_log2:.12g}"
+                )
+            if dom.split_minus_peak_bits > args.dominant_prefix_split_minus_peak_max_bits:
+                raise SystemExit(
+                    f"{item.name}_dominant_split_minus_peak_bits={dom.split_minus_peak_bits:.12g} exceeds "
+                    f"{args.dominant_prefix_split_minus_peak_max_bits:.12g}"
+                )
+            if dom.split_remainder_log2 > args.dominant_prefix_split_remainder_max_log2:
+                raise SystemExit(
+                    f"{item.name}_dominant_split_remainder_log2={dom.split_remainder_log2:.12g} exceeds "
+                    f"{args.dominant_prefix_split_remainder_max_log2:.12g}"
+                )
+            if dom.above_split_gap_bits < args.dominant_prefix_above_split_min_gap_bits:
+                raise SystemExit(
+                    f"{item.name}_dominant_above_split_gap_bits={dom.above_split_gap_bits:.12g} is below "
+                    f"{args.dominant_prefix_above_split_min_gap_bits:.12g}"
+                )
             print(
                 f"{item.name}_dominant_row,"
                 f"outer_weight={dom.h},first_r={dom.first_r},"
@@ -2700,6 +2733,12 @@ def main() -> int:
             print(f"{item.name}_dominant_split_minus_peak_bits,{dom.split_minus_peak_bits:.6f}")
             print(f"{item.name}_dominant_split_remainder_log2,{dom.split_remainder_log2:.6f}")
             print(f"{item.name}_dominant_above_split_gap_bits,{dom.above_split_gap_bits:.6f}")
+            print("dominant_prefix_inflation_status,PASS")
+            print(f"dominant_prefix_inflation_total_minus_peak_max_bits,{args.dominant_prefix_total_minus_peak_max_bits:.12g}")
+            print(f"dominant_prefix_inflation_total_remainder_max_log2,{args.dominant_prefix_total_remainder_max_log2:.12g}")
+            print(f"dominant_prefix_inflation_split_minus_peak_max_bits,{args.dominant_prefix_split_minus_peak_max_bits:.12g}")
+            print(f"dominant_prefix_inflation_split_remainder_max_log2,{args.dominant_prefix_split_remainder_max_log2:.12g}")
+            print(f"dominant_prefix_inflation_above_split_min_gap_bits,{args.dominant_prefix_above_split_min_gap_bits:.12g}")
             dominant_payload = {
                 "outer_weight": dom.h,
                 "first_r": dom.first_r,
@@ -2746,6 +2785,32 @@ def main() -> int:
                     "After exact RM outer reweighting, the checked prefix "
                     "family is peak-dominated by the h=32, first_r=1, "
                     "gap=1..4000 row."
+                ),
+            }
+            manifest["checks"]["dominant_prefix_inflation"] = {  # type: ignore[index]
+                "status": "PASS",
+                "row_family": item.name,
+                "thresholds": {
+                    "total_minus_peak_max_bits": args.dominant_prefix_total_minus_peak_max_bits,
+                    "total_remainder_max_log2": args.dominant_prefix_total_remainder_max_log2,
+                    "split_minus_peak_max_bits": args.dominant_prefix_split_minus_peak_max_bits,
+                    "split_remainder_max_log2": args.dominant_prefix_split_remainder_max_log2,
+                    "above_split_min_gap_bits": args.dominant_prefix_above_split_min_gap_bits,
+                },
+                "observed": {
+                    "total_minus_peak_bits": dom.total_minus_peak_bits,
+                    "total_remainder_log2": dom.total_remainder_log2,
+                    "split_minus_peak_bits": dom.split_minus_peak_bits,
+                    "split_remainder_log2": dom.split_remainder_log2,
+                    "above_split_gap_bits": dom.above_split_gap_bits,
+                    "total_inflation_factor": 2.0 ** dom.total_minus_peak_bits,
+                    "split_inflation_factor": 2.0 ** dom.split_minus_peak_bits,
+                    "total_remainder_to_peak_ratio": 2.0 ** (dom.total_remainder_log2 - dom.term_log2),
+                    "above_split_to_peak_ratio": 2.0 ** (dom.above_split_log2 - dom.term_log2),
+                },
+                "interpretation": (
+                    "Thresholded audit that the dominant peak row controls the "
+                    "entire exact-RM-reweighted prefix family."
                 ),
             }
         add_row_extra = {}

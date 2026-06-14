@@ -118,6 +118,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   peak, the full \(32\le h\le500,e\le8\) prefix family is only about
   `0.002423` bits above that peak, and the companion ridge-shape check records
   the first-ridge ratio thresholds.
+- The same peak-to-family inflation is now a thresholded verifier check:
+  total family inflation, total non-peak remainder, \(h=32\)-slice inflation,
+  \(h=32\)-slice remainder, and \(h>32\) separation all have explicit gates.
 - The dominant peak row arithmetic is now recomputed as its own manifest check:
   exact \(A_{32}=4096\,A^{RM}_{32}\), exact first-gap placement
   numerator/denominator, and the checked `T=5949,H=31` inner knot table value.
