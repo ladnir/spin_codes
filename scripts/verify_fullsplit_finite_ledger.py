@@ -565,6 +565,143 @@ def csv_logsum(path: Path, column: str) -> tuple[float, int, dict[str, str] | No
 
 
 @dataclass(frozen=True)
+class DominantPeakArithmeticAudit:
+    h: int
+    first_r: int
+    remaining_ones: int
+    gap_min: int
+    gap_max: int
+    bucket_T: int
+    local_outer_count: int
+    global_outer_count: int
+    placement_num_bits: int
+    placement_den_bits: int
+    outer_log2: float
+    placement_log2: float
+    inner_log2: float
+    inner_e0_log2: float
+    inner_e1_log2: float
+    term_log2: float
+    threshold_log2: float
+
+
+def log2_int(value: int) -> float:
+    if value <= 0:
+        raise ValueError("log2_int expects a positive integer")
+    return math.log2(value)
+
+
+def unique_csv_row(path: Path, predicate, *, label: str) -> dict[str, str]:
+    matches: list[dict[str, str]] = []
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if predicate(row):
+                matches.append(row)
+    if len(matches) != 1:
+        raise SystemExit(f"{label}: expected one row in {path}, found {len(matches)}")
+    return matches[0]
+
+
+def local_spectrum_count(path: Path, weight: int) -> int:
+    row = unique_csv_row(
+        path,
+        lambda item: int(item["weight"]) == weight,
+        label=f"local spectrum weight {weight}",
+    )
+    return int(row["count"])
+
+
+def dominant_peak_arithmetic_audit(
+    *,
+    prefix_csv: Path,
+    local_spectrum_csv: Path,
+    inner_knot_csv: Path,
+    exact_outer_coeffs: list[int],
+    outer_blocks: int,
+    n: int,
+    b: int,
+    late_blocks: int,
+    threshold_log2: float,
+    tolerance: float,
+) -> DominantPeakArithmeticAudit:
+    h = 32
+    first_r = 1
+    remaining_ones = 31
+    gap_min = 1
+    gap_max = 4000
+    bucket_T = late_blocks
+
+    row = unique_csv_row(
+        prefix_csv,
+        lambda item: (
+            int(item["outer_weight"]) == h
+            and int(item["first_r"]) == first_r
+            and int(item["remaining_ones"]) == remaining_ones
+            and int(item["gap_min"]) == gap_min
+            and int(item["gap_max"]) == gap_max
+            and int(item["bucket_T"]) == bucket_T
+        ),
+        label="dominant prefix peak row",
+    )
+    knot_row = unique_csv_row(
+        inner_knot_csv,
+        lambda item: int(item["H"]) == remaining_ones,
+        label="dominant inner knot row",
+    )
+
+    local_count = local_spectrum_count(local_spectrum_csv, h)
+    global_count = outer_blocks * local_count
+    if h >= len(exact_outer_coeffs) or exact_outer_coeffs[h] != global_count:
+        raise SystemExit(
+            f"dominant peak outer count mismatch: exact coeff={exact_outer_coeffs[h] if h < len(exact_outer_coeffs) else None}, "
+            f"direct min-weight count={global_count}"
+        )
+
+    gap_sum = 0
+    for gap in range(gap_min, gap_max + 1):
+        after_coords = b * (late_blocks + gap - 1)
+        gap_sum += math.comb(after_coords, remaining_ones)
+    placement_num = math.comb(b, first_r) * gap_sum
+    placement_den = math.comb(n, h)
+
+    outer_log2 = log2_int(global_count)
+    placement_log2 = log2_int(placement_num) - log2_int(placement_den)
+    inner_log2 = float(knot_row["total_log2"])
+    inner_e0_log2 = float(knot_row["e0_log2"])
+    inner_e1_log2 = float(knot_row["e1_log2"])
+    term_log2 = outer_log2 + placement_log2 + inner_log2
+
+    check_close("dominant_peak_outer_log2", outer_log2, float(row["outer_log2_bound"]), tolerance)
+    check_close("dominant_peak_placement_log2", placement_log2, float(row["placement_log2"]), tolerance)
+    check_close("dominant_peak_inner_log2", inner_log2, float(row["inner_log2"]), tolerance)
+    check_close("dominant_peak_term_log2", term_log2, float(row["term_log2"]), tolerance)
+    if term_log2 > threshold_log2:
+        raise SystemExit(
+            f"dominant peak term {term_log2:.12f} exceeds threshold {threshold_log2:.12f}"
+        )
+
+    return DominantPeakArithmeticAudit(
+        h=h,
+        first_r=first_r,
+        remaining_ones=remaining_ones,
+        gap_min=gap_min,
+        gap_max=gap_max,
+        bucket_T=bucket_T,
+        local_outer_count=local_count,
+        global_outer_count=global_count,
+        placement_num_bits=placement_num.bit_length(),
+        placement_den_bits=placement_den.bit_length(),
+        outer_log2=outer_log2,
+        placement_log2=placement_log2,
+        inner_log2=inner_log2,
+        inner_e0_log2=inner_e0_log2,
+        inner_e1_log2=inner_e1_log2,
+        term_log2=term_log2,
+        threshold_log2=threshold_log2,
+    )
+
+
+@dataclass(frozen=True)
 class PrefixRidgeRatioSummary:
     rows: int
     ridge_rows: int
@@ -1792,6 +1929,12 @@ def main() -> int:
     parser.add_argument("--prefix-ridge-tail-outer-ratio-max", type=float, default=2.747)
     parser.add_argument("--prefix-ridge-placement-ratio-max", type=float, default=0.303594)
     parser.add_argument("--prefix-ridge-inner-ratio-max", type=float, default=1.000000001)
+    parser.add_argument(
+        "--dominant-peak-inner-knot-csv",
+        type=Path,
+        default=ROOT / "fast_fullsplit_e01_T5949_H0_499_all.csv",
+    )
+    parser.add_argument("--dominant-peak-term-max-log2", type=float, default=-37.38575)
     parser.add_argument("--skip-prefix-placement-ratio-cert", action="store_true")
     parser.add_argument("--prefix-placement-ratio-threshold", default="0.303594")
     parser.add_argument("--prefix-placement-gap-min", type=int, default=1)
@@ -1896,6 +2039,7 @@ def main() -> int:
             "exact_integer_checks": [
                 "RM direct-sum low-weight outer coefficients",
                 "RM support floor and first support gap",
+                "dominant h=32 peak placement numerator/denominator",
                 "prefix placement-ratio cross multiplication",
             ],
             "coverage_checks": [
@@ -2156,6 +2300,64 @@ def main() -> int:
     print(f"exact_outer_support_split_h,{exact_outer_certificate.split_h}")
     print(f"exact_outer_support_split_coefficient_bits,{exact_outer_certificate.split_coefficient_bits}")
     print(f"exact_outer_support_next_coefficient_bits,{exact_outer_certificate.next_coefficient_bits}")
+
+    dominant_peak = dominant_peak_arithmetic_audit(
+        prefix_csv=args.prefix_e_le8_csv,
+        local_spectrum_csv=args.exact_outer_local_spectrum_csv,
+        inner_knot_csv=args.dominant_peak_inner_knot_csv,
+        exact_outer_coeffs=exact_outer_coeffs,
+        outer_blocks=args.exact_outer_blocks,
+        n=args.N,
+        b=args.block_bits,
+        late_blocks=args.late_blocks,
+        threshold_log2=args.dominant_peak_term_max_log2,
+        tolerance=args.tolerance,
+    )
+    print("dominant_peak_arithmetic_status,PASS")
+    print(f"dominant_peak_arithmetic_h,{dominant_peak.h}")
+    print(f"dominant_peak_arithmetic_first_r,{dominant_peak.first_r}")
+    print(f"dominant_peak_arithmetic_gap,{dominant_peak.gap_min}--{dominant_peak.gap_max}")
+    print(f"dominant_peak_arithmetic_local_outer_count,{dominant_peak.local_outer_count}")
+    print(f"dominant_peak_arithmetic_global_outer_count,{dominant_peak.global_outer_count}")
+    print(f"dominant_peak_arithmetic_placement_num_bits,{dominant_peak.placement_num_bits}")
+    print(f"dominant_peak_arithmetic_placement_den_bits,{dominant_peak.placement_den_bits}")
+    print(f"dominant_peak_arithmetic_outer_log2,{dominant_peak.outer_log2:.12f}")
+    print(f"dominant_peak_arithmetic_placement_log2,{dominant_peak.placement_log2:.12f}")
+    print(f"dominant_peak_arithmetic_inner_log2,{dominant_peak.inner_log2:.12f}")
+    print(f"dominant_peak_arithmetic_inner_e0_log2,{dominant_peak.inner_e0_log2:.12f}")
+    print(f"dominant_peak_arithmetic_inner_e1_log2,{dominant_peak.inner_e1_log2:.12f}")
+    print(f"dominant_peak_arithmetic_term_log2,{dominant_peak.term_log2:.12f}")
+    print(f"dominant_peak_arithmetic_threshold_log2,{dominant_peak.threshold_log2:.12f}")
+    manifest["checks"]["dominant_peak_arithmetic"] = {  # type: ignore[index]
+        "status": "PASS",
+        "source_csv": manifest_path(args.prefix_e_le8_csv),
+        "inner_knot_csv": manifest_path(args.dominant_peak_inner_knot_csv),
+        "threshold_log2": dominant_peak.threshold_log2,
+        "selector": {
+            "outer_weight": dominant_peak.h,
+            "first_r": dominant_peak.first_r,
+            "remaining_ones": dominant_peak.remaining_ones,
+            "gap_min": dominant_peak.gap_min,
+            "gap_max": dominant_peak.gap_max,
+            "bucket_T": dominant_peak.bucket_T,
+        },
+        "local_outer_count_weight_32": dominant_peak.local_outer_count,
+        "global_outer_count_weight_32": dominant_peak.global_outer_count,
+        "placement_num_bits": dominant_peak.placement_num_bits,
+        "placement_den_bits": dominant_peak.placement_den_bits,
+        "outer_log2": dominant_peak.outer_log2,
+        "placement_log2": dominant_peak.placement_log2,
+        "inner_log2": dominant_peak.inner_log2,
+        "inner_e0_log2": dominant_peak.inner_e0_log2,
+        "inner_e1_log2": dominant_peak.inner_e1_log2,
+        "term_log2": dominant_peak.term_log2,
+        "interpretation": (
+            "Recomputes the dominant h=32 peak row from exact RM min-weight "
+            "count, exact first-gap placement numerator/denominator, and the "
+            "checked T=5949,H=31 inner knot value."
+        ),
+    }
+
     exact_late_prefix = exact_late_prefix_sum(
         exact_outer_coeffs,
         n=args.N,

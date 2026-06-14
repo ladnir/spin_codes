@@ -9,6 +9,7 @@
     "exact_integer_checks": [
       "RM direct-sum low-weight outer coefficients",
       "RM support floor and first support gap",
+      "dominant h=32 peak placement numerator/denominator",
       "prefix placement-ratio cross multiplication"
     ],
     "level": "checked finite numerical certificate",
@@ -173,6 +174,31 @@
       ],
       "min_convexity_growth_bits": 0.27644972356737024,
       "status": "PASS"
+    },
+    "dominant_peak_arithmetic": {
+      "global_outer_count_weight_32": 216907579392,
+      "inner_e0_log2": -20.011734892647837,
+      "inner_e1_log2": -59.186694308334786,
+      "inner_knot_csv": "scripts\\fast_fullsplit_e01_T5949_H0_499_all.csv",
+      "inner_log2": -20.011734892645514,
+      "interpretation": "Recomputes the dominant h=32 peak row from exact RM min-weight count, exact first-gap placement numerator/denominator, and the checked T=5949,H=31 inner knot value.",
+      "local_outer_count_weight_32": 52955952,
+      "outer_log2": 37.65828950968128,
+      "placement_den_bits": 555,
+      "placement_log2": -55.03232145938108,
+      "placement_num_bits": 500,
+      "selector": {
+        "bucket_T": 5949,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "outer_weight": 32,
+        "remaining_ones": 31
+      },
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv",
+      "status": "PASS",
+      "term_log2": -37.38576684234531,
+      "threshold_log2": -37.38575
     },
     "dominant_prefix_row": {
       "above_split_gap_bits": 13.352485666805116,
