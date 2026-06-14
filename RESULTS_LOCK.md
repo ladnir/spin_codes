@@ -211,6 +211,7 @@ Current working conclusions to preserve during cleanup:
 
 Do not promote these to proved claims until resolved:
 
+- Keep `PROOF_STATUS.md` current as the explicit high-risk TODO ledger.
 - Replace BCH/random-like projection spectra with exact spectra or rigorous
   low-weight envelopes.
 - Recompute the `h>2000` tail under any new BCH-like outer model.

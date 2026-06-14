@@ -506,6 +506,7 @@ The first physical split is complete:
 
 Remaining cleanup is proof-facing polish, not the initial physical split:
 
+- keep `PROOF_STATUS.md` current as the explicit high-risk TODO ledger;
 - continue compressing the scalar dense inner proof presentation, especially
   the long ON/OFF lemma chain;
 - shorten dense outer proof machinery further only if the main paper remains
