@@ -223,8 +223,9 @@ inner linear-weight exponents.
 
 \begin{theorem}[Dense+dense linear-weight criterion]
 \label{thm:dense-dense-linear-weight-criterion}
-Fix constants \(\eta_0\in(0,1)\), \(\delta\in(0,1/2)\), \(\xi>0\), and \(\theta\in(0,1-\eta_0)\).
-For \(\eta\in[\eta_0,1-\theta]\), let
+Fix constants \(0<\eta_0<\eta_1<1\), \(\delta\in(0,1/2)\),
+\(\xi>0\), and \(\theta\in(0,1-\eta_1)\).  For
+\(\eta\in[\eta_0,\eta_1]\), let
 \[
 \Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)
 \]
@@ -241,11 +242,11 @@ Assume there exists \(\tau>0\) such that
 E_{\mathrm{in}}(\eta;\theta,\delta,\xi)
 \;\le\;
 -\tau
-\qquad\text{for every }\eta\in[\eta_0,1-\theta].
+\qquad\text{for every }\eta\in[\eta_0,\eta_1].
 \end{equation}
 Then the total first-moment contribution from outer weights \(h\ge \eta_0 n\) satisfies
 \[
-\sum_{h=\lceil \eta_0 n\rceil}^{\lfloor (1-\theta)n\rfloor}
+\sum_{h=\lceil \eta_0 n\rceil}^{\lfloor \eta_1 n\rfloor}
 \EE[\enum_{\Cone,h}]\,p_h(\delta)
 \;\le\;
 n^{O(1)}\,2^{-\tau n}.
@@ -253,7 +254,7 @@ n^{O(1)}\,2^{-\tau n}.
 \end{theorem}
 
 \begin{proof}
-For \(h=\lfloor \eta n\rfloor\) with \(\eta\in[\eta_0,1-\theta]\), Theorem~\ref{thm:outer-dense-linear-exponent} gives
+For \(h=\lfloor \eta n\rfloor\) with \(\eta\in[\eta_0,\eta_1]\), Theorem~\ref{thm:outer-dense-linear-exponent} gives
 \[
 \EE[\enum_{\Cone,h}]
 \le
@@ -272,7 +273,7 @@ Multiplying and using \eqref{eq:dense-dense-linear-gap},
 n^{O(1)}\,2^{-\tau n}.
 \]
 There are only \(O(n)\) such weights \(h\), so summing over
-\(h\in[\eta_0 n,(1-\theta)n]\) preserves the same exponential rate.
+\(h\in[\eta_0 n,\eta_1 n]\) preserves the same exponential rate.
 \end{proof}
 
 \begin{theorem}[A concrete moderate-to-high-weight exponent gap]
@@ -336,7 +337,11 @@ never exceeds \(-0.003\); the worst point occurs near \(\eta\approx 0.5\).
 This verification is reproduced by the companion script
 \texttt{scripts/verify\_dense\_claims.py}, which for the present parameters reports a worst sampled gap
 of approximately \(-0.0031\) near \(\eta=0.5000\).
-The final summation bound is then exactly Theorem~\ref{thm:dense-dense-linear-weight-criterion}.
+The final summation bound is then Theorem~\ref{thm:dense-dense-linear-weight-criterion}
+applied with \(\eta_0=\eta_{\mathrm{crit}}\) and \(\eta_1=0.99\).
+The only computer-assisted ingredient is this explicit one-variable exponent
+check; a final formalization can replace the sampled-grid check by an interval
+certificate for the same formulas.
 \end{proof}
 
 \begin{theorem}[A concrete 10.9-percent dense+dense theorem]
@@ -447,7 +452,7 @@ S_{\mathrm{lin}}\le n^{O(1)}2^{-0.003n}=o(1).
 \]
 
 For \(S_{\mathrm{top}}\), use only the outer exponent and the trivial bound \(p_h(0.109)\le 1\).
-If \(h=\lfloor \eta n\rfloor\) with \(\eta\in[0.99,1]\), then Corollary~\ref{cor:outer-dense-highweight-exponent} gives
+If \(h=\lfloor \eta n\rfloor<n\) with \(\eta\in[0.99,1)\), then Corollary~\ref{cor:outer-dense-highweight-exponent} gives
 \[
 \Phi_{\mathrm{out}}^{\mathrm{sys}}(\eta)=H_2(\eta)-\frac12
 \le
@@ -460,14 +465,21 @@ Hence Theorem~\ref{thm:outer-dense-linear-exponent} gives
 \le
 n^{O(1)}2^{-0.41n},
 \]
-uniformly over \(h\in[0.99n,n]\), and so
+uniformly over \(h\in[0.99n,n-1]\), and so
 \[
-S_{\mathrm{top}}
+\sum_{h=\lceil0.99n\rceil}^{n-1}\EE[\enum_{\Cone,h}]\,p_h(0.109)
 \le
 n^{O(1)}2^{-0.41n}
 =
 o(1).
 \]
+The endpoint \(h=n\) is harmless as well.  A codeword of weight \(n=2k\)
+forces the systematic input to be \(1^k\); for this unique input, all but the
+first parity-one constraint are independent fair constraints, so
+\[
+\EE[\enum_{\Cone,n}]\le 2^{-(k-1)}=2^{-n/2+1}=o(1).
+\]
+Thus \(S_{\mathrm{top}}=o(1)\).
 
 Combining the four windows proves
 \[

@@ -101,6 +101,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The scalar dense inner section now includes a dependency map identifying the
   ON/OFF lemmas as local machinery and pointing to the packaged envelopes
   consumed by the integration theorem.
+- The dense integration handoff now uses an explicit checked endpoint
+  `eta_1=0.99` in the linear-window criterion and treats the top endpoint
+  `h=n` separately instead of applying the outer linear exponent at `eta=1`.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
@@ -124,8 +127,8 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 
 - Harden the most important finite certificate rows with interval, rational,
   or exact-integer safeguards.
-- Audit the dense integration high-weight and linear-window handoff one more
-  time after the recent tiny-window and low-window fixes.
+- Replace the sampled-grid dense `0.109` exponent-gap check by an interval
+  certificate if a fully formal computer-assisted proof is needed.
 - Further compress the scalar dense inner ON/OFF proof chain if the main paper
   remains too long; the current narrative now marks which lemmas are local
   scaffolding versus consumed interfaces.
