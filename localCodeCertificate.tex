@@ -90,6 +90,9 @@ threshold \(0.303594\).
 The peak arithmetic itself is also recomputed separately from the exact
 \(A_{32}=4096\,A^{RM}_{32}\) count, the exact first-gap placement
 numerator/denominator, and the checked \(T=5949,H=31\) inner knot value.
+The latter knot is itself regenerated inside the verifier from the EBCH
+spectrum and the \(e\le1\) full-split episode formula under the stored
+effective-turnoff convention, then compared against the knot table.
 
 \begin{theorem}[Checked finite RM/full-split first-moment certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}

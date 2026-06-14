@@ -12,6 +12,9 @@
       "dominant h=32 peak placement numerator/denominator",
       "prefix placement-ratio cross multiplication"
     ],
+    "focused_numerical_recomputations": [
+      "dominant T=5949,H=31 inner knot from EBCH spectrum"
+    ],
     "level": "checked finite numerical certificate",
     "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
     "tolerance": 5e-06
@@ -174,6 +177,35 @@
       ],
       "min_convexity_growth_bits": 0.27644972356737024,
       "status": "PASS"
+    },
+    "dominant_inner_knot_recompute": {
+      "H": 31,
+      "T": 5949,
+      "distance": 188743,
+      "e_max": 1,
+      "extra_turnoff_log2": -67.63641049043137,
+      "inner_knot_csv": "scripts\\fast_fullsplit_e01_T5949_H0_499_all.csv",
+      "inner_spectrum": "scripts\\EBCH128_64.wd",
+      "interpretation": "Recomputes the dominant inner knot from EBCH spectrum data and the e<=1 full-split episode formula using the stored effective turnoff convention, then checks it against the stored knot table.",
+      "lambda_grid": {
+        "max": 2.0,
+        "min": 0.001,
+        "step": 0.004
+      },
+      "raw_turnoff_log2": -64.00457432724919,
+      "recomputed": {
+        "e0_log2": -20.011734892647837,
+        "e1_log2": -59.18669427029984,
+        "total_log2": -20.011734892645514
+      },
+      "status": "PASS",
+      "table": {
+        "e0_log2": -20.011734892647837,
+        "e1_log2": -59.186694308334786,
+        "total_log2": -20.011734892645514
+      },
+      "total_delta_bits": 0.0,
+      "turnoff_log2": -63.8926492
     },
     "dominant_peak_arithmetic": {
       "global_outer_count_weight_32": 216907579392,

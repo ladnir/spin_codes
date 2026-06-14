@@ -19,12 +19,19 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from bound_fullsplit_episode_gaps import load_spectrum as load_inner_spectrum
+from bound_fullsplit_episode_gaps import precompute_survival_log2 as precompute_inner_survival_log2
 from bound_fullsplit_episode_gaps import split_entries as split_inner_entries
 from check_fullsplit_T_monotonicity import (
     DEFAULT_INTERVALS as T_MONOTONICITY_INTERVALS,
     sufficient_reduction_rows,
 )
 from certify_prefix_placement_ratio import certify_placement_ratio
+from fast_fullsplit_episode_e01 import (
+    episode_terms_log2 as fast_episode_terms_log2,
+    precompute_gap_suffix_logsum as fast_precompute_gap_suffix_logsum,
+    precompute_logc_nk as fast_precompute_logc_nk,
+    precompute_nonempty_block_logcoeff as fast_precompute_nonempty_block_logcoeff,
+)
 from certify_rm_outer_prefix_exact import (
     exact_late_prefix_sum,
     load_local_spectrum,
@@ -585,6 +592,27 @@ class DominantPeakArithmeticAudit:
     threshold_log2: float
 
 
+@dataclass(frozen=True)
+class DominantInnerKnotAudit:
+    T: int
+    H: int
+    e_max: int
+    distance: int
+    lambda_min: float
+    lambda_max: float
+    lambda_step: float
+    raw_turnoff_log2: float
+    extra_turnoff_log2: float | None
+    turnoff_log2: float
+    e0_log2: float
+    e1_log2: float
+    total_log2: float
+    table_e0_log2: float
+    table_e1_log2: float
+    table_total_log2: float
+    total_delta_bits: float
+
+
 def log2_int(value: int) -> float:
     if value <= 0:
         raise ValueError("log2_int expects a positive integer")
@@ -609,6 +637,94 @@ def local_spectrum_count(path: Path, weight: int) -> int:
         label=f"local spectrum weight {weight}",
     )
     return int(row["count"])
+
+
+def dominant_inner_knot_audit(
+    *,
+    inner_spectrum: Path,
+    inner_knot_csv: Path,
+    n: int,
+    b: int,
+    distance_delta: float,
+    T: int,
+    H: int,
+    e_max: int,
+    lambda_min: float,
+    lambda_max: float,
+    lambda_step: float,
+    extra_turnoff_log2: float | None,
+    tolerance: float,
+) -> DominantInnerKnotAudit:
+    if e_max != 1:
+        raise SystemExit("dominant inner knot audit currently expects e_max=1")
+    table_row = unique_csv_row(
+        inner_knot_csv,
+        lambda item: int(item["H"]) == H,
+        label="dominant inner knot table row",
+    )
+    distance = math.floor(distance_delta * n)
+    entries = split_inner_entries(load_inner_spectrum(inner_spectrum), b)
+    p0 = sum(p for _j, q, p in entries if q == 0)
+    raw_turnoff_log2 = math.log2(p0)
+    turnoff_log2 = raw_turnoff_log2
+    if extra_turnoff_log2 is not None:
+        turnoff_log2 = log2add(turnoff_log2, extra_turnoff_log2)
+    survival = precompute_inner_survival_log2(
+        entries=entries,
+        max_live=T,
+        distance=distance,
+        lambda_min=lambda_min,
+        lambda_max=lambda_max,
+        lambda_step=lambda_step,
+    )
+    x_max = min(H, T)
+    logc = fast_precompute_logc_nk(n_max=T - 1, k_max=x_max)
+    suffix_logsum = fast_precompute_gap_suffix_logsum(
+        T=T,
+        x_max=x_max,
+        e_max=e_max,
+        survival_log2=survival,
+        logc=logc,
+    )
+    log_coeff = fast_precompute_nonempty_block_logcoeff(b=b, h_max=H, x_max=x_max)
+    terms = fast_episode_terms_log2(
+        b=b,
+        T=T,
+        H=H,
+        turnoff_log2=turnoff_log2,
+        survival_log2=survival,
+        suffix_logsum=suffix_logsum,
+        log_coeff=log_coeff,
+    )
+    total = float("-inf")
+    for term in terms:
+        total = log2add(total, term)
+
+    table_e0 = float(table_row["e0_log2"])
+    table_e1 = float(table_row["e1_log2"])
+    table_total = float(table_row["total_log2"])
+    check_close("dominant_inner_knot_e0", terms[0], table_e0, tolerance)
+    check_close("dominant_inner_knot_e1", terms[1], table_e1, tolerance)
+    check_close("dominant_inner_knot_total", total, table_total, tolerance)
+    return DominantInnerKnotAudit(
+        T=T,
+        H=H,
+        e_max=e_max,
+        distance=distance,
+        lambda_min=lambda_min,
+        lambda_max=lambda_max,
+        lambda_step=lambda_step,
+        raw_turnoff_log2=raw_turnoff_log2,
+        extra_turnoff_log2=extra_turnoff_log2,
+        turnoff_log2=turnoff_log2,
+        e0_log2=terms[0],
+        e1_log2=terms[1],
+        total_log2=total,
+        table_e0_log2=table_e0,
+        table_e1_log2=table_e1,
+        table_total_log2=table_total,
+        total_delta_bits=total - table_total,
+    )
 
 
 def dominant_peak_arithmetic_audit(
@@ -1935,6 +2051,13 @@ def main() -> int:
         default=ROOT / "fast_fullsplit_e01_T5949_H0_499_all.csv",
     )
     parser.add_argument("--dominant-peak-term-max-log2", type=float, default=-37.38575)
+    parser.add_argument("--dominant-inner-knot-T", type=int, default=5949)
+    parser.add_argument("--dominant-inner-knot-H", type=int, default=31)
+    parser.add_argument("--dominant-inner-knot-e-max", type=int, default=1)
+    parser.add_argument("--dominant-inner-knot-lambda-min", type=float, default=0.001)
+    parser.add_argument("--dominant-inner-knot-lambda-max", type=float, default=2.0)
+    parser.add_argument("--dominant-inner-knot-lambda-step", type=float, default=0.004)
+    parser.add_argument("--dominant-inner-knot-extra-turnoff-log2", type=float, default=-67.63641049043137)
     parser.add_argument("--skip-prefix-placement-ratio-cert", action="store_true")
     parser.add_argument("--prefix-placement-ratio-threshold", default="0.303594")
     parser.add_argument("--prefix-placement-gap-min", type=int, default=1)
@@ -2047,6 +2170,9 @@ def main() -> int:
                 "post-prefix h intervals",
                 "late-prefix bucket",
                 "high-density and complement intervals",
+            ],
+            "focused_numerical_recomputations": [
+                "dominant T=5949,H=31 inner knot from EBCH spectrum",
             ],
             "remaining_formalization": (
                 "replace floating logarithmic row arithmetic by interval, "
@@ -2300,6 +2426,68 @@ def main() -> int:
     print(f"exact_outer_support_split_h,{exact_outer_certificate.split_h}")
     print(f"exact_outer_support_split_coefficient_bits,{exact_outer_certificate.split_coefficient_bits}")
     print(f"exact_outer_support_next_coefficient_bits,{exact_outer_certificate.next_coefficient_bits}")
+
+    dominant_inner = dominant_inner_knot_audit(
+        inner_spectrum=args.inner_spectrum,
+        inner_knot_csv=args.dominant_peak_inner_knot_csv,
+        n=args.N,
+        b=args.block_bits,
+        distance_delta=0.09,
+        T=args.dominant_inner_knot_T,
+        H=args.dominant_inner_knot_H,
+        e_max=args.dominant_inner_knot_e_max,
+        lambda_min=args.dominant_inner_knot_lambda_min,
+        lambda_max=args.dominant_inner_knot_lambda_max,
+        lambda_step=args.dominant_inner_knot_lambda_step,
+        extra_turnoff_log2=args.dominant_inner_knot_extra_turnoff_log2,
+        tolerance=args.tolerance,
+    )
+    print("dominant_inner_knot_recompute_status,PASS")
+    print(f"dominant_inner_knot_T,{dominant_inner.T}")
+    print(f"dominant_inner_knot_H,{dominant_inner.H}")
+    print(f"dominant_inner_knot_e_max,{dominant_inner.e_max}")
+    print(f"dominant_inner_knot_distance,{dominant_inner.distance}")
+    print(f"dominant_inner_knot_raw_turnoff_log2,{dominant_inner.raw_turnoff_log2:.12f}")
+    if dominant_inner.extra_turnoff_log2 is not None:
+        print(f"dominant_inner_knot_extra_turnoff_log2,{dominant_inner.extra_turnoff_log2:.12f}")
+    print(f"dominant_inner_knot_turnoff_log2,{dominant_inner.turnoff_log2:.12f}")
+    print(f"dominant_inner_knot_e0_log2,{dominant_inner.e0_log2:.12f}")
+    print(f"dominant_inner_knot_e1_log2,{dominant_inner.e1_log2:.12f}")
+    print(f"dominant_inner_knot_total_log2,{dominant_inner.total_log2:.12f}")
+    print(f"dominant_inner_knot_total_delta_bits,{dominant_inner.total_delta_bits:.12g}")
+    manifest["checks"]["dominant_inner_knot_recompute"] = {  # type: ignore[index]
+        "status": "PASS",
+        "inner_spectrum": manifest_path(args.inner_spectrum),
+        "inner_knot_csv": manifest_path(args.dominant_peak_inner_knot_csv),
+        "T": dominant_inner.T,
+        "H": dominant_inner.H,
+        "e_max": dominant_inner.e_max,
+        "distance": dominant_inner.distance,
+        "lambda_grid": {
+            "min": dominant_inner.lambda_min,
+            "max": dominant_inner.lambda_max,
+            "step": dominant_inner.lambda_step,
+        },
+        "raw_turnoff_log2": dominant_inner.raw_turnoff_log2,
+        "extra_turnoff_log2": dominant_inner.extra_turnoff_log2,
+        "turnoff_log2": dominant_inner.turnoff_log2,
+        "recomputed": {
+            "e0_log2": dominant_inner.e0_log2,
+            "e1_log2": dominant_inner.e1_log2,
+            "total_log2": dominant_inner.total_log2,
+        },
+        "table": {
+            "e0_log2": dominant_inner.table_e0_log2,
+            "e1_log2": dominant_inner.table_e1_log2,
+            "total_log2": dominant_inner.table_total_log2,
+        },
+        "total_delta_bits": dominant_inner.total_delta_bits,
+        "interpretation": (
+            "Recomputes the dominant inner knot from EBCH spectrum data and "
+            "the e<=1 full-split episode formula using the stored effective turnoff convention, "
+            "then checks it against the stored knot table."
+        ),
+    }
 
     dominant_peak = dominant_peak_arithmetic_audit(
         prefix_csv=args.prefix_e_le8_csv,

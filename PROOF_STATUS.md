@@ -121,6 +121,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The dominant peak row arithmetic is now recomputed as its own manifest check:
   exact \(A_{32}=4096\,A^{RM}_{32}\), exact first-gap placement
   numerator/denominator, and the checked `T=5949,H=31` inner knot table value.
+- The dominant `T=5949,H=31` inner knot is now regenerated inside the verifier
+  from the EBCH spectrum and the `e<=1` full-split episode formula under the
+  stored effective-turnoff convention, then compared against the knot table.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
