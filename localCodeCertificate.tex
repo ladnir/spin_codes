@@ -37,6 +37,16 @@ ultra-late prefix, while the named gap buckets use
 \[
 T=5949+\mathrm{gap}-1 .
 \]
+The current audit level is deliberately finite and checkable, but not yet a
+fully interval-formal proof artifact.  The verifier constructs the
+low-weight RM direct-sum outer coefficients by exact integer polynomial
+arithmetic, checks the RM support floor and the first support gap, verifies the
+prefix placement-ratio step by exact cross multiplication, checks row-family
+coverage, and recomputes all locked row totals within the manifest tolerance.
+The remaining hardening step, before treating the ledger as a fully formal
+computer-assisted proof, is to replace the floating logarithmic row arithmetic
+by interval, rational, or exact-integer upper bounds.  In the present paper this
+is the intended status of the word ``checked.''
 
 The finite certificate input data are
 \[

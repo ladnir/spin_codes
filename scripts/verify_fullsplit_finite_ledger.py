@@ -1890,6 +1890,25 @@ def main() -> int:
             "exact_outer_local_spectrum_csv": manifest_path(args.exact_outer_local_spectrum_csv),
             "inner_spectrum": manifest_path(args.inner_spectrum),
         },
+        "audit_status": {
+            "level": "checked finite numerical certificate",
+            "tolerance": args.tolerance,
+            "exact_integer_checks": [
+                "RM direct-sum low-weight outer coefficients",
+                "RM support floor and first support gap",
+                "prefix placement-ratio cross multiplication",
+            ],
+            "coverage_checks": [
+                "low-weight first-active rows",
+                "post-prefix h intervals",
+                "late-prefix bucket",
+                "high-density and complement intervals",
+            ],
+            "remaining_formalization": (
+                "replace floating logarithmic row arithmetic by interval, "
+                "rational, or exact-integer upper bounds"
+            ),
+        },
         "checks": {},
         "row_families": [],
         "totals": {},

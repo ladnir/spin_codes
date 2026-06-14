@@ -108,6 +108,11 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   (`T=B-i+1` from the first active block), the `late_blocks=5949` split, and
   the unconstrained terminal-state convention in both paper prose and manifest
   metadata.
+- The finite certificate now states its current audit level: exact integer
+  RM-prefix support checks and exact prefix-ratio cross multiplication are
+  combined with manifest-tolerance floating logarithmic row totals.  This is
+  the intended meaning of a checked finite numerical certificate until interval
+  or rational hardening is added.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
@@ -122,13 +127,15 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
 - Keep the BCH projection rows visibly heuristic until the two items above are
   done.
-- Decide whether the finite exact-support prefix rows remain accepted numerical
-  certificates or are replaced by analytic monotonicity/support lemmas.
 
 ### P1: Proof-Hardening And Audit Items
 
 - Harden the most important finite certificate rows with interval, rational,
   or exact-integer safeguards.
+- If the RM/EBCH theorem must be promoted from checked finite numerical
+  certificate to fully formal computer-assisted theorem, replace the floating
+  logarithmic row arithmetic in the manifest ledger by outward-rounded
+  interval bounds or exact rational/integer inequalities.
 - Replace the sampled-grid dense `0.109` exponent-gap check by an interval
   certificate if a fully formal computer-assisted proof is needed.
 - Further compress the scalar dense inner ON/OFF proof chain if the main paper
