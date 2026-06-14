@@ -113,6 +113,11 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   combined with manifest-tolerance floating logarithmic row totals.  This is
   the intended meaning of a checked finite numerical certificate until interval
   or rational hardening is added.
+- The dominant RM/EBCH prefix mechanism is now isolated in the manifest:
+  after exact RM reweighting the \(h=32,r=1,\mathrm{gap}=1..4000\) row is the
+  peak, the full \(32\le h\le500,e\le8\) prefix family is only about
+  `0.002423` bits above that peak, and the companion ridge-shape check records
+  the first-ridge ratio thresholds.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,

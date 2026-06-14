@@ -174,6 +174,31 @@
       "min_convexity_growth_bits": 0.27644972356737024,
       "status": "PASS"
     },
+    "dominant_prefix_row": {
+      "above_split_gap_bits": 13.352485666805116,
+      "above_split_log2": -50.738252508305614,
+      "interpretation": "After exact RM outer reweighting, the checked prefix family is peak-dominated by the h=32, first_r=1, gap=1..4000 row.",
+      "row_family": "prefix_32_500_e_le8",
+      "selector": {
+        "bucket_T": 5949,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "inner_mode": "csv",
+        "outer_weight": 32,
+        "remaining_ones": 31
+      },
+      "split_h": 32,
+      "split_log2": -37.38348223458855,
+      "split_minus_peak_bits": 0.0022846069119495382,
+      "split_remainder_log2": -46.68722908748783,
+      "status": "PASS",
+      "term_log2": -37.3857668415005,
+      "tolerance": 5e-06,
+      "total_log2": -37.383344523987574,
+      "total_minus_peak_bits": 0.002422317512923655,
+      "total_remainder_log2": -46.602718187648264
+    },
     "eallratio_branch_semantics": {
       "max_code_delta_bits": 2.842170943040401e-14,
       "min_formula_slack_bits": 0.0,
@@ -1230,14 +1255,31 @@
       "first_ratio": 0.8526992999248486,
       "geometric_bound_log2": -34.76978522910598,
       "inner_span_bits": 3.147704319417244e-12,
+      "interpretation": "Shape audit for the first-r/gap=1..4000 prefix ridge. The placement component has a separate exact cross-multiplication certificate.",
       "remainder_exact_log2": -43.86017926542517,
       "ridge_exact_log2": -34.76981855267534,
       "ridge_rows": 469,
+      "ridge_selector": {
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1
+      },
       "rows": 88464,
+      "status": "PASS",
       "tail_inner_ratio": 1.0000000000000393,
       "tail_outer_ratio": 2.7464194576751995,
       "tail_placement_ratio": 0.3035934024219713,
       "tail_ratio": 0.8337948276335436,
+      "thresholds": {
+        "first_outer_ratio_max": 2.809,
+        "first_ratio_max": 0.8527,
+        "inner_ratio_max": 1.000000001,
+        "inner_span_tolerance_bits": 1e-09,
+        "placement_ratio_max": 0.303594,
+        "tail_outer_ratio_max": 2.747,
+        "tail_ratio_max": 0.833795,
+        "total_bound_max_log2": -34.76713
+      },
       "total_ratio_bound_log2": -34.76714102358159,
       "total_ratio_bound_slack_bits": 3.3262548498669275e-05
     },

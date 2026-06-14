@@ -2329,6 +2329,35 @@ def main() -> int:
                 "split_remainder_log2": dom.split_remainder_log2,
                 "above_split_gap_bits": dom.above_split_gap_bits,
             }
+            manifest["checks"]["dominant_prefix_row"] = {  # type: ignore[index]
+                "status": "PASS",
+                "row_family": item.name,
+                "tolerance": args.tolerance,
+                "selector": {
+                    "outer_weight": dom.h,
+                    "first_r": dom.first_r,
+                    "remaining_ones": dom.remaining_ones,
+                    "gap_min": dom.gap_min,
+                    "gap_max": dom.gap_max,
+                    "bucket_T": dom.bucket_T,
+                    "inner_mode": dom.inner_mode,
+                },
+                "term_log2": dom.term_log2,
+                "total_log2": dom.total_log2,
+                "total_minus_peak_bits": dom.total_minus_peak_bits,
+                "total_remainder_log2": dom.total_remainder_log2,
+                "split_h": dom.split_h,
+                "split_log2": dom.split_log2,
+                "split_minus_peak_bits": dom.split_minus_peak_bits,
+                "split_remainder_log2": dom.split_remainder_log2,
+                "above_split_log2": dom.above_split_log2,
+                "above_split_gap_bits": dom.above_split_gap_bits,
+                "interpretation": (
+                    "After exact RM outer reweighting, the checked prefix "
+                    "family is peak-dominated by the h=32, first_r=1, "
+                    "gap=1..4000 row."
+                ),
+            }
         add_row_extra = {}
         if dominant_payload is not None:
             add_row_extra["dominant"] = dominant_payload
@@ -2410,6 +2439,26 @@ def main() -> int:
     print(f"prefix_ridge_total_ratio_bound_slack_bits,{ridge_ratio.total_bound_log2 - ridge_ratio.total_exact_log2:.12g}")
     print(f"prefix_ridge_inner_span_bits,{ridge_ratio.inner_span_bits:.12g}")
     manifest["checks"]["prefix_ridge_ratio"] = {  # type: ignore[index]
+        "status": "PASS",
+        "ridge_selector": {
+            "first_r": 1,
+            "gap_min": 1,
+            "gap_max": 4000,
+        },
+        "thresholds": {
+            "first_ratio_max": args.prefix_ridge_first_ratio_max,
+            "tail_ratio_max": args.prefix_ridge_tail_ratio_max,
+            "total_bound_max_log2": args.prefix_ridge_total_bound_max_log2,
+            "inner_span_tolerance_bits": args.prefix_ridge_inner_span_tolerance,
+            "first_outer_ratio_max": args.prefix_ridge_first_outer_ratio_max,
+            "tail_outer_ratio_max": args.prefix_ridge_tail_outer_ratio_max,
+            "placement_ratio_max": args.prefix_ridge_placement_ratio_max,
+            "inner_ratio_max": args.prefix_ridge_inner_ratio_max,
+        },
+        "interpretation": (
+            "Shape audit for the first-r/gap=1..4000 prefix ridge. "
+            "The placement component has a separate exact cross-multiplication certificate."
+        ),
         "rows": ridge_ratio.rows,
         "ridge_rows": ridge_ratio.ridge_rows,
         "ridge_exact_log2": ridge_ratio.ridge_exact_log2,
