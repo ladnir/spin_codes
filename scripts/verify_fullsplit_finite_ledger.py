@@ -2031,6 +2031,11 @@ def main() -> int:
     parser.add_argument("--block-bits", type=int, default=64)
     parser.add_argument("--late-blocks", type=int, default=5949)
     parser.add_argument("--late-prefix-h-max", type=int, default=500)
+    parser.add_argument("--late-prefix-exact-total-max-log2", type=float, default=-41.11)
+    parser.add_argument("--late-prefix-exact-peak-max-log2", type=float, default=-41.11)
+    parser.add_argument("--late-prefix-exact-split-max-log2", type=float, default=-41.11)
+    parser.add_argument("--late-prefix-exact-above-split-max-log2", type=float, default=-66.40)
+    parser.add_argument("--late-prefix-exact-above-split-min-gap-bits", type=float, default=25.30)
     parser.add_argument("--skip-prefix-interior-audit", action="store_true")
     parser.add_argument("--prefix-interior-rows", type=int, default=1500)
     parser.add_argument("--prefix-interior-h-min", type=int, default=0)
@@ -2181,6 +2186,7 @@ def main() -> int:
             ],
             "focused_threshold_checks": [
                 "dominant prefix peak-to-family inflation",
+                "exact ultra-late prefix contribution",
             ],
             "remaining_formalization": (
                 "replace floating logarithmic row arithmetic by interval, "
@@ -2569,6 +2575,36 @@ def main() -> int:
         -66.416502,
         args.tolerance,
     )
+    exact_late_above_gap = (
+        exact_late_prefix.peak_term_log2 - exact_late_prefix.above_split_log2
+        if exact_late_prefix.above_split_log2 != float("-inf")
+        else float("inf")
+    )
+    if exact_late_prefix.total_log2 > args.late_prefix_exact_total_max_log2:
+        raise SystemExit(
+            f"late_prefix_exact_total_log2={exact_late_prefix.total_log2:.12g} exceeds "
+            f"{args.late_prefix_exact_total_max_log2:.12g}"
+        )
+    if exact_late_prefix.peak_term_log2 > args.late_prefix_exact_peak_max_log2:
+        raise SystemExit(
+            f"late_prefix_exact_peak_log2={exact_late_prefix.peak_term_log2:.12g} exceeds "
+            f"{args.late_prefix_exact_peak_max_log2:.12g}"
+        )
+    if exact_late_prefix.split_log2 > args.late_prefix_exact_split_max_log2:
+        raise SystemExit(
+            f"late_prefix_exact_split_log2={exact_late_prefix.split_log2:.12g} exceeds "
+            f"{args.late_prefix_exact_split_max_log2:.12g}"
+        )
+    if exact_late_prefix.above_split_log2 > args.late_prefix_exact_above_split_max_log2:
+        raise SystemExit(
+            f"late_prefix_exact_above_split_log2={exact_late_prefix.above_split_log2:.12g} exceeds "
+            f"{args.late_prefix_exact_above_split_max_log2:.12g}"
+        )
+    if exact_late_above_gap < args.late_prefix_exact_above_split_min_gap_bits:
+        raise SystemExit(
+            f"late_prefix_exact_above_split_gap_bits={exact_late_above_gap:.12g} is below "
+            f"{args.late_prefix_exact_above_split_min_gap_bits:.12g}"
+        )
     print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_rows,{exact_late_prefix.rows}")
     print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_log2,{exact_late_prefix.total_log2:.6f}")
     print(f"late_prefix_T_lt_{args.late_blocks}_exact_outer_split_h,{exact_late_prefix.split_h}")
@@ -2584,6 +2620,44 @@ def main() -> int:
         f"late_log2={exact_late_prefix.peak_late_log2:.6f},"
         f"term_log2={exact_late_prefix.peak_term_log2:.6f}"
     )
+    print("late_prefix_exact_outer_threshold_status,PASS")
+    print(f"late_prefix_exact_outer_above_split_gap_bits,{exact_late_above_gap:.6f}")
+    print(f"late_prefix_exact_outer_total_max_log2,{args.late_prefix_exact_total_max_log2:.12g}")
+    print(f"late_prefix_exact_outer_peak_max_log2,{args.late_prefix_exact_peak_max_log2:.12g}")
+    print(f"late_prefix_exact_outer_split_max_log2,{args.late_prefix_exact_split_max_log2:.12g}")
+    print(f"late_prefix_exact_outer_above_split_max_log2,{args.late_prefix_exact_above_split_max_log2:.12g}")
+    print(f"late_prefix_exact_outer_above_split_min_gap_bits,{args.late_prefix_exact_above_split_min_gap_bits:.12g}")
+    manifest["checks"]["late_prefix_exact_outer_thresholds"] = {  # type: ignore[index]
+        "status": "PASS",
+        "thresholds": {
+            "total_max_log2": args.late_prefix_exact_total_max_log2,
+            "peak_max_log2": args.late_prefix_exact_peak_max_log2,
+            "split_max_log2": args.late_prefix_exact_split_max_log2,
+            "above_split_max_log2": args.late_prefix_exact_above_split_max_log2,
+            "above_split_min_gap_bits": args.late_prefix_exact_above_split_min_gap_bits,
+        },
+        "observed": {
+            "total_log2": exact_late_prefix.total_log2,
+            "rows": exact_late_prefix.rows,
+            "split_h": exact_late_prefix.split_h,
+            "split_log2": exact_late_prefix.split_log2,
+            "above_split_log2": exact_late_prefix.above_split_log2,
+            "above_split_gap_bits": exact_late_above_gap,
+            "peak_h": exact_late_prefix.peak_h,
+            "peak_outer_log2": exact_late_prefix.peak_outer_log2,
+            "peak_late_log2": exact_late_prefix.peak_late_log2,
+            "peak_term_log2": exact_late_prefix.peak_term_log2,
+            "above_split_to_peak_ratio": (
+                2.0 ** (exact_late_prefix.above_split_log2 - exact_late_prefix.peak_term_log2)
+                if exact_late_prefix.above_split_log2 != float("-inf")
+                else 0.0
+            ),
+        },
+        "interpretation": (
+            "Thresholded audit for the ultra-late prefix T<late_blocks using exact "
+            "RM direct-sum outer coefficients and placement-only late probability."
+        ),
+    }
     add_row(
         manifest,
         name=f"late_prefix_T_lt_{args.late_blocks}_exact_outer_h_le_{args.late_prefix_h_max}",

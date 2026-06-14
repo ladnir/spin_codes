@@ -127,6 +127,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The dominant `T=5949,H=31` inner knot is now regenerated inside the verifier
   from the EBCH spectrum and the `e<=1` full-split episode formula under the
   stored effective-turnoff convention, then compared against the knot table.
+- The ultra-late prefix `T<5949` is now a thresholded verifier check using
+  exact RM direct-sum outer coefficients; the total, peak, split, above-split
+  mass, and above-split gap all have explicit gates.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,

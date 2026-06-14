@@ -16,7 +16,8 @@
       "dominant T=5949,H=31 inner knot from EBCH spectrum"
     ],
     "focused_threshold_checks": [
-      "dominant prefix peak-to-family inflation"
+      "dominant prefix peak-to-family inflation",
+      "exact ultra-late prefix contribution"
     ],
     "level": "checked finite numerical certificate",
     "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
@@ -1243,6 +1244,30 @@
       "right_endpoint_peaks": 0,
       "shape_rule": "adjacent ratio ((m-h)/(N-h))/z is decreasing, so each row is checked at endpoints and the critical point",
       "status": "PASS"
+    },
+    "late_prefix_exact_outer_thresholds": {
+      "interpretation": "Thresholded audit for the ultra-late prefix T<late_blocks using exact RM direct-sum outer coefficients and placement-only late probability.",
+      "observed": {
+        "above_split_gap_bits": 25.303060148808072,
+        "above_split_log2": -66.4165021170476,
+        "above_split_to_peak_ratio": 2.415571589850349e-08,
+        "peak_h": 32,
+        "peak_late_log2": -78.77173147792081,
+        "peak_outer_log2": 37.65828950968128,
+        "peak_term_log2": -41.11344196823953,
+        "rows": 114,
+        "split_h": 32,
+        "split_log2": -41.11344196823953,
+        "total_log2": -41.1134419333902
+      },
+      "status": "PASS",
+      "thresholds": {
+        "above_split_max_log2": -66.4,
+        "above_split_min_gap_bits": 25.3,
+        "peak_max_log2": -41.11,
+        "split_max_log2": -41.11,
+        "total_max_log2": -41.11
+      }
     },
     "prefix_interior_audit": {
       "buckets": [
