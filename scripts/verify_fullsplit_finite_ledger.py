@@ -2036,6 +2036,14 @@ def main() -> int:
     parser.add_argument("--late-prefix-exact-split-max-log2", type=float, default=-41.11)
     parser.add_argument("--late-prefix-exact-above-split-max-log2", type=float, default=-66.40)
     parser.add_argument("--late-prefix-exact-above-split-min-gap-bits", type=float, default=25.30)
+    parser.add_argument("--postprefix-h501-plus-max-log2", type=float, default=-182.25)
+    parser.add_argument("--postprefix-501-2000-max-log2", type=float, default=-182.25)
+    parser.add_argument("--postprefix-high-max-log2", type=float, default=-586.50)
+    parser.add_argument("--postprefix-complement-high-max-log2", type=float, default=-35150.0)
+    parser.add_argument("--postprefix-early-endpoint-max-log2", type=float, default=-380.82)
+    parser.add_argument("--postprefix-early-accelerated-max-log2", type=float, default=-1056.18)
+    parser.add_argument("--postprefix-late-max-log2", type=float, default=-545.69)
+    parser.add_argument("--postprefix-501-2000-dominance-min-gap-bits", type=float, default=198.0)
     parser.add_argument("--skip-prefix-interior-audit", action="store_true")
     parser.add_argument("--prefix-interior-rows", type=int, default=1500)
     parser.add_argument("--prefix-interior-h-min", type=int, default=0)
@@ -2187,6 +2195,7 @@ def main() -> int:
             "focused_threshold_checks": [
                 "dominant prefix peak-to-family inflation",
                 "exact ultra-late prefix contribution",
+                "h>=501 post-prefix aggregate contribution",
             ],
             "remaining_formalization": (
                 "replace floating logarithmic row arithmetic by interval, "
@@ -3500,6 +3509,76 @@ def main() -> int:
     ]:
         h501_plus_checked = log2add(h501_plus_checked, value)
     check_close("h501_plus_checked_rows", h501_plus_checked, -182.259739, args.tolerance)
+    postprefix_components = {
+        "postprefix_501_2000_eall": parts["postprefix_501_2000_eall"],
+        "high_interval_2001_1148736": high_total,
+        "complement_interval_1048577_2097152": complement_high_total,
+        "early_postprefix_501_75000": early_postprefix_total,
+        "early_accelerated_75001_1048576": early_accelerated_total,
+        "late_postprefix_501_380736": late_postprefix_total,
+    }
+    postprefix_other_max = max(
+        value for name, value in postprefix_components.items() if name != "postprefix_501_2000_eall"
+    )
+    postprefix_dominance_gap = postprefix_components["postprefix_501_2000_eall"] - postprefix_other_max
+    postprefix_thresholds = {
+        "h501_plus_checked_rows": (h501_plus_checked, args.postprefix_h501_plus_max_log2),
+        "postprefix_501_2000_eall": (
+            postprefix_components["postprefix_501_2000_eall"],
+            args.postprefix_501_2000_max_log2,
+        ),
+        "high_interval_2001_1148736": (high_total, args.postprefix_high_max_log2),
+        "complement_interval_1048577_2097152": (
+            complement_high_total,
+            args.postprefix_complement_high_max_log2,
+        ),
+        "early_postprefix_501_75000": (early_postprefix_total, args.postprefix_early_endpoint_max_log2),
+        "early_accelerated_75001_1048576": (
+            early_accelerated_total,
+            args.postprefix_early_accelerated_max_log2,
+        ),
+        "late_postprefix_501_380736": (late_postprefix_total, args.postprefix_late_max_log2),
+    }
+    for label, (observed, threshold) in postprefix_thresholds.items():
+        if observed > threshold:
+            raise SystemExit(
+                f"{label}_log2={observed:.12g} exceeds post-prefix threshold {threshold:.12g}"
+            )
+    if postprefix_dominance_gap < args.postprefix_501_2000_dominance_min_gap_bits:
+        raise SystemExit(
+            f"postprefix_501_2000_dominance_gap_bits={postprefix_dominance_gap:.12g} is below "
+            f"{args.postprefix_501_2000_dominance_min_gap_bits:.12g}"
+        )
+    print("postprefix_h501_plus_threshold_status,PASS")
+    print(f"postprefix_501_2000_dominance_gap_bits,{postprefix_dominance_gap:.6f}")
+    print(f"postprefix_501_2000_dominance_min_gap_bits,{args.postprefix_501_2000_dominance_min_gap_bits:.12g}")
+    manifest["checks"]["postprefix_h501_plus_thresholds"] = {  # type: ignore[index]
+        "status": "PASS",
+        "thresholds": {
+            "h501_plus_max_log2": args.postprefix_h501_plus_max_log2,
+            "postprefix_501_2000_max_log2": args.postprefix_501_2000_max_log2,
+            "high_max_log2": args.postprefix_high_max_log2,
+            "complement_high_max_log2": args.postprefix_complement_high_max_log2,
+            "early_endpoint_max_log2": args.postprefix_early_endpoint_max_log2,
+            "early_accelerated_max_log2": args.postprefix_early_accelerated_max_log2,
+            "late_max_log2": args.postprefix_late_max_log2,
+            "postprefix_501_2000_dominance_min_gap_bits": (
+                args.postprefix_501_2000_dominance_min_gap_bits
+            ),
+        },
+        "observed": {
+            "h501_plus_checked_rows_log2": h501_plus_checked,
+            "components": postprefix_components,
+            "largest_component": "postprefix_501_2000_eall",
+            "largest_other_component_log2": postprefix_other_max,
+            "postprefix_501_2000_dominance_gap_bits": postprefix_dominance_gap,
+        },
+        "interpretation": (
+            "Thresholded audit for the h>=501 row-family aggregate. The "
+            "501..2000 all-episode CSV aggregate dominates the h>=501 remainder; "
+            "all other post-prefix and high-weight covers are far below it."
+        ),
+    }
     print(f"h501_plus_checked_rows_log2,{h501_plus_checked:.6f}")
 
     total = float("-inf")

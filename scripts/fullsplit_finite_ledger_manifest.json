@@ -17,7 +17,8 @@
     ],
     "focused_threshold_checks": [
       "dominant prefix peak-to-family inflation",
-      "exact ultra-late prefix contribution"
+      "exact ultra-late prefix contribution",
+      "h>=501 post-prefix aggregate contribution"
     ],
     "level": "checked finite numerical certificate",
     "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
@@ -1267,6 +1268,34 @@
         "peak_max_log2": -41.11,
         "split_max_log2": -41.11,
         "total_max_log2": -41.11
+      }
+    },
+    "postprefix_h501_plus_thresholds": {
+      "interpretation": "Thresholded audit for the h>=501 row-family aggregate. The 501..2000 all-episode CSV aggregate dominates the h>=501 remainder; all other post-prefix and high-weight covers are far below it.",
+      "observed": {
+        "components": {
+          "complement_interval_1048577_2097152": -35150.097366,
+          "early_accelerated_75001_1048576": -1056.187188,
+          "early_postprefix_501_75000": -380.829185,
+          "high_interval_2001_1148736": -586.597103,
+          "late_postprefix_501_380736": -545.690526,
+          "postprefix_501_2000_eall": -182.25973862499328
+        },
+        "h501_plus_checked_rows_log2": -182.25973862499328,
+        "largest_component": "postprefix_501_2000_eall",
+        "largest_other_component_log2": -380.829185,
+        "postprefix_501_2000_dominance_gap_bits": 198.56944637500672
+      },
+      "status": "PASS",
+      "thresholds": {
+        "complement_high_max_log2": -35150.0,
+        "early_accelerated_max_log2": -1056.18,
+        "early_endpoint_max_log2": -380.82,
+        "h501_plus_max_log2": -182.25,
+        "high_max_log2": -586.5,
+        "late_max_log2": -545.69,
+        "postprefix_501_2000_dominance_min_gap_bits": 198.0,
+        "postprefix_501_2000_max_log2": -182.25
       }
     },
     "prefix_interior_audit": {

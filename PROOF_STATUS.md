@@ -130,6 +130,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The ultra-late prefix `T<5949` is now a thresholded verifier check using
   exact RM direct-sum outer coefficients; the total, peak, split, above-split
   mass, and above-split gap all have explicit gates.
+- The `h>=501` post-prefix aggregate is now a thresholded verifier check:
+  the total, the `501..2000` aggregate, high/complement/early/late components,
+  and the `501..2000` dominance gap all have explicit gates.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,

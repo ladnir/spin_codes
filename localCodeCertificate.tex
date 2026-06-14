@@ -97,6 +97,11 @@ effective-turnoff convention, then compared against the knot table.
 The ultra-late prefix \(T<5949\) is checked separately with exact RM outer
 coefficients: its total is below \(-41.11\), its peak is the \(h=32\) term, and
 the \(h>32\) part is at least \(25.30\) bits below that peak.
+For the \(h\ge501\) row families, the verifier also applies explicit
+thresholds to the component totals.  The aggregate remains below
+\(-182.25\), is dominated by the \(501\le h\le2000\) all-episode CSV family,
+and every other high/post-prefix component is at least \(198.0\) bits below
+that family.
 
 \begin{theorem}[Checked finite RM/full-split first-moment certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}
