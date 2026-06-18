@@ -1105,6 +1105,14 @@ def check_close(name: str, actual: float, expected: float, tol: float) -> None:
         )
 
 
+def check_upper_bound(name: str, actual: float, bound: float, tol: float) -> None:
+    if actual > bound + tol:
+        raise SystemExit(
+            f"{name}: expected <= {bound:.6f}, got {actual:.6f}; "
+            f"excess={actual - bound:.6g}"
+        )
+
+
 def print_peak(prefix: str, peak: dict[str, str] | None, column: str) -> None:
     if peak is None:
         return
@@ -1926,7 +1934,7 @@ def check_high_interval(interval: HighInterval, tolerance: float) -> float:
         check=True,
     )
     actual = parse_piecewise_total(result.stdout)
-    check_close(f"interval_{interval.label}_recompute", actual, interval.adjusted_log2, tolerance)
+    check_upper_bound(f"interval_{interval.label}_recompute", actual, interval.adjusted_log2, tolerance)
     return actual
 
 
@@ -1940,7 +1948,7 @@ def check_complement_high_interval(interval: ComplementHighInterval, tolerance: 
         check=True,
     )
     actual = parse_piecewise_total(result.stdout)
-    check_close(f"complement_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    check_upper_bound(f"complement_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -1954,7 +1962,7 @@ def check_early_postprefix_interval(interval: EarlyPostprefixInterval, tolerance
         check=True,
     )
     actual = parse_piecewise_total(result.stdout)
-    check_close(f"early_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    check_upper_bound(f"early_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -1968,7 +1976,7 @@ def check_early_accelerated_interval(interval: EarlyAcceleratedInterval, toleran
         check=True,
     )
     actual = parse_piecewise_total(result.stdout)
-    check_close(f"early_accelerated_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    check_upper_bound(f"early_accelerated_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
 
 
@@ -1982,8 +1990,92 @@ def check_late_postprefix_interval(interval: LatePostprefixInterval, tolerance: 
         check=True,
     )
     actual = parse_piecewise_total(result.stdout)
-    check_close(f"late_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
+    check_upper_bound(f"late_postprefix_interval_{interval.label}_recompute", actual, interval.log2_value, tolerance)
     return actual
+
+
+def write_interval_recompute_audit_md(path: Path, rows: list[dict[str, object]], tolerance: float) -> None:
+    if not rows:
+        raise SystemExit("--write-interval-recompute-audit-md requires at least one opt-in interval check")
+    by_family: dict[str, list[dict[str, object]]] = {}
+    for row in rows:
+        by_family.setdefault(str(row["family"]), []).append(row)
+
+    lines = [
+        "# Full-Split Interval Recompute Audit",
+        "",
+        "This artifact records an opt-in regeneration pass for the heavier interval families in the",
+        "finite RM/EBCH full-split certificate. The default verifier re-sums committed artifacts and",
+        "manifest constants; this report records a deeper run of the command-reproducible intervals.",
+        "",
+        f"Tolerance: `{tolerance:g}` bits.",
+        f"Rows recomputed: `{len(rows)}`.",
+        "Overall status: `PASS`.",
+        "",
+        "A row passes when its recomputed log2 contribution is at most the stored",
+        "upper bound plus the verifier tolerance. Negative deltas are safer than",
+        "the stored value and are not treated as failures.",
+        "",
+        "## Family Summary",
+        "",
+        "| family | rows | stored total log2 | recomputed total log2 | max upward delta bits | min delta bits |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for family in sorted(by_family):
+        family_rows = by_family[family]
+        stored_total = float("-inf")
+        recomputed_total = float("-inf")
+        max_upward_delta = float("-inf")
+        min_delta = float("inf")
+        for row in family_rows:
+            stored = float(row["stored_log2"])
+            recomputed = float(row["recomputed_log2"])
+            delta = recomputed - stored
+            stored_total = log2add(stored_total, stored)
+            recomputed_total = log2add(recomputed_total, recomputed)
+            max_upward_delta = max(max_upward_delta, delta)
+            min_delta = min(min_delta, delta)
+        lines.append(
+            f"| `{family}` | {len(family_rows)} | {stored_total:.6f} | "
+            f"{recomputed_total:.6f} | {max_upward_delta:.3g} | {min_delta:.3g} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Rows",
+            "",
+            "| family | interval | stored log2 | recomputed log2 | delta bits | status |",
+            "| --- | --- | ---: | ---: | ---: | --- |",
+        ]
+    )
+    for row in rows:
+        stored = float(row["stored_log2"])
+        recomputed = float(row["recomputed_log2"])
+        lines.append(
+            f"| `{row['family']}` | `{row['interval']}` | {stored:.6f} | "
+            f"{recomputed:.6f} | {recomputed - stored:.3g} | `PASS` |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Command",
+            "",
+            "```powershell",
+            "python scripts\\verify_fullsplit_finite_ledger.py "
+            "--check-high-intervals all "
+            "--check-complement-high-intervals all "
+            "--check-early-postprefix-intervals all "
+            "--check-early-accelerated-intervals all "
+            "--check-late-postprefix-intervals all "
+            "--write-interval-recompute-audit-md scripts\\fullsplit_interval_recompute_audit.md",
+            "```",
+            "",
+        ]
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def main() -> int:
@@ -2142,6 +2234,11 @@ def main() -> int:
         type=Path,
         help="Write a machine-readable manifest of the checked row families, constants, and totals.",
     )
+    parser.add_argument(
+        "--write-interval-recompute-audit-md",
+        type=Path,
+        help="Write a compact Markdown report for opt-in interval recomputation checks.",
+    )
     parser.add_argument("--tolerance", type=float, default=5e-6)
     args = parser.parse_args()
     if args.N % args.block_bits != 0:
@@ -2206,6 +2303,19 @@ def main() -> int:
         "row_families": [],
         "totals": {},
     }
+    interval_recompute_rows: list[dict[str, object]] = []
+
+    def record_interval_recompute(family: str, label: str, stored_log2: float, recomputed_log2: float) -> None:
+        interval_recompute_rows.append(
+            {
+                "family": family,
+                "interval": label,
+                "stored_log2": stored_log2,
+                "recomputed_log2": recomputed_log2,
+                "delta_bits": recomputed_log2 - stored_log2,
+                "status": "PASS",
+            }
+        )
 
     if (
         args.print_high_interval_commands
@@ -3477,32 +3587,44 @@ def main() -> int:
     if args.check_high_intervals:
         for interval in selected_high_intervals(args.check_high_intervals):
             actual = check_high_interval(interval, args.tolerance)
+            record_interval_recompute("high", interval.label, interval.adjusted_log2, actual)
             print(f"interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"interval_{interval.label}_recompute_status,PASS")
 
     if args.check_complement_high_intervals:
         for interval in selected_complement_high_intervals(args.check_complement_high_intervals):
             actual = check_complement_high_interval(interval, args.tolerance)
+            record_interval_recompute("complement_high", interval.label, interval.log2_value, actual)
             print(f"complement_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"complement_interval_{interval.label}_recompute_status,PASS")
 
     if args.check_early_postprefix_intervals:
         for interval in selected_early_postprefix_intervals(args.check_early_postprefix_intervals):
             actual = check_early_postprefix_interval(interval, args.tolerance)
+            record_interval_recompute("early_postprefix", interval.label, interval.log2_value, actual)
             print(f"early_postprefix_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"early_postprefix_interval_{interval.label}_recompute_status,PASS")
 
     if args.check_early_accelerated_intervals:
         for interval in selected_early_accelerated_intervals(args.check_early_accelerated_intervals):
             actual = check_early_accelerated_interval(interval, args.tolerance)
+            record_interval_recompute("early_accelerated", interval.label, interval.log2_value, actual)
             print(f"early_accelerated_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"early_accelerated_interval_{interval.label}_recompute_status,PASS")
 
     if args.check_late_postprefix_intervals:
         for interval in selected_late_postprefix_intervals(args.check_late_postprefix_intervals):
             actual = check_late_postprefix_interval(interval, args.tolerance)
+            record_interval_recompute("late_postprefix", interval.label, interval.log2_value, actual)
             print(f"late_postprefix_interval_{interval.label}_recomputed_log2,{actual:.6f}")
             print(f"late_postprefix_interval_{interval.label}_recompute_status,PASS")
+
+    if args.write_interval_recompute_audit_md:
+        output_audit_path = args.write_interval_recompute_audit_md
+        if not output_audit_path.is_absolute():
+            output_audit_path = (Path.cwd() / output_audit_path).resolve()
+        write_interval_recompute_audit_md(output_audit_path, interval_recompute_rows, args.tolerance)
+        print(f"interval_recompute_audit_md,{output_audit_path}")
 
     h501_plus_checked = float("-inf")
     for value in [

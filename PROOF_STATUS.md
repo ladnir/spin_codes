@@ -1,6 +1,6 @@
 # Proof Status And High-Risk TODOs
 
-Generated: 2026-06-13
+Generated: 2026-06-18
 
 Purpose: keep the post-restructure proof state explicit.  This is not a new
 theorem source; it is the working checklist for what is in good narrative
@@ -121,6 +121,12 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   from full regeneration: the default pass re-sums committed row artifacts and
   manifest interval constants, while the high/complement/early/late interval
   families have opt-in recomputation flags.
+- A full opt-in interval recomputation audit is now tracked at
+  `scripts/fullsplit_interval_recompute_audit.md`.  It recomputes all 45
+  high, complement-high, early-postprefix, early-accelerated, and late
+  postprefix rows and records `PASS` under upper-bound semantics; no row
+  recomputed above its stored manifest bound, and several high-interval rows
+  recomputed to slightly safer values.
 - The dominant RM/EBCH prefix mechanism is now isolated in the manifest:
   after exact RM reweighting the \(h=32,r=1,\mathrm{gap}=1..4000\) row is the
   peak, the full \(32\le h\le500,e\le8\) prefix family is only about
@@ -164,9 +170,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   certificate to fully formal computer-assisted theorem, replace the floating
   logarithmic row arithmetic in the manifest ledger by outward-rounded
   interval bounds or exact rational/integer inequalities.
-- For a stronger audit packet, either run/store regenerated artifacts for every
-  opt-in high/complement/early/late interval family or make the full verifier
-  require those recomputations.
+- For a fully formal audit packet, store raw regenerated interval artifacts or
+  make the canonical verifier require the full opt-in recomputation pass under
+  outward-rounded interval arithmetic.
 - Replace the sampled-grid dense `0.109` exponent-gap check by an interval
   certificate if a fully formal computer-assisted proof is needed.
 - Further compress the scalar dense inner ON/OFF proof chain if the main paper
