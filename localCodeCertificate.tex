@@ -43,8 +43,13 @@ low-weight RM direct-sum outer coefficients by exact integer polynomial
 arithmetic, checks the RM support floor and the first support gap, verifies the
 prefix placement-ratio step by exact cross multiplication, checks row-family
 coverage, and re-sums the committed row-family artifacts within the manifest
-tolerance.  Some heavier interval families are treated as command-reproducible
-manifest rows in the default pass rather than regenerated every time; the
+tolerance.  It also gives the dominant row an independent rational audit: the
+EBCH split probabilities, finite termination endpoint, RM coefficient, and
+placement probability are exact fractions; a rational Chernoff bound is
+rounded upward to an explicit dyadic; and the final peak comparison is exact
+integer cross multiplication.  Some heavier interval families are treated as
+command-reproducible manifest rows in the default pass rather than regenerated
+every time; the
 verifier exposes opt-in flags to recompute the high, complement-high, early
 post-prefix, early-accelerated, and ultra-late post-prefix interval rows.
 The tracked report
@@ -53,8 +58,8 @@ opt-in regeneration of those interval families: all 45 recomputed rows pass as
 upper bounds against the stored ledger values.  Negative recomputation deltas
 are safer than the stored manifest constants and are not failures.
 The remaining hardening step, before treating the ledger as a fully formal
-computer-assisted proof, is to replace the floating logarithmic row arithmetic
-by interval, rational, or exact-integer upper bounds, and to store or require
+computer-assisted proof, is to replace the remaining floating logarithmic row
+arithmetic by interval, rational, or exact-integer upper bounds, and to store or require
 full regeneration of those heavier interval rows if desired.  In the present
 paper this is the intended status of the word ``checked.''
 
@@ -80,11 +85,15 @@ the post-prefix row cover.  The paper-facing values are
 \text{checked item} & \text{manifest value}\\
 \hline
 \text{minimum positive outer weight} & 32\\
-\text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.278528\\
+\text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.2785\\
 \text{checked row families for }h\ge501 & \log_2\mu\le -182.259739\\
-\text{total checked first moment} & \log_2\mu\le -37.278528 .
+\text{total checked first moment} & \log_2\mu\le -37.2785 .
 \end{array}
 \]
+The verifier's nearest-six-decimal diagnostic is \(-37.278528\), while the
+stored unrounded log-sum is \(-37.278527626\ldots\).  The displayed inequalities
+therefore use the outward-safe exponent \(-37.2785\), not the nearest rounded
+decimal.
 The dominant row is \(h=32\), first-active regime \(r=1\), gap bucket
 \(1\le\mathrm{gap}\le4000\).  The detailed row family table is recorded in the
 manifest and supporting certificate notes.
@@ -101,12 +110,45 @@ threshold \(0.303594\).
 The peak arithmetic itself is also recomputed separately from the exact
 \(A_{32}=4096\,A^{RM}_{32}\) count, the exact first-gap placement
 numerator/denominator, and the checked \(T=5949,H=31\) inner knot value.
+Independently of those floating logarithms, the rational audit bounds the
+finite termination atom by \(2^{-63}\), evaluates the no-termination Chernoff
+bound at the rational pole \(z=2333/2373\) with outward dyadic rounding, and
+bounds all \(1\le e\le8\) termination contributions by
+\(\sum_{e=1}^8\binom{H+1}{e}2^{-63e}\).  Exact cross
+multiplication then gives the dominant peak at most \(49/2^{43}\), whose
+base-two logarithm is approximately \(-37.385290\).  This deliberately loose
+peak ceiling is now supplemented by a separate aggregate certificate for the
+complete \(h\le500\) family.
 The latter knot is itself regenerated inside the verifier from the EBCH
 spectrum and the \(e\le1\) full-split episode formula under the stored
 effective-turnoff convention, then compared against the knot table.
 The ultra-late prefix \(T<5949\) is checked separately with exact RM outer
 coefficients: its total is below \(-41.11\), its peak is the \(h=32\) term, and
 the \(h>32\) part is at least \(25.30\) bits below that peak.
+For this family the verifier also bypasses logarithmic summation entirely: it
+forms the exact rational sum
+\[
+\sum_{1\le h\le500} A_h^{\rm out}
+\frac{\binom{64\cdot5949}{h}}{\binom{2^{21}}{h}}
+\]
+and proves it is below \(2^{-41}\).  For the other first-active positions, the
+aggregate certificate uses exact placement sums for the six gap buckets with
+knots \(5949,9949,13949,17949,22949,27949\).  It retains every
+\(e=0,\ldots,8\) episode term in the first three buckets, every
+\(e=0,\ldots,16\) term in the early three, and covers the respective
+\(e\ge9\) and \(e\ge17\) tails.  The EBCH split law and termination endpoint
+are rational, the fixed-pole Chernoff envelope is rounded outward on a
+1024-bit dyadic grid, and the final aggregation is rational.  The resulting
+complete low-weight rational upper bound has diagnostic logarithm
+\[
+ \log_2\mu_{h\le500}^{\rm ub}\approx -37.276548513006.
+\]
+Exact integer cross multiplication proves that this total is at most
+\(6793/2^{50}\); raising to the hundredth power gives
+\(6793^{100}\le2^{1273}\), hence \(6793/2^{50}\le2^{-37.27}\).
+over all 114 supported weights and proves by integer cross multiplication that
+it is at most \(2^{-41}\).  The logarithmic value \(-41.113442\) is retained
+only as a readable report of that exact fraction.
 For the \(h\ge501\) row families, the verifier also applies explicit
 thresholds to the component totals.  The aggregate remains below
 \(-182.25\), is dominated by the \(501\le h\le2000\) all-episode CSV family,
@@ -125,11 +167,11 @@ Use the direct-sum \(RM(4,9)\) outer and the full-split EBCH inner above.  Let
 at most \(d\), with expectation taken over the random interleaver and the
 random choices of the inner construction.  The checked finite ledger gives
 \[
-\mathbb E Z_d\le 2^{-37.278528}.
+\mathbb E Z_d\le 2^{-37.2785}.
 \]
 Consequently
 \[
-\Pr[d_{\min}\le d]\le 2^{-37.278528}.
+\Pr[d_{\min}\le d]\le 2^{-37.2785}.
 \]
 In particular, with positive probability a sampled code has
 \(d_{\min}\ge188744\), and hence relative distance
@@ -144,7 +186,7 @@ probability to the first moment \(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  The
 manifest-backed ledger summary above removes all positive weights below \(32\),
 covers all first-active placements for \(32\le h\le500\), and covers the
 checked \(h\ge501\) row families.  Its log-sum gives
-\(\log_2\mu_{\rm checked}(.09)\le -37.278528\), which is the displayed
+\(\log_2\mu_{\rm checked}(.09)\le -37.2785\), which is the displayed
 expectation bound.  Markov's inequality applied to the nonnegative integer
 random variable \(Z_d\) gives the probability statement.
 \end{proof}

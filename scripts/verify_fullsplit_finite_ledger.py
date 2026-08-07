@@ -16,6 +16,7 @@ import math
 import subprocess
 import sys
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
 
 from bound_fullsplit_episode_gaps import load_spectrum as load_inner_spectrum
@@ -26,6 +27,7 @@ from check_fullsplit_T_monotonicity import (
     sufficient_reduction_rows,
 )
 from certify_prefix_placement_ratio import certify_placement_ratio
+from certify_fullsplit_h500_rational import certify as certify_fullsplit_h500_rational
 from fast_fullsplit_episode_e01 import (
     episode_terms_log2 as fast_episode_terms_log2,
     precompute_gap_suffix_logsum as fast_precompute_gap_suffix_logsum,
@@ -50,6 +52,7 @@ ROOT = Path(__file__).resolve().parent
 GLOBAL_TURNOFF_LOG2 = -62.4078758
 HIGH_INTERVAL_TURNOFF_ADJUSTMENT_BITS = 1.484774
 CURRENT_EALLRATIO_MAX_GAP = 26819
+THEOREM_SAFE_TOTAL_LOG2 = -37.2785
 
 
 @dataclass(frozen=True)
@@ -593,6 +596,44 @@ class DominantPeakArithmeticAudit:
 
 
 @dataclass(frozen=True)
+class DominantPeakRationalAudit:
+    termination_h_max: int
+    termination_T_min: int
+    termination_cap_shift: int
+    termination_log2: float
+    termination_num_bits: int
+    termination_den_bits: int
+    chernoff_z_num: int
+    chernoff_z_den: int
+    survival_dyadic_bits: int
+    survival_dyadic_num: int
+    survival_log2: float
+    episode_max: int
+    one_episode_log2: float
+    termination_tail_log2: float
+    inner_log2: float
+    peak_num_bits: int
+    peak_den_bits: int
+    peak_log2: float
+    threshold_num: int
+    threshold_shift: int
+    threshold_log2: float
+    cross_multiply_slack_bits: int
+
+
+@dataclass(frozen=True)
+class LatePrefixRationalAudit:
+    rows: int
+    h_max: int
+    total_num_bits: int
+    total_den_bits: int
+    total_log2: float
+    threshold_shift: int
+    threshold_log2: float
+    cross_multiply_slack_bits: int
+
+
+@dataclass(frozen=True)
 class DominantInnerKnotAudit:
     T: int
     H: int
@@ -617,6 +658,12 @@ def log2_int(value: int) -> float:
     if value <= 0:
         raise ValueError("log2_int expects a positive integer")
     return math.log2(value)
+
+
+def log2_fraction(value: Fraction) -> float:
+    if value <= 0:
+        raise ValueError("log2_fraction expects a positive fraction")
+    return log2_int(value.numerator) - log2_int(value.denominator)
 
 
 def unique_csv_row(path: Path, predicate, *, label: str) -> dict[str, str]:
@@ -814,6 +861,215 @@ def dominant_peak_arithmetic_audit(
         inner_e1_log2=inner_e1_log2,
         term_log2=term_log2,
         threshold_log2=threshold_log2,
+    )
+
+
+def dominant_peak_rational_audit(
+    *,
+    inner_spectrum: Path,
+    local_spectrum_csv: Path,
+    exact_outer_coeffs: list[int],
+    outer_blocks: int,
+    n: int,
+    b: int,
+    late_blocks: int,
+    termination_h_max: int = 499,
+    termination_cap_shift: int = 63,
+    chernoff_z_num: int = 2333,
+    chernoff_z_den: int = 2373,
+    survival_dyadic_bits: int = 96,
+    episode_max: int = 8,
+    threshold_num: int = 49,
+    threshold_shift: int = 43,
+) -> DominantPeakRationalAudit:
+    """Independently upper-bound the dominant row by exact rational arithmetic.
+
+    The only outward rounding is the explicit ceiling of the rational Chernoff
+    value to a dyadic with ``survival_dyadic_bits`` fractional bits.  The
+    The terms with one through ``episode_max`` terminations are bounded by
+    ``sum_e C(H+1,e) p_term^e``: conditioned on ``x`` occupied blocks there
+    are at most ``C(x+1,e) <= C(H+1,e)`` candidate gap subsets.
+    """
+
+    h = 32
+    first_r = 1
+    remaining_ones = h - first_r
+    gap_min = 1
+    gap_max = 4000
+    distance = (9 * n) // 100
+    if not (0 < chernoff_z_num < chernoff_z_den):
+        raise SystemExit("dominant rational audit: Chernoff pole must lie strictly between zero and one")
+    if (
+        survival_dyadic_bits < 1
+        or termination_cap_shift < 1
+        or threshold_shift < 1
+        or not 1 <= episode_max <= remaining_ones + 1
+    ):
+        raise SystemExit("dominant rational audit: invalid dyadic precision or threshold shift")
+
+    spectrum = load_inner_spectrum(inner_spectrum)
+    nonzero_total = sum(count for weight, count in spectrum if weight > 0)
+    split_law = [Fraction(0) for _ in range(b + 1)]
+    entries: list[tuple[int, int, Fraction]] = []
+    for weight, count in spectrum:
+        if weight <= 0 or count <= 0:
+            continue
+        split_den = nonzero_total * math.comb(2 * b, weight)
+        for state_weight in range(max(0, weight - b), min(b, weight) + 1):
+            output_weight = weight - state_weight
+            probability = Fraction(
+                count * math.comb(b, state_weight) * math.comb(b, output_weight),
+                split_den,
+            )
+            split_law[state_weight] += probability
+            entries.append((output_weight, state_weight, probability))
+    if sum(split_law, Fraction(0)) != 1:
+        raise SystemExit("dominant rational audit: exact EBCH split probabilities do not sum to one")
+
+    # For fixed q>=1 and n=bT, the exact-hit factor
+    # C(n-b,H-q)/C(n,H) is increasing in H whenever
+    # q(n+1) >= b(H+1).  The q=1 endpoint inequality therefore covers every
+    # q and H in the finite prefix.  Its decrease in T gives T=late_blocks.
+    termination_n = b * late_blocks
+    if termination_n + 1 < b * (termination_h_max + 1):
+        raise SystemExit("dominant rational audit: finite termination H-endpoint reduction failed")
+    termination_den = math.comb(termination_n, termination_h_max)
+    cancellation = Fraction(0)
+    for state_weight in range(1, min(b, termination_h_max) + 1):
+        cancellation += split_law[state_weight] * Fraction(
+            math.comb(termination_n - b, termination_h_max - state_weight),
+            termination_den,
+        )
+    termination = split_law[0] + cancellation
+    termination_cap_den = 1 << termination_cap_shift
+    if termination.numerator * termination_cap_den > termination.denominator:
+        raise SystemExit(
+            "dominant rational audit: exact finite termination atom exceeds "
+            f"2^-{termination_cap_shift}"
+        )
+
+    # For rational z in (0,1), z^{-d} M(z)^T is an exact Chernoff upper
+    # bound on the no-termination survival event.  Round it upward to a
+    # dyadic so every later comparison remains integer/rational.
+    z = Fraction(chernoff_z_num, chernoff_z_den)
+    mgf = sum(
+        (probability * z**output_weight for output_weight, state_weight, probability in entries if state_weight > 0),
+        Fraction(0),
+    )
+    dyadic_den = 1 << survival_dyadic_bits
+    survival_num_raw = (
+        pow(mgf.numerator, late_blocks)
+        * pow(z.denominator, distance)
+        * dyadic_den
+    )
+    survival_den_raw = pow(mgf.denominator, late_blocks) * pow(z.numerator, distance)
+    survival_dyadic_num, remainder = divmod(survival_num_raw, survival_den_raw)
+    if remainder:
+        survival_dyadic_num += 1
+    if survival_dyadic_num > dyadic_den:
+        raise SystemExit("dominant rational audit: rational Chernoff bound exceeds one")
+    survival = Fraction(survival_dyadic_num, dyadic_den)
+
+    one_episode = Fraction(remaining_ones + 1, termination_cap_den)
+    termination_tail = sum(
+        (
+            Fraction(
+                math.comb(remaining_ones + 1, episode),
+                1 << (termination_cap_shift * episode),
+            )
+            for episode in range(1, episode_max + 1)
+        ),
+        Fraction(0),
+    )
+    inner = survival + termination_tail
+
+    local_count = local_spectrum_count(local_spectrum_csv, h)
+    global_count = outer_blocks * local_count
+    if h >= len(exact_outer_coeffs) or exact_outer_coeffs[h] != global_count:
+        raise SystemExit("dominant rational audit: exact RM weight-32 coefficient mismatch")
+    gap_sum = sum(
+        math.comb(b * (late_blocks + gap - 1), remaining_ones)
+        for gap in range(gap_min, gap_max + 1)
+    )
+    placement = Fraction(math.comb(b, first_r) * gap_sum, math.comb(n, h))
+    peak = global_count * placement * inner
+    threshold_den = 1 << threshold_shift
+    cross_left = peak.numerator * threshold_den
+    cross_right = threshold_num * peak.denominator
+    if cross_left > cross_right:
+        raise SystemExit(
+            "dominant rational audit: peak upper bound exceeds rational threshold "
+            f"{threshold_num}/2^{threshold_shift}"
+        )
+    cross_slack = cross_right - cross_left
+
+    return DominantPeakRationalAudit(
+        termination_h_max=termination_h_max,
+        termination_T_min=late_blocks,
+        termination_cap_shift=termination_cap_shift,
+        termination_log2=log2_fraction(termination),
+        termination_num_bits=termination.numerator.bit_length(),
+        termination_den_bits=termination.denominator.bit_length(),
+        chernoff_z_num=z.numerator,
+        chernoff_z_den=z.denominator,
+        survival_dyadic_bits=survival_dyadic_bits,
+        survival_dyadic_num=survival_dyadic_num,
+        survival_log2=log2_fraction(survival),
+        episode_max=episode_max,
+        one_episode_log2=log2_fraction(one_episode),
+        termination_tail_log2=log2_fraction(termination_tail),
+        inner_log2=log2_fraction(inner),
+        peak_num_bits=peak.numerator.bit_length(),
+        peak_den_bits=peak.denominator.bit_length(),
+        peak_log2=log2_fraction(peak),
+        threshold_num=threshold_num,
+        threshold_shift=threshold_shift,
+        threshold_log2=log2_int(threshold_num) - threshold_shift,
+        cross_multiply_slack_bits=cross_slack.bit_length(),
+    )
+
+
+def late_prefix_rational_audit(
+    coeffs: list[int],
+    *,
+    n: int,
+    b: int,
+    late_blocks: int,
+    h_max: int,
+    threshold_shift: int = 41,
+) -> LatePrefixRationalAudit:
+    """Sum the ultra-late placement cover as one exact fraction."""
+
+    if threshold_shift < 1:
+        raise SystemExit("late-prefix rational audit: invalid threshold shift")
+    late_coordinates = b * late_blocks
+    total = Fraction(0)
+    rows = 0
+    for h in range(1, min(h_max, len(coeffs) - 1) + 1):
+        outer = coeffs[h]
+        if outer == 0:
+            continue
+        total += outer * Fraction(math.comb(late_coordinates, h), math.comb(n, h))
+        rows += 1
+    if total <= 0:
+        raise SystemExit("late-prefix rational audit: exact sum is empty")
+    threshold_den = 1 << threshold_shift
+    cross_left = total.numerator * threshold_den
+    cross_right = total.denominator
+    if cross_left > cross_right:
+        raise SystemExit(
+            "late-prefix rational audit: exact sum exceeds "
+            f"2^-{threshold_shift}"
+        )
+    return LatePrefixRationalAudit(
+        rows=rows,
+        h_max=h_max,
+        total_num_bits=total.numerator.bit_length(),
+        total_den_bits=total.denominator.bit_length(),
+        total_log2=log2_fraction(total),
+        threshold_shift=threshold_shift,
+        threshold_log2=-float(threshold_shift),
+        cross_multiply_slack_bits=(cross_right - cross_left).bit_length(),
     )
 
 
@@ -2117,6 +2373,16 @@ def main() -> int:
     )
     parser.add_argument("--exact-outer-local-spectrum-csv", type=Path, default=ROOT / "rm512_256_spectrum.csv")
     parser.add_argument("--inner-spectrum", type=Path, default=ROOT / "EBCH128_64.wd")
+    parser.add_argument(
+        "--h500-rational-gap-sums",
+        type=Path,
+        default=ROOT / "fullsplit_h500_gap_sums_exact.json",
+    )
+    parser.add_argument(
+        "--h500-rational-inner-bounds",
+        type=Path,
+        default=ROOT / "fullsplit_h500_inner_bounds_dyadic.json",
+    )
     parser.add_argument("--exact-outer-blocks", type=int, default=4096)
     parser.add_argument("--exact-outer-h-max", type=int, default=500)
     parser.add_argument("--N", type=int, default=2**21)
@@ -2278,6 +2544,8 @@ def main() -> int:
                 "RM direct-sum low-weight outer coefficients",
                 "RM support floor and first support gap",
                 "dominant h=32 peak placement numerator/denominator",
+                "dominant h=32 rational Chernoff and peak cross multiplication",
+                "ultra-late prefix exact rational sum and cross multiplication",
                 "prefix placement-ratio cross multiplication",
             ],
             "coverage_checks": [
@@ -2293,10 +2561,11 @@ def main() -> int:
                 "dominant prefix peak-to-family inflation",
                 "exact ultra-late prefix contribution",
                 "h>=501 post-prefix aggregate contribution",
+                "outward-safe theorem exponent for the final ledger total",
             ],
             "remaining_formalization": (
-                "replace floating logarithmic row arithmetic by interval, "
-                "rational, or exact-integer upper bounds"
+                "replace the remaining floating logarithmic row-family arithmetic by "
+                "interval, rational, or exact-integer upper bounds"
             ),
         },
         "checks": {},
@@ -2683,6 +2952,84 @@ def main() -> int:
         ),
     }
 
+    dominant_rational = dominant_peak_rational_audit(
+        inner_spectrum=args.inner_spectrum,
+        local_spectrum_csv=args.exact_outer_local_spectrum_csv,
+        exact_outer_coeffs=exact_outer_coeffs,
+        outer_blocks=args.exact_outer_blocks,
+        n=args.N,
+        b=args.block_bits,
+        late_blocks=args.late_blocks,
+    )
+    print("dominant_peak_rational_upper_bound_status,PASS")
+    print(f"dominant_peak_rational_termination_log2,{dominant_rational.termination_log2:.12f}")
+    print(f"dominant_peak_rational_termination_cap,2^-{dominant_rational.termination_cap_shift}")
+    print(
+        "dominant_peak_rational_chernoff_z,"
+        f"{dominant_rational.chernoff_z_num}/{dominant_rational.chernoff_z_den}"
+    )
+    print(f"dominant_peak_rational_survival_log2,{dominant_rational.survival_log2:.12f}")
+    print(f"dominant_peak_rational_one_episode_log2,{dominant_rational.one_episode_log2:.12f}")
+    print(f"dominant_peak_rational_episode_max,{dominant_rational.episode_max}")
+    print(f"dominant_peak_rational_termination_tail_log2,{dominant_rational.termination_tail_log2:.12f}")
+    print(f"dominant_peak_rational_inner_log2,{dominant_rational.inner_log2:.12f}")
+    print(f"dominant_peak_rational_upper_log2,{dominant_rational.peak_log2:.12f}")
+    print(
+        "dominant_peak_rational_threshold,"
+        f"{dominant_rational.threshold_num}/2^{dominant_rational.threshold_shift}"
+    )
+    print(f"dominant_peak_rational_threshold_log2,{dominant_rational.threshold_log2:.12f}")
+    print("dominant_peak_rational_cross_multiply_status,PASS")
+    manifest["checks"]["dominant_peak_rational_upper_bound"] = {  # type: ignore[index]
+        "status": "PASS",
+        "arithmetic": "exact integers and fractions, with one outward dyadic ceiling",
+        "selector": {
+            "outer_weight": 32,
+            "first_r": 1,
+            "remaining_ones": 31,
+            "gap_min": 1,
+            "gap_max": 4000,
+            "bucket_T": args.late_blocks,
+        },
+        "termination_atom": {
+            "finite_prefix_h_max": dominant_rational.termination_h_max,
+            "T_min": dominant_rational.termination_T_min,
+            "exact_log2_for_display": dominant_rational.termination_log2,
+            "exact_numerator_bits": dominant_rational.termination_num_bits,
+            "exact_denominator_bits": dominant_rational.termination_den_bits,
+            "rational_upper_bound": f"1/2^{dominant_rational.termination_cap_shift}",
+            "cross_multiply_status": "PASS",
+        },
+        "rational_chernoff": {
+            "z_numerator": dominant_rational.chernoff_z_num,
+            "z_denominator": dominant_rational.chernoff_z_den,
+            "survival_dyadic_bits": dominant_rational.survival_dyadic_bits,
+            "survival_dyadic_numerator": dominant_rational.survival_dyadic_num,
+            "survival_log2_for_display": dominant_rational.survival_log2,
+            "episode_max": dominant_rational.episode_max,
+            "termination_tail_bound": "sum_{e=1}^8 C(H+1,e) 2^(-63e)",
+            "one_episode_log2_for_display": dominant_rational.one_episode_log2,
+            "termination_tail_log2_for_display": dominant_rational.termination_tail_log2,
+            "inner_log2_for_display": dominant_rational.inner_log2,
+        },
+        "peak_upper_bound": {
+            "exact_numerator_bits": dominant_rational.peak_num_bits,
+            "exact_denominator_bits": dominant_rational.peak_den_bits,
+            "log2_for_display": dominant_rational.peak_log2,
+            "threshold_numerator": dominant_rational.threshold_num,
+            "threshold_denominator_power_of_two": dominant_rational.threshold_shift,
+            "threshold_log2_for_display": dominant_rational.threshold_log2,
+            "cross_multiply_slack_bits": dominant_rational.cross_multiply_slack_bits,
+            "cross_multiply_status": "PASS",
+        },
+        "interpretation": (
+            "Independent rational upper bound for the dominant h=32 row. The EBCH split law, "
+            "finite termination endpoint, RM coefficient, placement probability, and final "
+            "threshold comparison use exact integer/fraction arithmetic; the rational Chernoff "
+            "survival value is rounded upward to an explicit dyadic."
+        ),
+    }
+
     exact_late_prefix = exact_late_prefix_sum(
         exact_outer_coeffs,
         n=args.N,
@@ -2690,6 +3037,109 @@ def main() -> int:
         late_blocks=args.late_blocks,
         h_max=args.late_prefix_h_max,
     )
+    late_prefix_rational = late_prefix_rational_audit(
+        exact_outer_coeffs,
+        n=args.N,
+        b=args.block_bits,
+        late_blocks=args.late_blocks,
+        h_max=args.late_prefix_h_max,
+    )
+    print("late_prefix_exact_rational_status,PASS")
+    print(f"late_prefix_exact_rational_rows,{late_prefix_rational.rows}")
+    print(f"late_prefix_exact_rational_log2,{late_prefix_rational.total_log2:.12f}")
+    print(f"late_prefix_exact_rational_threshold,2^-{late_prefix_rational.threshold_shift}")
+    print("late_prefix_exact_rational_cross_multiply_status,PASS")
+    manifest["checks"]["late_prefix_exact_rational"] = {  # type: ignore[index]
+        "status": "PASS",
+        "arithmetic": "exact integer binomial coefficients and fractions",
+        "h_range": [1, late_prefix_rational.h_max],
+        "live_rows": late_prefix_rational.rows,
+        "exact_numerator_bits": late_prefix_rational.total_num_bits,
+        "exact_denominator_bits": late_prefix_rational.total_den_bits,
+        "log2_for_display": late_prefix_rational.total_log2,
+        "threshold": f"1/2^{late_prefix_rational.threshold_shift}",
+        "threshold_log2": late_prefix_rational.threshold_log2,
+        "cross_multiply_slack_bits": late_prefix_rational.cross_multiply_slack_bits,
+        "cross_multiply_status": "PASS",
+        "interpretation": (
+            "Exact rational sum of A_h C(b*late_blocks,h)/C(N,h) over every "
+            "supported RM direct-sum weight through h=500."
+        ),
+    }
+    h500_rational = certify_fullsplit_h500_rational(
+        inner_spectrum=args.inner_spectrum,
+        local_spectrum_csv=args.exact_outer_local_spectrum_csv,
+        gap_sums_path=args.h500_rational_gap_sums,
+        inner_bounds_path=args.h500_rational_inner_bounds,
+        n=args.N,
+        b=args.block_bits,
+        outer_blocks=args.exact_outer_blocks,
+        late_blocks=args.late_blocks,
+        h_max=args.exact_outer_h_max,
+    )
+    print("fullsplit_h500_complete_rational_status,PASS")
+    print(f"fullsplit_h500_complete_rational_log2,{h500_rational.total_log2:.12f}")
+    print(
+        "fullsplit_h500_complete_rational_threshold,"
+        f"{h500_rational.threshold_num}/2^{h500_rational.threshold_shift}"
+    )
+    print(f"fullsplit_h500_complete_rational_threshold_log2,{h500_rational.threshold_log2:.12f}")
+    print("fullsplit_h500_complete_rational_37_27_bits_status,PASS")
+    manifest["checks"]["fullsplit_h500_complete_rational"] = {  # type: ignore[index]
+        "status": "PASS",
+        "scope": {
+            "outer_weight_range": [1, h500_rational.h_max],
+            "live_outer_weights": h500_rational.live_outer_weights,
+            "ultra_late": "T<5949",
+            "gap_buckets": [
+                "1--4000@T5949",
+                "4001--8000@T9949",
+                "8001--12000@T13949",
+                "12001--17000@T17949",
+                "17001--22000@T22949",
+                "22001--26819@T27949",
+            ],
+            "prefix_episode_terms": "e=0..8",
+            "early_episode_terms": "e=0..16",
+            "tails": "prefix e>=9; early e>=17",
+        },
+        "exact_split": {
+            "chernoff_z": "2333/2373",
+            "mgf_log2_for_display": h500_rational.chernoff_mgf_log2,
+            "crossing": h500_rational.chernoff_crossing,
+            "termination_exact_log2_for_display": h500_rational.termination_exact_log2,
+            "termination_cap": f"2^-{h500_rational.termination_cap_shift}",
+        },
+        "outward_dyadic": {
+            "bits": h500_rational.dyadic_bits,
+            "gap_sums_sha256": h500_rational.gap_sums_sha256,
+            "inner_bounds_sha256": h500_rational.inner_bounds_sha256,
+        },
+        "component_log2_for_display": {
+            "buckets": list(h500_rational.bucket_log2),
+            "explicit_episode_total": h500_rational.explicit_episode_log2,
+            "episode_tails": h500_rational.episode_tail_log2,
+            "ultra_late": h500_rational.ultra_late_log2,
+        },
+        "rational_total": {
+            "log2_for_display": h500_rational.total_log2,
+            "threshold_numerator": h500_rational.threshold_num,
+            "threshold_denominator_power_of_two": h500_rational.threshold_shift,
+            "threshold_log2_for_display": h500_rational.threshold_log2,
+            "threshold_at_least_37_27_bits_exact_status": h500_rational.threshold_bits_exact_status,
+            "cross_multiply_slack_bits": h500_rational.cross_multiply_slack_bits,
+            "cross_multiply_status": "PASS",
+        },
+        "recompute_commands": {
+            "gap_sums": "python scripts\\certify_fullsplit_h500_rational.py --recompute-gap-sums",
+            "inner_bounds": "python scripts\\certify_fullsplit_h500_rational.py --recompute-inner-bounds",
+        },
+        "interpretation": (
+            "Complete h<=500 first-active certificate with exact RM coefficients, exact "
+            "placement sums, exact or outward-rounded EBCH episode bounds, outward-rounded tail "
+            "coverage, and an integer proof that 6793/2^50 <= 2^-37.27."
+        ),
+    }
     check_close("late_prefix_T_lt_5949_exact_outer", exact_late_prefix.total_log2, -41.113442, args.tolerance)
     check_close("late_prefix_T_lt_5949_exact_outer_split", exact_late_prefix.split_log2, -41.113442, args.tolerance)
     check_close(
@@ -3722,8 +4172,15 @@ def main() -> int:
     print(f"h32_500_all_first_active_positions_margin_bits,{-h32_500_all_positions:.6f}")
     current_checked = log2add(h32_500_all_positions, h501_plus_checked)
     check_close("current_checked_ledger", current_checked, -37.278528, args.tolerance)
+    check_upper_bound(
+        "current_checked_ledger_theorem_safe",
+        current_checked,
+        THEOREM_SAFE_TOTAL_LOG2,
+        0.0,
+    )
     print(f"current_checked_ledger_total_log2,{current_checked:.6f}")
     print(f"current_checked_ledger_margin_bits,{-current_checked:.6f}")
+    print(f"current_checked_ledger_theorem_safe_log2,{THEOREM_SAFE_TOTAL_LOG2:.7f}")
     manifest["totals"] = {  # type: ignore[index]
         "prefix_32_500_all_e_exact_outer_log2": prefix_all,
         "early_32_500_all_e_exact_outer_log2": early_all,
@@ -3743,6 +4200,8 @@ def main() -> int:
         "h32_500_all_first_active_positions_margin_bits": -h32_500_all_positions,
         "current_checked_ledger_total_log2": current_checked,
         "current_checked_ledger_margin_bits": -current_checked,
+        "current_checked_ledger_theorem_safe_log2": THEOREM_SAFE_TOTAL_LOG2,
+        "current_checked_ledger_theorem_safe_margin_bits": -THEOREM_SAFE_TOTAL_LOG2,
     }
     if args.write_manifest_json:
         output_manifest_path = args.write_manifest_json

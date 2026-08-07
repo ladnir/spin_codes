@@ -284,8 +284,8 @@ Locked parameters:
 Locked certificate:
 
 ```text
-E[Z_d] <= 2^-37.278528
-Pr[d_min <= d] <= 2^-37.278528
+E[Z_d] <= 2^-37.2785
+Pr[d_min <= d] <= 2^-37.2785
 d_min >= 188744 with positive probability
 188744 / 2^21 > .09
 ```
@@ -300,6 +300,8 @@ The verifier reports:
 
 - `current_checked_ledger_total_log2,-37.278528`
 - `current_checked_ledger_margin_bits,37.278528`
+- diagnostic `fullsplit_h500_complete_rational_log2,-37.276548513006`
+- exact cross-multiplied threshold `6793/2^50 <= 2^-37.27`
 - dominant row `outer_weight=32, first_r=1, gap=1..4000`.
 
 Main-paper role:
@@ -389,7 +391,12 @@ Status: theorem-facing.
 Status: current main finite certificate.
 
 - `N=2^21`, `delta=.09`, `d=188743`.
-- `E[Z_d] <= 2^-37.278528`.
+- `E[Z_d] <= 2^-37.2785` (the verifier's nearest-six-decimal diagnostic is
+  `-37.278528`; the theorem uses an outward-safe exponent).
+- Independently, every `h<=500` first-active position has an
+  exact/outward-rounded rational bound with diagnostic logarithm
+  `-37.276548513006`, closed by exact cross multiplication against
+  `6793/2^50 <= 2^-37.27`.
 - Dominant mode: outer `h=32`, first active occupancy `r=1`, near late window
   `gap=1..4000`.
 

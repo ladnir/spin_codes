@@ -107,8 +107,8 @@ Locked parameters:
 Locked certificate:
 
 ```text
-E[Z_d] <= 2^-37.278528
-Pr[d_min <= d] <= 2^-37.278528
+E[Z_d] <= 2^-37.2785
+Pr[d_min <= d] <= 2^-37.2785
 d_min >= 188744 with positive probability
 188744 / 2^21 > .09
 ```
@@ -119,9 +119,18 @@ Verification status:
   passed.
 - The verifier reported:
   - `current_checked_ledger_total_log2,-37.278528`
+  - unrounded stored total `-37.278527626...`
+  - theorem-safe outward-rounded exponent `-37.2785`
   - `current_checked_ledger_margin_bits,37.278528`
   - `h501_plus_checked_rows_log2,-182.259739`
   - `prefix_32_500_e_le8_dominant_term_log2,-37.385767`
+  - `dominant_peak_rational_upper_bound_status,PASS`
+  - exact rational dominant-peak threshold `49/2^43`
+  - `late_prefix_exact_rational_status,PASS`
+  - exact rational ultra-late-prefix threshold `2^-41`
+  - `fullsplit_h500_complete_rational_status,PASS`
+  - complete rational/outward `h<=500` diagnostic log `-37.276548513006`
+  - exact threshold `6793/2^50 <= 2^-37.27`
   - dominant row `outer_weight=32, first_r=1, gap=1..4000`
 
 Canonical artifacts:
@@ -129,6 +138,9 @@ Canonical artifacts:
 - `scripts/fullsplit_finite_ledger_manifest.json`
 - `scripts/rm512_256_spectrum.csv`
 - `scripts/EBCH128_64.wd`
+- `scripts/certify_fullsplit_h500_rational.py`
+- `scripts/fullsplit_h500_gap_sums_exact.json`
+- `scripts/fullsplit_h500_inner_bounds_dyadic.json`
 - `scripts/fullsplit_piecewise_h32_500_csv.csv`
 - `scripts/fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv`
 - `scripts/fullsplit_piecewise_h501_2000_eall_hsummary.csv`
@@ -215,8 +227,9 @@ Do not promote these to proved claims until resolved:
 - Replace BCH/random-like projection spectra with exact spectra or rigorous
   low-weight envelopes.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
-- Harden the most important numerical certificate rows with interval,
-  rational, or exact-integer safeguards.
+- Continue rational/interval hardening of the `h>=501` interval families.
+  The complete `h<=500` prefix-family inflation and all first-active positions
+  now have an independent 37.27-bit rational/outward certificate.
 - Clarify the full-split construction definition and boundary convention so
   all scripts visibly evaluate the same object.
 - Decide whether finite exact-support prefix lemmas should remain finite

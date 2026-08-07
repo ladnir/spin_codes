@@ -67,7 +67,7 @@ and BCH projection note.  The proved finite instantiation is:
 - inner: full-split EBCH `[128,64,22]` with `b=64`;
 - length: `N=2^21`;
 - target: `delta=.09`, `d=188743`;
-- checked first moment: `E[Z_d] <= 2^-37.278528`.
+- theorem-safe checked first moment: `E[Z_d] <= 2^-37.2785`.
 
 Current verifier:
 
@@ -76,7 +76,9 @@ python scripts\verify_fullsplit_finite_ledger.py --write-manifest-json scripts\f
 ```
 
 Latest checked status: verifier passes and reports
-`current_checked_ledger_total_log2,-37.278528`.
+`current_checked_ledger_total_log2,-37.278528`; the underlying stored value is
+`-37.278527626...`, so theorem-facing inequalities use the conservatively
+rounded exponent `-37.2785`.
 
 ### BCH And Better Local-Code Rows
 
@@ -138,12 +140,37 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 - The dominant peak row arithmetic is now recomputed as its own manifest check:
   exact \(A_{32}=4096\,A^{RM}_{32}\), exact first-gap placement
   numerator/denominator, and the checked `T=5949,H=31` inner knot table value.
+- The dominant peak now also has an independent rational upper-bound audit.
+  It constructs the EBCH split law with exact fractions, proves the finite
+  termination atom is below the rational cap `2^-63` at the monotone endpoint,
+  uses the rational Chernoff pole `2333/2373`, rounds the survival probability
+  upward to an explicit 96-bit dyadic, bounds the `e=1..8` termination terms by
+  `sum_e binom(H+1,e)2^(-63e)`, and checks the complete RM/placement/inner peak against
+  `49/2^43` by exact cross multiplication.  The resulting displayed upper
+  exponent is about `-37.385767`.  This remains a useful independent peak
+  cross-check; the complete low-weight family is now covered by the aggregate
+  rational certificate below.
 - The dominant `T=5949,H=31` inner knot is now regenerated inside the verifier
   from the EBCH spectrum and the `e<=1` full-split episode formula under the
   stored effective-turnoff convention, then compared against the knot table.
 - The ultra-late prefix `T<5949` is now a thresholded verifier check using
   exact RM direct-sum outer coefficients; the total, peak, split, above-split
   mass, and above-split gap all have explicit gates.
+- The same ultra-late prefix now has a fully rational aggregate check: the
+  verifier sums all 114 supported terms
+  `A_h binom(64*5949,h)/binom(2^21,h)` as exact fractions and proves the total
+  is below `2^-41` by integer cross multiplication.  Its displayed exact-sum
+  exponent is about `-41.113442`; logarithms are used only for reporting.
+- The complete `h<=500` first-active family now has an independent
+  exact/outward-rounded certificate.  It covers all six gap buckets, keeps
+  `e=0..8` in the three prefix buckets and `e=0..16` in the three early
+  buckets, and covers the remaining `e>=9`/`e>=17` tails.  Exact RM counts,
+  exact placement sums, a 1024-bit outward dyadic inner envelope, and exact
+  final cross multiplication give a rational upper bound whose diagnostic
+  logarithm is about `-37.276548513006`.  The theorem-safe threshold is the
+  exact rational `6793/2^50`; the integer inequality
+  `6793^100 <= 2^1273` proves it is at most `2^-37.27` without evaluating a
+  transcendental logarithm.
 - The `h>=501` post-prefix aggregate is now a thresholded verifier check:
   the total, the `501..2000` aggregate, high/complement/early/late components,
   and the `501..2000` dominance gap all have explicit gates.
@@ -164,8 +191,9 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 
 ### P1: Proof-Hardening And Audit Items
 
-- Harden the most important finite certificate rows with interval, rational,
-  or exact-integer safeguards.
+- Continue hardening the post-prefix `h>=501` interval families; the complete
+  `h<=500` family is now independently rational/outward-rounded through a
+  theorem-safe 37.27-bit threshold.
 - If the RM/EBCH theorem must be promoted from checked finite numerical
   certificate to fully formal computer-assisted theorem, replace the floating
   logarithmic row arithmetic in the manifest ledger by outward-rounded

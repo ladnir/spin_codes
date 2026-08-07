@@ -10,6 +10,8 @@
       "RM direct-sum low-weight outer coefficients",
       "RM support floor and first support gap",
       "dominant h=32 peak placement numerator/denominator",
+      "dominant h=32 rational Chernoff and peak cross multiplication",
+      "ultra-late prefix exact rational sum and cross multiplication",
       "prefix placement-ratio cross multiplication"
     ],
     "focused_numerical_recomputations": [
@@ -18,10 +20,11 @@
     "focused_threshold_checks": [
       "dominant prefix peak-to-family inflation",
       "exact ultra-late prefix contribution",
-      "h>=501 post-prefix aggregate contribution"
+      "h>=501 post-prefix aggregate contribution",
+      "outward-safe theorem exponent for the final ledger total"
     ],
     "level": "checked finite numerical certificate",
-    "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
+    "remaining_formalization": "replace the remaining floating logarithmic row-family arithmetic by interval, rational, or exact-integer upper bounds",
     "tolerance": 5e-06
   },
   "checks": {
@@ -236,6 +239,50 @@
       "status": "PASS",
       "term_log2": -37.38576684234531,
       "threshold_log2": -37.38575
+    },
+    "dominant_peak_rational_upper_bound": {
+      "arithmetic": "exact integers and fractions, with one outward dyadic ceiling",
+      "interpretation": "Independent rational upper bound for the dominant h=32 row. The EBCH split law, finite termination endpoint, RM coefficient, placement probability, and final threshold comparison use exact integer/fraction arithmetic; the rational Chernoff survival value is rounded upward to an explicit dyadic.",
+      "peak_upper_bound": {
+        "cross_multiply_slack_bits": 981,
+        "cross_multiply_status": "PASS",
+        "exact_denominator_bits": 987,
+        "exact_numerator_bits": 949,
+        "log2_for_display": -37.38576668693031,
+        "threshold_denominator_power_of_two": 43,
+        "threshold_log2_for_display": -37.38529015588479,
+        "threshold_numerator": 49
+      },
+      "rational_chernoff": {
+        "episode_max": 8,
+        "inner_log2_for_display": -20.011734737230427,
+        "one_episode_log2_for_display": -58.0,
+        "survival_dyadic_bits": 96,
+        "survival_dyadic_numerator": 74945776319462049292248,
+        "survival_log2_for_display": -20.01173473723574,
+        "termination_tail_bound": "sum_{e=1}^8 C(H+1,e) 2^(-63e)",
+        "termination_tail_log2_for_display": -58.0,
+        "z_denominator": 2373,
+        "z_numerator": 2333
+      },
+      "selector": {
+        "bucket_T": 5949,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "outer_weight": 32,
+        "remaining_ones": 31
+      },
+      "status": "PASS",
+      "termination_atom": {
+        "T_min": 5949,
+        "cross_multiply_status": "PASS",
+        "exact_denominator_bits": 1007,
+        "exact_log2_for_display": -63.89264922044356,
+        "exact_numerator_bits": 943,
+        "finite_prefix_h_max": 499,
+        "rational_upper_bound": "1/2^63"
+      }
     },
     "dominant_prefix_inflation": {
       "interpretation": "Thresholded audit that the dominant peak row controls the entire exact-RM-reweighted prefix family.",
@@ -880,6 +927,67 @@
         31
       ]
     },
+    "fullsplit_h500_complete_rational": {
+      "component_log2_for_display": {
+        "buckets": [
+          -37.381216379067155,
+          -77.445628975217,
+          -80.509630682639,
+          -80.12173097197683,
+          -81.69474681791598,
+          -82.91104632997758
+        ],
+        "episode_tails": -275.9709618598881,
+        "explicit_episode_total": -37.381216379065336,
+        "ultra_late": -41.11344193409059
+      },
+      "exact_split": {
+        "chernoff_z": "2333/2373",
+        "crossing": 5923,
+        "mgf_log2_for_display": -0.7814899180576731,
+        "termination_cap": "2^-63",
+        "termination_exact_log2_for_display": -63.89264922044356
+      },
+      "interpretation": "Complete h<=500 first-active certificate with exact RM coefficients, exact placement sums, exact or outward-rounded EBCH episode bounds, outward-rounded tail coverage, and an integer proof that 6793/2^50 <= 2^-37.27.",
+      "outward_dyadic": {
+        "bits": 1024,
+        "gap_sums_sha256": "7a32dcccc6e67dad804a9f3be42eda4115cd579104653877cb4c7e790c05c784",
+        "inner_bounds_sha256": "81845a5e71ba187418b6bcd7f1a621d974b01661e2bcf6a13a669dbcdc2905c9"
+      },
+      "rational_total": {
+        "cross_multiply_slack_bits": 9145,
+        "cross_multiply_status": "PASS",
+        "log2_for_display": -37.276548513005764,
+        "threshold_at_least_37_27_bits_exact_status": "PASS",
+        "threshold_denominator_power_of_two": 50,
+        "threshold_log2_for_display": -37.27016686115164,
+        "threshold_numerator": 6793
+      },
+      "recompute_commands": {
+        "gap_sums": "python scripts\\certify_fullsplit_h500_rational.py --recompute-gap-sums",
+        "inner_bounds": "python scripts\\certify_fullsplit_h500_rational.py --recompute-inner-bounds"
+      },
+      "scope": {
+        "early_episode_terms": "e=0..16",
+        "gap_buckets": [
+          "1--4000@T5949",
+          "4001--8000@T9949",
+          "8001--12000@T13949",
+          "12001--17000@T17949",
+          "17001--22000@T22949",
+          "22001--26819@T27949"
+        ],
+        "live_outer_weights": 114,
+        "outer_weight_range": [
+          1,
+          500
+        ],
+        "prefix_episode_terms": "e=0..8",
+        "tails": "prefix e>=9; early e>=17",
+        "ultra_late": "T<5949"
+      },
+      "status": "PASS"
+    },
     "high_feasible_min_T": {
       "buckets": [
         {
@@ -1270,6 +1378,23 @@
         "split_max_log2": -41.11,
         "total_max_log2": -41.11
       }
+    },
+    "late_prefix_exact_rational": {
+      "arithmetic": "exact integer binomial coefficients and fractions",
+      "cross_multiply_slack_bits": 6381,
+      "cross_multiply_status": "PASS",
+      "exact_denominator_bits": 6385,
+      "exact_numerator_bits": 6344,
+      "h_range": [
+        1,
+        500
+      ],
+      "interpretation": "Exact rational sum of A_h C(b*late_blocks,h)/C(N,h) over every supported RM direct-sum weight through h=500.",
+      "live_rows": 114,
+      "log2_for_display": -41.11344193409059,
+      "status": "PASS",
+      "threshold": "1/2^41",
+      "threshold_log2": -41.0
     },
     "postprefix_h501_plus_thresholds": {
       "interpretation": "Thresholded audit for the h>=501 row-family aggregate. The 501..2000 all-episode CSV aggregate dominates the h>=501 remainder; all other post-prefix and high-weight covers are far below it.",
@@ -2618,6 +2743,8 @@
   "totals": {
     "complement_interval_1048577_2097152_total_log2": -35150.097366,
     "current_checked_ledger_margin_bits": 37.27852762602124,
+    "current_checked_ledger_theorem_safe_log2": -37.2785,
+    "current_checked_ledger_theorem_safe_margin_bits": 37.2785,
     "current_checked_ledger_total_log2": -37.27852762602124,
     "early_32_500_all_e_exact_outer_log2": -86.91045616174831,
     "early_accelerated_75001_1048576_total_log2": -1056.187188,

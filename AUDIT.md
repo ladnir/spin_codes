@@ -14,8 +14,8 @@ The current finite ledger reports
 
 ```text
 log2 mu_finite <= -37.383345
-log2 mu_late_plus_window <= -37.278528
-log2 mu_32_500_all_first_active_positions <= -37.278528
+log2 mu_late_plus_window <= -37.2785
+log2 mu_32_500_all_first_active_positions <= -37.2785
 ```
 
 These values use exact RM direct-sum outer coefficients for the `h <= 500`
@@ -314,6 +314,42 @@ polynomial statement rather than a floating Cauchy-envelope observation.
 The old adjacent `h=33,34,...` ridge below is a useful diagnostic for the
 smoothed Cauchy outer envelope, but it is not the current bottleneck once the
 exact RM direct-sum support is used.
+
+### Complete rational/outward `h <= 500` certificate
+
+The default verifier now also runs an independent certificate for every
+first-active position through `h=500`.  It uses exact RM direct-sum
+coefficients and exact placement sums.  At the six knots
+`5949,9949,13949,17949,22949,27949`, the EBCH split law is rational, the
+termination atom is certified below `2^-63`, and the fixed-pole Chernoff
+envelope (`z=2333/2373`) is rounded upward at 1024 dyadic bits.  The first
+three buckets retain `e=0..8`; the early three retain `e=0..16`; exact/outward
+tails cover `e>=9` and `e>=17`, respectively.  The ultra-late prefix remains
+an exact rational sum.
+
+```text
+fullsplit_h500_complete_rational_status,PASS
+fullsplit_h500_complete_rational_log2,-37.276548513006
+fullsplit_h500_complete_rational_threshold,6793/2^50
+fullsplit_h500_complete_rational_threshold_log2,-37.270166861152
+fullsplit_h500_complete_rational_37_27_bits_status,PASS
+```
+
+The displayed logarithms are diagnostics.  The final gate is exact cross
+multiplication against `6793/2^50`, and `6793^100 <= 2^1273` proves this
+threshold is at most `2^-37.27` using integers only.  The cached exact/outward
+tables are SHA-256 protected in the default pass; their complete regeneration
+commands are sequential:
+
+```powershell
+python scripts\certify_fullsplit_h500_rational.py --recompute-gap-sums
+python scripts\certify_fullsplit_h500_rational.py --recompute-inner-bounds
+python scripts\certify_fullsplit_h500_rational.py
+```
+
+The canonical artifacts are
+`scripts/fullsplit_h500_gap_sums_exact.json` and
+`scripts/fullsplit_h500_inner_bounds_dyadic.json`.
 
 Smoothed-outer ridge decomposition:
 
@@ -1262,8 +1298,10 @@ Currently checkable:
 - the paper-facing current finite checkpoint `cor:fullsplit-current-finite-checkpoint`, which combines the checked
   small-prefix and post-prefix row families
 - the paper-facing finite first-moment theorem `thm:fullsplit-rm-finite-certificate-009`, which states
-  `E[Z_d] <= 2^-37.278528` for `N=2^21`, `delta=.09`, and `d=floor(.09 N)=188743`, hence
-  `Pr[d_min <= d] <= 2^-37.278528`
+  `E[Z_d] <= 2^-37.2785` for `N=2^21`, `delta=.09`, and `d=floor(.09 N)=188743`, hence
+  `Pr[d_min <= d] <= 2^-37.2785`.  The verifier's `-37.278528` line is a
+  nearest-six-decimal diagnostic for the unrounded `-37.278527626...`; it is
+  not used as the direction-sensitive theorem exponent.
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
@@ -1288,7 +1326,8 @@ Still proof debt:
   exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide which command-reproducible rows should eventually be regenerated into smaller checked artifacts, versus kept as
   interval-helper commands inside the JSON manifest
-- add interval-arithmetic or rational/integer safeguards for the most important numerical bounds
+- extend rational/integer safeguards from the now-complete `h<=500` family to
+  the post-prefix interval families
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 - before any BCH-like outer row becomes theorem text, replace the random-like spectrum projection with an exact local
