@@ -302,6 +302,8 @@ The verifier reports:
 - `current_checked_ledger_margin_bits,37.278528`
 - diagnostic `fullsplit_h500_complete_rational_log2,-37.276548513006`
 - exact cross-multiplied threshold `6793/2^50 <= 2^-37.27`
+- diagnostic `fullsplit_postprefix_complete_rational_log2_upper,-183.800029543464`
+- outward/rational post-prefix threshold `2^-180`
 - dominant row `outer_weight=32, first_r=1, gap=1..4000`.
 
 Main-paper role:
@@ -397,6 +399,11 @@ Status: current main finite certificate.
   exact/outward-rounded rational bound with diagnostic logarithm
   `-37.276548513006`, closed by exact cross multiplication against
   `6793/2^50 <= 2^-37.27`.
+- Independently, every `h>=501` first-active position has an exact-rational and
+  outward-rounded interval certificate with diagnostic upper logarithm
+  `-183.800029543464`, closed against the theorem-safe threshold `2^-180`.
+  Its cached artifact also records the exact `2^-62` turnoff gate and 56 exact
+  endpoint-in-`T` monotonicity checks.
 - Dominant mode: outer `h=32`, first active occupancy `r=1`, near late window
   `gap=1..4000`.
 

@@ -8,7 +8,7 @@ The intended audit target is narrow:
 - finite checkpoint: `N = 2^21`, relative distance `delta = 0.09`, `d = floor(delta N) = 188743`
 - outer model: direct sum of `4096` copies of the binary `RM(4,9)` block code, i.e. local `[512,256,32]`
 - inner model: full-codeword random-split dense recursive inner with block size `b = 64`, using the EBCH `[128,64]` weight distribution
-- quantity being certified: a first-moment upper bound for the currently isolated dense+dense contribution, with full first-active-position coverage for `32 <= h <= 500`, checked ultra-late post-prefix rows through the placement cutoff, checked early rows through `h = N/2`, complement-high rows above `N/2`, and late-window coverage beyond the small prefix
+- quantity being certified: a first-moment upper bound for the currently isolated dense+dense contribution, with full first-active-position coverage for `32 <= h <= N`; independent rational/outward artifacts cover `h <= 500` and every `h >= 501` post-prefix family
 
 The current finite ledger reports
 
@@ -27,7 +27,11 @@ post-prefix ultra-late table covers `501 <= h <= 380736` with
 `log2 <= -545.690526`, the checked early post-prefix tables cover
 `501 <= h <= N/2` with `log2 <= -380.829185` to displayed precision, and the
 complement-high table covers `N/2 < h <= N`.
-It is not yet a polished global theorem.
+An independent rational/outward post-prefix certificate now replaces those
+floating table values as the hardened bound: it gives a diagnostic upper
+logarithm `-183.800029543464` and passes the theorem-safe threshold `2^-180`.
+The sharper overall `-37.2785` statement remains the checked floating-ledger
+headline rather than a combined rational threshold.
 
 ## Construction Under Audit
 
@@ -350,6 +354,33 @@ python scripts\certify_fullsplit_h500_rational.py
 The canonical artifacts are
 `scripts/fullsplit_h500_gap_sums_exact.json` and
 `scripts/fullsplit_h500_inner_bounds_dyadic.json`.
+
+### Complete rational/outward `h >= 501` certificate
+
+Every remaining first-active-position family is independently recertified from
+exact rational combinatorial inputs and directed outward logarithmic intervals.
+The certificate covers the critical `501..2000` rows, ultra-late placement,
+prefix cap, prefix fixed-`T` and paired-`T` episode rows, early fixed-`T` and
+paired-`T` rows, and the complement-high range through `h=N`.  It checks the
+global turnoff envelope against `2^-62` by exact rational arithmetic and checks
+56 endpoint-in-`T` monotonicity reductions exactly.
+
+```text
+fullsplit_postprefix_complete_rational_status,PASS
+fullsplit_postprefix_complete_rational_log2_upper,-183.800029543464
+fullsplit_postprefix_complete_rational_threshold,2^-180
+```
+
+The logarithm is a diagnostic outward upper endpoint; the theorem-facing gate
+is `2^-180`.  The default verifier authenticates the cached artifact by SHA-256.
+Full regeneration is sequential and takes roughly two minutes on the reference
+machine:
+
+```powershell
+python scripts\certify_fullsplit_postprefix_rational.py --recompute-artifact
+```
+
+The canonical artifact is `scripts/fullsplit_postprefix_rational.json`.
 
 Smoothed-outer ridge decomposition:
 
@@ -1326,8 +1357,8 @@ Still proof debt:
   exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide which command-reproducible rows should eventually be regenerated into smaller checked artifacts, versus kept as
   interval-helper commands inside the JSON manifest
-- extend rational/integer safeguards from the now-complete `h<=500` family to
-  the post-prefix interval families
+- if a single rational theorem headline is desired, combine the independent
+  `h<=500` and `h>=501` thresholds with a direction-safe final comparison
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 - before any BCH-like outer row becomes theorem text, replace the random-like spectrum projection with an exact local

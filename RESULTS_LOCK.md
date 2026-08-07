@@ -131,6 +131,10 @@ Verification status:
   - `fullsplit_h500_complete_rational_status,PASS`
   - complete rational/outward `h<=500` diagnostic log `-37.276548513006`
   - exact threshold `6793/2^50 <= 2^-37.27`
+  - `fullsplit_postprefix_complete_rational_status,PASS`
+  - complete rational/outward `h>=501` diagnostic upper log
+    `-183.800029543464`
+  - theorem-safe post-prefix threshold `2^-180`
   - dominant row `outer_weight=32, first_r=1, gap=1..4000`
 
 Canonical artifacts:
@@ -141,6 +145,8 @@ Canonical artifacts:
 - `scripts/certify_fullsplit_h500_rational.py`
 - `scripts/fullsplit_h500_gap_sums_exact.json`
 - `scripts/fullsplit_h500_inner_bounds_dyadic.json`
+- `scripts/certify_fullsplit_postprefix_rational.py`
+- `scripts/fullsplit_postprefix_rational.json`
 - `scripts/fullsplit_piecewise_h32_500_csv.csv`
 - `scripts/fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv`
 - `scripts/fullsplit_piecewise_h501_2000_eall_hsummary.csv`
@@ -227,9 +233,10 @@ Do not promote these to proved claims until resolved:
 - Replace BCH/random-like projection spectra with exact spectra or rigorous
   low-weight envelopes.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
-- Continue rational/interval hardening of the `h>=501` interval families.
-  The complete `h<=500` prefix-family inflation and all first-active positions
-  now have an independent 37.27-bit rational/outward certificate.
+- The rational/interval hardening now covers every `h>=501` interval family as
+  well as the complete `h<=500` family.  If a single formal headline is wanted,
+  combine those two independent bounds with a direction-safe final threshold;
+  do not silently reuse the sharper floating-ledger exponent.
 - Clarify the full-split construction definition and boundary convention so
   all scripts visibly evaluate the same object.
 - Decide whether finite exact-support prefix lemmas should remain finite

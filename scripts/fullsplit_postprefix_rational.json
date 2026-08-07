@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "arithmetic": "exact rationals plus outward Decimal log2 intervals",
+  "decimal_precision": 100,
+  "exact_global_turnoff": {
+    "status": "PASS",
+    "threshold": "2^-62",
+    "log2_for_display": -62.407875819071386
+  },
+  "exact_t_monotonicity": {
+    "status": "PASS",
+    "rows": 56
+  },
+  "components": {
+    "critical_501_2000": {
+      "h_min": 501,
+      "h_max": 2000,
+      "live_outer_weights": 375,
+      "cap_exact_log2_upper": -191.345924830002,
+      "episode_bucket_log2_upper": [
+        -189.70692014007233,
+        -326.40523717089997,
+        -336.27960414744376,
+        -413.71591454839773,
+        -445.65735199875996
+      ],
+      "total_log2_upper": -187.12195763935117,
+      "threshold_shift": 180,
+      "status": "PASS"
+    },
+    "late_placement": {
+      "interval_log2_upper": [
+        -545.6846551866843,
+        -2237.5875424913634,
+        -8919.154851852236,
+        -23772.755936362813,
+        -93856.0264341808,
+        -210536.52242475306,
+        -417970.8909127611
+      ],
+      "total_log2_upper": -542.8773002646267,
+      "threshold_shift": 500,
+      "z_numerator": 19802992971729713,
+      "z_denominator": 50000000000000000,
+      "status": "PASS"
+    },
+    "complement_high": {
+      "interval_log2_upper": [
+        -128921.86639915299,
+        -124896.2024079595,
+        -113716.90830611979,
+        -35156.64801936078,
+        -524634.9169498244,
+        -894137.9475196842,
+        -893417.0885931727
+      ],
+      "total_log2_upper": -35153.84066443872,
+      "threshold_shift": 30000,
+      "pole_numerator": 1,
+      "pole_denominator": 10,
+      "status": "PASS"
+    },
+    "early_endpoint": {
+      "interval_log2_upper": [
+        -827.8646502769273,
+        -3691.813869427,
+        -8595.097952689874,
+        -21312.12421600175,
+        -34828.97292751554,
+        -28555.98356908114,
+        -22131.323220541748,
+        -1037.918151736606,
+        -10343.333451745299,
+        -34818.63848816251,
+        -54651.383667390204,
+        -82353.02531118268
+      ],
+      "total_log2_upper": -824.2796877762061,
+      "threshold_shift": 400,
+      "status": "PASS"
+    },
+    "early_paired": {
+      "interval_log2_upper": [
+        -181214.44515669157,
+        -194564.4420981521,
+        -85277.3787642579
+      ],
+      "total_log2_upper": -85275.79380175719,
+      "threshold_shift": 80000,
+      "pole_numerator": 10573069,
+      "pole_denominator": 78125000,
+      "status": "PASS"
+    },
+    "prefix_cap": {
+      "interval_log2_upper": [
+        -738.0141592783539,
+        -3028.9975917440674,
+        -8182.652051962594,
+        -33402.44452616965,
+        -155897.47334683375,
+        -271552.60700607265,
+        -346818.2260996341,
+        -435308.0119432849,
+        -671755.0980539513
+      ],
+      "total_log2_upper": -734.8442342769115,
+      "threshold_shift": 700,
+      "status": "PASS"
+    },
+    "prefix_endpoint": {
+      "interval_log2_upper": [
+        -562.0783223040773,
+        -2636.127373026011,
+        -6004.350104848925,
+        -12822.99227694642,
+        -69176.2112389419
+      ],
+      "total_log2_upper": -559.75639420919,
+      "threshold_shift": 500,
+      "status": "PASS"
+    },
+    "prefix_paired_rho1": {
+      "interval_log2_upper": [
+        -140665.8870564692,
+        -189935.68596675576,
+        -228038.56678820867,
+        -274319.128937399
+      ],
+      "total_log2_upper": -140663.8870564692,
+      "threshold_shift": 100000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    },
+    "prefix_paired_rho2": {
+      "interval_log2_upper": [
+        -262925.05853533803
+      ],
+      "total_log2_upper": -262925.05853533803,
+      "threshold_shift": 200000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    },
+    "prefix_paired_rho3": {
+      "interval_log2_upper": [
+        -285391.8107788577,
+        -325447.51686520653,
+        -483419.8206726677,
+        -642305.2423472451
+      ],
+      "total_log2_upper": -285389.8107788577,
+      "threshold_shift": 200000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    }
+  },
+  "complete": {
+    "h_min": 501,
+    "h_max": 2097152,
+    "component_count": 10,
+    "total_log2_upper": -183.8000295434638,
+    "threshold_shift": 180,
+    "coverage": [
+      "501--2000: all non-ultra-late first-active positions",
+      "501--380736: ultra-late placement",
+      "2001--636736: prefix cap bucket",
+      "2001--350000: prefix fixed-T episode buckets",
+      "350001--1048576: prefix paired-T episode buckets",
+      "2001--350000: early fixed-T buckets",
+      "350001--1048576: early paired-T buckets",
+      "1048577--2097152: complement-high all-T cover"
+    ],
+    "status": "PASS"
+  },
+  "sha256": "ef38cea5f937b62a175e94b9691308c99a9adb3408778c8650e31b3e387c60e6"
+}

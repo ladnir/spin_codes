@@ -49,19 +49,19 @@ placement probability are exact fractions; a rational Chernoff bound is
 rounded upward to an explicit dyadic; and the final peak comparison is exact
 integer cross multiplication.  Some heavier interval families are treated as
 command-reproducible manifest rows in the default pass rather than regenerated
-every time; the
-verifier exposes opt-in flags to recompute the high, complement-high, early
+every time; the verifier exposes opt-in flags to recompute the high, complement-high, early
 post-prefix, early-accelerated, and ultra-late post-prefix interval rows.
 The tracked report
 \texttt{scripts/fullsplit\_interval\_recompute\_audit.md} records one full
 opt-in regeneration of those interval families: all 45 recomputed rows pass as
 upper bounds against the stored ledger values.  Negative recomputation deltas
 are safer than the stored manifest constants and are not failures.
-The remaining hardening step, before treating the ledger as a fully formal
-computer-assisted proof, is to replace the remaining floating logarithmic row
-arithmetic by interval, rational, or exact-integer upper bounds, and to store or require
-full regeneration of those heavier interval rows if desired.  In the present
-paper this is the intended status of the word ``checked.''
+Independently of those legacy floating rows, a SHA-256-protected artifact now
+certifies every \(h\ge501\) family using exact rational combinatorial inputs
+and directed outward logarithmic intervals.  Full regeneration is available
+through the artifact's recorded command.  The sharper aggregate exponent below
+remains the checked floating-ledger value; the independent rational
+certificates use their own direction-safe thresholds.
 
 The finite certificate input data are
 \[
@@ -86,7 +86,7 @@ the post-prefix row cover.  The paper-facing values are
 \hline
 \text{minimum positive outer weight} & 32\\
 \text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.2785\\
-\text{checked row families for }h\ge501 & \log_2\mu\le -182.259739\\
+\text{rational/outward row families for }h\ge501 & \log_2\mu\le -180\\
 \text{total checked first moment} & \log_2\mu\le -37.2785 .
 \end{array}
 \]
@@ -146,14 +146,18 @@ complete low-weight rational upper bound has diagnostic logarithm
 Exact integer cross multiplication proves that this total is at most
 \(6793/2^{50}\); raising to the hundredth power gives
 \(6793^{100}\le2^{1273}\), hence \(6793/2^{50}\le2^{-37.27}\).
-over all 114 supported weights and proves by integer cross multiplication that
-it is at most \(2^{-41}\).  The logarithmic value \(-41.113442\) is retained
-only as a readable report of that exact fraction.
 For the \(h\ge501\) row families, the verifier also applies explicit
-thresholds to the component totals.  The aggregate remains below
-\(-182.25\), is dominated by the \(501\le h\le2000\) all-episode CSV family,
-and every other high/post-prefix component is at least \(198.0\) bits below
-that family.
+thresholds to ten rational/outward component totals.  Exact rational checks
+cover the EBCH split law, the global turnoff envelope below \(2^{-62}\), the
+fixed-pole MGFs, adjacent-ratio peak locations, and 56 endpoint-in-\(T\)
+monotonicity reductions.  Directed outward base-two logarithms at decimal
+precision 100 give the diagnostic aggregate upper bound
+\(-183.800029543464\); the theorem-facing comparison uses the looser threshold
+\(2^{-180}\).  This covers the critical \(501\ldots2000\) rows, ultra-late
+placement, prefix cap and episode rows, early endpoint and paired rows, and the
+complement-high range through \(h=N\).  The default verifier authenticates
+\texttt{scripts/fullsplit\_postprefix\_rational.json}; its recorded
+regeneration command recomputes the complete artifact.
 
 \begin{theorem}[Checked finite RM/full-split first-moment certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}

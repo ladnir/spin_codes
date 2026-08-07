@@ -110,11 +110,11 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   (`T=B-i+1` from the first active block), the `late_blocks=5949` split, and
   the unconstrained terminal-state convention in both paper prose and manifest
   metadata.
-- The finite certificate now states its current audit level: exact integer
-  RM-prefix support checks and exact prefix-ratio cross multiplication are
-  combined with manifest-tolerance floating logarithmic row totals.  This is
-  the intended meaning of a checked finite numerical certificate until interval
-  or rational hardening is added.
+- The finite certificate states its audit layers explicitly.  The legacy
+  manifest total still re-sums floating logarithmic rows within stored
+  tolerances, while independent exact/rational and outward-rounded artifacts
+  now cover both the complete `h<=500` family and every `h>=501` post-prefix
+  family.
 - The finite manifest now gives explicit `PASS` status fields for the exact
   RM support check, the prefix interior audit, and the prefix placement-ratio
   certificate, rather than leaving those checks implicit in successful
@@ -171,9 +171,15 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   exact rational `6793/2^50`; the integer inequality
   `6793^100 <= 2^1273` proves it is at most `2^-37.27` without evaluating a
   transcendental logarithm.
-- The `h>=501` post-prefix aggregate is now a thresholded verifier check:
-  the total, the `501..2000` aggregate, high/complement/early/late components,
-  and the `501..2000` dominance gap all have explicit gates.
+- The complete `h>=501` post-prefix aggregate now has an independent
+  rational/outward-rounded certificate.  Exact rational arithmetic handles the
+  EBCH split law, MGFs, turnoff envelope, adjacent-ratio peak locations, and 56
+  endpoint-in-`T` monotonicity checks.  Decimal logarithms are evaluated with
+  directed outward rounding at precision 100.  The diagnostic aggregate upper
+  logarithm is `-183.800029543464`, and the theorem-facing gate is `2^-180`.
+  The default verifier validates the SHA-256-protected artifact; full
+  regeneration is available with
+  `python scripts\certify_fullsplit_postprefix_rational.py --recompute-artifact`.
 - The RM/EBCH finite result is stated as a manifest-backed checked first
   moment, with BCH rows separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
@@ -191,13 +197,11 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 
 ### P1: Proof-Hardening And Audit Items
 
-- Continue hardening the post-prefix `h>=501` interval families; the complete
-  `h<=500` family is now independently rational/outward-rounded through a
-  theorem-safe 37.27-bit threshold.
-- If the RM/EBCH theorem must be promoted from checked finite numerical
-  certificate to fully formal computer-assisted theorem, replace the floating
-  logarithmic row arithmetic in the manifest ledger by outward-rounded
-  interval bounds or exact rational/integer inequalities.
+- If the RM/EBCH theorem is promoted from a checked finite numerical
+  certificate to a single fully formal computer-assisted theorem statement,
+  combine the independent `h<=500` rational certificate and the `h>=501`
+  outward certificate into one direction-safe published threshold.  The sharper
+  `2^-37.2785` headline remains the legacy checked-log ledger value.
 - For a fully formal audit packet, store raw regenerated interval artifacts or
   make the canonical verifier require the full opt-in recomputation pass under
   outward-rounded interval arithmetic.

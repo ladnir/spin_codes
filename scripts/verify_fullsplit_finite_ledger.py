@@ -28,6 +28,7 @@ from check_fullsplit_T_monotonicity import (
 )
 from certify_prefix_placement_ratio import certify_placement_ratio
 from certify_fullsplit_h500_rational import certify as certify_fullsplit_h500_rational
+from certify_fullsplit_postprefix_rational import load_artifact as load_postprefix_rational_artifact
 from fast_fullsplit_episode_e01 import (
     episode_terms_log2 as fast_episode_terms_log2,
     precompute_gap_suffix_logsum as fast_precompute_gap_suffix_logsum,
@@ -2383,6 +2384,11 @@ def main() -> int:
         type=Path,
         default=ROOT / "fullsplit_h500_inner_bounds_dyadic.json",
     )
+    parser.add_argument(
+        "--postprefix-rational-artifact",
+        type=Path,
+        default=ROOT / "fullsplit_postprefix_rational.json",
+    )
     parser.add_argument("--exact-outer-blocks", type=int, default=4096)
     parser.add_argument("--exact-outer-h-max", type=int, default=500)
     parser.add_argument("--N", type=int, default=2**21)
@@ -3138,6 +3144,48 @@ def main() -> int:
             "Complete h<=500 first-active certificate with exact RM coefficients, exact "
             "placement sums, exact or outward-rounded EBCH episode bounds, outward-rounded tail "
             "coverage, and an integer proof that 6793/2^50 <= 2^-37.27."
+        ),
+    }
+    postprefix_rational = load_postprefix_rational_artifact(args.postprefix_rational_artifact)
+    postprefix_complete = postprefix_rational["complete"]
+    assert isinstance(postprefix_complete, dict)
+    print("fullsplit_postprefix_complete_rational_status,PASS")
+    print(
+        "fullsplit_postprefix_complete_rational_log2_upper,"
+        f"{float(postprefix_complete['total_log2_upper']):.12f}"
+    )
+    print(
+        "fullsplit_postprefix_complete_rational_threshold,"
+        f"2^-{postprefix_complete['threshold_shift']}"
+    )
+    print(
+        "fullsplit_postprefix_complete_rational_artifact_sha256,"
+        f"{postprefix_rational['sha256']}"
+    )
+    manifest["checks"]["fullsplit_postprefix_complete_rational"] = {  # type: ignore[index]
+        "status": "PASS",
+        "artifact": manifest_path(args.postprefix_rational_artifact),
+        "artifact_sha256": postprefix_rational["sha256"],
+        "arithmetic": postprefix_rational["arithmetic"],
+        "decimal_precision": postprefix_rational["decimal_precision"],
+        "exact_global_turnoff": postprefix_rational["exact_global_turnoff"],
+        "exact_t_monotonicity": postprefix_rational["exact_t_monotonicity"],
+        "coverage": postprefix_complete["coverage"],
+        "h_range": [postprefix_complete["h_min"], postprefix_complete["h_max"]],
+        "component_count": postprefix_complete["component_count"],
+        "component_bounds": postprefix_rational["components"],
+        "total": {
+            "log2_upper": postprefix_complete["total_log2_upper"],
+            "threshold": f"2^-{postprefix_complete['threshold_shift']}",
+            "threshold_status": "PASS",
+        },
+        "recompute_command": (
+            "python scripts\\certify_fullsplit_postprefix_rational.py --recompute-artifact"
+        ),
+        "interpretation": (
+            "Complete h>=501 first-active cover using exact rational poles, exact RM/GF "
+            "inputs, exact turnoff and T-monotonicity checks, and 100-digit outward "
+            "Decimal log2 intervals. BCH projection rows remain heuristic and separate."
         ),
     }
     check_close("late_prefix_T_lt_5949_exact_outer", exact_late_prefix.total_log2, -41.113442, args.tolerance)
