@@ -1,6 +1,6 @@
 # Exact EBCH-128 block-outer certificate
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 This is a separate exact certificate lane for the finite full-split
 construction.  It replaces the direct sum of 4096 `RM(4,9) [512,256,32]`
@@ -19,19 +19,44 @@ The regenerated rational/outward artifact reports:
 
 | Family | Diagnostic log2 upper bound | Theorem-safe gate |
 |---|---:|---:|
-| `1 <= h <= 500` | `-19.775758215947` | `19/2^24` |
+| `1 <= h <= 500` | `-20.805420115939` | `588/2^30` |
 | `501 <= h <= N` | `-50.102265480007` | `2^-50` |
-| complete | `-19.775758214875` | `1275068417/2^50 <= 2^-19.75` |
+| complete | `-20.805420113752` | `616562689/2^50 <= 2^-20.80` |
+| random codimension-20 subcode | `-40.805420113752` | `616562689/2^70 <= 2^-40.80` |
 
 Thus the same first-moment argument proves that some realization is a binary
 `[2^21,2^20,d_min >= 188744]` code when this outer is used.  The smaller
-block size loses about 17.5 bits of certificate margin relative to the frozen
-RM-512 row, but it remains far below one.
+block size has 20.80 theorem-safe bits of full-dimension margin.  Independently
+choosing a uniformly random codimension-20 outer subcode multiplies every
+nonzero-word first-moment row by less than `2^-20`.  It therefore proves the
+stronger-margin existence statement
+`[2^21,1048556,d_min >= 188744]` with 40.80 theorem-safe bits.
 
 The initially positive bounds for the critical and post-prefix windows were
 pole-choice slack.  After rational pole retuning, the limiting post-prefix
 component is the exact `h=501..2000` cap at `-53.424193575894`; the limiting
 overall component is the exact/outward `h<=500` family.
+
+The low-weight improvement subdivides the first 4000-block gap bucket into
+250-block rational subbuckets for weights through 150.  The remaining weights
+retain the previous coarser upper bound.  This changes the first bucket from
+`-20.7464` to `-33.1587`; the exact ultra-late sum at `-20.8057` then becomes
+the full-dimension bottleneck.
+
+## Why full dimension cannot reach 40 bits in this ensemble
+
+The artifact also contains a lower-bound audit.  The weight-22 outer words
+whose permuted support lies in the final 4000 inner blocks have placement
+expectation `2^-34.858313...`.  Conditional on this event, the expected output
+weight is at most 4000 times the exact per-live-block mean.  Markov's
+inequality gives conditional probability at least `0.321832747...` that the
+output weight is at most 188743.  Consequently this family alone contributes
+more than `2^-36.493931` to the actual first moment.
+
+Therefore no upper-bound cleanup can give the unchanged full-dimension,
+uniform-interleaver ensemble 40 bits.  The codimension-20 result is a genuine
+expurgation step, not merely more favorable reporting.  Its rate loss is only
+20 dimensions out of `2^20`.
 
 ## Reproduction
 

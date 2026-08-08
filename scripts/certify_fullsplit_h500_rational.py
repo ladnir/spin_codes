@@ -324,6 +324,22 @@ def generate_gap_sums(*, b: int, h_max: int) -> list[list[int]]:
     return totals
 
 
+def generate_gap_sum_range(
+    *, gap_min: int, gap_max: int, b: int, h_max: int, late_blocks: int
+) -> list[int]:
+    """Exact placement sum for one refinement of the first gap bucket."""
+
+    row = [0] * (h_max + 1)
+    for gap in range(gap_min, gap_max + 1):
+        n = b * (late_blocks + gap - 1)
+        choose = 1
+        row[0] += 1
+        for H in range(1, h_max + 1):
+            choose = choose * (n - H + 1) // H
+            row[H] += choose
+    return row
+
+
 def gap_payload(sums: list[list[int]], *, b: int, h_max: int) -> dict[str, object]:
     data = {
         "schema": 1,
@@ -530,6 +546,8 @@ def certify(
     local_dimension: int = 256,
     local_distance: int = 32,
     exact_target_bits_hundredths: int = 3727,
+    near_refinement_h_max: int = 0,
+    near_subbucket_width: int = 0,
 ) -> RationalH500Certificate:
     if (
         h_max != 500
@@ -568,6 +586,38 @@ def certify(
         h_max=h_max - 1,
         bucket_episode_max=bucket_episode_max,
     )
+    refined_near: list[tuple[list[int], list[int]]] = []
+    if near_refinement_h_max or near_subbucket_width:
+        if not (1 <= near_refinement_h_max <= h_max and near_subbucket_width >= 1):
+            raise SystemExit("rational h<=500: invalid near-bucket refinement")
+        refined_coeffs = nonempty_coefficients(
+            b=b, h_max=near_refinement_h_max - 1
+        )
+        gap_min = BUCKETS[0][0]
+        while gap_min <= BUCKETS[0][1]:
+            gap_max = min(BUCKETS[0][1], gap_min + near_subbucket_width - 1)
+            T_min = late_blocks + gap_min - 1
+            refined_near.append(
+                (
+                    generate_gap_sum_range(
+                        gap_min=gap_min,
+                        gap_max=gap_max,
+                        b=b,
+                        h_max=near_refinement_h_max - 1,
+                        late_blocks=late_blocks,
+                    ),
+                    inner_bounds_scaled(
+                        T_min,
+                        b=b,
+                        h_max=near_refinement_h_max - 1,
+                        e_max=episode_max,
+                        termination_shift=termination_shift,
+                        envelope=envelope,
+                        coeffs=refined_coeffs,
+                    ),
+                )
+            )
+            gap_min = gap_max + 1
     scale = 1 << dyadic_bits
     bucket_totals = [Fraction(0) for _ in BUCKETS]
     tail_total = Fraction(0)
@@ -600,11 +650,21 @@ def certify(
         den_h = math.comb(n, h)
         for bucket_index, gap_row in enumerate(gap_sums):
             placement_inner_num = 0
-            for r in range(1, min(b, h) + 1):
-                H = h - r
-                placement_inner_num += (
-                    math.comb(b, r) * gap_row[H] * inner_by_bucket[bucket_index][H]
-                )
+            if bucket_index == 0 and refined_near and h <= near_refinement_h_max:
+                for refined_gap, refined_inner in refined_near:
+                    for r in range(1, min(b, h) + 1):
+                        H = h - r
+                        placement_inner_num += (
+                            math.comb(b, r) * refined_gap[H] * refined_inner[H]
+                        )
+            else:
+                for r in range(1, min(b, h) + 1):
+                    H = h - r
+                    placement_inner_num += (
+                        math.comb(b, r)
+                        * gap_row[H]
+                        * inner_by_bucket[bucket_index][H]
+                    )
             bucket_totals[bucket_index] += Fraction(A_h * placement_inner_num, den_h * scale)
 
         tail_inner_scaled = 0

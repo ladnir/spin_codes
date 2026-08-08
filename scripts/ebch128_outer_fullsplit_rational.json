@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "arithmetic": "exact rationals plus outward Decimal log2 intervals",
   "construction": {
     "N": 2097152,
@@ -273,6 +273,11 @@
       ]
     ]
   },
+  "low_weight_refinement": {
+    "near_refinement_h_max": 150,
+    "near_subbucket_width": 250,
+    "near_subbucket_count": 16
+  },
   "exact_global_turnoff": {
     "status": "PASS",
     "threshold": "2^-62",
@@ -297,20 +302,20 @@
     "local_spectrum_sha256": "26164b40cee431cd24995887ba485563f02048d64fdea00dc86b3d9a4897a94e",
     "inner_spectrum_sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
     "bucket_log2": [
-      -20.746429207553774,
+      -33.15871940767465,
       -60.717182050896554,
       -63.24578134359763,
       -62.812350256554964,
       -64.0155906066675,
       -64.92229087609758
     ],
-    "explicit_episode_log2": -20.746429207551955,
+    "explicit_episode_log2": -33.15871939626504,
     "episode_tail_log2": -144.07261071277208,
     "ultra_late_log2": -20.80569585761714,
-    "total_log2": -19.775758215946553,
-    "threshold_num": 19,
-    "threshold_shift": 24,
-    "threshold_log2": -19.752072486556415,
+    "total_log2": -20.80542011593934,
+    "threshold_num": 588,
+    "threshold_shift": 30,
+    "threshold_log2": -20.800327655163635,
     "threshold_bits_exact_status": "PASS",
     "cross_multiply_slack_bits": 9120
   },
@@ -540,12 +545,31 @@
     "status": "PASS"
   },
   "complete": {
-    "low_weight_log2_upper": -19.775758215946553,
+    "low_weight_log2_upper": -20.80542011593934,
     "postprefix_log2_upper": -50.102265480006906,
-    "diagnostic_total_log2_upper": -19.77575821487507,
-    "exact_threshold": "1275068417/1125899906842624",
-    "certified_bits_hundredths": 1975,
+    "diagnostic_total_log2_upper": -20.805420113751854,
+    "exact_threshold": "616562689/1125899906842624",
+    "certified_bits_hundredths": 2080,
     "status": "PASS"
   },
-  "sha256": "bbfdaa647c01810721c47cce5b765d7e26715e1f01a65deab0d264b1212411ee"
+  "uniform_ensemble_40bit_obstruction": {
+    "outer_weight": 22,
+    "suffix_blocks": 4000,
+    "placement_log2": -34.85831338583959,
+    "conditional_bad_probability_lower": 0.32183274700122916,
+    "contribution_log2_lower": -36.49393035064874,
+    "comparison": "contribution > 2^-40",
+    "status": "PASS"
+  },
+  "expurgated_subcode": {
+    "ambient_dimension": 1048576,
+    "codimension": 20,
+    "subcode_dimension": 1048556,
+    "inclusion_probability_bound": "(2^(K-20)-1)/(2^K-1) < 2^-20",
+    "diagnostic_total_log2_upper": -40.80542011375185,
+    "exact_threshold": "616562689/1180591620717411303424",
+    "certified_bits_hundredths": 4080,
+    "status": "PASS"
+  },
+  "sha256": "ed5be387a9b380ba740a1fdc73f89a2d41b20c08110d708aabedc326c88c3907"
 }

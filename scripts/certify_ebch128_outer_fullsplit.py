@@ -124,6 +124,29 @@ class CompleteCertificate:
     status: str
 
 
+@dataclass(frozen=True)
+class UniformEnsembleObstruction:
+    outer_weight: int
+    suffix_blocks: int
+    placement_log2: float
+    conditional_bad_probability_lower: float
+    contribution_log2_lower: float
+    comparison: str
+    status: str
+
+
+@dataclass(frozen=True)
+class ExpurgatedSubcodeCertificate:
+    ambient_dimension: int
+    codimension: int
+    subcode_dimension: int
+    inclusion_probability_bound: str
+    diagnostic_total_log2_upper: float
+    exact_threshold: str
+    certified_bits_hundredths: int
+    status: str
+
+
 def fraction_text(value: Fraction) -> str:
     return f"{value.numerator}/{value.denominator}"
 
@@ -149,6 +172,52 @@ def build_late_aggregate(local_spectrum_csv: Path) -> LateAggregateCertificate:
         total_log2_upper=total,
         threshold_shift=400,
         exact_union_gate="7 * 2^-405 < 2^-400",
+        status="PASS",
+    )
+
+
+def certify_uniform_40bit_obstruction(
+    local_spectrum_csv: Path,
+) -> UniformEnsembleObstruction:
+    """Lower-bound a bad family, proving the ambient ensemble exceeds 2^-40."""
+
+    spectrum = load_csv_spectrum(
+        local_spectrum_csv,
+        name=LOCAL_NAME,
+        length=128,
+        dimension=64,
+        minimum_distance=22,
+    )
+    nonzero = (1 << 64) - 1
+    mean_output_per_live_block = Fraction(
+        sum(weight * count for weight, count in spectrum), 2 * nonzero
+    )
+    suffix_blocks = 4000
+    target_distance = (9 * (2**21)) // 100
+    conditional_bad = 1 - Fraction(
+        suffix_blocks, target_distance + 1
+    ) * mean_output_per_live_block
+    if conditional_bad <= 0:
+        raise SystemExit("EBCH128 outer: invalid Markov obstruction probability")
+    outer = post.direct_sum_coefficients(
+        post.load_local_spectrum(local_spectrum_csv, 22),
+        blocks=OUTER_BLOCKS,
+        h_max=22,
+    )
+    placement = Fraction(
+        outer[22] * math.comb(64 * suffix_blocks, 22),
+        math.comb(2**21, 22),
+    )
+    contribution = placement * conditional_bad
+    if contribution <= Fraction(1, 1 << 40):
+        raise SystemExit("EBCH128 outer: expected 40-bit obstruction did not hold")
+    return UniformEnsembleObstruction(
+        outer_weight=22,
+        suffix_blocks=suffix_blocks,
+        placement_log2=float(post.log2_fraction(placement).hi),
+        conditional_bad_probability_lower=float(conditional_bad),
+        contribution_log2_lower=float(post.log2_fraction(contribution).lo),
+        comparison="contribution > 2^-40",
         status="PASS",
     )
 
@@ -187,9 +256,11 @@ def recompute(
         local_spectrum_csv=local_spectrum_csv,
         gap_sums_path=DEFAULT_GAP_SUMS,
         inner_bounds_path=DEFAULT_INNER_BOUNDS,
-        threshold_num=19,
-        threshold_shift=24,
-        exact_target_bits_hundredths=1975,
+        threshold_num=588,
+        threshold_shift=30,
+        exact_target_bits_hundredths=2080,
+        near_refinement_h_max=150,
+        near_subbucket_width=250,
         **LOCAL_KWARGS,
     )
     critical = post.certify_critical_window(
@@ -282,9 +353,9 @@ def recompute(
     ]
     post_complete = post.combine_complete_postprefix(post_components, threshold_shift=50)
 
-    full_threshold = Fraction(19, 1 << 24) + Fraction(1, 1 << 50)
-    if (full_threshold.numerator**100) << 1975 > full_threshold.denominator**100:
-        raise SystemExit("EBCH128 outer: combined threshold does not certify 19.75 bits")
+    full_threshold = Fraction(588, 1 << 30) + Fraction(1, 1 << 50)
+    if (full_threshold.numerator**100) << 2080 > full_threshold.denominator**100:
+        raise SystemExit("EBCH128 outer: combined threshold does not certify 20.80 bits")
     diagnostic_total = max(low.total_log2, post_complete.total_log2_upper)
     diagnostic_total += math.log2(
         1 + 2 ** (-abs(low.total_log2 - post_complete.total_log2_upper))
@@ -294,7 +365,29 @@ def recompute(
         postprefix_log2_upper=post_complete.total_log2_upper,
         diagnostic_total_log2_upper=diagnostic_total,
         exact_threshold=f"{full_threshold.numerator}/{full_threshold.denominator}",
-        certified_bits_hundredths=1975,
+        certified_bits_hundredths=2080,
+        status="PASS",
+    )
+    obstruction = certify_uniform_40bit_obstruction(local_spectrum_csv)
+    codimension = 20
+    # A fixed nonzero vector belongs to a uniformly random (K-s)-subspace
+    # with probability (2^(K-s)-1)/(2^K-1) < 2^-s.  Independence from the
+    # inner ensemble therefore scales every first-moment row by <2^-s.
+    expurgated_threshold = full_threshold / (1 << codimension)
+    if (expurgated_threshold.numerator**100) << 4080 > (
+        expurgated_threshold.denominator**100
+    ):
+        raise SystemExit("EBCH128 outer: expurgated threshold does not certify 40.80 bits")
+    expurgated = ExpurgatedSubcodeCertificate(
+        ambient_dimension=2**20,
+        codimension=codimension,
+        subcode_dimension=2**20 - codimension,
+        inclusion_probability_bound="(2^(K-20)-1)/(2^K-1) < 2^-20",
+        diagnostic_total_log2_upper=diagnostic_total - codimension,
+        exact_threshold=(
+            f"{expurgated_threshold.numerator}/{expurgated_threshold.denominator}"
+        ),
+        certified_bits_hundredths=4080,
         status="PASS",
     )
 
@@ -311,7 +404,7 @@ def recompute(
         "prefix_paired_rho3",
     )
     return {
-        "schema": 1,
+        "schema": 2,
         "arithmetic": "exact rationals plus outward Decimal log2 intervals",
         "construction": {
             "N": 2**21,
@@ -350,6 +443,11 @@ def recompute(
             ],
             "prefix_cap_intervals": [list(row) for row in PREFIX_CAP_INTERVALS],
         },
+        "low_weight_refinement": {
+            "near_refinement_h_max": 150,
+            "near_subbucket_width": 250,
+            "near_subbucket_count": 16,
+        },
         "exact_global_turnoff": {
             "status": "PASS",
             "threshold": "2^-62",
@@ -362,6 +460,8 @@ def recompute(
         },
         "postprefix_complete": asdict(post_complete),
         "complete": asdict(complete),
+        "uniform_ensemble_40bit_obstruction": asdict(obstruction),
+        "expurgated_subcode": asdict(expurgated),
     }
 
 
@@ -382,7 +482,7 @@ def load_artifact(path: Path) -> dict[str, object]:
     actual = hashlib.sha256(canonical).hexdigest()
     if claimed != actual:
         raise SystemExit("EBCH128 outer: artifact SHA-256 mismatch")
-    if payload.get("schema") != 1:
+    if payload.get("schema") != 2:
         raise SystemExit("EBCH128 outer: artifact schema mismatch")
     inputs = payload.get("inputs", {})
     if inputs.get("local_spectrum", {}).get("sha256") != file_sha256(LOCAL_SPECTRUM):
@@ -425,10 +525,16 @@ def main() -> int:
     else:
         payload = load_artifact(args.artifact)
     complete = payload["complete"]
+    expurgated = payload["expurgated_subcode"]
     print("ebch128_outer_fullsplit_status,PASS")
     print(f"diagnostic_total_log2_upper,{complete['diagnostic_total_log2_upper']:.12f}")
     print(f"theorem_safe_threshold,{complete['exact_threshold']}")
     print(f"certified_bits,{complete['certified_bits_hundredths'] / 100:.2f}")
+    print("ebch128_outer_expurgated_status,PASS")
+    print(f"expurgated_dimension,{expurgated['subcode_dimension']}")
+    print(f"expurgated_diagnostic_log2_upper,{expurgated['diagnostic_total_log2_upper']:.12f}")
+    print(f"expurgated_theorem_safe_threshold,{expurgated['exact_threshold']}")
+    print(f"expurgated_certified_bits,{expurgated['certified_bits_hundredths'] / 100:.2f}")
     print(f"artifact_sha256,{payload['sha256']}")
     return 0
 

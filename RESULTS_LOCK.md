@@ -167,12 +167,17 @@ theorem.
 
 Replacing the RM-512 block outer by `16384` copies of the committed extended
 BCH `[128,64,22]` spectrum passes every rational/outward family.  The complete
-diagnostic exponent is `-19.775758214875`, and exact integer arithmetic proves
+diagnostic exponent is `-20.805420113752`, and exact integer arithmetic proves
 the theorem-safe bound
-`1275068417/2^50 <= 2^-19.75`.  The construction therefore retains the same
+`616562689/2^50 <= 2^-20.80`.  The construction therefore retains the same
 `[2^21,2^20,d_min >= 188744]` existence conclusion with 128-bit outer blocks,
 conditional on the same declared EBCH enumerator input already used by the
-inner certificate.  The canonical verifier and audit note are
+inner certificate.  A uniformly random codimension-20 outer subcode scales
+the first moment by less than `2^-20`, giving the exact alternate conclusion
+`[2^21,2^20-20,d_min >= 188744]` with theorem-safe margin `40.80` bits.  A
+separate checked lower bound shows that the unchanged full-dimension ensemble
+has first moment above `2^-36.493931`, so it cannot itself reach 40 bits by
+upper-bound refinement.  The canonical verifier and audit note are
 `scripts/certify_ebch128_outer_fullsplit.py` and
 `scripts/ebch128_outer_fullsplit_certificate.md`.
 

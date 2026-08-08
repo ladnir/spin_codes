@@ -91,10 +91,14 @@ An exact alternate row is now available for a smaller block outer: the direct
 sum of `16384` copies of the committed extended BCH `[128,64,22]` spectrum.
 The standalone rational/outward verifier
 `scripts/certify_ebch128_outer_fullsplit.py` covers every outer weight and
-reports a complete diagnostic exponent `-19.775758214875`.  Its theorem-safe
-integer gate is `1275068417/2^50 <= 2^-19.75`.  The frozen manuscript theorem
-still uses RM-512 pending proof review and deliberate promotion of this
-alternate lane; see `scripts/ebch128_outer_fullsplit_certificate.md`.
+reports a complete diagnostic exponent `-20.805420113752`.  Its theorem-safe
+integer gate is `616562689/2^50 <= 2^-20.80`.  A random codimension-20 outer
+subcode gives an exact `40.80`-bit certificate and dimension `2^20-20`.
+Conversely, a checked weight-22 suffix family lower-bounds the unchanged
+full-dimension ensemble by `2^-36.493931`, so 40 bits at full dimension cannot
+come from further upper-bound cleanup.  The frozen manuscript theorem still
+uses RM-512 pending proof review and deliberate promotion of this alternate
+lane; see `scripts/ebch128_outer_fullsplit_certificate.md`.
 
 The BCH256 and BCH512 rows are spectrum-model projections, not theorem claims.
 They should not be promoted until an exact spectrum or rigorous low-weight
