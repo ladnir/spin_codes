@@ -42,16 +42,44 @@ def _validate(
 
 
 def load_rm512_spectrum(path: Path) -> tuple[tuple[int, int], ...]:
+    return load_csv_spectrum(
+        path,
+        name="RM(4,9) spectrum",
+        length=512,
+        dimension=256,
+        minimum_distance=32,
+    )
+
+
+def load_csv_spectrum(
+    path: Path,
+    *,
+    name: str,
+    length: int,
+    dimension: int,
+    minimum_distance: int,
+) -> tuple[tuple[int, int], ...]:
+    """Load and structurally validate a weight,count CSV spectrum."""
     with path.open(newline="") as handle:
         rows = tuple(
             (int(row["weight"]), int(row["count"])) for row in csv.DictReader(handle)
         )
     return _validate(
         rows,
-        name="RM(4,9) spectrum",
-        length=512,
-        dimension=256,
-        minimum_distance=32,
+        name=name,
+        length=length,
+        dimension=dimension,
+        minimum_distance=minimum_distance,
+    )
+
+
+def load_ebch128_csv_spectrum(path: Path) -> tuple[tuple[int, int], ...]:
+    return load_csv_spectrum(
+        path,
+        name="extended BCH [128,64,22] CSV spectrum",
+        length=128,
+        dimension=64,
+        minimum_distance=22,
     )
 
 

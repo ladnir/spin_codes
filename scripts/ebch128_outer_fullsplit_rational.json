@@ -1,0 +1,551 @@
+{
+  "schema": 1,
+  "arithmetic": "exact rationals plus outward Decimal log2 intervals",
+  "construction": {
+    "N": 2097152,
+    "K": 1048576,
+    "outer": "direct sum of 16384 extended BCH [128,64,22] blocks",
+    "inner": "full-split extended BCH [128,64,22]",
+    "target_distance": 188743
+  },
+  "inputs": {
+    "local_spectrum": {
+      "path": "ebch128_64_spectrum.csv",
+      "sha256": "26164b40cee431cd24995887ba485563f02048d64fdea00dc86b3d9a4897a94e",
+      "structural_validation": "extended BCH [128,64,22] PASS"
+    },
+    "inner_spectrum": {
+      "path": "EBCH128_64.wd",
+      "sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
+      "structural_validation": "extended BCH [128,64,22] PASS"
+    },
+    "gap_sums_sha256": "e7654c69edd1249972f3455a2ba0731a5a1979cde5ba1c8b969018fd09e04d1e",
+    "inner_bounds_sha256": "f96c27386719064eca6ab638366e5c8b7c5777595e5ea91e96d8d47ab668e75b"
+  },
+  "pole_data": {
+    "critical_schedule": [
+      [
+        650,
+        "249273789/250000000",
+        "754673/500000000"
+      ],
+      [
+        850,
+        "498019593/500000000",
+        "1012503/500000000"
+      ],
+      [
+        1050,
+        "248746073/250000000",
+        "50927/20000000"
+      ],
+      [
+        1250,
+        "124241313/125000000",
+        "3070553/1000000000"
+      ],
+      [
+        1450,
+        "124109729/125000000",
+        "719277/200000000"
+      ],
+      [
+        1650,
+        "247956569/250000000",
+        "4123229/1000000000"
+      ],
+      [
+        1850,
+        "198155169/200000000",
+        "290671/62500000"
+      ],
+      [
+        2000,
+        "989726533/1000000000",
+        "1294677/250000000"
+      ]
+    ],
+    "late_segments": [
+      [
+        501,
+        2000,
+        "0.348"
+      ],
+      [
+        2001,
+        7858,
+        "0.36"
+      ],
+      [
+        7859,
+        20550,
+        "0.375"
+      ],
+      [
+        20551,
+        75000,
+        "0.39"
+      ],
+      [
+        75001,
+        150000,
+        "0.4"
+      ],
+      [
+        150001,
+        250000,
+        "0.407"
+      ],
+      [
+        250001,
+        380736,
+        "0.415"
+      ]
+    ],
+    "early_endpoint_intervals": [
+      [
+        2001,
+        7858,
+        "4900255817/5000000000",
+        "1/100",
+        "0.355"
+      ],
+      [
+        7859,
+        20550,
+        "4707442269/5000000000",
+        "3/100",
+        "0.375"
+      ],
+      [
+        20551,
+        30000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        30001,
+        50000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        50001,
+        75000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        75001,
+        90000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        90001,
+        100000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        100001,
+        110000,
+        "5382199631/10000000000",
+        "3/10",
+        "0.396059859435"
+      ],
+      [
+        110001,
+        125000,
+        "5382199631/10000000000",
+        "3/10",
+        "0.396059859435"
+      ],
+      [
+        125001,
+        160000,
+        "5382199631/10000000000",
+        "3/10",
+        "0.396059859435"
+      ],
+      [
+        160001,
+        250000,
+        "3331239681/10000000000",
+        "1/2",
+        "0.396059859435"
+      ],
+      [
+        250001,
+        350000,
+        "3331239681/10000000000",
+        "1/2",
+        "0.430812727615"
+      ]
+    ],
+    "prefix_endpoint_intervals": [
+      [
+        2001,
+        7858,
+        "4900255817/5000000000",
+        "1/100",
+        "0.355"
+      ],
+      [
+        7859,
+        20550,
+        "4707442269/5000000000",
+        "3/100",
+        "0.375"
+      ],
+      [
+        20551,
+        75000,
+        "8178969571/10000000000",
+        "1/10",
+        "0.396059859435"
+      ],
+      [
+        75001,
+        250000,
+        "5382199631/10000000000",
+        "3/10",
+        "0.396059859435"
+      ],
+      [
+        250001,
+        350000,
+        "200254736993/625000000000",
+        "1769966552337/2500000000000",
+        "0.4126497310152"
+      ]
+    ],
+    "prefix_cap_intervals": [
+      [
+        2001,
+        7858,
+        "0.355"
+      ],
+      [
+        7859,
+        20550,
+        "0.375"
+      ],
+      [
+        20551,
+        75000,
+        "0.39"
+      ],
+      [
+        75001,
+        250000,
+        "0.405"
+      ],
+      [
+        250001,
+        350000,
+        "0.415"
+      ],
+      [
+        350001,
+        400000,
+        "0.42"
+      ],
+      [
+        400001,
+        450000,
+        "0.425"
+      ],
+      [
+        450001,
+        550000,
+        "0.43"
+      ],
+      [
+        550001,
+        636736,
+        "0.44"
+      ]
+    ]
+  },
+  "exact_global_turnoff": {
+    "status": "PASS",
+    "threshold": "2^-62",
+    "log2_for_display": -62.407875819071386
+  },
+  "exact_t_monotonicity": {
+    "status": "PASS",
+    "rows": 86
+  },
+  "low_weight": {
+    "h_max": 500,
+    "live_outer_weights": 240,
+    "chernoff_crossing": 5923,
+    "chernoff_mgf_log2": -0.7814899180576731,
+    "termination_exact_log2": -63.89264922044356,
+    "termination_cap_shift": 63,
+    "dyadic_bits": 1024,
+    "episode_max": 8,
+    "early_episode_max": 16,
+    "gap_sums_sha256": "7a32dcccc6e67dad804a9f3be42eda4115cd579104653877cb4c7e790c05c784",
+    "inner_bounds_sha256": "81845a5e71ba187418b6bcd7f1a621d974b01661e2bcf6a13a669dbcdc2905c9",
+    "local_spectrum_sha256": "26164b40cee431cd24995887ba485563f02048d64fdea00dc86b3d9a4897a94e",
+    "inner_spectrum_sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
+    "bucket_log2": [
+      -20.746429207553774,
+      -60.717182050896554,
+      -63.24578134359763,
+      -62.812350256554964,
+      -64.0155906066675,
+      -64.92229087609758
+    ],
+    "explicit_episode_log2": -20.746429207551955,
+    "episode_tail_log2": -144.07261071277208,
+    "ultra_late_log2": -20.80569585761714,
+    "total_log2": -19.775758215946553,
+    "threshold_num": 19,
+    "threshold_shift": 24,
+    "threshold_log2": -19.752072486556415,
+    "threshold_bits_exact_status": "PASS",
+    "cross_multiply_slack_bits": 9120
+  },
+  "postprefix_components": {
+    "critical_501_2000": {
+      "h_min": 501,
+      "h_max": 2000,
+      "live_outer_weights": 750,
+      "cap_exact_log2_upper": -56.00915607661543,
+      "episode_bucket_log2_upper": [
+        -213.17039368369208,
+        -275.21717916651033,
+        -279.51350358072403,
+        -314.67151896997217,
+        -342.22014860372155
+      ],
+      "total_log2_upper": -53.42419357589427,
+      "threshold_shift": 50,
+      "status": "PASS"
+    },
+    "late_placement": {
+      "segments": [
+        {
+          "interval_log2_upper": [
+            -409.49183053340744
+          ],
+          "total_log2_upper": -409.49183053340744,
+          "threshold_shift": 405,
+          "z_numerator": 87,
+          "z_denominator": 250,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -1812.4275851758216
+          ],
+          "total_log2_upper": -1812.4275851758216,
+          "threshold_shift": 405,
+          "z_numerator": 9,
+          "z_denominator": 25,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -7671.424097511482
+          ],
+          "total_log2_upper": -7671.424097511482,
+          "threshold_shift": 405,
+          "z_numerator": 3,
+          "z_denominator": 8,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -20867.223779016233
+          ],
+          "total_log2_upper": -20867.223779016233,
+          "threshold_shift": 405,
+          "z_numerator": 39,
+          "z_denominator": 100,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -89206.6230182954
+          ],
+          "total_log2_upper": -89206.6230182954,
+          "threshold_shift": 405,
+          "z_numerator": 2,
+          "z_denominator": 5,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -206553.7155480969
+          ],
+          "total_log2_upper": -206553.7155480969,
+          "threshold_shift": 405,
+          "z_numerator": 407,
+          "z_denominator": 1000,
+          "status": "PASS"
+        },
+        {
+          "interval_log2_upper": [
+            -417591.9820019081
+          ],
+          "total_log2_upper": -417591.9820019081,
+          "threshold_shift": 405,
+          "z_numerator": 83,
+          "z_denominator": 200,
+          "status": "PASS"
+        }
+      ],
+      "total_log2_upper": -406.68447561034986,
+      "threshold_shift": 400,
+      "exact_union_gate": "7 * 2^-405 < 2^-400",
+      "status": "PASS"
+    },
+    "complement_high": {
+      "interval_log2_upper": [
+        -128921.86639915299,
+        -124896.20240785151,
+        -113711.50065454087,
+        -30387.044726360506,
+        -519865.3136568242,
+        -893906.3481745634,
+        -893417.0885931727
+      ],
+      "total_log2_upper": -30384.23737143845,
+      "threshold_shift": 30000,
+      "pole_numerator": 1,
+      "pole_denominator": 10,
+      "status": "PASS"
+    },
+    "early_endpoint": {
+      "interval_log2_upper": [
+        -392.78884728962356,
+        -3938.4377117514064,
+        -4698.766719011954,
+        -17415.79298232383,
+        -30932.641693837617,
+        -24659.65233540322,
+        -18234.991986863824,
+        -62771.905331323396,
+        -70646.08051782475,
+        -79831.74718101024,
+        -77948.57837224824,
+        -105007.46129603493
+      ],
+      "total_log2_upper": -389.2038847889024,
+      "threshold_shift": 380,
+      "status": "PASS"
+    },
+    "early_paired": {
+      "interval_log2_upper": [
+        -176444.84186369128,
+        -194559.0344465732,
+        -85277.3787642579
+      ],
+      "total_log2_upper": -85275.79380175719,
+      "threshold_shift": 80000,
+      "pole_numerator": 10573069,
+      "pole_denominator": 78125000,
+      "status": "PASS"
+    },
+    "prefix_cap": {
+      "interval_log2_upper": [
+        -331.6665674730218,
+        -1781.2668373928757,
+        -5277.119894586817,
+        -27323.51441150997,
+        -155518.56443561244,
+        -270683.3070256337,
+        -343734.06135204947,
+        -430706.9163957757,
+        -666920.5027575456
+      ],
+      "total_log2_upper": -328.4966424715795,
+      "threshold_shift": 320,
+      "status": "PASS"
+    },
+    "prefix_endpoint": {
+      "interval_log2_upper": [
+        -127.00251931677369,
+        -2882.7512153504194,
+        -1883.683215033124,
+        -15930.462655410991,
+        -77686.61068733054
+      ],
+      "total_log2_upper": -124.68059122188632,
+      "threshold_shift": 100,
+      "status": "PASS"
+    },
+    "prefix_paired_rho1": {
+      "interval_log2_upper": [
+        -135896.2837634689,
+        -185166.08267375547,
+        -223268.96349520842,
+        -269549.5256443987
+      ],
+      "total_log2_upper": -135894.2837634689,
+      "threshold_shift": 130000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    },
+    "prefix_paired_rho2": {
+      "interval_log2_upper": [
+        -258155.45524233775
+      ],
+      "total_log2_upper": -258155.45524233775,
+      "threshold_shift": 250000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    },
+    "prefix_paired_rho3": {
+      "interval_log2_upper": [
+        -285386.4031272788,
+        -325447.3938512231,
+        -483419.8206509751,
+        -642305.2423472451
+      ],
+      "total_log2_upper": -285384.4031272788,
+      "threshold_shift": 280000,
+      "pole_numerator": 3011942119,
+      "pole_denominator": 10000000000,
+      "status": "PASS"
+    }
+  },
+  "postprefix_complete": {
+    "h_min": 501,
+    "h_max": 2097152,
+    "component_count": 10,
+    "total_log2_upper": -50.102265480006906,
+    "threshold_shift": 50,
+    "coverage": [
+      "501--2000: all non-ultra-late first-active positions",
+      "501--380736: ultra-late placement",
+      "2001--636736: prefix cap bucket",
+      "2001--350000: prefix fixed-T episode buckets",
+      "350001--1048576: prefix paired-T episode buckets",
+      "2001--350000: early fixed-T buckets",
+      "350001--1048576: early paired-T buckets",
+      "1048577--2097152: complement-high all-T cover"
+    ],
+    "status": "PASS"
+  },
+  "complete": {
+    "low_weight_log2_upper": -19.775758215946553,
+    "postprefix_log2_upper": -50.102265480006906,
+    "diagnostic_total_log2_upper": -19.77575821487507,
+    "exact_threshold": "1275068417/1125899906842624",
+    "certified_bits_hundredths": 1975,
+    "status": "PASS"
+  },
+  "sha256": "bbfdaa647c01810721c47cce5b765d7e26715e1f01a65deab0d264b1212411ee"
+}

@@ -83,9 +83,18 @@ Latest checked status: verifier passes and reports
 theorem-facing rational/outward certificate instead reports
 `fullsplit_complete_rational_37_27_bits_status,PASS` and uses `2^-37.27`.
 
-### BCH And Better Local-Code Rows
+### Smaller Exact Outer And BCH Projection Rows
 
-Status: heuristic projection only.
+Status: exact EBCH-128 alternate; BCH256/BCH512 projections remain heuristic.
+
+An exact alternate row is now available for a smaller block outer: the direct
+sum of `16384` copies of the committed extended BCH `[128,64,22]` spectrum.
+The standalone rational/outward verifier
+`scripts/certify_ebch128_outer_fullsplit.py` covers every outer weight and
+reports a complete diagnostic exponent `-19.775758214875`.  Its theorem-safe
+integer gate is `1275068417/2^50 <= 2^-19.75`.  The frozen manuscript theorem
+still uses RM-512 pending proof review and deliberate promotion of this
+alternate lane; see `scripts/ebch128_outer_fullsplit_certificate.md`.
 
 The BCH256 and BCH512 rows are spectrum-model projections, not theorem claims.
 They should not be promoted until an exact spectrum or rigorous low-weight

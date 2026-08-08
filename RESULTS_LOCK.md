@@ -160,6 +160,22 @@ complement symmetry.  The EBCH spectrum's mathematical provenance is still an
 explicit external input; more generally, the verifier does not derive either
 table from a code definition.
 
+### Exact EBCH-128 outer alternate
+
+Status: exact standalone certificate; not yet promoted into the manuscript
+theorem.
+
+Replacing the RM-512 block outer by `16384` copies of the committed extended
+BCH `[128,64,22]` spectrum passes every rational/outward family.  The complete
+diagnostic exponent is `-19.775758214875`, and exact integer arithmetic proves
+the theorem-safe bound
+`1275068417/2^50 <= 2^-19.75`.  The construction therefore retains the same
+`[2^21,2^20,d_min >= 188744]` existence conclusion with 128-bit outer blocks,
+conditional on the same declared EBCH enumerator input already used by the
+inner certificate.  The canonical verifier and audit note are
+`scripts/certify_ebch128_outer_fullsplit.py` and
+`scripts/ebch128_outer_fullsplit_certificate.md`.
+
 ## Scalar Dense Finite Diagnostics
 
 Status: diagnostic and partially superseded by the RM/full-split finite

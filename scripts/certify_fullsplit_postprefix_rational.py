@@ -17,7 +17,12 @@ from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
 
-from certificate_spectra import file_sha256, load_ebch128_spectrum, load_rm512_spectrum
+from certificate_spectra import (
+    file_sha256,
+    load_csv_spectrum,
+    load_ebch128_spectrum,
+    load_rm512_spectrum,
+)
 from certify_rm_outer_prefix_exact import direct_sum_coefficients, load_local_spectrum
 from outward_log2 import Interval, log2_binom, log2_fraction, log2_int, self_check
 
@@ -72,8 +77,23 @@ def exact_mgf(entries: list[tuple[int, int, Fraction]], pole: Fraction) -> Fract
     return value
 
 
-def load_full_local_spectrum(path: Path) -> list[tuple[int, int]]:
-    return list(load_rm512_spectrum(path))
+def load_full_local_spectrum(
+    path: Path,
+    *,
+    name: str = "RM(4,9) spectrum",
+    length: int = 512,
+    dimension: int = 256,
+    minimum_distance: int = 32,
+) -> list[tuple[int, int]]:
+    return list(
+        load_csv_spectrum(
+            path,
+            name=name,
+            length=length,
+            dimension=dimension,
+            minimum_distance=minimum_distance,
+        )
+    )
 
 
 def local_weight_enumerator(spectrum: list[tuple[int, int]], z: Fraction) -> Fraction:
@@ -144,17 +164,47 @@ class CriticalWindowCertificate:
 
 
 def certify_critical_window(
-    *, local_spectrum_csv: Path, inner_spectrum: Path, threshold_shift: int = 180
+    *,
+    local_spectrum_csv: Path,
+    inner_spectrum: Path,
+    threshold_shift: int = 180,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
+    pole_schedule: tuple[tuple[int, Fraction, Fraction], ...] | None = None,
 ) -> CriticalWindowCertificate:
     h_min, h_max = 501, 2000
+    load_full_local_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     outer = direct_sum_coefficients(
-        load_local_spectrum(local_spectrum_csv, h_max), blocks=OUTER_BLOCKS, h_max=h_max
+        load_local_spectrum(local_spectrum_csv, h_max), blocks=outer_blocks, h_max=h_max
     )
     live_h = [h for h in range(h_min, h_max + 1) if outer[h]]
     q_law, entries = exact_split_data(inner_spectrum)
     certify_global_turnoff(q_law)
-    low_pole = pole_data(entries, Fraction(997, 1000), Fraction(3, 1000))
-    high_pole = pole_data(entries, Fraction(99, 100), Fraction(1, 100))
+    if pole_schedule is None:
+        pole_schedule = (
+            (1100, Fraction(997, 1000), Fraction(3, 1000)),
+            (h_max, Fraction(99, 100), Fraction(1, 100)),
+        )
+    if not pole_schedule or pole_schedule[-1][0] < h_max - 1:
+        raise SystemExit("postprefix rational: critical pole schedule does not cover the window")
+    if any(
+        left[0] >= right[0]
+        for left, right in zip(pole_schedule, pole_schedule[1:])
+    ):
+        raise SystemExit("postprefix rational: critical pole schedule is not increasing")
+    scheduled_poles = tuple(
+        (h_upper, pole_data(entries, pole, rho))
+        for h_upper, pole, rho in pole_schedule
+    )
 
     cap_total = Fraction(0)
     for h in live_h:
@@ -180,7 +230,7 @@ def certify_critical_window(
             denominator = log2_binom(N, h)
             for r in range(1, B + 1):
                 H = h - r
-                selected = low_pole if H <= 1100 else high_pole
+                selected = next(pole for h_upper, pole in scheduled_poles if H <= h_upper)
                 e0, ege1 = inner_branch_upper_logs(
                     T_inner, H, selected, tail_T=T_placement
                 )
@@ -250,15 +300,32 @@ class LatePlacementCertificate:
 
 
 def certify_late_placement(
-    *, local_spectrum_csv: Path, threshold_shift: int = 500
+    *,
+    local_spectrum_csv: Path,
+    threshold_shift: int = 500,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
+    z: Fraction = Fraction(39605985943459426, 10**17),
+    intervals: tuple[tuple[int, int], ...] = LATE_INTERVALS,
 ) -> LatePlacementCertificate:
-    z = Fraction(39605985943459426, 10**17)
-    local = local_weight_enumerator(load_full_local_spectrum(local_spectrum_csv), z)
-    global_outer = log2_fraction(local).times_int(OUTER_BLOCKS)
+    local = local_weight_enumerator(
+        load_full_local_spectrum(
+            local_spectrum_csv,
+            name=local_name,
+            length=local_length,
+            dimension=local_dimension,
+            minimum_distance=local_distance,
+        ),
+        z,
+    )
+    global_outer = log2_fraction(local).times_int(outer_blocks)
     log_z = log2_fraction(z)
     m = B * LATE_BLOCKS
     interval_bounds: list[Decimal] = []
-    for lo, hi in LATE_INTERVALS:
+    for lo, hi in intervals:
         peak_h = unimodal_peak(lo, hi, m=m, z=z)
         row = (
             global_outer
@@ -299,11 +366,15 @@ def decimal_fraction(text: str) -> Fraction:
 
 
 def outer_gf_log(
-    spectrum: list[tuple[int, int]], z: Fraction, cache: dict[Fraction, Interval]
+    spectrum: list[tuple[int, int]],
+    z: Fraction,
+    cache: dict[Fraction, Interval],
+    *,
+    outer_blocks: int = OUTER_BLOCKS,
 ) -> Interval:
     cached = cache.get(z)
     if cached is None:
-        cached = log2_fraction(local_weight_enumerator(spectrum, z)).times_int(OUTER_BLOCKS)
+        cached = log2_fraction(local_weight_enumerator(spectrum, z)).times_int(outer_blocks)
         cache[z] = cached
     return cached
 
@@ -323,12 +394,23 @@ def certify_complement_high(
     local_spectrum_csv: Path,
     inner_spectrum: Path,
     threshold_shift: int = 30000,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
 ) -> ComplementHighCertificate:
-    spectrum = load_full_local_spectrum(local_spectrum_csv)
+    spectrum = load_full_local_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     spectrum_map = dict(spectrum)
     for weight, count in spectrum:
-        if spectrum_map.get(512 - weight) != count:
-            raise SystemExit("postprefix rational: local RM spectrum is not complement symmetric")
+        if spectrum_map.get(local_length - weight) != count:
+            raise SystemExit("postprefix rational: local outer spectrum is not complement symmetric")
     _q_law, entries = exact_split_data(inner_spectrum)
     pole = Fraction(1, 10)
     mgf = exact_mgf(entries, pole)
@@ -348,7 +430,9 @@ def certify_complement_high(
         H_min = h_lo - B
         H_max = h_hi - 1
 
-        outer_e0 = outer_gf_log(spectrum, z0, outer_cache) - log2_fraction(z0).times_int(N - h_lo)
+        outer_e0 = outer_gf_log(
+            spectrum, z0, outer_cache, outer_blocks=outer_blocks
+        ) - log2_fraction(z0).times_int(N - h_lo)
         ratio_e0 = Fraction(1, 1) / mgf * Fraction(n_endpoint - H_min, n_endpoint) ** B
         if ratio_e0 >= 1:
             raise SystemExit("postprefix rational: complement e0 endpoint ratio is not below one")
@@ -360,7 +444,7 @@ def certify_complement_high(
             + log2_fraction(Fraction(1, 1) / (1 - ratio_e0))
         )
 
-        outer_base = outer_gf_log(spectrum, z1, outer_cache)
+        outer_base = outer_gf_log(spectrum, z1, outer_cache, outer_blocks=outer_blocks)
         log_z1 = log2_fraction(z1)
         log_rho = log2_fraction(rho)
         endpoint_values = []
@@ -490,8 +574,19 @@ def certify_early_endpoint(
     threshold_shift: int = 400,
     intervals: tuple[tuple[int, int, Fraction, Fraction, str], ...] = EARLY_ENDPOINT_INTERVALS,
     gaps: tuple[tuple[int, int, int], ...] = EARLY_GAPS,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
 ) -> EarlyEndpointCertificate:
-    spectrum = load_full_local_spectrum(local_spectrum_csv)
+    spectrum = load_full_local_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     _q_law, entries = exact_split_data(inner_spectrum)
     outer_cache: dict[Fraction, Interval] = {}
     pole_cache: dict[tuple[Fraction, Fraction], PoleData] = {}
@@ -499,7 +594,7 @@ def certify_early_endpoint(
 
     for h_lo, h_hi, pole_value, rho, z_text in intervals:
         z = decimal_fraction(z_text)
-        outer_log = outer_gf_log(spectrum, z, outer_cache)
+        outer_log = outer_gf_log(spectrum, z, outer_cache, outer_blocks=outer_blocks)
         pdata = pole_cache.get((pole_value, rho))
         if pdata is None:
             mgf = exact_mgf(entries, pole_value)
@@ -642,17 +737,31 @@ class PrefixCapCertificate:
 
 
 def certify_prefix_cap(
-    *, local_spectrum_csv: Path, threshold_shift: int = 700
+    *,
+    local_spectrum_csv: Path,
+    threshold_shift: int = 700,
+    intervals: tuple[tuple[int, int, str], ...] = PREFIX_CAP_INTERVALS,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
 ) -> PrefixCapCertificate:
-    spectrum = load_full_local_spectrum(local_spectrum_csv)
+    spectrum = load_full_local_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     outer_cache: dict[Fraction, Interval] = {}
     m = B * 9948 + B
     interval_bounds: list[Decimal] = []
-    for h_lo, h_hi, z_text in PREFIX_CAP_INTERVALS:
+    for h_lo, h_hi, z_text in intervals:
         z = decimal_fraction(z_text)
         peak_h = unimodal_peak(h_lo, min(h_hi, m), m=m, z=z)
         row = (
-            outer_gf_log(spectrum, z, outer_cache)
+            outer_gf_log(spectrum, z, outer_cache, outer_blocks=outer_blocks)
             - log2_fraction(z).times_int(peak_h)
             + log2_int(4000)
             + log2_binom(m, peak_h)
@@ -705,8 +814,19 @@ def certify_early_paired(
     rho: Fraction = Fraction(4, 5),
     T_min: int = 17949,
     T_max: int = 32767,
+    outer_blocks: int = OUTER_BLOCKS,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
 ) -> EarlyPairedCertificate:
-    spectrum = load_full_local_spectrum(local_spectrum_csv)
+    spectrum = load_full_local_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     _q_law, entries = exact_split_data(inner_spectrum)
     mgf = exact_mgf(entries, pole)
     G = ((1 + rho) ** B - 1) * mgf / (1 - mgf)
@@ -728,7 +848,7 @@ def certify_early_paired(
     for h_lo, h_hi, z0_text, z1_text in intervals:
         z0 = decimal_fraction(z0_text)
         z1 = decimal_fraction(z1_text)
-        outer0 = outer_gf_log(spectrum, z0, outer_cache)
+        outer0 = outer_gf_log(spectrum, z0, outer_cache, outer_blocks=outer_blocks)
         peak_e0 = Decimal("-Infinity")
         for T in range(T_min, T_max + 1):
             m = B * T + B
@@ -748,7 +868,7 @@ def certify_early_paired(
             peak_e0, (h_hi - h_lo + 1) * (T_max - T_min + 1)
         )
 
-        outer1 = outer_gf_log(spectrum, z1, outer_cache)
+        outer1 = outer_gf_log(spectrum, z1, outer_cache, outer_blocks=outer_blocks)
         log_z1 = log2_fraction(z1)
         log_rho = log2_fraction(rho)
         outer_volume_hi = Decimal("-Infinity")
@@ -852,14 +972,13 @@ def certify_endpoint_t_monotonicity(
 
 
 def certify_critical_t_monotonicity(
-    *, entries: list[tuple[int, int, Fraction]]
+    *,
+    entries: list[tuple[int, int, Fraction]],
+    poles: tuple[Fraction, ...] = (Fraction(997, 1000), Fraction(99, 100)),
 ) -> int:
-    poles = (
-        exact_mgf(entries, Fraction(997, 1000)),
-        exact_mgf(entries, Fraction(99, 100)),
-    )
+    mgfs = tuple(exact_mgf(entries, pole) for pole in poles)
     rows = 0
-    for mgf in poles:
+    for mgf in mgfs:
         for T_min, T_max, _size in (
             (9949, 13948, 4000),
             (13949, 17948, 4000),

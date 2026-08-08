@@ -20,7 +20,11 @@ from dataclasses import asdict, dataclass
 from fractions import Fraction
 from pathlib import Path
 
-from certificate_spectra import file_sha256, load_ebch128_spectrum, load_rm512_spectrum
+from certificate_spectra import (
+    file_sha256,
+    load_csv_spectrum,
+    load_ebch128_spectrum,
+)
 from certify_rm_outer_prefix_exact import direct_sum_coefficients, load_local_spectrum
 
 
@@ -521,6 +525,11 @@ def certify(
     dyadic_bits: int = 1024,
     threshold_num: int = 6793,
     threshold_shift: int = 50,
+    local_name: str = "RM(4,9) spectrum",
+    local_length: int = 512,
+    local_dimension: int = 256,
+    local_distance: int = 32,
+    exact_target_bits_hundredths: int = 3727,
 ) -> RationalH500Certificate:
     if (
         h_max != 500
@@ -534,7 +543,15 @@ def certify(
             "b=64, late=5949, prefix e_max=8, early e_max=16"
         )
     self_check_peak_live()
-    load_rm512_spectrum(local_spectrum_csv)
+    if outer_blocks * local_length != n or outer_blocks * local_dimension != n // 2:
+        raise SystemExit("rational h<=500: outer direct-sum parameters do not match N,K")
+    load_csv_spectrum(
+        local_spectrum_csv,
+        name=local_name,
+        length=local_length,
+        dimension=local_dimension,
+        minimum_distance=local_distance,
+    )
     load_ebch128_spectrum(inner_spectrum)
     outer = load_outer_coefficients(local_spectrum_csv, blocks=outer_blocks, h_max=h_max)
     split_law, mgf = exact_split_law(inner_spectrum, b)
@@ -620,10 +637,10 @@ def certify(
             f"{[log2_fraction(value) for value in bucket_totals]}, "
             f"tail={log2_fraction(tail_total):.12f}, ultra={log2_fraction(ultra_late):.12f}"
         )
-    # Prove threshold <= 2^(-37.27) without transcendental arithmetic:
-    # (threshold)^100 <= 2^-3727.
-    if pow(threshold_num, 100) > 1 << (100 * threshold_shift - 3727):
-        raise SystemExit("rational h<=500: threshold does not certify 37.27 bits")
+    # Prove threshold <= 2^(-target) without transcendental arithmetic.
+    target_power = 100 * threshold_shift - exact_target_bits_hundredths
+    if target_power < 0 or pow(threshold_num, 100) > 1 << target_power:
+        raise SystemExit("rational h<=500: threshold does not certify target bits")
 
     return RationalH500Certificate(
         h_max=h_max,
