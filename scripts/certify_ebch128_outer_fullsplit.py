@@ -147,8 +147,67 @@ class ExpurgatedSubcodeCertificate:
     status: str
 
 
+@dataclass(frozen=True)
+class ParityBlockOuterCertificate:
+    ambient_blocks: int
+    independent_blocks: int
+    local_message_symbols: int
+    ambient_dimension: int
+    subcode_dimension: int
+    codimension: int
+    minimum_active_local_blocks: int
+    local_minimum_weight: int
+    minimum_outer_weight: int
+    encoding_rule: str
+    coefficientwise_spectrum_bound: str
+    gf128_scalar_extension: str
+    gf128_parity_xors: int
+    status: str
+
+
 def fraction_text(value: Fraction) -> str:
     return f"{value.numerator}/{value.denominator}"
+
+
+def certify_parity_block_outer() -> ParityBlockOuterCertificate:
+    """Certify the explicit XOR-parity subcode used by the GF(2^128) encoder."""
+
+    local_message_symbols = 64
+    independent_blocks = OUTER_BLOCKS - 1
+    ambient_dimension = OUTER_BLOCKS * local_message_symbols
+    subcode_dimension = independent_blocks * local_message_symbols
+    codimension = local_message_symbols
+    minimum_active_local_blocks = 2
+    minimum_outer_weight = minimum_active_local_blocks * 22
+    if (
+        ambient_dimension != 2**20
+        or subcode_dimension != 2**20 - 64
+        or codimension != 64
+        or minimum_outer_weight != 44
+    ):
+        raise SystemExit("EBCH128 outer: parity-block parameter mismatch")
+    return ParityBlockOuterCertificate(
+        ambient_blocks=OUTER_BLOCKS,
+        independent_blocks=independent_blocks,
+        local_message_symbols=local_message_symbols,
+        ambient_dimension=ambient_dimension,
+        subcode_dimension=subcode_dimension,
+        codimension=codimension,
+        minimum_active_local_blocks=minimum_active_local_blocks,
+        local_minimum_weight=22,
+        minimum_outer_weight=minimum_outer_weight,
+        encoding_rule="m_16384 = XOR_{i=1}^{16383} m_i, componentwise",
+        coefficientwise_spectrum_bound=(
+            "parity-block code is a subcode of the ambient direct sum; "
+            "A_parity[h] <= A_ambient[h], with A_parity[h] = 0 for h < 44"
+        ),
+        gf128_scalar_extension=(
+            "binary-generator scalar extension to GF(2^128) preserves the "
+            "binary minimum-distance lower bound"
+        ),
+        gf128_parity_xors=subcode_dimension,
+        status="PASS",
+    )
 
 
 def build_late_aggregate(local_spectrum_csv: Path) -> LateAggregateCertificate:
@@ -226,6 +285,7 @@ def recompute(
     *, local_spectrum_csv: Path = LOCAL_SPECTRUM, inner_spectrum: Path = INNER_SPECTRUM
 ) -> dict[str, object]:
     post.self_check()
+    parity_outer = certify_parity_block_outer()
     load_csv_spectrum(
         local_spectrum_csv,
         name=LOCAL_NAME,
@@ -368,6 +428,43 @@ def recompute(
         certified_bits_hundredths=2080,
         status="PASS",
     )
+    # The explicit parity-block precode is an injective codimension-64 map into
+    # the ambient direct-sum message space.  Its image has at least two active
+    # local blocks: with one nonzero independent block the parity block repeats
+    # it, while with two or more there are already two active independent
+    # blocks.  Thus its outer spectrum vanishes below 2*22=44 and is bounded
+    # coefficientwise by the ambient spectrum thereafter.
+    parity_low = certify_h500(
+        inner_spectrum=inner_spectrum,
+        local_spectrum_csv=local_spectrum_csv,
+        gap_sums_path=DEFAULT_GAP_SUMS,
+        inner_bounds_path=DEFAULT_INNER_BOUNDS,
+        threshold_num=26,
+        threshold_shift=46,
+        exact_target_bits_hundredths=4129,
+        near_refinement_h_max=300,
+        near_subbucket_width=250,
+        outer_weight_floor=parity_outer.minimum_outer_weight,
+        **LOCAL_KWARGS,
+    )
+    # Every post-prefix term is nonnegative and the parity-block code is a
+    # subcode, so the already-certified ambient post-prefix sum is also a valid
+    # upper bound for this explicit subcode.
+    parity_threshold = Fraction(26, 1 << 46) + Fraction(1, 1 << 50)
+    if (parity_threshold.numerator**100) << 4129 > parity_threshold.denominator**100:
+        raise SystemExit("EBCH128 outer: parity threshold does not certify 41.29 bits")
+    parity_diagnostic_total = max(parity_low.total_log2, post_complete.total_log2_upper)
+    parity_diagnostic_total += math.log2(
+        1 + 2 ** (-abs(parity_low.total_log2 - post_complete.total_log2_upper))
+    )
+    parity_complete = CompleteCertificate(
+        low_weight_log2_upper=parity_low.total_log2,
+        postprefix_log2_upper=post_complete.total_log2_upper,
+        diagnostic_total_log2_upper=parity_diagnostic_total,
+        exact_threshold=f"{parity_threshold.numerator}/{parity_threshold.denominator}",
+        certified_bits_hundredths=4129,
+        status="PASS",
+    )
     obstruction = certify_uniform_40bit_obstruction(local_spectrum_csv)
     codimension = 20
     # A fixed nonzero vector belongs to a uniformly random (K-s)-subspace
@@ -404,7 +501,7 @@ def recompute(
         "prefix_paired_rho3",
     )
     return {
-        "schema": 2,
+        "schema": 3,
         "arithmetic": "exact rationals plus outward Decimal log2 intervals",
         "construction": {
             "N": 2**21,
@@ -460,6 +557,15 @@ def recompute(
         },
         "postprefix_complete": asdict(post_complete),
         "complete": asdict(complete),
+        "parity_block_outer": asdict(parity_outer),
+        "parity_block_low_weight_refinement": {
+            "outer_weight_floor": parity_outer.minimum_outer_weight,
+            "near_refinement_h_max": 300,
+            "near_subbucket_width": 250,
+            "near_subbucket_count": 16,
+        },
+        "parity_block_low_weight": asdict(parity_low),
+        "parity_block_complete": asdict(parity_complete),
         "uniform_ensemble_40bit_obstruction": asdict(obstruction),
         "expurgated_subcode": asdict(expurgated),
     }
@@ -482,7 +588,7 @@ def load_artifact(path: Path) -> dict[str, object]:
     actual = hashlib.sha256(canonical).hexdigest()
     if claimed != actual:
         raise SystemExit("EBCH128 outer: artifact SHA-256 mismatch")
-    if payload.get("schema") != 2:
+    if payload.get("schema") != 3:
         raise SystemExit("EBCH128 outer: artifact schema mismatch")
     inputs = payload.get("inputs", {})
     if inputs.get("local_spectrum", {}).get("sha256") != file_sha256(LOCAL_SPECTRUM):
@@ -525,11 +631,25 @@ def main() -> int:
     else:
         payload = load_artifact(args.artifact)
     complete = payload["complete"]
+    parity_outer = payload["parity_block_outer"]
+    parity_complete = payload["parity_block_complete"]
     expurgated = payload["expurgated_subcode"]
     print("ebch128_outer_fullsplit_status,PASS")
     print(f"diagnostic_total_log2_upper,{complete['diagnostic_total_log2_upper']:.12f}")
     print(f"theorem_safe_threshold,{complete['exact_threshold']}")
     print(f"certified_bits,{complete['certified_bits_hundredths'] / 100:.2f}")
+    print("ebch128_outer_parity_block_status,PASS")
+    print(f"parity_block_dimension,{parity_outer['subcode_dimension']}")
+    print(f"parity_block_minimum_outer_weight,{parity_outer['minimum_outer_weight']}")
+    print(
+        "parity_block_diagnostic_log2_upper,"
+        f"{parity_complete['diagnostic_total_log2_upper']:.12f}"
+    )
+    print(f"parity_block_theorem_safe_threshold,{parity_complete['exact_threshold']}")
+    print(
+        "parity_block_certified_bits,"
+        f"{parity_complete['certified_bits_hundredths'] / 100:.2f}"
+    )
     print("ebch128_outer_expurgated_status,PASS")
     print(f"expurgated_dimension,{expurgated['subcode_dimension']}")
     print(f"expurgated_diagnostic_log2_upper,{expurgated['diagnostic_total_log2_upper']:.12f}")

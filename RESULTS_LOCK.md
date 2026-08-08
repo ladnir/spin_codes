@@ -1,6 +1,6 @@
 # Results Lock
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 Purpose: lock the current dense+dense research state before paper cleanup or
 prose movement. This file is a status snapshot, not a new proof.
@@ -162,21 +162,28 @@ table from a code definition.
 
 ### Exact EBCH-128 outer alternate
 
-Status: exact standalone certificate; not yet promoted into the manuscript
-theorem.
+Status: exact standalone parity-block certificate; not yet promoted into the
+manuscript theorem.
 
-Replacing the RM-512 block outer by `16384` copies of the committed extended
-BCH `[128,64,22]` spectrum passes every rational/outward family.  The complete
-diagnostic exponent is `-20.805420113752`, and exact integer arithmetic proves
-the theorem-safe bound
-`616562689/2^50 <= 2^-20.80`.  The construction therefore retains the same
-`[2^21,2^20,d_min >= 188744]` existence conclusion with 128-bit outer blocks,
-conditional on the same declared EBCH enumerator input already used by the
-inner certificate.  A uniformly random codimension-20 outer subcode scales
-the first moment by less than `2^-20`, giving the exact alternate conclusion
-`[2^21,2^20-20,d_min >= 188744]` with theorem-safe margin `40.80` bits.  A
-separate checked lower bound shows that the unchanged full-dimension ensemble
-has first moment above `2^-36.493931`, so it cannot itself reach 40 bits by
+The primary 128-block alternate uses `16383` independent extended BCH
+`[128,64,22]` message blocks and one componentwise-XOR parity block.  This is
+an explicit codimension-64 subcode of the ambient 16384-block direct sum.
+Every nonzero message activates at least two local blocks, so the outer
+minimum weight is at least 44 and its spectrum is coefficientwise bounded by
+the ambient spectrum.  The complete diagnostic exponent is
+`-41.306810170135`, and exact integer arithmetic proves
+`417/2^50 <= 2^-41.29`.  The resulting existence conclusion is
+`[2^21,2^20-64,d_min >= 188744]`.  Scalar extension through the binary
+generator gives the same `[2^21,1048512,d_min >= 188744]` parameters over
+`GF(2^128)`, matching the OT encoder's field-symbol interface.  Computing the
+parity block costs 1048512 128-bit XORs, uses 64 accumulators, and needs no
+field multiplication.
+
+For comparison, the unchanged full-dimension ambient construction has only
+20.80 theorem-safe bits.  A uniformly random codimension-20 outer subcode has
+dimension `2^20-20` and 40.80 bits, but lacks the deterministic parity
+structure.  A separate checked lower bound shows that the ambient ensemble's
+first moment is above `2^-36.493931`, so it cannot itself reach 40 bits by
 upper-bound refinement.  The canonical verifier and audit note are
 `scripts/certify_ebch128_outer_fullsplit.py` and
 `scripts/ebch128_outer_fullsplit_certificate.md`.

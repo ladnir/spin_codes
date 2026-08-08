@@ -548,6 +548,7 @@ def certify(
     exact_target_bits_hundredths: int = 3727,
     near_refinement_h_max: int = 0,
     near_subbucket_width: int = 0,
+    outer_weight_floor: int = 0,
 ) -> RationalH500Certificate:
     if (
         h_max != 500
@@ -572,6 +573,13 @@ def certify(
     )
     load_ebch128_spectrum(inner_spectrum)
     outer = load_outer_coefficients(local_spectrum_csv, blocks=outer_blocks, h_max=h_max)
+    if not 0 <= outer_weight_floor <= h_max:
+        raise SystemExit("rational h<=500: invalid outer-weight floor")
+    # A caller may replace the ambient direct sum by a certified subcode whose
+    # spectrum is coefficientwise dominated by the ambient spectrum and is zero
+    # below this floor.  Only those two properties are used by the union bound.
+    for h in range(1, outer_weight_floor):
+        outer[h] = 0
     split_law, mgf = exact_split_law(inner_spectrum, b)
     termination = certify_termination_cap(
         split_law, b=b, T_min=late_blocks, h_max=h_max - 1, cap_shift=termination_shift

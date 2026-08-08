@@ -1,6 +1,6 @@
 # Proof Status And High-Risk TODOs
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 Purpose: keep the post-restructure proof state explicit.  This is not a new
 theorem source; it is the working checklist for what is in good narrative
@@ -85,20 +85,26 @@ theorem-facing rational/outward certificate instead reports
 
 ### Smaller Exact Outer And BCH Projection Rows
 
-Status: exact EBCH-128 alternate; BCH256/BCH512 projections remain heuristic.
+Status: exact EBCH-128 parity-block alternate; BCH256/BCH512 projections
+remain heuristic.
 
-An exact alternate row is now available for a smaller block outer: the direct
-sum of `16384` copies of the committed extended BCH `[128,64,22]` spectrum.
+The primary smaller-block alternate uses `16383` independent EBCH
+`[128,64,22]` message blocks and one componentwise-XOR parity block.  It is an
+explicit codimension-64 subcode of the ambient direct sum of `16384` EBCH
+blocks, has outer weight at least 44, and has dimension `2^20-64=1048512`.
 The standalone rational/outward verifier
 `scripts/certify_ebch128_outer_fullsplit.py` covers every outer weight and
-reports a complete diagnostic exponent `-20.805420113752`.  Its theorem-safe
-integer gate is `616562689/2^50 <= 2^-20.80`.  A random codimension-20 outer
-subcode gives an exact `40.80`-bit certificate and dimension `2^20-20`.
-Conversely, a checked weight-22 suffix family lower-bounds the unchanged
-full-dimension ensemble by `2^-36.493931`, so 40 bits at full dimension cannot
-come from further upper-bound cleanup.  The frozen manuscript theorem still
-uses RM-512 pending proof review and deliberate promotion of this alternate
-lane; see `scripts/ebch128_outer_fullsplit_certificate.md`.
+reports the complete diagnostic exponent `-41.306810170135`; exact integer
+arithmetic proves `417/2^50 <= 2^-41.29`.  Scalar extension through the same
+binary generator gives the identical dimension and distance lower bound for
+vectors of `GF(2^128)` symbols.  Encoding the parity requires 1048512
+128-bit XORs and no field multiplication.  The ambient full-dimension lane
+still has only 20.80 bits; a checked weight-22 suffix family lower-bounds its
+first moment by `2^-36.493931`, so it cannot reach 40 bits by upper-bound
+cleanup.  A random codimension-20 subcode remains a 40.80-bit theoretical
+alternative.  The frozen manuscript theorem still uses RM-512 pending proof
+review and deliberate promotion of this alternate lane; see
+`scripts/ebch128_outer_fullsplit_certificate.md`.
 
 The BCH256 and BCH512 rows are spectrum-model projections, not theorem claims.
 They should not be promoted until an exact spectrum or rigorous low-weight

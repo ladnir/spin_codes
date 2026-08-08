@@ -1,5 +1,5 @@
 {
-  "schema": 2,
+  "schema": 3,
   "arithmetic": "exact rationals plus outward Decimal log2 intervals",
   "construction": {
     "N": 2097152,
@@ -552,6 +552,68 @@
     "certified_bits_hundredths": 2080,
     "status": "PASS"
   },
+  "parity_block_outer": {
+    "ambient_blocks": 16384,
+    "independent_blocks": 16383,
+    "local_message_symbols": 64,
+    "ambient_dimension": 1048576,
+    "subcode_dimension": 1048512,
+    "codimension": 64,
+    "minimum_active_local_blocks": 2,
+    "local_minimum_weight": 22,
+    "minimum_outer_weight": 44,
+    "encoding_rule": "m_16384 = XOR_{i=1}^{16383} m_i, componentwise",
+    "coefficientwise_spectrum_bound": "parity-block code is a subcode of the ambient direct sum; A_parity[h] <= A_ambient[h], with A_parity[h] = 0 for h < 44",
+    "gf128_scalar_extension": "binary-generator scalar extension to GF(2^128) preserves the binary minimum-distance lower bound",
+    "gf128_parity_xors": 1048512,
+    "status": "PASS"
+  },
+  "parity_block_low_weight_refinement": {
+    "outer_weight_floor": 44,
+    "near_refinement_h_max": 300,
+    "near_subbucket_width": 250,
+    "near_subbucket_count": 16
+  },
+  "parity_block_low_weight": {
+    "h_max": 500,
+    "live_outer_weights": 229,
+    "chernoff_crossing": 5923,
+    "chernoff_mgf_log2": -0.7814899180576731,
+    "termination_exact_log2": -63.89264922044356,
+    "termination_cap_shift": 63,
+    "dyadic_bits": 1024,
+    "episode_max": 8,
+    "early_episode_max": 16,
+    "gap_sums_sha256": "7a32dcccc6e67dad804a9f3be42eda4115cd579104653877cb4c7e790c05c784",
+    "inner_bounds_sha256": "81845a5e71ba187418b6bcd7f1a621d974b01661e2bcf6a13a669dbcdc2905c9",
+    "local_spectrum_sha256": "26164b40cee431cd24995887ba485563f02048d64fdea00dc86b3d9a4897a94e",
+    "inner_spectrum_sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
+    "bucket_log2": [
+      -52.87961287789767,
+      -68.11437510381711,
+      -73.75886843976878,
+      -73.54795472944079,
+      -76.41800542831152,
+      -78.58137992453248
+    ],
+    "explicit_episode_log2": -52.87957370414006,
+    "episode_tail_log2": -144.07261071277208,
+    "ultra_late_log2": -41.31053556399547,
+    "total_log2": -41.310060802403314,
+    "threshold_num": 26,
+    "threshold_shift": 46,
+    "threshold_log2": -41.29956028185891,
+    "threshold_bits_exact_status": "PASS",
+    "cross_multiply_slack_bits": 9123
+  },
+  "parity_block_complete": {
+    "low_weight_log2_upper": -41.310060802403314,
+    "postprefix_log2_upper": -50.102265480006906,
+    "diagnostic_total_log2_upper": -41.306810170134895,
+    "exact_threshold": "417/1125899906842624",
+    "certified_bits_hundredths": 4129,
+    "status": "PASS"
+  },
   "uniform_ensemble_40bit_obstruction": {
     "outer_weight": 22,
     "suffix_blocks": 4000,
@@ -571,5 +633,5 @@
     "certified_bits_hundredths": 4080,
     "status": "PASS"
   },
-  "sha256": "ed5be387a9b380ba740a1fdc73f89a2d41b20c08110d708aabedc326c88c3907"
+  "sha256": "d4862f15d6896f2edd5044b28ff86741cb28fcf19eaf974062cd327f8c5b4fb3"
 }
