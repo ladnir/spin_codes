@@ -121,5 +121,6 @@ mathematical provenance of the committed EBCH weight enumerator is a declared
 input: this certificate validates and consumes that table but does not derive
 the enumerator from a generator polynomial.
 
-The manuscript theorem remains on the frozen RM-512 lane until this alternate
-certificate receives a proof review and is deliberately promoted.
+The manuscript now includes this lane as
+`thm:fullsplit-ebch-xor-parity-certificate-009`, together with the subcode
+domination and scalar-extension lemmas used by the proof.

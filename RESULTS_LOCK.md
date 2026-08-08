@@ -65,7 +65,8 @@ Important command note:
 
 ### Finite RM outer x full-split EBCH inner
 
-Status: current main finite construction and checked certificate.
+Status: full-dimension finite construction and checked certificate; retained
+alongside the promoted parity-block theorem.
 
 Primary locations:
 
@@ -162,8 +163,8 @@ table from a code definition.
 
 ### Exact EBCH-128 outer alternate
 
-Status: exact standalone parity-block certificate; not yet promoted into the
-manuscript theorem.
+Status: exact parity-block certificate, promoted into the manuscript as
+`thm:fullsplit-ebch-xor-parity-certificate-009`.
 
 The primary 128-block alternate uses `16383` independent extended BCH
 `[128,64,22]` message blocks and one componentwise-XOR parity block.  This is

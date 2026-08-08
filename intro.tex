@@ -53,7 +53,8 @@ A terminated, feedforward convolutional outer with logarithmic memory and dense 
 analytic baseline for the asymptotic dense+dense theorem.
 \item \textbf{Structured local-code outer.}
 A direct sum of short local codes, used through its exact or certified weight spectrum.  This is the current finite
-certificate route; the proved checkpoint uses \(4096\) copies of \(RM(4,9)\).
+certificate route.  The proved rows use either \(4096\) copies of \(RM(4,9)\)
+or \(16384\) EBCH blocks restricted by one explicit XOR-parity block.
 \end{enumerate}
 
 \paragraph{Inner instantiations.}
@@ -87,7 +88,21 @@ Thus some realization is an actual binary
 length-preserving encoder with an unverified dimension.
 Here the complete \(h\le500\) first-active subfamily contributes at most
 \(6793/2^{50}\), while the complementary range \(h\ge501\) contributes at most
-\(2^{-180}\).  BCH-spectrum projections remain outside these proved RM rows.
+\(2^{-180}\).
+
+For encoding vectors over \(\F_{2^{128}}\), an explicit second row replaces
+the RM outer by \(16384\) EBCH \([128,64,22]\) blocks and makes the last
+64-symbol message block the componentwise XOR of the preceding \(16383\).
+Every nonzero message then activates at least two local blocks, giving outer
+weight at least \(44\).  The exact certificate proves
+\[
+ \mathbb E Z_d\le\frac{417}{2^{50}}\le2^{-41.29},
+\]
+and hence the existence of a binary
+\([2^{21},1048512,d_{\min}\ge188744]\) code.  Scalar extension of its binary
+generator gives the same parameters in symbol Hamming distance over
+\(\F_{2^{128}}\).  BCH-spectrum projections beyond these two exact rows remain
+heuristic.
 
 \paragraph{Organization.}
 Section~\ref{sec:sc-framework} states the modular serial-concatenation framework theorem and isolates the required outer and inner interfaces.
@@ -97,4 +112,5 @@ dense construction: the outer bounds, the scalar dense recursive inner
 interface, and the analytic dense+dense integration theorem.
 Section~\ref{sec:structured-local-code} gives the structured local-code
 construction: the local-code outer interface, the full-split inner interface,
-the proved RM/EBCH finite checkpoint, and the BCH/local-code projection paths.
+the proved RM/EBCH and EBCH/XOR-parity finite checkpoints, and the
+BCH/local-code projection paths.

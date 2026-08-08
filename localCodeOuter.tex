@@ -56,6 +56,46 @@ event that the restriction has a nonzero kernel word or a nonzero image word
 below the target distance.
 \end{proof}
 
+\begin{lemma}[Subcode spectrum domination]
+\label{lem:block-outer-subcode-domination}
+Let \(C'\subseteq C_{\mathrm{out}}\) be a linear subcode, with weight
+enumerators \(A'_h\) and \(A_h^{\mathrm{out}}\), respectively.  Then
+\(A'_h\le A_h^{\mathrm{out}}\) for every \(h\).  If in addition
+\(d_{\min}(C')\ge d_0\), then the first-moment bound for \(C'\) is at most
+\[
+ \sum_{h=d_0}^{N}A_h^{\mathrm{out}}p_h^{\rm in}(\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+Every weight-\(h\) word of \(C'\) is a distinct weight-\(h\) word of
+\(C_{\mathrm{out}}\), proving coefficientwise domination.  The distance
+hypothesis makes \(A'_h=0\) below \(d_0\); applying
+Lemma~\ref{lem:block-outer-first-moment-interface} and then replacing each
+remaining \(A'_h\) by \(A_h^{\mathrm{out}}\) gives the claim.
+\end{proof}
+
+\begin{lemma}[Distance under scalar extension]
+\label{lem:binary-code-scalar-extension}
+Let \(G\in\F_2^{K\times N}\) generate a binary linear \([N,K,d]\) code.
+For every \(s\ge1\), interpreting the same matrix over \(\F_{2^s}\) generates
+an \(\F_{2^s}\)-linear \([N,K,d]\) code in symbol Hamming distance.
+\end{lemma}
+
+\begin{proof}
+The binary row rank of \(G\) remains \(K\) over every extension field.  Fix an
+\(\F_2\)-basis \(\beta_1,\ldots,\beta_s\) of \(\F_{2^s}\).  Every extended-field
+message has a unique decomposition \(x=\sum_j\beta_jx_j\), with
+\(x_j\in\F_2^K\), and hence
+\[
+ xG=\sum_j\beta_j(x_jG).
+\]
+If \(xG\ne0\), some binary component \(x_jG\) is nonzero.  Its support is
+contained in the symbol support of \(xG\), so \(\wt(xG)\ge d\).  Conversely,
+a binary codeword of weight \(d\) is also an extended-field codeword, proving
+equality of the two minimum distances.
+\end{proof}
+
 \subsubsection{Finite certificate template}
 \label{subsec:local-code-certificate-template}
 

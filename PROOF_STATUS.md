@@ -57,11 +57,11 @@ Latest checked status: sampled-grid verification passes with worst gap
 
 ### Structured Local-Code Construction
 
-Status: finite checkable certificate line.
+Status: two theorem-facing finite checkable certificate rows.
 
 The structured parent section is `localCodeStructured.tex`; it inputs the
-local-code outer interface, full-split inner interface, RM/EBCH certificate,
-and BCH projection note.  The proved finite instantiation is:
+local-code outer interface, full-split inner interface, two exact certificate
+rows, and the BCH projection note.  The frozen full-dimension instantiation is:
 
 - outer: direct sum of `4096` copies of `RM(4,9) [512,256,32]`;
 - inner: full-split EBCH `[128,64,22]` with `b=64`;
@@ -70,6 +70,17 @@ and BCH projection note.  The proved finite instantiation is:
 - theorem-safe rational/outward first moment: `E[Z_d] <= 2^-37.27`;
 - conclusion: some realization is a binary
   `[2^21,2^20,d_min >= 188744]` code.
+
+The promoted field-symbol instantiation is:
+
+- outer: `16383` independent EBCH `[128,64,22]` message blocks plus one
+  componentwise-XOR parity block;
+- dimension: `2^20-64=1048512`;
+- outer minimum weight: at least `44`;
+- theorem-safe rational/outward first moment:
+  `417/2^50 <= 2^-41.29`;
+- conclusion: some binary `[2^21,1048512,d_min >= 188744]` code exists, and
+  scalar extension gives the same parameters over `GF(2^128)`.
 
 Current verifier:
 
@@ -102,8 +113,8 @@ vectors of `GF(2^128)` symbols.  Encoding the parity requires 1048512
 still has only 20.80 bits; a checked weight-22 suffix family lower-bounds its
 first moment by `2^-36.493931`, so it cannot reach 40 bits by upper-bound
 cleanup.  A random codimension-20 subcode remains a 40.80-bit theoretical
-alternative.  The frozen manuscript theorem still uses RM-512 pending proof
-review and deliberate promotion of this alternate lane; see
+alternative.  This parity-block lane is now promoted as
+`thm:fullsplit-ebch-xor-parity-certificate-009`; see
 `scripts/ebch128_outer_fullsplit_certificate.md`.
 
 The BCH256 and BCH512 rows are spectrum-model projections, not theorem claims.

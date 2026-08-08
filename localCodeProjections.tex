@@ -1,15 +1,16 @@
 \subsection{BCH and local-code upgrade projections}
 \label{sec:local-code-projections}
 
-The RM/EBCH theorem above is the rational/outward finite certificate.  The material in
-this section is not a theorem upgrade; it is a spectrum-model design
-comparison.
+The RM/EBCH and EBCH/XOR-parity theorems above are exact rational/outward
+finite certificates.  The material in this section goes beyond those two
+proved rows and is only a spectrum-model design comparison.
 
-The proved checkpoint uses the exact RM \([512,256,32]\) local spectrum.  As a
-finite-\(N\) design comparison, we also tested two possible stronger outer
-floors while leaving the full-split EBCH inner ledger unchanged.  The BCH rows
-use a spectrum model, not a certified local spectrum or a rigorous low-weight
-envelope.
+The full-dimension checkpoint uses the exact RM \([512,256,32]\) local
+spectrum, while the explicit parity-block checkpoint uses the exact EBCH
+\([128,64,22]\) spectrum.  As a finite-\(N\) design comparison, we also tested
+two possible stronger outer floors while leaving the full-split EBCH inner
+ledger unchanged.  Those BCH rows use a spectrum model, not a certified local
+spectrum or a rigorous low-weight envelope.
 Because both BCH candidates are parity extensions, the corrected random-like
 model is supported only on even weights and uses
 \(2^{k_0-(n_0-1)}\binom{n_0}{w}\), rather than assigning mass to impossible

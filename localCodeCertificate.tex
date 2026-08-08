@@ -50,18 +50,16 @@ The exact RM support check also proves \(A_h^{\rm out}=0\) for
 \paragraph{Arithmetic model.}
 All spectrum coefficients, placement counts, split probabilities, and final
 dyadic comparisons are integers or exact rational numbers.  For \(h\le500\),
-the six gap sums are exact and the Chernoff envelope is rounded upward on a
-1024-bit dyadic grid; the remaining episode tails and final aggregation are
-rational logarithms are evaluated with correctly rounded decimal logarithms at
-rational.  For \(h\ge501\), real logarithms occur only through outward
-intervals: integer and rational logarithms are evaluated with correctly rounded decimal logarithms at
-rational logarithms are evaluated with correctly rounded decimal logarithms at
-130 guard digits, enlarged by \(10^{-110}\), and every subsequent operation is
-rounded outward at 100 digits.  Binomial logarithms use exact small factorials
-or Robbins bounds together with \(333/106<\pi<355/113\).  Every threshold
+the six gap sums are exact, the Chernoff envelope is rounded upward on a
+1024-bit dyadic grid, and the remaining episode tails and final aggregation
+are rational.  For \(h\ge501\), real logarithms occur only through outward
+intervals: integer and rational logarithms are evaluated at 130 decimal
+digits, enlarged by \(10^{-110}\), and every subsequent operation is rounded
+outward at 100 digits.  Binomial logarithms use exact small factorials or
+Robbins bounds together with \(333/106<\pi<355/113\).  Every threshold
 comparison uses the upper interval endpoint.  The cached post-prefix artifact
-is authenticated by its payload hash and by the hashes of both spectrum inputs;
-its full recomputation reproduces the stored payload.
+is authenticated by its payload hash and by the hashes of both spectrum
+inputs; its full recomputation reproduces the stored payload.
 
 The authoritative default check is
 \[
@@ -145,3 +143,115 @@ inequality \(K^{100}\le2^{14273}\), which is equivalent to the final
 \(Z_d=0\); that realization is injective on the outer code and has the claimed
 dimension and minimum distance.
 \end{proof}
+
+\subsection{Finite EBCH/XOR-parity certificate}
+\label{sec:ebch-xor-parity-finite-certificate}
+
+Let \(D\subseteq\F_2^{128}\) be the extended BCH code with parameters
+\([128,64,22]\), and put \(M=16384\).  The ambient outer is
+\(C_{\rm amb}=D^{\oplus M}\), with length \(N=2^{21}\) and dimension
+\(2^{20}\).  To define the explicit parity-block subcode, split a message into
+\(M-1\) blocks \(m_i\in\F_2^{64}\), append
+\[
+ m_M=\bigoplus_{i=1}^{M-1}m_i,
+\]
+and encode all \(M\) blocks with the local encoder of \(D\).  Denote the image
+by \(C_{\oplus}\).  Its dimension is
+\[
+ K_{\oplus}=64(M-1)=2^{20}-64=1048512.
+\]
+
+\begin{lemma}[Parity-block outer floor]
+\label{lem:ebch-xor-parity-floor}
+The code \(C_{\oplus}\) is a subcode of \(C_{\rm amb}\), has minimum distance
+at least \(44\), and its enumerator satisfies
+\[
+ A_h^{\oplus}=0\quad(1\le h<44),\qquad
+ A_h^{\oplus}\le A_h^{\rm amb}\quad(44\le h\le N).
+\]
+\end{lemma}
+
+\begin{proof}
+The parity map is injective and its blockwise encoding lies in the ambient
+direct sum.  If exactly one independent message block is nonzero, the parity
+block repeats it, so two local codewords are nonzero.  If at least two
+independent blocks are nonzero, those two already give two nonzero local
+codewords, whether or not their XOR vanishes.  Each nonzero local codeword has
+weight at least \(22\), proving the weight-\(44\) floor.  Coefficientwise
+domination follows from Lemma~\ref{lem:block-outer-subcode-domination}.
+\end{proof}
+
+Use the same full-split inner, interleaver, and target
+\(d=188743\) as above.  The standalone verifier is
+\[
+ \texttt{python scripts/certify\_ebch128\_outer\_fullsplit.py}.
+\]
+It authenticates the EBCH spectrum and both low-weight support artifacts by
+SHA-256.  As in the RM/EBCH certificate, the mathematical provenance of the
+committed EBCH enumerator remains a declared input rather than something the
+verifier derives from a generator polynomial.  Full regeneration uses the option
+\(\texttt{--recompute-artifact}\).
+
+\begin{lemma}[Complete parity-block row certificate]
+\label{lem:ebch-xor-parity-rational}
+For the parity-block outer,
+\[
+ \sum_{h=1}^{500}A_h^{\oplus}p_h^{\rm in}(.09)
+ \le \frac{26}{2^{46}},\qquad
+ \sum_{h=501}^{N}A_h^{\oplus}p_h^{\rm in}(.09)
+ \le 2^{-50}.
+\]
+\end{lemma}
+
+\begin{proof}
+For \(h\le500\), the verifier applies Lemma~\ref{lem:ebch-xor-parity-floor}:
+it zeros the ambient coefficients below \(44\), retains the ambient spectrum
+as a coefficientwise upper bound thereafter, and refines the first gap bucket
+in 250-block subbuckets through weight \(300\).  Exact rational aggregation
+gives diagnostic logarithm \(-41.310060802403\), below \(26/2^{46}\); the
+integer check \(26^{100}\le2^{471}\) proves the displayed 41.29-bit gate.
+For \(h\ge501\), nonnegativity and subcode domination let us reuse the complete
+ambient post-prefix bound.  Its outward diagnostic logarithm is
+\(-50.102265480007\), below \(2^{-50}\).
+\end{proof}
+
+\begin{theorem}[Finite EBCH/XOR-parity full-split certificate]
+\label{thm:fullsplit-ebch-xor-parity-certificate-009}
+For the full-split ensemble restricted to \(C_{\oplus}\),
+\[
+ \Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{C_{\oplus}}\text{ is not injective}
+  \ \text{or}\ d_{\min}(\Csc)\le188743
+ \Bigr]
+ \le \frac{417}{2^{50}}
+ \le 2^{-41.29}.
+\]
+Consequently, some realization is a binary
+\[
+ [2^{21},1048512,d_{\min}\ge188744]
+\]
+code.  Interpreting its binary generator over \(\F_{2^{128}}\) gives an
+\(\F_{2^{128}}\)-linear code with the same length, dimension, and symbol
+minimum distance.
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:block-outer-first-moment-interface} and
+Lemma~\ref{lem:ebch-xor-parity-rational} give
+\[
+ \mathbb E Z_d
+ \le \frac{26}{2^{46}}+2^{-50}
+ =\frac{417}{2^{50}}.
+\]
+The exact integer inequality \(417^{100}\le2^{871}\) proves the final
+\(2^{-41.29}\) comparison.  The expectation is below one, so some sampled
+binary encoder is injective on \(C_{\oplus}\) and has the claimed distance.
+Lemma~\ref{lem:binary-code-scalar-extension} gives the field-symbol statement.
+\end{proof}
+
+\begin{remark}[Encoding cost]
+Over \(\F_{2^{128}}\), forming the parity block needs 64 running 128-bit
+accumulators and at most \(64(M-1)=1048512\) XORs.  It uses no field
+multiplications or coefficient tables, can be fused with the input pass, and
+does not change the \(M\) local EBCH encodings.
+\end{remark}
