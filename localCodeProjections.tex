@@ -10,6 +10,10 @@ finite-\(N\) design comparison, we also tested two possible stronger outer
 floors while leaving the full-split EBCH inner ledger unchanged.  The BCH rows
 use a spectrum model, not a certified local spectrum or a rigorous low-weight
 envelope.
+Because both BCH candidates are parity extensions, the corrected random-like
+model is supported only on even weights and uses
+\(2^{k_0-(n_0-1)}\binom{n_0}{w}\), rather than assigning mass to impossible
+odd local weights.
 The comparison script is
 \[
 \texttt{python scripts/compare\_outer\_modes\_fullsplit.py --delta 0.09}.
@@ -27,6 +31,17 @@ modeled rows suggest that replacing the RM outer by a BCH-like
 \([256,128,38]\) model is roughly comparable to the proved RM row and sensitive
 to low-weight-spectrum inflation.  This conclusion is only a projection until
 an exact spectrum or proved low-weight envelope is supplied.
+
+The \([512,256,\ge62]\) code object itself is no longer conjectural: an exact
+extended \([512,259,\ge62]\) primitive BCH parent and three deterministic
+independent checks regenerate such a subcode.  What remains missing is its
+weight spectrum.  An exact parameter-only audit using the parent's dual
+distance floor \(16\), orthogonal-array Christoffel bounds, and constant-weight
+packing still exceeds the projection targets by more than fifty bits at the
+audited critical weights.  Thus this row requires genuinely BCH-specific
+cancellation or specialized spectrum enumeration, not merely the standard
+distance and dual-strength constraints.  The \(h>2000\) tail must also be
+recomputed before any theorem upgrade.
 
 Additional comparison tables, inflation stress tests, and BCH spectrum notes
 are kept with the generated comparison artifacts.

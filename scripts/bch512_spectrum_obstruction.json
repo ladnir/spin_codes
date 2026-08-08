@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "status": "NOTEWORTHY_OBSTRUCTION",
+  "interpretation": "No exact spectrum was located or computed.  Parameter-only finite bounds remain more than 50 bits above the corrected projection targets, so a successful certificate must use BCH-specific cancellation or a real spectrum.",
+  "parent": {
+    "primitive_parameters": [
+      511,
+      259,
+      61
+    ],
+    "extended_parameters_floor": [
+      512,
+      259,
+      62
+    ],
+    "generator_degree": 252,
+    "dual_initial_zero_run": 15,
+    "extended_dual_distance_floor": 16,
+    "extended_dual_distance_reason": "B^perp has cyclic zeros 0..14, hence distance >=16.  For extension-dual words (u+1,1), u+1 retains zeros 1..14, hence weight >=15 before the extension coordinate."
+  },
+  "projection": {
+    "subcode_dimension": 256,
+    "even_weight_random_like_exponent": "2^(k-(n-1))*binom(n,w)",
+    "audited_uniform_low_weight_inflation_bits": 40,
+    "inflation_window_max_weight": 94,
+    "weights": [
+      {
+        "weight": 62,
+        "projection_inflation_bits": 40,
+        "random_like_subcode_log2": 13.42658445129672,
+        "projection_target_log2": 53.42658445129672,
+        "christoffel_upper_log2": 214.01396106496594,
+        "constant_weight_upper_log2": 110.26401517117263,
+        "best_generic_upper_log2": 110.26401517117263,
+        "generic_gap_above_target_bits": 56.8374307198759,
+        "best_generic_bound": "constant_weight_packing"
+      },
+      {
+        "weight": 94,
+        "projection_inflation_bits": 40,
+        "random_like_subcode_log2": 92.73447689077955,
+        "projection_target_log2": 132.73447689077955,
+        "christoffel_upper_log2": 217.73128721907153,
+        "constant_weight_upper_log2": 192.65552895260157,
+        "best_generic_upper_log2": 192.65552895260157,
+        "generic_gap_above_target_bits": 59.921052061822024,
+        "best_generic_bound": "constant_weight_packing"
+      },
+      {
+        "weight": 118,
+        "projection_inflation_bits": 0,
+        "random_like_subcode_log2": 139.18051863549084,
+        "projection_target_log2": 139.18051863549084,
+        "christoffel_upper_log2": 221.06651604199382,
+        "constant_weight_upper_log2": 241.56766860757403,
+        "best_generic_upper_log2": 221.06651604199382,
+        "generic_gap_above_target_bits": 81.88599740650295,
+        "best_generic_bound": "christoffel"
+      }
+    ]
+  },
+  "primitive_boundary": {
+    "primitive_weight": 61,
+    "random_like_parent_log2": 13.380780761683582,
+    "legacy_target_log2": 67.13078076168358,
+    "generic_interpolation_upper_log2": 112.25969418911396,
+    "gap_above_legacy_target_bits": 45.128913427430376,
+    "note": "The legacy 53.75-bit allowance is compared in the logarithmic domain."
+  },
+  "literature": {
+    "minimum_distance_status_source": "https://doi.org/10.11591/ijece.v9i2.pp1232-1239",
+    "source_finding": "The 2019 ZSSMP study reports BCH(511,259) as one of the two length-511 cases whose true minimum distance it did not determine.",
+    "finite_spectrum_bound_source": "https://doi.org/10.1023/A:1011220817609"
+  },
+  "sha256": "0fba2f0889e0d5f8d8e545de8dfd03b19fe4a8f93895ccf1ba3370227b23d2f6"
+}

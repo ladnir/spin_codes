@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "construction": "extended primitive narrow-sense BCH parent plus three even checks",
+  "field": {
+    "m": 9,
+    "primitive_polynomial_hex": "0x211",
+    "coordinate_alpha_hex": "0x2"
+  },
+  "parent": {
+    "primitive_length": 511,
+    "extended_length": 512,
+    "dimension": 259,
+    "primitive_redundancy": 252,
+    "extended_check_rank": 253,
+    "designed_distance": 61,
+    "extended_distance_floor": 62,
+    "distance_reason": "BCH bound gives primitive distance >=61; parity extension is even, so its nonzero weights are >=62",
+    "check_rows_sha256": "f9add3c3860b9df7e13b247a3bf6cf0adb56b285809398242961d894b840bd9b"
+  },
+  "subcode": {
+    "length": 512,
+    "dimension": 256,
+    "distance_floor": 62,
+    "extra_checks": [
+      "x_0+x_1=0",
+      "x_0+x_2=0",
+      "x_0+x_3=0"
+    ],
+    "rank_ladder": [
+      253,
+      254,
+      255,
+      256
+    ],
+    "contains_all_one": true,
+    "even_weight": true,
+    "complement_symmetric_spectrum": true,
+    "check_rows_sha256": "f072bfe54fd10075550a7042e971264e9d2f040d88909812618e96b21c868025",
+    "generator_basis_sha256": "80e1233e029a247c78df85f421bb51e48d89c704507a76f2ee22e3771355d7ef",
+    "basis_min_row_weight": 108,
+    "basis_max_row_weight": 146
+  },
+  "sha256": "fb9c88334eb0fd851f9c49e55783d6c0e5407b814e330de070de905180166987"
+}

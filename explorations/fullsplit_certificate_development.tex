@@ -1946,10 +1946,10 @@ It writes the CSV and Markdown reports
 \end{gathered}
 \]
 The RM row reproduces the checked ledger value
-\(-37.278528\), while the BCH rows are marked heuristic in both outputs.  The modeled local spectrum is
+\(-37.278528\), while the BCH rows are marked heuristic in both outputs.  The modeled BCH local spectrum is
 \[
-A_w=0\quad(0<w<d_0),\qquad
-A_w\approx 2^{k_0-n_0}\binom{n_0}{w}\quad(w\ge d_0),
+A_w=0\quad(0<w<d_0\text{ or }w\text{ odd}),\qquad
+A_w\approx 2^{k_0-(n_0-1)}\binom{n_0}{w}\quad(w\ge d_0,\ w\text{ even}),
 \]
 with optional sensitivity inflation of \(+10,+20,+40\) bits on the low-weight window
 \(d_0\le w\le d_0+32\).
@@ -1961,8 +1961,8 @@ At \(N=2^{21}\), \(\delta=.09\), and \(d=188743\), the baseline projection rows 
 \log_2\mu & \text{margin bits} & \text{dominant }h\\
 \hline
 \text{RM exact} & \text{proved} & [512,256,32] & 4096 & -37.278528 & 37.278528 & 32\\
-\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089134 & 37.089134 & 59\\
-\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 119 .
+\text{BCH-like} & \text{heuristic} & [256,128,38] & 8192 & -37.089003 & 37.089003 & 60\\
+\text{extended BCH-like} & \text{heuristic} & [512,256,\ge62] & 4096 & -68.171304 & 68.171304 & 118 .
 \end{array}
 \]
 All three baseline rows are still dominated by the first-active near-window row \(r=1\), \(1\le\mathrm{gap}\le4000\).
@@ -1970,9 +1970,9 @@ The rough work proxy \(B n_0\log_2 n_0\) is \(18874368\) for the \(512\)-bit row
 row, so the shorter-block projection has similar or slightly lower nominal outer work.
 
 The sensitivity check is the warning sign.  The \([256,128,38]\) model remains near the RM margin with no inflation and
-has \(27.167072\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
+has \(27.154731\) bits of margin under \(+10\) bits, but the projected \(501\le h\le2000\) row becomes dominant and
 positive under \(+20\) bits.  The \([512,256,\ge62]\) model is much more robust in this diagnostic: its margins under
-\(+10,+20,+40\) bits are \(65.802609\), \(56.111333\), and \(36.111659\) bits, respectively.  Thus the projection
+\(+10,+20,+40\) bits are \(65.625088\), \(55.894300\), and \(35.894577\) bits, respectively.  Thus the projection
 suggests that a real \(512\)-bit BCH-like outer spectrum could be a meaningful constant-factor upgrade, whereas the
 \(256\)-bit option depends sensitively on the actual low-weight spectrum.
 

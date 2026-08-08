@@ -86,6 +86,7 @@ class OuterModeSpec:
     blocks: int
     spectrum_kind: str
     source: str
+    even_weight_only: bool = False
     inflation_bits: int = 0
 
     @property
@@ -201,7 +202,14 @@ def random_like_local_log_spectrum(spec: OuterModeSpec, h_max: int) -> list[floa
     coeffs = [float("-inf")] * (h_max + 1)
     coeffs[0] = 0.0
     for w in range(spec.local_distance, min(spec.local_length, h_max) + 1):
-        value = spec.local_dimension - spec.local_length + log2_binom(spec.local_length, w)
+        if spec.even_weight_only and w % 2:
+            continue
+        # An even [n,k] subspace is random-like inside the (n-1)-dimensional
+        # even-weight ambient space, not inside all of F_2^n.  Consequently
+        # its even coefficients have one more bit than the unrestricted
+        # 2^(k-n) binomial model, while every odd coefficient is zero.
+        ambient_dimension = spec.local_length - int(spec.even_weight_only)
+        value = spec.local_dimension - ambient_dimension + log2_binom(spec.local_length, w)
         if w <= spec.local_distance + 32:
             value += spec.inflation_bits
         coeffs[w] = min(value, log2_binom(spec.local_length, w))
@@ -450,6 +458,7 @@ def outer_specs() -> list[OuterModeSpec]:
                 blocks=8192,
                 spectrum_kind="random_like_floor",
                 source="random-like hard-floor envelope; CodeTables construction record",
+                even_weight_only=True,
                 inflation_bits=inflation,
             )
         )
@@ -465,6 +474,7 @@ def outer_specs() -> list[OuterModeSpec]:
                 blocks=4096,
                 spectrum_kind="random_like_floor",
                 source="random-like hard-floor envelope; primitive BCH designed-distance projection",
+                even_weight_only=True,
                 inflation_bits=inflation,
             )
         )
@@ -655,7 +665,7 @@ def write_markdown(results: list[ModeResult], path: Path, args: argparse.Namespa
         "",
         "## Low-Weight Sensitivity",
         "",
-        "For BCH projections, `+s` means adding `s` bits to every local low-weight count in the window `d0 <= w <= d0+32` before direct-sum convolution.",
+        "For BCH projections, the random-like model is supported only on even weights and uses `2^(k-(n-1)) binom(n,w)`, as required for an even subspace.  `+s` means adding `s` bits to every supported local low-weight count in the window `d0 <= w <= d0+32` before direct-sum convolution.",
         "",
         markdown_table(
             ["mode", "status", "low-weight inflation", "log2 mu", "margin bits", "dom h", "dom term"],
@@ -674,8 +684,8 @@ def write_markdown(results: list[ModeResult], path: Path, args: argparse.Namespa
         "## Spectrum Notes",
         "",
         "- `rm512_exact`: exact RM `[512,256,32]` local spectrum from `scripts/rm512_256_spectrum.csv`.",
-        "- `bch256_heuristic`: BCH-like `[256,128,38]`, motivated by the CodeTables `[256,128]` construction record; modeled as `2^(k-n) binom(n,w)` above the hard floor.",
-        "- `bch512_heuristic`: extended BCH-like `[512,256,>=62]`, motivated by primitive BCH length `511`, designed distance `61`, extension, and subcode to dimension `256`; modeled the same way.",
+        "- `bch256_heuristic`: even BCH-like `[256,128,38]`, motivated by the CodeTables `[256,128]` construction record; modeled as `2^(k-(n-1)) binom(n,w)` on even weights above the hard floor.",
+        "- `bch512_heuristic`: even extended BCH-like `[512,256,>=62]`, motivated by primitive BCH length `511`, designed distance `61`, extension, and subcode to dimension `256`; modeled the same way.",
         "",
         "Sources: [CodeTables `[256,128]`](https://www.codetables.de/BKLC/BKLC.php?k=128&n=256&q=2), [Kusaka weight-distribution index](https://isec.ec.okayama-u.ac.jp/home/kusaka/wd/), and [BCH designed-distance bound](https://errorcorrectionzoo.org/c/bch).",
         "",

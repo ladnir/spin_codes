@@ -205,17 +205,38 @@ Locked projection rows at `N=2^21`, `delta=.09`, `d=188743`:
 | mode | status | local outer | blocks | log2 mu | margin bits | dominant h |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
 | `rm512_exact` | proved | RM `[512,256,32]` | 4096 | -37.278528 | 37.278528 | 32 |
-| `bch256_heuristic_plus0` | heuristic | BCH-like `[256,128,38]` | 8192 | -37.089134 | 37.089134 | 59 |
-| `bch512_heuristic_plus0` | heuristic | extended BCH-like `[512,256,>=62]` | 4096 | -68.171304 | 68.171304 | 119 |
+| `bch256_heuristic_plus0` | heuristic | BCH-like `[256,128,38]` | 8192 | -37.089003 | 37.089003 | 60 |
+| `bch512_heuristic_plus0` | heuristic | extended BCH-like `[512,256,>=62]` | 4096 | -68.171304 | 68.171304 | 118 |
+
+The BCH projection is supported only on even local weights and uses the
+even-ambient baseline `2^(k-(n-1))*binom(n,w)`.  The previous all-weight model
+incorrectly admitted odd local weights and underweighted each even coefficient
+by one bit; its reported dominant weights `59` and `119` were impossible.
 
 Sensitivity warning:
 
 - BCH256 is fragile under low-weight inflation: `+10` bits leaves
-  `27.167072` margin, while `+20` bits makes the `501..2000` projection
+  `27.154731` margin, while `+20` bits makes the `501..2000` projection
   positive.
 - BCH512 is more robust in this projection: `+10,+20,+40` give margins
-  `65.802609`, `56.111333`, and `36.111659`.
+  `65.625088`, `55.894300`, and `35.894577`.
 - The `>2000` tail is not recomputed for BCH projections in this driver.
+
+Construction/obstruction status:
+
+- `scripts/build_bch512_256_candidate.py` now regenerates an exact
+  complement-symmetric `[512,256,>=62]` subcode of the extended
+  `[512,259,>=62]` primitive BCH parent, with hashed check matrices and
+  generator basis.  This construction uses no spectrum assumption.
+- `scripts/audit_bch512_spectrum_obstruction.py` verifies the parent's dual
+  distance floor `16` and exact generic coefficient bounds.  At local weights
+  `62,94,118`, the best available strength-15 Christoffel or constant-weight
+  packing bound is still `56.84,59.92,81.89` bits above the corrected
+  projection target.
+- This is a noteworthy method obstruction, not evidence that the desired BCH
+  envelope is false.  A theorem upgrade still needs BCH-specific
+  cancellation, specialized orbit/coset enumeration, or another local code
+  with a certified spectrum.
 
 ## Conceptual Conclusions
 

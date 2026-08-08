@@ -90,6 +90,20 @@ Status: heuristic projection only.
 The BCH256 and BCH512 rows are spectrum-model projections, not theorem claims.
 They should not be promoted until an exact spectrum or rigorous low-weight
 envelope replaces the modeled spectrum and the affected tails are recomputed.
+The BCH512 code construction is no longer heuristic:
+`scripts/build_bch512_256_candidate.py` exactly regenerates and authenticates a
+complement-symmetric `[512,256,>=62]` subcode.  What remains heuristic is only
+its spectrum.  The corrected projection uses even weights and the
+`2^(k-(n-1))*binom(n,w)` baseline.
+
+The first exact obstruction audit is recorded by
+`scripts/audit_bch512_spectrum_obstruction.py`.  The extended parent has dual
+distance at least `16`, but the best strength-15 Christoffel/constant-weight
+generic bounds at weights `62,94,118` remain `56.84,59.92,81.89` bits above
+the current projection targets.  Therefore a theorem upgrade requires
+BCH-specific cancellation, specialized spectrum enumeration, or a different
+local code with a certified spectrum; another parameter-only Delsarte estimate
+is not expected to close the recorded gap.
 
 ## High-Risk Items Already Handled
 
@@ -215,7 +229,8 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 ### P0: Must Be Resolved Before Theorem Upgrades
 
 - Replace BCH/random-like projection spectra with exact spectra or rigorous
-  low-weight envelopes.
+  BCH-specific low-weight envelopes; the exact generic obstruction audit is
+  still more than 50 bits too weak.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
 - Keep the BCH projection rows visibly heuristic until the two items above are
   done.
@@ -249,6 +264,8 @@ Use these as the basic post-edit checks:
 ```powershell
 python scripts\verify_dense_claims.py --delta 0.109
 python scripts\verify_fullsplit_finite_ledger.py --write-manifest-json scripts\fullsplit_finite_ledger_manifest.json
+python scripts\build_bch512_256_candidate.py
+python scripts\audit_bch512_spectrum_obstruction.py
 python scripts\compare_outer_modes_fullsplit.py --delta 0.09
 pdflatex -interaction=nonstopmode main_permConv.tex
 pdflatex -interaction=nonstopmode main_permConv.tex

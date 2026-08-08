@@ -329,8 +329,8 @@ Locked projection rows at `N=2^21`, `delta=.09`, `d=188743`:
 | mode | status | local outer | blocks | log2 mu | margin bits | dominant h |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
 | `rm512_exact` | proved | RM `[512,256,32]` | 4096 | -37.278528 | 37.278528 | 32 |
-| `bch256_heuristic_plus0` | heuristic | BCH-like `[256,128,38]` | 8192 | -37.089134 | 37.089134 | 59 |
-| `bch512_heuristic_plus0` | heuristic | extended BCH-like `[512,256,>=62]` | 4096 | -68.171304 | 68.171304 | 119 |
+| `bch256_heuristic_plus0` | heuristic | BCH-like `[256,128,38]` | 8192 | -37.089003 | 37.089003 | 60 |
+| `bch512_heuristic_plus0` | heuristic | extended BCH-like `[512,256,>=62]` | 4096 | -68.171304 | 68.171304 | 118 |
 
 Main-paper role:
 
