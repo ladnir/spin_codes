@@ -107,8 +107,8 @@ Locked parameters:
 Locked certificate:
 
 ```text
-E[Z_d] <= 2^-37.2785
-Pr[d_min <= d] <= 2^-37.2785
+E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27
+Pr[d_min <= d] <= 2^-37.27
 d_min >= 188744 with positive probability
 188744 / 2^21 > .09
 ```
@@ -120,7 +120,7 @@ Verification status:
 - The verifier reported:
   - `current_checked_ledger_total_log2,-37.278528`
   - unrounded stored total `-37.278527626...`
-  - theorem-safe outward-rounded exponent `-37.2785`
+  - sharper checked-log exponent `-37.2785`
   - `current_checked_ledger_margin_bits,37.278528`
   - `h501_plus_checked_rows_log2,-182.259739`
   - `prefix_32_500_e_le8_dominant_term_log2,-37.385767`
@@ -135,6 +135,8 @@ Verification status:
   - complete rational/outward `h>=501` diagnostic upper log
     `-183.800029543464`
   - theorem-safe post-prefix threshold `2^-180`
+  - `fullsplit_complete_rational_status,PASS`
+  - exact combined threshold `(6793*2^130+1)/2^180 <= 2^-37.27`
   - dominant row `outer_weight=32, first_r=1, gap=1..4000`
 
 Canonical artifacts:
@@ -233,10 +235,10 @@ Do not promote these to proved claims until resolved:
 - Replace BCH/random-like projection spectra with exact spectra or rigorous
   low-weight envelopes.
 - Recompute the `h>2000` tail under any new BCH-like outer model.
-- The rational/interval hardening now covers every `h>=501` interval family as
-  well as the complete `h<=500` family.  If a single formal headline is wanted,
-  combine those two independent bounds with a direction-safe final threshold;
-  do not silently reuse the sharper floating-ledger exponent.
+- The rational/interval hardening covers every positive outer weight.  The two
+  independent thresholds are combined exactly into
+  `(6793*2^130+1)/2^180 <= 2^-37.27`; the sharper floating-ledger exponent is
+  retained only as a checked diagnostic.
 - Clarify the full-split construction definition and boundary convention so
   all scripts visibly evaluate the same object.
 - Decide whether finite exact-support prefix lemmas should remain finite

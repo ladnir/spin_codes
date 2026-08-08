@@ -284,8 +284,8 @@ Locked parameters:
 Locked certificate:
 
 ```text
-E[Z_d] <= 2^-37.2785
-Pr[d_min <= d] <= 2^-37.2785
+E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27
+Pr[d_min <= d] <= 2^-37.27
 d_min >= 188744 with positive probability
 188744 / 2^21 > .09
 ```
@@ -304,6 +304,7 @@ The verifier reports:
 - exact cross-multiplied threshold `6793/2^50 <= 2^-37.27`
 - diagnostic `fullsplit_postprefix_complete_rational_log2_upper,-183.800029543464`
 - outward/rational post-prefix threshold `2^-180`
+- exact whole-range threshold `(6793*2^130+1)/2^180 <= 2^-37.27`
 - dominant row `outer_weight=32, first_r=1, gap=1..4000`.
 
 Main-paper role:
@@ -393,8 +394,9 @@ Status: theorem-facing.
 Status: current main finite certificate.
 
 - `N=2^21`, `delta=.09`, `d=188743`.
-- `E[Z_d] <= 2^-37.2785` (the verifier's nearest-six-decimal diagnostic is
-  `-37.278528`; the theorem uses an outward-safe exponent).
+- `E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27`.  The verifier's sharper
+  checked-log diagnostic remains `-37.278528` (reported safely as
+  `-37.2785`), but it is not needed for the rational/outward theorem.
 - Independently, every `h<=500` first-active position has an
   exact/outward-rounded rational bound with diagnostic logarithm
   `-37.276548513006`, closed by exact cross multiplication against
@@ -404,6 +406,9 @@ Status: current main finite certificate.
   `-183.800029543464`, closed against the theorem-safe threshold `2^-180`.
   Its cached artifact also records the exact `2^-62` turnoff gate and 56 exact
   endpoint-in-`T` monotonicity checks.
+- The verifier adds the two certified thresholds on a common dyadic
+  denominator and proves the final `2^-37.27` comparison by raising to the
+  hundredth power and checking an integer inequality.
 - Dominant mode: outer `h=32`, first active occupancy `r=1`, near late window
   `gap=1..4000`.
 

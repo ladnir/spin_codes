@@ -67,7 +67,7 @@ and BCH projection note.  The proved finite instantiation is:
 - inner: full-split EBCH `[128,64,22]` with `b=64`;
 - length: `N=2^21`;
 - target: `delta=.09`, `d=188743`;
-- theorem-safe checked first moment: `E[Z_d] <= 2^-37.2785`.
+- theorem-safe rational/outward first moment: `E[Z_d] <= 2^-37.27`.
 
 Current verifier:
 
@@ -77,8 +77,9 @@ python scripts\verify_fullsplit_finite_ledger.py --write-manifest-json scripts\f
 
 Latest checked status: verifier passes and reports
 `current_checked_ledger_total_log2,-37.278528`; the underlying stored value is
-`-37.278527626...`, so theorem-facing inequalities use the conservatively
-rounded exponent `-37.2785`.
+`-37.278527626...`.  This remains a sharper checked-log diagnostic.  The
+theorem-facing rational/outward certificate instead reports
+`fullsplit_complete_rational_37_27_bits_status,PASS` and uses `2^-37.27`.
 
 ### BCH And Better Local-Code Rows
 
@@ -180,8 +181,13 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   The default verifier validates the SHA-256-protected artifact; full
   regeneration is available with
   `python scripts\certify_fullsplit_postprefix_rational.py --recompute-artifact`.
-- The RM/EBCH finite result is stated as a manifest-backed checked first
-  moment, with BCH rows separated as projections.
+- The two independent bounds are now combined exactly:
+  `(6793*2^130+1)/2^180`.  The default verifier checks
+  `(6793*2^130+1)^100 <= 2^14273`, proving that the complete `1<=h<=N`
+  rational/outward first moment is at most `2^-37.27` with integer arithmetic.
+- The RM/EBCH finite result is stated with the combined rational/outward first
+  moment as its theorem-facing bound; the sharper checked-log ledger remains a
+  diagnostic, and BCH rows remain separated as projections.
 - The current LaTeX log is clean after two passes: no warnings, overfulls,
   undefined references, multiply-defined labels, or rerun requests were found.
 
@@ -197,11 +203,6 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
 
 ### P1: Proof-Hardening And Audit Items
 
-- If the RM/EBCH theorem is promoted from a checked finite numerical
-  certificate to a single fully formal computer-assisted theorem statement,
-  combine the independent `h<=500` rational certificate and the `h>=501`
-  outward certificate into one direction-safe published threshold.  The sharper
-  `2^-37.2785` headline remains the legacy checked-log ledger value.
 - For a fully formal audit packet, store raw regenerated interval artifacts or
   make the canonical verifier require the full opt-in recomputation pass under
   outward-rounded interval arithmetic.

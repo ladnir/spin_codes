@@ -16,6 +16,7 @@ The current finite ledger reports
 log2 mu_finite <= -37.383345
 log2 mu_late_plus_window <= -37.2785
 log2 mu_32_500_all_first_active_positions <= -37.2785
+complete rational/outward mu <= 2^-37.27
 ```
 
 These values use exact RM direct-sum outer coefficients for the `h <= 500`
@@ -30,8 +31,10 @@ complement-high table covers `N/2 < h <= N`.
 An independent rational/outward post-prefix certificate now replaces those
 floating table values as the hardened bound: it gives a diagnostic upper
 logarithm `-183.800029543464` and passes the theorem-safe threshold `2^-180`.
-The sharper overall `-37.2785` statement remains the checked floating-ledger
-headline rather than a combined rational threshold.
+Adding the two hardened thresholds on a common dyadic denominator gives
+`(6793*2^130+1)/2^180 <= 2^-37.27`.  This is the theorem-facing whole-range
+bound; the sharper overall `-37.2785` statement remains a checked-log
+diagnostic.
 
 ## Construction Under Audit
 
@@ -381,6 +384,22 @@ python scripts\certify_fullsplit_postprefix_rational.py --recompute-artifact
 ```
 
 The canonical artifact is `scripts/fullsplit_postprefix_rational.json`.
+
+### Complete rational/outward whole-range certificate
+
+The default verifier combines the `h<=500` threshold `6793/2^50` with the
+`h>=501` threshold `2^-180` exactly:
+
+```text
+fullsplit_complete_rational_status,PASS
+fullsplit_complete_rational_threshold,9246152473975739929226814833136005841682433/2^180
+fullsplit_complete_rational_threshold_factored,(6793*2^130+1)/2^180
+fullsplit_complete_rational_37_27_bits_status,PASS
+```
+
+Writing `K=6793*2^130+1`, the final comparison is the integer inequality
+`K^100 <= 2^14273`.  Hence the complete first moment over every positive outer
+weight is at most `2^-37.27`; no floating logarithm is used in this final gate.
 
 Smoothed-outer ridge decomposition:
 
@@ -1329,10 +1348,10 @@ Currently checkable:
 - the paper-facing current finite checkpoint `cor:fullsplit-current-finite-checkpoint`, which combines the checked
   small-prefix and post-prefix row families
 - the paper-facing finite first-moment theorem `thm:fullsplit-rm-finite-certificate-009`, which states
-  `E[Z_d] <= 2^-37.2785` for `N=2^21`, `delta=.09`, and `d=floor(.09 N)=188743`, hence
-  `Pr[d_min <= d] <= 2^-37.2785`.  The verifier's `-37.278528` line is a
-  nearest-six-decimal diagnostic for the unrounded `-37.278527626...`; it is
-  not used as the direction-sensitive theorem exponent.
+  `E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27` for `N=2^21`, `delta=.09`, and
+  `d=floor(.09 N)=188743`, hence `Pr[d_min <= d] <= 2^-37.27`.  The verifier's
+  `-37.278528` line remains a sharper checked-log diagnostic for the unrounded
+  `-37.278527626...`, not the direction-sensitive theorem exponent.
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
   `verify_fullsplit_finite_ledger.py`
 - the first-gap placement slope in `certify_prefix_placement_ratio.py`, checked by exact integer cross multiplication
@@ -1357,8 +1376,6 @@ Still proof debt:
   exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide which command-reproducible rows should eventually be regenerated into smaller checked artifacts, versus kept as
   interval-helper commands inside the JSON manifest
-- if a single rational theorem headline is desired, combine the independent
-  `h<=500` and `h>=501` thresholds with a direction-safe final comparison
 - make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
   same object
 - before any BCH-like outer row becomes theorem text, replace the random-like spectrum projection with an exact local

@@ -927,6 +927,28 @@
         31
       ]
     },
+    "fullsplit_complete_rational": {
+      "combined_threshold": {
+        "denominator_power_of_two": 180,
+        "factored": "(6793*2^130+1)/2^180",
+        "log2_for_display": -37.27016686115164,
+        "numerator": 9246152473975739929226814833136005841682433
+      },
+      "coverage": "all first-active positions, 1<=h<=N (positive RM support begins at h=32)",
+      "exact_target_comparison": {
+        "integer_inequality": "combined_numerator^100 <= 2^14273",
+        "integer_power_slack_bits": 14267,
+        "power": 100,
+        "status": "PASS",
+        "target": "2^-37.27"
+      },
+      "interpretation": "The h<=500 threshold and h>=501 threshold are added exactly on a common dyadic denominator. Raising the result to the 100th power proves by an integer comparison that the complete rational/outward bound is <=2^-37.27.",
+      "source_thresholds": {
+        "h_ge_501": "2^-180",
+        "h_le_500": "6793/2^50"
+      },
+      "status": "PASS"
+    },
     "fullsplit_h500_complete_rational": {
       "component_log2_for_display": {
         "buckets": [

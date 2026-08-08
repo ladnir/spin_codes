@@ -74,12 +74,14 @@ The framework first gives a warmup theorem: the random sliding dense outer paire
 linear distance, although with weak constants.  The two main construction lines then improve this baseline.  The random
 sliding dense outer paired with the dense recursive inner gives a clean asymptotic linear-distance theorem, including the
 concrete \(0.109\) relative-distance checkpoint.  The structured local-code construction gives a finite certificate:
-\(RM(4,9)\) direct-sum outer plus the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with first moment at most
-\(2^{-37.2785}\).  Independently, the complete \(h\le500\) first-active
-subfamily has an exact/outward-rounded certificate below the rational threshold
-\(6793/2^{50}\le 2^{-37.27}\).  The complete complementary range
-\(h\ge501\) has a separate rational/outward-rounded certificate below
-\(2^{-180}\); BCH-spectrum projections remain outside these proved RM rows.
+\(RM(4,9)\) direct-sum outer plus the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with rational/outward first moment
+at most
+\[
+\frac{6793\cdot2^{130}+1}{2^{180}}\le 2^{-37.27}.
+\]
+Here the complete \(h\le500\) first-active subfamily contributes at most
+\(6793/2^{50}\), while the complementary range \(h\ge501\) contributes at most
+\(2^{-180}\).  BCH-spectrum projections remain outside these proved RM rows.
 
 \paragraph{Organization.}
 Section~\ref{sec:sc-framework} states the modular serial-concatenation framework theorem and isolates the required outer and inner interfaces.

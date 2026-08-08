@@ -37,8 +37,7 @@ ultra-late prefix, while the named gap buckets use
 \[
 T=5949+\mathrm{gap}-1 .
 \]
-The current audit level is deliberately finite and checkable, but not yet a
-fully interval-formal proof artifact.  The verifier constructs the
+The current audit level is deliberately finite and checkable.  The verifier constructs the
 low-weight RM direct-sum outer coefficients by exact integer polynomial
 arithmetic, checks the RM support floor and the first support gap, verifies the
 prefix placement-ratio step by exact cross multiplication, checks row-family
@@ -60,8 +59,8 @@ Independently of those legacy floating rows, a SHA-256-protected artifact now
 certifies every \(h\ge501\) family using exact rational combinatorial inputs
 and directed outward logarithmic intervals.  Full regeneration is available
 through the artifact's recorded command.  The sharper aggregate exponent below
-remains the checked floating-ledger value; the independent rational
-certificates use their own direction-safe thresholds.
+remains a checked floating-ledger diagnostic; the independent rational
+certificates combine to the direction-safe theorem threshold below.
 
 The finite certificate input data are
 \[
@@ -82,18 +81,20 @@ The manifest records the exact RM support floor, the exact-prefix ledger, and
 the post-prefix row cover.  The paper-facing values are
 \[
 \begin{array}{c|c}
-\text{checked item} & \text{manifest value}\\
+\text{certificate item} & \text{manifest value}\\
 \hline
 \text{minimum positive outer weight} & 32\\
-\text{all first-active placements for }32\le h\le500 & \log_2\mu\le -37.2785\\
-\text{rational/outward row families for }h\ge501 & \log_2\mu\le -180\\
-\text{total checked first moment} & \log_2\mu\le -37.2785 .
+\text{rational/outward rows for }h\le500 & \mu\le 6793/2^{50}\\
+\text{rational/outward rows for }h\ge501 & \mu\le 2^{-180}\\
+\text{complete rational/outward first moment}
+  & \mu\le (6793\cdot2^{130}+1)/2^{180}\le2^{-37.27}.
 \end{array}
 \]
-The verifier's nearest-six-decimal diagnostic is \(-37.278528\), while the
-stored unrounded log-sum is \(-37.278527626\ldots\).  The displayed inequalities
-therefore use the outward-safe exponent \(-37.2785\), not the nearest rounded
-decimal.
+The legacy checked-log ledger has nearest-six-decimal diagnostic
+\(-37.278528\), with stored unrounded log-sum
+\(-37.278527626\ldots\).  Its safely reported value \(-37.2785\) is sharper
+than the rational/outward theorem threshold, but the theorem below does not
+depend on that floating aggregation.
 The dominant row is \(h=32\), first-active regime \(r=1\), gap bucket
 \(1\le\mathrm{gap}\le4000\).  The detailed row family table is recorded in the
 manifest and supporting certificate notes.
@@ -158,8 +159,17 @@ placement, prefix cap and episode rows, early endpoint and paired rows, and the
 complement-high range through \(h=N\).  The default verifier authenticates
 \texttt{scripts/fullsplit\_postprefix\_rational.json}; its recorded
 regeneration command recomputes the complete artifact.
+Adding the two direction-safe thresholds on the common denominator \(2^{180}\)
+gives
+\[
+ \mu\le \frac{6793\cdot2^{130}+1}{2^{180}}.
+\]
+If \(K=6793\cdot2^{130}+1\), the verifier checks the integer inequality
+\(K^{100}\le2^{14273}\).  Raising the preceding fraction to the hundredth
+power therefore proves \(\mu\le2^{-37.27}\) without a transcendental final
+comparison.
 
-\begin{theorem}[Checked finite RM/full-split first-moment certificate]
+\begin{theorem}[Rational/outward finite RM/full-split first-moment certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}
 Consider the finite checkpoint \(N=2^{21}\), \(b=64\), and \(\delta=.09\), so
 that
@@ -169,13 +179,14 @@ d=\lfloor .09N\rfloor=188743 .
 Use the direct-sum \(RM(4,9)\) outer and the full-split EBCH inner above.  Let
 \(Z_d\) be the number of nonzero concatenated codewords whose final weight is
 at most \(d\), with expectation taken over the random interleaver and the
-random choices of the inner construction.  The checked finite ledger gives
+random choices of the inner construction.  The rational/outward certificate gives
 \[
-\mathbb E Z_d\le 2^{-37.2785}.
+\mathbb E Z_d\le
+\frac{6793\cdot2^{130}+1}{2^{180}}\le 2^{-37.27}.
 \]
 Consequently
 \[
-\Pr[d_{\min}\le d]\le 2^{-37.2785}.
+\Pr[d_{\min}\le d]\le 2^{-37.27}.
 \]
 In particular, with positive probability a sampled code has
 \(d_{\min}\ge188744\), and hence relative distance
@@ -187,10 +198,11 @@ In particular, with positive probability a sampled code has
 \begin{proof}
 Lemma~\ref{lem:block-outer-first-moment-interface} reduces the failure
 probability to the first moment \(\sum_hA_h^{\rm out}p_h^{\rm in}(.09)\).  The
-manifest-backed ledger summary above removes all positive weights below \(32\),
-covers all first-active placements for \(32\le h\le500\), and covers the
-checked \(h\ge501\) row families.  Its log-sum gives
-\(\log_2\mu_{\rm checked}(.09)\le -37.2785\), which is the displayed
-expectation bound.  Markov's inequality applied to the nonnegative integer
-random variable \(Z_d\) gives the probability statement.
+exact RM support removes all positive weights below \(32\).  The first
+rational/outward certificate covers every first-active placement through
+\(h=500\) by \(6793/2^{50}\), and the second covers every \(h\ge501\) row by
+\(2^{-180}\).  Their exact dyadic sum and the integer hundredth-power comparison
+above give the displayed expectation bound.  Markov's inequality applied to
+the nonnegative integer random variable \(Z_d\) gives the probability
+statement.
 \end{proof}

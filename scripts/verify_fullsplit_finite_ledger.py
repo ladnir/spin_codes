@@ -635,6 +635,20 @@ class LatePrefixRationalAudit:
 
 
 @dataclass(frozen=True)
+class WholeRangeRationalAudit:
+    low_threshold_num: int
+    low_threshold_shift: int
+    postprefix_threshold_shift: int
+    combined_threshold_num: int
+    combined_threshold_shift: int
+    combined_threshold_log2: float
+    target_bits_num: int
+    target_bits_den: int
+    integer_power_exponent: int
+    integer_power_slack_bits: int
+
+
+@dataclass(frozen=True)
 class DominantInnerKnotAudit:
     T: int
     H: int
@@ -665,6 +679,51 @@ def log2_fraction(value: Fraction) -> float:
     if value <= 0:
         raise ValueError("log2_fraction expects a positive fraction")
     return log2_int(value.numerator) - log2_int(value.denominator)
+
+
+def certify_whole_range_rational_threshold(
+    *,
+    low_threshold_num: int,
+    low_threshold_shift: int,
+    postprefix_threshold_shift: int,
+    target_bits_num: int = 3727,
+    target_bits_den: int = 100,
+) -> WholeRangeRationalAudit:
+    """Combine the two certified dyadic thresholds using integers only."""
+
+    if low_threshold_num <= 0 or low_threshold_shift <= 0:
+        raise SystemExit("whole-range rational audit: invalid low-weight threshold")
+    if postprefix_threshold_shift < low_threshold_shift:
+        raise SystemExit("whole-range rational audit: incompatible dyadic shifts")
+    if target_bits_num <= 0 or target_bits_den <= 0:
+        raise SystemExit("whole-range rational audit: invalid target exponent")
+
+    combined_shift = postprefix_threshold_shift
+    combined_num = (low_threshold_num << (combined_shift - low_threshold_shift)) + 1
+    power_exponent = target_bits_den * combined_shift - target_bits_num
+    if power_exponent < 0:
+        raise SystemExit("whole-range rational audit: negative integer power exponent")
+    powered_num = pow(combined_num, target_bits_den)
+    powered_limit = 1 << power_exponent
+    if powered_num > powered_limit:
+        raise SystemExit(
+            "whole-range rational audit: combined threshold does not certify "
+            f"{target_bits_num / target_bits_den:g} bits"
+        )
+
+    threshold = Fraction(combined_num, 1 << combined_shift)
+    return WholeRangeRationalAudit(
+        low_threshold_num=low_threshold_num,
+        low_threshold_shift=low_threshold_shift,
+        postprefix_threshold_shift=postprefix_threshold_shift,
+        combined_threshold_num=combined_num,
+        combined_threshold_shift=combined_shift,
+        combined_threshold_log2=log2_fraction(threshold),
+        target_bits_num=target_bits_num,
+        target_bits_den=target_bits_den,
+        integer_power_exponent=power_exponent,
+        integer_power_slack_bits=(powered_limit - powered_num).bit_length(),
+    )
 
 
 def unique_csv_row(path: Path, predicate, *, label: str) -> dict[str, str]:
@@ -3186,6 +3245,64 @@ def main() -> int:
             "Complete h>=501 first-active cover using exact rational poles, exact RM/GF "
             "inputs, exact turnoff and T-monotonicity checks, and 100-digit outward "
             "Decimal log2 intervals. BCH projection rows remain heuristic and separate."
+        ),
+    }
+    whole_range_rational = certify_whole_range_rational_threshold(
+        low_threshold_num=h500_rational.threshold_num,
+        low_threshold_shift=h500_rational.threshold_shift,
+        postprefix_threshold_shift=int(postprefix_complete["threshold_shift"]),
+    )
+    print("fullsplit_complete_rational_status,PASS")
+    print(
+        "fullsplit_complete_rational_threshold,"
+        f"{whole_range_rational.combined_threshold_num}/"
+        f"2^{whole_range_rational.combined_threshold_shift}"
+    )
+    print(
+        "fullsplit_complete_rational_threshold_factored,"
+        f"({whole_range_rational.low_threshold_num}*2^"
+        f"{whole_range_rational.combined_threshold_shift - whole_range_rational.low_threshold_shift}"
+        f"+1)/2^{whole_range_rational.combined_threshold_shift}"
+    )
+    print(
+        "fullsplit_complete_rational_threshold_log2_for_display,"
+        f"{whole_range_rational.combined_threshold_log2:.12f}"
+    )
+    print("fullsplit_complete_rational_37_27_bits_status,PASS")
+    manifest["checks"]["fullsplit_complete_rational"] = {  # type: ignore[index]
+        "status": "PASS",
+        "coverage": "all first-active positions, 1<=h<=N (positive RM support begins at h=32)",
+        "source_thresholds": {
+            "h_le_500": (
+                f"{whole_range_rational.low_threshold_num}/"
+                f"2^{whole_range_rational.low_threshold_shift}"
+            ),
+            "h_ge_501": f"2^-{whole_range_rational.postprefix_threshold_shift}",
+        },
+        "combined_threshold": {
+            "factored": (
+                f"({whole_range_rational.low_threshold_num}*2^"
+                f"{whole_range_rational.combined_threshold_shift - whole_range_rational.low_threshold_shift}"
+                f"+1)/2^{whole_range_rational.combined_threshold_shift}"
+            ),
+            "numerator": whole_range_rational.combined_threshold_num,
+            "denominator_power_of_two": whole_range_rational.combined_threshold_shift,
+            "log2_for_display": whole_range_rational.combined_threshold_log2,
+        },
+        "exact_target_comparison": {
+            "target": "2^-37.27",
+            "power": whole_range_rational.target_bits_den,
+            "integer_inequality": (
+                f"combined_numerator^{whole_range_rational.target_bits_den} "
+                f"<= 2^{whole_range_rational.integer_power_exponent}"
+            ),
+            "integer_power_slack_bits": whole_range_rational.integer_power_slack_bits,
+            "status": "PASS",
+        },
+        "interpretation": (
+            "The h<=500 threshold and h>=501 threshold are added exactly on a common "
+            "dyadic denominator. Raising the result to the 100th power proves by an "
+            "integer comparison that the complete rational/outward bound is <=2^-37.27."
         ),
     }
     check_close("late_prefix_T_lt_5949_exact_outer", exact_late_prefix.total_log2, -41.113442, args.tolerance)
