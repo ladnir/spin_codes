@@ -9,7 +9,6 @@ outward interval layer.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
 import math
@@ -18,7 +17,7 @@ from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
 
-from bound_fullsplit_episode_gaps import load_spectrum
+from certificate_spectra import file_sha256, load_ebch128_spectrum, load_rm512_spectrum
 from certify_rm_outer_prefix_exact import direct_sum_coefficients, load_local_spectrum
 from outward_log2 import Interval, log2_binom, log2_fraction, log2_int, self_check
 
@@ -33,7 +32,7 @@ DISTANCE = (9 * N) // 100
 
 
 def exact_split_data(inner_spectrum: Path) -> tuple[list[Fraction], list[tuple[int, int, Fraction]]]:
-    spectrum = load_spectrum(inner_spectrum)
+    spectrum = load_ebch128_spectrum(inner_spectrum)
     nonzero_total = sum(count for weight, count in spectrum if weight > 0)
     q_law = [Fraction(0) for _ in range(B + 1)]
     entries: list[tuple[int, int, Fraction]] = []
@@ -74,8 +73,7 @@ def exact_mgf(entries: list[tuple[int, int, Fraction]], pole: Fraction) -> Fract
 
 
 def load_full_local_spectrum(path: Path) -> list[tuple[int, int]]:
-    with path.open(newline="") as handle:
-        return [(int(row["weight"]), int(row["count"])) for row in csv.DictReader(handle)]
+    return list(load_rm512_spectrum(path))
 
 
 def local_weight_enumerator(spectrum: list[tuple[int, int]], z: Fraction) -> Fraction:
@@ -922,6 +920,8 @@ def combine_complete_postprefix(
 
 def recompute_all(*, local_spectrum_csv: Path, inner_spectrum: Path) -> dict[str, object]:
     self_check()
+    load_rm512_spectrum(local_spectrum_csv)
+    load_ebch128_spectrum(inner_spectrum)
     q_law, exact_entries = exact_split_data(inner_spectrum)
     global_turnoff = certify_global_turnoff(q_law)
     monotonic_rows = certify_critical_t_monotonicity(entries=exact_entries)
@@ -1015,9 +1015,21 @@ def recompute_all(*, local_spectrum_csv: Path, inner_spectrum: Path) -> dict[str
         "prefix_paired_rho3",
     )
     return {
-        "schema": 1,
+        "schema": 2,
         "arithmetic": "exact rationals plus outward Decimal log2 intervals",
         "decimal_precision": 100,
+        "inputs": {
+            "local_spectrum": {
+                "path": local_spectrum_csv.name,
+                "sha256": file_sha256(local_spectrum_csv),
+                "structural_validation": "RM(4,9) [512,256,32] PASS",
+            },
+            "inner_spectrum": {
+                "path": inner_spectrum.name,
+                "sha256": file_sha256(inner_spectrum),
+                "structural_validation": "extended BCH [128,64,22] PASS",
+            },
+        },
         "exact_global_turnoff": {
             "status": "PASS",
             "threshold": "2^-62",
@@ -1041,15 +1053,32 @@ def write_artifact(path: Path, data: dict[str, object]) -> None:
     path.write_text(json.dumps(artifact_payload(data), indent=2) + "\n")
 
 
-def load_artifact(path: Path) -> dict[str, object]:
+def load_artifact(
+    path: Path,
+    *,
+    local_spectrum_csv: Path = ROOT / "rm512_256_spectrum.csv",
+    inner_spectrum: Path = ROOT / "EBCH128_64.wd",
+) -> dict[str, object]:
     payload = json.loads(path.read_text())
     claimed = payload.pop("sha256")
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     actual = hashlib.sha256(canonical).hexdigest()
     if claimed != actual:
         raise SystemExit("postprefix rational: artifact SHA-256 mismatch")
-    if payload.get("schema") != 1 or payload.get("decimal_precision") != 100:
+    if payload.get("schema") != 2 or payload.get("decimal_precision") != 100:
         raise SystemExit("postprefix rational: artifact metadata mismatch")
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, dict):
+        raise SystemExit("postprefix rational: artifact input metadata missing")
+    expected_inputs = {
+        "local_spectrum": (local_spectrum_csv, load_rm512_spectrum),
+        "inner_spectrum": (inner_spectrum, load_ebch128_spectrum),
+    }
+    for label, (input_path, validator) in expected_inputs.items():
+        item = inputs.get(label)
+        if not isinstance(item, dict) or item.get("sha256") != file_sha256(input_path):
+            raise SystemExit(f"postprefix rational: {label} SHA-256 mismatch")
+        validator(input_path)
     complete = payload.get("complete")
     if not isinstance(complete, dict) or complete.get("status") != "PASS":
         raise SystemExit("postprefix rational: artifact complete status is not PASS")
@@ -1117,7 +1146,11 @@ def main() -> int:
         print(f"postprefix_rational_artifact_written,{args.artifact}")
         return 0
     if args.recompute_artifact:
-        stored = load_artifact(args.artifact)
+        stored = load_artifact(
+            args.artifact,
+            local_spectrum_csv=args.local_spectrum_csv,
+            inner_spectrum=args.inner_spectrum,
+        )
         regenerated = artifact_payload(
             recompute_all(
                 local_spectrum_csv=args.local_spectrum_csv,
@@ -1131,7 +1164,11 @@ def main() -> int:
         print("postprefix_rational_artifact_recompute_status,PASS")
         print(f"postprefix_rational_artifact_sha256,{stored['sha256']}")
         return 0
-    payload = load_artifact(args.artifact)
+    payload = load_artifact(
+        args.artifact,
+        local_spectrum_csv=args.local_spectrum_csv,
+        inner_spectrum=args.inner_spectrum,
+    )
     complete = payload["complete"]
     print("fullsplit_postprefix_rational_status,PASS")
     print(f"fullsplit_postprefix_rational_log2_upper,{complete['total_log2_upper']:.12f}")

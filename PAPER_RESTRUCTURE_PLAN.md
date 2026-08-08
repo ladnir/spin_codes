@@ -285,8 +285,8 @@ Locked certificate:
 
 ```text
 E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27
-Pr[d_min <= d] <= 2^-37.27
-d_min >= 188744 with positive probability
+Pr[noninjective on the outer code or d_min <= d] <= 2^-37.27
+an actual binary [2^21,2^20,d_min >= 188744] code exists
 188744 / 2^21 > .09
 ```
 
@@ -533,6 +533,13 @@ Remaining cleanup is proof-facing polish, not the initial physical split:
 - harden finite-certificate manifests for external audit;
 - replace BCH projections with exact spectra or rigorous envelopes before any
   theorem upgrade.
+
+The finite RM/EBCH theorem has now received its proof-facing cleanup: the
+framework certifies injectivity together with distance, the full-split
+probability space and terminal-state convention are explicit, the low- and
+high-weight certificates are named lemmas, the main theorem is a short exact
+dyadic combination, and both spectrum inputs are structurally validated and
+hash-bound to the artifacts.
 
 ## Verification Plan
 

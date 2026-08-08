@@ -970,6 +970,11 @@
         "termination_cap": "2^-63",
         "termination_exact_log2_for_display": -63.89264922044356
       },
+      "input_spectra": {
+        "inner_ebch_sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
+        "local_rm_sha256": "995aab561da18f22074b5c6f5413882f492084510aa1cd19b848355f1fcd4ed7",
+        "structural_validation": "PASS"
+      },
       "interpretation": "Complete h<=500 first-active certificate with exact RM coefficients, exact placement sums, exact or outward-rounded EBCH episode bounds, outward-rounded tail coverage, and an integer proof that 6793/2^50 <= 2^-37.27.",
       "outward_dyadic": {
         "bits": 1024,
@@ -1013,7 +1018,7 @@
     "fullsplit_postprefix_complete_rational": {
       "arithmetic": "exact rationals plus outward Decimal log2 intervals",
       "artifact": "scripts\\fullsplit_postprefix_rational.json",
-      "artifact_sha256": "ef38cea5f937b62a175e94b9691308c99a9adb3408778c8650e31b3e387c60e6",
+      "artifact_sha256": "0651fba087511153b2c5277da2eaa92ad9127afcab4bd3de9368b4bdeb04baae",
       "component_bounds": {
         "complement_high": {
           "interval_log2_upper": [
@@ -1184,6 +1189,18 @@
         501,
         2097152
       ],
+      "inputs": {
+        "inner_spectrum": {
+          "path": "EBCH128_64.wd",
+          "sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2",
+          "structural_validation": "extended BCH [128,64,22] PASS"
+        },
+        "local_spectrum": {
+          "path": "rm512_256_spectrum.csv",
+          "sha256": "995aab561da18f22074b5c6f5413882f492084510aa1cd19b848355f1fcd4ed7",
+          "structural_validation": "RM(4,9) [512,256,32] PASS"
+        }
+      },
       "interpretation": "Complete h>=501 first-active cover using exact rational poles, exact RM/GF inputs, exact turnoff and T-monotonicity checks, and 100-digit outward Decimal log2 intervals. BCH projection rows remain heuristic and separate.",
       "recompute_command": "python scripts\\certify_fullsplit_postprefix_rational.py --recompute-artifact",
       "status": "PASS",

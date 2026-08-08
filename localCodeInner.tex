@@ -12,18 +12,22 @@ state \(S_i\in\F_2^b\).  Starting from \(S_0=0\), form
 \[
 V_i=U_i+S_{i-1}.
 \]
-If \(V_i=0\), emit \(Y_i=0\) and set \(S_i=0\).  If \(V_i\ne0\), choose a fresh
-scrambler \(A_i\in GL_b(2)\), encode \(C_i=E(A_iV_i)\), choose a fresh random
-coordinate permutation \(\tau_i\) of the \(2b\) codeword coordinates, and split
+At construction time, sample \(A_i\) independently and uniformly from
+\(GL_b(2)\) and \(\tau_i\) independently and uniformly from the permutations
+of the \(2b\) codeword coordinates.  Encode \(C_i=E(A_iV_i)\) and split
 \[
 (Y_i,S_i)=\operatorname{split}_b(\tau_i C_i),
 \]
 where the first \(b\) coordinates are emitted and the last \(b\) coordinates
-become the next state.
+become the next state.  In particular, \(V_i=0\) gives \(Y_i=S_i=0\).
+The pairs \((A_i,\tau_i)\) are independent across blocks and independent of the
+outer interleaver.  For fixed choices, the displayed rule is a linear map.
 For a length-\(N\) inner instance we take \(B=N/b\) blocks, emit
 \((Y_1,\dots,Y_B)\), and stop.  The terminal state \(S_B\) is not emitted and
-is not constrained.  Thus the inner remains rate \(1\) at the global level:
-it maps \(N\) interleaved outer bits to exactly \(N\) output bits.
+is not constrained.  Thus the inner is length preserving (nominally rate one):
+it maps \(N\) interleaved outer bits to exactly \(N\) output bits, although the
+square map need not be invertible on all of \(\F_2^N\).  The finite certificate
+proves injectivity on the selected outer code.
 
 \begin{lemma}[One-step full-split law]
 \label{lem:fullsplit-one-step-law}
@@ -36,8 +40,11 @@ words of \(C_{\rm in}\).  Therefore the joint law of emitted weight
 \frac{A^{\rm in}_{y+q}}{2^b-1}
 \frac{\binom{b}{y}\binom{b}{q}}{\binom{2b}{y+q}}.
 \]
-If the incoming state has support size \(q\) and the next input block has
-support size \(r\), then the pre-encoding turnoff atom is
+Condition on the block occupancies of the uniform Hamming-slice input and on
+the preceding transition weights.  If the incoming state has support size
+\(q\) and the next input block has support size \(r\), then their supports are
+independent uniform subsets of \([b]\) of the specified sizes.  Hence the
+pre-encoding turnoff atom is
 \[
 \Pr[V_i=0\mid q,r]
 =
@@ -52,10 +59,13 @@ support size \(r\), then the pre-encoding turnoff atom is
 For fixed nonzero \(V_i\), \(A_iV_i\) is uniform over
 \(\F_2^b\setminus\{0\}\), and \(E\) bijects this set with the nonzero codewords
 of \(C_{\rm in}\).  Conditional on a codeword of weight \(y+q\), the random
-coordinate split is hypergeometric, giving the displayed split law.  The
-turnoff atom \(V_i=0\) occurs exactly when the input support equals the state
-support; conditioned on the two support sizes this has probability
-\(\binom{b}{q}^{-1}\) if \(q=r\) and is impossible otherwise.
+coordinate split is hypergeometric, giving the displayed split law.
+Conditional on the complete input-block occupancy vector, the supports in
+distinct input blocks are independent and uniform.  Independently,
+\(\tau_{i-1}\) makes the state support uniform conditional on its weight and
+independent of every future input block.  The turnoff atom \(V_i=0\) occurs
+exactly when the input support equals the state support, so its probability is
+\(\binom{b}{q}^{-1}\) if \(q=r\) and zero otherwise.
 \end{proof}
 
 Thus a full-split certificate needs the local inner spectrum \(A_w^{\rm in}\),

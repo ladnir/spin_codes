@@ -15,8 +15,11 @@ We study depth-2 serial concatenation with a random interleaver:
 \qquad
 G_{\mathrm{sc}} \;=\; \Gone \cdot \Pi \cdot \Gtwo,
 \]
-where \(\Gone\) and \(\Gtwo\) are generator matrices for the outer map \(\Cone\) and rate-\(1\) recursive inner map
-\(\Ctwo\), and \(\Pi\) is a uniform random interleaver on \([n]\).
+where \(\Gone\) and \(\Gtwo\) are matrices for the outer map \(\Cone\) and
+the length-preserving recursive inner map \(\Ctwo\), and \(\Pi\) is a uniform
+random interleaver on \([n]\).  A square inner map need not be globally
+invertible, so the framework controls the joint event that the concatenation
+is noninjective on the outer code or has a low-weight nonzero image word.
 Our main conceptual contribution is to separate the minimum-distance proof into two independently verifiable interfaces:
 
 \begin{itemize}
@@ -79,6 +82,9 @@ at most
 \[
 \frac{6793\cdot2^{130}+1}{2^{180}}\le 2^{-37.27}.
 \]
+Thus some realization is an actual binary
+\([2^{21},2^{20},d_{\min}\ge188744]\) code, not merely a
+length-preserving encoder with an unverified dimension.
 Here the complete \(h\le500\) first-active subfamily contributes at most
 \(6793/2^{50}\), while the complementary range \(h\ge501\) contributes at most
 \(2^{-180}\).  BCH-spectrum projections remain outside these proved RM rows.

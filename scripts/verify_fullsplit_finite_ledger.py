@@ -3180,6 +3180,11 @@ def main() -> int:
             "gap_sums_sha256": h500_rational.gap_sums_sha256,
             "inner_bounds_sha256": h500_rational.inner_bounds_sha256,
         },
+        "input_spectra": {
+            "local_rm_sha256": h500_rational.local_spectrum_sha256,
+            "inner_ebch_sha256": h500_rational.inner_spectrum_sha256,
+            "structural_validation": "PASS",
+        },
         "component_log2_for_display": {
             "buckets": list(h500_rational.bucket_log2),
             "explicit_episode_total": h500_rational.explicit_episode_log2,
@@ -3205,7 +3210,11 @@ def main() -> int:
             "coverage, and an integer proof that 6793/2^50 <= 2^-37.27."
         ),
     }
-    postprefix_rational = load_postprefix_rational_artifact(args.postprefix_rational_artifact)
+    postprefix_rational = load_postprefix_rational_artifact(
+        args.postprefix_rational_artifact,
+        local_spectrum_csv=args.exact_outer_local_spectrum_csv,
+        inner_spectrum=args.inner_spectrum,
+    )
     postprefix_complete = postprefix_rational["complete"]
     assert isinstance(postprefix_complete, dict)
     print("fullsplit_postprefix_complete_rational_status,PASS")
@@ -3227,6 +3236,7 @@ def main() -> int:
         "artifact_sha256": postprefix_rational["sha256"],
         "arithmetic": postprefix_rational["arithmetic"],
         "decimal_precision": postprefix_rational["decimal_precision"],
+        "inputs": postprefix_rational["inputs"],
         "exact_global_turnoff": postprefix_rational["exact_global_turnoff"],
         "exact_t_monotonicity": postprefix_rational["exact_t_monotonicity"],
         "coverage": postprefix_complete["coverage"],

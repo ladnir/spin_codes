@@ -34,7 +34,10 @@ word from the nonzero-codeword sum.  If \(p_h^{\rm in}(\delta)\) is any valid
 upper bound on the chosen inner construction producing output weight at most
 \(\lfloor\delta N\rfloor\) from an interleaved outer word of weight \(h\), then
 \[
-\Pr[d_{\min}(\Csc)\le \lfloor\delta N\rfloor]
+\Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{C_{\mathrm{out}}}\text{ is not injective}
+ \ \text{or}\ d_{\min}(\Csc)\le \lfloor\delta N\rfloor
+\Bigr]
 \le
 \mu_{\mathrm{block}}(\delta)
 :=
@@ -48,8 +51,9 @@ functions block by block.  Conditional on any nonzero outer word of weight
 \(h\), the uniform interleaver randomizes only the support positions seen by
 the inner code, so the same inner bound \(p_h^{\rm in}(\delta)\) applies to
 every such word.  Summing these failure probabilities over all nonzero outer
-words gives \(\mu_{\mathrm{block}}(\delta)\), and Markov's inequality gives the
-minimum-distance bound.
+words gives \(\mu_{\mathrm{block}}(\delta)\).  Markov's inequality bounds the
+event that the restriction has a nonzero kernel word or a nonzero image word
+below the target distance.
 \end{proof}
 
 \subsubsection{Finite certificate template}
@@ -67,7 +71,10 @@ proof establishes
 If the rows cover every nonzero outer word and every inner placement/episode
 case used by the bound, then
 \[
-\Pr[d_{\min}(\Csc)\le\lfloor\delta N\rfloor]
+\Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{C_{\mathrm{out}}}\text{ is not injective}
+ \ \text{or}\ d_{\min}(\Csc)\le\lfloor\delta N\rfloor
+\Bigr]
 \le
 \sum_{R\in\mathcal R}2^{-\lambda_R}.
 \]

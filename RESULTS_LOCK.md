@@ -1,6 +1,6 @@
 # Results Lock
 
-Generated: 2026-06-12
+Updated: 2026-08-07
 
 Purpose: lock the current dense+dense research state before paper cleanup or
 prose movement. This file is a status snapshot, not a new proof.
@@ -108,8 +108,8 @@ Locked certificate:
 
 ```text
 E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27
-Pr[d_min <= d] <= 2^-37.27
-d_min >= 188744 with positive probability
+Pr[noninjective on the outer code or d_min <= d] <= 2^-37.27
+an actual binary [2^21,2^20,d_min >= 188744] code exists
 188744 / 2^21 > .09
 ```
 
@@ -152,6 +152,13 @@ Canonical artifacts:
 - `scripts/fullsplit_piecewise_h32_500_csv.csv`
 - `scripts/fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv`
 - `scripts/fullsplit_piecewise_h501_2000_eall_hsummary.csv`
+
+The rational artifacts record SHA-256 fingerprints of both committed spectrum
+inputs and reject mismatches.  Their structural checks verify the expected
+length, dimension via total multiplicity, minimum positive weight, and
+complement symmetry.  The EBCH spectrum's mathematical provenance is still an
+explicit external input; more generally, the verifier does not derive either
+table from a code definition.
 
 ## Scalar Dense Finite Diagnostics
 
@@ -239,8 +246,6 @@ Do not promote these to proved claims until resolved:
   independent thresholds are combined exactly into
   `(6793*2^130+1)/2^180 <= 2^-37.27`; the sharper floating-ledger exponent is
   retained only as a checked diagnostic.
-- Clarify the full-split construction definition and boundary convention so
-  all scripts visibly evaluate the same object.
 - Decide whether finite exact-support prefix lemmas should remain finite
   certificates or be replaced by analytic monotonicity/support lemmas.
 - Build an explicit outer-spectrum comparison audit for banded, random-block,

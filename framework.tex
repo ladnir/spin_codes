@@ -1,9 +1,7 @@
 \section{A Modular Serial Concatenation Framework}
 \label{sec:sc-framework}
-\label{sec:framework}
-\label{sec:sccc-framework}
 
-We study depth-2 serially concatenated convolutional codes
+We study depth-2 serially concatenated convolutional encoders
 \[
 \Csc \;:=\; \Ctwo \circ \Pi \circ \Cone \;\subseteq\; \{0,1\}^n,
 \]
@@ -14,8 +12,10 @@ and \(\Gtwo\in\{0,1\}^{n\times n}\), a codeword can be computed as
 y \;=\; x\cdot \Gone \cdot \Pi \cdot \Gtwo \in \{0,1\}^n
 \qquad\text{for a message }x\in\{0,1\}^k.
 \]
-(Here \(\Ctwo\) is rate-1, hence represented by an \(n\times n\) matrix. In later sections \(\Ctwo\) will be a
-recursive convolutional encoder, possibly drawn from a random inner ensemble.)
+(Here \(\Ctwo\) is length preserving, hence represented by an \(n\times n\)
+matrix.  It need not be invertible on all of \(\F_2^n\); the first-moment event
+below certifies injectivity on the chosen outer code together with distance.  In
+later sections \(\Ctwo\) may be drawn from a random inner ensemble.)
 
 We follow the standard convention: \(\Cone\) is the outer code and \(\Ctwo\) is the inner code.
 
@@ -90,7 +90,7 @@ Define, for \(\delta\in(0,1)\),
 \label{eq:pw-def}
 p_w(\delta)
 \;:=\;
-\Pr\bigl[\wt(\Ctwo(U))\le \delta n\ \big|\ \wt(U)=w\bigr].
+\Pr\bigl[\wt(\Ctwo(U))\le \lfloor\delta n\rfloor\ \big|\ \wt(U)=w\bigr].
 \end{equation}
 If \(\Ctwo\) itself is drawn from a random inner ensemble
 (e.g. the dense time-varying recursion of Section~\ref{sec:inner-dense}
@@ -113,7 +113,7 @@ if $U$ is uniform over $\{0,1\}^n$ conditioned on $\wt(U)=w$, then the inner enc
 \label{eq:inner-interface-pw}
 p_w(\delta)
 \;:=\;
-\PP\big[\wt(\Ctwo(U))\le \delta n \ \big|\ \wt(U)=w\big]
+\PP\big[\wt(\Ctwo(U))\le \lfloor\delta n\rfloor \ \big|\ \wt(U)=w\big]
 \;\le\;
 n^{a}\,\rho^{\,w}.
 \end{equation}
@@ -133,20 +133,24 @@ envelope \(p_w(\delta)\le B_w(\delta)\).
 
 \begin{theorem}[SC framework theorem]
 \label{thm:sc-framework}
-Fix \(\delta\in(0,1)\). Let \(\Cone\subseteq\{0,1\}^n\) be any fixed linear outer code and let \(\Ctwo\) be any (possibly random)
-rate-1 linear inner encoder independent of the interleaver \(\Pi\).
+Fix \(\delta\in(0,1)\). Let \(\Cone\subseteq\{0,1\}^n\) be any fixed linear
+outer code and let \(\Ctwo:\F_2^n\to\F_2^n\) be any possibly random linear
+inner map independent of the interleaver \(\Pi\).
 Let \(\Csc=\Ctwo\circ\Pi\circ\Cone\).
 
 Define the random variable counting low-weight nonzero concatenated codewords:
 \[
 X_\delta
 \;:=\;
-\bigl|\{c\in\Cone\setminus\{0\}:\ \wt(\Ctwo(\Pi(c)))\le \delta n\}\bigr|.
+\bigl|\{c\in\Cone\setminus\{0\}:\ \wt(\Ctwo(\Pi(c)))\le \lfloor\delta n\rfloor\}\bigr|.
 \]
 Then
 \begin{equation}
 \label{eq:first-moment-master}
-\Pr\bigl[d_{\min}(\Csc)\le \delta n\bigr]
+\Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{\Cone}\text{ is not injective}
+ \ \text{or}\ d_{\min}(\Csc)\le \lfloor\delta n\rfloor
+\Bigr]
 \;\le\;
 \EE[X_\delta]
 \;=\;
@@ -156,11 +160,15 @@ where \(p_w(\delta)\) is defined in \eqref{eq:pw-def}.
 \end{theorem}
 
 \begin{proof}
-The event \(d_{\min}(\Csc)\le \delta n\) occurs iff there exists a nonzero
-\(c\in\Cone\) such that \(\wt(\Ctwo(\Pi(c)))\le \delta n\), i.e. iff \(X_\delta\ge 1\).
-Thus by Markov's inequality,
+Because the concatenated map is linear, \(X_\delta\ge1\) occurs exactly when
+its restriction to \(\Cone\) has a nonzero kernel element or its image has a
+nonzero word of weight at most \(\lfloor\delta n\rfloor\).  Thus by Markov's
+inequality,
 \[
-\Pr[d_{\min}(\Csc)\le \delta n]
+\Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{\Cone}\text{ is not injective}
+ \ \text{or}\ d_{\min}(\Csc)\le \lfloor\delta n\rfloor
+\Bigr]
 \;=\;
 \Pr[X_\delta\ge 1]
 \;\le\;
@@ -170,7 +178,8 @@ To compute \(\EE[X_\delta]\), group outer codewords by weight \(w\).
 For each fixed \(c\in\Cone\) with \(\wt(c)=w\), Lemma~\ref{lem:interleaver-uniform-slice} implies that \(\Pi(c)\)
 is uniform over the Hamming slice of weight \(w\), hence
 \[
-\Pr[\wt(\Ctwo(\Pi(c)))\le \delta n \mid \wt(c)=w] \;=\; p_w(\delta),
+\Pr[\wt(\Ctwo(\Pi(c)))\le \lfloor\delta n\rfloor \mid \wt(c)=w]
+\;=\; p_w(\delta),
 \]
 which depends only on \(w\). Summing over all codewords of each weight yields
 \[
@@ -200,7 +209,10 @@ p_w(\delta)\;\le\; B_w.
 \end{enumerate}
 Then
 \[
-\Pr[d_{\min}(\Csc)\le \delta n]
+\Pr\Bigl[
+ \Ctwo\circ\Pi\big|_{\Cone}\text{ is not injective}
+ \ \text{or}\ d_{\min}(\Csc)\le \lfloor\delta n\rfloor
+\Bigr]
 \;\le\;
 \varepsilon_{\mathrm{out}}(n)\;+\;\sum_{w=w_0}^{n} A_w\,B_w.
 \]
@@ -208,24 +220,23 @@ Then
 
 \begin{proof}
 Let \(\mathcal{G}_{\mathrm{out}}\) be the event \(d_{\min}(\Cone)\ge w_0\).
-Split according to \(\mathcal{G}_{\mathrm{out}}\):
+Let \(\mathcal B_\delta\) denote the joint bad event in the statement.  Split
+according to \(\mathcal{G}_{\mathrm{out}}\):
 \[
-\Pr[d_{\min}(\Csc)\le \delta n]
-\;\le\;
-\Pr[\mathcal{G}_{\mathrm{out}}^{c}]
-\;+\;
-\Pr[d_{\min}(\Csc)\le \delta n \,\wedge\, \mathcal{G}_{\mathrm{out}}].
+ \Pr[\mathcal B_\delta]
+ \le \Pr[\mathcal{G}_{\mathrm{out}}^{c}]
+     +\Pr[\mathcal B_\delta\wedge\mathcal{G}_{\mathrm{out}}].
 \]
 Condition on the realization of \(\Cone\) on the event \(\mathcal{G}_{\mathrm{out}}\).
 Since \(d_{\min}(\Cone)\ge w_0\), Theorem~\ref{thm:sc-framework} gives
 \[
-\Pr[d_{\min}(\Csc)\le \delta n \mid \Cone,\mathcal{G}_{\mathrm{out}}]
+\Pr[\mathcal B_\delta\mid\Cone,\mathcal{G}_{\mathrm{out}}]
 \;\le\;
 \sum_{w=w_0}^{n}\enum_{\Cone,w}\,p_w(\delta).
 \]
 Take expectation over \(\Cone\) and use the assumed envelopes:
 \[
-\Pr[d_{\min}(\Csc)\le \delta n \,\wedge\, \mathcal{G}_{\mathrm{out}}]
+\Pr[\mathcal B_\delta\wedge\mathcal{G}_{\mathrm{out}}]
 \;\le\;
 \sum_{w=w_0}^{n}\EE[\enum_{\Cone,w}]\,B_w
 \;\le\;

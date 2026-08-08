@@ -1349,7 +1349,9 @@ Currently checkable:
   small-prefix and post-prefix row families
 - the paper-facing finite first-moment theorem `thm:fullsplit-rm-finite-certificate-009`, which states
   `E[Z_d] <= (6793*2^130+1)/2^180 <= 2^-37.27` for `N=2^21`, `delta=.09`, and
-  `d=floor(.09 N)=188743`, hence `Pr[d_min <= d] <= 2^-37.27`.  The verifier's
+  `d=floor(.09 N)=188743`, hence the probability of noninjectivity on the outer
+  code or `d_min <= d` is at most `2^-37.27`.  Therefore an actual binary
+  `[2^21,2^20,d_min >= 188744]` code exists.  The verifier's
   `-37.278528` line remains a sharper checked-log diagnostic for the unrounded
   `-37.278527626...`, not the direction-sensitive theorem exponent.
 - the tiny-prefix ridge decomposition in `analyze_fullsplit_prefix_ridge.py`, and its ratio skeleton in
@@ -1376,8 +1378,6 @@ Still proof debt:
   exact RM support gap to `h=48`, and a support-weight remainder bound for `h>32`
 - decide which command-reproducible rows should eventually be regenerated into smaller checked artifacts, versus kept as
   interval-helper commands inside the JSON manifest
-- make the construction definition and boundary convention crisp enough that every script is visibly evaluating the
-  same object
 - before any BCH-like outer row becomes theorem text, replace the random-like spectrum projection with an exact local
   spectrum or a proved low-weight envelope, and recompute the `h>2000` tail under that same outer model
 
@@ -1404,3 +1404,22 @@ The following are useful context but should not be treated as proof:
 4. Check `check_fullsplit_T_monotonicity.py` against the monotonicity argument in `innerDense.tex`.
 5. Check that the `32..500` finite CSV inputs are generated from formulas that are conservative upper bounds.
 6. Only then read the surrounding prose and decide what should become theorem text versus working-save-point text.
+
+## Proof Cleanup Audit (2026-08-07)
+
+- The generic framework no longer assumes that an `n x n` inner map is
+  invertible.  Its first moment bounds the joint noninjectivity-or-low-distance
+  event, and the finite theorem consequently certifies dimension as well as
+  distance.
+- The full-split definition fixes `S_0=0`, discards unconstrained `S_B`, and
+  states all independence in the random scramblers, coordinate splits, and
+  interleaver.  The turnoff atom is conditioned on block occupancies and prior
+  transition weights, under which the state and input supports are independent
+  uniform subsets.
+- The theorem-facing certificate is now factored into named complete
+  `h<=500` and `h>=501` lemmas.  Legacy row diagnostics remain in this audit
+  file and the manifest rather than interrupting the main proof.
+- Both source spectrum tables are structurally validated and SHA-256-bound to
+  the rational artifacts.  This authenticates the exact inputs used but does
+  not derive either table from a code definition; the EBCH table's
+  mathematical provenance in particular remains declared.

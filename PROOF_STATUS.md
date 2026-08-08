@@ -1,6 +1,6 @@
 # Proof Status And High-Risk TODOs
 
-Generated: 2026-06-18
+Updated: 2026-08-07
 
 Purpose: keep the post-restructure proof state explicit.  This is not a new
 theorem source; it is the working checklist for what is in good narrative
@@ -67,7 +67,9 @@ and BCH projection note.  The proved finite instantiation is:
 - inner: full-split EBCH `[128,64,22]` with `b=64`;
 - length: `N=2^21`;
 - target: `delta=.09`, `d=188743`;
-- theorem-safe rational/outward first moment: `E[Z_d] <= 2^-37.27`.
+- theorem-safe rational/outward first moment: `E[Z_d] <= 2^-37.27`;
+- conclusion: some realization is a binary
+  `[2^21,2^20,d_min >= 188744]` code.
 
 Current verifier:
 
@@ -111,6 +113,17 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   (`T=B-i+1` from the first active block), the `late_blocks=5949` split, and
   the unconstrained terminal-state convention in both paper prose and manifest
   metadata.
+- The generic first-moment theorem and the block-outer interface now bound the
+  joint event that the inner restriction is noninjective or the image has
+  minimum distance at most the target.  This repairs the former implicit
+  assumption that every square, length-preserving inner map is invertible.
+- The full-split one-step turnoff law now states its probability space:
+  conditional on block occupancies and preceding transition weights, the
+  input and state supports are independent uniform subsets of their specified
+  sizes.
+- The finite theorem is factored through named complete `h<=500` and `h>=501`
+  certificate lemmas; the theorem itself only combines their exact dyadic
+  thresholds and concludes the certified dimension and distance.
 - The finite certificate states its audit layers explicitly.  The legacy
   manifest total still re-sums floating logarithmic rows within stored
   tolerances, while independent exact/rational and outward-rounded artifacts
@@ -181,6 +194,12 @@ envelope replaces the modeled spectrum and the affected tails are recomputed.
   The default verifier validates the SHA-256-protected artifact; full
   regeneration is available with
   `python scripts\certify_fullsplit_postprefix_rational.py --recompute-artifact`.
+- Both rational certificate paths structurally validate the committed RM and
+  EBCH weight tables and record their SHA-256 fingerprints.  The post-prefix
+  artifact is rejected if either source table changes.  These checks bind and
+  internally validate the inputs; they do not independently derive either
+  spectrum from a code definition.  In particular, the EBCH table's
+  mathematical provenance remains a declared input.
 - The two independent bounds are now combined exactly:
   `(6793*2^130+1)/2^180`.  The default verifier checks
   `(6793*2^130+1)^100 <= 2^14273`, proving that the complete `1<=h<=N`

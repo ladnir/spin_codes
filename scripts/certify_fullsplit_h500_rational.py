@@ -20,7 +20,7 @@ from dataclasses import asdict, dataclass
 from fractions import Fraction
 from pathlib import Path
 
-from bound_fullsplit_episode_gaps import load_spectrum
+from certificate_spectra import file_sha256, load_ebch128_spectrum, load_rm512_spectrum
 from certify_rm_outer_prefix_exact import direct_sum_coefficients, load_local_spectrum
 
 
@@ -58,7 +58,7 @@ def load_outer_coefficients(local_spectrum_csv: Path, *, blocks: int, h_max: int
 
 
 def exact_split_law(inner_spectrum: Path, b: int) -> tuple[list[Fraction], Fraction]:
-    spectrum = load_spectrum(inner_spectrum)
+    spectrum = load_ebch128_spectrum(inner_spectrum)
     nonzero_total = sum(count for weight, count in spectrum if weight > 0)
     split_law = [Fraction(0) for _ in range(b + 1)]
     mgf_terms: list[tuple[int, Fraction]] = []
@@ -490,6 +490,8 @@ class RationalH500Certificate:
     early_episode_max: int
     gap_sums_sha256: str
     inner_bounds_sha256: str
+    local_spectrum_sha256: str
+    inner_spectrum_sha256: str
     bucket_log2: tuple[float, ...]
     explicit_episode_log2: float
     episode_tail_log2: float
@@ -532,6 +534,8 @@ def certify(
             "b=64, late=5949, prefix e_max=8, early e_max=16"
         )
     self_check_peak_live()
+    load_rm512_spectrum(local_spectrum_csv)
+    load_ebch128_spectrum(inner_spectrum)
     outer = load_outer_coefficients(local_spectrum_csv, blocks=outer_blocks, h_max=h_max)
     split_law, mgf = exact_split_law(inner_spectrum, b)
     termination = certify_termination_cap(
@@ -633,6 +637,8 @@ def certify(
         early_episode_max=early_episode_max,
         gap_sums_sha256=artifact_sha,
         inner_bounds_sha256=inner_artifact_sha,
+        local_spectrum_sha256=file_sha256(local_spectrum_csv),
+        inner_spectrum_sha256=file_sha256(inner_spectrum),
         bucket_log2=tuple(log2_fraction(value) for value in bucket_totals),
         explicit_episode_log2=log2_fraction(episode_total),
         episode_tail_log2=log2_fraction(tail_total),
