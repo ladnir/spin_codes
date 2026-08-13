@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import bisect
+import csv
 import hashlib
 import itertools
 import json
@@ -408,6 +409,168 @@ def _exact_graph_linear_outer(
     }
 
 
+@lru_cache(maxsize=1)
+def _conditioned_row_split_spectra():
+    """Load and validate the exact pair spectra used by the conditioned-row branch."""
+
+    root = Path(__file__).resolve().parent.parent / "out"
+
+    def load(path: Path) -> dict[tuple[int, int], int]:
+        table: dict[tuple[int, int], int] = {}
+        with path.open(newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                key = (int(row["band0_weight"]), int(row["band1_weight"]))
+                count = int(row["count"])
+                if count <= 0 or key in table:
+                    raise ValueError("conditioned-row split spectrum is malformed")
+                table[key] = count
+        if sum(table.values()) != 1 << 64 or table.get((0, 0)) != 1:
+            raise ValueError("conditioned-row split spectrum has wrong mass")
+        return table
+
+    path01 = root / "ebch85_band01_split_spectrum.csv"
+    path12 = root / "ebch86_band12_split_spectrum.csv"
+    spectrum01 = load(path01)
+    spectrum12 = load(path12)
+    punctured01 = {
+        (a, b): (42 - a) * spectrum01.get((a, b), 0)
+        + (a + 1) * spectrum01.get((a + 1, b), 0)
+        for a in range(42)
+        for b in range(44)
+    }
+    punctured01 = {key: count for key, count in punctured01.items() if count}
+    if sum(punctured01.values()) != 42 * (1 << 64):
+        raise ValueError("conditioned-row punctured spectrum has wrong mass")
+    return spectrum01, punctured01, spectrum12, {
+        "spectrum01_sha256": _file_digest(path01),
+        "spectrum12_sha256": _file_digest(path12),
+    }
+
+
+def _conditioned_row_exact_graph_outer(
+    log_variables: list[float], band1_coefficient: float, theta_value: float
+) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
+    """Outward one-conditioned-row BL branch with exact graph averaging."""
+
+    if GROUP_BITS != 4 or BLOCK_ATOMS != 16:
+        raise ValueError("conditioned-row outer is currently g=4 only")
+    variables = tuple(exact_float(math.exp(float(value))) for value in log_variables)
+    if len(variables) != 5 or any(value <= 0 for value in variables):
+        raise ValueError("conditioned-row variables are invalid")
+    band1 = exact_float(float(band1_coefficient))
+    band0 = Fraction(1) - band1
+    theta = exact_float(float(theta_value))
+    if not Fraction(0) < band0 <= Fraction(1, 2):
+        raise ValueError("conditioned-row band-zero coefficient is invalid")
+    if not Fraction(1, 2) <= band1 < 1:
+        raise ValueError("conditioned-row band-one coefficient is invalid")
+    if not Fraction(0) <= theta <= 1:
+        raise ValueError("conditioned-row Cauchy split is invalid")
+
+    atom = tuple(
+        Fraction(math.comb(4, weight)) * variables[weight] for weight in range(5)
+    )
+    coefficients = _fraction_polynomial_power(atom, 16)
+    moments = tuple(
+        coefficient / math.comb(64, weight)
+        for weight, coefficient in enumerate(coefficients)
+    )
+
+    def scale(value: Interval, factor: Fraction) -> Interval:
+        return value * (
+            Interval.exact(factor.numerator) / Interval.exact(factor.denominator)
+        )
+
+    def conditioned_norm(coefficient: Fraction, bit: int) -> Interval:
+        coefficient_interval = (
+            Interval.exact(coefficient.numerator)
+            / Interval.exact(coefficient.denominator)
+        )
+        terms = [
+            log2_fraction(Fraction(math.comb(63, weight), 1 << 63))
+            + log2_fraction(moments[weight + bit]) / coefficient_interval
+            for weight in range(64)
+        ]
+        return coefficient_interval * _log2_sum_exp(terms)
+
+    factors = (
+        (conditioned_norm(band0, 0), conditioned_norm(band0, 1)),
+        (conditioned_norm(band1, 0), conditioned_norm(band1, 1)),
+        (conditioned_norm(band1, 0), conditioned_norm(band1, 1)),
+    )
+    zeros = tuple(pair[0] for pair in factors)
+    ratios = tuple(pair[1] - pair[0] for pair in factors)
+    spectrum01, punctured01, spectrum12, source_report = (
+        _conditioned_row_split_spectra()
+    )
+
+    def pair_log_enumerator(table, left: Interval, right: Interval, divisor: int):
+        return _log2_sum_exp(
+            log2_fraction(Fraction(count, divisor))
+            + left.times_int(a)
+            + right.times_int(b)
+            for (a, b), count in table.items()
+        )
+
+    left01 = ratios[0].times_int(2)
+    middle01 = scale(ratios[1].times_int(2), theta)
+    middle12 = scale(ratios[1].times_int(2), Fraction(1) - theta)
+    right12 = ratios[2].times_int(2)
+
+    def cauchy(first, divisor: int) -> Interval:
+        return (
+            pair_log_enumerator(first, left01, middle01, divisor)
+            + pair_log_enumerator(spectrum12, middle12, right12, 1)
+        ) / Interval.exact(2)
+
+    normal_pair = cauchy(spectrum01, 1)
+    punctured_pair = cauchy(punctured01, 42)
+    free_message = Interval.exact(63 * 64)
+    normal_tile = (
+        free_message
+        + zeros[0].times_int(42)
+        + zeros[1].times_int(43)
+        + zeros[2].times_int(43)
+        + normal_pair
+    )
+    punctured_common = (
+        free_message
+        + zeros[0].times_int(41)
+        + zeros[1].times_int(43)
+        + zeros[2].times_int(43)
+        + punctured_pair
+    )
+    hole0_tile = punctured_common + factors[0][0]
+    hole1_tile = punctured_common + factors[0][1]
+    graph = _log2_sum_exp(
+        log2_fraction(Fraction(count, 1 << 24))
+        + hole0_tile.times_int(128 - weight)
+        + hole1_tile.times_int(weight)
+        for weight, count in enumerate(load_graph_spectrum())
+        if count
+    )
+    constant = normal_tile.times_int(128) + graph
+    charges = tuple(log2_fraction(value) for value in variables)
+    return constant, charges, {
+        "type": "conditioned_row_exact_graph",
+        "variables": [f"{value.numerator}/{value.denominator}" for value in variables],
+        "band1": f"{band1.numerator}/{band1.denominator}",
+        "theta": f"{theta.numerator}/{theta.denominator}",
+        "normal_tile_log2_interval": [str(normal_tile.lo), str(normal_tile.hi)],
+        "hole0_tile_log2_interval": [str(hole0_tile.lo), str(hole0_tile.hi)],
+        "hole1_tile_log2_interval": [str(hole1_tile.lo), str(hole1_tile.hi)],
+        "graph_factor_log2_interval": [str(graph.lo), str(graph.hi)],
+        "graph_spectrum_sha256": _file_digest(
+            Path(__file__).with_name("ebch128_graph24_spectrum.csv")
+        ),
+        **source_report,
+        "lemma": (
+            "condition one BCH row; apply three-band BL to 63 rows; "
+            "pair-spectrum Cauchy; condition punctured row in hole tiles"
+        ),
+    }
+
+
 def _exact_graph_total_spectrum_outer(
     log_variables: list[float], log_beta: float
 ) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
@@ -645,6 +808,20 @@ def _parameters(row: dict[str, Any], artifact: Path) -> dict[str, Any]:
             [float(value) for value in log_variables],
             float(band1),
         )
+    elif outer_type == "conditioned_row_exact_graph":
+        log_variables = outer_details.get(
+            "log_variables", merged.get("outer_log_variables")
+        )
+        band1 = outer_details.get("band1_coefficient")
+        theta = outer_details.get("pair_cauchy_theta")
+        if log_variables is None or band1 is None or theta is None:
+            raise ValueError("conditioned-row witness lacks frozen parameters")
+        outer = (
+            "conditioned_row_exact_graph",
+            [float(value) for value in log_variables],
+            float(band1),
+            float(theta),
+        )
     elif outer_type == "exact_graph_total_spectrum":
         log_variables = outer_details.get("log_variables", merged.get("outer_log_variables"))
         outer_point = outer_details.get("outer_point")
@@ -792,6 +969,10 @@ def harden_witness(
     elif outer[0] == "exact_graph_linear_bl":
         outer_constant, outer_charges, outer_report = _exact_graph_linear_outer(
             outer[1], outer[2]
+        )
+    elif outer[0] == "conditioned_row_exact_graph":
+        outer_constant, outer_charges, outer_report = (
+            _conditioned_row_exact_graph_outer(outer[1], outer[2], outer[3])
         )
     elif outer[0] == "exact_graph_total_spectrum":
         outer_constant, outer_charges, outer_report = _exact_graph_total_spectrum_outer(
