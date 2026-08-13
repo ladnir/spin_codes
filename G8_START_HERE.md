@@ -124,6 +124,19 @@ The commands, artifact hashes, and detailed results are in
 `explorations/g8_witness_reuse_recon.md`. The proposed shard artifact contract
 is in `explorations/g8_support_shard_schema.md`.
 
+The complete support-local reconnaissance tunes one paired inner/outer witness
+at a deterministic representative of every feasible support. All 510 anchors
+pass the uniform target. The worst local margin is about 58,470 bits and occurs
+at the full-support anchor. Peach produced the atlas in about 202 seconds with
+16 workers.
+
+The frozen atlas is `out/g8_support_seed_atlas.json`, with SHA-256
+`c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e`.
+`G8_SUPPORT_MANIFEST.json` binds the atlas rows, exact support counts, spectra,
+and evaluator sources. The manifest's SHA-256 is
+`6b525083164953bc783ebc04d33703b232f602439be4d7f3bdacafc010d530af`.
+These are discovery inputs. They do not establish coverage within a support.
+
 ## Proof dependencies
 
 The EBCH and graph spectrum tables remain authenticated mathematical inputs.

@@ -98,8 +98,32 @@ The data supports two conclusions. First, the current inequality has large
 local margin at every tuned sparse anchor tested so far. Second, a small
 global witness bank does not span the profile domain.
 
-The next stage should tune one representative in every exact support stratum.
-These 510 witnesses form a support-local atlas, not a certificate. Within each
-stratum, an adaptive exact slab or BSP decomposition can then test affine
-reuse. Refinement should target cells whose cell-local union contribution
-remains largest.
+The next stage therefore tuned one representative in every exact support
+stratum. These 510 witnesses form a support-local atlas, not a certificate.
+The proof must now test affine reuse with an adaptive exact slab or BSP
+decomposition. Refinement should target cells whose cell-local union
+contribution remains largest.
+
+## Complete support-local atlas
+
+The support-local atlas stage is complete. It tunes paired inner and outer
+witnesses at one deterministic representative of each feasible exact support.
+The 16-worker Peach run completed in 202.47 seconds.
+
+All 510 representatives pass the uniform per-profile target. The worst local
+margin is 58,470.196 bits. The worst anchor has full support. This establishes
+large pointwise diagnostic slack at every support anchor; it does not cover
+the remaining profiles in any support.
+
+```powershell
+python scripts\build_packet_group_g8_support_seed_atlas.py `
+  --workers 16 --checkpoint-dir out\g8_support_seed_checkpoints `
+  --output out\g8_support_seed_atlas.json `
+  --inner-screen-iterations 1 --inner-final-iterations 3 `
+  --outer-max-iterations 60 --outer-max-evaluations 800
+```
+
+The atlas SHA-256 is
+`c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e`.
+The frozen manifest SHA-256 is
+`6b525083164953bc783ebc04d33703b232f602439be4d7f3bdacafc010d530af`.
