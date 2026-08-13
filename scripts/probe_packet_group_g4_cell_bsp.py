@@ -28,10 +28,27 @@ import probe_packet_group_g4_stellar_cover as cover
 DIMENSION = 4
 CLASSES = 5
 SUPPORT_MASK = 31
+SUPPORT = (0, 1, 2, 3, 4)
+CHART_INDICES = (0, 1, 2, 3)
+DEPENDENT_INDEX = 4
 BSP_SCHEMA = "packet-group-g4-cell-dominance-bsp-v1"
 Profile = tuple[Fraction, ...]
 Constraint = tuple[tuple[Fraction, ...], Fraction]
 Affine = tuple[Fraction, tuple[Fraction, ...]]
+
+
+def configure_support(support_mask: int) -> None:
+    """Select the affine chart for one exact positive-support stratum."""
+
+    global DIMENSION, SUPPORT_MASK, SUPPORT, CHART_INDICES, DEPENDENT_INDEX
+    support = tuple(index for index in range(CLASSES) if support_mask & (1 << index))
+    if len(support) < 2:
+        raise ValueError("g4 cell BSP requires a positive-dimensional support")
+    SUPPORT_MASK = support_mask
+    SUPPORT = support
+    DIMENSION = len(support) - 1
+    CHART_INDICES = support[:-1]
+    DEPENDENT_INDEX = support[-1]
 
 
 def file_sha256(path: Path) -> str:
@@ -82,8 +99,11 @@ def solve_linear(
 
 def simplex_constraints(vertices: tuple[Profile, ...]) -> tuple[Constraint, ...]:
     if len(vertices) != DIMENSION + 1:
-        raise ValueError("g4 cell BSP: root must be a 4-simplex")
-    augmented = [list(vertex[:DIMENSION]) + [Fraction(1)] for vertex in vertices]
+        raise ValueError("g4 cell BSP: root has the wrong simplex dimension")
+    augmented = [
+        [vertex[index] for index in CHART_INDICES] + [Fraction(1)]
+        for vertex in vertices
+    ]
     constraints = []
     for owner in range(DIMENSION + 1):
         target = [Fraction(int(index == owner)) for index in range(DIMENSION + 1)]
@@ -98,7 +118,11 @@ def simplex_constraints(vertices: tuple[Profile, ...]) -> tuple[Constraint, ...]
 
 
 def profile_from_chart(point: tuple[Fraction, ...]) -> Profile:
-    return tuple(point) + (Fraction(cover.M) - sum(point, Fraction(0)),)
+    profile = [Fraction(0)] * CLASSES
+    for index, value in zip(CHART_INDICES, point):
+        profile[index] = value
+    profile[DEPENDENT_INDEX] = Fraction(cover.M) - sum(point, Fraction(0))
+    return tuple(profile)
 
 
 def enumerate_vertices(constraints: tuple[Constraint, ...]) -> tuple[Profile, ...]:
@@ -127,8 +151,11 @@ def affine_value(affine: Affine, profile: Profile) -> Fraction:
 
 def affine_constraint(affine: Affine, nonpositive: bool) -> Constraint:
     constant, coefficients = affine
-    chart = tuple(coefficients[index] - coefficients[-1] for index in range(DIMENSION))
-    chart_constant = constant + coefficients[-1] * cover.M
+    chart = tuple(
+        coefficients[index] - coefficients[DEPENDENT_INDEX]
+        for index in CHART_INDICES
+    )
+    chart_constant = constant + coefficients[DEPENDENT_INDEX] * cover.M
     if nonpositive:
         return chart, -chart_constant
     return tuple(-value for value in chart), chart_constant
@@ -268,7 +295,7 @@ class Builder:
         # Geometry-only fallback.  It remains sound because the verifier does
         # not rely on a cut being a dominance plane.
         coordinate = max(
-            range(CLASSES),
+            SUPPORT,
             key=lambda index: max(p[index] for p in vertices) - min(p[index] for p in vertices),
         )
         low = min(profile[coordinate] for profile in vertices)
@@ -395,6 +422,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, required=True)
     parser.add_argument("--atlas", type=Path, action="append", required=True)
+    parser.add_argument("--support-mask", type=lambda value: int(value, 0), default=31)
     parser.add_argument("--cell-id")
     parser.add_argument("--max-depth", type=int, default=5)
     parser.add_argument("--top-witnesses-per-vertex", type=int, default=2)
@@ -403,6 +431,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.max_depth < 0 or args.top_witnesses_per_vertex < 1 or args.safety_bits < 0:
         parser.error("invalid BSP depth, candidate count, or safety margin")
+    configure_support(args.support_mask)
 
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
     if int(ledger.get("group_bits", -1)) != cover.GROUP_BITS:

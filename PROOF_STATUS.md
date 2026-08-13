@@ -23,8 +23,8 @@ chronological research log through 2026-08-13 is preserved in
 | Structured RM/EBCH construction | Theorem-facing and checkable | A binary `[2^21,2^20,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-37.27`. |
 | Structured EBCH/XOR-parity construction | Theorem-facing and checkable | A binary `[2^21,1048512,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-41.29`. |
 | Riffle with packet width `g=2` | Certified | The optimized end-to-end first-moment bound is at most `2^-62.7194713852`. |
-| Riffle with packet width `g=4` | Incomplete | No end-to-end theorem is claimed. The current leading diagnostic profile remains about `1409.7` bits short after convergence corrections and the best implemented exact-graph outer family. |
-| Riffle with packet width `g=8` | Not started end to end | This is the intended deployment width. The proof methodology must first close at `g=4`. |
+| Riffle with packet width `g=4` | Certified | The complete end-to-end first-moment bound is at most `2^-61.7881515553`. |
+| Riffle with packet width `g=8` | Not started end to end | This is the intended deployment width. The `g=4` certificate now supplies the proof template. |
 
 ## Frozen Riffle target
 
@@ -104,10 +104,29 @@ Canonical artifacts:
 The aggregation ledger inside the final report has SHA-256
 `43ecbb47c2b61e9cb20890053e879a6adf863e14923a16f4a188a9d88e2e4b40`.
 
-## Sound `g=4` proof architecture
+## Complete `g=4` certificate
 
-The following parts are established proof machinery. They do not constitute
-the missing end-to-end certificate by themselves.
+Let the frozen `g=4` setup sample the independent lane bijections, packet
+permutation, and recursive state permutations specified by Riffle. For a
+sampled setup, let `Z_d` count nonzero messages whose codeword has weight at
+most `d=188743`. The complete outward certificate proves
+
+```text
+E[Z_d] <= 2^-61.78815155534398186100.
+```
+
+The expectation is over the declared setup randomness. Markov's inequality
+therefore gives
+
+```text
+Pr[d_min <= 188743] <= 2^-61.78815155534398186100.
+```
+
+The certified margin beyond the required 40-bit threshold is
+`21.7881515553` bits. In particular, at least one frozen setup defines a
+binary `[2^21,2^20,d_min>=188744]` code.
+
+The verifier establishes the bound through the following finite ledger.
 
 1. **Packet-profile orbit.** Conditional on `a`, the permuted binary word is
    uniform on an orbit of size
@@ -127,18 +146,17 @@ the missing end-to-end certificate by themselves.
    and an exact rational simplicial mesh. The verifier checks determinants,
    facet incidence, boundary facets, and total volume.
 
-4. **Per-cell BSP.** An exact rational binary space partition may refine one
-   source cell without conforming to adjacent source cells. Each BSP tree must
-   cover its parent cell exactly. Closed shared boundaries may be overcounted.
+4. **Per-cell BSP.** An exact rational binary space partition refines 899
+   source cells. Each tree covers its parent exactly. Closed boundaries may be
+   overcounted because every parent retains its original profile-count bound.
 
 5. **Fixed witnesses and mixtures.** A leaf uses one fixed witness or one
    fixed rational convex mixture at every vertex. Convexity then covers the
    complete leaf. Different witnesses at different vertices do not suffice.
 
-6. **Finite-atlas pricing.** The minimax LP uses dual column generation. It
-   scans every eligible atlas column before declaring convergence. The final
-   verifier does not trust the discovery LP; it independently evaluates the
-   selected rational mixture.
+6. **Finite-atlas pricing.** Discovery uses dual column generation. The final
+   verifier does not trust its floating-point objectives. It independently
+   hardens every selected witness and evaluates every fixed rational mixture.
 
 7. **Cell-local union bound.** Each certified cell bound is multiplied by a
    rigorous integer-profile count upper bound. The verifier performs an
@@ -149,135 +167,33 @@ Relevant mathematical notes are
 `explorations/g4_delaunay_cover_math.md`, and
 `explorations/riffle_group_chain_proof.md`.
 
-## Current `g=4` frontier
-
-The best available source-cell discovery ledger processes the leading 1024
-source cells. It selects the best of four exact BSP trees per cell, preserves
-their partitions, and reattaches every leaf over an atlas of 5587 frozen
-witnesses.
+The independent replay reports:
 
 ```text
-processed source cells                 1024
-largest unprocessed source-cell term   +12078.982162066526
-largest updated source-cell term       +16514.50512918122
-leading cell                           s1fr033931
-leading rounded profile                [429359,24531,38395,28039,3964]
+feasible exact-support strata                 30
+exact support-mesh root cells              40902
+root cells replaced by exact BSPs            899
+exact BSP leaves                             2132
+used fixed witnesses                         2144
+component evaluations at vertices          483058
+BSP leaf inequalities                        15284
+outward log2 E[Z_d] upper endpoint   -61.78815155534398186100
 ```
 
-This is a diagnostic regional ledger. It is neither a complete global cover
-nor an outward certificate.
-
-Canonical local artifacts:
+Canonical artifacts:
 
 | Artifact | SHA-256 |
 | --- | --- |
-| `out/g4_cell_bsp_top1024_best_collatz_merged_round4_reattached.json` | `69ff23973c9d38a1a93ac0378b4b38e834b83b0b913004340bb8870ad027fd17` |
-| `out/g4_cell_bsp_top1024_best_collatz_merged_round4_reattached_failures.json` | `de996e74ce8622926e20deacf916a897d5f27f7bf1f6cd112d9f2261f6891930` |
-| `out/g4_leader_429359_joint_fullcollatz_multistart.json` | `f7951ff6e116de9d81411b9abd214642f2fed9d6490735ec7ddc098a8fc31675` |
-| `out/g4_leader_429359_joint_fullcollatz_exact_graph.json` | `1d7b5271ca477784f9e40b4796604030f76a4777798086387187690be0b90f1e` |
-| `out/g4_leader_429359_exact_graph_linear_optimized.json` | `b9141dad0e74e170822a9c3981b240ee4e1c91ad4663a5a216f21366c31d5ee2` |
+| `out/g4_support_lower30_outward_sparse_grid9_mixtures.json` | `ddd57ef25a1ef815614ca3592941075a1ae12dc8652b8c76806c233c511a92d7` |
+| `out/g4_support_full_asymmetric_incremental_peach.json` | `80b03f60b4b3c6c7b22d1c20cf2e1e203561cd9f111a6baf8bd84cf24e349ef8` |
+| `out/g4_lower296_bsp_diagnostic.json` | `e1208a95642ea6092dbde94baea8015a6cf675b652294d6ae492e7a0a7442880` |
+| `out/g4_cell_bsp_remaining603_asymmetric.json` | `4a67362e2a0b191617c93933e0d0474769adf6ffc4442bb002544c5b673c6e19` |
+| `out/g4_end_to_end_bsp_outward_certificate.json` | `9a416987feda6c0edf15ea2af91b30eb84d3be8b97a002831cf85f03e7086364` |
 
-The merged BSP ledger names Peach source artifacts under
-`/tmp/permute-conv-g2/out/`. Their expected hashes are embedded in the
-ledger. A final certificate must make every source available to the verifier
-or package its authenticated content.
-
-### Leading-profile decomposition
-
-The best stored 320-step witness under the old adversarial-hole linear-BL
-outer gives
-
-```text
-outer                         +268976.6146352452
-inner                         -267070.1202656985
-combined                        +1906.4943695467
-uniform target                   -111.4150650164
-deficit                           2017.9094345631
-```
-
-Longer power iteration on the same frozen parameters converges near
-
-```text
-inner                         -267186.9845
-combined with old outer         +1789.6301
-inner MGF                         30.8161
-state-domination charge           25.4891
-```
-
-The exact graph-conditioned linear-BL outer reduces the outer contribution
-to approximately `268485.2337363`. Reoptimizing that outer family improves
-it by only about `0.005` bits. Combining the converged inner diagnostic with
-that outer gives approximately
-
-```text
-combined                        +1298.2492
-uniform target                   -111.4151
-remaining pointwise deficit       1409.6643
-```
-
-The 20,000-step trajectory is packaged as
-`out/g4_leader_429359_collatz_20000.json` (SHA-256
-`7e0f634d169a84e7266670ec775b6b1459245c372fb84cf4c4aef20f92d1f76a`).
-The file records the converged inner witness with the older adversarial-hole
-outer. The companion
-`out/g4_leader_429359_collatz_20000_exact_graph.json` (SHA-256
-`330e262bde5d624ed937c3208c587c013eee158a8958ae687e5c4d5f3a2bc7c6`)
-replaces that outer by the inherited exact graph-conditioned outer. The
-separately optimized exact-graph outer recovers about another `0.005` bits.
-
-### Relaxations tested at the leading profile
-
-| Test | Observation | Interpretation |
-| --- | --- | --- |
-| Power iteration from 320 to 20,000 steps | About `116.9` bits recovered | Finite Collatz convergence mattered, but the trajectory is now effectively saturated. |
-| Exact graph-conditioned outer | About `491.4` bits recovered relative to the adversarial-hole outer | The old hole tax was substantial. |
-| Direct optimization of exact-graph linear-BL tilt | About `0.005` additional bits | This outer family is locally optimized. |
-| Shared systematic-column inner bound | About `0.035` bits beyond the row-specific bound | Global column sharing does not own the remaining deficit at the current tilt. |
-| Exact drive-pattern transfer at the current tilt | No material gain after convergence correction | The point-cap relaxation is not the main owner at this tilt. |
-| Arbitrary 65-state test-vector improvement | The complete converged MGF is only about `30.8` bits | This component has no plausible 1400-bit gain unless the operator or tilt changes. |
-
-These are diagnostic comparisons. They localize slack but do not prove that
-the construction has the target distance.
-
-## Active proof routes
-
-The current witness family has reached its redesign trigger at the leading
-profile. More Powell depth, more Collatz iterations, or another arbitrary
-state vector is not the preferred next move.
-
-### Primary candidate: band-pair-spectrum outer
-
-The repository contains exact split spectra for bands `(0,1)` and `(1,2)`:
-
-```text
-out/ebch85_band01_split_spectrum.csv
-out/ebch86_band12_split_spectrum.csv
-```
-
-The candidate route combines their exact membership probabilities through a
-rank-one domination and degree-4 Finner inequality. The intended result is a
-profile-shaped outer bound that retains more three-band structure than the
-current linear-BL family.
-
-`scripts/probe_packet_group_g4_pair_spectrum_outer.py` is an unfinished
-prototype. It has not passed its mass invariant, mathematical audit, or a
-hard-profile run. No value produced by that script should be cited yet.
-
-### Fallback: retuned exact drive-pattern inner
-
-`scripts/probe_packet_group_pattern_exact_transfer.py` retains all 4845
-multisets of four packet-drive patterns. At the inherited tilt it gives no
-material improvement. A joint retuning could expose a better saddle point,
-but the current Python implementation is too expensive for a broad search.
-Use caching or a native data-oriented kernel before launching a campaign.
-
-### Stop condition for the current construction
-
-Challenge the construction only after both structured routes fail at the
-leading profile under a properly audited joint optimization. A negative
-binary64 experiment is not a counterexample. An explicit codeword of weight
-at most `188743`, or a rigorous lower bound showing the required first moment
-cannot close within the permitted ensemble, would be contrary evidence.
+The final report binds the evaluated inequalities with SHA-256
+`512f46a7e6cf2686e7bcf88b8b8af22af11080d6741f8f60eaaba0bb785d4c6f`.
+It binds the hardened witness reports with SHA-256
+`adfc9e21df420c4c6dd0fc9823c0b2c457bc91a84d1e833a153fd5e3fa39f0e1`.
 
 ## Theorem-facing non-Riffle rows
 
@@ -310,8 +226,21 @@ pdflatex -interaction=nonstopmode main_permConv.tex
 pdflatex -interaction=nonstopmode main_permConv.tex
 ```
 
-For the Riffle line, a successful diagnostic run is not a verification gate.
-The final `g=4` gate must invoke an independent outward verifier on a complete
-ledger and must reproduce a final upper endpoint at most `-40`.
+The complete `g=4` gate is:
+
+```powershell
+python scripts\certify_packet_group_g4_end_to_end_bsp.py `
+  --lower-ledger out\g4_support_lower30_outward_sparse_grid9_mixtures.json `
+  --full-ledger out\g4_support_full_asymmetric_incremental_peach.json `
+  --bsp-batch out\g4_lower296_bsp_diagnostic.json `
+  --bsp-batch out\g4_cell_bsp_remaining603_asymmetric.json `
+  --workers 8 --iterations 40 `
+  --checkpoint-dir out\g4_race_hardened_cache `
+  --output out\g4_end_to_end_bsp_outward_certificate.json
+```
+
+The command must reproduce `passed: true` and an upper endpoint at most
+`-61.78815155534398186100`. A diagnostic discovery run is not a substitute
+for this independent replay.
 
 Never run two benchmarks or long verification jobs simultaneously.

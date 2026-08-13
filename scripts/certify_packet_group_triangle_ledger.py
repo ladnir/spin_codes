@@ -53,7 +53,7 @@ import math
 import os
 import re
 from collections import Counter, defaultdict
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from functools import lru_cache
@@ -62,7 +62,10 @@ from typing import Any, Iterable
 
 import numpy as np
 
-from certify_packet8_hard_face_drive_inner import exact_float, outward_transport_image
+from certify_packet8_hard_face_drive_inner import (
+    exact_float,
+    outward_transport_image_decimal_upper,
+)
 from certify_packet_group_profile import outward_normalization
 from outward_log2 import LN2, Interval, log2_fraction, log2_int, self_check
 from packet_group_drive_stratified import (
@@ -83,6 +86,7 @@ from packet_group_outer_profile import (
     full_spectrum,
 )
 from packet_group_profile_bound import GRAPH_REPLACEMENTS, split_cap_table
+from packet_group_native import load_point_caps as load_native_point_caps
 from probe_packet8_drive_stratified_transfer import SharedDriveStratifiedKernel
 from probe_packet8_repeated_value_state_transfer import best_witness
 from probe_packet8_weight_profile_state_transfer import INNER_BLOCKS
@@ -117,6 +121,20 @@ def _up_mul(left: np.ndarray | float, right: np.ndarray | float) -> np.ndarray:
     return np.where(raw > 0.0, np.nextafter(raw, np.inf), raw)
 
 
+def _roundoff_enclosure_factor(operations: int) -> float:
+    """Return a binary64 upper bound on ``1/(1-gamma_operations)``."""
+
+    if operations < 1:
+        return 1.0
+    unit = Fraction(1, 1 << 53)
+    gamma = operations * unit / (1 - operations * unit)
+    exact = Fraction(1, 1) / (1 - gamma)
+    value = float(exact)
+    if Fraction.from_float(value) < exact:
+        value = math.nextafter(value, math.inf)
+    return value
+
+
 def _clean_outward_pairs(fugacities: np.ndarray) -> np.ndarray:
     exact_support = compatible_pair_polynomials(GROUP_BITS, fugacities)
     upper = compatible_pair_polynomials_outward(GROUP_BITS, fugacities)
@@ -125,7 +143,13 @@ def _clean_outward_pairs(fugacities: np.ndarray) -> np.ndarray:
 
 
 def _block_histograms_outward(fugacities: np.ndarray) -> np.ndarray:
-    """Existing outward block DP with exact structural zeros retained."""
+    """Outward block DP with one roundoff enclosure per atom.
+
+    Each destination is a nonnegative dot product over at most ``entries``
+    transfer terms.  A stage-wide gamma bound encloses every such dot product.
+    A parallel Boolean DP retains exact structural zeros and detects positive
+    underflow before the enclosure factor is applied.
+    """
 
     atoms = BLOCK_ATOMS
     patterns = accumulator_pattern_counts(GROUP_BITS)
@@ -144,25 +168,44 @@ def _block_histograms_outward(fugacities: np.ndarray) -> np.ndarray:
                             )
     dp = np.zeros((2, BLOCK_BITS + 1, BLOCK_BITS + 1, BLOCK_BITS + 1))
     dp[0, 0, 0, 0] = 1.0
+    support = np.zeros_like(dp, dtype=bool)
+    support[0, 0, 0, 0] = True
+    factor = _roundoff_enclosure_factor(2 * len(entries) + 1)
     maximum = 0
     for _ in range(atoms):
         next_dp = np.zeros_like(dp)
+        next_support = np.zeros_like(support)
         for incoming, outgoing, selected, drive, emitted, coefficient in entries:
             source = dp[incoming, : maximum + 1, : maximum + 1, : maximum + 1]
-            contribution = _up_mul(coefficient, source)
             destination = next_dp[
                 outgoing,
                 selected : selected + maximum + 1,
                 drive : drive + maximum + 1,
                 emitted : emitted + maximum + 1,
             ]
-            destination[...] = _up_add(destination, contribution)
-        dp = next_dp
+            destination[...] += coefficient * source
+            support_source = support[
+                incoming, : maximum + 1, : maximum + 1, : maximum + 1
+            ]
+            support_destination = next_support[
+                outgoing,
+                selected : selected + maximum + 1,
+                drive : drive + maximum + 1,
+                emitted : emitted + maximum + 1,
+            ]
+            support_destination[...] |= support_source
+        if np.any(next_support & (next_dp == 0.0)):
+            raise FloatingPointError(
+                "outward block DP underflowed a structurally positive coefficient"
+            )
+        dp = _up_mul(next_dp, factor)
+        dp[~next_support] = 0.0
+        support = next_support
         maximum += GROUP_BITS
     return _up_add(dp[0], dp[1])
 
 
-def _convolve_outward(left: np.ndarray, right: np.ndarray) -> np.ndarray:
+def _convolve_outward_reference(left: np.ndarray, right: np.ndarray) -> np.ndarray:
     result = np.zeros(len(left) + len(right) - 1)
     for index, value in enumerate(left):
         if value == 0.0:
@@ -173,7 +216,34 @@ def _convolve_outward(left: np.ndarray, right: np.ndarray) -> np.ndarray:
     return result
 
 
-def _point_caps_outward(fugacities: np.ndarray) -> np.ndarray:
+def _convolve_outward(left: np.ndarray, right: np.ndarray) -> np.ndarray:
+    """Fast outward convolution for nonnegative binary64 coefficients.
+
+    A coefficient uses at most ``k=min(len(left),len(right))`` products and
+    ``k-1`` additions.  The standard ``gamma_(2k-1)`` bound applies under
+    round-to-nearest.  Multiplication by ``1/(1-gamma)`` therefore encloses
+    the exact convolution of the already-outward inputs.  The final multiply
+    itself rounds upward through ``_up_mul``.
+    """
+
+    if np.any(left < 0.0) or np.any(right < 0.0):
+        raise ValueError("outward convolution requires nonnegative coefficients")
+    raw = np.convolve(left, right)
+    if not np.all(np.isfinite(raw)):
+        raise FloatingPointError("outward convolution overflowed")
+    structural = np.convolve(left > 0.0, right > 0.0) > 0
+    if np.any(structural & (raw == 0.0)):
+        raise FloatingPointError(
+            "outward convolution underflowed a structurally positive coefficient"
+        )
+    operations = 2 * min(len(left), len(right)) - 1
+    factor = _roundoff_enclosure_factor(operations)
+    result = _up_mul(raw, factor)
+    result[~structural] = 0.0
+    return result
+
+
+def _point_caps_outward_reference(fugacities: np.ndarray) -> np.ndarray:
     atoms = BLOCK_ATOMS
     local = _clean_outward_pairs(fugacities)
     maxima = np.zeros((BLOCK_BITS + 1, BLOCK_BITS + 1))
@@ -185,6 +255,48 @@ def _point_caps_outward(fugacities: np.ndarray) -> np.ndarray:
             polynomial = _convolve_outward(polynomial, local[weight])
         total = sum(weights)
         maxima[:, total] = np.maximum(maxima[:, total], polynomial)
+    for state_weight in range(BLOCK_BITS + 1):
+        positive = maxima[state_weight] > 0.0
+        quotient = maxima[state_weight, positive] / math.comb(BLOCK_BITS, state_weight)
+        maxima[state_weight, positive] = np.nextafter(quotient, np.inf)
+    return maxima
+
+
+def _point_caps_outward(fugacities: np.ndarray) -> np.ndarray:
+    """Native point caps enlarged by a complete recurrence error bound."""
+
+    native = load_native_point_caps()
+    if native is None:
+        return _point_caps_outward_reference(fugacities)
+    local = _clean_outward_pairs(fugacities)
+    maxima = np.zeros((BLOCK_BITS + 1, BLOCK_BITS + 1), dtype=np.float64)
+    status = native(
+        GROUP_BITS,
+        np.ascontiguousarray(local.reshape(-1), dtype=np.float64),
+        maxima.reshape(-1),
+    )
+    if status != 0 or not np.all(np.isfinite(maxima)):
+        raise RuntimeError("native outward point-cap recurrence failed")
+    # One depth performs at most GROUP_BITS+1 products and GROUP_BITS
+    # additions.  Repeating the lower-error factor for every atom encloses
+    # the complete shared-prefix recurrence before the exact maximum at each
+    # leaf is taken.
+    stage = Fraction.from_float(
+        _roundoff_enclosure_factor(2 * (GROUP_BITS + 1) - 1)
+    )
+    # The extra 64-operation guard dominates call-boundary stores, the final
+    # maximum updates, and compiler reassociation in the small native kernel.
+    factor_exact = stage**BLOCK_ATOMS * Fraction.from_float(
+        _roundoff_enclosure_factor(64)
+    )
+    factor = float(factor_exact)
+    if Fraction.from_float(factor) < factor_exact:
+        factor = math.nextafter(factor, math.inf)
+    maxima = _up_mul(maxima, factor)
+    if np.all(fugacities > 0.0) and np.any(maxima == 0.0):
+        raise FloatingPointError(
+            "native point-cap recurrence underflowed a structurally positive entry"
+        )
     for state_weight in range(BLOCK_BITS + 1):
         positive = maxima[state_weight] > 0.0
         quotient = maxima[state_weight, positive] / math.comb(BLOCK_BITS, state_weight)
@@ -848,14 +960,14 @@ def _parameters(row: dict[str, Any], artifact: Path) -> dict[str, Any]:
             ),
             float(theta),
         )
-    elif outer_type == "exact_graph_total_spectrum":
+    elif outer_type in ("total_spectrum", "exact_graph_total_spectrum"):
         log_variables = outer_details.get("log_variables", merged.get("outer_log_variables"))
         outer_point = outer_details.get("outer_point")
         log_beta = outer_details.get("log_beta")
         if log_beta is None and isinstance(outer_point, list) and len(outer_point) > GROUP_BITS:
             log_beta = outer_point[GROUP_BITS]
         if log_variables is None or log_beta is None:
-            raise ValueError("exact graph total-spectrum witness lacks frozen parameters")
+            raise ValueError("total-spectrum witness lacks frozen parameters")
         outer = (
             "exact_graph_total_spectrum",
             [float(value) for value in log_variables],
@@ -972,18 +1084,26 @@ def harden_witness(
         raise ValueError("outward histogram does not enclose diagnostic histogram")
     if not np.all(caps_upper >= diagnostic_caps):
         raise ValueError("outward cap does not enclose diagnostic cap")
-    image, transport_stats = outward_transport_image(
+    image, transport_stats = outward_transport_image_decimal_upper(
         values, histograms_upper, caps_upper, split_caps, pole
     )
     value_fractions = [exact_float(float(value)) for value in values]
     eigenvalue_upper = max(entry / value for entry, value in zip(image, value_fractions))
     domination = max(Fraction(1) / value for value in value_fractions)
-    inner_mgf = (
+    inner_mgf_upper = (
         log2_fraction(domination)
         + log2_fraction(eigenvalue_upper).times_int(INNER_BLOCKS)
         + log2_fraction(value_fractions[0])
     )
-    inner_constant = inner_mgf - log2_fraction(exact_float(pole)).times_int(D)
+    inner_constant_upper = (
+        inner_mgf_upper - log2_fraction(exact_float(pole)).times_int(D)
+    )
+    # Only the upper endpoint enters the certificate inequality.  The coarse
+    # lower endpoint is a universal finite bound for this fixed-size
+    # computation: fewer than 2^31 positive IEEE-754 factors occur, and each
+    # is at least 2^-1074.  The -10^15 guard is therefore below every possible
+    # base-two logarithm produced here.
+    inner_constant = Interval(Decimal("-1e15"), inner_constant_upper.hi)
     inner_charges = tuple(
         None if value == 0 else log2_fraction(exact_float(float(value)))
         for value in fugacities
@@ -1178,8 +1298,13 @@ def _write_cached_hardened(
     temporary.replace(path)
 
 
-def _initialize_hardening_worker() -> None:
-    global _WORKER_SPLIT_CAPS
+def _initialize_hardening_worker(group_bits: int = 2) -> None:
+    global GROUP_BITS, BLOCK_ATOMS, _WORKER_SPLIT_CAPS
+    if group_bits not in (1, 2, 4, 8):
+        raise ValueError(f"unsupported packet group size {group_bits}")
+    GROUP_BITS = group_bits
+    BLOCK_ATOMS = BLOCK_BITS // GROUP_BITS
+    _OUTWARD_NORMALIZATION_CACHE.clear()
     _WORKER_SPLIT_CAPS = split_cap_table()
 
 
@@ -1203,6 +1328,7 @@ def harden_selected_witnesses(
     iterations: int,
     workers: int,
     checkpoint_dir: Path | None,
+    group_bits: int = 2,
 ) -> dict[str, dict[str, Any]]:
     hardened: dict[str, dict[str, Any]] = {}
     tasks = []
@@ -1246,30 +1372,45 @@ def harden_selected_witnesses(
                 flush=True,
             )
     else:
+        worker_count = min(workers, len(tasks))
         with ProcessPoolExecutor(
-            max_workers=min(workers, len(tasks)),
+            max_workers=worker_count,
             initializer=_initialize_hardening_worker,
+            initargs=(group_bits,),
         ) as executor:
-            future_to_name = {
-                executor.submit(_harden_worker, task): task[0] for task in tasks
-            }
-            for future in as_completed(future_to_name):
-                name = future_to_name[future]
-                try:
-                    returned_name, value = future.result()
-                except BaseException as error:
-                    raise RuntimeError(f"outward hardening failed for witness {name}") from error
-                if returned_name != name:
-                    raise RuntimeError("outward hardening worker returned the wrong witness")
-                hardened[name] = value
-                key, cache_path = cache_records[name]
-                if cache_path is not None:
-                    _write_cached_hardened(cache_path, key, value)
-                completed += 1
-                print(
-                    f"hardened witness={name} progress={completed}/{len(used_names)}",
-                    flush=True,
-                )
+            task_iterator = iter(tasks)
+            pending = {}
+            for _ in range(min(2 * worker_count, len(tasks))):
+                task = next(task_iterator)
+                pending[executor.submit(_harden_worker, task)] = task[0]
+            while pending:
+                done, _not_done = wait(pending, return_when=FIRST_COMPLETED)
+                for future in done:
+                    name = pending.pop(future)
+                    try:
+                        returned_name, value = future.result()
+                    except BaseException as error:
+                        raise RuntimeError(
+                            f"outward hardening failed for witness {name}"
+                        ) from error
+                    if returned_name != name:
+                        raise RuntimeError(
+                            "outward hardening worker returned the wrong witness"
+                        )
+                    hardened[name] = value
+                    key, cache_path = cache_records[name]
+                    if cache_path is not None:
+                        _write_cached_hardened(cache_path, key, value)
+                    completed += 1
+                    print(
+                        f"hardened witness={name} progress={completed}/{len(used_names)}",
+                        flush=True,
+                    )
+                    try:
+                        task = next(task_iterator)
+                    except StopIteration:
+                        continue
+                    pending[executor.submit(_harden_worker, task)] = task[0]
     return {name: hardened[name] for name in used_names}
 
 

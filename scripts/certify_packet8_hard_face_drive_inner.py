@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from decimal import Decimal, ROUND_CEILING, localcontext
 from fractions import Fraction
 from pathlib import Path
 
@@ -125,6 +126,106 @@ def outward_transport_image(
         "transport_segments": total_transports,
         "source_limited_cells": source_limited,
         "sink_limited_cells": sink_limited,
+    }
+
+
+def outward_transport_image_decimal_upper(
+    values_float: np.ndarray,
+    histograms_upper: np.ndarray,
+    caps_upper: np.ndarray,
+    split_caps,
+    pole_float: float,
+    precision: int = 100,
+) -> tuple[list[Fraction], dict[str, int]]:
+    """Upper-bound the enlarged transport operator with directed decimals.
+
+    Every binary64 input is converted exactly.  Division, multiplication,
+    addition, and residual subtraction then round toward positive infinity.
+    Hence every source supply and every running residual encloses the exact
+    enlarged problem from above.  Greedy transportation remains optimal
+    because source caps and sink values retain their exact binary64 order.
+    The returned decimal values are converted to exact rational upper bounds.
+    """
+
+    if precision < 32:
+        raise ValueError("transport decimal precision is too small")
+    values = [Decimal.from_float(float(value)) for value in values_float]
+    state_order = sorted(range(BITS + 1), key=lambda state: values[state], reverse=True)
+    pole = Decimal.from_float(float(pole_float))
+    image: list[Fraction] = []
+    total_transports = 0
+    source_limited = 0
+    sink_limited = 0
+    with localcontext() as context:
+        context.prec = precision
+        context.rounding = ROUND_CEILING
+        pole_powers = [Decimal(1)]
+        for _ in range(BITS):
+            pole_powers.append(pole_powers[-1] * pole)
+
+        for incoming_state in range(BITS + 1):
+            denominator = Decimal(math.comb(BITS, incoming_state))
+            total = Decimal(0)
+            for emitted in range(BITS + 1):
+                sources: list[tuple[Decimal, Decimal]] = []
+                for drive_weight in range(BITS + 1):
+                    histogram_float = float(
+                        histograms_upper[incoming_state, drive_weight, emitted]
+                    )
+                    if histogram_float == 0.0:
+                        continue
+                    cap_float = float(caps_upper[incoming_state, drive_weight])
+                    if cap_float <= 0.0:
+                        raise SystemExit(
+                            "hard-face drive inner: outward positive mass has zero cap"
+                        )
+                    cap = Decimal.from_float(cap_float)
+                    mass_upper = Decimal.from_float(histogram_float) / denominator
+                    sources.append((cap, mass_upper / cap))
+                if not sources:
+                    continue
+                sources.sort(key=lambda item: item[0], reverse=True)
+                sinks = [
+                    (values[state], Decimal(int(split_caps[emitted][state])))
+                    for state in state_order
+                    if int(split_caps[emitted][state]) > 0
+                ]
+                if not sinks:
+                    raise SystemExit(
+                        "hard-face drive inner: positive outward mass has no split column"
+                    )
+
+                source_index = 0
+                sink_index = 0
+                source_remaining = sources[0][1]
+                sink_remaining = sinks[0][1]
+                value = Decimal(0)
+                while source_index < len(sources) and sink_index < len(sinks):
+                    take = min(source_remaining, sink_remaining)
+                    value += take * sources[source_index][0] * sinks[sink_index][0]
+                    total_transports += 1
+                    source_remaining -= take
+                    sink_remaining -= take
+                    if source_remaining == 0:
+                        source_index += 1
+                        if source_index < len(sources):
+                            source_remaining = sources[source_index][1]
+                    if sink_remaining == 0:
+                        sink_index += 1
+                        if sink_index < len(sinks):
+                            sink_remaining = sinks[sink_index][1]
+                if source_index == len(sources):
+                    source_limited += 1
+                else:
+                    sink_limited += 1
+                total += pole_powers[emitted] * value
+            image.append(Fraction(total))
+    return image, {
+        "transport_segments": total_transports,
+        "source_limited_cells": source_limited,
+        "sink_limited_cells": sink_limited,
+        "transport_arithmetic": "directed_decimal_upper",
+        "transport_decimal_precision": precision,
     }
 
 

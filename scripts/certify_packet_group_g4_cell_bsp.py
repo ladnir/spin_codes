@@ -26,10 +26,26 @@ from packet_group_drive_stratified import profile_count
 
 DIMENSION = 4
 CLASSES = 5
+SUPPORT = (0, 1, 2, 3, 4)
+CHART_INDICES = (0, 1, 2, 3)
+DEPENDENT_INDEX = 4
 BSP_SCHEMA = "packet-group-g4-cell-dominance-bsp-v1"
 Profile = tuple[Fraction, ...]
 Constraint = tuple[tuple[Fraction, ...], Fraction]
 Affine = tuple[Fraction, tuple[Fraction, ...]]
+
+
+def configure_support(support_mask: int) -> None:
+    """Select the affine chart for one exact positive-support stratum."""
+
+    global DIMENSION, SUPPORT, CHART_INDICES, DEPENDENT_INDEX
+    support = tuple(index for index in range(CLASSES) if support_mask & (1 << index))
+    if len(support) < 2:
+        raise ValueError("g4 cell BSP verifier requires positive dimension")
+    SUPPORT = support
+    DIMENSION = len(support) - 1
+    CHART_INDICES = support[:-1]
+    DEPENDENT_INDEX = support[-1]
 
 
 def file_sha256(path: Path) -> str:
@@ -72,9 +88,12 @@ def solve_linear(
 
 
 def simplex_constraints(vertices: tuple[Profile, ...]) -> tuple[Constraint, ...]:
-    augmented = [list(vertex[:DIMENSION]) + [Fraction(1)] for vertex in vertices]
+    augmented = [
+        [vertex[index] for index in CHART_INDICES] + [Fraction(1)]
+        for vertex in vertices
+    ]
     if len(augmented) != DIMENSION + 1:
-        raise ValueError("g4 cell BSP verifier: root is not a 4-simplex")
+        raise ValueError("g4 cell BSP verifier: root has the wrong dimension")
     constraints = []
     for owner in range(DIMENSION + 1):
         target = [Fraction(int(index == owner)) for index in range(DIMENSION + 1)]
@@ -100,7 +119,11 @@ def enumerate_vertices(constraints: tuple[Constraint, ...]) -> tuple[Profile, ..
             sum(coefficient * value for coefficient, value in zip(left, solution)) <= right
             for left, right in constraints
         ):
-            vertices.add(tuple(solution) + (Fraction(g4.M) - sum(solution, Fraction(0)),))
+            profile = [Fraction(0)] * CLASSES
+            for index, value in zip(CHART_INDICES, solution):
+                profile[index] = value
+            profile[DEPENDENT_INDEX] = Fraction(g4.M) - sum(solution, Fraction(0))
+            vertices.add(tuple(profile))
     return tuple(sorted(vertices))
 
 
@@ -125,8 +148,11 @@ def affine_value(affine: Affine, profile: Profile) -> Fraction:
 
 def affine_constraint(affine: Affine, nonpositive: bool) -> Constraint:
     constant, coefficients = affine
-    chart = tuple(coefficients[index] - coefficients[-1] for index in range(DIMENSION))
-    chart_constant = constant + coefficients[-1] * g4.M
+    chart = tuple(
+        coefficients[index] - coefficients[DEPENDENT_INDEX]
+        for index in CHART_INDICES
+    )
+    chart_constant = constant + coefficients[DEPENDENT_INDEX] * g4.M
     if nonpositive:
         return chart, -chart_constant
     return tuple(-value for value in chart), chart_constant
@@ -134,6 +160,17 @@ def affine_constraint(affine: Affine, nonpositive: bool) -> Constraint:
 
 def serialized_vertices(vertices: tuple[Profile, ...]) -> list[list[str]]:
     return [[fraction_text(value) for value in profile] for profile in vertices]
+
+
+def parse_serialized_vertices(raw: Any) -> tuple[Profile, ...]:
+    if not isinstance(raw, list):
+        raise ValueError("g4 cell BSP verifier: malformed serialized vertices")
+    result = []
+    for profile in raw:
+        if not isinstance(profile, list) or len(profile) != CLASSES:
+            raise ValueError("g4 cell BSP verifier: malformed serialized profile")
+        result.append(tuple(g4.parse_fraction(value) for value in profile))
+    return tuple(result)
 
 
 def resolve_source(artifact_path: Path, row: Any, label: str) -> Path:
@@ -283,6 +320,7 @@ def main() -> None:
     context, geometry = audit_source_stratum(
         ledger, int(artifact["support_mask"]), str(artifact["cell_id"])
     )
+    configure_support(int(artifact["support_mask"]))
     if context["identifier"] != expected_identifier:
         raise ValueError("g4 cell BSP verifier: selected cell identifier mismatch")
     row = context["row"]
@@ -291,7 +329,7 @@ def main() -> None:
     if list(indices) != list(map(int, artifact.get("root_anchor_indices", []))):
         raise ValueError("g4 cell BSP verifier: root anchor indices mismatch")
     root_vertices = tuple(anchors[index] for index in indices)
-    if serialized_vertices(root_vertices) != artifact.get("root_anchor_profiles"):
+    if root_vertices != parse_serialized_vertices(artifact.get("root_anchor_profiles")):
         raise ValueError("g4 cell BSP verifier: root anchor profiles mismatch")
     root_constraints = simplex_constraints(root_vertices)
     if enumerate_vertices(root_constraints) != tuple(sorted(root_vertices)):

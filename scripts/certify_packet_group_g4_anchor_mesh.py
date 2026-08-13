@@ -677,7 +677,7 @@ def verify_pure_triangle_star_refinements(
     """
 
     ledger = stratum.get("pure_triangle_star_refinement_ledger")
-    if ledger is None:
+    if ledger is None or ledger == []:
         return None
     if not isinstance(ledger, list) or not ledger:
         raise ValueError("pure_triangle_star_refinement_ledger must be a nonempty array")

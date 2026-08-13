@@ -1736,13 +1736,94 @@ eventually loses to `.181^g` for dense group inputs.  More local motif
 enumeration cannot repair that: a large one-tile star can have a positive
 target-pole moment, so the support cutoff is essential.
 
-The remaining proof therefore needs a global consistency bound coupling the
+At that stage, the remaining proof needed a global consistency bound coupling the
 randomized tiled outer layout to outer-code membership.  The promising route
 is a group-profile analogue of the existing identity-matrix ledger: condition
 on per-group or per-block weights, use the random lane and coordinate
 permutations to charge EBCH membership densities, and combine that outer
-profile with a matrix/transfer PA1 bound.  A high-density subspace/rank bound
-may give the same result more directly.  No runtime construction change has
-been justified or made.  If this gate instead demands a global permutation or
-a Singer-sized mixer, that is a performance-significant failure and must be
-reported before modifying the encoder.
+profile with a matrix/transfer PA1 bound. The packet-profile certificate below
+supplies that bound. No runtime construction change was needed.
+
+## Complete packet-profile certificate for `g=4`
+
+The packet-profile route closes the high-support gate without changing the
+construction. Fix the frozen `g=4` ensemble described above. For a sampled
+setup, define
+
+```text
+Z_d = #{nonzero messages m : wt(C(m)) <= d},
+d = 188743.
+```
+
+The remaining probability is over the independent lane bijections, packet
+permutation, and recursive state permutations sampled during setup. The
+packet-profile orbit lemma gives the exact normalization
+
+```text
+Q_4(a) = M! / product_j a_j! * 4^(a1+a3) * 6^a2,
+M = 524288.
+```
+
+The certificate partitions every feasible profile by its exact positive
+support. There are 30 feasible supports. Each support has an exact integer
+hull and an exact rational simplicial mesh. The verifier checks every hull,
+facet incidence relation, orientation, boundary, and determinant volume.
+
+Each unchanged root cell uses one fixed rational mixture of affine witness
+bounds. Convexity extends the vertex inequalities across that cell. A root
+cell whose fixed mixture is too weak receives an exact rational binary space
+partition. Each BSP leaf uses one fixed witness at all of its vertices.
+The verifier reconstructs every leaf from its half-space constraints and
+checks that the BSP partitions the complete parent cell.
+
+Sparse witnesses set fugacities outside their exact support to zero. This is
+valid because the local generating functions have nonnegative coefficients.
+Deleting monomials for absent packet classes cannot increase the moment.
+The verifier rejects a sparse witness whenever its zero-fugacity class is
+active on the cell under evaluation.
+
+The outer witnesses combine the asymmetric one-conditioned-row bound with
+the exact graph and puncture average. The inner witnesses use the shared-drive
+65-state transfer bound. Discovery uses binary64 optimization, but discovery
+values are not theorem inputs. The independent verifier treats the selected
+parameters as exact dyadics, encloses local nonnegative arithmetic upward,
+and evaluates the final Collatz inequalities with directed arithmetic.
+
+For each root cell `c`, let `n_c` be the verifier's integer-profile count
+upper bound. Let `U_c` be the largest outward endpoint among its fixed-mixture
+vertices or all vertices of its BSP leaves. Closed boundaries may occur in
+more than one cell, so the proof uses the safe overcount
+
+```text
+E[Z_d] <= sum_c n_c 2^U_c.
+```
+
+The independent replay audits 40902 root cells. It replaces 899 roots by
+2132 exact BSP leaves and evaluates 2144 fixed witnesses. Directed
+log-sum-exp gives
+
+```text
+log2 E[Z_d]
+  <= -61.788151555343981861003442630812211839178495852356.
+```
+
+Markov's inequality now yields
+
+```text
+Pr[d_min(C) <= 188743]
+  <= Pr[Z_d >= 1]
+  <= E[Z_d]
+  <= 2^-61.78815155534398186100.
+```
+
+Thus the frozen ensemble has `61.7881515553` bits of first-moment security.
+The margin beyond the required 40-bit threshold is `21.7881515553` bits.
+Consequently, at least one setup gives a binary
+`[2^21,2^20,d_min>=188744]` code.
+
+The canonical report is
+`out/g4_end_to_end_bsp_outward_certificate.json`, with SHA-256
+`9a416987feda6c0edf15ea2af91b30eb84d3be8b97a002831cf85f03e7086364`.
+The report authenticates every source ledger, witness report, and evaluated
+inequality. `PROOF_STATUS.md` gives the complete replay command and the hashes
+of its four structural inputs.

@@ -21,6 +21,7 @@ from packet_group_outer_profile import (
     optimize_spectrum_outer,
 )
 from packet_group_profile_bound import (
+    density_fugacities,
     inner_probability,
     refine_inner_full_fugacities,
     refine_inner_shaped_density,
@@ -61,14 +62,25 @@ def tune_fixed_witness(
     full_coordinate_passes: int = 2,
     full_coordinate_fine_steps: bool = False,
 ) -> dict:
-    initial = tune_inner_density(
-        group_bits,
-        profile,
-        split_caps,
-        poles=(0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95),
-        exponents=(0.25, 0.5, 0.75, 1.0),
-        iterations=screen_iterations,
-    )
+    sparse_fast = screen_iterations == 1 and any(count == 0 for count in profile)
+    if sparse_fast:
+        initial = tune_inner_density(
+            group_bits,
+            profile,
+            split_caps,
+            poles=(0.2, 0.5, 0.8),
+            exponents=(0.25, 0.5, 0.75),
+            iterations=1,
+        )
+    else:
+        initial = tune_inner_density(
+            group_bits,
+            profile,
+            split_caps,
+            poles=(0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95),
+            exponents=(0.25, 0.5, 0.75, 1.0),
+            iterations=screen_iterations,
+        )
     candidates = [
         (
             initial[0],
@@ -128,6 +140,30 @@ def tune_fixed_witness(
         )
         screened = min(candidates, key=lambda row: row[0])
 
+        # The sparse search uses a small positive floor only to keep its
+        # diagnostic coordinate steps numerically stable.  Once it selects
+        # the occupied coordinates, project the unused coordinates onto the
+        # exact zero face and recompute.  All local coefficients are
+        # nonnegative, so deleting unused-class monomials cannot enlarge the
+        # MGF.  The resulting frozen witness is exactly support-eligible.
+        exact_face = np.asarray(screened[2], dtype=np.float64).copy()
+        exact_face[np.asarray(profile) == 0] = 0.0
+        exact_probability, exact_details = inner_probability(
+            group_bits,
+            profile,
+            screened[1],
+            exact_face,
+            split_caps,
+            iterations=screen_iterations,
+        )
+        screened = (
+            exact_probability,
+            screened[1],
+            exact_face,
+            exact_details,
+            "support_sparse_exact_face",
+        )
+
     inner_value, inner_details = inner_probability(
         group_bits,
         profile,
@@ -141,6 +177,10 @@ def tune_fixed_witness(
         group_bits, profile, fast=False
     )
     vector = np.asarray(profile, dtype=np.float64)
+
+    def occupied_dot(left: np.ndarray, right: np.ndarray) -> float:
+        occupied = left != 0.0
+        return float(left[occupied] @ right[occupied])
     total_outer_value, total_outer_details = fixed_total_weight_outer(physical_weight)
     if total_outer_value < linear_outer_value:
         outer_type = "total_weight"
@@ -165,10 +205,11 @@ def tune_fixed_witness(
         - D * math.log2(float(screened[1]))
     )
     fugacities = np.asarray(screened[2], dtype=np.float64)
-    charge = outer_charge + np.log2(fugacities)
+    with np.errstate(divide="ignore"):
+        charge = outer_charge + np.log2(fugacities)
     constant = outer_constant + inner_constant
     normalization = float(normalization_log2(group_bits, vector)[0])
-    combined = constant - float(vector @ charge) - normalization
+    combined = constant - occupied_dot(vector, charge) - normalization
     target = -40.0 - math.log2(profile_count(group_bits, N))
     # The profile-shaped total-spectrum optimization is materially more
     # expensive than the linear-BL and total-weight branches, so reserve it
@@ -204,7 +245,7 @@ def tune_fixed_witness(
             outer_value = spectrum_outer_value
             charge = outer_charge + np.log2(fugacities)
             constant = outer_constant + inner_constant
-            combined = constant - float(vector @ charge) - normalization
+            combined = constant - occupied_dot(vector, charge) - normalization
     if exact_graph_puncture and group_bits == 4:
         graph_log_q = optimize_exact_graph_puncture_q(profile)
         graph_q = exact_float(math.exp(graph_log_q))
@@ -228,7 +269,7 @@ def tune_fixed_witness(
             outer_value = graph_outer_value
             charge = outer_charge + np.log2(fugacities)
             constant = outer_constant + inner_constant
-            combined = constant - float(vector @ charge) - normalization
+            combined = constant - occupied_dot(vector, charge) - normalization
     if combined > target and all(count > 0 for count in profile):
         full = refine_inner_full_fugacities(
             group_bits,
@@ -298,7 +339,7 @@ def tune_fixed_witness(
         "group_bits": group_bits,
         "profile": profile,
         "physical_weight": physical_weight,
-        "support": list(range(group_bits + 1)),
+        "support": [index for index, value in enumerate(fugacities) if value > 0.0],
         "pole": float(screened[1]),
         "fugacities": fugacities.tolist(),
         "outer_type": outer_type,

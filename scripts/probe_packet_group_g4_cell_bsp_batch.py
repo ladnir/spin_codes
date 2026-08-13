@@ -27,6 +27,7 @@ def initialize_worker(atlas_paths: list[str]) -> None:
 def build_cell(task: dict[str, Any]) -> dict[str, Any]:
     if _WITNESSES is None:
         raise RuntimeError("g4 BSP batch worker was not initialized")
+    bsp.configure_support(int(task["support_mask"]))
     root_vertices = tuple(bsp.parse_profile(row) for row in task["root_anchor_profiles"])
     constraints = bsp.simplex_constraints(root_vertices)
     if bsp.enumerate_vertices(constraints) != tuple(sorted(root_vertices)):
@@ -47,6 +48,7 @@ def build_cell(task: dict[str, Any]) -> dict[str, Any]:
         for status in sorted(set(builder.leaf_statuses))
     }
     return {
+        "support_mask": int(task["support_mask"]),
         "cell_id": task["cell_id"],
         "root_anchor_indices": task["root_anchor_indices"],
         "root_anchor_profiles": task["root_anchor_profiles"],
@@ -85,6 +87,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, required=True)
     parser.add_argument("--atlas", type=Path, action="append", required=True)
+    parser.add_argument("--support-mask", type=lambda value: int(value, 0), action="append")
+    parser.add_argument("--all-lower-supports", action="store_true")
     parser.add_argument("--top-cells", type=int, default=32)
     parser.add_argument("--max-depth", type=int, default=5)
     parser.add_argument("--top-witnesses-per-vertex", type=int, default=2)
@@ -98,25 +102,43 @@ def main() -> None:
         or args.top_witnesses_per_vertex < 1
         or args.safety_bits < 0
         or args.workers < 1
+        or args.workers > 8
     ):
         parser.error("invalid BSP batch limits")
+    if args.all_lower_supports and args.support_mask:
+        parser.error("choose either --all-lower-supports or --support-mask")
 
     ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
-    stratum = next(
-        row for row in ledger["support_strata"] if int(row["support_mask"]) == 31
+    masks = (
+        list(range(1, 31))
+        if args.all_lower_supports
+        else (args.support_mask if args.support_mask else [31])
     )
-    anchors = stratum["anchor_profiles"]
-    rows = sorted(
-        stratum["covered_cell_ledger"],
-        key=lambda row: float(row["cell_local_contribution_log2_upperish"]),
+    strata = {
+        int(row["support_mask"]): row
+        for row in ledger["support_strata"]
+        if int(row["support_mask"]) in masks and row.get("feasible")
+    }
+    if set(strata) != {mask for mask in masks if mask != 1}:
+        # Support {0} is the unique infeasible nonempty support.
+        raise ValueError("g4 BSP batch: requested support strata are missing")
+    ranked = sorted(
+        (
+            (float(row["cell_local_contribution_log2_upperish"]), mask, row)
+            for mask, stratum in strata.items()
+            for row in stratum["covered_cell_ledger"]
+        ),
         reverse=True,
+        key=lambda item: (item[0], item[1], str(item[2].get("cell_id"))),
     )
-    selected = rows[: args.top_cells]
+    selected = ranked[: args.top_cells]
     tasks = []
-    for row in selected:
+    for _term, mask, row in selected:
+        anchors = strata[mask]["anchor_profiles"]
         indices = list(map(int, row["anchor_indices"]))
         tasks.append(
             {
+                "support_mask": mask,
                 "cell_id": str(row["cell_id"]),
                 "root_anchor_indices": indices,
                 "root_anchor_profiles": [anchors[index] for index in indices],
@@ -154,15 +176,17 @@ def main() -> None:
                     f"leaves={result['diagnostic']['leaf_count']}",
                     flush=True,
                 )
-    results.sort(key=lambda row: row["cell_id"])
+    results.sort(key=lambda row: (int(row["support_mask"]), row["cell_id"]))
 
     replacements = {
-        row["cell_id"]: float(row["diagnostic"]["bsp_cell_union_contribution_log2"])
+        (int(row["support_mask"]), row["cell_id"]): float(
+            row["diagnostic"]["bsp_cell_union_contribution_log2"]
+        )
         for row in results
     }
     updated_terms = [
-        replacements.get(str(row["cell_id"]), float(row["cell_local_contribution_log2_upperish"]))
-        for row in rows
+        replacements.get((mask, str(row["cell_id"])), term)
+        for term, mask, row in ranked
     ]
     report = {
         "schema": BATCH_SCHEMA,
@@ -174,7 +198,7 @@ def main() -> None:
         },
         "sources": sources,
         "duplicate_atlas_anchor_rows": duplicates,
-        "support_mask": 31,
+        "support_mask": masks[0] if len(masks) == 1 else masks,
         "discovery": {
             "top_cells": args.top_cells,
             "max_depth": args.max_depth,
@@ -185,7 +209,7 @@ def main() -> None:
         },
         "cells": results,
         "diagnostic": {
-            "source_cell_local_union_log2": float(stratum["cell_local_security_diagnostic_log2"]),
+            "source_cell_local_union_log2": logsumexp2([term for term, _mask, _row in ranked]),
             "updated_cell_local_union_log2": logsumexp2(updated_terms),
             "processed_cells": len(results),
             "all_processed_cells_pass_uniform_target": all(
@@ -193,9 +217,12 @@ def main() -> None:
             ),
             "largest_updated_term_log2": max(updated_terms),
             "largest_unprocessed_term_log2": max(
-                float(row["cell_local_contribution_log2_upperish"])
-                for row in rows
-                if str(row["cell_id"]) not in replacements
+                (
+                    term
+                    for term, mask, row in ranked
+                    if (mask, str(row["cell_id"])) not in replacements
+                ),
+                default=float("-inf"),
             ),
         },
     }
