@@ -215,9 +215,15 @@ uniform target                   -111.4151
 remaining pointwise deficit       1409.6643
 ```
 
-The 20,000-step inner value was measured on Peach and is not yet packaged as
-a canonical local artifact. It must be rerun or copied before a certificate
-may rely on it.
+The 20,000-step trajectory is packaged as
+`out/g4_leader_429359_collatz_20000.json` (SHA-256
+`7e0f634d169a84e7266670ec775b6b1459245c372fb84cf4c4aef20f92d1f76a`).
+The file records the converged inner witness with the older adversarial-hole
+outer. The companion
+`out/g4_leader_429359_collatz_20000_exact_graph.json` (SHA-256
+`330e262bde5d624ed937c3208c587c013eee158a8958ae687e5c4d5f3a2bc7c6`)
+replaces that outer by the inherited exact graph-conditioned outer. The
+separately optimized exact-graph outer recovers about another `0.005` bits.
 
 ### Relaxations tested at the leading profile
 

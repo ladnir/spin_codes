@@ -156,9 +156,14 @@ uniform profile target                    -111.4151
 deficit                                   1409.6643
 ```
 
-The converged inner value came from a 20,000-step power trajectory on Peach.
-It has not yet been packaged as a canonical local artifact. Reproduce or copy
-it before relying on it.
+The converged inner trajectory is packaged as
+`out/g4_leader_429359_collatz_20000.json` (SHA-256
+`7e0f634d169a84e7266670ec775b6b1459245c372fb84cf4c4aef20f92d1f76a`).
+The companion
+`out/g4_leader_429359_collatz_20000_exact_graph.json` (SHA-256
+`330e262bde5d624ed937c3208c587c013eee158a8958ae687e5c4d5f3a2bc7c6`)
+uses the inherited exact graph-conditioned outer. Both files are present in
+the Claude and Codex Peach workspaces. Do not regenerate the trajectory.
 
 The following avenues have already been tested at this profile:
 
