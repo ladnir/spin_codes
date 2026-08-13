@@ -140,6 +140,29 @@ split slices, the pure-Python point-cap policy, and the frozen Git tree for
 transitive proof code. These are discovery inputs. They do not establish
 coverage within a support.
 
+## First adaptive coverage results
+
+Direct root witnesses or fixed minimax mixtures close 17 of the 128 supports
+of dimension at most two. Exact adaptive splits are therefore necessary even
+in low dimension.
+
+For full support, coordinate BSPs with 128 and 1,024 terminal cells close no
+cell. The best bound remains about 1.18 million bits above zero. Thirty-two
+witnesses tuned at the largest residual vertices all pass locally. They reduce
+the best terminal bound to about 183,000 bits, but they still close no existing
+coordinate cell.
+
+Dominance-informed affine cuts are sound discovery tools, but the first exact
+polyhedral implementation does not scale. A seven-node tree finishes quickly;
+a 15-node tree takes about 17 seconds; a 63-node tree does not finish within
+the bounded run. The number of exact vertices grows after each arbitrary cut,
+and no tested dominance leaf closes.
+
+The next geometry should retain explicit low-complexity vertices. Use laminar
+or ordered chambers and let witness dominance choose their structured
+boundaries. Do not continue the current arbitrary-halfspace BSP by increasing
+its node budget.
+
 ## Proof dependencies
 
 The EBCH and graph spectrum tables remain authenticated mathematical inputs.
