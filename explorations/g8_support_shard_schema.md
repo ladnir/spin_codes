@@ -85,16 +85,30 @@ Each node has exactly one of these states.
   count data.  The selector is either one witness or one fixed rational
   mixture.
 
-For every split, the nine coefficients and threshold are integers.  The
-coefficient vector is nonzero and primitive.  The verifier rejects rational
-or floating cuts.  To canonicalize an integer form, divide its coefficients
-by their gcd and replace the threshold by its floor after the same division.
-If the first nonzero coefficient is negative, negate the form, replace `t` by
-`-t-1`, and exchange the children.  These operations preserve integer
-ownership.  The verifier reconstructs both child domains from the root and path,
-so serialized vertices and incidence claims are diagnostic only.  Every node
-must be reachable exactly once from `r`; cycles, duplicate parents, missing
-children, and unreachable nodes are errors.
+Every split uses the strict wire format
+`support-relative-primitive-affine-gap-v2`. Its nine coefficients and
+threshold are integers with at most 256 bits, including the sign. The verifier
+rejects rational, floating, overwide, or noncanonical cuts.
+
+Let `S` be the shard support, let `r=max(S)`, and let `M` be the fixed profile
+mass. Canonicalization first sets inactive coefficients to zero. It then uses
+the fixed-sum relation to replace
+
+```text
+c_j <- c_j-c_r for j in S,       t <- t-c_r*M.
+```
+
+Thus the pivot coefficient `c_r` is zero without changing integer ownership.
+Next, divide the active coefficients by their gcd and replace `t` by
+`floor(t/g)`. If the first active nonzero coefficient is negative, negate the
+coefficients, replace `t` by `-t-1`, and exchange the children. The serialized
+form must already equal this canonical result. A support-constant form is
+invalid.
+
+The verifier reconstructs both child domains from the root and path. It
+rejects an empty or redundant child. Serialized vertices and incidence claims
+are diagnostic only. Every node must be reachable exactly once from `r`;
+cycles, duplicate parents, missing children, and unreachable nodes are errors.
 
 A witness reference has
 

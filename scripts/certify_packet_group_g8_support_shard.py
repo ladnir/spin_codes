@@ -32,12 +32,14 @@ MANIFEST_SCHEMA = "packet-group-g8-support-manifest-v1"
 SHARD_SCHEMA = "packet-group-g8-support-shard-v1"
 REPLAY_SCHEMA = "packet-group-g8-support-replay-v1"
 CANONICAL_JSON = "sorted-compact-json-v1"
-SPLIT_RULE = "primitive-affine-gap-v1"
+SPLIT_RULE = "support-relative-primitive-affine-gap-v2"
 CLASSES = 9
 GROUP_BITS = 8
+PROFILE_MASS = 1 << 18
+MAX_SPLIT_INTEGER_BITS = 256
 EXPECTED_MASKS = set(range(2, 1 << CLASSES))
 DEFAULT_MANIFEST_SHA256 = (
-    "dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890"
+    "cc446d0c6a0c986a8712ef78c4aa7c9d6073687665b7e0f315164339a5b81616"
 )
 FROZEN_COMMIT = "3934dae73836e9051638db2e51b8b66a07055b3c"
 FROZEN_TREE = "b7a7d3cbdc0b0361c5f55931e6e09afeddf762e8"
@@ -497,19 +499,62 @@ def parse_selector(
     return tuple(sorted((name, weight) for name, weight in combined.items() if weight))
 
 
-def validate_split(value: Any) -> tuple[tuple[int, ...], int]:
+def canonicalize_integer_split(
+    coefficients: tuple[int, ...], threshold: int, support: tuple[int, ...]
+) -> tuple[tuple[int, ...], int, bool]:
+    """Canonicalize an exact integer cut on one fixed-support hyperplane."""
+
+    # Inactive coordinates vanish.  Subtracting the pivot coefficient from
+    # every active coefficient subtracts the constant c_pivot * PROFILE_MASS.
+    active = set(support)
+    pivot = support[-1]
+    pivot_coefficient = coefficients[pivot]
+    reduced = tuple(
+        coefficients[index] - pivot_coefficient if index in active else 0
+        for index in range(CLASSES)
+    )
+    threshold -= pivot_coefficient * PROFILE_MASS
+    if any(abs(item).bit_length() > MAX_SPLIT_INTEGER_BITS for item in reduced):
+        raise ValueError("support-canonical split coefficient exceeds the 256-bit limit")
+    if abs(threshold).bit_length() > MAX_SPLIT_INTEGER_BITS:
+        raise ValueError("support-canonical split threshold exceeds the 256-bit limit")
+    if not any(reduced):
+        raise ValueError("split affine form is constant on its exact support")
+
+    divisor = math.gcd(*(abs(reduced[index]) for index in support))
+    reduced = tuple(item // divisor for item in reduced)
+    threshold //= divisor
+    exchanged = False
+    if next(reduced[index] for index in support if reduced[index]) < 0:
+        reduced = tuple(-item for item in reduced)
+        threshold = -threshold - 1
+        exchanged = True
+    return reduced, threshold, exchanged
+
+
+def validate_split(
+    value: Any, support: tuple[int, ...]
+) -> tuple[tuple[int, ...], int]:
+    """Parse and require the unique support-canonical wire representation."""
+
     if not isinstance(value, dict) or not isinstance(value.get("coefficients"), list):
         raise ValueError("split must contain an integer coefficient vector")
     coefficients = tuple(
         parse_int(item, "split coefficient") for item in value["coefficients"]
     )
-    if len(coefficients) != CLASSES or not any(coefficients):
-        raise ValueError("split coefficient vector must have nine entries and be nonzero")
-    if math.gcd(*map(abs, coefficients)) != 1:
-        raise ValueError("split coefficient vector must be primitive")
-    if next(item for item in coefficients if item) < 0:
-        raise ValueError("split coefficient vector has noncanonical sign")
-    return coefficients, parse_int(value.get("threshold"), "split threshold")
+    if len(coefficients) != CLASSES:
+        raise ValueError("split coefficient vector must have nine entries")
+    threshold = parse_int(value.get("threshold"), "split threshold")
+    if any(abs(item).bit_length() > MAX_SPLIT_INTEGER_BITS for item in coefficients):
+        raise ValueError("split coefficient exceeds the 256-bit verifier limit")
+    if abs(threshold).bit_length() > MAX_SPLIT_INTEGER_BITS:
+        raise ValueError("split threshold exceeds the 256-bit verifier limit")
+    canonical, canonical_threshold, exchanged = canonicalize_integer_split(
+        coefficients, threshold, support
+    )
+    if exchanged or coefficients != canonical or threshold != canonical_threshold:
+        raise ValueError("split does not use the support-canonical wire representation")
+    return coefficients, threshold
 
 
 def replay_tree(
@@ -568,13 +613,23 @@ def replay_tree(
             leaves.append(node)
             vertices_by_leaf[identifier] = vertices
             return
-        coefficients, threshold = validate_split(node.get("split"))
+        coefficients, threshold = validate_split(node.get("split"), support)
         left = node.get("left")
         right = node.get("right")
         if not isinstance(left, str) or not isinstance(right, str) or left == right:
             raise ValueError(f"split node {identifier!r} has invalid children")
-        visit(left, constraints + (split_constraint(coefficients, threshold, support, True),))
-        visit(right, constraints + (split_constraint(coefficients, threshold, support, False),))
+        visit(
+            left,
+            constraints
+            + (split_constraint(coefficients, threshold, support, True),),
+        )
+        visit(
+            right,
+            constraints
+            + (split_constraint(coefficients, threshold, support, False),),
+        )
+        if not vertices_by_node[left] or not vertices_by_node[right]:
+            raise ValueError(f"split node {identifier!r} has an empty or redundant child")
 
     visit(str(root), root_constraints(support, 1 << 18, 21))
     if visited != set(nodes):
@@ -604,7 +659,9 @@ def iter_support_profiles(support: tuple[int, ...], mass: int, cutoff: int):
     yield from visit(0, mass)
 
 
-def owned_path(profile: tuple[int, ...], shard: dict[str, Any]) -> tuple[str, ...]:
+def owned_path(
+    profile: tuple[int, ...], shard: dict[str, Any], support: tuple[int, ...]
+) -> tuple[str, ...]:
     nodes = {str(node["node_id"]): node for node in shard["nodes"]}
     identifier = str(shard["root_node"])
     path = []
@@ -618,7 +675,7 @@ def owned_path(profile: tuple[int, ...], shard: dict[str, Any]) -> tuple[str, ..
             raise ValueError(f"integer profile {profile!r} is owned by an EMPTY node")
         if state == "UNRESOLVED":
             raise ValueError("unresolved node owns an integer profile")
-        coefficients, threshold = validate_split(node["split"])
+        coefficients, threshold = validate_split(node["split"], support)
         value = sum(left * right for left, right in zip(coefficients, profile))
         identifier = str(node["left"] if value <= threshold else node["right"])
 
@@ -631,7 +688,7 @@ def bounded_leaf_counts(
     counts: Counter = Counter()
     seen = 0
     for profile in iter_support_profiles(support, 1 << 18, 21):
-        for identifier in owned_path(profile, shard):
+        for identifier in owned_path(profile, shard, support):
             counts[identifier] += 1
         seen += 1
     if seen != root_count:
@@ -773,9 +830,20 @@ def verify_node_count_records(
     for node in nodes:
         if node.get("state") != "SPLIT":
             continue
+        identifier = str(node["node_id"])
+        left_identifier = str(node["left"])
+        right_identifier = str(node["right"])
+        if exact_node_counts is not None:
+            parent_exact = exact_node_counts.get(identifier, 0)
+            left_exact = exact_node_counts.get(left_identifier, 0)
+            right_exact = exact_node_counts.get(right_identifier, 0)
+            if not (0 < left_exact < parent_exact and 0 < right_exact < parent_exact):
+                raise ValueError(
+                    f"split node {identifier!r} makes no progress on integer profiles"
+                )
         parent_record = node.get("count")
-        left_record = by_id[str(node["left"])].get("count")
-        right_record = by_id[str(node["right"])].get("count")
+        left_record = by_id[left_identifier].get("count")
+        right_record = by_id[right_identifier].get("count")
         records = (parent_record, left_record, right_record)
         if all(isinstance(record, dict) and record.get("kind") == "exact" for record in records):
             parent, left, right = (
@@ -1047,6 +1115,67 @@ def structural_self_test() -> None:
     right = constraints + (split_constraint((1, 0, 0, 0, 0, 0, 0, 0, 0), 100, support, False),)
     assert max(vertex[0] for vertex in enumerate_vertices(support, left, 100)) == 100
     assert min(vertex[0] for vertex in enumerate_vertices(support, right, 100)) == 101
+
+    mass = PROFILE_MASS
+    base, base_threshold, base_exchange = canonicalize_integer_split(
+        (3, 2, *([0] * 7)), 2 * mass + 100,
+        support,
+    )
+    duplicate, duplicate_threshold, duplicate_exchange = canonicalize_integer_split(
+        (8, 6, *([0] * 7)), 6 * mass + 201,
+        support,
+    )
+    assert (base, base_threshold, base_exchange) == (
+        duplicate,
+        duplicate_threshold,
+        duplicate_exchange,
+    ) == ((1, 0, 0, 0, 0, 0, 0, 0, 0), 100, False)
+    assert canonicalize_integer_split(
+        (-2, 0, *([0] * 7)), -3, support
+    ) == ((1, 0, 0, 0, 0, 0, 0, 0, 0), 1, True)
+    assert canonicalize_integer_split(
+        (2, 0, *([0] * 7)), -3, support
+    ) == ((1, 0, 0, 0, 0, 0, 0, 0, 0), -2, False)
+
+    invalid_splits = (
+        {"coefficients": [5, 5] + [0] * 7, "threshold": 0},
+        {"coefficients": [0, 0, 1] + [0] * 6, "threshold": 0},
+        {"coefficients": [1 << MAX_SPLIT_INTEGER_BITS] + [0] * 8, "threshold": 0},
+        {"coefficients": [3, 2] + [0] * 7, "threshold": 2 * mass + 100},
+        {"coefficients": [-1, 0] + [0] * 7, "threshold": 100},
+    )
+    for invalid in invalid_splits:
+        try:
+            validate_split(invalid, support)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("adversarial split unexpectedly passed validation")
+
+    empty_child_shard = {
+        "root_node": "r",
+        "nodes": [
+            {
+                "node_id": "r",
+                "state": "SPLIT",
+                "left": "l",
+                "right": "u",
+                "split": {"coefficients": [1] + [0] * 8, "threshold": 0},
+            },
+            {
+                "node_id": "l",
+                "state": "EMPTY",
+                "emptiness_method": "exact-rational-polytope-v1",
+            },
+            {"node_id": "u", "state": "UNRESOLVED"},
+        ],
+    }
+    try:
+        replay_tree(empty_child_shard, support, {}, 100)
+    except ValueError as error:
+        assert "empty or redundant child" in str(error)
+    else:
+        raise AssertionError("empty-child split unexpectedly passed replay")
 
 
 def parse_overrides(values: list[str]) -> dict[str, Path]:

@@ -42,7 +42,7 @@ DEFAULT_SPECTRUM01 = ROOT / "out" / "ebch85_band01_split_spectrum.csv"
 DEFAULT_PUNCTURED01 = ROOT / "out" / "ebch84_punctured_band01_split_spectrum.csv"
 DEFAULT_SPECTRUM12 = ROOT / "out" / "ebch86_band12_split_spectrum.csv"
 EXPECTED_MANIFEST_SHA256 = (
-    "dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890"
+    "cc446d0c6a0c986a8712ef78c4aa7c9d6073687665b7e0f315164339a5b81616"
 )
 EXPECTED_BASE_ATLAS_SHA256 = (
     "c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e"

@@ -126,4 +126,4 @@ python scripts\build_packet_group_g8_support_seed_atlas.py `
 The atlas SHA-256 is
 `c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e`.
 The frozen manifest SHA-256 is
-`dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890`.
+`cc446d0c6a0c986a8712ef78c4aa7c9d6073687665b7e0f315164339a5b81616`.

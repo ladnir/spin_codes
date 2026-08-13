@@ -5,7 +5,7 @@ The frozen witness source is `out/g8_support_seed_atlas.json` at SHA-256
 `c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e`.
 Its 510 rows are binary64 discovery witnesses.  They are not certificates.
 Every plan and shard binds `G8_SUPPORT_MANIFEST.json` at SHA-256
-`dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890`.
+`cc446d0c6a0c986a8712ef78c4aa7c9d6073687665b7e0f315164339a5b81616`.
 
 ## Direct root certificates
 
@@ -178,3 +178,46 @@ If nearly all roots pass the uniform target, run dimensions three through
 five with the same planner.  Outward-harden only the selected rows.  If many
 roots fail, inspect the largest exact contributions before introducing any
 split tree.
+
+## Adaptive plans for failed roots
+
+The adaptive producer never certifies a discovery result.  It emits canonical
+`SPLIT`, `EMPTY`, and `UNRESOLVED` nodes, sets every shard to `INCOMPLETE`, and
+stores proposed fixed selectors only under each terminal's `diagnostic` field.
+
+On a dimension-one support, the producer uses a coordinate split.  When the
+two endpoint-winning witnesses differ, it places the integer threshold near
+their binary64 equality point.  Otherwise, it bisects the exact integer
+coordinate interval.  The resulting children use `a_j<=t` and `a_j>=t+1`.
+
+On a dimension-two support, the producer first compares singleton winners at
+conflicting vertices.  The multinomial normalization cancels from their
+difference.  The producer converts the remaining binary64 affine plane to
+exact dyadic rationals, scales it to integers, divides by the coefficient gcd,
+and applies the canonical sign rule.  This dominance-informed cut affects
+discovery efficiency only.  Exact integer ownership follows solely from the
+emitted primitive coefficients and threshold.  A longest-coordinate split is
+the fallback.  No approximation or conservatism claim about the discovery
+plane enters ownership or the later outward vertex inequalities.
+
+Every child polytope, including a physical-weight clipped root, is rebuilt by
+the same exact rational constraint enumerator as the verifier.  Each terminal
+gets a newly selected rational minimax mixture on its exact vertices.  A later
+hardening step may replace an `UNRESOLVED` terminal with `CERTIFIED_LEAF` only
+after outward replay succeeds at all reconstructed vertices.
+
+The first bounded adaptive run processes the four failed roots with the
+largest exact diagnostic contributions and uses depth two:
+
+```powershell
+python scripts/plan_packet_group_g8_lowdim_adaptive_splits.py `
+  --source-plan out/g8_lowdim_root_mixture_d0_2.json `
+  --manifest G8_SUPPORT_MANIFEST.json --top-failures 4 --max-depth 2 `
+  --mixture-denominator 1073741824 `
+  --output-dir out/g8_lowdim_split_shards_top4 `
+  --report out/g8_lowdim_split_top4.json
+```
+
+The source plan is diagnostic and may name an older manifest generation.  The
+producer independently checks its atlas and root census, then binds every new
+shard to the current manifest digest.
