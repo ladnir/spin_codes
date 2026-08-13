@@ -134,8 +134,11 @@ The frozen atlas is `out/g8_support_seed_atlas.json`, with SHA-256
 `c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e`.
 `G8_SUPPORT_MANIFEST.json` binds the atlas rows, exact support counts, spectra,
 and evaluator sources. The manifest's SHA-256 is
-`6b525083164953bc783ebc04d33703b232f602439be4d7f3bdacafc010d530af`.
-These are discovery inputs. They do not establish coverage within a support.
+`dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890`.
+The manifest includes the graph spectrum, EBCH weight distribution, systematic
+split slices, the pure-Python point-cap policy, and the frozen Git tree for
+transitive proof code. These are discovery inputs. They do not establish
+coverage within a support.
 
 ## Proof dependencies
 

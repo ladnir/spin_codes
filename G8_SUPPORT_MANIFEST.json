@@ -12,7 +12,14 @@
   "arithmetic": {
     "canonical_json": "sorted-compact-json-v1",
     "integer_split_rule": "primitive-affine-gap-v1",
-    "outward_evaluator_source_id": "combined-outward-evaluator"
+    "outward_evaluator_source_id": "combined-outward-evaluator",
+    "inner_point_cap_policy": "pure-python-reference-v1"
+  },
+  "code_closure": {
+    "kind": "git-tree-v1",
+    "repository_commit": "3934dae73836e9051638db2e51b8b66a07055b3c",
+    "repository_tree": "b7a7d3cbdc0b0361c5f55931e6e09afeddf762e8",
+    "scope": "all imported discovery and outward proof code"
   },
   "census": {
     "rule": "exact-support-positive-compositions-weight-cut-v1",
@@ -8983,6 +8990,21 @@
       "source_id": "spectrum-12",
       "path": "out/ebch86_band12_split_spectrum.csv",
       "sha256": "d7bf4816ab602a03bfdb526cabfa437ab412e5894e6ea64987ae736752f448e1"
+    },
+    {
+      "source_id": "graph24-spectrum",
+      "path": "scripts/ebch128_graph24_spectrum.csv",
+      "sha256": "79a3f8f34280996d46ccd076c515ef1ccdc3b1f80f389ddaf2e7a24286c4f2b3"
+    },
+    {
+      "source_id": "ebch-weight-distribution",
+      "path": "scripts/EBCH128_64.wd",
+      "sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2"
+    },
+    {
+      "source_id": "systematic-split-slices",
+      "path": "scripts/ebch128_systematic_split_slices.csv",
+      "sha256": "1175e6c8c86ebdf2438d4902335ed124f4500c736244ad69e35361229a6731eb"
     },
     {
       "source_id": "conditioned-row-discovery",

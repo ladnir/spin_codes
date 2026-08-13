@@ -1,0 +1,72 @@
+{
+  "schema": "packet-group-g8-support-shard-v1",
+  "manifest_sha256": "dafff5c978d51515355960293832223a8a4736ca4b2c0405496c89d395ac3890",
+  "support_mask": "0x003",
+  "active_classes": [0, 1],
+  "root_count": "262123",
+  "root_node": "r",
+  "nodes": [
+    {
+      "node_id": "r",
+      "state": "SPLIT",
+      "left": "l",
+      "right": "u",
+      "split": {
+        "coefficients": [1, 0, 0, 0, 0, 0, 0, 0, 0],
+        "threshold": "100"
+      }
+    },
+    {
+      "node_id": "l",
+      "state": "CERTIFIED_LEAF",
+      "selector": {
+        "kind": "witness",
+        "witness": {
+          "source_id": "atlas-3934dae",
+          "source_sha256": "c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e",
+          "row": 8,
+          "row_sha256": "ece37459b409eef6680126a8bb18775f0e057e895e1ed0d2cefaabfe09b1d4df"
+        }
+      },
+      "count": {
+        "kind": "exact",
+        "method": "enumeration-v1",
+        "value": "100"
+      }
+    },
+    {
+      "node_id": "u",
+      "state": "CERTIFIED_LEAF",
+      "selector": {
+        "kind": "mixture",
+        "components": [
+          {
+            "weight": "1/2",
+            "witness": {
+              "source_id": "atlas-3934dae",
+              "source_sha256": "c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e",
+              "row": 8,
+              "row_sha256": "ece37459b409eef6680126a8bb18775f0e057e895e1ed0d2cefaabfe09b1d4df"
+            }
+          },
+          {
+            "weight": "1/2",
+            "witness": {
+              "source_id": "atlas-3934dae",
+              "source_sha256": "c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e",
+              "row": 8,
+              "row_sha256": "ece37459b409eef6680126a8bb18775f0e057e895e1ed0d2cefaabfe09b1d4df"
+            }
+          }
+        ]
+      },
+      "count": {
+        "kind": "exact",
+        "method": "enumeration-v1",
+        "value": "262023"
+      }
+    }
+  ],
+  "aggregation_requested": "minimum",
+  "state": "COMPLETE"
+}

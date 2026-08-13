@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 GROUP_BITS = 8
 CLASSES = GROUP_BITS + 1
 EXPECTED_ATLAS_SHA256 = "c48644fa62ad74619a4db30b07950b14aaf1419d040760f7d659f43288fca45e"
+FROZEN_PROOF_CODE_COMMIT = "3934dae73836e9051638db2e51b8b66a07055b3c"
+FROZEN_PROOF_CODE_TREE = "b7a7d3cbdc0b0361c5f55931e6e09afeddf762e8"
 
 
 def file_sha256(path: Path) -> str:
@@ -119,6 +121,18 @@ def main() -> None:
             "spectrum-12", ROOT / "out" / "ebch86_band12_split_spectrum.csv"
         ),
         source_record(
+            "graph24-spectrum",
+            ROOT / "scripts" / "ebch128_graph24_spectrum.csv",
+        ),
+        source_record(
+            "ebch-weight-distribution",
+            ROOT / "scripts" / "EBCH128_64.wd",
+        ),
+        source_record(
+            "systematic-split-slices",
+            ROOT / "scripts" / "ebch128_systematic_split_slices.csv",
+        ),
+        source_record(
             "conditioned-row-discovery",
             ROOT / "scripts" / "probe_packet_group_conditioned_row_outer.py",
         ),
@@ -146,6 +160,13 @@ def main() -> None:
             "canonical_json": "sorted-compact-json-v1",
             "integer_split_rule": "primitive-affine-gap-v1",
             "outward_evaluator_source_id": "combined-outward-evaluator",
+            "inner_point_cap_policy": "pure-python-reference-v1",
+        },
+        "code_closure": {
+            "kind": "git-tree-v1",
+            "repository_commit": FROZEN_PROOF_CODE_COMMIT,
+            "repository_tree": FROZEN_PROOF_CODE_TREE,
+            "scope": "all imported discovery and outward proof code",
         },
         "census": {
             "rule": "exact-support-positive-compositions-weight-cut-v1",
