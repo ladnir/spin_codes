@@ -25,6 +25,7 @@ import numpy as np
 from probe_packet_group_g4_conditioned_row_outer import (
     load_split_spectrum,
     optimize_conditioned_outer,
+    optimize_conditioned_outer_asymmetric,
 )
 
 
@@ -52,8 +53,8 @@ def initialize_worker(spectrum01: str, punctured01: str, spectrum12: str) -> Non
     )
 
 
-def upgrade(task: tuple[int, dict]) -> tuple[int, dict]:
-    index, row = task
+def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
+    index, row, asymmetric = task
     if _SPECTRA is None:
         raise RuntimeError("conditioned-row upgrader worker is not initialized")
     if int(row.get("group_bits", -1)) != 4 or "fugacities" not in row:
@@ -65,13 +66,35 @@ def upgrade(task: tuple[int, dict]) -> tuple[int, dict]:
         initial_logs = [0.0] * 5
     initial_logs = np.asarray(initial_logs, dtype=np.float64)
     initial_band1 = float(details.get("band1_coefficient", 0.6))
-    value, variables, band1, theta, result, conditioned = optimize_conditioned_outer(
-        profile,
-        initial_logs,
-        initial_band1,
-        0.5,
-        *_SPECTRA,
-    )
+    if asymmetric:
+        initial_coefficients = details.get("band_coefficients")
+        initial_band2 = (
+            float(initial_coefficients[2])
+            if isinstance(initial_coefficients, list) and len(initial_coefficients) == 3
+            else initial_band1
+        )
+        value, variables, coefficients, theta, result, conditioned = (
+            optimize_conditioned_outer_asymmetric(
+                profile,
+                initial_logs,
+                initial_band1,
+                initial_band2,
+                0.5,
+                *_SPECTRA,
+            )
+        )
+        band1 = coefficients[1]
+        outer_type = "conditioned_row_exact_graph_asymmetric"
+    else:
+        value, variables, band1, theta, result, conditioned = optimize_conditioned_outer(
+            profile,
+            initial_logs,
+            initial_band1,
+            0.5,
+            *_SPECTRA,
+        )
+        coefficients = (1.0 - band1, band1, band1)
+        outer_type = "conditioned_row_exact_graph"
     outer_charge = variables / math.log(2.0)
     profile_vector = np.asarray(profile, dtype=np.float64)
     outer_constant = value + float(profile_vector @ outer_charge)
@@ -88,10 +111,11 @@ def upgrade(task: tuple[int, dict]) -> tuple[int, dict]:
     return index, {
         **row,
         "name": str(row.get("name", "witness")) + "__conditioned_row",
-        "outer_type": "conditioned_row_exact_graph",
+        "outer_type": outer_type,
         "outer_details": {
             "log_variables": variables.tolist(),
             "band1_coefficient": band1,
+            "band_coefficients": list(coefficients),
             "pair_cauchy_theta": theta,
             "optimizer_success": bool(result.success),
             "optimizer_message": str(result.message),
@@ -128,6 +152,11 @@ def main() -> None:
     )
     parser.add_argument("--max-rows", type=int, default=0)
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument(
+        "--asymmetric",
+        action="store_true",
+        help="optimize over the valid p0+p1=1, p2>=p1 BL boundary",
+    )
     parser.add_argument(
         "--spectrum01", type=Path, default=root / "out" / "ebch85_band01_split_spectrum.csv"
     )
@@ -169,7 +198,7 @@ def main() -> None:
     rows = rows[: args.max_rows or None]
     if not rows:
         raise ValueError("conditioned-row upgrader: no rows selected")
-    tasks = list(enumerate(rows))
+    tasks = [(index, row, args.asymmetric) for index, row in enumerate(rows)]
     completed: list[dict | None] = [None] * len(tasks)
     with concurrent.futures.ProcessPoolExecutor(
         max_workers=min(args.workers, len(tasks)),
@@ -189,6 +218,7 @@ def main() -> None:
     report = {
         "status": "DIAGNOSTIC_BINARY64_G4_CONDITIONED_ROW_ATLAS",
         "group_bits": 4,
+        "asymmetric": args.asymmetric,
         "complete": all(row is not None for row in completed),
         "source_artifacts": [
             {"path": str(path), "sha256": digest(path)} for path in args.artifact

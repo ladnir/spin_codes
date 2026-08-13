@@ -35,8 +35,6 @@ from packet_group_outer_profile import atom_count, group_log_moments
 GROUP_BITS = 4
 CLASSES = GROUP_BITS + 1
 ROWS = 64
-CONDITIONED_ROWS = 1
-FREE_ROWS = ROWS - CONDITIONED_ROWS
 TILES = 256
 HOLE_TILES = 128
 NORMAL_TILES = TILES - HOLE_TILES
@@ -84,19 +82,29 @@ def pair_cauchy_log_enumerator(
     return 0.5 * (left + right)
 
 
-def conditioned_norms(log_variables: np.ndarray, coefficient: float) -> tuple[float, float]:
-    """Return log factors for conditioned bit zero and one."""
+def conditioned_norms(
+    log_variables: np.ndarray, coefficient: float, conditioned_rows: int
+) -> tuple[float, ...]:
+    """Return log factors for every weight among the conditioned rows."""
 
     moments = group_log_moments(GROUP_BITS, log_variables)
+    free_rows = ROWS - conditioned_rows
     binomial = np.asarray(
         [
-            math.log(math.comb(FREE_ROWS, weight)) - FREE_ROWS * math.log(2.0)
-            for weight in range(FREE_ROWS + 1)
+            math.log(math.comb(free_rows, weight)) - free_rows * math.log(2.0)
+            for weight in range(free_rows + 1)
         ]
     )
-    zero = coefficient * logsumexp(binomial + moments[:ROWS] / coefficient)
-    one = coefficient * logsumexp(binomial + moments[1:] / coefficient)
-    return float(zero), float(one)
+    return tuple(
+        float(
+            coefficient
+            * logsumexp(
+                binomial
+                + moments[shift : shift + free_rows + 1] / coefficient
+            )
+        )
+        for shift in range(conditioned_rows + 1)
+    )
 
 
 def evaluate_conditioned_outer(
@@ -107,26 +115,45 @@ def evaluate_conditioned_outer(
     spectrum01: np.ndarray,
     punctured01: np.ndarray,
     spectrum12: np.ndarray,
+    conditioned_rows: int = 1,
+    band_coefficients: tuple[float, float, float] | None = None,
 ) -> tuple[float, dict]:
     if len(profile) != CLASSES or sum(profile) != atom_count(GROUP_BITS):
         raise ValueError("conditioned-row outer: malformed profile")
     if log_variables.shape != (CLASSES,) or log_variables[0] != 0.0:
         raise ValueError("conditioned-row outer: malformed packet variables")
-    if not 0.5 <= band1_coefficient < 1.0:
-        raise ValueError("conditioned-row outer: invalid band coefficient")
     if not 0.0 <= theta <= 1.0:
         raise ValueError("conditioned-row outer: invalid Cauchy split")
+    if not 1 <= conditioned_rows <= ROWS:
+        raise ValueError("conditioned-row outer: invalid conditioned-row count")
 
-    coefficients = (
+    coefficients = band_coefficients or (
         1.0 - band1_coefficient,
         band1_coefficient,
         band1_coefficient,
     )
+    if (
+        len(coefficients) != 3
+        or any(not 0.0 < value <= 1.0 for value in coefficients)
+        or any(
+            coefficients[left] + coefficients[right] < 1.0
+            for left, right in ((0, 1), (0, 2), (1, 2))
+        )
+    ):
+        raise ValueError("conditioned-row outer: invalid BL coefficient vector")
     factors = [
-        conditioned_norms(log_variables, coefficient) for coefficient in coefficients
+        conditioned_norms(log_variables, coefficient, conditioned_rows)
+        for coefficient in coefficients
     ]
-    zeros = tuple(row[0] for row in factors)
-    ratios = tuple(row[1] - row[0] for row in factors)
+    parity_factors = [
+        (
+            max(row[shift] for shift in range(0, conditioned_rows + 1, 2)),
+            max(row[shift] for shift in range(1, conditioned_rows + 1, 2)),
+        )
+        for row in factors
+    ]
+    zeros = tuple(row[0] for row in parity_factors)
+    ratios = tuple(row[1] - row[0] for row in parity_factors)
     normal_enumerator = pair_cauchy_log_enumerator(
         spectrum01, spectrum12, ratios, theta
     )
@@ -134,7 +161,10 @@ def evaluate_conditioned_outer(
         punctured01, spectrum12, ratios, theta
     )
 
-    free_message_log = FREE_ROWS * ROWS * math.log(2.0)
+    # Change variables from the conditioned codewords to their XOR parity
+    # codeword and r-1 free codewords.  Together with the 64-r unconditioned
+    # messages, this always leaves 63 free 64-bit messages.
+    free_message_log = (ROWS - 1) * ROWS * math.log(2.0)
     normal_tile_log = (
         free_message_log
         + sum(size * value for size, value in zip(BAND_SIZES, zeros))
@@ -147,9 +177,13 @@ def evaluate_conditioned_outer(
         + BAND_SIZES[2] * zeros[2]
         + punctured_enumerator
     )
-    hole_tile_logs = (
-        punctured_common_log + factors[0][0],
-        punctured_common_log + factors[0][1],
+    # At the puncture, the graph bit replaces one conditioned-row bit.  After
+    # maximizing over the other r-1 conditioned bits, parity no longer
+    # constrains this coordinate.
+    hole_tile_logs = tuple(
+        punctured_common_log
+        + max(factors[0][shift] for shift in range(graph_bit, graph_bit + conditioned_rows))
+        for graph_bit in (0, 1)
     )
     graph_terms = [
         math.log(count)
@@ -166,7 +200,9 @@ def evaluate_conditioned_outer(
     )
     return natural / math.log(2.0), {
         "band_coefficients": list(coefficients),
+        "conditioned_rows": conditioned_rows,
         "conditioned_log_factors": [list(row) for row in factors],
+        "conditioned_parity_log_factors": [list(row) for row in parity_factors],
         "conditioned_log_ratios": list(ratios),
         "normal_pair_enumerator_log": normal_enumerator,
         "punctured_pair_enumerator_log": punctured_enumerator,
@@ -185,6 +221,7 @@ def optimize_conditioned_outer(
     spectrum01: np.ndarray,
     punctured01: np.ndarray,
     spectrum12: np.ndarray,
+    conditioned_rows: int = 1,
 ) -> tuple[float, np.ndarray, float, float, object, dict]:
     def objective(point: np.ndarray) -> float:
         variables = np.concatenate(([0.0], point[:GROUP_BITS]))
@@ -196,6 +233,7 @@ def optimize_conditioned_outer(
             spectrum01,
             punctured01,
             spectrum12,
+            conditioned_rows,
         )
         return value
 
@@ -220,9 +258,98 @@ def optimize_conditioned_outer(
     band1 = float(result.x[-2])
     theta = float(result.x[-1])
     checked, details = evaluate_conditioned_outer(
-        profile, variables, band1, theta, spectrum01, punctured01, spectrum12
+        profile,
+        variables,
+        band1,
+        theta,
+        spectrum01,
+        punctured01,
+        spectrum12,
+        conditioned_rows,
     )
     return checked, variables, band1, theta, result, details
+
+
+def optimize_conditioned_outer_asymmetric(
+    profile: list[int],
+    initial_log_variables: np.ndarray,
+    initial_band1: float,
+    initial_band2: float,
+    initial_theta: float,
+    spectrum01: np.ndarray,
+    punctured01: np.ndarray,
+    spectrum12: np.ndarray,
+) -> tuple[float, np.ndarray, tuple[float, float, float], float, object, dict]:
+    """Optimize the boundary p0+p1=1 with p2>=p1."""
+
+    def unpack(point: np.ndarray):
+        band1 = float(point[GROUP_BITS])
+        fraction = float(point[GROUP_BITS + 1])
+        band2 = band1 + (0.999 - band1) * fraction
+        return (
+            np.concatenate(([0.0], point[:GROUP_BITS])),
+            (1.0 - band1, band1, band2),
+            float(point[GROUP_BITS + 2]),
+        )
+
+    def objective(point: np.ndarray) -> float:
+        variables, coefficients, theta = unpack(point)
+        value, _details = evaluate_conditioned_outer(
+            profile,
+            variables,
+            coefficients[1],
+            theta,
+            spectrum01,
+            punctured01,
+            spectrum12,
+            1,
+            coefficients,
+        )
+        return value
+
+    initial_fraction = (
+        0.0
+        if initial_band2 <= initial_band1
+        else min(1.0, (initial_band2 - initial_band1) / (0.999 - initial_band1))
+    )
+    starts = [
+        np.concatenate(
+            (
+                initial_log_variables[1:],
+                [initial_band1, initial_fraction, initial_theta],
+            )
+        ),
+        np.concatenate((initial_log_variables[1:], [initial_band1, 0.95, initial_theta])),
+        np.asarray([0.0] * GROUP_BITS + [0.6, 0.95, 0.5]),
+    ]
+    bounds = (
+        [(-40.0, 40.0)] * GROUP_BITS
+        + [(0.500001, 0.998), (0.0, 1.0), (0.0, 1.0)]
+    )
+    candidates = []
+    for start in starts:
+        result = minimize(
+            objective,
+            start,
+            method="L-BFGS-B",
+            bounds=bounds,
+            options={"maxiter": 5000, "ftol": 1e-14, "gtol": 1e-9},
+        )
+        candidates.append((objective(result.x), result))
+    value, result = min(candidates, key=lambda row: row[0])
+    variables, coefficients, theta = unpack(result.x)
+    checked, details = evaluate_conditioned_outer(
+        profile,
+        variables,
+        coefficients[1],
+        theta,
+        spectrum01,
+        punctured01,
+        spectrum12,
+        1,
+        coefficients,
+    )
+    return checked, variables, coefficients, theta, result, details
 
 
 def parse_vector(text: str, expected: int, cast=float) -> list:
@@ -239,6 +366,7 @@ def main() -> None:
     parser.add_argument("--log-variables", required=True)
     parser.add_argument("--band1", type=float, required=True)
     parser.add_argument("--theta", type=float, default=0.5)
+    parser.add_argument("--conditioned-rows", type=int, default=1)
     parser.add_argument("--optimize", action="store_true")
     parser.add_argument("--inner-log2", type=float)
     parser.add_argument("--target-log2", type=float, default=-111.41506501642425)
@@ -272,6 +400,7 @@ def main() -> None:
             spectrum01,
             punctured01,
             spectrum12,
+            args.conditioned_rows,
         )
         optimizer = {
             "success": bool(result.success),
@@ -290,6 +419,7 @@ def main() -> None:
             spectrum01,
             punctured01,
             spectrum12,
+            args.conditioned_rows,
         )
         optimizer = None
     report = {
@@ -298,6 +428,7 @@ def main() -> None:
         "log_variables": variables.tolist(),
         "band1_coefficient": band1,
         "pair_cauchy_theta": theta,
+        "conditioned_rows": args.conditioned_rows,
         "outer_log2": value,
         "optimizer": optimizer,
         "details": details,

@@ -448,7 +448,9 @@ def _conditioned_row_split_spectra():
 
 
 def _conditioned_row_exact_graph_outer(
-    log_variables: list[float], band1_coefficient: float, theta_value: float
+    log_variables: list[float],
+    coefficient_values: float | list[float],
+    theta_value: float,
 ) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
     """Outward one-conditioned-row BL branch with exact graph averaging."""
 
@@ -457,13 +459,23 @@ def _conditioned_row_exact_graph_outer(
     variables = tuple(exact_float(math.exp(float(value))) for value in log_variables)
     if len(variables) != 5 or any(value <= 0 for value in variables):
         raise ValueError("conditioned-row variables are invalid")
-    band1 = exact_float(float(band1_coefficient))
-    band0 = Fraction(1) - band1
+    if isinstance(coefficient_values, list):
+        if len(coefficient_values) != 3:
+            raise ValueError("conditioned-row coefficient vector has wrong length")
+        band_coefficients = tuple(
+            exact_float(float(value)) for value in coefficient_values
+        )
+    else:
+        band1 = exact_float(float(coefficient_values))
+        band_coefficients = (Fraction(1) - band1, band1, band1)
     theta = exact_float(float(theta_value))
-    if not Fraction(0) < band0 <= Fraction(1, 2):
-        raise ValueError("conditioned-row band-zero coefficient is invalid")
-    if not Fraction(1, 2) <= band1 < 1:
-        raise ValueError("conditioned-row band-one coefficient is invalid")
+    if any(not Fraction(0) < value <= 1 for value in band_coefficients):
+        raise ValueError("conditioned-row BL coefficient is invalid")
+    if any(
+        band_coefficients[left] + band_coefficients[right] < 1
+        for left, right in ((0, 1), (0, 2), (1, 2))
+    ):
+        raise ValueError("conditioned-row BL dimension condition fails")
     if not Fraction(0) <= theta <= 1:
         raise ValueError("conditioned-row Cauchy split is invalid")
 
@@ -494,9 +506,9 @@ def _conditioned_row_exact_graph_outer(
         return coefficient_interval * _log2_sum_exp(terms)
 
     factors = (
-        (conditioned_norm(band0, 0), conditioned_norm(band0, 1)),
-        (conditioned_norm(band1, 0), conditioned_norm(band1, 1)),
-        (conditioned_norm(band1, 0), conditioned_norm(band1, 1)),
+        tuple(conditioned_norm(band_coefficients[0], bit) for bit in (0, 1)),
+        tuple(conditioned_norm(band_coefficients[1], bit) for bit in (0, 1)),
+        tuple(conditioned_norm(band_coefficients[2], bit) for bit in (0, 1)),
     )
     zeros = tuple(pair[0] for pair in factors)
     ratios = tuple(pair[1] - pair[0] for pair in factors)
@@ -552,9 +564,11 @@ def _conditioned_row_exact_graph_outer(
     constant = normal_tile.times_int(128) + graph
     charges = tuple(log2_fraction(value) for value in variables)
     return constant, charges, {
-        "type": "conditioned_row_exact_graph",
+        "type": "conditioned_row_exact_graph_asymmetric",
         "variables": [f"{value.numerator}/{value.denominator}" for value in variables],
-        "band1": f"{band1.numerator}/{band1.denominator}",
+        "band_coefficients": [
+            f"{value.numerator}/{value.denominator}" for value in band_coefficients
+        ],
         "theta": f"{theta.numerator}/{theta.denominator}",
         "normal_tile_log2_interval": [str(normal_tile.lo), str(normal_tile.hi)],
         "hole0_tile_log2_interval": [str(hole0_tile.lo), str(hole0_tile.hi)],
@@ -808,18 +822,30 @@ def _parameters(row: dict[str, Any], artifact: Path) -> dict[str, Any]:
             [float(value) for value in log_variables],
             float(band1),
         )
-    elif outer_type == "conditioned_row_exact_graph":
+    elif outer_type in (
+        "conditioned_row_exact_graph",
+        "conditioned_row_exact_graph_asymmetric",
+    ):
         log_variables = outer_details.get(
             "log_variables", merged.get("outer_log_variables")
         )
+        coefficients = outer_details.get("band_coefficients")
         band1 = outer_details.get("band1_coefficient")
         theta = outer_details.get("pair_cauchy_theta")
-        if log_variables is None or band1 is None or theta is None:
+        if (
+            log_variables is None
+            or (coefficients is None and band1 is None)
+            or theta is None
+        ):
             raise ValueError("conditioned-row witness lacks frozen parameters")
         outer = (
-            "conditioned_row_exact_graph",
+            outer_type,
             [float(value) for value in log_variables],
-            float(band1),
+            (
+                [float(value) for value in coefficients]
+                if coefficients is not None
+                else float(band1)
+            ),
             float(theta),
         )
     elif outer_type == "exact_graph_total_spectrum":
@@ -970,7 +996,10 @@ def harden_witness(
         outer_constant, outer_charges, outer_report = _exact_graph_linear_outer(
             outer[1], outer[2]
         )
-    elif outer[0] == "conditioned_row_exact_graph":
+    elif outer[0] in (
+        "conditioned_row_exact_graph",
+        "conditioned_row_exact_graph_asymmetric",
+    ):
         outer_constant, outer_charges, outer_report = (
             _conditioned_row_exact_graph_outer(outer[1], outer[2], outer[3])
         )

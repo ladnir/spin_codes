@@ -498,6 +498,146 @@ above 188743; at the endpoint the certificate reports 188745.  The
 support-dependent 65-state/outer row at `q=2622` is already safe by thousands
 of bits, so the deterministic and probabilistic regions overlap.
 
+### One-conditioned-row outer bound for `g=4`
+
+The `g=4` proof can retain one complete BCH row before applying the linear
+Brascamp--Lieb inequality.  This removes most of the gap left by the earlier
+row-independent outer bound.
+
+Fix packet fugacities `t_0,...,t_4>0`, with `t_0=1`.  Define
+
+```text
+P_t(x) = sum_(j=0)^4 binom(4,j) t_j x^j,
+R_w(t) = [x^w] P_t(x)^16 / binom(64,w).
+```
+
+The value `R_w(t)` is the packet moment conditional on a 64-bit column of
+weight `w`.  Let `p in [1/2,1)` and set
+
+```text
+(p_0,p_1,p_2) = (1-p,p,p).
+```
+
+These coefficients satisfy the three-band linear BL dimension condition.
+More generally, coefficients `p_0,p_1,p_2 in (0,1]` are valid when
+
+```text
+p_0+p_1 >= 1,  p_0+p_2 >= 1,  p_1+p_2 >= 1.
+```
+
+The first conditioned-row optimizer used only the symmetric boundary
+`(1-p,p,p)`.  That restriction is not part of the lemma.  The current
+optimizer also searches `p_0+p_1=1` with `p_2>=p_1`.
+For `b in {0,1,2}` and `s in {0,1}`, define
+
+```text
+H_(b,s)(t) =
+  (2^-63 sum_(u=0)^63 binom(63,u) R_(u+s)(t)^(1/p_b))^p_b.
+```
+
+Now fix one of the 64 BCH rows in a tile.  Its bit at one physical coordinate
+is `s`.  The other 63 rows contribute `H_(b,s)(t)` at a coordinate in band
+`b`.  The 63 free messages also contribute the factor `2^(63*64)` per tile.
+
+Let `C` be the systematic extended BCH `[128,64,22]` code.  For `c in C`, let
+`w_b(c)` be its weight in band `b`.  Put
+
+```text
+r_b = H_(b,1)(t) / H_(b,0)(t).
+```
+
+After conditioning on the selected BCH row, the remaining sum over that row
+contains the three-band enumerator
+
+```text
+A_012(r_0,r_1,r_2)
+  = sum_(c in C) product_(b=0)^2 r_b^w_b(c).
+```
+
+The repository has exact split spectra for bands `(0,1)` and `(1,2)`.  For
+every `theta in [0,1]`, Cauchy--Schwarz gives
+
+```text
+A_012(r_0,r_1,r_2)
+ <= sqrt(
+      A_01(r_0^2,r_1^(2 theta))
+      A_12(r_1^(2(1-theta)),r_2^2)
+    ).
+```
+
+This inequality follows by factoring each summand into two nonnegative
+terms.  The first term contains bands zero and one.  The second contains bands
+one and two.  Their band-one exponents sum to the original exponent.
+
+The 128 graph holes require a separate conditioned tile.  Each hole replaces
+one band-zero coordinate in a distinct data row and a distinct tile.  In such
+a tile, choose that punctured data row as the conditioned row.  The remaining
+84 coordinates use the exact puncture-averaged `(0,1)` split spectrum,
+
+```text
+P_01(a,b) = (42-a) A_01(a,b) + (a+1) A_01(a+1,b).
+```
+
+The enumerator is divided by 42 because the punctured coordinate is uniform.
+At the hole coordinate, the graph bit selects `H_(0,0)` or `H_(0,1)`.
+Conditioned on a fixed nonzero data message, the random 24-bit graph syndrome
+is uniform.  Its encoded graph word therefore has the exact stored graph-code
+weight spectrum.  Averaging that spectrum jointly over all 128 distinct holes
+retains their correlation; it does not charge 128 independent worst cases.
+
+At `t_j=1`, all `H_(b,s)` equal one.  Each normal or hole tile then has total
+mass `2^4096`.  The complete outer expression has mass `2^(256*4096)=2^K`.
+This identity is both a normalization check and a required verifier invariant.
+
+The discovery implementation is
+`scripts/probe_packet_group_g4_conditioned_row_outer.py`.  The independent
+outward implementation is in
+`scripts/certify_packet_group_triangle_ledger.py`.  The latter reconstructs
+the exact spectra, converts every frozen binary64 parameter to its exact
+dyadic value, and evaluates all logarithms with directed intervals.
+
+At the former leading profile
+
+```text
+(429359,24531,38395,28039,3964),
+```
+
+the optimized conditioned-row outer is approximately `267000.634654` bits.
+With the frozen 20,000-step inner witness, the outward combined interval is
+
+```text
+[-186.3499452387, -186.3498302196].
+```
+
+The uniform per-profile target is about `-111.4150650164`.  Thus this fixed
+witness closes that profile by at least `74.9347652031` bits.  This is a
+single-profile result.  An end-to-end `g=4` claim still requires a complete
+profile cover and an outward cell-local union ledger.
+
+The asymmetric search is much stronger in the adjacent sparse region.  At
+profile
+
+```text
+(443439,24075,32591,18739,5444),
+```
+
+it selects coefficients close to
+
+```text
+(p_0,p_1,p_2) = (0.478066,0.521934,0.999).
+```
+
+The independent outward implementation gives the combined interval
+
+```text
+[-76983.9807140, -76983.9805989].
+```
+
+The lower bound on the margin against the uniform target exceeds 76,872
+bits.  The binary64 discovery value is about 2,292 bits smaller because
+negligible positive terms underflow at the extreme tilt.  Only the outward
+interval is theorem-facing.
+
 The exponent-three obstruction has now been removed by using the linear
 structure of the band projections rather than only the factor-incidence
 degree.  At the rounded 70-percent repeated-to-balanced profile
