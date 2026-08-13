@@ -1,0 +1,64 @@
+{
+  "schema": "permute-conv.riffle-g4-savepoint.v1",
+  "description": "Frozen integrity manifest for the complete Riffle g=4 end-to-end certificate.",
+  "parameters": {
+    "N": 2097152,
+    "K": 1048576,
+    "distance_threshold": 188743,
+    "packet_width": 4,
+    "packet_count": 524288,
+    "target_log2_failure_probability": "-40"
+  },
+  "certified_result": {
+    "upper_log2_expected_bad_messages": "-61.78815155534398186100344263081221183917849585235601027577909508708686754295725962767064087765128259",
+    "margin_bits": "21.78815155534398186100344263",
+    "status": "OUTWARD_CERTIFIED_G4_END_TO_END_BSP_2^-40"
+  },
+  "source_commits": {
+    "certificate_close": "ffef082bd05f54e46d04f0076f19f6a4cf17c2eb",
+    "independent_audit_pass": "762a9977fbd9526dad2d4845cfd3ebf3e5489098",
+    "independent_audit_closeout": "eb942354ec25897c3143b86e13d99a6768b4e7c7"
+  },
+  "assumptions": [
+    "The authenticated EBCH and graph spectrum tables are mathematical inputs.",
+    "The hole treatment uses the graph-syndrome uniformity specified by the construction."
+  ],
+  "artifacts": {
+    "lower_support_ledger": {
+      "path": "out/g4_support_lower30_outward_sparse_grid9_mixtures.json",
+      "sha256": "ddd57ef25a1ef815614ca3592941075a1ae12dc8652b8c76806c233c511a92d7"
+    },
+    "full_support_ledger": {
+      "path": "out/g4_support_full_asymmetric_incremental_peach.json",
+      "sha256": "80b03f60b4b3c6c7b22d1c20cf2e1e203561cd9f111a6baf8bd84cf24e349ef8"
+    },
+    "lower_bsp_batch": {
+      "path": "out/g4_lower296_bsp_diagnostic.json",
+      "sha256": "e1208a95642ea6092dbde94baea8015a6cf675b652294d6ae492e7a0a7442880"
+    },
+    "remaining_bsp_batch": {
+      "path": "out/g4_cell_bsp_remaining603_asymmetric.json",
+      "sha256": "4a67362e2a0b191617c93933e0d0474769adf6ffc4442bb002544c5b673c6e19"
+    },
+    "final_report": {
+      "path": "out/g4_end_to_end_bsp_outward_certificate.json",
+      "sha256": "9a416987feda6c0edf15ea2af91b30eb84d3be8b97a002831cf85f03e7086364"
+    }
+  },
+  "final_report_assertions": {
+    "group_bits": 4,
+    "passed": true,
+    "status": "OUTWARD_CERTIFIED_G4_END_TO_END_BSP_2^-40",
+    "certified_margin_bits": "21.78815155534398186100344263",
+    "union_log2_upper": "-61.78815155534398186100344263081221183917849585235601027577909508708686754295725962767064087765128259",
+    "feasible_strata": 30,
+    "covered_cells": 40902,
+    "bsp_replaced_root_cells": 899,
+    "bsp_leaves": 2132,
+    "used_witnesses": 2144,
+    "used_component_vertex_evaluations": 483058,
+    "used_bsp_leaf_vertex_inequalities": 15284,
+    "inequality_sha256": "512f46a7e6cf2686e7bcf88b8b8af22af11080d6741f8f60eaaba0bb785d4c6f",
+    "witness_reports_sha256": "adfc9e21df420c4c6dd0fc9823c0b2c457bc91a84d1e833a153fd5e3fa39f0e1"
+  }
+}

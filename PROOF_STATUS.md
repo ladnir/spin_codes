@@ -195,6 +195,28 @@ The final report binds the evaluated inequalities with SHA-256
 It binds the hardened witness reports with SHA-256
 `adfc9e21df420c4c6dd0fc9823c0b2c457bc91a84d1e833a153fd5e3fa39f0e1`.
 
+An independent adversarial audit re-derived the one-conditioned-row lemma,
+cross-implemented its numerical branch, and reproduced the complete warm
+replay bit for bit. The audit found no weakened verifier invariant. Its PASS
+verdict is recorded by commits `762a9977fbd9526dad2d4845cfd3ebf3e5489098`
+and `eb942354ec25897c3143b86e13d99a6768b4e7c7` on branch
+`codex/g4-race-claude`. The second commit records that the optional fresh-cache
+replay was stopped at the user's request. It was not needed for the verdict.
+
+The theorem uses two declared inputs beyond the finite certificate machinery.
+The EBCH and graph spectrum tables are authenticated mathematical inputs. The
+hole analysis also assumes the construction's graph-syndrome uniformity. A
+proof of either input would strengthen the dependency chain but would not
+change the finite ledger.
+
+`G4_CERTIFICATE_MANIFEST.json` freezes the result, hashes, assumptions, and
+source commits. Run the fast integrity gate before starting from this
+checkpoint:
+
+```powershell
+python scripts\verify_g4_savepoint.py
+```
+
 ## Theorem-facing non-Riffle rows
 
 The structured RM/EBCH certificate uses `4096` copies of
