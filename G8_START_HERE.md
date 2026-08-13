@@ -90,8 +90,19 @@ It says nothing about complete coverage of the profile domain.
 The proposed decomposition is documented in
 `explorations/g8_domain_decomposition.md`. It uses 510 support shards, exact
 integer slabs, and local BSP trees. Only the full-support shard has dimension
-eight. The current proof-critical gap is an independent outward evaluator for
-the generalized conditioned-row branch.
+eight.
+
+The conditioned-row outward evaluator now supports `g=8`. Its regression gate
+checks five frozen vectors, the exact mass identity, the canonical `g=4`
+leader, and an independent 180-digit reconstruction:
+
+```powershell
+python scripts\check_packet_group_g8_conditioned_row_outward.py
+```
+
+The next proof-critical gap is reusable witness coverage across the support
+shards. Profile-local optimization is too expensive to serve as the coverage
+algorithm.
 
 ## Proof dependencies
 

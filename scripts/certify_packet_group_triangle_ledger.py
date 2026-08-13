@@ -563,13 +563,16 @@ def _conditioned_row_exact_graph_outer(
     log_variables: list[float],
     coefficient_values: float | list[float],
     theta_value: float,
+    group_bits: int | None = None,
 ) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
     """Outward one-conditioned-row BL branch with exact graph averaging."""
 
-    if GROUP_BITS != 4 or BLOCK_ATOMS != 16:
-        raise ValueError("conditioned-row outer is currently g=4 only")
+    local_group_bits = GROUP_BITS if group_bits is None else int(group_bits)
+    if local_group_bits not in (1, 2, 4, 8) or BLOCK_BITS % local_group_bits:
+        raise ValueError("conditioned-row outer has unsupported packet width")
+    local_block_atoms = BLOCK_BITS // local_group_bits
     variables = tuple(exact_float(math.exp(float(value))) for value in log_variables)
-    if len(variables) != 5 or any(value <= 0 for value in variables):
+    if len(variables) != local_group_bits + 1 or any(value <= 0 for value in variables):
         raise ValueError("conditioned-row variables are invalid")
     if isinstance(coefficient_values, list):
         if len(coefficient_values) != 3:
@@ -592,9 +595,10 @@ def _conditioned_row_exact_graph_outer(
         raise ValueError("conditioned-row Cauchy split is invalid")
 
     atom = tuple(
-        Fraction(math.comb(4, weight)) * variables[weight] for weight in range(5)
+        Fraction(math.comb(local_group_bits, weight)) * variables[weight]
+        for weight in range(local_group_bits + 1)
     )
-    coefficients = _fraction_polynomial_power(atom, 16)
+    coefficients = _fraction_polynomial_power(atom, local_block_atoms)
     moments = tuple(
         coefficient / math.comb(64, weight)
         for weight, coefficient in enumerate(coefficients)
@@ -677,6 +681,8 @@ def _conditioned_row_exact_graph_outer(
     charges = tuple(log2_fraction(value) for value in variables)
     return constant, charges, {
         "type": "conditioned_row_exact_graph_asymmetric",
+        "group_bits": local_group_bits,
+        "block_atoms": local_block_atoms,
         "variables": [f"{value.numerator}/{value.denominator}" for value in variables],
         "band_coefficients": [
             f"{value.numerator}/{value.denominator}" for value in band_coefficients
@@ -695,6 +701,26 @@ def _conditioned_row_exact_graph_outer(
             "pair-spectrum Cauchy; condition punctured row in hole tiles"
         ),
     }
+
+
+def conditioned_row_exact_graph_outer_outward(
+    group_bits: int,
+    log_variables: list[float],
+    coefficient_values: float | list[float],
+    theta_value: float,
+) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
+    """Evaluate one frozen conditioned-row outer with outward intervals.
+
+    The caller supplies the packet width explicitly. The returned affine
+    bound is ``constant-sum_j profile[j]*charges[j]``.
+    """
+
+    return _conditioned_row_exact_graph_outer(
+        log_variables,
+        coefficient_values,
+        theta_value,
+        group_bits,
+    )
 
 
 def _exact_graph_total_spectrum_outer(
@@ -1233,6 +1259,7 @@ def _cache_key(
     row: dict[str, Any],
     artifact: Path,
     iterations: int,
+    group_bits: int,
 ) -> str:
     script_root = Path(__file__).resolve().parent
     dependency_names = (
@@ -1258,6 +1285,7 @@ def _cache_key(
         "artifact_sha256": _file_digest(artifact.resolve()),
         "nested_source_sha256": _resolved_source_digest(row, artifact),
         "iterations": iterations,
+        "group_bits": group_bits,
         "dependencies": dependencies,
     }
     encoded = json.dumps(
@@ -1330,6 +1358,10 @@ def harden_selected_witnesses(
     checkpoint_dir: Path | None,
     group_bits: int = 2,
 ) -> dict[str, dict[str, Any]]:
+    # Configure the parent process even when every witness comes from cache or
+    # worker processes. Subsequent normalization and vertex evaluation use
+    # these globals in the parent.
+    _initialize_hardening_worker(group_bits)
     hardened: dict[str, dict[str, Any]] = {}
     tasks = []
     cache_records = {}
@@ -1339,7 +1371,7 @@ def harden_selected_witnesses(
             print("hardened witness=full_bijection source=builtin", flush=True)
             continue
         row, artifact = witnesses[name]
-        key = _cache_key(name, row, artifact, iterations)
+        key = _cache_key(name, row, artifact, iterations, group_bits)
         cache_path = None if checkpoint_dir is None else _cache_path(checkpoint_dir, name, key)
         if cache_path is not None and cache_path.exists():
             hardened[name] = _read_cached_hardened(cache_path, key)
@@ -1353,7 +1385,8 @@ def harden_selected_witnesses(
 
     completed = len(hardened)
     if workers == 1:
-        split_caps = split_cap_table()
+        assert _WORKER_SPLIT_CAPS is not None
+        split_caps = _WORKER_SPLIT_CAPS
         for name, row, artifact_text, local_iterations in tasks:
             value = harden_witness(
                 name,
@@ -2266,7 +2299,10 @@ def evaluate_mixture(
     return total, components
 
 
-def harden_full_bijection() -> dict[str, Any]:
+def harden_full_bijection(group_bits: int | None = None) -> dict[str, Any]:
+    local_group_bits = GROUP_BITS if group_bits is None else int(group_bits)
+    if local_group_bits not in (1, 2, 4, 8):
+        raise ValueError("full-bijection witness has unsupported packet width")
     constant = (
         Interval.exact(K)
         + log2_int(11).times_int(N)
@@ -2276,7 +2312,7 @@ def harden_full_bijection() -> dict[str, Any]:
     return {
         "name": "full_bijection",
         "constant": constant,
-        "charges": (zero, zero, zero),
+        "charges": tuple(zero for _ in range(local_group_bits + 1)),
         "subtract_normalization": True,
         "report": {
             "name": "full_bijection",
