@@ -59,6 +59,40 @@ The first stopping point is a quantitative reconnaissance report. It should
 state the worst profiles, their certified or diagnostic margins, the active
 witness branches, and the predicted cost of completing the residual domain.
 
+## First reconnaissance checkpoint
+
+The packet-width interface now supports `g=8`. The regression gate reproduces
+the decisive frozen `g=4` outer value bit for bit. It also checks the `g=8`
+total-mass identity and five frozen `g=8` discovery vectors:
+
+```powershell
+python scripts\check_packet_group_conditioned_row.py
+```
+
+The exact domain census has 510 feasible supports and
+
+```text
+binom(262144+8,8)-2099
+=553169839211945865258921061892182603726
+```
+
+feasible profiles. The census gate is:
+
+```powershell
+python scripts\check_packet_group_g8_census.py
+```
+
+A bounded five-profile run found large diagnostic margins. Its worst tested
+profile was the `Binomial(8,1/2)` profile, with a combined exponent near
+`-58640.97`. This result is evidence that the local inequality remains strong.
+It says nothing about complete coverage of the profile domain.
+
+The proposed decomposition is documented in
+`explorations/g8_domain_decomposition.md`. It uses 510 support shards, exact
+integer slabs, and local BSP trees. Only the full-support shard has dimension
+eight. The current proof-critical gap is an independent outward evaluator for
+the generalized conditioned-row branch.
+
 ## Proof dependencies
 
 The EBCH and graph spectrum tables remain authenticated mathematical inputs.

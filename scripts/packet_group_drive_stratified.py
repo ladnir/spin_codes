@@ -334,5 +334,30 @@ def profile_classes(group_bits: int) -> tuple[int, ...]:
 
 
 def profile_count(group_bits: int, total_bits: int) -> int:
+    """Count every nonnegative packet profile, including low physical weight."""
+
     atoms = total_bits // group_bits
     return math.comb(atoms + group_bits, group_bits)
+
+
+def feasible_profile_count(
+    group_bits: int, total_bits: int, minimum_physical_weight: int
+) -> int:
+    """Count profiles whose total physical weight reaches the given threshold."""
+
+    atoms = total_bits // group_bits
+    if minimum_physical_weight <= 0:
+        return profile_count(group_bits, total_bits)
+    if minimum_physical_weight > atoms * group_bits:
+        return 0
+    # For excluded profiles, a_0 is determined by the positive-weight counts.
+    # The threshold is tiny relative to every active construction's atom count.
+    maximum_excluded_weight = minimum_physical_weight - 1
+    if atoms < maximum_excluded_weight:
+        raise ValueError("feasible profile count requires a general mass-aware DP")
+    partitions = [0] * (maximum_excluded_weight + 1)
+    partitions[0] = 1
+    for weight in range(1, group_bits + 1):
+        for total_weight in range(weight, maximum_excluded_weight + 1):
+            partitions[total_weight] += partitions[total_weight - weight]
+    return profile_count(group_bits, total_bits) - sum(partitions)

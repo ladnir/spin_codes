@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Attach optimized one-conditioned-row outers to frozen g=4 inner witnesses."""
+"""Attach optimized one-conditioned-row outers to frozen packet-group witnesses."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ for variable in (
 
 import numpy as np
 
-from probe_packet_group_g4_conditioned_row_outer import (
+from probe_packet_group_conditioned_row_outer import (
     load_split_spectrum,
     optimize_conditioned_outer,
     optimize_conditioned_outer_asymmetric,
@@ -57,14 +57,17 @@ def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
     index, row, asymmetric = task
     if _SPECTRA is None:
         raise RuntimeError("conditioned-row upgrader worker is not initialized")
-    if int(row.get("group_bits", -1)) != 4 or "fugacities" not in row:
-        raise ValueError("conditioned-row upgrader requires a g=4 inner witness")
+    group_bits = int(row.get("group_bits", -1))
+    if group_bits not in (1, 2, 4, 8, 16, 32, 64) or "fugacities" not in row:
+        raise ValueError("conditioned-row upgrader requires a supported inner witness")
     profile = [int(value) for value in row["profile"]]
     details = row.get("outer_details", {})
     initial_logs = details.get("log_variables")
     if initial_logs is None:
-        initial_logs = [0.0] * 5
+        initial_logs = [0.0] * (group_bits + 1)
     initial_logs = np.asarray(initial_logs, dtype=np.float64)
+    if initial_logs.shape != (group_bits + 1,):
+        raise ValueError("conditioned-row upgrader: outer variable dimension mismatch")
     initial_band1 = float(details.get("band1_coefficient", 0.6))
     if asymmetric:
         initial_coefficients = details.get("band_coefficients")
@@ -81,6 +84,7 @@ def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
                 initial_band2,
                 0.5,
                 *_SPECTRA,
+                group_bits,
             )
         )
         band1 = coefficients[1]
@@ -92,6 +96,8 @@ def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
             initial_band1,
             0.5,
             *_SPECTRA,
+            1,
+            group_bits,
         )
         coefficients = (1.0 - band1, band1, band1)
         outer_type = "conditioned_row_exact_graph"
@@ -99,12 +105,17 @@ def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
     profile_vector = np.asarray(profile, dtype=np.float64)
     outer_constant = value + float(profile_vector @ outer_charge)
     fugacities = np.asarray(row["fugacities"], dtype=np.float64)
-    inner_charge = np.log2(fugacities)
+    if fugacities.shape != (group_bits + 1,) or np.any(fugacities < 0.0):
+        raise ValueError("conditioned-row upgrader: malformed fugacity vector")
+    if any(count and fugacity == 0.0 for count, fugacity in zip(profile, fugacities)):
+        raise ValueError("conditioned-row upgrader: occupied class has zero fugacity")
+    with np.errstate(divide="ignore"):
+        inner_charge = np.log2(fugacities)
     charge = outer_charge + inner_charge
     constant = outer_constant + float(row["inner_constant_log2"])
     combined = (
         constant
-        - float(profile_vector @ charge)
+        - sum(count * float(charge[index]) for index, count in enumerate(profile) if count)
         - float(row["normalization_log2"])
     )
     target = float(row["target_log2"])
@@ -130,7 +141,7 @@ def upgrade(task: tuple[int, dict, bool]) -> tuple[int, dict]:
         "charge": charge.tolist(),
         "combined_log2": combined,
         "margin_bits": target - combined,
-        "status": "DIAGNOSTIC_BINARY64_G4_CONDITIONED_ROW_UPGRADED_WITNESS",
+        "status": "DIAGNOSTIC_BINARY64_PACKET_GROUP_CONDITIONED_ROW_UPGRADED_WITNESS",
     }
 
 
@@ -198,6 +209,10 @@ def main() -> None:
     rows = rows[: args.max_rows or None]
     if not rows:
         raise ValueError("conditioned-row upgrader: no rows selected")
+    group_widths = {int(row.get("group_bits", -1)) for row in rows}
+    if len(group_widths) != 1:
+        raise ValueError("conditioned-row upgrader: selected rows mix packet widths")
+    group_bits = next(iter(group_widths))
     tasks = [(index, row, args.asymmetric) for index, row in enumerate(rows)]
     completed: list[dict | None] = [None] * len(tasks)
     with concurrent.futures.ProcessPoolExecutor(
@@ -216,8 +231,8 @@ def main() -> None:
                 flush=True,
             )
     report = {
-        "status": "DIAGNOSTIC_BINARY64_G4_CONDITIONED_ROW_ATLAS",
-        "group_bits": 4,
+        "status": "DIAGNOSTIC_BINARY64_PACKET_GROUP_CONDITIONED_ROW_ATLAS",
+        "group_bits": group_bits,
         "asymmetric": args.asymmetric,
         "complete": all(row is not None for row in completed),
         "source_artifacts": [
