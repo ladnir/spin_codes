@@ -68,7 +68,7 @@ A log-memory streaming recursion with fresh dense random taps at each time step.
 While the encoder is \(O(n\log n)\)-work, it yields a strong three-mechanism tail bound for \(p_w(\delta)\)
 (early-first-one, rare ON\(\to\)OFF termination, and a large-deviation term),
 and a forced-termination refinement that turns termination into a geometric-in-\(w\) contraction for small/intermediate weights.
-\item \textbf{Full-split local-code recursive inner.}
+\item \textbf{Riffle local-code recursive inner.}
 A block recursion whose active block is encoded by a short rate-half local code and randomly split between emitted
 coordinates and next state.  The current finite certificate uses the exact EBCH \([128,64,22]\) spectrum.
 \end{enumerate}
@@ -78,7 +78,7 @@ The framework first gives a warmup theorem: the random sliding dense outer paire
 linear distance, although with weak constants.  The two main construction lines then improve this baseline.  The random
 sliding dense outer paired with the dense recursive inner gives a clean asymptotic linear-distance theorem, including the
 concrete \(0.109\) relative-distance checkpoint.  The structured local-code construction gives a finite certificate:
-\(RM(4,9)\) direct-sum outer plus the full-split EBCH inner at \(N=2^{21}\), \(\delta=.09\), with rational/outward first moment
+\(RM(4,9)\) direct-sum outer plus the Riffle EBCH inner at \(N=2^{21}\), \(\delta=.09\), with rational/outward first moment
 at most
 \[
 \frac{6793\cdot2^{130}+1}{2^{180}}\le 2^{-37.27}.
@@ -111,6 +111,6 @@ Section~\ref{sec:random-sliding-dense-construction} gives the random sliding
 dense construction: the outer bounds, the scalar dense recursive inner
 interface, and the analytic dense+dense integration theorem.
 Section~\ref{sec:structured-local-code} gives the structured local-code
-construction: the local-code outer interface, the full-split inner interface,
+construction: the local-code outer interface, the Riffle inner interface,
 the proved RM/EBCH and EBCH/XOR-parity finite checkpoints, and the
 BCH/local-code projection paths.

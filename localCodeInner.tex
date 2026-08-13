@@ -1,7 +1,10 @@
-\subsection{Full-split local-code recursive inner}
+\subsection{The Riffle local-code recursive inner}
 \label{sec:fullsplit-local-code-inner}
 
-The structured inner is also local-code independent.  Let
+We call the following construction the \emph{Riffle inner}.  It is
+local-code independent; the ``full-split'' terminology retained in theorem
+labels and certificate artifact names refers to randomly splitting the whole
+local codeword between output and state.  Let
 \(C_{\rm in}\subseteq\F_2^{2b}\) be a binary linear \([2b,b,d_0]\) code with
 encoder \(E:\F_2^b\to C_{\rm in}\) and local weight enumerator
 \[
@@ -12,9 +15,18 @@ state \(S_i\in\F_2^b\).  Starting from \(S_0=0\), form
 \[
 V_i=U_i+S_{i-1}.
 \]
-At construction time, sample \(A_i\) independently and uniformly from
-\(GL_b(2)\) and \(\tau_i\) independently and uniformly from the permutations
-of the \(2b\) codeword coordinates.  Encode \(C_i=E(A_iV_i)\) and split
+Let \(\mathcal D_b\) be a distribution on \(GL_b(2)\) with the transitivity
+property
+\[
+ A\leftarrow\mathcal D_b,\quad v\ne0
+ \qquad\Longrightarrow\qquad
+ Av\text{ is uniform on }\F_2^b\setminus\{0\}.
+\]
+At construction time, sample \(A_i\) independently from \(\mathcal D_b\)
+and \(\tau_i\) independently and uniformly from the permutations of the
+\(2b\) codeword coordinates.  Uniform \(GL_b(2)\) is one admissible choice,
+but the implementation below uses a much smaller exact family.  Encode
+\(C_i=E(A_iV_i)\) and split
 \[
 (Y_i,S_i)=\operatorname{split}_b(\tau_i C_i),
 \]
@@ -29,7 +41,7 @@ it maps \(N\) interleaved outer bits to exactly \(N\) output bits, although the
 square map need not be invertible on all of \(\F_2^N\).  The finite certificate
 proves injectivity on the selected outer code.
 
-\begin{lemma}[One-step full-split law]
+\begin{lemma}[One-step Riffle law]
 \label{lem:fullsplit-one-step-law}
 Conditional on \(V_i\ne0\), the codeword \(C_i\) is uniform over the nonzero
 words of \(C_{\rm in}\).  Therefore the joint law of emitted weight
@@ -56,7 +68,8 @@ pre-encoding turnoff atom is
 \end{lemma}
 
 \begin{proof}
-For fixed nonzero \(V_i\), \(A_iV_i\) is uniform over
+By the defining property of \(\mathcal D_b\), for fixed nonzero \(V_i\),
+\(A_iV_i\) is uniform over
 \(\F_2^b\setminus\{0\}\), and \(E\) bijects this set with the nonzero codewords
 of \(C_{\rm in}\).  Conditional on a codeword of weight \(y+q\), the random
 coordinate split is hypergeometric, giving the displayed split law.
@@ -68,7 +81,43 @@ exactly when the input support equals the state support, so its probability is
 \(\binom{b}{q}^{-1}\) if \(q=r\) and zero otherwise.
 \end{proof}
 
-Thus a full-split certificate needs the local inner spectrum \(A_w^{\rm in}\),
+Thus a Riffle certificate needs the local inner spectrum \(A_w^{\rm in}\),
 the induced split law above, and a finite or analytic episode ledger for
 summing \(A_h^{\rm out}p_h^{\rm in}(\delta)\).  The current proved instance
 uses the exact extended-BCH \([128,64,22]\) spectrum, so \(b=64\).
+For implementation reproducibility we fix the BCH primitive polynomial
+\(x^7+x+1\), primitive designed distance \(21\), and one overall parity
+coordinate.  The encoder uses the cyclic polynomial basis: with
+\[
+ g(x)=\texttt{0xf4845518b9582a1f}
+\]
+in little-endian coefficient order, a message polynomial \(m\) maps first to
+the 127 coordinates of \(m(x)g(x)\), then to the overall parity coordinate.
+The SHA-256 digest of its 64 little-endian 128-bit generator rows is
+\texttt{972cfc1c6de12e4ddc0c67680fd8e3cd}\allowbreak
+\texttt{dedbd84d0a409c7061e09a86b818ca56}.
+This is a basis change within the same extended BCH code, so it does not alter
+the local spectrum or any certificate bound.
+
+The production distribution \(\mathcal D_{64}\) is equally explicit.  Let
+\[
+ \mathbb F=\F_2[x]/(x^{64}+x^4+x^3+x+1),
+\]
+where the displayed polynomial is irreducible, identify \(\F_2^{64}\) with
+the polynomial basis of \(\mathbb F\), and write \(M_a\) for multiplication
+by \(a\in\mathbb F\).  For uniform \(a\in\mathbb F^*\), set
+\(A_a=M_a^{\mathsf T}\).  For every fixed nonzero \(v\), the map
+\(a\mapsto M_a^{\mathsf T}v\) is \(\F_2\)-linear.  It has no nonzero kernel:
+if \(a\ne0\), then \(M_a^{\mathsf T}\) is invertible.  Hence it is a
+bijection of \(\mathbb F\), and restricting to \(\mathbb F^*\) proves the
+required exact transitivity.  In the transposed encoder used by OT generation,
+\(A_a^{\mathsf T}=M_a\).  The implementation precomputes the \(64\) binary
+rows of this fixed linear map at setup and evaluates them directly over
+\(\F_{2^{128}}\) symbols with a four-bit subset-sum circuit.  This costs
+\(16\cdot11+64\cdot15=1136\) field additions.  Independently, exact
+common-subexpression synthesis reduces the cyclic BCH encoder from the direct
+\(1792\)-XOR form to an \(849\)-XOR forward circuit.  Mechanically transposing
+that straight-line circuit gives the implemented \(913=849+128-64\)-XOR
+transpose.  Thus the OT hot path uses native
+field-element XOR circuits; it does
+not transpose the field elements into bit slices.

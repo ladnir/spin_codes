@@ -6,7 +6,7 @@ The finite instantiation uses the direct sum of \(4096\) copies of the binary
 \[
  k=4096\cdot256=2^{20},\qquad N=4096\cdot512=2^{21}.
 \]
-The inner is the full-split construction of
+The inner is the Riffle construction of
 Section~\ref{sec:fullsplit-local-code-inner} with \(b=64\) and the extended-BCH
 \([128,64,22]\) local weight distribution.  We take
 \[
@@ -107,7 +107,7 @@ upper endpoint is \(-183.800029543464\), which is below the stated dyadic
 threshold.
 \end{proof}
 
-\begin{theorem}[Rational/outward finite RM/full-split certificate]
+\begin{theorem}[Rational/outward finite RM/Riffle certificate]
 \label{thm:fullsplit-rm-finite-certificate-009}
 For the ensemble above, let \(Z_d\) count nonzero outer codewords whose
 concatenated output has weight at most \(d=188743\), including a zero output if
@@ -181,7 +181,7 @@ weight at least \(22\), proving the weight-\(44\) floor.  Coefficientwise
 domination follows from Lemma~\ref{lem:block-outer-subcode-domination}.
 \end{proof}
 
-Use the same full-split inner, interleaver, and target
+Use the same Riffle inner, interleaver, and target
 \(d=188743\) as above.  The standalone verifier is
 \[
  \texttt{python scripts/certify\_ebch128\_outer\_fullsplit.py}.
@@ -215,9 +215,9 @@ ambient post-prefix bound.  Its outward diagnostic logarithm is
 \(-50.102265480007\), below \(2^{-50}\).
 \end{proof}
 
-\begin{theorem}[Finite EBCH/XOR-parity full-split certificate]
+\begin{theorem}[Finite EBCH/XOR-parity Riffle certificate]
 \label{thm:fullsplit-ebch-xor-parity-certificate-009}
-For the full-split ensemble restricted to \(C_{\oplus}\),
+For the Riffle ensemble restricted to \(C_{\oplus}\),
 \[
  \Pr\Bigl[
  \Ctwo\circ\Pi\big|_{C_{\oplus}}\text{ is not injective}

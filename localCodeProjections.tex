@@ -8,7 +8,7 @@ proved rows and is only a spectrum-model design comparison.
 The full-dimension checkpoint uses the exact RM \([512,256,32]\) local
 spectrum, while the explicit parity-block checkpoint uses the exact EBCH
 \([128,64,22]\) spectrum.  As a finite-\(N\) design comparison, we also tested
-two possible stronger outer floors while leaving the full-split EBCH inner
+two possible stronger outer floors while leaving the Riffle EBCH inner
 ledger unchanged.  Those BCH rows use a spectrum model, not a certified local
 spectrum or a rigorous low-weight envelope.
 Because both BCH candidates are parity extensions, the corrected random-like
@@ -46,3 +46,35 @@ recomputed before any theorem upgrade.
 
 Additional comparison tables, inflation stress tests, and BCH spectrum notes
 are kept with the generated comparison artifacts.
+
+\subsection{Power-of-two punctured EBCH/graph projection}
+\label{sec:power-two-punctured-ebch-projection}
+
+The identity-inner, graph-codimension-24 design initially produces length
+$2^{21}+256$ at user dimension $2^{20}$.  The 256-coordinate excess is not
+fundamental.  Before the interleaver, puncture one fixed coordinate from each
+of 256 distinct data EBCH blocks.  The affected local codes are
+$[127,64,\ge21]$, the parity block remains unpunctured, and the resulting
+outer and inner lengths are exactly $N=2^{21}$.
+
+For completeness, the committed extended BCH generator has a transitive
+coordinate action.  The verifier checks invariance under cyclic scaling on
+the 127 nonzero coordinates of $\F_{128}$ and under translation $x\mapsto
+x+1$.  Thus, if $A_j$ is the committed extended spectrum, the exact spectrum
+of a one-coordinate puncturing is
+\[
+ B_j=\frac{(128-j)A_j+(j+1)A_{j+1}}{128}.
+\]
+The resulting enumerator has cardinality $2^{64}$ and minimum positive weight
+21.  The heterogeneous ambient enumerator is the product of 256 such
+punctured local enumerators and 16130 ordinary EBCH enumerators.
+
+The complete floating matrix-ledger regeneration at distance 188743 gives an
+ambient upper estimate $2^{-22.537900097230}$ and, after the graph factor, an
+estimate $2^{-46.537900097230}$.  This leaves approximately 6.538 bits beyond
+the 40-bit target.  The manifest
+\texttt{scripts/power2\_punctured\_identity\_}\allowbreak
+\texttt{ledger\_manifest.json} covers
+$h\le500$ and every integer weight through $2^{21}$.  This remains a
+projection rather than a theorem because its matrix rows still require
+outward or exact arithmetic.

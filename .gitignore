@@ -9,4 +9,25 @@ __pycache__/
 # Ad hoc script outputs. Promoted result artifacts can still be force-added
 # explicitly when they become part of a proof ledger or paper result.
 scripts/*.csv
+!scripts/ebch128_cyclic_input_slices.csv
+!scripts/ebch128_graph24_spectrum.csv
 scripts/*.png
+
+# Generated proof-search artifacts and scratch work. Canonical small inputs
+# under out/ may be force-added when their existing paths are part of a
+# reproducible proof command.
+out/
+tmp/
+
+# Native build products and external-solver outputs.
+*.obj
+*.exe
+*.dll
+*.lib
+*.exp
+*.lp
+*.vipr
+*.vipr_ori
+*.npz
+*.tgz
+*.tar

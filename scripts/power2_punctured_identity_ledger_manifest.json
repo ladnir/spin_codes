@@ -1,0 +1,147 @@
+{
+  "name": "Riffle power-of-two punctured identity plus graph-r24 matrix ledger",
+  "status": "DIAGNOSTIC_PASS_NOT_FORMAL",
+  "construction": "256 one-coordinate-punctured EBCH blocks plus 16130 full EBCH blocks",
+  "arithmetic": "long-double/log-gamma except exact combinatorial inputs, exact punctured spectrum, and exact x=1 consistency identity",
+  "N": 2097152,
+  "distance": 188743,
+  "graph_codimension": 24,
+  "punctured_blocks": 256,
+  "full_blocks": 16130,
+  "target_failure_log2": -40.0,
+  "supported_weight_parity": "all",
+  "low_weight": {
+    "h_min": 1,
+    "h_max": 500,
+    "ambient_log2_upper_approx": -22.53790009723,
+    "command": "python scripts\\probe_nosinger_r24_h500.py --power2-punctured",
+    "note": "exact heterogeneous outer coefficients from 256 punctured and 16130 full EBCH blocks"
+  },
+  "episode_weight": {
+    "h_min": 501,
+    "h_max": 2000,
+    "h_step": 1,
+    "ambient_log2_upper_approx": -108.912151743717,
+    "commands": [
+      "python scripts\\probe_identity_matrix_ledger.py --power2-punctured --h-min 501 --h-max 1000 --h-step 1 --output-pole 0.997 --occupancy-pole 0.001",
+      "python scripts\\probe_identity_matrix_ledger.py --power2-punctured --h-min 1001 --h-max 2000 --h-step 1 --output-pole 0.995 --occupancy-pole 0.002"
+    ],
+    "note": "combined even and odd interval totals"
+  },
+  "matrix_intervals": [
+    {
+      "h_min": 2001,
+      "h_max": 7858,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.9800511634,
+      "occupancy_pole": 0.008,
+      "ambient_log2_upper_approx": -281.001207370594
+    },
+    {
+      "h_min": 7859,
+      "h_max": 20550,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.9414884538,
+      "occupancy_pole": 0.025,
+      "ambient_log2_upper_approx": -1766.275485183309
+    },
+    {
+      "h_min": 20551,
+      "h_max": 30000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.9414884538,
+      "occupancy_pole": 0.025,
+      "ambient_log2_upper_approx": -4868.724986201315
+    },
+    {
+      "h_min": 30001,
+      "h_max": 75000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.8178969571,
+      "occupancy_pole": 0.06,
+      "ambient_log2_upper_approx": -3243.219604760241
+    },
+    {
+      "h_min": 75001,
+      "h_max": 110000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.8178969571,
+      "occupancy_pole": 0.1,
+      "ambient_log2_upper_approx": -428.201894696169
+    },
+    {
+      "h_min": 110001,
+      "h_max": 200000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.2,
+      "ambient_log2_upper_approx": -47080.615113889668
+    },
+    {
+      "h_min": 200001,
+      "h_max": 350000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.3,
+      "ambient_log2_upper_approx": -15949.336116678964
+    },
+    {
+      "h_min": 350001,
+      "h_max": 364000,
+      "h_step": 1,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.3,
+      "ambient_log2_upper_approx": -5990.284466288565
+    },
+    {
+      "h_min": 364001,
+      "h_max": 1500000,
+      "h_step": 1,
+      "mode": "complement",
+      "output_pole": 0.1002588437228,
+      "occupancy_pole": 1.0,
+      "ambient_log2_upper_approx": -1898.598961282242,
+      "note": "x=1 uses the exact state-XOR-uniform-input identity"
+    },
+    {
+      "h_min": 1500001,
+      "h_max": 1900000,
+      "h_step": 1,
+      "mode": "complement",
+      "output_pole": 0.3331239681,
+      "occupancy_pole": 0.5,
+      "ambient_log2_upper_approx": -3211.751162239856
+    },
+    {
+      "h_min": 1900001,
+      "h_max": 2090000,
+      "h_step": 1,
+      "mode": "complement",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.2,
+      "ambient_log2_upper_approx": -3972.360634761381
+    },
+    {
+      "h_min": 2090001,
+      "h_max": 2097152,
+      "h_step": 1,
+      "mode": "complement",
+      "output_pole": 0.9800511634,
+      "occupancy_pole": 0.005,
+      "ambient_log2_upper_approx": -3354.934896521152
+    }
+  ],
+  "combined": {
+    "ambient_log2_upper_approx": -22.53790009723,
+    "after_graph_log2_upper_approx": -46.53790009723,
+    "margin_beyond_target_bits_approx": 6.53790009723
+  }
+}

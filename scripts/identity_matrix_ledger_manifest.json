@@ -1,0 +1,144 @@
+{
+  "name": "Riffle identity plus graph-r24 matrix ledger",
+  "status": "DIAGNOSTIC_PASS_NOT_FORMAL",
+  "arithmetic": "long-double/log-gamma except exact combinatorial inputs and exact x=1 consistency identity",
+  "N": 2097408,
+  "distance": 188766,
+  "graph_codimension": 24,
+  "target_failure_log2": -40.0,
+  "supported_weight_parity": 0,
+  "low_weight": {
+    "h_min": 1,
+    "h_max": 500,
+    "ambient_log2_upper_approx": -22.60854983566,
+    "command": "python scripts\\probe_nosinger_r24_h500.py",
+    "note": "250-block refinement of the first two 4000-block placement buckets"
+  },
+  "episode_weight": {
+    "h_min": 502,
+    "h_max": 2000,
+    "h_step": 2,
+    "ambient_log2_upper_approx": -110.107158449195,
+    "commands": [
+      "python scripts\\probe_identity_matrix_ledger.py --h-min 502 --h-max 1000 --h-step 2 --output-pole 0.997 --occupancy-pole 0.001",
+      "python scripts\\probe_identity_matrix_ledger.py --h-min 1002 --h-max 2000 --h-step 2 --output-pole 0.995 --occupancy-pole 0.002"
+    ],
+    "note": "identity-only matrix bridge; the second interval is -465.867651599299 and negligible in this aggregate"
+  },
+  "matrix_intervals": [
+    {
+      "h_min": 2002,
+      "h_max": 7858,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.9800511634,
+      "occupancy_pole": 0.008,
+      "ambient_log2_upper_approx": -283.275534391025
+    },
+    {
+      "h_min": 7860,
+      "h_max": 20550,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.9414884538,
+      "occupancy_pole": 0.025,
+      "ambient_log2_upper_approx": -1769.410118452081
+    },
+    {
+      "h_min": 20552,
+      "h_max": 30000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.9414884538,
+      "occupancy_pole": 0.025,
+      "ambient_log2_upper_approx": -4880.785061984297
+    },
+    {
+      "h_min": 30002,
+      "h_max": 75000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.8178969571,
+      "occupancy_pole": 0.06,
+      "ambient_log2_upper_approx": -3270.38724529258
+    },
+    {
+      "h_min": 75002,
+      "h_max": 110000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.8178969571,
+      "occupancy_pole": 0.1,
+      "ambient_log2_upper_approx": -463.433308726257
+    },
+    {
+      "h_min": 110002,
+      "h_max": 200000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.2,
+      "ambient_log2_upper_approx": -47106.861427805386
+    },
+    {
+      "h_min": 200002,
+      "h_max": 350000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.3,
+      "ambient_log2_upper_approx": -16059.939423434495
+    },
+    {
+      "h_min": 350002,
+      "h_max": 364000,
+      "h_step": 2,
+      "mode": "first-active",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.3,
+      "ambient_log2_upper_approx": -6106.328116480873
+    },
+    {
+      "h_min": 364002,
+      "h_max": 1500000,
+      "h_step": 2,
+      "mode": "complement",
+      "output_pole": 0.1002588437228,
+      "occupancy_pole": 1.0,
+      "ambient_log2_upper_approx": -1938.784993606527,
+      "note": "x=1 uses the exact state-XOR-uniform-input identity"
+    },
+    {
+      "h_min": 1500002,
+      "h_max": 1900000,
+      "h_step": 2,
+      "mode": "complement",
+      "output_pole": 0.3331239681,
+      "occupancy_pole": 0.5,
+      "ambient_log2_upper_approx": -3173.815761786895
+    },
+    {
+      "h_min": 1900002,
+      "h_max": 2090000,
+      "h_step": 2,
+      "mode": "complement",
+      "output_pole": 0.5382199631,
+      "occupancy_pole": 0.2,
+      "ambient_log2_upper_approx": -5095.110933977498
+    },
+    {
+      "h_min": 2090002,
+      "h_max": 2097408,
+      "h_step": 2,
+      "mode": "complement",
+      "output_pole": 0.9800511634,
+      "occupancy_pole": 0.005,
+      "ambient_log2_upper_approx": -3355.329396501841
+    }
+  ],
+  "combined": {
+    "ambient_log2_upper_approx": -22.60854983566,
+    "after_graph_log2_upper_approx": -46.60854983566,
+    "margin_beyond_target_bits_approx": 6.60854983566
+  }
+}
