@@ -393,7 +393,7 @@ the local dependency directory:
 
 ```bash
 cd /tmp/permute-conv-g4-claude
-PYTHONPATH=scripts:pydeps OMP_NUM_THREADS=1 python <script> <arguments>
+PYTHONPATH=scripts:pydeps OMP_NUM_THREADS=1 python3 <script> <arguments>
 ```
 
 Set the script's explicit worker count for parallel batch work. Previous
@@ -419,7 +419,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 cd /tmp/permute-conv-g4-claude
-PYTHONPATH=scripts:pydeps OMP_NUM_THREADS=1 <command>
+PYTHONPATH=scripts:pydeps OMP_NUM_THREADS=1 python3 <script> <arguments>
 ```
 
 Do not remove a lock merely because it exists. First inspect its owner and
