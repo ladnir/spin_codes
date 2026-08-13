@@ -101,8 +101,28 @@ python scripts\check_packet_group_g8_conditioned_row_outward.py
 ```
 
 The next proof-critical gap is reusable witness coverage across the support
-shards. Profile-local optimization is too expensive to serve as the coverage
-algorithm.
+shards. Profile-local optimization can seed an atlas, but it cannot serve as
+the final coverage argument.
+
+The first low-support reuse experiment used three inner seeds and five outer
+seeds across one representative from each of the 128 support strata of
+dimension at most two. Only six representatives passed the uniform target.
+The worst failures concentrate on classes 7 and 8. This is a transfer failure
+of the small witness bank, not evidence against profile-local bounds. The next
+low-support bank should include support-local seeds for the high classes before
+any geometric subdivision.
+
+The enriched surveys confirm that local adaptation is effective. Nine paired
+inner/outer sparse anchors all pass locally by at least 289,000 bits, but they
+cover only 12 of 128 low-support representatives. On 224 full-support samples,
+an enriched 14-witness bank covers 83 profiles. The density subset covers 66.
+One targeted witness improves its profile by about 937,435 bits. These results
+favor a 510-support local atlas followed by exact adaptive slab or BSP coverage.
+They do not favor a larger fixed global bank.
+
+The commands, artifact hashes, and detailed results are in
+`explorations/g8_witness_reuse_recon.md`. The proposed shard artifact contract
+is in `explorations/g8_support_shard_schema.md`.
 
 ## Proof dependencies
 

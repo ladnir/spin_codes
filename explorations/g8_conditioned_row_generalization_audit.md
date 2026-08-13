@@ -31,13 +31,16 @@ The bounded regression checks established the following facts.
   `g4` path is now a compatibility wrapper, and internal imports use the
   canonical module.
 
-One proof-scope limit remains.
-`scripts/certify_packet_group_triangle_ledger.py` still rejects this outer
-branch unless `g=4`; no `g=8` result is theorem-facing until an independent
-outward evaluator is generalized and checked.
+The independent outward evaluator now accepts an explicit packet width. Its
+`g=8` regression checks five frozen vectors, the exact mass identity, and the
+canonical `g=4` leader. A separately written 180-digit implementation also
+lies inside every frozen outward interval. Complete domain coverage remains
+necessary before any `g=8` result becomes theorem-facing.
 
 The upgrader now handles sparse witnesses explicitly. It rejects negative
 fugacities and a zero fugacity on an occupied class. A zero fugacity is valid
 on an absent class, and the profile pairing sums only over occupied classes.
 This rule avoids the undefined binary64 expression `0*(-infinity)` while
 preserving the witness's support boundary.
+A bounded `g=8` probe produced a finite combined value when the zero class
+was absent and rejected the same fugacity vector when that class was occupied.
