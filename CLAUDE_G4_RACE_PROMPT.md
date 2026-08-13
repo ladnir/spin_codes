@@ -15,6 +15,17 @@ Write your running conclusions and final submission to
 CLAUDE_G4_RACE_REPORT.md
 ```
 
+Your isolated Windows worktree is
+
+```text
+C:\Users\peter\repo\permute_conv-claude-g4
+branch: codex/g4-race-claude
+```
+
+Do not edit `C:\Users\peter\repo\permute_conv`; that worktree belongs to the
+other contestant. Both race branches must initially resolve to the baseline
+commit supplied with this prompt.
+
 Label intermediate claims as **CERTIFIED**, **PROVED**, **DIAGNOSTIC**,
 **CANDIDATE**, or **REFUTED**. Do not promote a binary64 result to a proof.
 
