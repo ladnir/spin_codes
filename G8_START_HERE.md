@@ -294,6 +294,31 @@ Stop the current nonclumping family. A continuation would need a new
 block-resummed loop theorem, with little evidence that its gain could approach
 the remaining hundreds of thousands of bits.
 
+## Conditioned-row layout audit
+
+The exact-graph conditioned-row branch has a construction-binding defect. Its
+63-free-row decomposition requires one perfect matching of retained data
+blocks across all three band-tile classes. The frozen sampler chooses an
+independent puncture lane in each selected band-zero tile. An allowed pair of
+punctures can collide in band one, so no matching can contain every punctured
+block. Exact spectra and outward arithmetic do not repair this global defect.
+
+The proof-only repair conditions a fixed diagonal matching on the unpunctured
+data word and pays a pointwise 128-replacement packet-fugacity tax. The first
+diagnostic costs about 558 bits at the canonical `g=4` leader and 515 bits at
+`g=8` leaf `h2:073` before the trivial outer cap.
+
+The zero-hot-path-cost construction repair is to sample one global puncture
+lane and use it in all 128 selected tiles. A fixed lane class is a perfect
+matching in every band. This rule preserves every block's puncture marginal
+and makes the existing exact-graph one-row formula applicable. It also permits
+a separated rank-two probe with a second lane class. The construction must
+choose this rule explicitly before the old `g=4` or current `g=8` receipts are
+called end to end.
+
+The full audit is in
+`explorations/conditioned_row_sloped_layout_audit.md`.
+
 The structured-geometry proofs and commands are in:
 
 - `explorations/g8_full_support_structured_geometry.md`;

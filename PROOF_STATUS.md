@@ -23,8 +23,8 @@ chronological research log through 2026-08-13 is preserved in
 | Structured RM/EBCH construction | Theorem-facing and checkable | A binary `[2^21,2^20,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-37.27`. |
 | Structured EBCH/XOR-parity construction | Theorem-facing and checkable | A binary `[2^21,1048512,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-41.29`. |
 | Riffle with packet width `g=2` | Certified | The optimized end-to-end first-moment bound is at most `2^-62.7194713852`. |
-| Riffle with packet width `g=4` | Certified | The complete end-to-end first-moment bound is at most `2^-61.7881515553`. |
-| Riffle with packet width `g=8` | Not started end to end | This is the intended deployment width. The `g=4` certificate now supplies the proof template. |
+| Riffle with packet width `g=4` | Certificate needs construction binding | The outward ledger gives `2^-61.7881515553` for the global-lane puncture variant. It does not certify independent puncture lanes in the sloped layout. |
+| Riffle with packet width `g=8` | In progress; same binding gap | This is the intended deployment width. The conditioned-row branch needs the global-lane puncture rule or a proof-only replacement tax. |
 
 ## Frozen Riffle target
 
@@ -104,10 +104,11 @@ Canonical artifacts:
 The aggregation ledger inside the final report has SHA-256
 `43ecbb47c2b61e9cb20890053e879a6adf863e14923a16f4a188a9d88e2e4b40`.
 
-## Complete `g=4` certificate
+## `g=4` certificate and layout-binding condition
 
-Let the frozen `g=4` setup sample the independent lane bijections, packet
-permutation, and recursive state permutations specified by Riffle. For a
+Let the `g=4` setup use the global-lane puncture rule described below, and
+sample the remaining lane bijections, packet permutation, and recursive state
+permutations specified by Riffle. For a
 sampled setup, let `Z_d` count nonzero messages whose codeword has weight at
 most `d=188743`. The complete outward certificate proves
 
@@ -202,6 +203,16 @@ verdict is recorded by commits `762a9977fbd9526dad2d4845cfd3ebf3e5489098`
 and `eb942354ec25897c3143b86e13d99a6768b4e7c7` on branch
 `codex/g4-race-claude`. The second commit records that the optional fresh-cache
 replay was stopped at the user's request. It was not needed for the verdict.
+
+A later global-layout audit found a missing construction obligation. The
+conditioned-row formula needs all 128 punctured blocks to lie in one perfect
+matching of the three band-tile classes. Independent per-tile puncture lanes
+do not ensure this. The numerical ledger therefore applies to the variant
+that samples one global lane and punctures that lane in all selected tiles.
+Uniformly sampling the global lane preserves each block's puncture marginal
+and changes no hot-path operation. The exact argument and an allowed
+counterexample to the independent-lane claim are in
+`explorations/conditioned_row_sloped_layout_audit.md`.
 
 The theorem uses two declared inputs beyond the finite certificate machinery.
 The EBCH and graph spectrum tables are authenticated mathematical inputs. The
