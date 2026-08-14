@@ -850,15 +850,22 @@ def _hypergeometric_band0_rows(weight: int) -> tuple[tuple[int, Fraction], ...]:
 def _exact_graph_puncture_total_weight_outer(
     pole: Fraction,
 ) -> tuple[Interval, tuple[Interval, ...], dict[str, Any]]:
-    """Exact graph-spectrum/puncture-averaged affine total-weight branch."""
+    """Global-lane graph-spectrum/puncture-averaged total-weight branch."""
 
     if not 0 < pole < 1:
         raise ValueError("exact graph-puncture outer pole must lie in (0,1)")
+    data_blocks = K // 64
+    selected_blocks = GRAPH_REPLACEMENTS
+    band_zero_coordinates = 42
+    if (data_blocks, selected_blocks, band_zero_coordinates) != (16384, 128, 42):
+        raise ValueError("global-lane puncture lemma parameters changed")
     log_q = log2_fraction(pole)
-    # Maclaurin over 128 distinct selected tiles followed by
-    # (1+x)^128 <= exp(128x) leaves exp(lambda*J), where J is the
-    # hypergeometric band-zero occupancy of one permuted EBCH word.
-    lam = (Fraction(1, 1) / pole - 1) / 5376
+    # Condition on the one global lane and its 128 distinct selected blocks.
+    # The independent block variables factor exactly.  Applying 1+x<=exp(x)
+    # and then Jensen leaves exp(lambda*J), where J is the hypergeometric
+    # band-zero occupancy of one independently permuted EBCH word.
+    lambda_denominator = selected_blocks * band_zero_coordinates
+    lam = (Fraction(1, 1) / pole - 1) / lambda_denominator
     lam_interval = Interval.exact(lam.numerator) / Interval.exact(lam.denominator)
     block_terms = []
     for weight, count in enumerate(full_spectrum()):
@@ -884,18 +891,30 @@ def _exact_graph_puncture_total_weight_outer(
     graph_log2 = _ln_sum_exp(graph_terms) / LN2
     constant = block_log2.times_int(K // 64) + graph_log2
     charges = tuple(log_q.times_int(weight) for weight in range(GROUP_BITS + 1))
+    lemma_path = (
+        Path(__file__).resolve().parents[1]
+        / "explorations"
+        / "g4_global_lane_exact_graph_puncture_total_weight_lemma.md"
+    )
     return constant, charges, {
         "type": "exact_graph_puncture_total_weight",
         "pole": f"{pole.numerator}/{pole.denominator}",
+        "construction_rule": "global-lane-puncture-v1",
+        "lane_events_independent": False,
+        "data_blocks": data_blocks,
+        "selected_blocks": selected_blocks,
+        "band0_coordinates": band_zero_coordinates,
+        "lambda_denominator": lambda_denominator,
+        "full_spectrum_sha256": _file_digest(
+            Path(__file__).with_name("ebch128_64_spectrum.csv")
+        ),
         "graph_spectrum_sha256": _file_digest(
             Path(__file__).with_name("ebch128_graph24_spectrum.csv")
         ),
+        "lemma_sha256": _file_digest(lemma_path),
         "block_log2_interval": [str(block_log2.lo), str(block_log2.hi)],
         "graph_factor_log2_interval": [str(graph_log2.lo), str(graph_log2.hi)],
-        "puncture_lemma": (
-            "distinct-tile Maclaurin; independent coordinate bijections; "
-            "hypergeometric(128,w,42); (1+x)^128<=exp(128x)"
-        ),
+        "puncture_lemma": "global_lane_exchangeability_jensen_v1",
     }
 
 
@@ -1262,22 +1281,35 @@ def _cache_key(
     group_bits: int,
 ) -> str:
     script_root = Path(__file__).resolve().parent
-    dependency_names = (
-        "certify_packet_group_triangle_ledger.py",
-        "EBCH128_64.wd",
-        "ebch128_systematic_split_slices.csv",
-        "ebch128_64_spectrum.csv",
-        "ebch128_graph24_spectrum.csv",
-    )
-    dependencies = {
-        item: (
-            os.environ.get("G2_HARDENING_CODE_SHA256", _file_digest(script_root / item))
-            if item == "certify_packet_group_triangle_ledger.py"
-            else _file_digest(script_root / item)
-        )
-        for item in dependency_names
-        if (script_root / item).exists()
+    repository_root = script_root.parent
+    dependency_paths = {
+        "certify_packet_group_triangle_ledger.py": script_root
+        / "certify_packet_group_triangle_ledger.py",
+        "EBCH128_64.wd": script_root / "EBCH128_64.wd",
+        "ebch128_systematic_split_slices.csv": script_root
+        / "ebch128_systematic_split_slices.csv",
+        "ebch128_64_spectrum.csv": script_root / "ebch128_64_spectrum.csv",
+        "ebch128_graph24_spectrum.csv": script_root
+        / "ebch128_graph24_spectrum.csv",
+        "ebch85_band01_split_spectrum.csv": repository_root
+        / "out"
+        / "ebch85_band01_split_spectrum.csv",
+        "ebch86_band12_split_spectrum.csv": repository_root
+        / "out"
+        / "ebch86_band12_split_spectrum.csv",
+        "g4_global_lane_exact_graph_puncture_total_weight_lemma.md": repository_root
+        / "explorations"
+        / "g4_global_lane_exact_graph_puncture_total_weight_lemma.md",
     }
+    dependencies = {}
+    for item, path in dependency_paths.items():
+        if not path.exists():
+            continue
+        dependencies[item] = (
+            os.environ.get("G2_HARDENING_CODE_SHA256", _file_digest(path))
+            if item == "certify_packet_group_triangle_ledger.py"
+            else _file_digest(path)
+        )
     payload = {
         "schema": "g2-outward-hardened-witness-cache-v1",
         "name": name,

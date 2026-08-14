@@ -22,11 +22,12 @@ from typing import Any
 import certify_packet_group_g4_anchor_mesh as g4
 import certify_packet_group_g4_cell_bsp as bsp
 import certify_packet_group_triangle_ledger as g2
+import run_g4_global_lane_rerun_preflight as global_lane
 from outward_log2 import Interval, log2_int, self_check
 
 
 BATCH_SCHEMA = "packet-group-g4-cell-dominance-bsp-batch-v1"
-STATUS = "OUTWARD_CERTIFIED_G4_END_TO_END_BSP_2^-40"
+STATUS = "OUTWARD_CERTIFIED_G4_GLOBAL_LANE_END_TO_END_BSP_2^-40"
 
 
 def file_sha256(path: Path) -> str:
@@ -101,6 +102,7 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, default=40)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--checkpoint-dir", type=Path)
+    parser.add_argument("--construction-manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if not 1 <= args.workers <= 8:
@@ -108,6 +110,9 @@ def main() -> None:
     if args.iterations < 1:
         parser.error("--iterations must be positive")
     self_check()
+    construction_manifest, construction_preflight = global_lane.preflight(
+        args.construction_manifest
+    )
 
     lower = load_json(args.lower_ledger)
     full = load_json(args.full_ledger)
@@ -200,6 +205,19 @@ def main() -> None:
     paths = resolved_witness_paths(
         ((args.lower_ledger, lower), (args.full_ledger, full), *batches)
     )
+    selected_binding = construction_manifest["theorem_data_bindings"][
+        "selected_global_lane_total_weight_witness"
+    ]
+    selected_source_path = Path(selected_binding["path"])
+    selected_source_digest = str(selected_binding["sha256"])
+    matching_sources = [
+        path
+        for path in paths
+        if path.name == selected_source_path.name
+        and file_sha256(path) == selected_source_digest
+    ]
+    if len(matching_sources) != 1:
+        raise ValueError("selected global-lane total-weight witness is not uniquely bound")
     witnesses = g2.load_witnesses(paths)
     missing = sorted(name for name in used if name != "full_bijection" and name not in witnesses)
     if missing:
@@ -329,6 +347,7 @@ def main() -> None:
     passed = margin >= 0
     top_terms.sort(key=lambda item: item[0], reverse=True)
     source_digests = {
+        "construction_manifest": file_sha256(args.construction_manifest),
         "lower_ledger": file_sha256(args.lower_ledger),
         "full_ledger": file_sha256(args.full_ledger),
         "bsp_batches": {path.name: file_sha256(path) for path, _batch in batches},
@@ -341,7 +360,25 @@ def main() -> None:
         "status": STATUS if passed else "OUTWARD_G4_END_TO_END_BSP_DID_NOT_CLOSE",
         "passed": passed,
         "group_bits": 4,
-        "scope": "all feasible positive-support profiles for the frozen g=4 construction",
+        "scope": (
+            "all feasible positive-support profiles for the g=4 construction "
+            "with one uniformly sampled global puncture lane"
+        ),
+        "construction": {
+            "manifest_schema": construction_manifest["schema"],
+            "manifest_sha256": construction_preflight["manifest_sha256"],
+            "rule": construction_manifest["construction_rule"]["name"],
+            "layout_certificate": construction_preflight["layout_certificate"],
+            "lane_events_independent": False,
+            "theorem_data_bindings": construction_preflight[
+                "theorem_data_bindings"
+            ],
+            "selected_global_lane_total_weight_witness": {
+                "reference": selected_binding["reference"],
+                "name": selected_binding["name"],
+                "sha256": selected_source_digest,
+            },
+        },
         "source_digests": source_digests,
         "exact_geometry": geometry,
         "profile_owner_rule": g4.SUPPORT_OWNER_RULE,

@@ -1007,19 +1007,34 @@ check `r=Rm`, and embed it as the 64-bit graph word `(r,0^40)`.  Encode the
 16384 data words and this one graph word with the committed extended BCH
 `[128,64,22]` encoder.  There is no componentwise-XOR parity block.
 
-Before puncturing these 16385 words have length `N+128`.  The physical layout
-has 256 tiles, each with 64 data-block lanes and 128 physical groups.  Sample
-a uniform assignment of the data words to the 16384 lanes.  Choose 128 of the
-256 tiles uniformly without replacement.  In each chosen tile, choose one
-data lane uniformly and puncture a uniformly chosen coordinate from its
-42-coordinate band-zero cell.  Map its other 127 coordinates bijectively to
-the other 127 groups in that tile.  Map every unpunctured data word
-bijectively to its tile's 128 groups.  Finally, map the graph codeword's 128
-coordinates bijectively into the 128 freed lane positions.  Thus every
-physical group still has exactly 64 coordinates and the final length is
-exactly `N`.
+Before puncturing these 16385 words have length `N+128`.  Index the 16384 data
+positions by `(t,l)` in `Z_256 x {0,...,63}`.  Sample a uniform assignment of
+the data words to these positions.  Split every 128-coordinate codeword into
+bands of sizes `42,43,43`.  For slopes `(s_0,s_1,s_2)=(0,9,20)`, map band `b`
+of position `(t,l)` to lane `l` in tile
 
-The distinct-tile rule is proof-relevant but preprocessing-only.  It replaces
+```text
+t + s_b l mod 256.
+```
+
+Each tile has 128 physical groups, partitioned into the three band cells.
+Every group receives one coordinate from each of the 64 incident data blocks.
+
+Next sample one global lane `L*` uniformly from the 64 lanes, and choose 128
+band-zero tiles uniformly without replacement.  In every chosen tile,
+puncture a uniformly sampled coordinate from the 42-coordinate band-zero cell
+of lane `L*`.  Finally, map the graph codeword's 128 coordinates bijectively
+into the 128 freed lane positions.  Every physical group still has exactly 64
+coordinates, and the final length is exactly `N`.
+
+For each fixed lane `L`, the blocks in lane `L` form a perfect matching of
+the three band-tile classes.  The global-lane rule therefore places all 128
+punctured blocks inside one matching.  This property is required by the
+one-conditioned-row outer bound.  Independent lane samples in different
+tiles do not satisfy it.
+
+The distinct-tile and global-lane rules are proof-relevant but
+preprocessing-only.  The distinct-tile rule replaces
 the invalid bare `2^-24` graph charge (which allowed adversarial overlap
 between graph holes and data support) by the exact Maclaurin bound
 

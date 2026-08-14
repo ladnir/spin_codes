@@ -1,0 +1,170 @@
+{
+  "schema": "permute-conv.riffle-g4-global-lane-rerun.v1",
+  "status": "STATIC_PREFLIGHT_READY_FULL_OUTWARD_RERUN_NOT_EXECUTED",
+  "description": "Construction and input binding for a complete g=4 rerun under the globally correlated puncture-lane rule.",
+  "supersedes": {
+    "path": "G4_CERTIFICATE_MANIFEST.json",
+    "sha256": "da0e0eb8496737a6684ff7e631975f63105181fea711e9cb27406d09f62d615e",
+    "disposition": "integrity reference only; its certified result does not transfer to the global-lane construction"
+  },
+  "parameters": {
+    "N": 2097152,
+    "K": 1048576,
+    "distance_threshold": 188743,
+    "packet_width": 4,
+    "packet_count": 524288,
+    "target_log2_failure_probability": "-40",
+    "tile_modulus": 256,
+    "lane_classes": 64,
+    "band_slopes": [0, 9, 20],
+    "selected_band0_tiles": 128,
+    "band0_coordinates_per_block": 42
+  },
+  "construction_rule": {
+    "name": "global-lane-puncture-v1",
+    "steps": [
+      "sample one global lane L* uniformly from {0,...,63}",
+      "sample one uniform 128-subset H of the 256 band-zero tiles",
+      "for each u in H select the matching block (u,L*)",
+      "independently choose one of the 42 band-zero coordinates in each selected block",
+      "map the 128 graph coordinates bijectively and uniformly to the 128 holes"
+    ],
+    "per_block_selection_marginal": "1/128",
+    "per_band0_coordinate_marginal": "1/5376",
+    "lane_events_independent": false,
+    "one_conditioned_row_regroups_into_complete_codewords": true
+  },
+  "construction_bindings": {
+    "specification": {
+      "path": "explorations/g4_global_lane_construction_spec.md",
+      "sha256": "62955af8ab6f396136965254129513745dfeea9be8091f5c94afd839b785e8c0"
+    },
+    "exact_layout_certificate": {
+      "path": "scripts/certify_global_lane_puncture_layout.py",
+      "sha256": "2e0f70cde90f94974f4bd86931905d975eaea8a8c1bc727ab5ba0fa1f810aaf2",
+      "required_status": "EXACT_GLOBAL_LANE_PUNCTURE_LAYOUT_CERTIFICATE"
+    }
+  },
+  "theorem_data_bindings": {
+    "global_lane_total_weight_lemma": {
+      "path": "explorations/g4_global_lane_exact_graph_puncture_total_weight_lemma.md",
+      "sha256": "4dce0396fcc0e8d9faafa2d033301d38268b0ab241a854f054b9c48f1577def1"
+    },
+    "ebch_weight_spectrum": {
+      "path": "scripts/ebch128_64_spectrum.csv",
+      "sha256": "26164b40cee431cd24995887ba485563f02048d64fdea00dc86b3d9a4897a94e"
+    },
+    "ebch_weight_spectrum_source": {
+      "path": "scripts/EBCH128_64.wd",
+      "sha256": "de6b49d292f6742488ab76d799718e1385feab42b1b375c91508ecd7b13e1cb2"
+    },
+    "graph_weight_spectrum": {
+      "path": "scripts/ebch128_graph24_spectrum.csv",
+      "sha256": "79a3f8f34280996d46ccd076c515ef1ccdc3b1f80f389ddaf2e7a24286c4f2b3"
+    },
+    "systematic_split_slices": {
+      "path": "scripts/ebch128_systematic_split_slices.csv",
+      "sha256": "1175e6c8c86ebdf2438d4902335ed124f4500c736244ad69e35361229a6731eb"
+    },
+    "band01_split_spectrum": {
+      "path": "out/ebch85_band01_split_spectrum.csv",
+      "sha256": "10315518bf5aa72199a48bb201e9f11d159c61bd9a83aa6f0fc1948887cf1f06"
+    },
+    "band12_split_spectrum": {
+      "path": "out/ebch86_band12_split_spectrum.csv",
+      "sha256": "d7bf4816ab602a03bfdb526cabfa437ab412e5894e6ea64987ae736752f448e1"
+    },
+    "selected_global_lane_total_weight_witness": {
+      "path": "out/g4_support_lower30_failed8_retuned_local.json",
+      "sha256": "5c0d29c9e879ba21a20068e642549a5ffe4992c8807eb37c37f3dc94fc05ebd9",
+      "reference": "g4_support_lower30_failed8_retuned_local.json:0",
+      "name": "s0f_anchor_0131"
+    }
+  },
+  "candidate_proof_inputs": {
+    "lower_support_ledger": {
+      "path": "out/g4_support_lower30_outward_sparse_grid9_mixtures.json",
+      "sha256": "ddd57ef25a1ef815614ca3592941075a1ae12dc8652b8c76806c233c511a92d7"
+    },
+    "full_support_ledger": {
+      "path": "out/g4_support_full_asymmetric_incremental_peach.json",
+      "sha256": "80b03f60b4b3c6c7b22d1c20cf2e1e203561cd9f111a6baf8bd84cf24e349ef8"
+    },
+    "lower_bsp_batch": {
+      "path": "out/g4_lower296_bsp_diagnostic.json",
+      "sha256": "e1208a95642ea6092dbde94baea8015a6cf675b652294d6ae492e7a0a7442880"
+    },
+    "remaining_bsp_batch": {
+      "path": "out/g4_cell_bsp_remaining603_asymmetric.json",
+      "sha256": "4a67362e2a0b191617c93933e0d0474769adf6ffc4442bb002544c5b673c6e19"
+    }
+  },
+  "proof_code_bindings": {
+    "reproduction_preflight": {
+      "path": "scripts/run_g4_global_lane_rerun_preflight.py",
+      "sha256": "3e4d47c67561bdd759181a17d7cde87cb0b2595a3536819ca84816793786dd33"
+    },
+    "full_certifier": {
+      "path": "scripts/certify_packet_group_g4_end_to_end_bsp.py",
+      "sha256": "a18db08c2cd1a40ba4668e68a4d57f3c48dfdb3e75a291d5d7376b1b1d2c27aa"
+    },
+    "anchor_mesh_certifier": {
+      "path": "scripts/certify_packet_group_g4_anchor_mesh.py",
+      "sha256": "5cfb572bf1044a74374be10b73f530804c432e79d54661df276f02fe5d43618a"
+    },
+    "cell_bsp_certifier": {
+      "path": "scripts/certify_packet_group_g4_cell_bsp.py",
+      "sha256": "1bb407f80282204bb785ed3166d002f8593e7e6735a03682e8bcbd7b046b8f49"
+    },
+    "witness_hardener": {
+      "path": "scripts/certify_packet_group_triangle_ledger.py",
+      "sha256": "bdb6e9e675c7bfaa7abe0058a53072e715f7f3352af5d5e77355aa4ad30ee7b9"
+    },
+    "outward_arithmetic": {
+      "path": "scripts/outward_log2.py",
+      "sha256": "68a25daaddd2408532d5653f85b8f2ca3f8dc664850f6979b8d0aea1ab629c85"
+    },
+    "profile_parameters": {
+      "path": "scripts/packet_group_outer_profile.py",
+      "sha256": "4865a0eb33e9abd17a92ba409d1b53a476cd18273ca3b69697b47a658ee8f4be"
+    }
+  },
+  "rerun": {
+    "entrypoint": "scripts/certify_packet_group_g4_end_to_end_bsp.py",
+    "iterations": 40,
+    "workers": 8,
+    "checkpoint_dir": "out/g4_global_lane_rerun_checkpoints",
+    "output": "out/g4_global_lane_end_to_end_bsp_outward_certificate.json",
+    "arguments": [
+      "--lower-ledger",
+      "out/g4_support_lower30_outward_sparse_grid9_mixtures.json",
+      "--full-ledger",
+      "out/g4_support_full_asymmetric_incremental_peach.json",
+      "--bsp-batch",
+      "out/g4_lower296_bsp_diagnostic.json",
+      "--bsp-batch",
+      "out/g4_cell_bsp_remaining603_asymmetric.json",
+      "--iterations",
+      "40",
+      "--workers",
+      "8",
+      "--checkpoint-dir",
+      "out/g4_global_lane_rerun_checkpoints",
+      "--construction-manifest",
+      "G4_GLOBAL_LANE_RERUN_MANIFEST.json",
+      "--output",
+      "out/g4_global_lane_end_to_end_bsp_outward_certificate.json"
+    ]
+  },
+  "required_preflight_assertions": [
+    "all declared SHA-256 bindings match repository bytes",
+    "the exact global-lane layout certificate executes successfully",
+    "the sampler uses one lane shared by all selected tiles",
+    "the per-block and per-coordinate marginals are 1/128 and 1/5376",
+    "lane_events_independent is false",
+    "the old final report is not used as a proof input",
+    "all theorem data and the selected global-lane witness are content-addressed",
+    "the full rerun output path differs from the old savepoint output"
+  ],
+  "scope_limit": "The prior ledgers and BSP batches are candidate geometry and witness inputs. Only a new complete outward replay can certify the global-lane construction."
+}
