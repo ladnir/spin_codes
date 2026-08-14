@@ -11,9 +11,15 @@ that retains the first two facts.  It also identifies the additional local
 majorant needed to use the four-block facts.
 
 The lemma concerns the unpunctured data layout.  A final outer witness must add
-the existing exact graph and puncture correction.  Binary64 evaluation of the
-lemma is a discovery diagnostic until an outward implementation replays every
-frozen parameter.
+a multivariate correction for the 128 graph replacements.  One valid choice
+adds
+\[
+128\max_{|j-k|\leq1}\log_2(t_k/t_j)
+\]
+to the base-two outer constant.  Scalar support corrections from the star
+certificates are not interchangeable with this packet-class correction.
+Binary64 evaluation of the lemma is a discovery diagnostic until an outward
+implementation replays every frozen parameter.
 
 ## Fixed incidence structure
 
@@ -62,8 +68,17 @@ by exhaustive integer computation.
 ## Local tile moments
 
 Fix positive packet fugacities
-\(t=(t_0,\ldots,t_8)\), with \(t_0=1\).  For each band tile
-\((b,u)\), let
+\(t=(t_0,\ldots,t_8)\), with \(t_0=1\).  Define
+
+\[
+R_w(t):=
+\frac{[z^w]\left(\sum_{j=0}^8 {8\choose j}t_jz^j\right)^8}
+{{64\choose w}},
+\qquad 0\leq w\leq64.
+\]
+
+This is the exact expected packet monomial after a uniform permutation of 64
+binary lanes whose total weight is \(w\).  For each band tile \((b,u)\), let
 
 \[
 F_{b,u,t}:(\mathbb F_2^{64})^{E_{b,u}}\longrightarrow\mathbb R_{\geq0}
@@ -109,6 +124,39 @@ The expectation is over independent uniform nonzero values \((X_i)_{i\in A}\).
 The maximum makes the definition valid even when the averaged local factor is
 not block-symmetric.
 
+The committed projection spectra do not directly evaluate this cube moment.
+Surjectivity nevertheless gives an explicit upper envelope.  Let
+\(c_0:=42\) and \(c_1=c_2:=43\).  Let \(R_w(t)\) denote the exact packet
+moment of one 64-lane column of weight \(w\), and define
+
+\[
+A_d(t):=\sum_{w=0}^d {d\choose w}R_w(t)^3.
+\]
+
+For \(c\in\{42,43\}\), define
+
+\[
+\overline m_{c,r}(t):=
+\frac{1}{(2^{64}-1)^r}
+\sum_{d=0}^r(-1)^{r-d}{r\choose d}
+2^{(64-c)d}A_d(t)^c.
+\]
+
+To derive this identity, fix the coordinate permutations before taking the
+cube.  Apply inclusion--exclusion to the condition that all \(r\) inputs are
+nonzero.  If \(d\) inputs remain unrestricted, surjectivity gives
+\(2^{(64-c)d}\) fibers, and the \(c\) projected coordinates are independent.
+Thus, \(\overline m_{c,r}\) is the exact cube moment of the fixed-permutation
+tile monomial.  Jensen's inequality gives
+
+\[
+m_{b,r}(t)\leq \overline m_{c_b,r}(t).
+\]
+
+The alternating sum requires high-precision arithmetic.  At unit fugacity,
+\(A_d=2^d\), and inclusion--exclusion gives
+\(\overline m_{c,r}=1\) exactly.
+
 ## Conditional-Finner lemma
 
 **Lemma 1 (nonclumping conditional-Finner bound).**  For every positive
@@ -119,7 +167,7 @@ Z_\tau(t)
 \leq
 \sum_{S\subseteq I}(2^{64}-1)^{|S|}
 \prod_{b=0}^2\prod_{u\in\mathbb Z_{256}}
-m_{b,r_{b,u}(S)}(t)^{1/3}.
+\overline m_{c_b,r_{b,u}(S)}(t)^{1/3}.
 \tag{1}
 \]
 
@@ -136,7 +184,7 @@ Finner's inequality with coefficient \(1/3\) therefore gives
 X_i\ne0\Longleftrightarrow i\in S
 \right]
 \leq
-\prod_{b,u}m_{b,r_{b,u}(S)}(t)^{1/3}.
+\prod_{b,u}\overline m_{c_b,r_{b,u}(S)}(t)^{1/3}.
 \]
 
 Exactly \((2^{64}-1)^{|S|}\) message assignments have active set \(S\).
@@ -203,7 +251,7 @@ and \(\eta\geq0\).  For each band define
 \[
 P_{b,\eta}(y):=
 \sum_{r=0}^{64}{64\choose r}
-m_{b,r}(t)e^{-3\eta {r\choose2}}y^r.
+\overline m_{c_b,r}(t)e^{-3\eta {r\choose2}}y^r.
 \]
 
 **Corollary 2 (pair-capacity coefficient bound).**  The contribution to (1)
@@ -273,9 +321,9 @@ One suitable interface is a pair-interaction majorant.  For each band, seek
 \(a_b\geq0\) and \(\rho_b\geq0\) such that
 
 \[
-m_{b,r}(t)^{1/3}
+\overline m_{c_b,r}(t)^{1/3}
 \leq
-m_{b,0}(t)^{1/3}a_b^r(1+\rho_b)^{{r\choose2}}
+\overline m_{c_b,0}(t)^{1/3}a_b^r(1+\rho_b)^{{r\choose2}}
 \quad\text{for }0\leq r\leq64.
 \tag{7}
 
@@ -315,13 +363,17 @@ stronger local outer lemma or additional construction randomness.
 The first diagnostic should not optimize a new outer witness.  It should use
 the current worst-leaf dual barycenters and their frozen packet fugacities.
 
-1. Reconstruct the three fixed-band tile factors from the committed projection
-   spectra.
-2. Compute the 195 values \(m_{b,r}(t)\), with exact subset symmetry where
-   available and a maximum otherwise.
-3. Check \(m_{b,r}(1)=1\) and the global normalization \(Z_\tau(1)=2^K\).
-4. Evaluate (5) for the eight leading leaves.  Use at most 64 fixed
-   \(\eta\)-values and coefficient Chernoff bounds.
+1. Reconstruct \(R_w(t)\) and verify the committed band-surjectivity
+   certificates.  The current projection tables do not directly serialize
+   the required nine-fugacity cube moments.
+2. Compute the 195 values \(\overline m_{c_b,r}(t)\) from the displayed
+   inclusion--exclusion formula.
+3. Check \(\overline m_{c_b,r}(1)=1\) and the global normalization
+   \(Z_\tau(1)=2^K\).
+4. Sum (5) over every \(s\in\{0,\ldots,16384\}\).  A packet profile does not
+   determine \(s\).  Use at most 64 fixed \(\eta\)-values and coefficient
+   Chernoff bounds.  Start with one leading leaf, then extend to all eight if
+   the measured gain justifies the work.
 5. Fit the least pair majorants (7).  Stop the motif branch if a certified
    polymer convergence condition fails.
 6. If convergence holds, enumerate connected collision motifs through six
@@ -334,10 +386,34 @@ the current worst-leaf dual barycenters and their frozen packet fugacities.
 The state tables contain only `3 * 65` local rows.  A Chernoff coefficient
 evaluation costs `O(3 * 65)` operations per `(s,eta)` pair.  Scanning every
 \(s\leq16384\) and 64 fixed tilts requires about 200 million elementary
-log-domain updates.  Restricting the first probe to the dual support sizes and
-eight leaves reduces this by more than two orders of magnitude.
+log-domain updates per leaf.  The first probe may evaluate one leaf before all
+eight.  It must not restrict the active-set sizes unless a separate tail bound
+covers every omitted size.
 
 The diagnostic artifact should bind the manifest, geometry checkpoint,
 component catalogues, projection spectra, tile-map certificate, and all local
 moment tables.  It must label (5) separately from any motif correction and
 record whether the polymer convergence gate passed.
+
+## Bounded diagnostic result
+
+The complete active-set scan was run once for h2:073.  It used every
+\(s\in\{0,\ldots,16384\}\) and eight fixed collision tilts.  The optimized
+log-sum equals the zero-tilt log-sum:
+
+\[
+\log_2 Z_{\mathrm{pair}}=
+\log_2 Z_{\eta=0}=390432.47233220655.
+\]
+
+Thus, pair capacity saves zero bits in the complete sum.  The support-size-one
+term saves about \(0.0022\) bits, but dense support sizes dominate.  The
+artifact is out/g8_pair_capacity_nonclumping_h2_073.json, with SHA-256
+151ae23c9ec820d873137eac72e621fa3e4ed962a777308052edbe0a91a5e553.
+
+The singleton-matched pair majorants have
+\(\rho_{42}\approx0.01818\) and \(\rho_{43}\approx0.01862\).  Simple
+uncentered and centered polymer criteria both fail.  The corresponding gate
+values are approximately \(9.6\) and \(19.3\), while each criterion requires
+a value at most one.  Therefore, the present proof does not certify a
+six-edge motif remainder.  The current nonclumping branch stops here.

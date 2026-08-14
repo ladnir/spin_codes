@@ -273,12 +273,26 @@ that uses band balance and pair capacity. Pasch exclusion requires a separate
 motif-sensitive majorant; inserting unconditional motif probabilities into a
 packet-profile fiber would be unsound.
 
-The next bounded experiment should evaluate the pair-capacity coefficient
-bound on the eight leading leaves. It should then fit the least pair
-majorants. Stop the motif branch unless the resulting polymer expansion has a
-certified convergence margin. This gate is cheap compared with another global
-coverage run and determines whether the current layout contains enough unused
-structure to justify a full nonclumping verifier.
+The full active-set scan has now evaluated the pair-capacity coefficient bound
+at `h2:073`. It sums all 16,385 possible support sizes and uses eight fixed
+collision tilts. The optimized sum equals the zero-tilt sum:
+
+```text
+pair-capacity saving = 0 bits.
+```
+
+Only the isolated support-size-one term improves, by about `0.0022` bits.
+Dense support terms dominate the outer moment and select zero collision tilt.
+Do not extend the pair-capacity histogram scan to the other seven leaves.
+
+The motif-sensitive majorant also fails its theorem gate. The fitted
+interactions are near 0.0182 and 0.0186. The uncentered polymer criterion is
+about 9.6, where convergence requires at most one. A conservative
+centered-Ising/Kotecky--Preiss criterion is about 19.3. Dobrushin contraction
+holds but does not certify the required truncated log-partition remainder.
+Stop the current nonclumping family. A continuation would need a new
+block-resummed loop theorem, with little evidence that its gain could approach
+the remaining hundreds of thousands of bits.
 
 The structured-geometry proofs and commands are in:
 
