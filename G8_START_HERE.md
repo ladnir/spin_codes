@@ -163,6 +163,135 @@ or ordered chambers and let witness dominance choose their structured
 boundaries. Do not continue the current arbitrary-halfspace BSP by increasing
 its node budget.
 
+## Structured-geometry results
+
+Three bounded experiments tested refinements with exact ownership and small
+vertex sets.
+
+An ordered decomposition by one band mass produced seven cells with at most
+40 vertices. It closed no cell. Even the best band leaves incompatible pure
+corners together, so adding more thresholds along the same mass cannot close
+the root.
+
+A balanced level-two cumulative grid produced 165 cells, at most 81 vertices
+per cell, and 6,435 total vertex incidences. Rational minimax mixtures improved
+every singleton bound. However, the grid closed no cell. Its worst diagnostic
+contribution was about `+1,454,125` bits.
+
+Reflection blocks `{0,8}`, `{1,6}`, `{2,7}`, `{3,5}`, and `{4}` jointly control
+their pure corners. Majority-mass caps do not preserve that property. The caps
+introduce cross-block boundary vertices, and their ten leaves also closed no
+cell. Retain only the exact maximum-mass faces as possible boundary lemmas.
+
+The first adaptive cumulative wave refined the eight largest level-two
+contributions. Each parent received one exact prefix split at a discovered
+witness transition. All eight splits improved their parent by between
+22,533 and 66,713 bits. The global worst contribution fell by about 38,959
+bits, to `+1,415,166`. The 16 children used 540 exact vertex incidences and
+the run took about 22 seconds.
+
+This wave passes the continuation gate, but it is not close to a certificate.
+A linear extrapolation suggests roughly 31--63 comparable waves. Continue
+with a resumable cumulative-prefix engine. Stop if improvement plateaus or
+the exact vertex sets grow beyond the declared cap. The diagnostic selectors
+also use 32 supplementary witnesses that are not yet in the frozen manifest;
+regenerate the manifest before outward certification.
+
+The corrected engine ran two waves and stopped at its finite gate. Both waves
+accepted eight splits, but the lower-quartile rate projected 53 more levels
+and 4,269 leaves. Geometry-only refinement is therefore a no-go.
+
+The inner and outer witness components can be recombined independently. A
+factorized minimax replay improved every active leaf and reduced the frontier
+by about 257,500 bits, to `+1,134,921`. One further adaptive wave under this
+stronger family reduced it by about 49,550 bits, to `+1,085,371`. The proof
+selector should store separate rational inner and outer marginals; explicitly
+materializing their Cartesian product would be unnecessarily quadratic.
+
+This factorization needs one theorem statement made explicit. The inner bound
+must hold uniformly after conditioning on the complete outer setup used by
+the conditioned-row lemma. The construction retains independent inner lane,
+packet, and state randomization, but the final proof and manifest must bind
+that conditional statement.
+
+Sixteen additional witnesses tuned at active worst vertices did not change
+the factorized worst aggregate. Pointwise tuning is therefore exhausted for
+the controlling cells. The next witness jobs should use the minimax LP dual
+barycenter of a failed cell and tune inner and outer components separately.
+Accept a component only when it has a verified negative reduced cost against
+the current component hull.
+
+The first cell-aware round tuned eight inner and eight outer components at
+exact dual barycenters. The fixed 189-leaf replay reduced the frontier by
+about 400,367 bits, from `+1,085,371` to `+685,003`. Every new component
+passed its reduced-cost test, and all 189 leaves improved.
+
+An audited second round tuned only eight outer components. It reduced the
+frontier by another 51,671 bits, to `+633,333`. Every component transferred
+outside its source cell, and 159 non-source leaves improved. The slowdown is
+material: the lower-quartile gain projects about six comparable rounds, which
+exceeds the two-round continuation gate. Stop pure pricing and alternate with
+one exact adaptive geometry wave under the enlarged factorized bank.
+
+Independent checks found no affine-sign or normalization error. They
+reconstruct both component identities, subtract the orbit normalization once,
+and retain the old-selector fallback. The result remains diagnostic until the
+conditional inner lemma and outward factorized replay are complete.
+
+The factorized proof state is now independently outward-replayed. The v2
+manifest binds 92 inner components, 34 outer components, and exact rational
+selectors for 197 leaves. Pure-Python interval replay checks 8,687 vertex
+inequalities. Its expanded interval is approximately
+
+```text
+[580922.1202845245, 580922.1203803732].
+```
+
+Thus the ledger is rigorous but misses the `-40` target by about 580,962 bits.
+The interval width is below `0.0001` bit, so outward arithmetic is not the
+source of the gap.
+
+Two complementary outer families were then added with the audited
+128-replacement graph correction. Eight three-band BL2 rows plus eight exact
+total-spectrum rows reduce the diagnostic frontier to about `+514,758`. A
+fresh round at the shifted worst leaves reduces it to about `+486,266`, but
+improves only 28,492 bits and fails the continuation gate. Stop outer-column
+generation at this point.
+
+The remaining high-leverage omission is combinatorial. The current outer
+columns discard the certified three-band nonclumping properties: pair capacity
+one, absence of Pasch/intercalate patterns, exact band balance, and dense
+four-block pattern counts. The next proof family should retain enough pattern
+state to use these constraints. Changing `N`, adding more mixtures, or running
+more prefix waves has much lower expected leverage.
+
+The nonclumping refinement must act on an augmented outer fiber. The nine
+packet-weight counts do not determine the three collision partitions. A sound
+first lemma conditions on the active outer blocks and retains the 195 band
+occupancy counts. Finner's inequality then yields an exact coefficient bound
+that uses band balance and pair capacity. Pasch exclusion requires a separate
+motif-sensitive majorant; inserting unconditional motif probabilities into a
+packet-profile fiber would be unsound.
+
+The next bounded experiment should evaluate the pair-capacity coefficient
+bound on the eight leading leaves. It should then fit the least pair
+majorants. Stop the motif branch unless the resulting polymer expansion has a
+certified convergence margin. This gate is cheap compared with another global
+coverage run and determines whether the current layout contains enough unused
+structure to justify a full nonclumping verifier.
+
+The structured-geometry proofs and commands are in:
+
+- `explorations/g8_full_support_structured_geometry.md`;
+- `explorations/g8_structured_geometry_lane_b.md`;
+- `explorations/g8_full_support_ordered_band_geometry.md`;
+- `explorations/g8_adaptive_cumulative_prefix_refinement.md`;
+- `explorations/g8_independent_inner_outer_recombination_audit.md`;
+- `explorations/g8_cell_aware_factorized_column_generation.md`;
+- `explorations/g8_cell_aware_second_wave_gate.md`;
+- `explorations/g8_three_band_nonclumping_outer_lemma.md`;
+- `explorations/three_band_nonclumping_profile_fiber_audit.md`.
+
 ## Proof dependencies
 
 The EBCH and graph spectrum tables remain authenticated mathematical inputs.

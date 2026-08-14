@@ -27,7 +27,7 @@ The immutable manifest has this logical shape:
   },
   "arithmetic": {
     "canonical_json": "RFC8785",
-    "integer_split_rule": "primitive-affine-gap-v1",
+    "integer_split_rule": "support-relative-primitive-affine-gap-v2",
     "outward_evaluator": "...",
     "outward_evaluator_sha256": "..."
   },
@@ -199,3 +199,90 @@ The verifier applies these gates in order.
 Reconnaissance may stop with incomplete shards and diagnostic binary64
 scores.  Certification integration consumes only immutable shards and their
 independent `VERIFIED_COMPLETE` receipts.
+
+## Factorized component extension
+
+Independent inner/outer recombination requires a new manifest version. The
+existing `packet-group-g8-support-manifest-v1` binds combined witness rows and
+must not be reinterpreted.
+
+The factorized manifest uses schema
+`packet-group-g8-factorized-manifest-v2`. It retains the census, arithmetic,
+code-closure, geometry, and fixed-data declarations above. It replaces the
+combined witness catalogue with role-separated sources:
+
+```json
+{
+  "recombination_contract": {
+    "selector_kind": "independent-sum-mixture-v1",
+    "inner_interface": "uniform-conditional-on-complete-outer-word-v1",
+    "combination_rule": "sum-marginals-subtract-normalization-once-v1",
+    "normalization": "packet-profile-orbit-v1"
+  },
+  "component_sources": [
+    {"source_id":"inner-0001", "component_role":"inner",
+     "sha256":"...", "schema":"packet-group-g8-inner-components-v1",
+     "rows":[{"row":0,"row_sha256":"..."}]},
+    {"source_id":"outer-0001", "component_role":"outer",
+     "sha256":"...", "schema":"packet-group-g8-outer-components-v1",
+     "rows":[{"row":0,"row_sha256":"..."}]}
+  ]
+}
+```
+
+Each inner row stores its pole, nine fugacities, and the complete positive
+65-entry Collatz vector. A selected iteration number is diagnostic and cannot
+replace the vector. Each outer row stores nine log variables, three BL
+coefficients, and the Cauchy split. Producer affine constants and charges are
+diagnostic only. The verifier reconstructs both affine intervals from these
+parameters and the manifest's transitive fixed inputs.
+
+A factorized leaf selector has this strict wire form:
+
+```json
+{
+  "kind":"independent-sum-mixture-v1",
+  "normalization":"packet-profile-orbit-v1",
+  "inner_marginal":[
+    {"weight":"1/1", "component":{
+      "source_id":"inner-0001", "source_sha256":"...",
+      "row":0, "row_sha256":"..."}}
+  ],
+  "outer_marginal":[
+    {"weight":"1/1", "component":{
+      "source_id":"outer-0001", "source_sha256":"...",
+      "row":0, "row_sha256":"..."}}
+  ]
+}
+```
+
+Each marginal is nonempty. Its weights are positive reduced rationals that
+sum exactly to one. References are unique within a marginal and cannot cross
+component roles. The verifier rejects a positive-weight inner component when
+an active class has zero fugacity. It applies the corresponding positivity
+check to every outer packet variable.
+
+At a leaf vertex `a`, the verifier computes
+
+```text
+sum_i alpha_i I_i(a) + sum_j beta_j O_j(a) - H(a).
+```
+
+It subtracts one outward interval for `H(a)`. It does not subtract
+normalization inside either marginal. Dual vectors, pricing barycenters,
+optimizer traces, stored affine columns, and diagnostic upper bounds are not
+proof inputs.
+
+The current full-support geometry uses 165 balanced `h=2` cumulative roots and
+189 terminal leaves. A proof artifact must serialize every cumulative interval
+and prefix split. The verifier reconstructs each order-polytope vertex, counts
+every bounded nondecreasing integer chain by exact DP, checks child-count
+conservation, rejects unreachable nodes, and recovers
+
+```text
+binom(262143,8)
+```
+
+profiles across the 165 roots. Stored vertex arrays and counts are diagnostic.
+The independent implementation of these gates is
+`scripts/certify_packet_group_g8_factorized_selector.py`.
