@@ -15,7 +15,11 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = ROOT / "G4_CERTIFICATE_MANIFEST.json"
+DEFAULT_MANIFEST = ROOT / "G4_GLOBAL_LANE_CERTIFICATE_MANIFEST.json"
+SUPPORTED_SCHEMAS = {
+    "permute-conv.riffle-g4-savepoint.v1",
+    "permute-conv.riffle-g4-global-lane-savepoint.v2",
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -43,11 +47,10 @@ def main() -> None:
     args = parser.parse_args()
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    require_equal(
-        "manifest schema",
-        manifest.get("schema"),
-        "permute-conv.riffle-g4-savepoint.v1",
-    )
+    schema = manifest.get("schema")
+    if schema not in SUPPORTED_SCHEMAS:
+        raise SystemExit(f"FAIL manifest schema: unsupported {schema!r}")
+    print(f"PASS manifest schema {schema}")
 
     for name, metadata in manifest["artifacts"].items():
         path = resolve_artifact(metadata["path"])
@@ -90,6 +93,29 @@ def main() -> None:
         report["exact_geometry"]["covered_cells"],
         expected["covered_cells"],
     )
+    construction_expected = manifest.get("construction_assertions")
+    if construction_expected is not None:
+        construction = report.get("construction", {})
+        require_equal(
+            "construction rule",
+            construction.get("rule"),
+            construction_expected["rule"],
+        )
+        require_equal(
+            "construction manifest SHA-256",
+            construction.get("manifest_sha256"),
+            construction_expected["manifest_sha256"],
+        )
+        require_equal(
+            "construction lane-event independence",
+            construction.get("lane_events_independent"),
+            construction_expected["lane_events_independent"],
+        )
+        require_equal(
+            "report source construction-manifest SHA-256",
+            report["source_digests"]["construction_manifest"],
+            construction_expected["manifest_sha256"],
+        )
     print("G4 SAVEPOINT INTEGRITY: PASS")
 
 

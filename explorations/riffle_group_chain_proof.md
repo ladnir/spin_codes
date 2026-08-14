@@ -1836,9 +1836,9 @@ The margin beyond the required 40-bit threshold is `21.7881515553` bits.
 Consequently, at least one setup gives a binary
 `[2^21,2^20,d_min>=188744]` code.
 
-The canonical report is
-`out/g4_end_to_end_bsp_outward_certificate.json`, with SHA-256
-`9a416987feda6c0edf15ea2af91b30eb84d3be8b97a002831cf85f03e7086364`.
+The canonical global-lane report is
+`out/g4_global_lane_end_to_end_bsp_outward_certificate.json`, with SHA-256
+`322c785dae28a04fe71c32f99479702d699d84c5abc4784c56184d22cf9d09f2`.
 The report authenticates every source ledger, witness report, and evaluated
 inequality. `PROOF_STATUS.md` gives the complete replay command and the hashes
 of its four structural inputs.

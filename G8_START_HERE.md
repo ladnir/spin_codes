@@ -1,8 +1,8 @@
 # Riffle `g=8` starting point
 
-The `g=4` certificate is frozen at tag `riffle-g4-certified-v1`. Start `g=8`
-work from that tag. Do not modify the `g=4` artifacts to make a `g=8`
-diagnostic pass.
+The current `g=4` certificate uses the globally sampled puncture lane and is
+frozen by `G4_GLOBAL_LANE_CERTIFICATE_MANIFEST.json`. Start `g=8` from that
+savepoint. Do not modify the `g=4` artifacts to make a `g=8` diagnostic pass.
 
 ## Baseline to preserve
 
@@ -12,7 +12,7 @@ bits. The `g=8` proof must retain the declared lane bijections, packet
 permutation, and recursive state permutations unless the construction itself
 is revised explicitly.
 
-The `g=4` theorem proves
+For the global-lane construction, the `g=4` theorem proves
 
 ```text
 Pr[d_min <= 188743] <= 2^-61.78815155534398186100.
@@ -30,7 +30,7 @@ The following components are independent of the four-bit profile dimension.
 - Exact rational mixtures with independently hardened vertex evaluations.
 - Dual column generation over a finite witness atlas.
 - Cell-local profile-count bounds and outward log-sum-exp aggregation.
-- The one-conditioned-row outer bound, including the graph-hole treatment.
+- The one-conditioned-row outer bound, including the global-lane graph-hole treatment.
 - Exact BSP ledgers and their independent outward verification.
 
 The one-conditioned-row inequality is the decisive `g=4` improvement. Test it
@@ -340,4 +340,4 @@ These assumptions must remain visible in any `g=8` theorem statement.
 The complete `g=4` proof and reproduction command are in `PROOF_STATUS.md`.
 The mathematical development is in
 `explorations/riffle_group_chain_proof.md`. The machine-readable checkpoint is
-`G4_CERTIFICATE_MANIFEST.json`.
+`G4_GLOBAL_LANE_CERTIFICATE_MANIFEST.json`.

@@ -23,8 +23,8 @@ chronological research log through 2026-08-13 is preserved in
 | Structured RM/EBCH construction | Theorem-facing and checkable | A binary `[2^21,2^20,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-37.27`. |
 | Structured EBCH/XOR-parity construction | Theorem-facing and checkable | A binary `[2^21,1048512,d_min>=188744]` code exists with a theorem-safe first moment at most `2^-41.29`. |
 | Riffle with packet width `g=2` | Certified | The optimized end-to-end first-moment bound is at most `2^-62.7194713852`. |
-| Riffle with packet width `g=4` | Certificate needs construction binding | The outward ledger gives `2^-61.7881515553` for the global-lane puncture variant. It does not certify independent puncture lanes in the sloped layout. |
-| Riffle with packet width `g=8` | In progress; same binding gap | This is the intended deployment width. The conditioned-row branch needs the global-lane puncture rule or a proof-only replacement tax. |
+| Riffle with packet width `g=4` | Certified | The construction-bound global-lane certificate gives `2^-61.7881515553`. |
+| Riffle with packet width `g=8` | In progress | This is the intended deployment width. Its proof must use the same global-lane rule or a separately certified replacement. |
 
 ## Frozen Riffle target
 
@@ -104,7 +104,7 @@ Canonical artifacts:
 The aggregation ledger inside the final report has SHA-256
 `43ecbb47c2b61e9cb20890053e879a6adf863e14923a16f4a188a9d88e2e4b40`.
 
-## `g=4` certificate and layout-binding condition
+## Complete `g=4` global-lane certificate
 
 Let the `g=4` setup use the global-lane puncture rule described below, and
 sample the remaining lane bijections, packet permutation, and recursive state
@@ -189,12 +189,12 @@ Canonical artifacts:
 | `out/g4_support_full_asymmetric_incremental_peach.json` | `80b03f60b4b3c6c7b22d1c20cf2e1e203561cd9f111a6baf8bd84cf24e349ef8` |
 | `out/g4_lower296_bsp_diagnostic.json` | `e1208a95642ea6092dbde94baea8015a6cf675b652294d6ae492e7a0a7442880` |
 | `out/g4_cell_bsp_remaining603_asymmetric.json` | `4a67362e2a0b191617c93933e0d0474769adf6ffc4442bb002544c5b673c6e19` |
-| `out/g4_end_to_end_bsp_outward_certificate.json` | `9a416987feda6c0edf15ea2af91b30eb84d3be8b97a002831cf85f03e7086364` |
+| `out/g4_global_lane_end_to_end_bsp_outward_certificate.json` | `322c785dae28a04fe71c32f99479702d699d84c5abc4784c56184d22cf9d09f2` |
 
 The final report binds the evaluated inequalities with SHA-256
 `512f46a7e6cf2686e7bcf88b8b8af22af11080d6741f8f60eaaba0bb785d4c6f`.
 It binds the hardened witness reports with SHA-256
-`adfc9e21df420c4c6dd0fc9823c0b2c457bc91a84d1e833a153fd5e3fa39f0e1`.
+`2174ec4636f69eee2a029990eeeb009bdffb58319e18b42f4503b08de47ebe52`.
 
 An independent adversarial audit re-derived the one-conditioned-row lemma,
 cross-implemented its numerical branch, and reproduced the complete warm
@@ -204,7 +204,7 @@ and `eb942354ec25897c3143b86e13d99a6768b4e7c7` on branch
 `codex/g4-race-claude`. The second commit records that the optional fresh-cache
 replay was stopped at the user's request. It was not needed for the verdict.
 
-A later global-layout audit found a missing construction obligation. The
+A later global-layout audit found and repaired a missing construction obligation. The
 conditioned-row formula needs all 128 punctured blocks to lie in one perfect
 matching of the three band-tile classes. Independent per-tile puncture lanes
 do not ensure this. The numerical ledger therefore applies to the variant
@@ -214,15 +214,22 @@ and changes no hot-path operation. The exact argument and an allowed
 counterexample to the independent-lane claim are in
 `explorations/conditioned_row_sloped_layout_audit.md`.
 
+The complete fresh-cache replay binds the global-lane sampler, its exact
+matching certificate, all theorem data, and the sole affected total-weight
+witness. The exchangeability/Jensen proof for that witness is in
+`explorations/g4_global_lane_exact_graph_puncture_total_weight_lemma.md`.
+The new report reproduces the old numerical endpoint and inequality digest.
+
 The theorem uses two declared inputs beyond the finite certificate machinery.
 The EBCH and graph spectrum tables are authenticated mathematical inputs. The
 hole analysis also assumes the construction's graph-syndrome uniformity. A
 proof of either input would strengthen the dependency chain but would not
 change the finite ledger.
 
-`G4_CERTIFICATE_MANIFEST.json` freezes the result, hashes, assumptions, and
-source commits. Run the fast integrity gate before starting from this
-checkpoint:
+`G4_GLOBAL_LANE_CERTIFICATE_MANIFEST.json` freezes the current result, hashes,
+assumptions, and source commits. `G4_CERTIFICATE_MANIFEST.json` remains the
+legacy pre-repair integrity record. Run the fast integrity gate before
+starting from the current checkpoint:
 
 ```powershell
 python scripts\verify_g4_savepoint.py
@@ -268,8 +275,9 @@ python scripts\certify_packet_group_g4_end_to_end_bsp.py `
   --bsp-batch out\g4_lower296_bsp_diagnostic.json `
   --bsp-batch out\g4_cell_bsp_remaining603_asymmetric.json `
   --workers 8 --iterations 40 `
-  --checkpoint-dir out\g4_race_hardened_cache `
-  --output out\g4_end_to_end_bsp_outward_certificate.json
+  --checkpoint-dir out\g4_global_lane_rerun_checkpoints `
+  --construction-manifest G4_GLOBAL_LANE_RERUN_MANIFEST.json `
+  --output out\g4_global_lane_end_to_end_bsp_outward_certificate.json
 ```
 
 The command must reproduce `passed: true` and an upper endpoint at most
