@@ -1,0 +1,23 @@
+\section{Implementation and performance}
+\label{sec:implementation}
+
+The mathematical sections define forward encoders. The implementation uses
+transposed, batched evaluation because the target application encodes many
+binary columns in parallel. This evaluation order must preserve the same
+linear map.
+
+The current finite-length target uses a BA-3 outer, the factored Structured
+SPIN interleaver, and the RM2Sub-S19 inner. The base constituent and its length
+remain under selection. The optimized transposed pipeline applies the
+transposed inner, inverts the routing factors, and then applies the transposed
+BA-3 outer.
+
+Performance measurements and distance certificates answer different
+questions. Correctness tests establish that the optimized code evaluates the
+declared linear map. Benchmarks measure that evaluation. The finite
+first-moment certificate separately establishes minimum distance.
+
+\papertodo{Select the finite BA-3 base constituent and insert the finalized
+interface, build and test commands, operation ledger, dependency provenance,
+correctness receipt, and serialized benchmark receipt. Do not report a
+preliminary timing as a paper result before these records are fixed.}

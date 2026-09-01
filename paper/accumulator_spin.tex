@@ -1,0 +1,311 @@
+\section{Accumulator SPIN}
+\label{sec:accumulator-spin}
+
+Accumulator SPIN is the transparent instantiation of the framework. It uses a
+random block-diagonal outer, a uniform interleaver, and the binary
+accumulator.
+
+\subsection{Relation to Block-Accumulate codes}
+
+Block-Accumulate (BA) codes concatenate a random block-diagonal outer with
+one or more stages, each consisting of a uniform interleaver and an accumulator
+\cite{KolesnikovEtAl2026BA}. Accumulator SPIN retains the first such stage and
+therefore may be viewed as a truncated BA code. We retain the SPIN name to
+place this construction in the common outer--interleaver--inner interface, but
+the block-accumulate architecture and the random-block enumerator below are
+due to Kolesnikov et al.
+
+Accumulator SPIN follows the BA ensemble at this level: setup samples the
+local maps independently. The theorem below conditions each local map to be
+injective. This condition makes every realized outer encoder injective.
+
+Chosen-block BAA studies the related fixed-constituent choice
+\cite{PecenyRindal2026ChosenBlockBAA}. It fixes a short constituent code and
+uses the same code in every outer position. Its concrete binary constituents
+include Golay, Reed--Muller, and a BCH subcode. That reuse option is not the
+ensemble analyzed here.
+
+\subsection{Random-block outer lineage}
+
+The following local input--output enumerator is the random-block calculation
+used for BA codes. We state it in the present notation because it is also the
+local input to the Accumulator SPIN analysis.
+
+\begin{lemma}[Uniform random-block enumerator]
+\label{lem:uniform-random-block-enumerator}
+Suppose that $G_B$ is uniform over $\F_2^{K_B\times B}$. Let
+$E^{\mathrm{blk}}_{a,b}(G_B)$ be the number of inputs of weight $a$ whose
+images have weight $b$. Then
+\begin{equation}
+  \E_{G_B}[E^{\mathrm{blk}}_{a,b}(G_B)]
+  =
+  \begin{cases}
+    1, & a=0 \text{ and } b=0,\\
+    0, & a=0 \text{ and } b>0,\\
+    \displaystyle
+    \binom{K_B}{a}\binom{B}{b}2^{-B}, & a>0.
+  \end{cases}
+  \label{eq:uniform-random-block-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The zero input maps to the zero output. Fix a nonzero input $u$. Each column
+of $G_B$ is uniform and independent, so the coordinates of $uG_B$ are
+independent uniform bits. Thus $uG_B$ is uniform over $\F_2^B$. There are
+$\binom{K_B}{a}$ inputs of weight $a$ and $\binom{B}{b}$ outputs of weight
+$b$. Summing the probability $2^{-B}$ over these pairs gives
+\eqref{eq:uniform-random-block-enumerator}.
+\end{proof}
+
+The BA independent-block ensemble has a closed global input--output
+enumerator. Let $E^{\mathrm{BA}}_{a,b}$ count total input weight
+$a$ and total outer-output weight $b$ across $M$ blocks. Specializing the BA
+formula~\cite{KolesnikovEtAl2026BA} to local dimensions
+$K_B\times B$ gives
+\begin{equation}
+  \E[E^{\mathrm{BA}}_{a,b}]
+  =
+  \sum_{q=0}^{M}
+  2^{-Bq}\binom{M}{q}\binom{Bq}{b}
+  \sum_{j=0}^{q}(-1)^j\binom{q}{j}
+  \binom{K_B(q-j)}{a}.
+  \label{eq:ba-independent-block-enumerator}
+\end{equation}
+Here $q$ is the number of nonzero input blocks. The inner alternating sum
+counts weight-$a$ inputs for which exactly those $q$ blocks are nonzero. For a
+fixed such input, the $q$ independently sampled local matrices produce a
+uniform word on the corresponding $Bq$ output coordinates. This yields the
+factor $2^{-Bq}\binom{Bq}{b}$.
+
+The theorem below uses the same independence pattern but samples uniform
+injections rather than unconditioned matrices. Its exact generating function
+appears in Section~\ref{sec:accumulator-spin-theorem}.
+
+\subsection{Accumulator inner}
+
+Define $\Acc_N:\F_2^N\to\F_2^N$ by
+\begin{equation}
+  (\Acc_N(u))_t
+  :=
+  \sum_{i=1}^t u_i
+  \pmod 2,
+  \qquad t\in[N].
+  \label{eq:accumulator-definition}
+\end{equation}
+Equivalently, if $y:=\Acc_N(u)$ and $y_0:=0$, then
+$y_t=y_{t-1}\mathbin\oplus u_t$.
+
+For $w,h\in\{0,\ldots,N\}$, define
+\[
+  A^{\Acc}_{w,h}
+  :=
+  |\{u\in\F_2^N:\wt(u)=w,\ \wt(\Acc_N(u))=h\}|.
+\]
+
+\begin{lemma}[Exact accumulator enumerator]
+\label{lem:accumulator-enumerator}
+Fix $w\in\{1,\ldots,N-1\}$ and set $k:=\lceil w/2\rceil$. Then
+\begin{equation}
+  A^{\Acc}_{w,h}
+  =
+  \binom{h-1}{k-1}\binom{N-h}{w-k}.
+  \label{eq:accumulator-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let the ones of $u$ occur at
+$1\le p_1<\cdots<p_w\le N$. Set $p_0:=0$, $p_{w+1}:=N+1$, and
+$\Delta_i:=p_i-p_{i-1}$. The positive spacings satisfy
+$\sum_{i=1}^{w+1}\Delta_i=N+1$.
+
+The accumulator output equals one between its first and second flips, between
+its third and fourth flips, and so on. Hence its weight is the sum of the
+even-index spacings. There are $k$ such spacings. The number of positive
+compositions of $h$ into those $k$ parts is
+$\binom{h-1}{k-1}$. The remaining $w+1-k$ spacings sum to $N+1-h$,
+which gives $\binom{N-h}{w-k}$ choices. Multiplication proves
+\eqref{eq:accumulator-enumerator}.
+\end{proof}
+
+If $U_w$ is uniform over the weight-$w$ slice, then
+\begin{equation}
+  \Prob[\wt(\Acc_N(U_w))\le d]
+  =
+  \frac{1}{\binom Nw}
+  \sum_{h=0}^d A^{\Acc}_{w,h}.
+  \label{eq:accumulator-exact-tail}
+\end{equation}
+
+\begin{lemma}[A simple accumulator tail]
+\label{lem:accumulator-tail}
+Fix $\delta\in(0,1/4)$ and
+$w\in\{1,\ldots,\lfloor N/2\rfloor\}$. Then
+\[
+  \Prob[\wt(\Acc_N(U_w))\le\lfloor\delta N\rfloor]
+  \le
+  (4e\delta)^{\lceil w/2\rceil}.
+\]
+\end{lemma}
+
+\begin{proof}
+Set $k:=\lceil w/2\rceil$. Lemma~\ref{lem:accumulator-enumerator} and the
+hockey-stick identity give
+\[
+  \sum_{h\le\lfloor\delta N\rfloor}A^{\Acc}_{w,h}
+  \le
+  \binom{N}{w-k}\binom{\lfloor\delta N\rfloor}{k}.
+\]
+After division by $\binom Nw$, bound the binomial term by
+$(e\delta N/k)^k$. Since $w\le N/2$, the remaining binomial ratio is at
+most $(2w/N)^k$. Finally, $w\le2k$, which gives the claim.
+\end{proof}
+
+The next contraction is uniform in the input weight. It is the form used by
+the asymptotic theorem.
+
+\begin{lemma}[Sharp accumulator contraction]
+\label{lem:sharp-accumulator-contraction}
+Fix $\delta\in(0,1/2)$ and define
+\[
+  \rho(\delta):=2\sqrt{\delta(1-\delta)}.
+\]
+For every $w\in\{1,\ldots,N\}$,
+\begin{equation}
+  \Prob[\wt(\Acc_N(U_w))\le\lfloor\delta N\rfloor]
+  \le \rho(\delta)^w.
+  \label{eq:sharp-accumulator-contraction}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Set $D:=\lfloor\delta N\rfloor$ and $k:=\lceil w/2\rceil$.
+For $w<N$, Lemma~\ref{lem:accumulator-enumerator} identifies the probability
+in~\eqref{eq:sharp-accumulator-contraction} with $\Prob[X\ge k]$, where $X$
+is hypergeometric with sample size $w$ and $D$ marked positions among $N$.
+For $t>0$, the moment bound for sampling without replacement gives
+\[
+  \E[e^{tX}]
+  \le (1-\delta+\delta e^t)^w.
+\]
+Markov's inequality and $k\ge w/2$ give
+\[
+  \Prob[X\ge k]
+  \le
+  \inf_{t>0}
+  \left(e^{-t/2}(1-\delta+\delta e^t)\right)^w.
+\]
+The minimizer satisfies $e^t=(1-\delta)/\delta$, which yields the claim.
+When $w=N$, the accumulator output has weight $\lceil N/2\rceil>D$, so the
+left side is zero.
+\end{proof}
+
+\subsection{Asymptotic theorem}
+\label{sec:accumulator-spin-theorem}
+
+Fix a rational
+rate $R\in(0,1)$ and let
+\[
+  \mathcal B_R:=\{B\ge1:RB\in\mathbb Z\}.
+\]
+For $B\in\mathcal B_R$ and each $i\in[M]$, setup samples an independent
+uniform linear injection
+\[
+  C_i:\F_2^{RB}\longrightarrow\F_2^B.
+\]
+It then samples $\Pi\gets S_N$, where $N:=MB$. For
+$x=(x^{(1)},\ldots,x^{(M)})$, define
+\begin{equation}
+  E_N^{\mathrm{acc}}(x)
+  :=
+  \Acc_N\!\left(
+    \Pi(C_1(x^{(1)})\Vert\cdots\Vert C_M(x^{(M)}))
+  \right).
+  \label{eq:independent-accumulator-spin}
+\end{equation}
+The setup remains fixed for all messages. Every realized encoder is
+injective.
+
+For one local injection, define
+\begin{equation}
+  G_{B,R}(z)
+  :=
+  (2^{RB}-1)\frac{(1+z)^B-1}{2^B-1}.
+  \label{eq:injection-local-mass}
+\end{equation}
+Every nonzero input has a uniform nonzero image, so independence across block
+positions gives
+\begin{equation}
+  \E\!\left[
+    1+\sum_{w=1}^{N}A_{N,w}^{\mathrm{out}}z^w
+  \right]
+  =(1+G_{B,R}(z))^M.
+  \label{eq:injection-global-mass}
+\end{equation}
+
+Define
+\begin{equation}
+  \lambda_A(R,\delta)
+  :=
+  1-R-\log_2(1+\rho(\delta)).
+  \label{eq:accumulator-sparse-exponent}
+\end{equation}
+Fix $c>0$. For each sufficiently large $M$, let $B_M$ be the least member of
+$\mathcal B_R$ satisfying
+\[
+  B_M\ge c\log_2(MB_M),
+\]
+and set $N_M:=MB_M$.
+
+\begin{theorem}[Accumulator SPIN]
+\label{thm:independent-accumulator-spin}
+Suppose
+\[
+  \lambda_A(R,\delta)>0,
+  \qquad
+  c\lambda_A(R,\delta)\ge1.
+\]
+Then
+\begin{equation}
+  \Prob[d_{\min}(E_{N_M}^{\mathrm{acc}})\le\delta N_M]
+  =o(1)
+  \qquad(M\to\infty).
+  \label{eq:independent-accumulator-distance}
+\end{equation}
+The family has rate $R$, block size $\Theta(\log N_M)$, and
+$\Theta(N_M\log N_M)$ direct encoding cost.
+\end{theorem}
+
+\begin{proof}
+Let $D:=\lfloor\delta N_M\rfloor$ and let $Z_D$ count nonzero messages whose
+encoded words have weight at most $D$. Corollary~\ref{cor:weight-first-moment},
+Lemma~\ref{lem:sharp-accumulator-contraction}, and
+\eqref{eq:injection-global-mass} give
+\[
+  \E[Z_D]
+  \le
+  (1+G_{B_M,R}(\rho(\delta)))^M-1.
+\]
+For $z>0$, equation~\eqref{eq:injection-local-mass} gives
+\[
+  G_{B,R}(z)
+  \le
+  2\left(2^{R-1}(1+z)\right)^B.
+\]
+Set $\lambda:=\lambda_A(R,\delta)$. The block schedule implies
+\[
+  M G_{B_M,R}(\rho(\delta))
+  \le
+  \frac{2}{B_M}N_M^{1-c\lambda}
+  =o(1).
+\]
+Thus $\E[Z_D]=o(1)$, and Markov's inequality proves
+\eqref{eq:independent-accumulator-distance}.
+\end{proof}
+
+At rate $R=1/2$, the choice $c=3$ and
+$\delta=37/10000$ satisfies the theorem with a strict interval-certified
+margin. The corresponding relative-distance guarantee is small but positive.
+For this proof, the largest possible rate-half limit as $c\to\infty$ is
+$0.0449101394\ldots$.

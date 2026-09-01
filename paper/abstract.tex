@@ -1,0 +1,31 @@
+\begin{abstract}
+Pseudorandom correlation generators and proof systems need binary codes that
+combine constant rate and linear distance with fast ordinary and transposed
+encoding. They also need predictable data movement. Random linear codes provide
+strong distance but require dense computation. Fast structured encoders reduce
+this cost, but their sparse dependencies make linear distance difficult to
+prove. We ask whether one code family can achieve all of these properties.
+
+We introduce Single-Permutation INterleaved (SPIN) codes. A SPIN encoder
+composes a blockwise outer encoder, one global interleaver, and a recursive
+inner encoder. Our central result is a Structured SPIN family at native lengths
+$N$. Every realized code has rate $1/2$, and its ordinary and transposed
+encoders use $O(N)$ bit operations. With probability $1-o(1)$ over setup, its
+  minimum distance exceeds $0.11N$. The construction reuses one sampled
+  spectrum-certified BA-3 constituent along the outer diagonal, factors the
+  interleaver into structured routing stages, and uses the fixed RM2Sub-S19
+  inner. The outer interface permits different base constituents and base
+  lengths. The current certificate uses extended Golay blocks and the schedule
+  $\frac{39}{4}\log_2N+O(1)$. Zero extension gives a family at every
+  sufficiently large requested length with rate $1/2-o(1)$, relative distance
+  greater than $0.11-o(1)$, and linear work.
+
+The proof uses a finite, class-indexed first-moment framework. The outer stage
+supplies class multiplicities, while the interleaver--inner pair supplies
+conditional failure envelopes. Two additional families isolate the main proof
+mechanisms. At rate $1/2$, Accumulator SPIN achieves relative distance
+$0.0037$, and Random SPIN achieves relative distance $0.11002$, under explicit
+  logarithmic schedules. A finite-length specialization is under separate
+  constituent selection and certification; it is not used by the scalable
+  theorem.
+\end{abstract}

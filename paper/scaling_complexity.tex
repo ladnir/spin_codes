@@ -1,0 +1,62 @@
+\section{Finite lengths, asymptotics, and complexity}
+\label{sec:scaling}
+
+Finite validity, asymptotic distance, and encoding complexity are separate
+properties. We state them separately for each SPIN family.
+
+\subsection{Native and requested lengths}
+
+The direct constructions apply at native lengths for which their block
+dimensions are integral. Their logarithmic schedules permit admissible lengths
+with relative gaps \(o(1)\). For Structured SPIN, the zero extension in
+\eqref{eq:structured-requested-length-wrapper} maps the largest native member
+below any sufficiently large requested length into that output length. This wrapper preserves
+injectivity and absolute minimum distance. It changes rate and relative
+distance by only $o(1)$ and preserves linear work.
+
+\subsection{Asymptotic statements}
+
+Theorems~\ref{thm:independent-accumulator-spin}
+and~\ref{thm:independent-random-spin} give positive relative distance with
+high probability for the independent-block ensembles. They specify the block
+schedule, setup failure probability, and rate. At rate one half, the stated
+examples use block constants \(3\) and \(17\), respectively; Random SPIN also
+uses memory constant \(51/50\).
+
+Theorem~\ref{thm:structured-spin-scalable} uses direct lengths
+$N_m=L_mb_m$, where $L_m=128m$ and $b_m$ is the least multiple of $24$
+satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)$.
+The requested-length wrapper gives rate $1/2-o(1)$, relative distance
+$0.11-o(1)$, and linear work.
+
+\subsection{Random-family encoding costs}
+
+Under either proved schedule, the outer encoder processes \(N/B\) blocks of
+length \(B=\Theta(\log N)\). Direct dense block multiplication therefore
+costs \(\Theta(N\log N)\) bit operations. The accumulator costs \(O(N)\).
+The Random SPIN recurrence evaluates \(m=\Theta(\log N)\) taps per output
+coordinate and hence costs \(\Theta(N\log N)\). These bounds concern direct
+encoders; preprocessing or word-level batching may reduce practical constants.
+
+\subsection{Cost model}
+
+Let $C_{\mathrm{out}}(b)$ be the work to encode one outer block, and let
+$C_{\mathrm{in}}(t,s)$ be the work for one structured inner step. A
+Structured SPIN encoder has the schematic cost
+\begin{equation}
+  T(N)
+  =
+  \frac{N}{b}C_{\mathrm{out}}(b)
+  +
+  \frac{N}{t}C_{\mathrm{in}}(t,s)
+  +O(N),
+  \label{eq:structured-cost}
+\end{equation}
+where the last term covers routing and permutation work.
+
+For any fixed base constituent with a constant-size encoding circuit, tiling,
+two permutations, and two accumulators give
+$C_{\mathrm{out}}(b)=O(b)$. The fixed RM2Sub-S19 step has constant cost.
+Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The current
+certificate uses extended Golay as the base constituent, but the cost argument
+does not depend on its 24-bit length.

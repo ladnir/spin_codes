@@ -1,0 +1,46 @@
+\section{Finite-length certificates}
+\label{sec:finite-certificates}
+
+The first-moment identity is finite and exact. A computer-assisted proof
+upper-bounds its class contributions and should expose a finite collection of
+rigorous bounds rather than only a floating optimization trace.
+
+Fix a finite class map with class set $\mathcal T$. A certificate
+provides bounds $\widehat A_\tau^{\mathrm{out}}$ and
+$\widehat Q_\tau(d)$ satisfying
+\[
+  A_\tau^{\mathrm{out}}
+  \le \widehat A_\tau^{\mathrm{out}},
+  \qquad
+  Q_\tau(d)
+  \le \widehat Q_\tau(d)
+\]
+for every $\tau$. If an independently checkable evaluation proves
+\begin{equation}
+  \sum_{\tau\in\mathcal T}
+  \widehat A_\tau^{\mathrm{out}}
+  \widehat Q_\tau(d)
+  <1,
+  \label{eq:finite-certificate}
+\end{equation}
+then Theorem~\ref{thm:class-first-moment} proves the existence of an injective
+encoder with minimum distance greater than $d$. The bound
+$\widehat Q_\tau(d)$ may certify a worst-case conditional failure probability;
+the conditional law need not be identical throughout the class.
+
+A certificate must record:
+
+\begin{enumerate}
+  \item the complete encoder and setup distribution;
+  \item all finite parameters and divisibility conditions;
+  \item the interface classes and their complete range;
+  \item the source of each exact value or upper bound;
+  \item the arithmetic and outward-rounding rules;
+  \item the verifier and hashes of its inputs.
+\end{enumerate}
+
+The main text reports the class partition and final bound. Detailed tables,
+optimization grids, and verifier transcripts belong in the artifact bundle or
+appendix. Appendix~\ref{app:structured-scalable-certificate} identifies the
+hash-bound bundle for the scalable Structured SPIN theorem. Future finite
+specializations should use the same manifest fields and evidence labels.

@@ -1,0 +1,187 @@
+\section{Random SPIN}
+\label{sec:random-spin}
+
+Random SPIN replaces the accumulator with a random recursive convolution.
+Its outer uses the independent random-block injections from
+Section~\ref{sec:accumulator-spin}.
+
+\subsection{Relation to Silver and Expand-Convolute}
+
+Silver codes predate Expand-Convolute and use a banded lower-triangular solve
+for linear-time encoding~\cite{CouteauRindalRaghuraman2021Silver}. The solve
+is an earlier structured recursive encoder of convolutional form. Silver does
+not sample independent convolution taps at every time step.
+
+Expand-Convolute makes the random convolution explicit. It combines a sparse
+expander with a non-wrapping recursion whose time-dependent feedback
+coefficients are independent uniform bits
+\cite{RaghuramanRindalTanguy2023EC}. The Random SPIN theorem retains that
+inner distribution and replaces the expander with independent random-block
+injections followed by one uniform interleaver.
+
+\subsection{Random recursive inner}
+
+Fix a memory $m\ge1$. For every $t\in[N]$, setup samples
+\[
+  \alpha_t\gets\F_2^m
+\]
+independently. Set $y_j:=0$ for $j\le0$. On input $u\in\F_2^N$, define
+\begin{equation}
+  y_t
+  :=
+  u_t+
+  \left\langle
+    \alpha_t,(y_{t-1},\ldots,y_{t-m})
+  \right\rangle,
+  \qquad t\in[N].
+  \label{eq:random-recursive-inner}
+\end{equation}
+Write $I_{N,m}^{\mathrm{rnd}}(u):=y$. Once setup fixes
+$(\alpha_t)_{t=1}^N$, this map is linear and invertible because $y_t$ contains
+$u_t$ with coefficient one.
+
+\subsection{Exact convolution transfer}
+
+The random inner admits an exact finite-state transform. Let $X$ mark input
+weight and let $S$ mark output weight. Index the matrix rows and columns by
+$z\in\{0,\ldots,m\}$, where $z$ is the number of trailing output zeros,
+clipped at $m$. Thus $z=m$ means that the convolution state is zero.
+
+Define the nonnegative matrix $T_m(X,S)$ by
+\begin{equation}
+  T_m(X,S)[z,z']
+  :=
+  \begin{cases}
+    (1+X)S/2, & z<m,\ z'=0,\\
+    (1+X)/2, & z<m,\ z'=z+1,\\
+    XS, & z=m,\ z'=0,\\
+    1, & z=m,\ z'=m,\\
+    0, & \text{otherwise}.
+  \end{cases}
+  \label{eq:random-transfer-matrix}
+\end{equation}
+Let $e_m$ be the unit vector at index $m$, and let $\boldsymbol 1$ be the
+all-ones vector.
+
+\begin{lemma}[Exact random-convolution transform]
+\label{lem:exact-random-convolution-transform}
+For the setup in~\eqref{eq:random-recursive-inner},
+\begin{equation}
+  \E\!\left[
+    \sum_{u\in\F_2^N}
+    X^{\wt(u)}S^{\wt(I_{N,m}^{\mathrm{rnd}}(u))}
+  \right]
+  =
+  e_m^{\mathsf T}T_m(X,S)^N\boldsymbol 1.
+  \label{eq:exact-random-convolution-transform}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Suppose $z<m$. The convolution state is nonzero, so the fresh uniform
+$\alpha_t$ makes the output bit uniform for either input bit. Summing the two
+input choices with weights $1$ and $X$ gives the first two nonzero transitions
+in~\eqref{eq:random-transfer-matrix}. If $z=m$, input zero stays in the zero
+state, while input one produces output one and moves to state zero. These are
+the remaining two transitions. Multiplying the one-step transforms and
+summing over the terminal state proves the identity.
+\end{proof}
+
+Let $U_h$ be uniform on the weight-$h$ slice, independently of the inner
+setup. For $0<S<1$, $a>0$, and $D\in\{0,\ldots,N\}$,
+Lemma~\ref{lem:exact-random-convolution-transform} gives
+\begin{equation}
+  \Prob[\wt(I_{N,m}^{\mathrm{rnd}}(U_h))\le D]
+  \le
+  S^{-D}a^{-h}
+  \frac{e_m^{\mathsf T}T_m(a,S)^N\boldsymbol 1}{\binom Nh}.
+  \label{eq:random-convolution-tail}
+\end{equation}
+The first step is the lower-tail moment bound. The second bounds the
+$X^h$ coefficient by evaluating the nonnegative polynomial at $a$.
+
+For $\delta\in(0,1/2)$, define
+\begin{equation}
+  p_{N,h}(\delta)
+  :=
+  \Prob[
+    \wt(I_{N,m}^{\mathrm{rnd}}(U_h))
+    \le\lfloor\delta N\rfloor
+  ].
+  \label{eq:random-inner-slice-tail}
+\end{equation}
+
+\subsection{Asymptotic theorem}
+
+For an even block length $B$ dividing $N$, set $M:=N/B$. Independently
+sample uniform linear injections
+\[
+  C_i:\F_2^{B/2}\longrightarrow\F_2^B,
+  \qquad i\in[M],
+\]
+one permutation $\Pi\gets S_N$, and the convolution setup above. Define
+\begin{equation}
+  E_{N,m}^{\mathrm{rnd}}(x)
+  :=
+  I_{N,m}^{\mathrm{rnd}}\!\left(
+    \Pi(C_1(x^{(1)})\Vert\cdots\Vert C_M(x^{(M)}))
+  \right).
+  \label{eq:independent-random-spin}
+\end{equation}
+All setup objects are independent and remain fixed for all messages.
+
+For each sufficiently large $M$, let $B_M^*$ be the least positive even
+integer satisfying
+\[
+  B_M^*\ge17\log_2(MB_M^*).
+\]
+Set
+\[
+  N_M^*:=MB_M^*,
+  \qquad
+  m_M^*:=\left\lceil\frac{51}{50}\log_2N_M^*\right\rceil,
+  \qquad
+  \delta_*:=\frac{5501}{50000}.
+\]
+
+\begin{theorem}[Random SPIN]
+\label{thm:independent-random-spin}
+For the ensemble in~\eqref{eq:independent-random-spin},
+\begin{equation}
+  \Prob[
+    d_{\min}(E_{N_M^*,m_M^*}^{\mathrm{rnd}})
+    \le\delta_*N_M^*
+  ]
+  =o(1)
+  \qquad(M\to\infty).
+  \label{eq:independent-random-spin-distance}
+\end{equation}
+The family has rate $1/2$, relative distance greater than $0.11002$, and
+$\Theta(N_M^*\log N_M^*)$ direct encoding cost.
+\end{theorem}
+
+\begin{proof}
+Let $A_{N,h}^{\mathrm{out}}$ be the number of outer words of weight $h$, and
+let $p_{N,h}(\delta_*)$ be the probability in
+\eqref{eq:random-convolution-tail} with
+$D=\lfloor\delta_*N\rfloor$. Split the first-moment sum at
+$h=N/5000$ and $h=0.9N$.
+
+Lemma~\ref{lem:random-spin-sparse-closure} shows that the first range is
+$o(1)$. Lemma~\ref{lem:random-spin-linear-closure} is uniform for
+$h/N\in[1/5000,0.9]$, so the middle range is $2^{-\Omega(N)}$. For the final
+range, use $p_{N,h}\le1$ and the rate-half random-block outer exponent:
+\[
+  \sum_{h\ge0.9N}\E[A_{N,h}^{\mathrm{out}}]
+  \le
+  2^{N(H_2(0.9)-1/2+o(1))}
+  =2^{-\Omega(N)}.
+\]
+The complete first moment tends to zero. Markov's inequality proves
+\eqref{eq:independent-random-spin-distance}.
+\end{proof}
+
+The admissible lengths have relative gaps $o(1)$. For a requested length, zero
+extend the largest preceding native member. This preserves injectivity and
+absolute minimum distance while changing rate and relative distance by only
+$o(1)$.

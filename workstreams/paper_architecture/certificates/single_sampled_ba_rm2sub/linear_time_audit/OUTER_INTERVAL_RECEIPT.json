@@ -1,0 +1,59 @@
+{
+  "claims": [
+    "The Golay--BA-3 central half-Bernoulli likelihood exponent is strictly below 0.36 on relative weights [0.104, 0.896].",
+    "For active-block density at least 0.001, the expected-spectrum exponent is strictly negative on final relative weights [0.002, 0.104].",
+    "The sparse-active-block constants give a geometric base below 0.657."
+  ],
+  "interval_dps": 60,
+  "method": "Rational-box branch and bound with mpmath outward interval arithmetic and one-binary64-step expansion after interval endpoint conversion.",
+  "parameters": {
+    "active_block_density_split": "1/1000",
+    "central_lower_relative_weight": "13/125",
+    "central_upper_relative_weight": "112/125",
+    "central_threshold_nats_per_outer_coordinate": "0.36",
+    "dense_tail_input_weight_lower": "1/125",
+    "dense_tail_output_weight_lower": "1/500",
+    "dense_tail_output_weight_upper": "13/125"
+  },
+  "results": {
+    "central": {
+      "accepted_boxes": 27190,
+      "deepest_box": 43,
+      "largest_accepted_upper": 0.359999549314812,
+      "processed_boxes": 27189,
+      "remaining_boxes": 0,
+      "status": "proved"
+    },
+    "dense_low_tail": {
+      "accepted_boxes": 6748,
+      "deepest_box": 26,
+      "largest_accepted_upper": -7.686951035770771e-08,
+      "processed_boxes": 6747,
+      "remaining_boxes": 0,
+      "status": "proved"
+    },
+    "sparse_constants": {
+      "C_star_times_b0_cubed_upper": 0.6565638131135586,
+      "first_moment_log_derivative_upper": -1.2275267347465848,
+      "status": "proved"
+    }
+  },
+  "schema": "structured-spin-golay-ba3-outer-interval-v2",
+  "verifiers": [
+    {
+      "commands": [
+        "python -B workstreams/linear_time_audit/verify_outer_interval.py --mode central --max-boxes 100000 --max-depth 100 --progress-every 10000",
+        "python -B workstreams/linear_time_audit/verify_outer_interval.py --mode low-tail --max-boxes 100000 --max-depth 100 --progress-every 0"
+      ],
+      "path": "workstreams/linear_time_audit/verify_outer_interval.py",
+      "sha256": "84F743AF9825E64F58C54AF3F41C8E5B7468851425A071F22F357E60BBF4B706"
+    },
+    {
+      "commands": [
+        "python -B workstreams/linear_time_audit/verify_outer_sparse_constants.py"
+      ],
+      "path": "workstreams/linear_time_audit/verify_outer_sparse_constants.py",
+      "sha256": "1D446EDB295A210531140979D3F1F91A5F94D66E8CF02A777140DE5142C22210"
+    }
+  ]
+}

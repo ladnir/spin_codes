@@ -1,0 +1,434 @@
+\section{Structured SPIN}
+\label{sec:structured-spin}
+
+\subsection{From random mixing to structured mixing}
+
+Random SPIN is a useful starting point. Its random outer blocks have a simple
+expected spectrum. Its uniform interleaver erases coordinate information, and
+its random recursive inner repeatedly introduces fresh mixing. These
+properties make the first-moment proof relatively clean.
+
+They also make the encoder expensive. The random recursive inner performs
+fresh random mixing at every coordinate. Under the parameter schedule used in
+Section~\ref{sec:random-spin}, its direct implementation costs more than
+linear time. Fast encoders usually obtain their speed from repeated circuits,
+fixed local maps, and predictable data movement. In this sense, fast codes are
+usually highly structured.
+
+Structured SPIN tries to retain the randomness required by the distance proof
+while placing structure wherever the encoder needs speed. A useful way to
+understand this balance is to follow a sparse message through the
+construction. Sparse messages are not always the only difficult regime:
+medium-weight messages can also matter because there are many of them.
+Nevertheless, a message supported in one or two outer blocks is a useful
+model of the construction's most fragile behavior. Such a message begins with
+little support, so every later stage must prevent that support from remaining
+localized or disappearing.
+
+Suppose first that the message activates one outer block. Random SPIN would
+encode this block with a random injection. To obtain a faster and more
+explicit construction, we replace that injection with a constituent code
+whose low-weight spectrum can be certified. The minimum-weight codewords are
+important, but the proof must also control the nearby low-weight shells, which
+may contain many more words. The required outer interface is therefore a
+certified envelope for the relevant low-weight spectrum, not merely a
+minimum-distance bound.
+
+Weight alone does not yet describe a structured block output. Two words of
+equal weight may occupy different coordinates, and those coordinate patterns
+may behave differently in later stages. Structured SPIN therefore samples an
+independent output permutation for every outer block. Conditioned on the
+output weight, the permuted support is uniform within that block. Independence
+across blocks also prevents a message from deliberately aligning a repeated
+coordinate pattern across several active blocks. After this local
+randomization, the first-moment argument can again describe a block output by
+its weight.
+
+The next question is where this support enters the recursive inner. A uniform
+global interleaver can, with small probability, send most of an active block
+near the end of the inner computation. The state then has too few remaining
+steps in which to spread the support. One can reduce this risk by forcing each
+outer block to have large output weight, but larger or denser outer blocks
+increase the encoding cost.
+
+Structured SPIN instead builds the desired spreading property into the
+interleaver. Its global permutation is factored into simple stages. The
+within-block permutation first removes the constituent code's coordinate
+structure. A deterministic transpose then distributes the coordinates of
+each block among regions spanning the inner computation. Finally, independent
+shuffles within those regions randomize the precise locations. The transpose
+is the structured part that rules out a deliberately late start in the
+declared routing pattern. The region shuffles stop the message from
+controlling the remaining alignment and supply the probability law needed by
+the first-moment calculation.
+
+At this point, we have replaced the random outer and the uniform global
+interleaver. The remaining expensive component is the random recursive inner.
+A direct random inner refreshes its mixing at every coordinate. Structured
+SPIN instead amortizes that refresh over a group of coordinates. During the
+cheap part of an inner step, fixed structured maps mix one input group with a
+small persistent state and emit a group of output bits. These maps are fast
+because they operate on whole groups and reuse a compact circuit. At the
+refresh stage, multiplication by a sampled field element supplies the
+uniform-state law used by the proof for each fixed nonzero state. The analysis
+combines this refresh with certified information about the kernels and images
+of the fixed maps.
+
+The resulting encoder is neither fully random nor fully deterministic. Its
+constituent codes and batched inner operations provide speed. Its independent
+block permutations, region shuffles, and state refreshes supply randomness at
+the interfaces where the distance proof uses it. The rest of this section
+turns this design story into a parameterized construction.
+
+\subsection{Construction at a glance}
+
+We first define one direct member of the family. Choose a constituent length
+$b$, a constituent dimension $k\le b$, a number $L$ of outer-block
+positions, an inner step width $t$, and a state dimension $s$, with $t\mid L$.
+Set
+\begin{equation}
+  N:=Lb,
+  \qquad
+  K:=Lk,
+  \qquad
+  e:=L/t,
+  \qquad
+  R:=N/t=be.
+  \label{eq:structured-parameters}
+\end{equation}
+Thus the interleaver will have $b$ regions, each region will contain $L$
+coordinates, and the inner will process each region in $e$ steps.
+
+The encoder has the following dataflow:
+\begin{equation}
+\F_2^{Lk}
+  \xrightarrow{\ O\ }
+(\F_2^b)^L
+  \xrightarrow{\ \Pi_{\mathrm{blk}}\ }
+(\F_2^b)^L
+  \xrightarrow{\ T\ }
+(\F_2^L)^b
+  \xrightarrow{\ \Pi_{\mathrm{reg}}\ }
+(\F_2^L)^b
+  \xrightarrow{\ \mathrm{serialize}\ }
+\F_2^N
+  \xrightarrow{\ I\ }
+\F_2^N.
+\label{eq:structured-dataflow}
+\end{equation}
+The next three subsections define these arrows. The block-diagonal outer $O$
+controls the possible weights produced by each active message block. The
+within-block permutations $\Pi_{\mathrm{blk}}$ erase the coordinate patterns
+of those outputs. The transpose $T$ spreads every outer block across the $b$
+regions, and the region permutations $\Pi_{\mathrm{reg}}$ randomize the
+locations within each region. The recursive inner $I$ then processes the
+serialized regions in $t$-bit steps. In short, the outer supplies a certified
+weight profile, the route supplies a controlled support law, and the inner
+turns that routed support into output weight.
+
+There are two kinds of construction data. The fixed data are the integers
+$(L,b,k,t,s)$, two linear maps
+\[
+  A:\F_2^s\to\F_2^t,
+  \qquad
+  C:\F_2^t\to\F_2^s,
+  \qquad
+  C\circ A=0,
+\]
+a basis identifying $\F_2^s$ with $\F_{2^s}$, and a joint setup law for
+injective constituent maps
+\[
+  G_j:\F_2^k\to\F_2^b
+  \qquad (j\in[L]).
+\]
+This joint law must state whether the positions use one fixed constituent, one
+shared sampled constituent, or independently sampled constituents. The
+distinction changes the expected outer enumerator.
+
+Setup samples the constituent maps from this joint law. Independently, it
+samples one uniform coordinate permutation for every outer block, one uniform
+permutation for every region, and one uniform nonzero field multiplier for
+every inner step. All routing permutations and inner multipliers are mutually
+independent. After setup, every arrow in
+\eqref{eq:structured-dataflow} is fixed. A family selector $\theta_m$ is a
+sequence of these parameter choices and setup laws; we suppress $m$ until the
+scalable instantiation in Section~\ref{sec:structured-scalable}.
+
+\subsection{Block-diagonal outer}
+
+Write a message as $u=(u_1,\ldots,u_L)$ with
+$u_j\in\F_2^k$. The outer encoder is the direct sum
+\begin{equation}
+  O(u)
+  :=
+  \bigl(G_1(u_1),\ldots,G_L(u_L)\bigr)
+  \in(\F_2^b)^L.
+  \label{eq:structured-outer}
+\end{equation}
+Equivalently, a generator matrix for $O$ places the local generator matrices
+on the diagonal. The most basic instantiation repeats one constituent
+$G:\F_2^k\to\F_2^b$ in every position. The scalable construction below builds
+this shared map from a parameterized base constituent and two accumulator
+layers. The current certificate uses an extended Golay base constituent, but
+the construction interface does not fix that choice or its length.
+
+The outer proof interface is its local weight enumerator. For a realized local
+map $G_j$, define
+\begin{equation}
+  P_{G_j}(z)
+  :=
+  \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
+  \label{eq:local-constituent-enumerator}
+\end{equation}
+If one deterministic map $G$ is repeated, the number of messages with exactly
+$q$ active blocks and outer weight $h$ is
+\begin{equation}
+  \binom Lq [z^h]P_G(z)^q.
+  \label{eq:repeated-constituent-enumerator}
+\end{equation}
+For independently sampled, identically distributed local maps, expectation
+replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
+$\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
+quantity is instead
+\begin{equation}
+  \binom Lq\E\bigl[[z^h]P_G(z)^q\bigr].
+  \label{eq:shared-constituent-enumerator}
+\end{equation}
+In particular, an expectation over one sampled constituent must not be moved
+inside the $q$th power.
+
+The distance proof need not know how the local encoder is implemented. It may
+consume an exact enumerator, an expected enumerator under the declared setup,
+or a coefficientwise certified envelope. Minimum distance alone is generally
+insufficient because nearby low-weight shells can have much larger
+multiplicity.
+
+\subsection{Structured interleaver}
+
+Index the outer coordinates by pairs $(j,r)\in[L]\times[b]$, where $j$ is
+the outer-block position. For every $j\in[L]$, setup samples
+$\sigma_j\gets S_b$ and defines
+\[
+  \Pi_{\mathrm{blk}}(j,r):=(j,\sigma_j(r)).
+\]
+The deterministic transpose changes the coordinate view by
+\[
+  T(j,r):=(r,j)\in[b]\times[L].
+\]
+For every region $r\in[b]$, setup samples $\pi_r\gets S_L$ and defines
+\[
+  \Pi_{\mathrm{reg}}(r,j):=(r,\pi_r(j)).
+\]
+The complete interleaver is
+\begin{equation}
+  \Pi
+  :=
+  \Pi_{\mathrm{reg}}\circ T\circ\Pi_{\mathrm{blk}}.
+  \label{eq:structured-interleaver}
+\end{equation}
+We serialize the output of \eqref{eq:structured-interleaver} in region-major
+order. Thus region $r$ occupies the consecutive coordinates
+$(r-1)L+1,\ldots,rL$.
+
+Each outer block contributes exactly one coordinate to each of the $b$
+regions. Conditional on the local output weight, $\sigma_j$ makes its active
+coordinates a uniform subset of the regions. Conditional on every region
+weight, $\pi_r$ makes the support uniform within that region. These two
+symmetries remove the original coordinate pattern while preserving the
+deterministic spreading supplied by the transpose.
+
+\subsection{Structured recursive inner}
+
+The inner processes the serialized interleaver output in $t$-bit steps. Write
+that output as
+\[
+  X=(X_0,\ldots,X_{R-1}),
+  \qquad
+  X_i\in\F_2^t,
+  \qquad
+  R:=N/t=be.
+\]
+The state space $\F_2^s$ uses the fixed basis of $\F_{2^s}$. Fix linear maps
+\[
+  A:\F_2^s\to\F_2^t,
+  \qquad
+  C:\F_2^t\to\F_2^s,
+  \qquad
+  C\circ A=0.
+\]
+Setup samples $\alpha_i\gets\F_{2^s}^{\times}$ independently for
+$0\le i<R$. Starting from $Q_0:=0$, the inner computes
+\begin{equation}
+  Y_i:=X_i+A(Q_i),
+  \qquad
+  Q_{i+1}:=\alpha_iQ_i+C(X_i)
+  \quad(0\le i<R).
+  \label{eq:structured-inner}
+\end{equation}
+It outputs $I(X):=(Y_0,\ldots,Y_{R-1})$ and discards $Q_R$. Field
+multiplication refreshes a nonzero state once per $t$ output coordinates.
+The fixed maps $A$ and $C$ perform the cheaper work inside each step. The
+identity $C\circ A=0$ supports the transfer analysis and the optimized
+transpose; it is not needed for injectivity.
+
+\begin{lemma}[Inner bijectivity]
+\label{lem:structured-inner-bijective}
+For every fixed multiplier schedule and every fixed pair of linear maps
+$A,C$, the map $I:(\F_2^t)^R\to(\F_2^t)^R$ defined in
+\eqref{eq:structured-inner} is bijective.
+\end{lemma}
+
+\begin{proof}
+Fix $Y_0,\ldots,Y_{R-1}$. The initial state is known. At step $i$, recover
+\[
+  X_i=Y_i+A(Q_i),
+\]
+and then compute $Q_{i+1}$ from \eqref{eq:structured-inner}. This procedure
+recovers exactly one input sequence from every output sequence.
+\end{proof}
+
+\subsection{Composition and rate}
+
+\begin{definition}[Structured SPIN]
+\label{def:structured-spin}
+For a selector $\theta_m$ and one realization of its setup, the Structured
+SPIN encoder is
+\begin{equation}
+  E_m
+  :=
+  I_m\circ\Pi_m\circ O_m
+  :\F_2^{K_m}\longrightarrow\F_2^{N_m}.
+  \label{eq:structured-spin-encoder}
+\end{equation}
+\end{definition}
+
+Every realized local map is injective. The outer direct sum is therefore
+injective. The interleaver is a permutation, and
+Lemma~\ref{lem:structured-inner-bijective} makes the inner bijective. Hence
+every realized Structured SPIN encoder is injective and has rate
+\begin{equation}
+  \frac{K_m}{N_m}=\frac{k_m}{b_m}.
+  \label{eq:structured-spin-rate}
+\end{equation}
+The distance analysis can now vary the constituent family without changing
+the routing or inner definitions. It must supply a certified outer spectrum
+or envelope and a conditional failure envelope for the structured route
+classes used in Theorem~\ref{thm:class-first-moment}.
+
+The scalable family below lets the base constituent and $b_m$ vary while
+retaining the fixed RM2Sub step and state dimensions. Finite-length
+instantiations may tune these choices at one target length. Both cases use
+Definition~\ref{def:structured-spin}.
+
+\subsection{Scalable constituent family}
+\label{sec:structured-scalable}
+
+The scalable outer begins with an even base length $a$ and an injective
+rate-one-half map
+\[
+  H_a:\F_2^{a/2}\longrightarrow\F_2^a.
+\]
+Its weight enumerator
+\[
+  W_a(z):=\sum_{v\in\F_2^{a/2}}z^{\wt(H_a(v))}
+\]
+must be known exactly or bounded by a certified envelope. For any multiple
+$b$ of $a$, let $H_{a,b}$ be the direct sum of $b/a$ copies of $H_a$.
+Setup samples two independent permutations $\tau_1,\tau_2\gets S_b$ and
+constructs the rate-one-half BA-3 constituent
+\begin{equation}
+  \mathcal O_{a,b}
+  :=
+  \Acc_b\circ\tau_2\circ
+  \Acc_b\circ\tau_1\circ H_{a,b}.
+  \label{eq:ba3-outer}
+\end{equation}
+It samples $\mathcal O_{a,b}$ once and reuses that realization in every outer
+position. This is the chosen-block form of the BA construction
+\cite{KolesnikovEtAl2026BA,PecenyRindal2026ChosenBlockBAA}.
+
+The base length $a$ is a construction parameter. A distance certificate must
+bind a particular $H_a$, its spectrum, and an admissible schedule for $b$.
+Changing $a$ or $H_a$ changes the outer enumerator and may change the certified
+schedule. It does not change the route or the structured inner.
+
+\paragraph{Current certified choice.}
+For the theorem below, set $a:=24$ and let
+\[
+  H_{24}:\F_2^{12}\longrightarrow\F_2^{24}
+\]
+encode the extended binary Golay code. Fix a positive integer $m$ and set
+$L_m:=128m$. Let $b_m$ be the least positive multiple of $24$ satisfying
+\begin{equation}
+  b_m\ge \frac{39}{4}\log_2(L_mb_m),
+  \qquad
+  N_m:=L_mb_m,
+  \qquad
+  K_m:=N_m/2.
+  \label{eq:structured-native-schedule}
+\end{equation}
+Then $b_m=\frac{39}{4}\log_2N_m+O(1)$, and consecutive direct lengths have relative
+gap $o(1)$.
+
+Use $\mathcal O_{24,b_m}$ from \eqref{eq:ba3-outer}. Setup reuses this sampled
+map in all $L_m$ diagonal positions:
+\[
+  G_{m,1}=\cdots=G_{m,L_m}:=\mathcal O_{24,b_m}.
+\]
+The expectation over $(\tau_1,\tau_2)$ therefore remains outside the
+$q$th enumerator power, as in
+\eqref{eq:shared-constituent-enumerator}.
+
+After sampling this shared constituent, setup follows the generic
+construction. It samples one independent $\sigma_j\gets S_{b_m}$ for every
+outer position and one independent $\pi_r\gets S_{L_m}$ for every region.
+The inner fixes $(t,s)=(128,19)$ and the RM2Sub-S19 maps $A,C$. It samples one
+independent $\alpha_i\gets\F_{2^{19}}^\times$ per inner step. All route
+permutations and multipliers are independent of $(\tau_1,\tau_2)$.
+
+\begin{theorem}[Scalable Structured SPIN]
+\label{thm:structured-spin-scalable}
+For the setup above,
+\begin{equation}
+  \Prob\left[
+    d_{\min}(E_m)\le\lfloor0.11N_m\rfloor
+  \right]
+  =o(1)
+  \qquad(m\to\infty).
+  \label{eq:structured-spin-distance}
+\end{equation}
+The probability includes the two BA permutations, all route permutations,
+and all RM2Sub multipliers. Every realized code has rate $1/2$. Its ordinary
+and transposed encoders use $O(N_m)$ bit operations.
+\end{theorem}
+
+Appendix~\ref{app:structured-scalable-certificate} records the certified
+outer event, the occupation split, and the outward numerical inequalities
+used in Theorem~\ref{thm:structured-spin-scalable}. The block constant $39/4$
+is the current safe certificate value. Tightening it changes
+\eqref{eq:structured-native-schedule}, but not the code architecture.
+
+For any sufficiently large requested output length $n$, let $m(n)$ be the
+largest index satisfying $N_{m(n)}\le n$. Define
+\begin{equation}
+  \widetilde E_n(x)
+  :=
+  E_{m(n)}(x)\Vert 0^{,n-N_{m(n)}}.
+  \label{eq:structured-requested-length-wrapper}
+\end{equation}
+This zero extension preserves injectivity and minimum distance. Consecutive
+direct lengths have relative gap $o(1)$, so
+$N_{m(n)}/n=1-o(1)$. The wrapped family therefore has rate
+$1/2-o(1)$, relative distance greater than $0.11-o(1)$ with high probability,
+and $O(n)$ ordinary and transposed work. The native-length theorem remains
+the primary statement.
+
+\subsection{Finite-length specializations}
+
+At a fixed target length, Definition~\ref{def:structured-spin} permits
+hand-tuned outer and routing parameters. In particular, the base length $a$
+and base constituent $H_a$ need not match the current Golay certificate. The
+current $N=2^{21}$ evaluation target retains RM2Sub-S19, but its outer
+constituent remains under selection. Appendix~\ref{app:structured-finite-member}
+records the open certification and evaluation boundary for this
+specialization.
