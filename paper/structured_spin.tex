@@ -423,6 +423,68 @@ $1/2-o(1)$, relative distance greater than $0.11-o(1)$ with high probability,
 and $O(n)$ ordinary and transposed work. The native-length theorem remains
 the primary statement.
 
+\subsection{Proof roadmap for the scalable theorem}
+
+We now summarize why the structured construction still admits a first-moment
+proof. For $1\le Q\le L$, let $Z_Q$ count messages that activate exactly
+$Q$ outer positions and produce an encoded word of weight at most $0.11N$.
+A code with minimum distance at most $0.11N$ has at least one such message.
+It is therefore enough to identify an outer event $\mathcal G_b$ such that
+$\Prob[\mathcal G_b]=1-o(1)$ and
+\[
+  \sum_{Q=1}^L \E[Z_Q\mid\mathcal G_b]=o(1).
+\]
+The proof follows this plan, but the useful estimate for
+$\E[Z_Q\mid\mathcal G_b]$ changes with the occupation $Q$.
+
+The first step controls the shared outer constituent. The exact expected
+Golay--BA-3 enumerator yields a certified envelope for every output-weight
+shell. With probability $1-o(1)$ over the two BA permutations, the sampled
+constituent has two properties. Every nonzero output has relative weight in
+$[0.104,0.896]$, and every shell multiplicity is at most a polynomial factor
+larger than its certified expectation. We condition on this good event once.
+The same selected constituent may then be reused in all $L$ outer positions.
+
+Next fix the $Q$ active positions and their outer weights. The independent
+within-block permutations make each active support uniform inside its row.
+The transpose sends one coordinate from every row to every region. The
+independent region permutations then erase the remaining location data. Thus
+the route preserves the row weights but removes the coordinate patterns that
+could exploit the structured inner.
+
+When $Q/L$ is bounded away from zero, this routed law is dominated by an iid
+Bernoulli law with the same mean density, up to an $\exp(o(N))$ factor. A
+finite transfer matrix tracks zero, freshly produced nonzero, and randomized
+nonzero RM2Sub states. It bounds the output-weight generating function. The
+outer spectrum exponent, the routing cost, and the transfer bound combine
+into one exponent. The certificate verifies that this exponent is negative
+for every admissible occupation and mean row weight.
+
+That iid comparison is too coarse when $Q/L$ tends to zero: its overhead can
+exceed the smaller decay available on the $Qb$ scale. The proof therefore
+separates the sparse range into three parts. Exact continuum transfers handle
+$Q=1$ and $Q=2$. For each fixed $Q\ge3$, coefficient extraction retains the
+weight of every active row, and a common product-norm bound gives exponential
+decay in $Qb$. When $Q\to\infty$ but $Q/L\le10^{-4}$, a four-state transfer
+distinguishes freshly produced, uniform, and punctured-uniform nonzero states.
+It again gives decay in $Qb$. For $Q/L\ge10^{-4}$, the iid route comparison
+gives a uniform decay on the larger $N$ scale.
+
+The schedule $b=(39/4)\log_2N+O(1)$ is chosen at the final counting step.
+Selecting the $Q$ active positions costs at most $\exp(Q\log L)$, while the
+sparse transfer bounds save $\exp(-\Omega(Qb))$. The chosen constant makes
+the latter exponent strictly larger. The four occupation regimes cover every
+sequence of $Q$ values. Summing their first moments and removing the outer
+good-event conditioning proves the distance claim.
+
+The other parts of Theorem~\ref{thm:structured-spin-scalable} are
+deterministic. Injectivity follows from the injective outer, the interleaver,
+and Lemma~\ref{lem:structured-inner-bijective}. Each constituent application,
+route stage, and RM2Sub step uses linear work in the coordinates it processes.
+The same property holds for their transposes. Appendix
+\ref{app:structured-scalable-certificate} gives the formal bounds and records
+the outward numerical checks.
+
 \subsection{Finite-length specializations}
 
 At a fixed target length, Definition~\ref{def:structured-spin} permits
