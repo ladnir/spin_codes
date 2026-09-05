@@ -1,0 +1,111 @@
+{
+  "schema": "spin-landscape-import-catalog-v1",
+  "scope": "RM2Sub inner only. Random entries refer only to the outer-code ensemble.",
+  "csv_sources": [
+    {
+      "path": "rate_half_family_k_margin_d100_rm2sub_t64_matched.csv",
+      "study": "rm2sub_t64_matched_persistence_family_curve",
+      "occupation": 1,
+      "map_tag": "family-scan-selected"
+    },
+    {
+      "path": "rate_half_family_k_margin_d100_rm2sub_t64_s16.csv",
+      "study": "rm2sub_t64_s16_family_curve",
+      "occupation": 1,
+      "map_tag": "family-scan-selected"
+    },
+    {
+      "path": "rm2sub_epoch_calibration_bch_q1_d100.csv",
+      "study": "rm2sub_epoch_calibration_bch_q1",
+      "occupation": 1,
+      "require_inner": "RM2Sub",
+      "map_tag": "calibration-selected"
+    },
+    {
+      "path": "rm2sub_q2_calibration_bch_k13_d100.csv",
+      "study": "rm2sub_bch_q2_calibration",
+      "occupation": 2,
+      "require_inner": "RM2Sub",
+      "map_tag": "calibration-selected"
+    },
+    {
+      "path": "rm2sub_t64_state_calibration_bch_q1_d100.csv",
+      "study": "rm2sub_t64_state_calibration_bch_q1",
+      "occupation": 1,
+      "require_inner": "RM2Sub",
+      "map_tag": "calibration-selected"
+    },
+    {
+      "path": "rm2sub_t64_s16_bch128_k20_crosscheck.csv",
+      "study": "rm2sub_t64_s16_bch128_k20_crosscheck",
+      "occupation": 1,
+      "require_inner": "RM2Sub",
+      "map_tag": "crosscheck-selected"
+    },
+    {
+      "path": "rm2sub_t64_s9_bch_k13_crosscheck.csv",
+      "study": "rm2sub_t64_s9_bch_k13_q1_crosscheck",
+      "occupation": 1,
+      "require_inner": "RM2Sub",
+      "map_tag": "crosscheck-selected"
+    },
+    {
+      "path": "rm2sub_t64_s9_bch_k13_q2_crosscheck.csv",
+      "study": "rm2sub_t64_s9_bch_k13_q2_crosscheck",
+      "occupation": 2,
+      "require_inner": "RM2Sub",
+      "map_tag": "crosscheck-selected"
+    },
+    {
+      "path": "rm2sub_epoch_geometry_rm49_t64_s14_q1_d100.csv",
+      "study": "rm2sub_rm49_t64_s14_q1_geometry",
+      "occupation": 1,
+      "map_tag": "rm49-certificate-map"
+    },
+    {
+      "path": "rm2sub_epoch_geometry_rm49_t64_s14_q2_d100.csv",
+      "study": "rm2sub_rm49_t64_s14_q2_geometry",
+      "map_tag": "rm49-certificate-map"
+    },
+    {
+      "path": "rm2sub_primary_q1_rm49_t128_s14_d100.csv",
+      "study": "rm2sub_rm49_t128_s14_primary_q1",
+      "occupation": 1,
+      "map_tag": "primary-tranche-selected"
+    }
+  ],
+  "q_ladder_sources": [
+    {
+      "path": "rm2sub_q_ladder_rm49_t64_s14_d100.json",
+      "study": "rm2sub_rm49_t64_s14_q03_q08",
+      "map_tag": "rm49-certificate-map"
+    },
+    {
+      "path": "rm2sub_q_ladder_rm49_t64_s14_q09_q16_d100.json",
+      "study": "rm2sub_rm49_t64_s14_q09_q16",
+      "map_tag": "rm49-certificate-map"
+    },
+    {
+      "path": "rm2sub_q_ladder_rm49_t64_s14_q17_q32_d100.json",
+      "study": "rm2sub_rm49_t64_s14_q17_q32",
+      "map_tag": "rm49-certificate-map"
+    },
+    {
+      "path": "rm2sub_q_ladder_rm49_t128_s13_d100.json",
+      "study": "rm2sub_rm49_t128_s13_q03_q08",
+      "map_tag": "primary-tranche-selected"
+    },
+    {
+      "path": "rm2sub_q_ladder_rm49_t256_s12_d100.json",
+      "study": "rm2sub_rm49_t256_s12_q03_q08",
+      "map_tag": "primary-tranche-selected"
+    }
+  ],
+  "certificate_sources": [
+    {
+      "path": "rm2sub_rm49_t64_s14_full_distance_outward.json",
+      "study": "rm2sub_rm49_t64_s14_full_distance_certificate",
+      "map_tag": "rm49-certificate-map"
+    }
+  ]
+}
