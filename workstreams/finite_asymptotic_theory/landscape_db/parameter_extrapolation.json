@@ -1,0 +1,624 @@
+{
+  "schema": "spin-parameter-extrapolation-v1",
+  "status": "diagnostic empirical extrapolation; not a certificate",
+  "distance_target": 0.1,
+  "source_database": {
+    "path": "spin_landscape.sqlite3",
+    "sha256": "2386af5e595de6e9faf1ad839020657ca6442c3843fcdaa8a1e9c0dad1a08128"
+  },
+  "source_results": [
+    {
+      "result_id": "94319e7e5d5e8681244b401c",
+      "block_bits": 32,
+      "minimum_distance": 8,
+      "message_exponent": 16,
+      "margin_bits": 4.098575865041087
+    },
+    {
+      "result_id": "26fc2efcd4516c16a0551ac4",
+      "block_bits": 32,
+      "minimum_distance": 8,
+      "message_exponent": 17,
+      "margin_bits": 3.8959607059245194
+    },
+    {
+      "result_id": "64ba8328df35b46ab3bdf2f1",
+      "block_bits": 32,
+      "minimum_distance": 8,
+      "message_exponent": 18,
+      "margin_bits": 3.6066495734431405
+    },
+    {
+      "result_id": "6660143c1fdf1530922679b0",
+      "block_bits": 32,
+      "minimum_distance": 8,
+      "message_exponent": 19,
+      "margin_bits": 3.2515011786111727
+    },
+    {
+      "result_id": "672b5dec793a367eedf53831",
+      "block_bits": 32,
+      "minimum_distance": 8,
+      "message_exponent": 20,
+      "margin_bits": 2.846364061588874
+    },
+    {
+      "result_id": "3bfdf31901b3f923d4215a16",
+      "block_bits": 64,
+      "minimum_distance": 12,
+      "message_exponent": 16,
+      "margin_bits": 12.815978330928063
+    },
+    {
+      "result_id": "c847a3fa4c3f5daf12b32b49",
+      "block_bits": 64,
+      "minimum_distance": 12,
+      "message_exponent": 17,
+      "margin_bits": 12.365007688888332
+    },
+    {
+      "result_id": "c65de946940f95b366a47bc3",
+      "block_bits": 64,
+      "minimum_distance": 12,
+      "message_exponent": 18,
+      "margin_bits": 11.736613062096398
+    },
+    {
+      "result_id": "c1b70c1169e753d6065cdca0",
+      "block_bits": 64,
+      "minimum_distance": 12,
+      "message_exponent": 19,
+      "margin_bits": 10.956876554016963
+    },
+    {
+      "result_id": "b149d9ee2bc305eb549828f9",
+      "block_bits": 64,
+      "minimum_distance": 12,
+      "message_exponent": 20,
+      "margin_bits": 10.089313973984618
+    },
+    {
+      "result_id": "d7f92e3b4297969e445c76c2",
+      "block_bits": 128,
+      "minimum_distance": 22,
+      "message_exponent": 16,
+      "margin_bits": 33.96633639389293
+    },
+    {
+      "result_id": "1a0d95faba2f3563bb8f18a2",
+      "block_bits": 128,
+      "minimum_distance": 22,
+      "message_exponent": 17,
+      "margin_bits": 33.94678515286404
+    },
+    {
+      "result_id": "c6100773b64c2987ef09db67",
+      "block_bits": 128,
+      "minimum_distance": 22,
+      "message_exponent": 18,
+      "margin_bits": 33.666101429414006
+    },
+    {
+      "result_id": "a6b9f1c28a58acccc9560027",
+      "block_bits": 128,
+      "minimum_distance": 22,
+      "message_exponent": 19,
+      "margin_bits": 33.082984644743306
+    },
+    {
+      "result_id": "f5b23f1e894779fa291b7c35",
+      "block_bits": 128,
+      "minimum_distance": 22,
+      "message_exponent": 20,
+      "margin_bits": 32.33784925772823
+    }
+  ],
+  "fit": {
+    "formula": "margin = intercept + distance_slope*d + exponent_slope*(log2(k)-20)",
+    "scope": "Q=1 binary64 rows; exact-spectrum BCH B=32,64,128; RM2Sub t=64; p=log2(k)+2; log2(k)=16,...,20",
+    "observation_count": 15,
+    "intercept": -14.753586348497935,
+    "distance_slope": 2.142074168272422,
+    "exponent_slope": -0.4710372587808706,
+    "rmse_bits": 0.3432912183518082,
+    "maximum_absolute_residual_bits": 0.8619896967865088
+  },
+  "cross_validation": {
+    "leave_one_message_exponent_out": {
+      "groups": [
+        16.0,
+        17.0,
+        18.0,
+        19.0,
+        20.0
+      ],
+      "rmse_bits": 0.4167516334838909,
+      "maximum_absolute_error_bits": 1.0720111199749223,
+      "predictions": [
+        {
+          "held_out_group": 16.0,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 4.098575865041087,
+          "predicted_margin_bits": 4.48781757747599,
+          "error_bits": 0.38924171243490324
+        },
+        {
+          "held_out_group": 16.0,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 12.815978330928063,
+          "predicted_margin_bits": 13.068310733270401,
+          "error_bits": 0.2523324023423381
+        },
+        {
+          "held_out_group": 16.0,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 33.96633639389293,
+          "predicted_margin_bits": 34.519543622756416,
+          "error_bits": 0.5532072288634851
+        },
+        {
+          "held_out_group": 17.0,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 3.8959607059245194,
+          "predicted_margin_bits": 3.7686734535436557,
+          "error_bits": -0.1272872523808637
+        },
+        {
+          "held_out_group": 17.0,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 12.365007688888332,
+          "predicted_margin_bits": 12.330308702505878,
+          "error_bits": -0.03469898638245361
+        },
+        {
+          "held_out_group": 17.0,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 33.94678515286404,
+          "predicted_margin_bits": 33.73439682491144,
+          "error_bits": -0.21238832795259555
+        },
+        {
+          "held_out_group": 18.0,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 3.6066495734431405,
+          "predicted_margin_bits": 3.306118335490764,
+          "error_bits": -0.30053123795237635
+        },
+        {
+          "held_out_group": 18.0,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 11.736613062096398,
+          "predicted_margin_bits": 11.86056910117537,
+          "error_bits": 0.12395603907897268
+        },
+        {
+          "held_out_group": 18.0,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 33.666101429414006,
+          "predicted_margin_bits": 33.24669601538688,
+          "error_bits": -0.41940541402712483
+        },
+        {
+          "held_out_group": 19.0,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 3.2515011786111727,
+          "predicted_margin_bits": 2.8362004381843766,
+          "error_bits": -0.4153007404267961
+        },
+        {
+          "held_out_group": 19.0,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 10.956876554016963,
+          "predicted_margin_bits": 11.40002207783259,
+          "error_bits": 0.4431455238156268
+        },
+        {
+          "held_out_group": 19.0,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 33.082984644743306,
+          "predicted_margin_bits": 32.809576176953115,
+          "error_bits": -0.27340846779019046
+        },
+        {
+          "held_out_group": 20.0,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 2.846364061588874,
+          "predicted_margin_bits": 2.580242538600533,
+          "error_bits": -0.2661215229883407
+        },
+        {
+          "held_out_group": 20.0,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 10.089313973984618,
+          "predicted_margin_bits": 11.16132509395954,
+          "error_bits": 1.0720111199749223
+        },
+        {
+          "held_out_group": 20.0,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 32.33784925772823,
+          "predicted_margin_bits": 32.61403148235706,
+          "error_bits": 0.27618222462883324
+        }
+      ]
+    },
+    "leave_one_block_size_out": {
+      "groups": [
+        32,
+        64,
+        128
+      ],
+      "rmse_bits": 1.136968055409393,
+      "maximum_absolute_error_bits": 1.9409743947783582,
+      "predictions": [
+        {
+          "held_out_group": 32,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 4.098575865041087,
+          "predicted_margin_bits": 3.968080003405455,
+          "error_bits": -0.13049586163563198
+        },
+        {
+          "held_out_group": 32,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 3.8959607059245194,
+          "predicted_margin_bits": 3.4189682719450385,
+          "error_bits": -0.4769924339794809
+        },
+        {
+          "held_out_group": 32,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 3.6066495734431405,
+          "predicted_margin_bits": 2.8698565404846215,
+          "error_bits": -0.7367930329585191
+        },
+        {
+          "held_out_group": 32,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 3.2515011786111727,
+          "predicted_margin_bits": 2.3207448090242044,
+          "error_bits": -0.9307563695869683
+        },
+        {
+          "held_out_group": 32,
+          "block_bits": 32,
+          "minimum_distance": 8.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 2.846364061588874,
+          "predicted_margin_bits": 1.7716330775637879,
+          "error_bits": -1.074730984025086
+        },
+        {
+          "held_out_group": 64,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 12.815978330928063,
+          "predicted_margin_bits": 12.798262096619046,
+          "error_bits": -0.0177162343090167
+        },
+        {
+          "held_out_group": 64,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 12.365007688888332,
+          "predicted_margin_bits": 12.43477920088565,
+          "error_bits": 0.06977151199731857
+        },
+        {
+          "held_out_group": 64,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 11.736613062096398,
+          "predicted_margin_bits": 12.071296305152256,
+          "error_bits": 0.33468324305585817
+        },
+        {
+          "held_out_group": 64,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 10.956876554016963,
+          "predicted_margin_bits": 11.70781340941886,
+          "error_bits": 0.7509368554018963
+        },
+        {
+          "held_out_group": 64,
+          "block_bits": 64,
+          "minimum_distance": 12.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 10.089313973984618,
+          "predicted_margin_bits": 11.344330513685465,
+          "error_bits": 1.255016539700847
+        },
+        {
+          "held_out_group": 128,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 16.0,
+          "observed_margin_bits": 33.96633639389293,
+          "predicted_margin_bits": 32.72616133293325,
+          "error_bits": -1.2401750609596789
+        },
+        {
+          "held_out_group": 128,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 17.0,
+          "observed_margin_bits": 33.94678515286404,
+          "predicted_margin_bits": 32.225644183784446,
+          "error_bits": -1.7211409690795918
+        },
+        {
+          "held_out_group": 128,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 18.0,
+          "observed_margin_bits": 33.666101429414006,
+          "predicted_margin_bits": 31.725127034635648,
+          "error_bits": -1.9409743947783582
+        },
+        {
+          "held_out_group": 128,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 19.0,
+          "observed_margin_bits": 33.082984644743306,
+          "predicted_margin_bits": 31.224609885486846,
+          "error_bits": -1.85837475925646
+        },
+        {
+          "held_out_group": 128,
+          "block_bits": 128,
+          "minimum_distance": 22.0,
+          "message_exponent": 20.0,
+          "observed_margin_bits": 32.33784925772823,
+          "predicted_margin_bits": 30.724092736338044,
+          "error_bits": -1.6137565213901865
+        }
+      ]
+    }
+  },
+  "bch_distance_model": {
+    "formula": "d(B) = coefficient*B/log2(B)",
+    "coefficient": 1.187945030998711,
+    "points": [
+      {
+        "block_bits": 32,
+        "minimum_distance": 8,
+        "normalized_distance_constant": 1.25
+      },
+      {
+        "block_bits": 64,
+        "minimum_distance": 12,
+        "normalized_distance_constant": 1.125
+      },
+      {
+        "block_bits": 128,
+        "minimum_distance": 22,
+        "normalized_distance_constant": 1.203125
+      },
+      {
+        "block_bits": 256,
+        "minimum_distance": 38,
+        "normalized_distance_constant": 1.1875
+      }
+    ],
+    "caveat": "The B=256 point is the deterministic BCH-derived [256,128,>=38] subcode, not a pure BCH constituent; the model uses only its known distance, not its spectrum."
+  },
+  "forty_bit_q1_projections": [
+    {
+      "message_exponent": 16,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 24.681422378578766,
+      "projected_continuous_block_bits": 150.23746864102066,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 20,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 25.561013320400843,
+      "projected_continuous_block_bits": 156.94808964152048,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 24,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 26.440604262222923,
+      "projected_continuous_block_bits": 163.70175579024132,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 28,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 27.320195204045,
+      "projected_continuous_block_bits": 170.49700493415563,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 32,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 28.199786145867076,
+      "projected_continuous_block_bits": 177.33246996343723,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 36,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 29.079377087689153,
+      "projected_continuous_block_bits": 184.20686988777842,
+      "next_power_of_two_block_bits": 256
+    },
+    {
+      "message_exponent": 40,
+      "target_margin_bits": 40.0,
+      "projected_required_minimum_distance": 29.95896802951123,
+      "projected_continuous_block_bits": 191.119001991219,
+      "next_power_of_two_block_bits": 256
+    }
+  ],
+  "rm2sub_staircases": {
+    "aggressive_offset_2": [
+      {
+        "message_exponent": 16,
+        "persistence_offset": 2,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 12,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 20,
+        "persistence_offset": 2,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 16,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 24,
+        "persistence_offset": 2,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 20,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 28,
+        "persistence_offset": 2,
+        "step_exponent": 7,
+        "step_bits": 128,
+        "state_bits": 23,
+        "rm2_capacity": 29
+      },
+      {
+        "message_exponent": 32,
+        "persistence_offset": 2,
+        "step_exponent": 7,
+        "step_bits": 128,
+        "state_bits": 27,
+        "rm2_capacity": 29
+      },
+      {
+        "message_exponent": 36,
+        "persistence_offset": 2,
+        "step_exponent": 8,
+        "step_bits": 256,
+        "state_bits": 30,
+        "rm2_capacity": 37
+      },
+      {
+        "message_exponent": 40,
+        "persistence_offset": 2,
+        "step_exponent": 8,
+        "step_bits": 256,
+        "state_bits": 34,
+        "rm2_capacity": 37
+      }
+    ],
+    "certificate_anchored_offset_4": [
+      {
+        "message_exponent": 16,
+        "persistence_offset": 4,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 14,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 20,
+        "persistence_offset": 4,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 18,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 24,
+        "persistence_offset": 4,
+        "step_exponent": 6,
+        "step_bits": 64,
+        "state_bits": 22,
+        "rm2_capacity": 22
+      },
+      {
+        "message_exponent": 28,
+        "persistence_offset": 4,
+        "step_exponent": 7,
+        "step_bits": 128,
+        "state_bits": 25,
+        "rm2_capacity": 29
+      },
+      {
+        "message_exponent": 32,
+        "persistence_offset": 4,
+        "step_exponent": 7,
+        "step_bits": 128,
+        "state_bits": 29,
+        "rm2_capacity": 29
+      },
+      {
+        "message_exponent": 36,
+        "persistence_offset": 4,
+        "step_exponent": 8,
+        "step_bits": 256,
+        "state_bits": 32,
+        "rm2_capacity": 37
+      },
+      {
+        "message_exponent": 40,
+        "persistence_offset": 4,
+        "step_exponent": 8,
+        "step_bits": 256,
+        "state_bits": 36,
+        "rm2_capacity": 37
+      }
+    ]
+  },
+  "limitations": [
+    "The regression extrapolates occupation-one diagnostics only.",
+    "The fit does not use a BCH [256,128] spectrum or RM2Sub transfer receipt.",
+    "The BCH distance law is a size heuristic and is not a spectrum theorem.",
+    "Full-distance selection still requires every occupation and outward rounding."
+  ]
+}

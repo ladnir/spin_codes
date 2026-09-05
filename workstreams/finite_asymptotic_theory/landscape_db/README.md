@@ -38,6 +38,17 @@ Export the joined `landscape` view with:
 python query_landscape.py export landscape_export.csv
 ```
 
+Regenerate the diagnostic parameter extrapolation with:
+
+```text
+python extrapolate_parameters.py
+```
+
+The output `parameter_extrapolation.json` fits only the exact-spectrum BCH
+occupation-one rows under the matched-persistence RM2Sub schedule. It also
+constructs RM2Sub capacity staircases. The output is an experiment-planning
+artifact, not a distance certificate.
+
 The checked-in `spin_landscape.sqlite3` and `landscape_export.csv` are
 reproducible convenience artifacts. Rebuild them after changing `catalog.json`
 or any imported source.
@@ -52,6 +63,7 @@ Run the tests with:
 
 ```text
 python -m unittest -v test_landscape_db.py
+python -m unittest -v test_extrapolate_parameters.py
 ```
 
 ## Current coverage

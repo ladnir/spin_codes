@@ -29,6 +29,156 @@ satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)
 The requested-length wrapper gives rate $1/2-o(1)$, relative distance
 $0.11-o(1)$, and linear work.
 
+\subsection{Finite parameter extrapolation}
+\label{sec:finite-parameter-extrapolation}
+
+The asymptotic schedules do not identify the fastest finite member.  We use
+finite calculations to order candidates before running a complete
+certificate.  The present comparison targets relative distance $0.10$; a
+larger distance is treated as additional slack.
+
+Fix a rate-one-half outer constituent
+$C:\F_2^{B/2}\rightarrow\F_2^B$.  The outer encoder repeats this same map in
+every row.  For message length $k$, output length $N=2k$, and
+$d=\lfloor0.10N\rfloor$, let
+\begin{equation}
+  \widehat U(C,k,t,s;d)
+  :=
+  \sum_{\tau\in\mathcal T}
+  \widehat A^{\mathrm{out}}_\tau
+  \widehat Q_\tau(d)
+  \label{eq:finite-parameter-first-moment}
+\end{equation}
+be the computed class-indexed first-moment envelope from
+\eqref{eq:finite-certificate}.  Define its margin by
+\begin{equation}
+  \widehat\Lambda(C,k,t,s;d)
+  :=-\log_2\widehat U(C,k,t,s;d).
+  \label{eq:finite-parameter-margin}
+\end{equation}
+The setup samples the row permutations, region permutations, and independent
+nonzero RM2Sub multipliers.  The constituent $C$ remains fixed.  If a
+construction samples $C$, the final failure bound must also include the
+probability that its certified spectrum event fails.
+
+Equation~\eqref{eq:finite-parameter-margin} has two distinct uses.  Outward
+arithmetic and complete occupation coverage make it a certified failure
+margin.  Binary64 arithmetic or incomplete occupation coverage makes it only
+a diagnostic margin.  An estimated outer spectrum produces an estimated
+margin.  A random outer spectrum is a reference ensemble and does not describe
+the repeated fixed constituent.
+
+The current RM2Sub landscape gives the following occupation-one diagnostics.
+All rows use exact BCH spectra, $t=64$, distance $0.10$, and the matched
+persistence rule $s+\log_2t=\log_2k+2$.
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+constituent & $B$ & $d(C)$ & margin at $k=2^{20}$ \\
+\midrule
+extended BCH $[32,16,8]$ & 32 & 8 & 2.846 \\
+shortened XBCH $[64,32,12]$ & 64 & 12 & 10.089 \\
+extended BCH $[128,64,22]$ & 128 & 22 & 32.338 \\
+\bottomrule
+\end{tabular}
+\end{center}
+These values measure one active outer row.  They do not certify the complete
+code.  As a separate anchor, the outward RM$(4,9)$ calculation at
+$k=2^{16}$, $(t,s)=(64,14)$, and the same distance target has a complete
+margin of $42.578$ bits.
+
+For experiment planning, we fitted the 15 BCH rows with
+$B\in\{32,64,128\}$ and $16\le e:=\log_2k\le20$ to
+\begin{equation}
+  \widehat\Lambda_1
+  =-14.754+2.142d(C)-0.471(e-20).
+  \label{eq:bch-diagnostic-fit}
+\end{equation}
+The root-mean-square residual is $0.343$ bits, and the largest absolute
+residual is $0.862$ bits.  Leaving out one message exponent at a time raises
+the root-mean-square error to $0.417$ bits.  Leaving out one block size at a
+time raises it to $1.137$ bits, with maximum error $1.941$ bits.  These checks
+support interpolation within the measured slice.  The fit is not a spectrum
+theorem and should not receive a confidence level.
+
+The observed distances in the BCH-derived rate-one-half ladder at lengths
+$32,64,128,256$ are respectively $8,12,22,38$.  The last point is the
+deterministic $[256,128,\ge38]$ subcode, not a pure BCH constituent.  The size
+heuristic
+\begin{equation}
+  d_{\mathrm{BCH\text{-}derived}}(B)
+  \approx1.188\frac{B}{\log_2B}
+  \label{eq:bch-distance-size-heuristic}
+\end{equation}
+fits these four values.  Combining
+\eqref{eq:bch-diagnostic-fit} and
+\eqref{eq:bch-distance-size-heuristic} projects a 40-bit occupation-one
+threshold near $B=157$ at $k=2^{20}$.  The next power-of-two candidate is
+therefore $B=256$.  This projection orders the next experiment; it does not
+assert that the BCH-derived $[256,128,\ge38]$ subcode has a 40-bit RM2Sub
+certificate.  That assertion requires its certified spectrum input and every
+occupation.
+
+The inner schedule uses the persistence coordinate
+\begin{equation}
+  p:=s+\log_2t.
+\end{equation}
+The diagnostic curves remain roughly level when $p=\log_2k+2$.  The complete
+RM$(4,9)$ certificate instead anchors the more conservative offset
+$p=\log_2k+4$.  Write $t=2^m$.  The selected map $A$ is an $s$-dimensional
+subcode of RM$(2,m)$, so it requires
+\begin{equation}
+  s\le1+m+\binom m2.
+  \label{eq:rm2sub-capacity}
+\end{equation}
+At fixed persistence, the tested shorter epochs gave stronger margins.
+Accordingly, the initial certified-track staircase takes the smallest
+$m\ge6$ that satisfies~\eqref{eq:rm2sub-capacity}.  It gives:
+\begin{center}
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$\log_2k$ & 16 & 20 & 24 & 28 & 32 & 36 \\
+\midrule
+$t$ & 64 & 64 & 64 & 128 & 128 & 256 \\
+$s$ & 14 & 18 & 22 & 25 & 29 & 32 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The table is an admissible search schedule, not a transfer theorem.  Each new
+$(t,s)$ pair needs audited maps, exact map spectra, and a complete finite
+calculation.  The offset-two staircase is the corresponding performance
+candidate and should be tested in the same parameter scan.
+
+Missing BCH spectra can enter through exact coefficients, certified shell
+caps, or an explicitly labeled estimate.  For a fixed $w\le r$, one unbiased
+estimator samples a uniform $r$-subset $S\subseteq[B]$ and enumerates the
+shortened code
+\[
+  C_S:=\{c\in C:\supp(c)\subseteq S\}.
+\]
+If $X_w(S)$ counts its weight-$w$ words, then
+\begin{equation}
+  \E_S[X_w(S)]
+  =A_w(C)\frac{\binom rw}{\binom Bw},
+  \qquad
+  \widehat A_w
+  :=\overline X_w\frac{\binom Bw}{\binom rw}
+  \label{eq:shortening-spectrum-estimator}
+\end{equation}
+is unbiased.  The expectation is over independent uniform $r$-subsets.
+Before this estimate guides parameters, it must reproduce the exact BCH
+$[128,64,22]$ SPIN functional on held-out samples.  It must also agree across
+several shortening sizes and random seeds.  Without a concentration bound,
+the resulting row remains estimated rather than certified.
+
+The finite selector therefore proceeds in two stages.  It first uses
+\eqref{eq:bch-diagnostic-fit}, the RM2Sub staircase, and spectrum estimates to
+rank admissible tuples.  It then computes every occupation with outward
+arithmetic and benchmarks only the surviving implementations.  For requested
+margin $\lambda_{\mathrm{target}}$, the selector accepts a tuple only when the
+complete setup bound is at most $2^{-\lambda_{\mathrm{target}}}$.  The
+extrapolation never substitutes for this final test.
+
 \subsection{Random-family encoding costs}
 
 Under either proved schedule, the outer encoder processes \(N/B\) blocks of
