@@ -1,0 +1,41 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s16",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-SplitState-PreAddMul-RM2Sub t=128 s=16",
+  "status": "FIXED_INNER_REGULAR_PROOF_CLOSED",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_t128_s32",
+  "modification": "reduce the state from 32 to 16 bits and replace A,B with the recorded self-orthogonal RM(2,7) subcode pair",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_bits": 256,
+    "step_bits": 128,
+    "state_bits": 16,
+    "fixed_A_minimum_distance": 48,
+    "fixed_B_kernel_minimum_distance": 4,
+    "fixed_B_weight_four_kernel_words": 64,
+    "relative_distance_target": 0.09,
+    "target_distance": 188743
+  },
+  "regular_results": {
+    "one_active_margin_bits_float": 80.16854709,
+    "occupations_2_through_8192_aggregate_margin_bits_float": 125.520043,
+    "combined_margin_bits_float": 80.16854709
+  },
+  "performance_status": {
+    "field_state_width_reduction_from_parent": 0.5,
+    "epoch_scalar_random_bits": 16,
+    "wall_clock_implementation": "open",
+    "logical_xor_proxy": "requires a circuit for the selected RM(2,7) subcode and its transpose"
+  },
+  "proof_status": {
+    "fixed_A_profile": "closed by complete 2^16-word enumeration; distance 48 and exact coordinate profile",
+    "fixed_B_activation_profile": "closed by exact MacWilliams transform; kernel distance 4",
+    "regular_occupations": "closed in nearest-binary64 arithmetic",
+    "explicit_outer_spectrum": "open",
+    "mixed_all_one_tail": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "claim_scope": "Fixed-inner regular theorem. The result remains conditional on the modeled outer spectrum and nearest-binary64 rounding."
+}

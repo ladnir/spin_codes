@@ -1,0 +1,432 @@
+\section{Finite fields and field-size scaling}
+\label{sec:prime-fields}
+
+Over $\F_2$, a nonzero message is determined by its support.  Over
+$\F_p$, two messages with the same support can cancel differently.  An
+addition-only expander therefore has no support-only output law.  We restore
+that symmetry by assigning an independent label from $\F_p^*$ to every edge.
+
+Fix a prime power $p$, choose the field $\F_p$, and write $s:=p-1$.
+Multiplying a fixed nonzero message value
+by a uniform edge label gives a uniform element of $\F_p^*$.  Thus random
+labels erase the message values while preserving its support.
+
+The analysis has two scales.  The asymptotic theorem below fixes $p$ while
+the code length grows.  The finite certificates in
+Section~\ref{sec:certificates} instead fix a cryptographic-size length and
+fields whose orders are near $2^{128}$.  In that finite regime, the proof must
+control the projective message count rather than absorb it into an
+asymptotic exponent.
+
+\subsection{Labeled Bernoulli incidence}
+
+In the labeled Bernoulli ensemble, an entry is zero with probability
+$1-\rho$ and equals each element of $\F_p^*$ with probability $\rho/s$.
+
+\begin{lemma}[Labeled Bernoulli output law]
+\label{lem:p-bernoulli-law}
+Fix $\x\in\F_p^k$ with support size $r$.  The coordinates of $\x\B$ are
+independent.  Each coordinate is nonzero with probability
+\begin{equation}
+ a^{(p)}_r:=\frac{s}{p}
+ \left(1-\left(1-\frac{p\rho}{s}\right)^r\right).
+ \label{eq:p-activation}
+\end{equation}
+Conditional on being nonzero, its value is uniform in $\F_p^*$.
+\end{lemma}
+
+\begin{proof}
+Let $\chi$ be a nonconstant additive character of $\F_p$, that is, a
+complex-valued function satisfying $\chi(x+y)=\chi(x)\chi(y)$.  One active row
+contribution $Z$ satisfies
+\[
+ \E[\chi(Z)]
+ =1-\rho+\frac{\rho}{s}\sum_{a\in\F_p^*}\chi(a)
+ =1-\frac{p\rho}{s}.
+\]
+The $r$ active rows are independent.  Fourier inversion over the additive
+group of $\F_p$ gives \eqref{eq:p-activation} and equal mass at every
+nonzero value.  Different columns use independent samples.
+\end{proof}
+
+\subsection{Finite-field EA}
+
+Suppose an accumulator input is zero with probability $1-a$ and is otherwise
+uniform in $\F_p^*$.  Group the accumulator states into zero and nonzero.
+These two classes have the exact transfer matrix
+\begin{equation}
+ \mathbf T^{(p)}_a(Y):=
+ \begin{pmatrix}
+  1-a&aY\\
+  a/s&(1-a/s)Y
+ \end{pmatrix}.
+ \label{eq:p-ea-transfer}
+\end{equation}
+From a nonzero state, exactly one of the $s$ possible nonzero increments
+returns to zero.  Hence this two-state reduction is exact.
+
+All nonzero scalar multiples of one message produce codewords with the same
+support.  A \emph{projective message line} is a one-dimensional subspace of
+$\F_p^k$.  The number of such lines with support size $r$ is
+\begin{equation}
+ N_{p,k,r}:=\binom{k}{r}s^{r-1}.
+ \label{eq:projective-count}
+\end{equation}
+
+\begin{theorem}[Labeled Bernoulli EA first moment]
+\label{thm:p-ea-first-moment}
+Sample a labeled Bernoulli expander $\B$ and set $\G:=\B\A$.  Then
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\G)]\leq
+ \sum_{r=1}^{k}N_{p,k,r}
+ \sum_{h=0}^{L}[Y^h]\,
+ \e_0^{\mathsf T}
+ \mathbf T^{(p)}_{a^{(p)}_r}(Y)^n\one.
+ \label{eq:p-ea-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:p-bernoulli-law} gives the exact two-class input law for every
+projective line with support size $r$.  Matrix
+\eqref{eq:p-ea-transfer} gives its output-weight generating function.  Sum
+over projective lines and apply the first-moment bound.  Counting one
+representative per line is sufficient because scalar multiplication does not
+change output support.
+\end{proof}
+
+For $a\in[0,s/p]$ and $z\in(0,1]$, define
+\begin{align}
+ \lambda_p(a,z)
+ &:=\frac12\left(1-a+(1-a/s)z
+ +\sqrt{(1-a-(1-a/s)z)^2+4a^2z/s}\right),
+ \label{eq:p-ea-spectral-radius}\\
+ J^{(p)}_\delta(a)
+ &:=\sup_{0<z\leq1}
+ \{\delta\ln z-\ln\lambda_p(a,z)\},
+ \label{eq:p-ea-rate-function}\\
+ I_{p,\delta}
+ &:=\left(\sqrt{1-\delta}
+ -\sqrt{\frac{\delta}{p-1}}\right)^2.
+ \label{eq:p-ea-sparse-rate}
+\end{align}
+
+\begin{lemma}[Finite-field accumulator endpoints]
+\label{lem:p-ea-endpoints}
+For $0<\delta<s/p$,
+\begin{align}
+ \Pr[H\leq\lfloor\delta n\rfloor]
+ &\leq\sqrt p\exp(-nJ^{(p)}_\delta(a)),
+ \label{eq:p-ea-tail}\\
+ \liminf_{a\downarrow0}\frac{J^{(p)}_\delta(a)}a
+ &\geq I_{p,\delta},
+ \label{eq:p-ea-sparse-endpoint}\\
+ J^{(p)}_\delta(s/p)&=\ln p-h_p(\delta).
+ \label{eq:p-ea-dense-endpoint}
+\end{align}
+Here $H$ is the output weight for independent inputs that are nonzero with
+probability $a$ and uniform conditional on being nonzero.
+\end{lemma}
+
+\begin{proof}
+Conjugating \eqref{eq:p-ea-transfer} by
+$\diag(1,\sqrt{sz})$ gives a symmetric positive semidefinite matrix with
+largest eigenvalue $\lambda_p(a,z)$.  The same positive-marker argument as in
+Lemma~\ref{lem:ea-lower-tail} gives \eqref{eq:p-ea-tail}.
+
+For the sparse endpoint, set $z=e^{-\theta a}$ and expand at $a=0$.
+Optimizing the coefficient of $a$ gives
+$(\sqrt{1-\delta}-\sqrt{\delta/s})^2$.  At $a=s/p$, the input and accumulator
+state are uniform in $\F_p$, and
+$\lambda_p(s/p,z)=(1+sz)/p$.  The optimizer
+$z=\delta/(s(1-\delta))$ gives \eqref{eq:p-ea-dense-endpoint}.
+\end{proof}
+
+\begin{theorem}[Fixed-field EA distance]
+\label{thm:p-ea-distance}
+Fix a prime power $p$ and the field $\F_p$.  Let $k/n\to R\in(0,1)$ and sample a labeled Bernoulli
+expander of density $\rho_n=C\ln(n)/n$.  If
+$0<\delta<(p-1)/p$ and
+\begin{align}
+ C I_{p,\delta}&>1,
+ \label{eq:p-ea-sparse-condition}\\
+ h_p(\delta)&<(1-R)\ln p,
+ \label{eq:p-ea-gv-condition}
+\end{align}
+then
+\begin{equation}
+ \Pr_{\B}[d_{\min}(\B\A)\leq\lfloor\delta n\rfloor]=o(1).
+ \label{eq:p-ea-distance-conclusion}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Use the three support ranges from Theorem~\ref{thm:ea-distance}.  For sparse
+supports, $a^{(p)}_r=r\rho_n(1-o(1))$, while
+$N_{p,k,r}\leq(sk)^r$.  Equations \eqref{eq:p-ea-sparse-endpoint} and
+\eqref{eq:p-ea-sparse-condition} make their sum vanish.  For intermediate
+supports, the rate function is uniformly positive and dominates their small
+counting exponent.  For $r>\eta n$, one has
+$a^{(p)}_r=s/p-o(1)$ uniformly.  There are at most $p^k/s$ projective lines,
+so their total exponent is
+\[
+ R\ln p+h_p(\delta)-\ln p+o(1),
+\]
+which is negative by \eqref{eq:p-ea-gv-condition}.
+\end{proof}
+
+The phrase ``fix a field'' is essential.  If $p$ grows with $n$, the factor
+$s^{r-1}$ in \eqref{eq:projective-count} changes the sparse counting exponent.
+Theorem~\ref{thm:p-ea-distance} therefore does not justify a cryptographic-size
+field at finite length.  The next bounds group projective messages more
+carefully.
+
+\subsection{Constraint traces for the projective union}
+
+For a fixed support $S$, the elementary union bound multiplies a per-line
+failure probability by $s^{|S|-1}$.  That multiplier can exceed one long
+before the underlying event becomes likely.  The first correction is to cap
+the union for each support:
+\begin{equation}
+ \Pr[\Bad_L(\B\A)]
+ \leq\sum_{r=1}^{k}\binom{k}{r}
+ \min\{1,s^{r-1}\tau_r(L)\},
+ \label{eq:support-grouping}
+\end{equation}
+where $\tau_r(L)$ is the bad-output probability of one projective line.
+Here RAA denotes repeat--accumulate--accumulate codes.  This support grouping
+is related to recent large-field RAA
+analyses~\cite{AkhianiZhang2026,Khabbazian2026}.
+
+A sharper bound counts the independent field equations imposed by one output
+trace.  Call an intermediate coordinate \emph{occupied} when at least one
+edge from the message support reaches it.  In the Bernoulli ensemble, an
+occupied indicator has probability
+\begin{equation}
+ u_r:=1-(1-\rho)^r.
+\end{equation}
+Let $z$ mark a nonzero accumulator output and let $v$ mark an occupied
+coordinate whose new accumulator state is zero.  Define
+\begin{equation}
+ \mathbf K_u(z,v):=
+ \begin{pmatrix}1-u+uv&uz\\uv&z\end{pmatrix}.
+ \label{eq:p-ea-trace-matrix}
+\end{equation}
+
+\begin{theorem}[Bernoulli constraint-trace bound]
+\label{thm:p-ea-trace}
+For the labeled Bernoulli EA ensemble,
+\begin{equation}
+ \Pr[\Bad_L(\B\A)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}
+ \sum_{h=0}^{L}\sum_{a=0}^{n}
+ [z^hv^a]\,
+ \e_0^{\mathsf T}\mathbf K_{u_r}(z,v)^n\one
+ \min\{1,s^{r-1-a}\}.
+ \label{eq:p-ea-trace-bound}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Fix a message support $S$ of size $r$, the occupied coordinates, and one
+zero--nonzero accumulator trace.  Suppose $a$ occupied coordinates end in
+state zero.  Each such event gives one prefix equation in the active edge
+labels.  Subtracting consecutive equations isolates a nonempty set of fresh
+labels, so the $a$ equations have rank $a$.  One projective line satisfies
+them with probability at most $s^{-a}$.  Union-bound the $s^{r-1}$ lines on
+$S$, cap the result at one, and average the traces with
+\eqref{eq:p-ea-trace-matrix}.
+\end{proof}
+
+The factor $\min\{1,s^{r-1-a}\}$ is the key cancellation.  A trace with more
+independent equations than projective message degrees of freedom gains a
+field factor for every surplus equation.  A trace with too few equations is
+charged at most one, not the full projective count.
+
+\subsection{Two-sided regular trace for EA}
+
+For the two-sided regular ensemble, each right coordinate has $d_R$ incident
+slots.  A support of size $r$ maps to a uniform $r$-subset of the
+$k=d_R\ell$ regional slots.  Define
+\begin{equation}
+ \mathbf Q_0(z):=\begin{pmatrix}1&0\\0&z\end{pmatrix},
+ \qquad
+ \mathbf Q_1(z,v):=\begin{pmatrix}v&z\\v&z\end{pmatrix},
+ \label{eq:p-ea-regular-trace-inputs}
+\end{equation}
+and
+\begin{equation}
+ \mathbf R^{\EA}_{\ell,d_R,r}(z,v):=
+ \binom{k}{r}^{-1}[X^r]
+ \left(\mathbf Q_0(z)+
+ ((1+X)^{d_R}-1)\mathbf Q_1(z,v)\right)^\ell.
+ \label{eq:p-ea-biregular-region}
+\end{equation}
+
+\begin{theorem}[Two-sided regular EA trace]
+\label{thm:p-ea-biregular-trace}
+For the labeled two-sided regular EA ensemble,
+\begin{equation}
+ \Pr[\Bad_L(\B\A)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}
+ \sum_{h=0}^{L}\sum_{a=0}^{n}[z^hv^a]\,
+ \e_0^{\mathsf T}
+ \mathbf R^{\EA}_{\ell,d_R,r}(z,v)^{d_L}\one
+ \min\{1,s^{r-1-a}\}.
+ \label{eq:p-ea-biregular-trace}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+In one region, $(1+X)^{d_R}-1$ counts a nonempty set of active slots at one
+right coordinate.  Coefficient extraction conditions the regional slots to
+contain exactly the $r$ supported left vertices.  Matrix multiplication
+preserves the accumulator state across regions.  The rank argument from
+Theorem~\ref{thm:p-ea-trace} supplies the projective factor.
+\end{proof}
+
+\subsection{Finite-field EC}
+
+We now combine labeled two-sided regular incidence with the convolution in
+\eqref{eq:prime-convolution}.  The full-field feedback distribution preserves
+a reduced state with $m+1$ classes.  State $j<m$ records exactly $j$ trailing
+zero outputs.  State $m$ means that the entire feedback state is zero.
+
+The next transfer counts upper bounds rather than exact transition
+probabilities.  Let $z$ mark a nonzero output.  Let $v$ mark a zero event that
+imposes one equation in fresh randomness.  For $b\in\{0,1\}$, where $b$
+records whether the expander coordinate is occupied, define matrices
+$\mathbf P_b(z,v)$ by
+\begin{align}
+ (\mathbf P_b)_{j,0}&=z,&
+ (\mathbf P_b)_{j,j+1}&=v
+ &&(0\leq j<m),
+ \label{eq:p-ec-active-trace}\\
+ (\mathbf P_0)_{m,m}&=1,&
+ (\mathbf P_1)_{m,0}&=z,&
+ (\mathbf P_1)_{m,m}&=v.
+ \label{eq:p-ec-zero-trace}
+\end{align}
+
+If the convolution state is nonzero, a zero output fixes one affine equation
+in the fresh vector $\boldsymbol\alpha_t$.  Its probability is $1/p\leq1/s$.
+If the state is zero and the coordinate is occupied, a zero expander symbol
+fixes one equation in labels used only at that coordinate.  Its probability
+is at most $1/s$.  All other transition probabilities are bounded by one.
+
+Define the regional matrix
+\begin{equation}
+ \mathbf R^{\EC}_{\ell,d_R,r}(z,v):=
+ \binom{k}{r}^{-1}[X^r]
+ \left(\mathbf P_0(z,v)+
+ ((1+X)^{d_R}-1)\mathbf P_1(z,v)\right)^\ell.
+ \label{eq:p-ec-biregular-region}
+\end{equation}
+
+\begin{theorem}[Two-sided regular finite-field EC trace]
+\label{thm:p-ec-trace}
+Independently sample a labeled two-sided regular expander $\B$ and the
+finite-field convolution $\C$ from \eqref{eq:prime-convolution}.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}
+ \sum_{h=0}^{L}\sum_{a=0}^{n}[z^hv^a]\,
+ \e_m^{\mathsf T}
+ \mathbf R^{\EC}_{\ell,d_R,r}(z,v)^{d_L}\one
+ \min\{1,s^{r-1-a}\}.
+ \label{eq:p-ec-trace}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Fix a support, one projective message line, and one output trace.  Expose the
+randomness in time order.  Every $v$-marked event imposes an equation in a
+fresh feedback vector or in fresh coordinate labels.  A trace with $a$ marks
+therefore has probability at most $s^{-a}$ for the fixed line.  Union-bound
+the $s^{r-1}$ lines on the support and cap the result at one.  The regional
+coefficient in \eqref{eq:p-ec-biregular-region} averages the two-sided regular
+incidence.  Matrix multiplication retains the convolution state across
+regions.
+\end{proof}
+
+Sampling feedback coefficients only from $\F_p^*$ would invalidate this
+reduction.  The distribution of an inner product with a nonzero state would
+then depend on the support and values of that state.  Full-field sampling
+makes each nontrivial inner product uniform in $\F_p$.
+
+\paragraph{Dependence on the field.}
+The trace bound uses the field only through its order $p$.  The projective
+message count contributes $(p-1)^{r-1}$.  Each independent nonzero-label
+equation contributes at most $(p-1)^{-1}$, and each full-field feedback
+equation contributes $p^{-1}\leq(p-1)^{-1}$.  The remaining change is the
+$p$-ary GV cutoff.  Consequently, the same argument applies in prime fields
+and extension fields.  It does not apply to a binary matrix that is merely
+reinterpreted over an extension field, because that matrix lacks the sampled
+field labels and feedback coefficients.
+
+\subsection{Singleton refinement}
+
+The trace in Theorem~\ref{thm:p-ec-trace} treats every occupied right
+coordinate alike.  In fact, a coordinate incident to exactly one supported
+message symbol cannot vanish: both that symbol and its edge label are
+nonzero.
+
+Let $\mathbf P_{\mathrm{sg}}$ equal $\mathbf P_1$ except that
+$(\mathbf P_{\mathrm{sg}})_{m,m}:=0$.  Replace
+\eqref{eq:p-ec-biregular-region} by
+\begin{equation}
+ \widehat{\mathbf R}^{\EC}_{\ell,d_R,r}(z,v):=
+ \binom{k}{r}^{-1}[X^r]
+ \left(
+ \mathbf P_0+d_RX\mathbf P_{\mathrm{sg}}+
+ ((1+X)^{d_R}-1-d_RX)\mathbf P_1
+ \right)^\ell.
+ \label{eq:p-ec-singleton-region}
+\end{equation}
+Theorem~\ref{thm:p-ec-trace} remains valid with this refined matrix.
+
+For the lowest-equation traces, one more combinatorial bound removes a
+positive-marker loss.  Let $U_r$ be the number of occupied right coordinates
+when a uniform $r$-subset of the $d_R\ell$ regional slots is selected.  Put
+\begin{align}
+ \beta_r&:=\Pr[U_r\leq\lfloor r/2\rfloor],
+ \label{eq:singleton-free-probability}\\
+ J_r&:=1+\left\lfloor\frac{r-1}{m}\right\rfloor,
+ \qquad
+ b_r:=\left\lceil\frac{n-L-(r-1)}{\ell}\right\rceil-2J_r.
+ \label{eq:required-singleton-free-regions}
+\end{align}
+
+\begin{lemma}[Singleton-free regions]
+\label{lem:singleton-free-regions}
+Fix a support size $r$ and restrict to traces with at most $r-1$ fresh
+equations.  If $b_r>0$, their contribution to the probability in
+Theorem~\ref{thm:p-ec-trace} is at most
+\begin{equation}
+ \binom{k}{r}\binom{d_L}{b_r}\beta_r^{b_r}.
+ \label{eq:singleton-free-bound}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Every later entry into the all-zero convolution state requires $m$
+consecutive zero outputs from a nonzero state.  Those outputs impose $m$
+fresh equations.  A trace with at most $r-1$ equations therefore has at most
+$J_r$ maximal all-zero-state intervals.
+
+Such an interval can meet at most two regions containing a singleton
+coordinate.  Otherwise it encounters a singleton inside a fully traversed
+region and must leave the all-zero state.  If $B$ regions are singleton-free,
+the all-zero-state intervals contain at most $(2J_r+B)\ell$ positions.  All
+remaining zero outputs impose fresh equations.  Thus
+\[
+ n-L\leq(2J_r+B)\ell+r-1,
+\]
+which implies $B\geq b_r$.  Regional permutations are independent, and a
+singleton-free region has at most $\lfloor r/2\rfloor$ occupied coordinates.
+A union bound over the required regions gives \eqref{eq:singleton-free-bound}.
+\end{proof}
+
+This lemma is needed for the degree-$22$, memory-$12$ certificate.  It removes
+slack in the structural branch; it does not assert that the ensemble fails
+when the bound is inconclusive.

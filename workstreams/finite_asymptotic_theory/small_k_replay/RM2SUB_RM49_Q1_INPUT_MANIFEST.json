@@ -1,0 +1,48 @@
+{
+  "schema": "rm2sub-rm49-q1-input-manifest-v1",
+  "status": "FROZEN_CERTIFICATE_INPUTS",
+  "claim": {
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "bad_weight_upper": 13107,
+    "outer_rows": 256,
+    "outer_constituent": "one fixed RM(4,9) [512,256,32] constituent reused in every row",
+    "inner": "fixed audited RM2Sub t=64,s=14 A/B pair",
+    "occupation": 1,
+    "target_margin_bits": 40
+  },
+  "files": [
+    {
+      "role": "authenticated_outer_spectrum_csv",
+      "path": "../../../scripts/rm512_256_spectrum.csv",
+      "sha256": "995aab561da18f22074b5c6f5413882f492084510aa1cd19b848355f1fcd4ed7"
+    },
+    {
+      "role": "outer_spectrum_certificate_input",
+      "path": "spectra/rm49_weight_counts.json",
+      "sha256": "ad0344db2ead5c14caa7757fab93beac7231cdfbe9d8b4f0b94cbb144ee98fa4"
+    },
+    {
+      "role": "rm2sub_a_spectrum",
+      "path": "rm2sub_calibration_constituents/t64_s14_a_spectrum.json",
+      "sha256": "5f7660203acf965df4adc76ee75e3a0af76c2390110d03cdf7ff0641f0c6e012"
+    },
+    {
+      "role": "rm2sub_b_kernel_spectrum",
+      "path": "rm2sub_calibration_constituents/t64_s14_b_kernel_spectrum.json",
+      "sha256": "cc5b0869aa035951d847dce6d60c63de5d3a79b2befd96afaac16353728a18f3"
+    },
+    {
+      "role": "rm2sub_map_selection",
+      "path": "rm2sub_calibration_constituents/t64_s14_selection.json",
+      "sha256": "18def49b0d11658f2e05c817cc6b2472e5a59261331708230e22e9784150ca45"
+    },
+    {
+      "role": "binary64_witness_discovery",
+      "path": "rm2sub_epoch_geometry_rm49_t64_s14_q1_full_witness_d100.json",
+      "sha256": "255a597942e18fa72b8634bebc06f5c8fe2a4ac3feb84cf3b23a0a73404b2c6e"
+    }
+  ],
+  "witness_rule": "For each nonzero RM weight, map the stored binary64 log-surprisal to its unique nearest tenth and certify that the discrepancy is below 1e-12. The checker evaluates that decimal as an exact rational and never optimizes in outward arithmetic.",
+  "scope": "This manifest freezes the occupation-one certificate inputs. It does not certify occupations two through 256."
+}

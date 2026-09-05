@@ -1,0 +1,81 @@
+{
+  "schema": "ebch128-randomstepconv-parity-pivot-manifest-v1",
+  "status": "OUTWARD_DISTANCE_CERTIFICATE",
+  "claim": {
+    "minimum_distance_at_least": 233165,
+    "relative_distance_lower": 0.11000009435386474,
+    "bad_probability_log2_upper": -26.1921836158846,
+    "margin_bits_lower": 26.1921836158846,
+    "certified_margin_bits": 20,
+    "meets_certified_margin": true,
+    "dominant_active_outer_rows": 1,
+    "dominant_pointwise_log2_upper": -26.34975088854077
+  },
+  "parameters": {
+    "outer_rows": 16560,
+    "active_outer_rows": 16384,
+    "message_bits": 1048576,
+    "output_bits": 2119680,
+    "distance_cutoff": 233165,
+    "memory_bits": 30,
+    "outer_code": "extended BCH [128,64,22]",
+    "outer_bits": 128,
+    "outer_dimension": 64,
+    "shortened_outer_rows": 176,
+    "sparse_exact_max_occupation": 99,
+    "outer_cyclic_generator_polynomial_hex": "0xf4845518b9582a1f",
+    "outer_extension_parity_coordinate": 127,
+    "outer_generator_rows_sha256_little_endian_128": "972cfc1c6de12e4ddc0c67680fd8e3cddedbd84d0a409c7061e09a86b818ca56"
+  },
+  "spectrum_generator_binding": {
+    "status": "EXPLICIT_IMPORTED_PREMISE",
+    "statement": "The concrete generator row space has the weight enumerator in scripts/EBCH128_64.wd.",
+    "local_derivation_present": false
+  },
+  "artifacts": [
+    {
+      "path": "scripts/ebch128x64_forward_paar_circuit.json",
+      "sha256": "3d3451b81f4e8f3de2c5a1b042fd642629d4d5c8a8e9b08ba96422bb8136d1fa",
+      "size_bytes": 19310
+    },
+    {
+      "path": "scripts/EBCH128_64.wd",
+      "sha256": "f633eb9a2f76c64c1d74313b066c2613adba642162e04b67466714f3c30c4b8a",
+      "size_bytes": 1194
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_g1.py",
+      "sha256": "0e63c66088cef00c3bbfb54dba4f4793e21f10ae584ea999aa3e9c9248b92e1f",
+      "size_bytes": 14518
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_q1_exact.py",
+      "sha256": "96cab8ad7cee8a4e2a31aaaf853429ecc8b4361b3cdf83db6dbe6422f2da93b9",
+      "size_bytes": 5799
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_parity_pivot.py",
+      "sha256": "ea52f6666879bcbb5bacb00d51835f7306109f54a83c705f59c6768415c08358",
+      "size_bytes": 13510
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_ebch128_randomstepconv_parity_pivot_outward.py",
+      "sha256": "35df4382149a1cff0d0408e6d06a99c7b9d1ef89f7d18c7ce2b4b492ad3ad607",
+      "size_bytes": 27174
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s30_parity_pivot_d11_diagnostic.json",
+      "sha256": "861de9d5d23a3dc620bf8c53e360cfc0396131421c1f0404cccfdc4033481aa3",
+      "size_bytes": 5538926
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s30_parity_pivot_outward_d11.json",
+      "sha256": "c9b2d92dcc4b2f2bc21854cc266427b16f56d8625f41b120bb73d05e3596c599",
+      "size_bytes": 4176166
+    }
+  ],
+  "runtime": {
+    "python_flint_version": "0.9.0",
+    "arithmetic": "Arb plus directed positive binary64 recurrences"
+  }
+}

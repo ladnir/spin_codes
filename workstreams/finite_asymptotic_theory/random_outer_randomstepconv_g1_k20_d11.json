@@ -1,0 +1,158 @@
+{
+  "schema": "random-outer-randomstepconv-g1-finite-v1",
+  "status": "BINARY64_DIAGNOSTIC_EXACT_TWO_STATE_TRANSFER",
+  "construction": {
+    "outer": "one uniform random binary linear map from k input bits to N outer bits",
+    "inner": "independent uniform unrestricted binary linear (M+1)-by-(M+1) map at every bit position",
+    "recurrence": "(y_t,s_{t+1}) = M_t (x_t,s_t)",
+    "initial_state": 0,
+    "terminal_state": "discarded",
+    "shared_setup": "all sampled maps are fixed and shared by every message"
+  },
+  "probability_space": "the random outer generator and all independent RandomStepConv step maps",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2119680,
+    "relative_distance": 0.11,
+    "distance_cutoff": 233164
+  },
+  "rows": [
+    {
+      "memory_bits": 8,
+      "log_surprisal": 0.6853017174857885,
+      "surprisal": 1.9843704644916265,
+      "z": 0.13746712732041258,
+      "log2_expected_bad_upper": 23944.859891035354,
+      "margin_bits": -23944.859891035354,
+      "closes_one_bit": false,
+      "closes_40_bits": false,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 9,
+      "log_surprisal": 0.7068542462779677,
+      "surprisal": 2.02760287648093,
+      "z": 0.1316507262569809,
+      "log2_expected_bad_upper": 7680.1952470381075,
+      "margin_bits": -7680.1952470381075,
+      "closes_one_bit": false,
+      "closes_40_bits": false,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 10,
+      "log_surprisal": 0.720531302188732,
+      "surprisal": 2.0555250255214403,
+      "z": 0.12802560122116108,
+      "log2_expected_bad_upper": -1422.7138037796155,
+      "margin_bits": 1422.7138037796155,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 12,
+      "log_surprisal": 0.7328594216244592,
+      "surprisal": 2.0810226293602114,
+      "z": 0.12480252019753342,
+      "log2_expected_bad_upper": -8834.215152958652,
+      "margin_bits": 8834.215152958652,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 14,
+      "log_surprisal": 0.7363228884681929,
+      "surprisal": 2.0882426782205776,
+      "z": 0.12390468501104328,
+      "log2_expected_bad_upper": -10783.10976540186,
+      "margin_bits": 10783.10976540186,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 16,
+      "log_surprisal": 0.7372175039330706,
+      "surprisal": 2.0901116883129447,
+      "z": 0.12367332218134762,
+      "log2_expected_bad_upper": -11277.089732974,
+      "margin_bits": 11277.089732974,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 18,
+      "log_surprisal": 0.737443024838148,
+      "surprisal": 2.090583105347806,
+      "z": 0.12361503421056406,
+      "log2_expected_bad_upper": -11401.020918004215,
+      "margin_bits": 11401.020918004215,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 19,
+      "log_surprisal": 0.737480712099044,
+      "surprisal": 2.0906618951833993,
+      "z": 0.12360529498602277,
+      "log2_expected_bad_upper": -11421.693217957258,
+      "margin_bits": 11421.693217957258,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 20,
+      "log_surprisal": 0.7374995672941344,
+      "surprisal": 2.0907013153929377,
+      "z": 0.1236004225354315,
+      "log2_expected_bad_upper": -11432.03120399251,
+      "margin_bits": 11432.03120399251,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 21,
+      "log_surprisal": 0.7375089636102437,
+      "surprisal": 2.0907209603756822,
+      "z": 0.12359799443111369,
+      "log2_expected_bad_upper": -11437.200656239756,
+      "margin_bits": 11437.200656239756,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 22,
+      "log_surprisal": 0.7375136643229171,
+      "surprisal": 2.090730788277296,
+      "z": 0.12359677972815375,
+      "log2_expected_bad_upper": -11439.78549719749,
+      "margin_bits": 11439.78549719749,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 23,
+      "log_surprisal": 0.7375160201671306,
+      "surprisal": 2.0907357137191274,
+      "z": 0.12359617096090389,
+      "log2_expected_bad_upper": -11441.077946387004,
+      "margin_bits": 11441.077946387004,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    }
+  ],
+  "limitations": [
+    "The random outer is a full random linear map, not the repeated BA outer.",
+    "Arithmetic and tilt optimization use nearest binary64.",
+    "The calculation proves no implementation-cost bound."
+  ]
+}

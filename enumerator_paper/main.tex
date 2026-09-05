@@ -1,0 +1,31 @@
+\documentclass[]{llncs}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[backend=biber,style=alphabetic]{biblatex}
+\addbibresource{ref.bib}
+
+\title{Permute-Convolute Codes}
+\author{Stanislav Peceny\inst{1} \and Rahul Rachuri\inst{2} \and Srinivasan Raghuraman\inst{3} \and  Peter Rindal\inst{4}}
+\institute{Stealth Software Technologies, Inc. \and Visa Research \and Visa Research and MIT \and Category Labs}
+%\date{November 2023}
+
+\def\showTodos{1}
+
+\input{packages}
+\input{macros}
+
+\begin{document}
+
+\maketitle
+\input{intro}
+\input{prelim}
+\input{turbo}
+\input{Expander}
+\input{nonWrapping}
+\input{wrapping}
+
+\input{linearMD}
+\input{AccPoly}
+%\bibliographystyle{alpha}
+%\bibliography{ref}
+
+\end{document}

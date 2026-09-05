@@ -1,0 +1,135 @@
+{
+  "schema": "rm2sub-primary-parameter-tranche-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "primary_target": {
+    "relative_distance": 0.1,
+    "bad_event": "output weight at most floor((distance_numerator/distance_denominator)*N)",
+    "target_margin_bits": 40
+  },
+  "bonus_target": "10.9% or 11% may be evaluated for surviving configurations, but does not influence this tranche's ranking",
+  "probability_space": {
+    "structured_outer": "one fixed authenticated BCH or RM constituent repeated in every row",
+    "random_outer": "one uniform full-rank constituent sampled once and repeated; only the joint occupation-one expectation is evaluated",
+    "routing": "independent uniform row-coordinate permutations and independent uniform position permutations in the transposed regions",
+    "inner": "one fixed exactly audited A/B pair and independent nonzero field multipliers in each epoch"
+  },
+  "admissible_length_rule": "the constituent dimension divides k and the epoch length divides L=k/dimension; no padding or partial epoch is used",
+  "parameters": {
+    "message_exponents": [
+      16
+    ],
+    "constituents": [
+      "rm49"
+    ],
+    "step_bits": [
+      64
+    ],
+    "persistence_exponents": [
+      20
+    ],
+    "distance_numerator": 100,
+    "distance_denominator": 1000,
+    "tilt_count": 7,
+    "q2_enabled": true
+  },
+  "inner_configurations": [
+    {
+      "name": "t64_s14",
+      "step_bits": 64,
+      "state_bits": 14,
+      "persistence_exponent": 20.0,
+      "a_minimum_distance": 24,
+      "kernel_minimum_distance": 6,
+      "kernel_weight_four": 0,
+      "selection_receipt": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\small_k_replay\\rm2sub_calibration_constituents\\t64_s14_selection.json"
+    }
+  ],
+  "cases": [
+    {
+      "inner": "RM2Sub",
+      "configuration": "t64_s14",
+      "step_bits": 64,
+      "state_bits": 14,
+      "persistence_exponent": 20.0,
+      "epochs_per_region": 4,
+      "a_minimum_distance": 24,
+      "kernel_minimum_distance": 6,
+      "kernel_weight_four": 0,
+      "margin_bits": 42.16259049979557,
+      "dominant_weight": 32,
+      "dominant_log_surprisal": -6.0,
+      "constituent": "RM(4,9) [512,256,32]",
+      "block_bits": 512,
+      "dimension": 256,
+      "message_exponent": 16,
+      "message_bits": 65536,
+      "outer_rows": 256,
+      "output_bits": 131072,
+      "bad_weight": 13107,
+      "family": "structured",
+      "outer_model": "fixed-exact-spectrum",
+      "occupation": 1
+    },
+    {
+      "inner": "RM2Sub",
+      "configuration": "t64_s14",
+      "step_bits": 64,
+      "state_bits": 14,
+      "persistence_exponent": 20.0,
+      "epochs_per_region": 4,
+      "a_minimum_distance": 24,
+      "kernel_minimum_distance": 6,
+      "kernel_weight_four": 0,
+      "margin_bits": 135.60321616970873,
+      "dominant_weight": 44,
+      "dominant_log_surprisal": -5.0,
+      "constituent": "random full-rank [512,256]",
+      "block_bits": 512,
+      "dimension": 256,
+      "message_exponent": 16,
+      "message_bits": 65536,
+      "outer_rows": 256,
+      "output_bits": 131072,
+      "bad_weight": 13107,
+      "family": "random-control",
+      "outer_model": "single-reused-constituent-Q1-ensemble-average",
+      "occupation": 1
+    },
+    {
+      "margin_bits": 87.41506162741018,
+      "dominant_first_weight": 32,
+      "dominant_second_weight": 32,
+      "dominant_pointwise_margin_bits": 87.41506162815459,
+      "dominant_log_surprisal": -5.0,
+      "inner": "RM2Sub",
+      "configuration": "t64_s14",
+      "state_bits": 14,
+      "step_bits": 64,
+      "persistence_exponent": 20.0,
+      "epochs_per_region": 4,
+      "a_minimum_distance": 24,
+      "kernel_minimum_distance": 6,
+      "kernel_weight_four": 0,
+      "constituent": "RM(4,9) [512,256,32]",
+      "block_bits": 512,
+      "dimension": 256,
+      "message_exponent": 16,
+      "message_bits": 65536,
+      "outer_rows": 256,
+      "output_bits": 131072,
+      "bad_weight": 13107,
+      "family": "structured",
+      "outer_model": "fixed-exact-spectrum",
+      "occupation": 2
+    }
+  ],
+  "skipped_inadmissible_cases": [],
+  "limitations": [
+    "The receipt covers occupations one and two only.",
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "The finite tilt grid is not proved optimal.",
+    "Random-control values do not certify a realized constituent.",
+    "BCH plus fanout is deferred until its single-reused-constituent envelope is specified.",
+    "No arbitrary-length wrapper or implementation benchmark is included."
+  ]
+}

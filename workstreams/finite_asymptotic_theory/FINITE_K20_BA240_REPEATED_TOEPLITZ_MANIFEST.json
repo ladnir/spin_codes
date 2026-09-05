@@ -1,0 +1,39 @@
+{
+  "schema": "finite-k20-ba240-repeated-toeplitz-manifest-v1",
+  "status": "COMPLETE_OUTWARD_ALL_MESSAGE_CERTIFICATE",
+  "claim": {
+    "message_bits": 1048576,
+    "output_bits": 2119680,
+    "bad_output_weight_at_most": 233164,
+    "minimum_distance_on_success_at_least": 233165,
+    "toeplitz_setup_failure_probability_less_than": "2^-180"
+  },
+  "construction": {
+    "outer": "one fixed [240,120] Golay--BA-3 code repeated in 8832 rows",
+    "routing": "fixed row-local coordinate orders and fixed row orders in all 240 transposed regions",
+    "inner": "one shared random unit-diagonal lower-triangular Toeplitz convolution over GF(2)",
+    "setup_seed_hex": "0x4241323430544f45"
+  },
+  "artifacts": [
+    {
+      "path": "certify_ba240_repeated_toeplitz_prefix_outward.py",
+      "role": "standalone setup reconstruction, exact prefix-rank computation, and outward verifier",
+      "sha256": "d1a0ae79dfa53ebb04776e2c153bb9e59a6731d41f52426e3f8fc0cb0e014e5d"
+    },
+    {
+      "path": "ba3_B240_repeated_toeplitz_prefix_outward.json",
+      "role": "outward receipt and authenticated setup hashes",
+      "sha256": "481e6af56ea562917c2e58b660d11eb8a89da8a2259c9ab0a9fbbb137a6cddf5"
+    },
+    {
+      "path": "FINITE_K20_BA240_REPEATED_TOEPLITZ_CERTIFICATE.md",
+      "role": "construction, probability space, theorem, proof, and limitations",
+      "sha256": "6330ca23349d224f916391a4b848a592be693d89b0e0572fa4097a56b5e783f0"
+    }
+  ],
+  "boundary": [
+    "The manifest authenticates a finite distance proof, not a linear-time implementation.",
+    "The outer and routing setup is fixed; no setup-sampling success probability is claimed.",
+    "The only theorem randomness is the shared Toeplitz kernel."
+  ]
+}

@@ -1,0 +1,17 @@
+\section{Recursive Block Construction}\label{sec:recursiveblock}
+
+why does the enum fail
+
+why do we think its ok
+
+implement small G and check brute force
+
+
+
+\srini{add that each block itself consists of multiply-permute etc. Argue why it is secure (maybe informal is enough)}
+
+In \sectionref{sec:block}, the blocks of each matrix we considered were each sampled independently and uniformly at random. Instead, we could generate them recursively using our block construction, i.e., each block would itself be made up of smaller blocks, etc. Since our block construction has high enough minimum distance, each block built recursively would serve as a reasonable enough surrogate for a truly random matrix on the one hand while simultaneously boosting our capability for parallelization on the other.
+
+\srinireply{This is obviously very sketchy and would need to be fleshed out at least empirically before the deadline.}
+
+

@@ -1,0 +1,37 @@
+{
+  "schema": "pure-ea-dominant-character-deviation-outward-v1",
+  "status": "OUTWARD_ARB_AND_BINARY64_CERTIFICATE",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "arb_precision_bits": 512
+  },
+  "ordered_pair_types": 22,
+  "elapsed_seconds": 0.00238690001424402,
+  "shells": [
+    {
+      "shell_weight": 2,
+      "mean_ratio_lower": 0.7470703124999994,
+      "mean_ratio_upper": 0.7470703125000007,
+      "positive_pair_excess_normalized_upper": 2.946189413265312,
+      "variance_to_mean_upper": 7.901400560224113,
+      "passes_factor_512": true
+    }
+  ],
+  "claim": {
+    "all_requested_shells_pass_factor_512": true,
+    "maximum_variance_to_mean_upper": 7.901400560224113
+  },
+  "proved_reduction": [
+    "For each ordered nonzero distinct pair, retain one row-character bias of maximum absolute value.",
+    "Arb encloses each one-word and correlated-reference ratio and its absolute deviation from one.",
+    "The pair excess over independent marginals is bounded by a sum of nonnegative deviation and likelihood terms; no near-one subtraction occurs in binary64.",
+    "Pairs with a deterministic all-ones marginal have zero covariance. Complement pairs use their exact two-atom support and a likelihood factor 1+abs(beta(x))."
+  ],
+  "scope": [
+    "Arb encloses every reference polynomial evaluation and deviation.",
+    "Binary64 combines only nonnegative upper endpoints and advances each basic operation outward.",
+    "The receipt covers exactly the requested shells and assumes no realized-spectrum complement symmetry."
+  ]
+}

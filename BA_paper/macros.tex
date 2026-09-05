@@ -1,0 +1,109 @@
+
+
+% hyperlinks
+\definecolor{darkred}{rgb}{0.5, 0, 0}
+\definecolor{darkgreen}{rgb}{0, 0.5, 0}
+\definecolor{darkblue}{rgb}{0, 0, 0.5}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=darkred,
+	citecolor=darkgreen,
+	urlcolor=darkblue
+}
+\newtheorem{assumption}{Assumption}
+
+\newcommand{\share}[1]{\ensuremath{[\hspace{-1.5px}[#1]\hspace{-1.5px}]}\xspace}
+
+\newcommand{\F}{\ensuremath{\mathbb{F}}}
+\newcommand{\namedref}[2]{\hyperref[#2]{#1~\ref*{#2}}}
+
+\newcommand{\sectionref}[1]{\namedref{Section}{#1}}
+\newcommand{\theoremref}[1]{\namedref{Theorem}{#1}}
+\newcommand{\definitionref}[1]{\namedref{Definition}{#1}}
+\newcommand{\corollaryref}[1]{\namedref{Corollary}{#1}}
+\newcommand{\lemmaref}[1]{\namedref{Lemma}{#1}}
+\newcommand{\figureref}[1]{\namedref{Figure}{#1}}
+\newcommand{\tableref}[1]{\namedref{Table}{#1}}
+\newcommand{\appendixref}[1]{\namedref{Appendix}{#1}}
+\newcommand{\lemmaref}[1]{\namedref{Lemma}{#1}}
+
+\newcommand{\todotemplate}[3]{%
+    \mbox{}% prevent marginpar from being on previous paragraph
+    \marginpar{%
+        \colorbox{#2!80!black}{\textcolor{white}{#1}}%
+        \vspace*{-22pt}% hack!
+    }%
+    \textcolor{#2}{{#3}}%
+}
+
+\if\showTodos1
+    \newcommand{\stan}[1]{
+    \todotemplate{stan}{brown}{#1}
+    }
+    \newcommand{\peter}[1]{
+    \todotemplate{Peter}{red}{#1}
+    }
+
+    \newcommand{\srini}[1]{
+    \todotemplate{Srini}{purple}{#1}
+    }
+
+    \newcommand{\srinireply}[1]{
+    \todotemplate{Srini says}{violet}{#1}
+    }
+
+    \newcommand{\vlad}[1]{
+    \todotemplate{Vlad}{blue}{#1}
+    }
+
+    \newcommand{\everyone}[1]{
+    \todotemplate{Everyone}{green}{#1}
+    }
+\else
+    \newcommand{\stan}[1]{}
+    \newcommand{\peter}[1]{}
+    \newcommand{\srini}[1]{}
+    \newcommand{\vlad}[1]{}
+    
+    \newcommand{\srinireply}[1]{
+    }
+    \newcommand{\everyone}[1]{}
+\fi
+
+
+\newcommand{\bt}{\blacktriangle}
+\newcommand{\mbf}[1]{\mathbf{#1}}
+
+
+\newcommand{\av}{\ensuremath{\mathbf{a}}\xspace}
+\newcommand{\bv}{\ensuremath{\mathbf{b}}\xspace}
+\newcommand{\cv}{\ensuremath{\mathbf{c}}\xspace}
+\newcommand{\ev}{\ensuremath{\mathbf{e}}\xspace}
+\newcommand{\xv}{\ensuremath{\mathbf{x}}\xspace}
+\newcommand{\sv}{\ensuremath{\mathbf{s}}\xspace}
+\newcommand{\yv}{\ensuremath{\mathbf{y}}\xspace}
+\newcommand{\A}{\ensuremath{\mathbf{A}}\xspace}
+\newcommand{\B}{\ensuremath{\mathbf{B}}\xspace}
+\newcommand{\C}{\ensuremath{\mathbf{C}}\xspace}
+\newcommand{\E}{\ensuremath{\mathbf{E}}\xspace}
+\newcommand{\G}{\ensuremath{\mathbf{G}}\xspace}
+\newcommand{\I}{\ensuremath{\mathbf{I}}\xspace}
+\newcommand{\dw}{\ensuremath{\mathbf{\delta}}\xspace}
+\newcommand{\Fbb}{\ensuremath{\mathbb{F}}\xspace}
+\newcommand{\Ebb}{\ensuremath{\mathbb{E}}\xspace}
+\newcommand{\Zbb}{\ensuremath{\mathbb{Z}_{\geq0}}\xspace}
+\newcommand{\Nbb}{\ensuremath{\mathbb{N}}\xspace}
+\newcommand{\enum}{\ensuremath{\mathsf{E}}\xspace}
+\newcommand{\enumVar}{\ensuremath{{E}}\xspace}
+\newcommand{\dist}{\ensuremath{\mathcal{D}}\xspace}
+
+\newcommand{\hw}[1]{\ensuremath{|#1|_\mathsf{H}}\xspace}
+\newcommand{\wt}[1]{\hw{#1}} % alias: Hamming weight
+\newcommand{\ballsBins}{\ensuremath{\mathsf{B}}\xspace}
+\newcommand{\ballsBinsCap}{\ensuremath{\mathsf{C}}\xspace}
+\newcommand{\ballsBinsSlots}{\ensuremath{\mathsf{S}}\xspace}
+\newcommand{\Qfn}{\ensuremath{\mathsf{Q}}\xspace}
+\newcommand{\qfn}{\ensuremath{\mathsf{q}}\xspace}
+%\renewcommand{\in}{\ensuremath{\mathsf{in}}\xspace}
+

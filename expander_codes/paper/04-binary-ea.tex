@@ -1,0 +1,235 @@
+\section{Binary Expand--Accumulate}
+\label{sec:binary-ea}
+
+We first keep the binary EA construction of~\cite{EA} unchanged.  The only
+change is the analysis.  For each message weight, the Bernoulli expander gives
+independent intermediate bits.  The accumulator then has an exact two-state
+description.
+
+\subsection{Exact first moment}
+
+Fix a message $\x\in\F_2^k$ of weight $r$ and sample
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$.  Each coordinate of $\x\B$ is
+the parity of $r$ independent Bernoulli variables.  Its probability of being
+one is
+\begin{equation}
+ a_r:=\frac{1-(1-2\rho)^r}{2}.
+ \label{eq:ea-activation}
+\end{equation}
+Different coordinates use independent columns of $\B$.  Thus the entries of
+$\x\B$ are independent $\Ber(a_r)$ variables.
+
+Let $Y$ mark a nonzero accumulator output.  Rows and columns of
+\begin{equation}
+ \mathbf T_a(Y):=
+ \begin{pmatrix}
+  1-a & aY\\
+  a   & (1-a)Y
+ \end{pmatrix}
+ \label{eq:ea-transfer}
+\end{equation}
+index the current and next accumulator states in the order $0,1$.  The factor
+$Y$ marks the next state because that state is also the current output symbol.
+Let $\e_0:=(1,0)^{\mathsf T}$.
+
+\begin{theorem}[Exact Bernoulli EA first moment]
+\label{thm:ea-exact-first-moment}
+For $\G=\B\A$ and every $0\leq L\leq n$, define
+\begin{equation}
+ \mu_{\EA}(L):=
+ \sum_{r=1}^{k}\binom{k}{r}
+ \sum_{h=0}^{L}[Y^h]\,
+ \e_0^{\mathsf T}\mathbf T_{a_r}(Y)^n\one.
+ \label{eq:ea-first-moment}
+\end{equation}
+Then
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\B\A)]\leq\mu_{\EA}(L).
+ \label{eq:ea-first-moment-failure}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For a fixed weight-$r$ message, the matrix product in
+\eqref{eq:ea-first-moment} is the probability generating function of its
+output weight.  Coefficient extraction sums its probability of output weight
+at most $L$.  There are $\binom{k}{r}$ binary messages of weight $r$.
+Equation~\eqref{eq:first-moment} gives the probability bound.
+\end{proof}
+
+The theorem retains the exact accumulator process.  The next bound replaces
+coefficient extraction by a one-dimensional optimization without changing
+the transfer matrix.
+
+For $a\in[0,1/2]$ and $z\in(0,1]$, define
+\begin{align}
+ \lambda(a,z)
+ &:=\frac{(1-a)(1+z)+
+ \sqrt{(1-a)^2(1-z)^2+4a^2z}}{2},
+ \label{eq:ea-spectral-radius}\\
+ J_\delta(a)&:=
+ \sup_{0<z\leq1}\{\delta\ln z-\ln\lambda(a,z)\}.
+ \label{eq:ea-rate-function}
+\end{align}
+The quantity $\lambda(a,z)$ is the spectral radius of
+$\mathbf T_a(z)$, meaning the largest absolute value of its eigenvalues.
+
+\begin{lemma}[Accumulator lower tail]
+\label{lem:ea-lower-tail}
+Let $H$ be the output weight of the binary accumulator on $n$ independent
+$\Ber(a)$ inputs.  For $a\in(0,1/2]$ and $\delta\in(0,1/2)$,
+\begin{equation}
+ \Pr[H\leq\lfloor\delta n\rfloor]
+ \leq\sqrt2\exp(-nJ_\delta(a)).
+ \label{eq:ea-lower-tail}
+\end{equation}
+Moreover,
+\begin{align}
+ \liminf_{a\downarrow0}\frac{J_\delta(a)}a
+ &\geq I_\delta:=1-2\sqrt{\delta(1-\delta)},
+ \label{eq:ea-sparse-endpoint}\\
+ J_\delta(1/2)&=\ln2-h(\delta).
+ \label{eq:ea-dense-endpoint}
+\end{align}
+The function $J_\delta$ is continuous and positive on $(0,1/2]$.
+\end{lemma}
+
+\begin{proof}
+Set $D_z:=\diag(1,\sqrt z)$.  The similar matrix
+\[
+ D_z\mathbf T_a(z)D_z^{-1}
+ =\begin{pmatrix}1-a&a\sqrt z\\a\sqrt z&(1-a)z\end{pmatrix}
+\]
+is symmetric and positive semidefinite.  Its largest eigenvalue is
+$\lambda(a,z)$.  Hence
+\[
+ \E[z^H]
+ =\e_0^{\mathsf T}\mathbf T_a(z)^n\one
+ \leq\sqrt{1+z}\,\lambda(a,z)^n.
+\]
+Apply \eqref{eq:positive-marker-tail} and optimize over $z$.
+
+For the sparse endpoint, set $z=e^{-\theta a}$ and expand at $a=0$.
+The coefficient of $a$ is optimized at
+$\theta=(1-2\delta)/\sqrt{\delta(1-\delta)}$, which gives
+\eqref{eq:ea-sparse-endpoint}.  At $a=1/2$, one has
+$\lambda(1/2,z)=(1+z)/2$.  The choice $z=\delta/(1-\delta)$ gives
+\eqref{eq:ea-dense-endpoint}.  Positivity and continuity follow by restricting
+the optimization to a compact interval of markers.
+\end{proof}
+
+\subsection{Asymptotic distance}
+
+The endpoint formulas separate the sparse and dense message regimes.  Sparse
+messages determine the required expander density.  Dense messages give the GV
+condition.
+
+\begin{theorem}[Binary EA distance]
+\label{thm:ea-distance}
+Let $k=k(n)$ satisfy $k/n\to R\in(0,1)$.  Sample
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho_n}$ with
+\begin{equation}
+ \rho_n=C\frac{\ln n}{n}
+ \label{eq:ea-density}
+\end{equation}
+for a constant $C>0$.  Fix $\delta\in(0,1/2)$.  If
+\begin{align}
+ C I_\delta&>1,
+ \label{eq:ea-sparse-condition}\\
+ h(\delta)&<(1-R)\ln2,
+ \label{eq:ea-gv-condition}
+\end{align}
+then
+\begin{equation}
+ \Pr_{\B}\!\left[d_{\min}(\B\A)\leq\lfloor\delta n\rfloor\right]
+ =o(1).
+ \label{eq:ea-distance-conclusion}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+We apply Lemma~\ref{lem:ea-lower-tail} to
+Theorem~\ref{thm:ea-exact-first-moment} and split the message weights into
+three ranges.
+
+For $r\rho_n$ sufficiently small,
+$a_r\geq r\rho_n(1-o(1))$.  Equations
+\eqref{eq:ea-sparse-endpoint} and \eqref{eq:ea-sparse-condition} give a
+constant $\gamma>1$ such that the weight-$r$ tail is at most
+$n^{-\gamma r}$.  Since $\binom{k}{r}\leq k^r$ and $k=O(n)$, the sum over
+these sparse messages is $o(1)$.
+
+Once $r\rho_n$ is bounded below, $a_r$ is bounded away from zero.  Positivity
+and continuity of $J_\delta$ give a uniform exponential tail.  The number of
+messages with $r\leq\eta n$ has exponent
+$R h(\eta/R)+o(1)$.  Choose $\eta>0$ small enough that this counting exponent
+is below the tail exponent.  The intermediate contribution is then
+exponentially small.
+
+For $r>\eta n$, equation~\eqref{eq:ea-activation} gives
+$a_r=1/2-o(1)$ uniformly.  There are at most $2^k$ messages.  The dense
+endpoint bounds their total contribution by
+\[
+ \exp\!\left(n\bigl(R\ln2+h(\delta)-\ln2+o(1)\bigr)\right),
+\]
+which vanishes by \eqref{eq:ea-gv-condition}.  The three ranges cover every
+nonzero message weight.
+\end{proof}
+
+Condition~\eqref{eq:ea-gv-condition} is exactly the binary GV condition.
+The accumulator therefore loses no asymptotic exponent for dense messages.
+The sparse condition is an additional cost of the sparse expander.
+
+At $\delta=0.05$, the sparse condition requires $C>1.773$.  The analysis in
+\cite[Theorem~3.10]{EA} requires $C>4.938$.  At rate $R=1/5$, its rate
+condition permits $\delta<0.1127$, while
+\eqref{eq:ea-gv-condition} permits $\delta<0.2430$.  These are asymptotic
+comparisons; they do not state a finite failure probability.
+
+\subsection{Finite same-ensemble certificates}
+
+The verifier described in Section~\ref{sec:certificates} evaluates
+\eqref{eq:ea-first-moment} over every message weight.
+
+\begin{theorem}[Finite Bernoulli EA certificates]
+\label{thm:ea-finite}
+For each row of Table~\ref{tab:ea-finite}, set $k:=2^s$, $n:=5k$,
+$\rho:=w/n$, and $L:=n/20$.  If
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$, then
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\B\A)]\leq U<2^{-20}.
+\end{equation}
+\end{theorem}
+
+\begin{table}[t]
+\centering
+\caption{Certified binary Bernoulli EA bounds at rate $1/5$ and relative
+distance $0.05$.  The parameter $w$ is the expected expander row weight.}
+\label{tab:ea-finite}
+\begin{tabular}{@{}crrr@{}}
+\toprule
+$s$ & $w$ & $U$ & $-\log_2U$ \\
+\midrule
+$20$ & $50$ & $6.891818499\cdot10^{-7}$ & $20.468611$ \\
+$25$ & $56$ & $7.475946766\cdot10^{-7}$ & $20.351240$ \\
+$30$ & $62$ & $8.107513660\cdot10^{-7}$ & $20.234237$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+For each row, the verifier evaluates weights $1$ through $128$ with the exact
+transfer matrix.  It partitions the remaining weights into contiguous
+intervals and bounds each interval through the transfer matrix's largest
+eigenvalue.  Their union is $[129,k]$.  Outward-rounded interval arithmetic
+evaluates every stored marker and the final sum.  The verified upper endpoint
+is the displayed value $U$.  Theorem~\ref{thm:ea-exact-first-moment} converts
+that sum into the claimed probability bound.
+\end{proof}
+
+At $s=20$, the original $C=3$ profile has expected row weight $46.42$ but an
+extrapolated failure bound $0.0157$ at distance $0.05$~\cite{EA}.  The first
+row of Table~\ref{tab:ea-finite} is slightly denser and proves a complete
+$2^{-20}$ statement.  At $s=25$ and $s=30$, the certified profiles are both
+sparser and have much smaller failure bounds than the corresponding published
+profiles.

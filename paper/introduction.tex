@@ -1,0 +1,232 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Binary codes inside correlation generators and proof systems are algorithms,
+not merely stored generator matrices. They must combine constant rate and
+linear distance with fast ordinary and transposed encoding and regular data
+movement.
+
+Pseudorandom correlation generators apply a public generator matrix to large
+vectors to expand sparse correlations into OT and VOLE correlations
+\cite{bcgi18,bcg19pcg}. Code-based proof systems encode rows of large arrays,
+with distance supporting soundness~\cite{brakedown23,blaze25}. Transposition is
+also operational: for a linear encoder $E$ and check vector $q$, the identity
+$\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$ pulls the check back to the
+message coordinates. At these dimensions, long-range memory traffic can cost
+more than the binary arithmetic.
+
+Random linear codes provide excellent distance, but their encoders are dense.
+Fast structured encoders reduce the computation and make memory access more
+regular.
+Their sparse dependencies, however, make linear distance difficult to prove.
+The central question is whether one binary code family can achieve strong
+distance, linear-time evaluation in both directions, and predictable data
+movement.
+
+This paper answers that question with Structured SPIN. At its native lengths
+$N$, every realized code has rate $1/2$ and $O(N)$ ordinary and transposed
+encoding work. With probability $1-o(1)$ over setup, its minimum distance
+exceeds $0.11N$. One global factored interleaver contains the long-range data
+movement; the outer permutations remain inside logarithmic-size blocks. A
+  zero-extension wrapper gives rate $1/2-o(1)$, relative distance $0.11-o(1)$,
+  and linear work at every sufficiently large requested length.
+
+The construction follows the serial-concatenation pattern. An outer encoder
+prevents messages from remaining too sparse. A recursive inner encoder spreads
+the interleaved outer word across the final codeword. The interleaver moves the
+outer support before the recursion processes it. SPIN makes this pattern
+modular: structure appears where speed and regular data movement require it,
+and setup randomness remains at the interfaces used by the distance proof.
+
+For an admissible output length $N$, a SPIN encoder has the form
+\begin{equation}
+  E_N := I_N\circ\Pi_N\circ O_N.
+  \label{eq:intro-spin-composition}
+\end{equation}
+The outer encoder $O_N$ maps the message into $N$ intermediate bits.
+The interleaver $\Pi_N$ is one permutation of those $N$ coordinates.
+The inner encoder $I_N$ is a length-preserving recursive linear map.
+Setup may sample any of these objects from a declared distribution.
+
+The phrase \emph{single permutation} describes the mathematical interface.
+An implementation may factor $\Pi_N$ into block shuffles, a transpose, and
+region shuffles. These factors still compose to one global interleaver.
+
+\subsection{A family of SPIN families}
+
+We use the same interface for three construction lines.
+
+\paragraph{Accumulator SPIN.}
+The outer encoder uses random block maps along the diagonal.
+The interleaver is uniform, and the inner encoder is the binary accumulator.
+This is the depth-two, one-accumulator truncation of the Block-Accumulate
+architecture of Kolesnikov et al.~\cite{KolesnikovEtAl2026BA}. The BA
+construction also supplies the random-block enumerator used below.
+Chosen-block BAA instead studies the related option of reusing one certified
+constituent in every outer position
+\cite{PecenyRindal2026ChosenBlockBAA}.
+The accumulator admits an exact input--output enumerator, making this construction
+the simplest setting in which to expose the distance mechanism.
+
+\paragraph{Random SPIN.}
+The outer encoder and uniform interleaver remain unchanged. A random recursive
+convolution replaces the accumulator. The stronger inner mixing yields a
+substantially larger relative distance, at the cost of a denser recursion.
+Silver codes earlier used a banded lower-triangular solve, which is
+a structured recursive encoder of convolutional form
+\cite{CouteauRindalRaghuraman2021Silver}. Expand-Convolute later isolated a
+random time-varying convolution after a sparse expander
+\cite{RaghuramanRindalTanguy2023EC}. The theorem below combines that random
+inner with independent random-block injections.
+
+\paragraph{Structured SPIN.}
+A spectrum-controlled local outer, a structured global interleaver, and a
+  structured recursive inner replace the random components. The scalable
+  family samples one spectrum-certified BA-3 constituent and reuses it in every
+  outer position. Its base code and base length are parameters. Independent
+  block and region shuffles surround a deterministic transpose, and RM2Sub-S19
+  supplies the inner recursion. The direct family has natural admissible
+  lengths. Zero extension from the largest preceding direct member gives a
+  code at every sufficiently large requested length. A separately tuned
+  implementation at $N=2^{21}$ is a finite specialization, not the family
+  definition.
+
+Table~\ref{tab:spin-families} summarizes the three lines.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Family & Outer & Interleaver & Inner \\
+    \midrule
+    Accumulator SPIN & random blocks & uniform & accumulator \\
+    Random SPIN & random blocks & uniform & random recursive \\
+    Structured SPIN & spectrum-controlled & structured & RM2Sub-S19 \\
+    \bottomrule
+  \end{tabular}
+  \caption{The three principal SPIN construction lines.}
+  \label{tab:spin-families}
+\end{table}
+
+The component table also defines a larger design space. For example, one may
+combine a structured interleaver with a random outer and an accumulator.
+This paper does not analyze every combination. An additional combination
+enters the main development only when it supplies a necessary proof bridge or
+a distinct quantitative result.
+
+\subsection{Contributions}
+
+We make four contributions.
+
+\begin{itemize}
+  \item \textbf{A structured linear-time code with proved distance.}
+  We construct a sampled binary code family whose native members have rate
+  $1/2$ and minimum distance greater than $0.11N$ with probability $1-o(1)$.
+  Every realized member has $O(N)$ ordinary and transposed encoding work. The
+  result therefore combines strong binary distance with linear work in both
+  evaluation directions.
+
+  \item \textbf{A modular structured construction.}
+  Structured SPIN combines one sampled BA-3 constituent reused along the outer
+  diagonal, one factored global interleaver, and the fixed RM2Sub-S19 inner.
+  The base constituent and its length are parameters exposed through a
+  certified spectrum envelope. The interleaver contains the long-range data
+  movement; the remaining outer permutations are block-local. Constituent
+  replacement therefore does not change the route or inner architecture.
+
+  \item \textbf{A first-moment framework for structured routes.}
+  We index outer words by classes and bound each class's conditional failure
+  probability under the interleaver--inner pair. Equal-weight words need not
+  have the same inner law. The Structured SPIN proof uses occupation and
+  row-weight classes.
+
+  \item \textbf{Two explanatory SPIN families.}
+  At rate $1/2$, Accumulator SPIN proves relative distance $0.0037$, while
+  Random SPIN proves relative distance $0.11002$. These baselines isolate the
+  block spectrum, uniform interleaving, and recursive mixing.
+\end{itemize}
+
+\subsection{Related work}
+
+\paragraph{Serially concatenated codes.}
+Turbo codes introduced randomized interleaving as a way to combine simple
+constituent encoders~\cite{berrou93}. Benedetto et al. developed the
+uniform-interleaver analysis of serial concatenations~\cite{benedetto98}.
+Divsalar, Jin, and McEliece introduced repeat--accumulate codes and their
+weight-enumerator analysis~\cite{divsalar98}, while Kahale and Urbanke studied
+minimum distance in random parallel and serial concatenations
+~\cite{kahale98}. Bazzi, Mahdian, and Spielman proved limitations for
+depth-two constant-memory serial concatenations and positive results with two
+accumulators~\cite{bms09}. Later work established coding theorems for
+repeat-multiple-accumulate ensembles approaching the binary
+Gilbert--Varshamov bound~\cite{kliewer08}.
+
+Block-Accumulate codes replace repetition with random block-diagonal maps and
+compute detailed expected spectra; they also provide optimized CPU and GPU
+implementations~\cite{KolesnikovEtAl2026BA}. Accumulator SPIN is their
+one-accumulator truncation. Chosen-block BAA studies the complementary choice
+of reusing one constituent in every diagonal position
+~\cite{PecenyRindal2026ChosenBlockBAA}. Structured SPIN adopts that shared-code
+view, but adds a structured global route and a different recursive inner.
+
+\paragraph{Codes for correlation generation.}
+Linear codes compress sparse correlations in vector-OLE and pseudorandom
+correlation generators~\cite{bcgi18,bcg19pcg}. This application motivated a
+sequence of faster structured codes. Silver uses structured LDPC matrices and
+a banded triangular solve~\cite{CouteauRindalRaghuraman2021Silver}. Linear
+distance was an explicit conjecture supported by heuristic evidence.
+Expand--Accumulate combines a sparse expander with an accumulator
+~\cite{ea22}. Expand--Convolute replaces that accumulator with a random
+time-varying convolution~\cite{RaghuramanRindalTanguy2023EC}. Random SPIN keeps
+the latter inner distribution but replaces the expander with random block
+injections. Structured SPIN instead combines a spectrum-controlled BA outer,
+one factored global interleaver, and the RM2Sub inner. Its principal distinction
+is the simultaneous proof of rate one half, relative distance $0.11$, and
+linear ordinary and transposed encoding work.
+
+\paragraph{Linear-time proving systems.}
+Constant-overhead arguments make linear-time encoding a first-order prover
+cost~\cite{rr25}. Orion uses code switching to obtain a linear-time prover
+~\cite{orion22}, and Brakedown builds a field-agnostic SNARK from a
+linear-time encodable code~\cite{brakedown23}. Field-agnostic SNARKs have also
+been instantiated from Expand--Accumulate codes~\cite{fieldEA24}. Blaze uses
+interleaved RAA codes and supplies improved binary distance bounds
+~\cite{blaze25}. SPIN does not instantiate a proof system in this paper. These
+works motivate the combination of high rate, strong binary distance, fast
+transposed evaluation, and regular data movement.
+
+\subsection{One distance calculation}
+
+All three lines use the same first-moment idea. Fix a target distance $d$,
+and count nonzero messages whose encoded words have weight at most $d$.
+If the expected count is below one, then some sampled encoder is injective and
+has minimum distance greater than $d$.
+
+For a uniform interleaver, the outer Hamming weight is often a sufficient
+interface. The expected bad-word count then has the form
+\begin{equation}
+  \sum_w A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d),
+  \label{eq:intro-weight-first-moment}
+\end{equation}
+where $A_w^{\mathrm{out}}$ is the expected outer spectrum and
+$p_w^{\mathrm{in}}(d)$ is an inner slice-to-tail probability.
+
+A structured interleaver need not produce a uniform Hamming slice. We
+therefore allow a class to record block occupation or another routing profile.
+The interleaver--inner analysis supplies a uniform failure envelope for each
+class. The weight-indexed sum in~\eqref{eq:intro-weight-first-moment} is the
+special case in which the conditional law depends only on weight.
+
+\subsection{Organization}
+
+Section~\ref{sec:preliminaries} fixes notation. Section~\ref{sec:framework}
+states the exact finite first-moment framework.
+Sections~\ref{sec:accumulator-spin} and~\ref{sec:random-spin} develop the two
+random construction lines. Section~\ref{sec:structured-spin} defines the
+  structured line, its parameterized constituent interface, and the currently
+  certified scalable instantiation.
+Section~\ref{sec:finite-certificates} specifies finite certificate semantics.
+Section~\ref{sec:scaling} separates finite validity, asymptotic distance, and
+encoding complexity. Section~\ref{sec:implementation} records the
+implementation and finite-evaluation boundary. The appendix records the
+scalable certificate and finite-length specialization.

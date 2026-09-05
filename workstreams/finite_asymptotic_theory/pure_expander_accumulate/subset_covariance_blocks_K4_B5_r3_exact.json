@@ -1,0 +1,73 @@
+{
+  "schema": "pure-ea-subset-covariance-blocks-small-v1",
+  "status": "EXACT_RATIONAL_IDENTITIES_WITH_BINARY64_EIGENVALUE_CHECK",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 5,
+    "right_degree": 3,
+    "shell_weight": 2,
+    "enumerated_maps": 1024
+  },
+  "return_probabilities": [
+    "1/1",
+    "0/1",
+    "1/4",
+    "0/1",
+    "5/32",
+    "0/1"
+  ],
+  "shell_mean": "129/32",
+  "exhaustive_shell_variance": "2751/1024",
+  "dual_quadratic_shell_variance": "2751/1024",
+  "full_vs_block_eigenvalue_maximum_residual": 1.6653345369377348e-16,
+  "blocks": [
+    {
+      "sector": 0,
+      "levels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "irreducible_dimension": 1,
+      "maximum_eigenvalue": 0.2884125238622677,
+      "minimum_eigenvalue": 0.0,
+      "symmetry_residual": 0.0
+    },
+    {
+      "sector": 1,
+      "levels": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "irreducible_dimension": 4,
+      "maximum_eigenvalue": 0.20604580892526375,
+      "minimum_eigenvalue": 0.0,
+      "symmetry_residual": 0.0
+    },
+    {
+      "sector": 2,
+      "levels": [
+        2,
+        3
+      ],
+      "irreducible_dimension": 5,
+      "maximum_eigenvalue": 0.1875,
+      "minimum_eigenvalue": 0.0,
+      "symmetry_residual": 0.0
+    }
+  ],
+  "verified_identities": [
+    "dual covariance quadratic form equals exhaustive ensemble shell variance",
+    "symmetric-group block eigenvalues reproduce the full covariance spectrum"
+  ],
+  "scope": [
+    "Rational probability and variance comparisons are exact.",
+    "The eigenvalue comparison uses nondirected binary64 arithmetic.",
+    "The result validates only the displayed small instance."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "pure-ea-dominant-character-parallel-validation-v1",
+  "status": "EXACT_SEMANTIC_FIELD_COMPARISON",
+  "host": "peach48.devcore4.com",
+  "logical_processors": 16,
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "right_degree": 33,
+    "shell_min": 80,
+    "shell_max": 432,
+    "arb_precision_bits": 1536,
+    "shell_workers": 8,
+    "flint_threads_per_worker": 1,
+    "openblas_threads_per_worker": 1,
+    "omp_threads_per_worker": 1
+  },
+  "comparison": {
+    "shells_equal": true,
+    "claim_equal": true,
+    "current_local_serial_semantic_match": true,
+    "serial_elapsed_seconds": 771.2017428000108,
+    "parallel_elapsed_seconds": 84.70951886300463,
+    "speedup": 9.10407417196203,
+    "parallel_worker_elapsed_seconds": [
+      78.03973190899706,
+      76.48319385596551,
+      76.61505911598215,
+      76.46777996001765,
+      76.53380873397691,
+      76.10869491798803,
+      76.19971459900262,
+      76.17296976700891
+    ]
+  },
+  "sha256": {
+    "serial_receipt_at_peach": "f4c1a36529b6497afb1dcb7e841ad4f13967453a795d3d83cbe232659e65790d",
+    "current_local_serial_receipt": "1c664de6a49f328a48267a07d4ec297c07abf65b84b4dccb1be0d16dd7b79baa",
+    "parallel_receipt": "598a48231cd429a6ab02f2a90d4a7a6218f05602a57e750edc56bd4cd6bd31a7",
+    "semantic_shells_and_claim": "f31074cf762920c98ef7ab80891b9ce4e4a28141c105f7dc36ac12feaa319b93"
+  },
+  "scope": [
+    "The comparison was executed on Peach after the local serial receipt was uploaded through the authenticated plink channel.",
+    "Metadata fields that necessarily differ between serial and parallel execution were not compared.",
+    "Every shell row and the complete claim object were compared for exact JSON equality.",
+    "The current local serial receipt has updated nonclaim metadata. Its canonical shells-and-claim SHA-256 equals the corresponding hash of both receipts retained on Peach."
+  ]
+}

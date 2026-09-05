@@ -1,0 +1,83 @@
+{
+  "schema": "expander-ec-d10-m15-k20-wrapper-outward-v1",
+  "status": "OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "claim": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "failure_probability_upper": "[7.70311144615061362732969068224966467995825893389853286117e-16 +/- 1.30e-73]",
+    "failure_margin_bits_lower": "[50.2054082202816788347083311557281444768590509197015245073 +/- 1.52e-56]",
+    "comparison_to_2^-40": true
+  },
+  "parent": {
+    "parameters": {
+      "k": 1048585,
+      "n": 2097170,
+      "cutoff": 228607,
+      "left_degree": 10,
+      "right_degree": 5,
+      "memory": 15,
+      "target_bits": 40
+    },
+    "minimum_distance_at_least_on_good_event": 228608,
+    "certificate": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\expander_ec_d10_m15_k20_parent_candidate.json",
+    "certificate_sha256": "250ea3e3759ba1ec42dc0bda3324de074d8dbb067f43b5af2e90aaccb64d37ee",
+    "outward_contributions": {
+      "exact_supports_1_through_32": "[7.70311144615061362732968271747846524679205045228619262904e-16 +/- 2.63e-73]",
+      "outer_blocks": "[7.96477119943316620848161234023212782897541152591764119914e-40 +/- 2.33e-97]",
+      "central_blocks": "[6.02577307373254868611648255500149916243273277392791736595e-1946 +/- 3.07e-2003]",
+      "full_support": "[8.72929831258621719129358093209789500180219292882062777231e-344440 +/- 4.17e-344497]"
+    }
+  },
+  "wrapper": {
+    "shortened_input_coordinates": 9,
+    "punctured_output_coordinates": 18,
+    "distance_loss_upper": 18,
+    "dimension_argument": "positive wrapped distance implies that puncturing cannot create a kernel word",
+    "randomness": "the wrapper is deterministic and adds no failure probability"
+  },
+  "ensemble": {
+    "expander": "binary two-sided regular with left degree 10, right degree 5, and ten independently sampled regional permutations",
+    "inner": "independently sampled wrapped binary convolution of memory 15",
+    "reuse": "all expander permutations and convolution coefficients are sampled once and shared by every message",
+    "linearity": "both the expander matrix and wrapped recurrence are binary linear maps",
+    "encoding_complexity": "ordinary and transposed maps use O(k) word operations for fixed degrees and memory"
+  },
+  "verifier_dependencies": [
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\binary_biregular_ec_certificate.py",
+      "sha256": "409a29a0373e9896a0b1e62f9412e5c5bd7f1490c644905c840c0d7ae8888290"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\check_binary_biregular_ec_certificate.py",
+      "sha256": "4393ece013bb04e93d737cb4a362a04bb79c3cc321b85fe5e46afb6e4fbbd060"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\binary_biregular_diagnostic.py",
+      "sha256": "e8399b179fa98e0078fba02116cc6c7a96eaca6cd1a55e452822879a18011ea0"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\ea_certificate.py",
+      "sha256": "422a61a3fee32b460e22f80d87950c10ac7f2812a60893a378de059883c09e98"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\regular_ec_certificate.py",
+      "sha256": "d84df83be9d8dd33dc30ffa4362522cd97968fbd8b227d4fc97c8874e728ce1b"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\regular_ec_diagnostic.py",
+      "sha256": "f37db922b982a59c3a2dd84746d26e5cfcf917180f0e329a495b5f03257b7c3a"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\expander_bounds.py",
+      "sha256": "4676834858780d3d028b00699710b324c7b075e4b4b3ddd30f80d396523714da"
+    }
+  ],
+  "limitations": [
+    "This is an Expand--Convolute code, not the structured SPIN construction.",
+    "The theorem proves minimum distance and does not provide a decoding theorem.",
+    "Linear ordinary and transposed encoding time is an operation-count statement; no implementation benchmark has been run.",
+    "The verifier currently depends on the cited expander-code worktree paths and hashes."
+  ]
+}

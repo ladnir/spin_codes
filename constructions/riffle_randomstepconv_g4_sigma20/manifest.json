@@ -1,0 +1,33 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_randomstepconv_g4_sigma20",
+  "display_name": "Riffle RandomStepConv g=4 sigma=20",
+  "status": "PAUSED_ONE_LAP_BOUNDARY_OBSTRUCTION",
+  "parent_candidate_id": "riffle_shiftalpha64_bchblockperm_parallelacc_g4",
+  "inherited": [
+    "ShiftAlpha64 systematic GF(2^64) outer code with two parity symbols",
+    "extended BCH [128,64,22] local encoder",
+    "independent uniform 128-bit permutation inside every BCH block",
+    "uniform global permutation of four-bit packets"
+  ],
+  "modified_mechanism": "replace four lane-parallel accumulators with an independent random packet-level linear map at every position",
+  "inner_parameters": {
+    "packet_bits": 4,
+    "state_bits": 20,
+    "packet_positions": 524352,
+    "terminal_state": "discarded"
+  },
+  "random_map": "M_i is independent and uniform in GF(2)^((g+sigma) x (g+sigma)); (y_i,s_(i+1))=M_i(x_i,s_i)",
+  "goal01_status": "COMPLETE",
+  "goal01_receipt": "receipts/goal01_inner_transfer_bound.json",
+  "goal02_status": "COMPLETE",
+  "goal02_receipt": "receipts/goal02_all_support_envelope.json",
+  "goal03_status": "DIAGNOSTIC_COMPLETE",
+  "goal03_receipts": [
+    "receipts/goal03_bch_moment_gate.json",
+    "receipts/goal03_bch_moment_gate_r5_r7.json"
+  ],
+  "goal04_status": "DIAGNOSTIC_COMPLETE",
+  "goal04_receipt": "receipts/goal04_all_occupation_closure.json",
+  "claim_scope": "Exact inner transfer and rank-one gap identities; outward-rounded conditional inner bounds for every packet support from 18 through N; exact BCH moment and all-occupation identities; floating-point complete first-moment diagnostic of 2^-19.7044 at 5% output weight. The candidate is paused because a late-support witness nearly saturates the 9% inner bound. No outward-rounded end-to-end distance claim."
+}

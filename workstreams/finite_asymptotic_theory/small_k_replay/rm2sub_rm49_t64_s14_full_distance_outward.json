@@ -1,0 +1,157 @@
+{
+  "schema": "rm2sub-rm49-full-distance-outward-certificate-v1",
+  "status": "OUTWARD_FULL_DISTANCE_CERTIFICATE",
+  "theorem_parameters": {
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "outer": "one fixed RM(4,9) [512,256,32] constituent repeated in 256 rows",
+    "inner": "fixed audited RM2Sub A/B pair with t=64 and s=14",
+    "routing": "independent uniform row-coordinate permutations and independent uniform permutations in 512 transposed regions",
+    "inner_randomness": "one independent uniform nonzero field scalar per RM2Sub epoch",
+    "bad_weight_upper": 13107,
+    "certified_minimum_distance_lower": 13108
+  },
+  "claim": {
+    "event": "there exists a nonzero message whose encoded word has Hamming weight at most 13107",
+    "failure_probability_upper_interval": "[1.523176871255521289789405701102375552093461859083080373215117088448001989e-13 +/- 4.29e-86]",
+    "log2_failure_probability_interval": "[-42.577981756275573124593730171371941002353388933901899904852733647182798878 +/- 7.08e-73]",
+    "margin_bits_lower": 42.57798175627556,
+    "clears_40_bits": true
+  },
+  "coverage": {
+    "occupation_interval": [
+      1,
+      256
+    ],
+    "occupation_count": 256,
+    "complete_without_overlap": true
+  },
+  "components": [
+    {
+      "role": "q1_certificate",
+      "occupation_interval": [
+        1,
+        1
+      ],
+      "occupation_count": 1,
+      "probability_upper_interval": "[1.523176870905044293899355046447020905761471203681411866166582799577996380e-13 +/- 4.08e-86]"
+    },
+    {
+      "role": "q2_certificate",
+      "occupation_interval": [
+        2,
+        2
+      ],
+      "occupation_count": 1,
+      "probability_upper_interval": "[3.46595256526595941503887262023594075963731072116257226582172981808697900e-23 +/- 5.54e-95]"
+    },
+    {
+      "role": "q3_q4_certificate",
+      "occupation_interval": [
+        3,
+        4
+      ],
+      "occupation_count": 2,
+      "probability_upper_interval": "[9.63271686505850033394648749625744009523619272933472930242178891792810050e-26 +/- 3.64e-98]"
+    },
+    {
+      "role": "q05_q29_certificate",
+      "occupation_interval": [
+        5,
+        29
+      ],
+      "occupation_count": 25,
+      "probability_upper_interval": "[2.918467676948863118072735558770835428413815659343589357590448278211477693e-25 +/- 1.40e-98]"
+    },
+    {
+      "role": "q30_certificate",
+      "occupation_interval": [
+        30,
+        30
+      ],
+      "occupation_count": 1,
+      "probability_upper_interval": "[1.390330960717271266536928302866126638034013075142665306203306943584348995e-370 +/- 5.26e-443]"
+    },
+    {
+      "role": "q031_q256_certificate",
+      "occupation_interval": [
+        31,
+        256
+      ],
+      "occupation_count": 226,
+      "probability_upper_interval": "[4.3097333306622215389407949124589093540853429939683892245090880800463551367e-390 +/- 6.47e-464]"
+    }
+  ],
+  "arithmetic": {
+    "library": "python-flint Arb",
+    "precision_bits": 256,
+    "union_rule": "sum the six authenticated positive component upper bounds"
+  },
+  "inputs": {
+    "manifest": "RM2SUB_RM49_FULL_CERTIFICATE_MANIFEST.json",
+    "manifest_sha256": "dc7bd009d4eea2030fdbe8c6a660c96fc0c189611bcb591fb1c7e04165556576",
+    "checker_sha256": "f2d6aa634a366f372d86b23da4ddf0a33caa576eb22d249db20be63fd0c97f01",
+    "files": [
+      {
+        "role": "q1_checker",
+        "path": "certify_rm2sub_rm49_q1_outward.py",
+        "sha256": "e71d757394cb453209db4875f803f04daabd9d4382ea6de7d988272d9b5da4cd"
+      },
+      {
+        "role": "q1_certificate",
+        "path": "rm2sub_rm49_t64_s14_q1_outward.json",
+        "sha256": "bb21dc5cdd761714e1a1ec304c8a94832822591c539e3301a70106a9e4c4107a"
+      },
+      {
+        "role": "q2_checker",
+        "path": "certify_rm2sub_rm49_q2_shells_outward.py",
+        "sha256": "5dfcda8de811116b0a83c58e97f1e5ee1d9d3d5929c011ec3701c84afc763262"
+      },
+      {
+        "role": "q2_certificate",
+        "path": "rm2sub_rm49_t64_s14_q2_shells_outward.json",
+        "sha256": "ac9ddeb0d78f30d8ac89f0b6f915527a455f8712c479fdf0e504f1d209ec4fc4"
+      },
+      {
+        "role": "q3_q4_checker",
+        "path": "certify_rm2sub_rm49_q3_q4_outward.py",
+        "sha256": "a9b956b54fdbc899dbf51e13304eb3950f54e0ea2613453d7d2fc7cac9ae9352"
+      },
+      {
+        "role": "q3_q4_certificate",
+        "path": "rm2sub_rm49_t64_s14_q3_q4_outward.json",
+        "sha256": "ab77b167c6a83e08f299dca71ae103ae519d737d0b8be8f28ec1bfd8d6106de0"
+      },
+      {
+        "role": "q05_q29_checker",
+        "path": "certify_rm2sub_rm49_q05_q29_outward.py",
+        "sha256": "69fe97c96fc8a665dc9d20b980f9c1716008bb552a1e611dacb3cf0acbb543d4"
+      },
+      {
+        "role": "q05_q29_certificate",
+        "path": "rm2sub_rm49_t64_s14_q05_q29_outward.json",
+        "sha256": "b762bc4e73510be8f1cda6a686429ce8e83596fb9dddd6d06f4930fd433cf974"
+      },
+      {
+        "role": "q30_checker",
+        "path": "certify_rm2sub_rm49_q30_outward.py",
+        "sha256": "69f3a6e578008c669b05ebc4e3ae9ac699cc286379b7671c429a90146f7bafcf"
+      },
+      {
+        "role": "q30_certificate",
+        "path": "rm2sub_rm49_t64_s14_q30_outward.json",
+        "sha256": "b19237b73ade3ddf658e34bdb65ec9f5a9e794895011e0e3478113db2af9a87b"
+      },
+      {
+        "role": "q031_q256_checker",
+        "path": "certify_rm2sub_rm49_q31_q256_outward.py",
+        "sha256": "81a3e9c8cf181e1edd514891948489f18e5c538df766e7c206935e1fe7044b02"
+      },
+      {
+        "role": "q031_q256_certificate",
+        "path": "rm2sub_rm49_t64_s14_q031_q256_outward.json",
+        "sha256": "374a91586361b718c784a38b77ca566c5a60192e9f009f4673c16ca752863b9a"
+      }
+    ]
+  }
+}

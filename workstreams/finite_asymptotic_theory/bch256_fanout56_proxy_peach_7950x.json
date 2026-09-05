@@ -1,0 +1,112 @@
+{
+  "schema": "finite-k20-bch256-fanout56-production-structure-proxy-v1",
+  "date": "2026-09-02",
+  "status": "MEASURED_PERFORMANCE_PROXY_NOT_EXACT_BCH250_ENCODER",
+  "machine": {
+    "host": "peach48.devcore4.com",
+    "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+    "pinned_cpu": 15,
+    "kernel": "6.17.0-41-generic",
+    "load_average_before_run": [1.61, 0.71, 0.51],
+    "load_average_after_run": [1.61, 0.71, 0.51]
+  },
+  "compiler": {
+    "name": "g++",
+    "version": "15.2.0",
+    "flags": "-std=c++20 -O3 -DNDEBUG -march=native -pthread -I."
+  },
+  "proxy_construction": {
+    "outer": "frozen ExtendedBch256x128Eq3 transpose",
+    "message_blocks": 1048576,
+    "code_blocks": 2097152,
+    "block_bits": 128,
+    "outer_rows": 8192,
+    "outer_length": 256,
+    "outer_dimension": 128,
+    "inner": "frozen RM2Sub-S19 reverse emitter",
+    "routing": "frozen packed 24-bit route, four 2048-row tiles, fused emit-route-outer pipeline",
+    "fanout": {
+      "layers_per_row": 56,
+      "source_size": 31,
+      "target_size": 33,
+      "transpose_xors_per_row_layer": 63,
+      "transpose_xors_per_call": 28901376,
+      "explicit_schedule_mib": 28.0,
+      "schedule_generation": "std::mt19937_64 benchmark generator with independent 64-coordinate samples for each row and layer",
+      "transpose_composition_order": "layers 55 through 0"
+    }
+  },
+  "correctness": {
+    "status": "PASS",
+    "checks": [
+      "RM2Sub-S19 optimized reverse emitter agrees with its independent dense transpose oracle",
+      "zero-layer fused output agrees block-for-block with a materialized-inner staged route and BCH transpose",
+      "56-layer fused output agrees block-for-block with the staged route, reverse layer composition, and BCH transpose",
+      "zero-layer and 56-layer outputs differ"
+    ],
+    "combined_checksum": "0x10a8c3949dd7a2a9"
+  },
+  "benchmark": {
+    "warmup_pairs": 3,
+    "trials_per_mode": 21,
+    "order": "alternating zero-first and fanout56-first paired measurements",
+    "setup_ms_excluded_from_online_timings": 310.983616,
+    "zero_layers": {
+      "median_ms": 10.650813,
+      "mean_ms": 10.667073,
+      "min_ms": 10.551919,
+      "max_ms": 11.003533,
+      "samples_ms": [
+        10.661864, 11.003533, 10.765498, 10.755238, 10.592444,
+        10.650813, 10.574621, 10.716547, 10.622851, 10.703773,
+        10.551919, 10.665811, 10.566887, 10.665010, 10.572687,
+        10.635354, 10.568138, 10.778943, 10.568730, 10.824858,
+        10.563020
+      ]
+    },
+    "fanout56_layers": {
+      "median_ms": 20.454284,
+      "mean_ms": 20.461394,
+      "min_ms": 20.295016,
+      "max_ms": 20.758693,
+      "samples_ms": [
+        20.383772, 20.758693, 20.568447, 20.433355, 20.391567,
+        20.454284, 20.613110, 20.295016, 20.525657, 20.497495,
+        20.485061, 20.470654, 20.603032, 20.387559, 20.501442,
+        20.331314, 20.394883, 20.360218, 20.367712, 20.298703,
+        20.567295
+      ]
+    },
+    "comparison": {
+      "ratio_of_mode_medians": 1.920443,
+      "difference_of_mode_medians_ms": 9.803471,
+      "median_paired_increment_ms": 9.799123,
+      "mean_paired_increment_ms": 9.794320,
+      "min_paired_increment_ms": 9.473845,
+      "max_paired_increment_ms": 10.038489
+    }
+  },
+  "mapping_to_bch250_proof_model": {
+    "exact_bch250_rows": 8576,
+    "proxy_bch256_rows": 8192,
+    "exact_to_proxy_row_ratio": 1.046875,
+    "exact_bch250_fanout_xors_per_call": 30256128,
+    "linear_row_scaled_increment_ms": 10.263009,
+    "interpretation": "The scaled increment is an engineering estimate, not a measured exact-encoder result. It assumes fanout cost scales linearly with row count and does not model the BCH250 outer or shortening projection."
+  },
+  "scope": {
+    "proved": false,
+    "exact_encoder_benchmarked": false,
+    "ordinary_forward_encoder_benchmarked": false,
+    "proof_compatible_setup_sampler": false,
+    "claim": "This receipt measures the cost of adding 56 row-local fanout layers to the frozen packed, tiled, fused BCH256 transpose path."
+  },
+  "source_sha256": {
+    "proxy256_fanout56/RiffleFieldCheckpoint_Bench.cpp": "79497a33ff54f68e83c136d019dd9b0a469966b160dbe8cd9880e30029239768",
+    "proxy256_fanout56/libOTe/Tools/RiffleCode/RiffleExactPermFieldCheckpoint.h": "53794f9b6cabbbac568344b80a314a15352fd3b1361766c51cf53c17d7c86eae",
+    "unchanged_remote_dependency/libOTe/Tools/RiffleCode/RiffleRm2SubS19.h": "c7e4e51ff4e6726dba827cf879a9e520250c6a7786d1a39eb2fd17c5b7f2fb6b",
+    "remote_binary": "1f8cd175663d57d2e1a8aa88a507f80ee0d60495f621f01fa88373a4d46b9874",
+    "remote_stdout": "fe51b8d9e58ff72235b76ecccb18639ea94c4fa0e5a5057fcb2a5b372458eebf"
+  },
+  "remote_workspace": "/tmp/riffle_fanout56_proxy_v1"
+}

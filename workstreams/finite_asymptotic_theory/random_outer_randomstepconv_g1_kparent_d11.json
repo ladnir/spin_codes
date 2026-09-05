@@ -1,0 +1,48 @@
+{
+  "schema": "random-outer-randomstepconv-g1-finite-v1",
+  "status": "BINARY64_DIAGNOSTIC_EXACT_TWO_STATE_TRANSFER",
+  "construction": {
+    "outer": "one uniform random binary linear map from k input bits to N outer bits",
+    "inner": "independent uniform unrestricted binary linear (M+1)-by-(M+1) map at every bit position",
+    "recurrence": "(y_t,s_{t+1}) = M_t (x_t,s_t)",
+    "initial_state": 0,
+    "terminal_state": "discarded",
+    "shared_setup": "all sampled maps are fixed and shared by every message"
+  },
+  "probability_space": "the random outer generator and all independent RandomStepConv step maps",
+  "parameters": {
+    "message_bits": 1059840,
+    "output_bits": 2119680,
+    "relative_distance": 0.11,
+    "distance_cutoff": 233164
+  },
+  "rows": [
+    {
+      "memory_bits": 19,
+      "log_surprisal": 0.737480712099044,
+      "surprisal": 2.0906618951833993,
+      "z": 0.12360529498602277,
+      "log2_expected_bad_upper": -157.69321795731048,
+      "margin_bits": 157.69321795731048,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    },
+    {
+      "memory_bits": 23,
+      "log_surprisal": 0.7375160201671306,
+      "surprisal": 2.0907357137191274,
+      "z": 0.12359617096090389,
+      "log2_expected_bad_upper": -177.0779463870568,
+      "margin_bits": 177.0779463870568,
+      "closes_one_bit": true,
+      "closes_40_bits": true,
+      "optimizer_success": true
+    }
+  ],
+  "limitations": [
+    "The random outer is a full random linear map, not the repeated BA outer.",
+    "Arithmetic and tilt optimization use nearest binary64.",
+    "The calculation proves no implementation-cost bound."
+  ]
+}

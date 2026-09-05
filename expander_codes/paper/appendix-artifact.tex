@@ -1,0 +1,134 @@
+\section{Reproducing the finite certificates}
+\label{app:artifact}
+
+The repository contains the certificate files, verifiers, manifest, and tests
+used for the finite claims.  Run the following commands from the
+\path{expander_codes} directory.  The commands are intentionally serial: each
+verifier can use substantial processor time and memory.
+
+Install the tested dependency versions with
+\begin{verbatim}
+python -m pip install -r requirements.txt
+\end{verbatim}
+The manifest records the tested Python and package versions.  To check every
+input digest, command, claim label, and dependency, run
+\begin{verbatim}
+python scripts/verify_manifest.py --strict-versions --list
+\end{verbatim}
+To replay the principal results or every rigorous entry, respectively, run
+\begin{verbatim}
+python scripts/verify_manifest.py --run headline
+python scripts/verify_manifest.py --run all
+\end{verbatim}
+The driver launches one subprocess at a time and reports the elapsed time for
+each entry.  The degree-$6/3$ exact transfer is tagged \texttt{slow}; its final
+band can take several minutes and use substantially more memory than the
+other binary checks.
+
+\paragraph{Tests.}
+The full test suite is
+\begin{verbatim}
+python -m unittest discover -s scripts -p "test_*.py"
+\end{verbatim}
+
+\paragraph{Binary Bernoulli EA.}
+The three rows of Table~\ref{tab:ea-finite} are checked together by
+\begin{verbatim}
+python scripts/ea_certificate.py table \
+  scripts/certificates/ea-k20-r5-d005-w50-s20.json \
+  scripts/certificates/ea-k25-r5-d005-w56-s20.json \
+  scripts/certificates/ea-k30-r5-d005-w62-s20.json
+\end{verbatim}
+On PowerShell, replace each trailing backslash by a backtick.
+
+\paragraph{Regular binary ensembles.}
+The first two programs use the default rate-one-half parameters in
+Theorem~\ref{thm:regular-binary-certificates}:
+\begin{verbatim}
+python scripts/regular_ea_certificate.py
+python scripts/regular_ec_certificate.py
+\end{verbatim}
+Each two-sided binary EC claim uses a frozen marker file.  Check its structure,
+then run its numerical verifier:
+\begin{verbatim}
+python scripts/check_binary_biregular_ec_certificate.py \
+  results/binary_biregular_ec_rate_half_d10_m15_gv.json
+python scripts/binary_biregular_ec_certificate.py verify \
+  results/binary_biregular_ec_rate_half_d10_m15_gv.json
+python scripts/check_binary_biregular_ec_certificate.py \
+  results/binary_biregular_ec_rate_half_d14_m6_gv.json
+python scripts/binary_biregular_ec_certificate.py verify \
+  results/binary_biregular_ec_rate_half_d14_m6_gv.json
+python scripts/check_binary_biregular_ec_certificate.py \
+  results/binary_biregular_ec_rate_half_d18_m4_gv.json
+python scripts/binary_biregular_ec_certificate.py verify \
+  results/binary_biregular_ec_rate_half_d18_m4_gv.json
+python scripts/check_binary_biregular_ec_d6_certificate.py \
+  results/binary_biregular_ec_rate_half_d6_m79_gv.json
+python scripts/binary_biregular_ec_d6_certificate.py verify \
+  results/binary_biregular_ec_rate_half_d6_m79_gv.json
+\end{verbatim}
+The structural checker uses only the Python standard library.  It validates
+the parameter relations, marker domains, and support partition without
+loading the optimizer or the numerical verifier.
+
+\paragraph{Finite-field EA.}
+The certificate in Theorem~\ref{thm:p-ea-certificate} is checked by
+\begin{verbatim}
+python scripts/prime_field_biregular_ea_certificate.py verify \
+  results/prime_field_biregular_ea_p127_rate_half_d30_gv.json
+\end{verbatim}
+
+\paragraph{Finite-field EC.}
+The four EC rows of Table~\ref{tab:p-ec-frontier} and the
+$\F_{2^{128}}$ results in Theorem~\ref{thm:gf128-ec-certificate} use the
+following verifier and certificate pairs:
+{\small
+\begin{verbatim}
+python scripts/prime_field_biregular_ec_certificate.py verify \
+  results/prime_field_biregular_ec_p127_rate_half_d28_m3_gv.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/prime_field_biregular_ec_p127_rate_half_d26_m4_singleton_gv.json
+python scripts/prime_field_biregular_ec_d24_m6_certificate.py verify \
+  results/prime_field_biregular_ec_p127_rate_half_d24_m6_singleton_gv.json
+python scripts/prime_field_biregular_ec_d22_m12_certificate.py verify \
+  results/prime_field_biregular_ec_p127_rate_half_d22_m12_region_gv.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/finite_field_biregular_ec_gf128_rate_half_d26_m4.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/finite_field_biregular_ec_gf128_rate_half_d24_m5_40bit.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/finite_field_biregular_ec_gf127_rate_half_d24_m5_40bit.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/finite_field_biregular_ec_gf129_rate_half_d24_m5_40bit.json
+python scripts/prime_field_biregular_ec_singleton_certificate.py verify \
+  results/finite_field_biregular_ec_gf136_rate_half_d24_m5_38bit.json
+\end{verbatim}
+}
+
+Each numerical verifier reads fixed decimal marker choices and recomputes the
+complete upper bound with outward rounding.  Most bounds use Arb real balls.
+The degree-$6/3$ exact transfer uses upward-rounded exponent-layered binary64
+matrices and passes their scaled row sums to Arb.  Some older binary verifiers
+compute their markers at startup; the theorem-specific JSON certificates do
+not.  The optimizer is not trusted: changing a marker can weaken a bound, but
+it cannot make the verifier accept an invalid inequality.  The checked
+support partition is likewise part of verification.
+
+The frozen-marker values in Table~\ref{tab:field-size-diagnostic} are recorded
+in the following file:
+\begin{center}
+\small
+\path{results/finite_field_biregular_ec_gf128_rate_half_d24_m5_field_size_diagnostic.json}.
+\end{center}
+The file identifies each interval certificate by its SHA-256 digest.  It also
+marks the remaining calculations as floating-point diagnostics.
+
+The machine-readable file \path{certificate_manifest.json} maps every
+finite theorem and table to its command, frozen inputs, arithmetic precision,
+and expected failure exponent.  It hashes the complete trusted verifier
+source tree and every certificate used by a finite claim or diagnostic table.  Entries marked
+\texttt{diagnostic} are not accepted as proofs.  Frozen entries only invoke
+verification subcommands and never regenerate markers.  A few legacy binary
+entries choose a marker at startup; their optimizer is untrusted because Arb
+checks the resulting inequality before the command succeeds.

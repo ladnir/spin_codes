@@ -1,0 +1,45 @@
+done 2. Peter: add to section 10, implementation paragraph (first paragraph) something about ZK, it only talks about pcgs
+done 3. Figure 10: explain what * means in the caption
+done 5. add a sentence or 2 to abstract with zk numbers
+done "For w \in [0,n]  there are \delta := k \choose w inputs with hamming weight w" shouldn't it be w \in [0,k]?
+done Implement lemmaref
+
+
+1. Srini: Review 8.3
+4. we do not run enumerators to 2^20, write some proof that we do not need to.
+
+From reviewers at EC:
+
+
+Is this one done???
+vvvvvvvvvvvvvvvvv
+In section 6.2 before lemma 1 fix the mathematical notation so that it is less ambiguous that the codomain of Q is the power set of [k/\sigma] = [1, ... , k/sigma]
+
+
+
+done 
+For iterative enumeration you still need to compute all of the inner E^{D_i}_{w_i, h_i} values where w_i can take on up to n_i different values and h_i has n_{i+1} and unrolling the sum looks like it's the original one. Does the gain come from simply not considering each codeword individually but grouping them all by those that have the same hamming weight? Do you use it in combination with the permutation matrix to argue something about the message space distribution for the intermediate codewords? Is this mainly an argument that you can compute each E^{D_i}_{w_i,h_i} separately at the same time and then use the \delta distributions to calculate the total E^{D_total}_{w,h}? How else would you do it? Explain this in the section and the reasoning behind it in the tech overview.
+
+done.
+Page 19, "this can easily be seen by the fact that ... does not go below log \delta h = 0 in Figure 1" but it does go below after h = 450. In this section, say that because the codes considered in this work are linear, the minimum distance is equal to the hamming weight of the smallest codewords. Then it becomes clear that for these graphs the expected minimum distance occurs when the best fit line intersects with x = 0 while having positive slope.
+
+done
+ - In Figure 10, when comparing to EA or EC codes, do you use the asymptotic bounds on the failure probability, or the bound that comes directly from the IOWEF (as you use in your upper bound)? I think it's only fair if all the bounds come directly from the IOWEF.
+
+done
+ - Page 2: for scaling RA-t codes to larger alphabets there are some challenges with just using IOWE (see, e.g., Rosnes and Graell i Amat, "On the Analysis of Weighted Nonbinary Repeat Multiple-Accumulate Codes"). I would therefore suggest that the IOWEF you have for your codes will naturally lead to an effective bound over larger alphabets is a bit overly optimistic (unless you just mean that you naturally embed the binary code into a larger characteristic 2 field without damaging the minimum distance, as done in e.g. Blaze).
+ 
+ done :(
+ - Page 8: I would highly recommend not using \mathbb{Z} for {0,1,2,...}, since that is almost universally defined to be all integers (including negative integers). Maybe \mathbb{Z}_{\geq 0}?
+
+
+
+#
+# RIGHT BEFORE PAPER SUBMISSION
+#
+
+Once all above is done:
+1. Use prism to check for typo/grammar
+2. use prism to check there is nothing incomplete/something out of context
+2. cut to required length
+3. check there are no ??

@@ -1,0 +1,90 @@
+{
+  "schema": "pure-ea-primal-schur-diagonal-outward-v1",
+  "status": "OUTWARD_BINARY64_UPPER_BOUND",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3
+  },
+  "enumerated_pair_types": 35,
+  "elapsed_seconds": 0.01279670000076294,
+  "entries": [
+    {
+      "sector": 0,
+      "level": 0,
+      "scaled_diagonal_upper": 10.956846788525679
+    },
+    {
+      "sector": 0,
+      "level": 1,
+      "scaled_diagonal_upper": 6.550995603203841
+    },
+    {
+      "sector": 0,
+      "level": 2,
+      "scaled_diagonal_upper": 4.205746516585399
+    },
+    {
+      "sector": 0,
+      "level": 3,
+      "scaled_diagonal_upper": 2.5643749237060867
+    },
+    {
+      "sector": 0,
+      "level": 4,
+      "scaled_diagonal_upper": 2.2868056297302557
+    },
+    {
+      "sector": 1,
+      "level": 1,
+      "scaled_diagonal_upper": 3.281250000000022
+    },
+    {
+      "sector": 1,
+      "level": 2,
+      "scaled_diagonal_upper": 1.5000000000000102
+    },
+    {
+      "sector": 1,
+      "level": 3,
+      "scaled_diagonal_upper": 0.8789062500000067
+    },
+    {
+      "sector": 1,
+      "level": 4,
+      "scaled_diagonal_upper": 0.7265625000000057
+    },
+    {
+      "sector": 2,
+      "level": 2,
+      "scaled_diagonal_upper": 1.5703125000000098
+    },
+    {
+      "sector": 2,
+      "level": 3,
+      "scaled_diagonal_upper": 1.054687500000007
+    },
+    {
+      "sector": 2,
+      "level": 4,
+      "scaled_diagonal_upper": 1.4531250000000115
+    }
+  ],
+  "shells": [
+    {
+      "shell_weight": 2,
+      "mean_lower": 1.3073730468749951,
+      "mean_log2_lower": 0.38667085963761283,
+      "variance_to_mean_upper": 14.410885934537761,
+      "variance_to_mean_log2_upper": 3.8490871253393446,
+      "passes_factor_512": true
+    }
+  ],
+  "proof_scope": [
+    "Every reported diagonal is an upper bound under IEEE-754 binary64 round-to-nearest arithmetic with gradual underflow.",
+    "Sector zero uses a termwise rational-log bound on the absolute locally centered contribution.",
+    "Sector one discards negative determinant contributions; sector two is nonnegative.",
+    "The exact diagonal insertion lemma reduces all higher sectors to sector two for levels at most output_bits/2.",
+    "The shell contraction uses exact accumulator run counts and an outward lower bound on the shell mean."
+  ]
+}

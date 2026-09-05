@@ -1,0 +1,26 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_transpose_bitshuffle_randomstepconv",
+  "display_name": "Riffle TransposeBitShuffle-RandomStepConv g",
+  "status": "CERTIFIED_RANDOM_ENSEMBLE_DISTANCE",
+  "parent_candidate_id": "riffle_transpose_packetshuffle_randomstepconv",
+  "outer": "independent uniform random rate-half linear injections of B/2 bits into B bits",
+  "packet_bits": "parameter g, formed after bit permutation",
+  "permutation": "transpose the outer-block matrix, independently permute all L bits in each of B rows, then partition each row into g-bit inner inputs",
+  "inner": "one-lap RandomStepConv with independent unrestricted (g+sigma)-square binary matrices and discarded terminal state",
+  "observed_positive_cells": [
+    {"outer_bits": 1024, "packet_bits": 4, "sigma": 13, "distance": 188743, "lambda_bits_lower": 83.087891407589, "certificate": "packed-support domination"},
+    {"outer_bits": 512, "packet_bits": 4, "sigma": 15, "distance": 188743, "lambda_bits_lower": 57.641932041422, "certificate": "packed-support domination"},
+    {"outer_bits": 256, "packet_bits": 4, "sigma": 18, "distance": 188743, "lambda_bits_lower": 45.400358851794, "certificate": "packed-support domination"},
+    {"outer_bits": 1024, "packet_bits": 8, "sigma": 12, "distance": 188743, "lambda_bits_lower": 83.201070356493, "certificate": "exact bit-shuffle row coefficients"},
+    {"outer_bits": 512, "packet_bits": 8, "sigma": 14, "distance": 188743, "lambda_bits_lower": 57.659313166668, "certificate": "exact bit-shuffle row coefficients"},
+    {"outer_bits": 256, "packet_bits": 8, "sigma": 17, "distance": 188743, "lambda_bits_lower": 45.402590000096, "certificate": "exact bit-shuffle row coefficients"}
+  ],
+  "numerical_candidate_cells": [
+    {"outer_bits": 512, "packet_bits": 4, "sigma": 14, "distance": 188743, "lambda_bits_estimate": 40.297311369318, "method": "tilted Fourier one-block tail plus full Chernoff spectrum for occupations at least two"},
+    {"outer_bits": 256, "packet_bits": 4, "sigma": 17, "distance": 188743, "lambda_bits_estimate": 42.400958099659, "method": "tilted Fourier one-block tail plus full Chernoff spectrum for occupations at least two"},
+    {"outer_bits": 512, "packet_bits": 8, "sigma": 13, "distance": 188743, "lambda_bits_estimate": 40.325903980744, "method": "tilted Fourier one-block tail plus full Chernoff spectrum for occupations at least two"},
+    {"outer_bits": 256, "packet_bits": 8, "sigma": 16, "distance": 188743, "lambda_bits_estimate": 42.404325695198, "method": "tilted Fourier one-block tail plus full Chernoff spectrum for occupations at least two"}
+  ],
+  "claim_scope": "Complete random-ensemble distance certificates at n=2^20 and distance threshold 188743 for the displayed cells. The g=8 receipts use the exact bit-shuffle coefficient checker. The g=4 claims inherit the proved packed-support upper bound and are also reproduced by the exact diagnostic."
+}

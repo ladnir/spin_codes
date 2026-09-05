@@ -1,0 +1,36 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_fieldcheckpoint_accumulate_t32_s64_k32",
+  "display_name": "Riffle FieldCheckpointAccumulate t=32 s=64 K=32",
+  "status": "ACTIVE_PROOF_EXPLORATION",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_structuredstepconv",
+  "outer": "fixed binary [256,128] code with a supplied spectrum; independent output-coordinate permutation per outer block",
+  "permutation": "transpose to 256 regions and independently permute the 8192 bits in every region",
+  "inner": "64 parallel accumulator lanes; after each 32 batches of 32 bits, multiply the state by the transpose of an independent uniform nonzero GF(2^64) multiplier",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "step_bits": 32,
+    "state_bits": 64,
+    "checkpoint_steps": 32,
+    "checkpoint_epoch_bits": 1024,
+    "epochs_per_region": 8
+  },
+  "proof_status": {
+    "fixed_epoch_input_transfer": "exact two-state formula",
+    "uniform_r_subset_epoch_transfer": "exact coefficient formula and brute-force validation",
+    "one_active_outer_block": "floating-point Chernoff diagnostic",
+    "two_active_outer_blocks": "complete modeled-spectrum floating-point diagnostic",
+    "regular_occupations_all_counts_at_relative_distance_0.06": "complete floating-point density-envelope diagnostic",
+    "one_all_one_word_at_relative_distance_0.06": "complete floating-point diagnostic",
+    "two_or_more_all_one_words_below_dense_threshold": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "one_active_results": {
+    "lambda_bits_at_relative_distance_0.09": 81.2666974906473,
+    "40_bit_relative_distance_diagnostic": 0.14049,
+    "dominant_modeled_outer_weight_at_0.09": 38
+  },
+  "claim_scope": "The outer spectrum is a modeled BCH-like [256,128,38] profile. The 9% full-occupation first-moment route fails in the middle-density range. At 6%, all regular occupations and the one-all-one layer are covered numerically, but configurations with at least two all-one words below the dense threshold and outward rounding remain open."
+}

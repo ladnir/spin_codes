@@ -1,0 +1,27 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_ldpcsplitstate_packetmul_g4_t256_s64",
+  "display_name": "Riffle LDPCSplitState PacketMul g=4 t=256 s=64",
+  "status": "PAUSED_LOW_EXPECTED_VALUE",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_ldpcsplitstate_g4_t256_s64",
+  "modification": "independent uniform nonzero GF(16) multiplier on every four-bit packet before packet-position permutation",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "packet_bits": 4,
+    "step_bits": 256,
+    "state_bits": 64,
+    "epochs": 8192,
+    "packet_multipliers": 524288
+  },
+  "proof_status": {
+    "survivor_factorization": "exact: every profile is a scalar mixture over a Poisson-binomial number of uniform nonzero packets",
+    "active_packet_collapse": "exact for one region; the tested profile-free exponential envelope loses 19140.366 bits against the exact occupation-128 sum because of a late-start path",
+    "occupation_128": "all 16335 profiles are positive at the common p=1/2 point; all-quad is worst with 7105.481 bits",
+    "termination": "all-quad law and its 1007.389-bit termination inflation are unchanged",
+    "end_to_end_distance": "open",
+    "pause_decision": "paused on 2026-08-29 with its parent packet branch; PacketMul simplifies packet values but does not remove the persistent 256-region shared-profile obstruction, and its unmeasured implementation cost may consume the packet route's approximately 1 ms gross advantage"
+  },
+  "claim_scope": "Floating-point diagnostic under the modeled outer-spectrum envelope. No implementation, fixed multiplier schedule certificate, outward rounding, all-one analysis, or complete all-occupation distance proof is provided."
+}

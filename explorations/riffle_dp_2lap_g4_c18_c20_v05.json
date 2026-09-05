@@ -1,0 +1,30 @@
+{
+  "schema": "riffle-dp-2lap-g4-c18-c20-certificate-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT_EXHAUSTIVE_CERTIFICATE",
+  "packet_value": 5,
+  "code_length": 192,
+  "code_dimension": 38,
+  "component_degrees": [18,20],
+  "required_two_sided_distance": 48,
+  "information_radius": 9,
+  "hamming_ball_size": 227881004,
+  "information_set_count": 5,
+  "information_partition_restarts": 1,
+  "information_sets": [
+    [38,125,173,183,35,135,45,97,176,178,65,117,107,82,29,110,15,11,111,50,94,86,151,116,37,88,2,105,165,68,174,9,55,190,119,155,124,25],
+    [70,89,184,167,60,147,39,54,152,14,30,96,187,138,118,4,103,12,98,91,166,139,44,18,87,52,73,158,106,28,126,114,83,43,153,17,85,177],
+    [42,127,144,90,102,51,122,175,26,123,10,41,7,113,64,156,191,160,75,146,92,71,168,67,162,22,48,31,115,69,76,134,112,100,141,36,180,169],
+    [58,131,53,108,104,74,84,56,132,101,61,99,57,34,0,3,148,5,78,142,79,140,33,128,24,154,20,143,159,40,1,149,136,121,23,179,161,163],
+    [32,27,181,188,93,172,21,66,157,170,189,63,133,13,19,77,95,182,47,59,130,6,72,185,171,16,62,150,8,46,186,49,80,137,109,81,120,145]
+  ],
+  "unused_coordinates": [164,129],
+  "total_information_vectors_checked": 1139405020,
+  "minimum_enumerated_weight": 50,
+  "minimum_enumerated_complement_weight": 49,
+  "elapsed_seconds": 4.2040225,
+  "passed": true,
+  "result": "PASS",
+  "proof_rule": "Five disjoint information sets cover 190 coordinates. A word or complement of weight below the required distance restricts to Hamming radius floor((d-1)/5) in at least one set. Each restriction determines one codeword. The search exhausts both balls around zero and one.",
+  "scope_limitation": "This receipt covers one packet value and only the C_18 direct-sum C_20 character subcode."
+}

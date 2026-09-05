@@ -1,0 +1,111 @@
+{
+  "schema": "one-stage-sparse-ea-vs-bch-comparison-v1",
+  "status": "EXACT_KERNELS_AND_MEASURED_PERFORMANCE",
+  "host": {
+    "name": "Peach",
+    "os": "Linux 6.17.0-41-generic x86_64 GNU/Linux",
+    "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+    "available_cpus": 16,
+    "threads_per_core": 1,
+    "l1d": "512 KiB across 16 instances",
+    "l2": "16 MiB across 16 instances",
+    "l3": "64 MiB across 2 instances",
+    "compiler": "g++ (Ubuntu 15.2.0-4ubuntu4) 15.2.0",
+    "compile_flags": "-O3 -march=native -std=c++20 -pthread",
+    "pinned_cpu": 0
+  },
+  "workload": {
+    "input_blocks": 2097152,
+    "output_blocks": 1048576,
+    "block_bits": 128,
+    "input_bytes": 33554432,
+    "output_bytes": 16777216,
+    "warmups_per_run": 5,
+    "samples_per_run": 31,
+    "packing": "two independent constituent calls per AVX2 vector",
+    "execution": "four separate sequential processes in sparse,bch,bch,sparse order"
+  },
+  "sparse_ea": {
+    "construction": "C = A E with zero-initialized length-512 accumulator A and one sampled 512x256 degree-33 row-regular E",
+    "transpose": "C^T = E^T A^T",
+    "rows_sha256": "42508e8b7d1d74f52ef3b4b9d884655d113fec81408bc095e0908da995ae2fac",
+    "circuit_sha256": "929e57413cf86e25534aa1a817315f4278253567ef906190f32bbddd32bbf62e",
+    "transpose_xors_per_scalar_constituent": 9733,
+    "greedy_schedule_peak_live": 1305,
+    "compiled_function_bytes": 164189,
+    "compiled_stack_frame_bytes": 53312,
+    "runs": [
+      {
+        "median_ms": 8.658394,
+        "mean_ms": 8.675797548387097,
+        "stddev_ms": 0.052887229983659002,
+        "minimum_ms": 8.61872,
+        "maximum_ms": 8.822911,
+        "sink": 8032986753798260419,
+        "samples_ms": [8.61872, 8.624982, 8.625182, 8.627637, 8.631154, 8.632166, 8.635602, 8.637655, 8.638687, 8.641472, 8.644257, 8.646031, 8.649157, 8.655539, 8.657162, 8.658394, 8.659526, 8.660318, 8.660658, 8.668393, 8.682379, 8.686787, 8.68844, 8.690354, 8.69935, 8.726371, 8.745657, 8.766386, 8.775643, 8.792754, 8.822911]
+      },
+      {
+        "median_ms": 8.746729,
+        "mean_ms": 8.772198580645162,
+        "stddev_ms": 0.06052812631292321,
+        "minimum_ms": 8.703188,
+        "maximum_ms": 8.92402,
+        "sink": 8032986753798260419,
+        "samples_ms": [8.703188, 8.709359, 8.716202, 8.718376, 8.719268, 8.720179, 8.721222, 8.722763, 8.725941, 8.728956, 8.734506, 8.735168, 8.739375, 8.740848, 8.742051, 8.746729, 8.754213, 8.754514, 8.764372, 8.770504, 8.785511, 8.78965, 8.802363, 8.814456, 8.821228, 8.83355, 8.838691, 8.873205, 8.877573, 8.910174, 8.92402]
+      }
+    ],
+    "mean_of_run_medians_ms": 8.7025615
+  },
+  "bch": {
+    "construction": "two copies of ExtendedBch256x128-Eq3 per 512-to-256 capacity",
+    "generator_rows_sha256": "ff5f6eae3ab0e9b974e38f20334f25dc50e412018439bcbead0d53e9985dcb3d",
+    "optimizer_seed": 114,
+    "transpose_xors_per_scalar_256_to_128_constituent": 2934,
+    "transpose_xors_per_scalar_512_to_256_capacity": 5868,
+    "greedy_schedule_peak_live": 448,
+    "compiled_function_bytes": 51914,
+    "compiled_stack_frame_bytes": 19328,
+    "runs": [
+      {
+        "median_ms": 4.891437,
+        "mean_ms": 4.893633709677419,
+        "stddev_ms": 0.02098380340104666,
+        "minimum_ms": 4.864816,
+        "maximum_ms": 4.950877,
+        "sink": 12953895924677896836,
+        "samples_ms": [4.864816, 4.865378, 4.865558, 4.865718, 4.869585, 4.87206, 4.8722, 4.877941, 4.881136, 4.886847, 4.88777, 4.889011, 4.889763, 4.890144, 4.891005, 4.891437, 4.891856, 4.892148, 4.8938, 4.894953, 4.895432, 4.896576, 4.900984, 4.908618, 4.90947, 4.913598, 4.915, 4.916753, 4.917244, 4.944966, 4.950877]
+      },
+      {
+        "median_ms": 4.900543,
+        "mean_ms": 4.899723225806452,
+        "stddev_ms": 0.026602358866679256,
+        "minimum_ms": 4.856741,
+        "maximum_ms": 4.954063,
+        "sink": 12953895924677896836,
+        "samples_ms": [4.856741, 4.857062, 4.859627, 4.867632, 4.873633, 4.874495, 4.876198, 4.881297, 4.883391, 4.883431, 4.886367, 4.887359, 4.887709, 4.890093, 4.894412, 4.900543, 4.901665, 4.903048, 4.906263, 4.908257, 4.908398, 4.909138, 4.90953, 4.911274, 4.924668, 4.92565, 4.931651, 4.939626, 4.944916, 4.953282, 4.954063]
+      }
+    ],
+    "mean_of_run_medians_ms": 4.89599
+  },
+  "comparison": {
+    "sparse_to_bch_runtime_ratio": 1.7774875969926411,
+    "sparse_minus_bch_ms": 3.8065715,
+    "sparse_runtime_overhead_fraction": 0.7774875969926411,
+    "sparse_to_bch_static_transpose_xor_ratio": 1.6586571233810499
+  },
+  "hashes": {
+    "generated_source_sha256": "0b0e776843b637ff665adaebe44d63ecd81f9236c60ca394f7917c52ffb3b189",
+    "peach_binary_sha256": "7cbb5d18335023968e049f1d1c066e17acc63c9644d600cb9fe1f18c51663beb"
+  },
+  "checks": [
+    "The Python generator verifies each linear circuit exactly before emitting C++.",
+    "The benchmark executable compares both packed kernels with independent dense reference implementations before timing.",
+    "The two benchmark variants ran in separate processes and never concurrently.",
+    "Both variants use the same input and output sizes, compiler, CPU, affinity, warmup count, trial count, and AVX2 packing width."
+  ],
+  "scope": [
+    "This receipt measures the isolated outer transpose at k=2^20 and N=2^21.",
+    "It does not measure routing, the inner code, setup sampling, or an end-to-end SPIN encoder.",
+    "The fixed sparse sample has an exact rank and circuit receipt, but its realized spectrum is not enumerated; the distance theorem remains probabilistic over setup."
+  ]
+}

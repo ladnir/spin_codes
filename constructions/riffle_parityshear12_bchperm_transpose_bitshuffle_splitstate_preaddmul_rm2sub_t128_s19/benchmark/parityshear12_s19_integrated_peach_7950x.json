@@ -1,0 +1,99 @@
+{
+  "schema": "riffle-parityshear12-rm2sub-s19-integrated-performance-receipt-v1",
+  "date": "2026-08-31",
+  "machine": {
+    "host": "peach48.devcore4.com",
+    "cpu": "AMD Ryzen 9 7950X",
+    "pinned_cpu": 15,
+    "load_average_before_run": [0.18, 0.12, 0.04]
+  },
+  "construction": {
+    "name": "Riffle ParityShear12 BCHPerm BitShuffle RM2Sub-S19",
+    "message_blocks": 1048576,
+    "code_blocks": 2097152,
+    "block_bits": 128,
+    "outer": "ExtendedBch256x128Eq3 transposed encoder",
+    "outer_delta": "one independently sampled invertible output-coordinate shear per outer block",
+    "outer_shear": "sample target j and 12 distinct sources excluding j; in the transposed encoder XOR the target PCG block into each source block",
+    "outer_shear_block_xors": 98304,
+    "inner_step_blocks": 128,
+    "inner_state_blocks": 19,
+    "inner_epochs": 16384,
+    "inner_state_code": "selected RM(2,7) subcode A with B=A^T and BA=0",
+    "field": "GF(2^19) modulo x^19+x^5+x^2+x+1"
+  },
+  "compiler": {
+    "name": "g++",
+    "version": "15.2.0",
+    "flags": "-O3 -std=c++20 -march=znver4 -mavx2 -mvpclmulqdq -mpclmul -pthread"
+  },
+  "correctness": {
+    "status": "PASS",
+    "inner_oracle": "Five-epoch optimized transpose agrees block-for-block with an independent dense A, B, and GF(2^19) matrix implementation.",
+    "complete_oracle": "The full fused encoder agrees block-for-block with a materialized inner transpose, independent inner-to-outer routing, independent ParityShear-12 transpose, and BCH transpose.",
+    "checksum": "0x9f3b59bea84e65f5"
+  },
+  "benchmark": {
+    "trials": 21,
+    "integrated_full_median_ms": 10.747357,
+    "integrated_full_samples_ms": [
+      13.037981,
+      10.588349,
+      10.730745,
+      10.747357,
+      10.760240,
+      10.726147,
+      10.846942,
+      10.729383,
+      10.728882,
+      10.782602,
+      10.788413,
+      10.771822,
+      10.690220,
+      10.690690,
+      10.673237,
+      10.719163,
+      10.801257,
+      10.786459,
+      10.872490,
+      10.887538,
+      10.715326
+    ],
+    "materialized_reverse_inner_median_ms": 3.032319,
+    "materialized_reverse_inner_samples_ms": [
+      3.137745,
+      3.091188,
+      3.089676,
+      3.074888,
+      3.061113,
+      3.063948,
+      3.055081,
+      3.044371,
+      3.055943,
+      3.023663,
+      3.018833,
+      3.022280,
+      3.020968,
+      3.024534,
+      3.033841,
+      3.014506,
+      3.002032,
+      3.002524,
+      3.022060,
+      2.999377,
+      3.032319
+    ]
+  },
+  "comparison": {
+    "prior_s16_integrated_median_ms": 10.821225,
+    "median_difference_ms": -0.073868,
+    "interpretation": "Different-session comparison. The data support no observed end-to-end regression, not a speedup claim."
+  },
+  "source_sha256": {
+    "RiffleRm2SubS19.h": "c7e4e51ff4e6726dba827cf879a9e520250c6a7786d1a39eb2fd17c5b7f2fb6b",
+    "RiffleExactPermFieldCheckpoint.h": "ca19f3707249b86963012bfe16caf424300779d3418fe73a586717b5ef9fd53e",
+    "RiffleFieldCheckpoint_Bench.cpp": "94811efc3ea133584d0575396cf95f6c23e64534ffb18545afed4ddeea6fd411",
+    "RiffleParityShear12S19_Bench": "f3461673ddc845deb4592a41180b5725d47b7fb1a551a95aed687abf8ee480a2"
+  },
+  "remote_workspace": "/tmp/riffle_parityshear_s19_v1"
+}

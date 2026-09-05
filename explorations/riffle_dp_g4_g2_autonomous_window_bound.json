@@ -1,0 +1,48 @@
+{
+  "schema": "riffle-dp-g4-g2-autonomous-window-bound-v1",
+  "candidate": "Riffle DP g=4@g0-v1",
+  "evidence_label": "RIGOROUS_BOUND",
+  "search_receipt_sha256": "d3f6627ada0660d43b9380aa692e8bb6383259b57b6ef14a8f072bf37a33e72c",
+  "search_source_sha256": "52a6315907d2a0ddb0c549f840b5664b055d933a51fdf3540ed668e2d65394d6",
+  "parameters": {
+    "low_output_weight_maximum": 8,
+    "high_output_weight_minimum": 9,
+    "short_return_horizon": 2,
+    "long_return_gap_minimum": 3,
+    "enumerated_low_states": 5130659560
+  },
+  "short_return_certificate": {
+    "first_return_counts_by_gap": [
+      0,
+      11039336
+    ],
+    "minimum_segment_weight_by_gap": [
+      null,
+      19
+    ],
+    "minimum_excess_over_high_baseline_by_gap": [
+      null,
+      1
+    ]
+  },
+  "theorem": {
+    "scope": "Every nonzero zero-input autonomous output segment of length L under the fixed map Q=Acc P.",
+    "lower_bound": "delta(L) >= 9*L - 8 - 8*floor((L-1)/3)",
+    "proof_summary": [
+      "Call an output low when its Hamming weight is at most 8.",
+      "The exhaustive receipt covers all nonzero low outputs.",
+      "A first return after one node is impossible.",
+      "Every first-return segment of length two has weight at least 19, which is at least 9*2.",
+      "A later first-return segment has weight at least 1+9*(g-1)=9*g-8.",
+      "The initial high prefix costs at least 9 per node, and the final segment loses at most 8.",
+      "At most floor((L-1)/3) complete segments can have length at least three."
+    ]
+  },
+  "distance_consequences": {
+    "distance_threshold": 188766,
+    "first_length_forced_above_threshold": 29807,
+    "full_chain_length": 32772,
+    "full_chain_lower_bound": 207556,
+    "full_chain_margin": 18790
+  }
+}

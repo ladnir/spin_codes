@@ -1,0 +1,39 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_auxw3_t128_s32",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-SplitState-PreAddMul-AuxW3 t=128 s=32",
+  "status": "FIXED_INNER_REGULAR_PROOF_CLOSED",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_t128_s32",
+  "modification": "replace the 32 weight-seven auxiliary columns of A with the recorded weight-three columns",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_bits": 256,
+    "step_bits": 128,
+    "state_bits": 32,
+    "auxiliary_bits": 64,
+    "auxiliary_column_weight": 3,
+    "accumulator_depth": 2,
+    "fixed_A_minimum_distance": 24,
+    "required_A_minimum_distance": 20,
+    "relative_distance_target": 0.09,
+    "target_distance": 188743,
+    "logical_inner_xor_per_output_proxy": 8.36572265625
+  },
+  "operation_delta_from_parent": {
+    "logical_xor_contributions_per_epoch": -128,
+    "logical_xor_per_output_bit": -1.0
+  },
+  "regular_results": {
+    "inherited_aggregate_margin_bits_float": 80.8139155117839
+  },
+  "proof_status": {
+    "fixed_A_profile": "closed by complete 2^32-word enumeration; distance 24 and exact coordinate profile",
+    "fixed_B_activation_profile": "inherited closed profile",
+    "explicit_outer_spectrum": "open",
+    "mixed_all_one_tail": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "claim_scope": "The explicitly recorded lighter A satisfies every inner assumption of the parent's fixed-inner regular theorem. The inherited regular theorem remains conditional on the modeled outer spectrum and nearest-binary64 rounding."
+}

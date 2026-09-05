@@ -1,0 +1,92 @@
+{
+  "candidate": "Riffle BCHPerm-TransposeBitShuffle-SplitState t=128 s=19",
+  "dominant_rows": [
+    {
+      "active_regular_outer_blocks": 8448,
+      "best_candidate_probability": 0.5,
+      "best_log_surprisal": 0.5,
+      "inner_log2_upper": 32500.046177111297,
+      "outer_log2_envelope": 0.0,
+      "pointwise_log2_upper": 32500.046177111297,
+      "pointwise_margin_bits": -32500.046177111297
+    }
+  ],
+  "envelope": {
+    "bernoulli_envelopes": [
+      {
+        "log2_mass": 125.00000019126784,
+        "maximizing_weight": 209,
+        "probability": 0.5
+      }
+    ],
+    "log2_eta": 1.9126785246980392e-07,
+    "maximizing_regular_weight": 209
+  },
+  "method": {
+    "arithmetic": "nearest binary64 log semiring",
+    "epoch_transfer": "entrywise SplitState upper matrix",
+    "outer": "regular spectrum-density envelope from the supplied exact/expected spectrum or the modeled fallback",
+    "outward_rounded": false,
+    "region_recurrence": "exact hypergeometric conditioning of candidate positions"
+  },
+  "occupation_rows": [
+    {
+      "active_regular_outer_blocks": 8448,
+      "best_candidate_probability": 0.5,
+      "best_log_surprisal": 0.5,
+      "inner_log2_upper": 32500.046177111297,
+      "outer_log2_envelope": 0.0,
+      "pointwise_log2_upper": 32500.046177111297,
+      "pointwise_margin_bits": -32500.046177111297
+    }
+  ],
+  "one_all_one_partial_log2_upper": -Infinity,
+  "one_all_one_partial_margin_bits": Infinity,
+  "one_all_one_rows": [],
+  "parameters": {
+    "activation_model": "constructions\\riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20\\receipts\\min_state\\s19_rm2sub_b_kernel_spectrum.json",
+    "active_blocks": [
+      8448
+    ],
+    "candidate_probabilities": [
+      0.5
+    ],
+    "constituent_distance": 48,
+    "distance": 232320,
+    "epochs_per_region": 66,
+    "live_model": "support-averaged-preaddmul",
+    "live_moment_order": 3,
+    "live_spectrum": "constructions\\riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20\\receipts\\min_state\\s19_rm2sub_a_spectrum_audit.json",
+    "log_surprisals": [
+      -3.0,
+      -2.5,
+      -2.0,
+      -1.5,
+      -1.0,
+      -0.5,
+      0.0,
+      0.5,
+      1.0
+    ],
+    "message_bits": 1056000,
+    "modeled_minimum_distance": 38,
+    "occupation_family": "regular",
+    "outer_bits": 250,
+    "outer_blocks": 8448,
+    "outer_dimension": 125,
+    "outer_spectrum": "workstreams\\finite_asymptotic_theory\\bch250_parityfanout31x33_random_even_model.json",
+    "output_bits": 2112000,
+    "random_linear_extension": false,
+    "random_linear_extension_bits": 0,
+    "region_bits": 8448,
+    "relative_distance": 0.11,
+    "state_bits": 19,
+    "step_bits": 128,
+    "tail_endpoint_width": 40
+  },
+  "partial_log2_upper": 32500.046177111297,
+  "partial_margin_bits": -32500.046177111297,
+  "schema": "riffle-bitshuffle-splitstate-regular-bulk-v1",
+  "scope": "Floating-point diagnostic. The activation table is consumed as a fixed-map profile; an ensemble-average table requires a separate fixed-map existence or concentration argument. The factorial-moment live model is an upper bound for the audited constituent. The ideal-random spectrum and coset models are only constituent-code landscape assumptions. Numerical arithmetic is not outward rounded.",
+  "tilt_rows": []
+}

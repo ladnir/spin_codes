@@ -1,0 +1,130 @@
+\section{Preliminary}
+
+\todo{paraphrase, this was copied from ppcg.}
+
+\subsection{Notation}\label{ssec:not}
+
+Let $\Zbb:=\{0,1,2,...\}$ and $\Nbb:=\{1,2,3,...\}$.
+For any $n \in \Zbb$, $[n] := \{1, 2, \ldots, n\}$ denotes the set of natural numbers $1, \ldots, n$ (both inclusive). $[0]$ is defined to be the empty set $\emptyset$. For any $a \le b \in \Zbb$, $[a,b]$ denotes the set of integers $a, \ldots, b$ (both inclusive). For any $a > b \in \Zbb$, $[a,b]$ is defined to be the empty set $\emptyset$. We use $[a,b)$ to denote $[a,b-1]$. We use $(a,b,...)$ to denote a vector with $a,b,...$ as its elements. 
+ 
+Vectors will be bold and lower case, e.g. $\xv$.
+For any vector $\xv \in \{0,1\}^k$, where $k \in \Nbb\cup\{0\}$, let $x_i\in\{0,1\}$ denote the $i$th element of $\xv$ for $i \in [k]$, and let $|\xv| := k$ denote its length. For any $S\subseteq \Nbb$, let $\xv_{S} = (x_i:i\in S\cap [n])$ denote the subvector of $\xv$ indexed by the indices that belong to $S\cap [n]$. To simplify notation we will allow $S$ to contain elements not in $[n]$ which are simply ignored. 
+For any vector $\xv$ and $\hw{\xv} := |\{i:x_i\neq 0\}|$ is defined as the number of elements of $\xv$ that are  nonzero.
+
+
+Matrices are typically denoted in bold and upper case, e.g. $\A$. The element in row $i$ and column $j$ is index as $\A_{i,j}$. For sets $S,C\subset \Zbb$, $\A_{i+R,j+C}$ will represent the submatrix/subvector consisting $|R|$ rows and $|C|$ columns and containing $A_{i+r,j+c}$ for $r\in R,c\in C$. For matrices $\A\in \{0,1\}^{k\times n_1},\B\in \{0,1\}^{k\times n_2}$, we denote $\A||\B\in \{0,1\}^{k\times n_1+n_2}$ can the concatination of them. 
+
+ \subsection{Coding Theory}\label{ssec:codingtheory}
+
+\paragraph{Generator Matrix.}
+Let $k < n$, where $n,k\in\Nbb$, and let $\G\in\Fbb^{k\times n}$ be a matrix over the field $\Fbb$. The matrix $\G$ is called the generator matrix of the linear code $\mathcal{C}$, which is defined as
+\(
+C := \{ \cv = \xv\G \mid \xv \in \Fbb^k \}.
+\)
+Here, $\xv$ represents an arbitrary message vector of length $k$, and $\cv$ is the corresponding codeword in $\mathcal{C}$.
+
+\paragraph{Systematic Form.}
+A common representation for the generator matrix is its \emph{systematic form}, expressed as
+\(
+\G = \begin{bmatrix} \I_k || \mathbf{P} \end{bmatrix},
+\)
+where $\I_k$ is the $k\times k$ identity matrix and $\mathbf{P}$ is a $k \times (n-k)$ matrix. When $\G$ is in systematic form, the code $\mathcal{C}$ is said to be \emph{systematic} since the original message appears directly in the first $k$ positions of the codeword
+\(
+\cv = \xv\G = \begin{bmatrix} \xv || \mathbf{p} \end{bmatrix},
+\)
+with $\mathbf{p}\in\Fbb^{n-k}$ representing the parity information. Any generator matrix $\G'$ can be transformed into systematic form by performing elementary row operations and, if necessary, column permutations. This preserves the structural properties of the code, such as the minimum distance.
+
+\paragraph{Parity Check Matrix.}
+A matrix $\mathbf{H}\in\Fbb^{(n-k)\times n}$ is called a parity check matrix of $\mathcal{C}$ if it represents a linear function 
+\(
+\varphi: \mathbb{R}^n \to \mathbb{R}^{n-k}
+\)
+whose kernel is exactly $\mathcal{C}$. Equivalently, we have
+\(
+C = \{ \cv \in \Fbb^n \mid \mathbf{H}\cv^T = \mathbf{0} \}.
+\)
+It follows that $\mathbf{H}$ has dimensions $(n-k)\times n$. The code defined by $\mathbf{H}$ is known as the \emph{dual code} of $\mathcal{C}$.
+
+\paragraph{Minimum Distance.}
+The minimum distance $d$ of a linear code $\mathcal{C}$ is defined as the smallest number of positions in which any two distinct codewords differ. Equivalently, since $\mathcal{C}$ is a linear code, $d$ is equal to the minimum weight (i.e., the number of nonzero entries) of any nonzero codeword in $\mathcal{C}$. Another equivalent definition is that $d$ is the minimum number of linearly dependent columns of the parity check matrix $\mathbf{H}$. It is known that computing the minimum distance for an arbitrary linear code is an NP-complete problem.
+
+\paragraph{Relationship Between Generator and Parity Check Matrices.}
+There is a direct connection between the generator matrix and the parity check matrix. In particular, if the generator matrix is in systematic form, 
+\(
+\G = \begin{bmatrix} \I_k || \mathbf{P} \end{bmatrix},
+\)
+then a corresponding parity check matrix for $\mathcal{C}$ can be constructed as
+\(
+\mathbf{H} = \begin{bmatrix} -\mathbf{P}^T || \I_{n-k} \end{bmatrix},
+\)
+where $\mathbf{P}^T$ denotes the transpose of $\mathbf{P}$, and $\I_{n-k}$ is the $(n-k)\times (n-k)$ identity matrix.
+
+
+
+\subsection{Combinatorial Functions}\label{ssec:bb}
+
+\paragraph{Balls in bins.} There are
+\begin{align*}
+\ballsBins(n,k)&=\binom{n+k-1}{k-1}\\
+&= \left|\left\{ \xv\in \Zbb^k \mid \sum_i \xv_i = n \right\}\right|
+\end{align*}
+
+ways to assign $n \in \Nbb$ identical balls into $k \in \Nbb$ labeled bins. This can be easily seen from the following argument. Consider a binary vector $\bv\in\{0,1\}^{n+k-1}$ where is position represents a ``slot.'' Suppose we designate \(k - 1\) of them as ``demarcators'' with value 1, partitioning the remaining \(n\) slots into \(k\) groups, where each group is a sequence of zeros. The size of each group represents the number of balls (out of \(n\)) allocated to each of the \(k\) bins.
+ Each choice of demarcators results in a unique way of assigning the $n$ identical balls into $k$ labeled bins. Since there are $\binom{n+k-1}{k-1}$ ways to choose the demarcators, i.e. a binary string $\bv$ with weight $k-1$, the claim follows. The very same argument also shows that the number of $\xv$ s.t. $\sum_{i\in[k]}\xv_i = n$ is $
+\ballsBins(n,k)=\binom{n+k-1}{k-1}
+$.\\  
+
+\paragraph{Balls in bins w/ capacity.} There are
+\begin{align*}
+    \ballsBinsCap(n,k,c) &= \sum_{i=0}^k (-1)^i \binom{k}{i} \binom{n+k -i (c+1)-1}{k-1}\\
+    &=\left|\left\{ \xv\in \Zbb^k \mid \sum_i \xv_i = n \wedge \xv_i \leq c \right\}\right|
+\end{align*}
+
+ways to assign $n$ identical balls into $k$ labeled bins each having a maximum capacity of $c$. A proof of this result can be found in \cite{bro19}.
+
+
+\subsection{Recusrive Convolutions}
+
+We define a recursive convolution with generator $\C\in \bbG^{k\times n}$ as a linear function. $\C$ is a convolutions if there exists vectors $\cv_1,...,\cv_n\in \{0,1\}^\sigma$ s.t. for all $\xv\in \{0,1\}^k$, 
+and $\yv:=\xv\C$, it holds that 
+$$
+    \yv_i =\yv_{i-[\sigma]} \cdot \cv_i + \xv_{i/d}
+$$
+where $d:=n/k$. The typical case will be $d=1$ and small $\sigma$.
+That is, each output $\yv_i\in \{0,1\}$ is a linear combination of the last $\sigma$ outputs $(\yv_{i-1},...,\yv_{i-\sigma})$ and $\xv_{i/d}$. $\sigma$ is referred to as the memory or state size.
+
+
+We consider three types of convolutions. 
+\begin{itemize}
+    \item \textbf{Repeater.} The simplest convolution is a repeater $\R\in \{0,1\}^{k\times n}$ and is defined with state size $\sigma=0$. Each input bit $\xv_i$ is output $n/k$ times. I.e. $\yv = (\xv_1,...,\xv_1,...,\xv_k,...,\xv_k)$. The matrix representation of this convolution is 
+    $$
+\R=\begin{bmatrix}
+    1 ... 1 &    &0\\
+            &\ddots&\\
+     0       &&1...1
+\end{bmatrix}
+    $$
+
+
+    \item \textbf{Accumulator.} The first non-trivial convolution is referred to as an accumulator $\A\in \{0,1\}^{n\times n}$. We assume $n=k$ in this case. It has state size $\sigma=1$ with $\cv_i=(1)$. The output is 
+$$
+    \yv_i=\yv_{i-1}+\xv_i=\xv_1 +...+\xv_i.
+$$
+The matrix representation of this convolution is an upper triangular matrix of all ones, i.e.
+$$
+\A=\begin{bmatrix}
+    1  & ...   &1\\
+            &\ddots&\vdots\\
+    0        &&1
+\end{bmatrix}
+$$
+    \item \textbf{Random Convolution.}
+We will focus on the case when $\cv_i\in\{0,1\}^\sigma$ is a random vector. In some cases we will also consider a so called ``wrapping'' convolution where $\cv_i\gets (1) || \{0,1\}^{\sigma-1}$ is a random vector with the first position fixed as a 1. The full matrix can be expressed as 
+$$
+\C := \prod_{i\in [n]} \C'_i
+$$
+where $\C'_i$ is 1 along the diagonal and column $i$ contains $\cv_i$ just above the disagonal, i.e. $\C_{i-[\sigma],i} = \cv_i$. 
+
+The matrix representation of such a convolution superficially appears as a random upper triangular matrix with ones on the diagonal. However, it has the structure that reguardless of the prior outputs $\yv_{[i]}$, there exists a value for $\xv_{i+[\sigma]}$ such that if the remainign $\xv$ inputs are zero, i.e. $\xv_{[i+\sigma, n]}=0$, then $\yv_{[i+\sigma, n]}=0$. If $\C$ truely was a random upper triangular matrix, this would be extremely unlikely to happen. More on this will be discussed later.
+
+\end{itemize}

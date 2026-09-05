@@ -1,0 +1,85 @@
+
+
+\section{Serially Concatenated Block-Diagonal Codes}\label{sec:BDSerial}
+
+Although the Block-Accumulate (BA-3) construction in \sectionref{sec:BDA} achieves stable relative minimum distance with a fixed state size $\sigma$, it is natural to ask what is achievable by pure serial, non-recursive architectures that do not use accumulators. In this section, we study the behavior of such constructions, focusing on block-diagonal serial codes as a theoretical baseline. This analysis clarifies the limitations of non-recursive designs and highlights why the BA-3 construction is able to surpass these bounds in the concrete regime.
+%Following the outline above, we will define the distributions $\dist_1,...,\dist_t$ and sample subcodes $\G_i\gets \dist_i$ with the final code being $\G:=\G_1\pi_1\G_2...\pi_{t-1}\G_t$. These distributions $\dist_1,...,\dist_t$ will all have the same Block-Diagonal structure.
+
+
+\subsection{Weight Distribution at $t= 2$}\label{sec:ttwo}
+
+Now consider the case of $t$ serially concatenated Block-Diagonal subcodes. Our high-level conclusion is that the code undergoes a phase transition at
+$
+\sigma = \Theta(\sqrt[t]{k}),
+$
+where for smaller values of $\sigma$, the code is expected to have sublinear minimum distance, while for larger values of $\sigma$, it has linear minimum distance in expectation.
+This result is intuitive given the structure of the code and tight, as smaller values of $\sigma$ can be shown to have sublinear minimum distance. 
+
+Indeed, consider the case of $t=2$ and $\sigma=O(\sqrt{k})$. It will be instructive to consider the case of what happens to a weight $w=1$ input word. After the first multiplication, the weight of the intermediate word is upper bounded by $\sigma=O(\sqrt{k})$. This intermediate vector will be randomly permuted. The number of ``on'' blocks for the second iteration will be upper bounded by $\sigma$. However, there are only $O(\sigma)=O(\sqrt{k})$ blocks, and therefore a constant fraction of the blocks will be on in expectation. As such, the resulting codeword should have linear Hamming weight. However, if $\sigma=o(\sqrt{k})$, this argument starts to break down. After the first iteration, less than a constant fraction of the $q=n/\sigma$ blocks will be on in expectation. Therefore, the resulting codeword must also have less than linear Hamming weight. 
+
+In \figureref{fig:BBEnum}, we present the enumerator for $t=2$ and $\sigma=32$. Concretely, we find that as one varies $k$, setting $\sigma:=2\sqrt{k}$ results in the code achieving expected minimum distance approximately $0.1n=0.2k$. This matches the same minimum distance as a random code of the same size. This can be observed in the lower plot of  \figureref{fig:BBEnum}, showing the $\log_2 \delta_h$ values for the various values of $h\in[0,512]$. To more accurately depict the minimum distance, we have cropped the plot to only show values of $\log_2 \delta_h$ in the range $[-50, 50]$.
+
+
+\begin{figure}\vspace{-0.3cm}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.95\linewidth, trim=0cm 1.4cm 0cm 1.2cm, clip]{fig/enum_B32B32_B256.512.32B512.512.32.txt.pdf} 
+    \caption{Depictions of the Block-Diagonal enumerator $\enum^{\dist }$ with $(t,k,n,\sigma)=(2,256,512,32)$.  See \figureref{fig:blockEnum} for details.  }
+    \label{fig:BBEnum}\vspace{-0.4cm}
+\end{figure}
+
+
+
+As can be observed, there is a phase transition of this graph at approximately $\log_2\delta_h=0$ and $h=56$. As $h$ approaches this phase transition from zero, we observe a slow growth rate of $\log_2\delta_h$; beyond the transition, the growth becomes rapid. The weight distribution above this phase transition is identical to that of a random code and therefore the best that can be achieved. However, below the phase transition, there is a significant difference between the Block-Diagonal codes and random codes. For random codes, we observe the expected number of codewords with a given $h$ value to continue to decrease at a rapid rate. 
+The exact location of the phase transition is a function of $\sigma$ as seen in \figureref{fig:BBdistVsSigma}. For $\sigma=o(\sqrt{k})$, the phase transition happens above the $\log_2\delta_h=0$ line, and therefore, in expectation, we would see codewords with smaller $h$ than a random code. For small values of $\sigma$, such as $2$ and $4$, the code degenerates without exhibiting a phase transition, and numerous low-weight codewords appear. We believe the lack of phase transition is largely due to having too many submatrices that are relatively far from being invertible. As such, when multiplying by such a matrix, information is lost, resulting in poor distance. We suspect that if one was able to define the enumerator for Block-Diagonal codes with only invertible submatrices, the code would behave better in this regime. 
+
+As $\sigma$ increases beyond the phase transition $2\sqrt{k}$, we observe an exponential drop in the expected number of low-weight codewords as compared to a random code. For example, at $\sigma=64$ there is less than a $2^{-30}$ probability of having a codeword with small weight compared to a random code.
+
+
+\begin{figure}[htbp]\vspace{-0.2cm}
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=\linewidth, trim=0.7cm 0.9cm 2cm 2.7cm, clip]{fig/BB_dist_vs_sigma.pdf} 
+    \caption{Depictions of the Block-Diagonal weight distribution  with $(t,k,n)=(2,256,512)$, various $\sigma\in\{2,4,8,16,32,64,125\}$ and a random linear code.}
+    \label{fig:BBdistVsSigma}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth, trim=0.7cm 0.9cm 2cm 2.7cm, clip]{fig/BB_dist_vs_k.pdf} 
+    \caption{Depictions of the Block-Diagonal weight distribution with various $k\in\{128,506,1025,2047,4096,8170\},n=2k,\sigma=2\sqrt{k}$. }
+    \label{fig:BBdistVsK}
+  \end{minipage}\vspace{-0.4cm}
+\end{figure}
+
+Thus far, we have focused on the case of $k=256$. However, we are also interested in general values of $k$ such as $k\in[128,2^{20}]$. In \figureref{fig:BBdistVsK}, we plot the expected weight distribution for various values of $k$ and $\sigma=2\sqrt{k}$. The general trend is that for larger values of $k$, the probability of small weight codewords decreases. For example, at $k=8170$ there is less than a $2^{-20}$ probability of being a codeword with $h\leq 0.11n$ and $2^{-100}$ probability of a codeword with $h\leq 0.05n$. While such bounds are more than sufficient for most applications, increasing $\sigma$ further can reduce the probability of low-weight codewords, as shown in \figureref{fig:BBdistVsSigma}.
+
+%The question of achieving asymptotic bounds on the minimum distance as $k$ increases is intriguing. Given the complexity of the enumerator, it appears challenging to bound it sufficiently tightly. We leave it as an open question and settle for showing the growth of the concrete distance up to $k=2^{14}$, which supports our proposition that $\sigma=2\sqrt{k}$ is sufficient.
+
+\subsection{Partially Systematic}
+
+We optimize the depth-$t$ serial ensemble by making only the first subcode systematic: $G_1 := (I \parallel G_1')$, where $G_1' \in \{0,1\}^{k \times (n-k)}$ is Block-Diagonal. This reduces the first multiplication cost by $2\times$ at rate $1/2$ and ensures $G_1$ is invertible, preventing scenarios where non-invertible diagonal blocks collapse the minimum distance. As shown in \figureref{fig:sBBEnum}, this partial systematization smooths the weight distribution and significantly reduces the probability of low-weight codewords near $h=0$ compared to the non-systematic version. While the phase transition point remains largely unchanged, the smoother contour lines suggest that avoiding non-invertible matrices at the first layer stabilizes the code's distance properties.
+\begin{figure}\vspace{-0.3cm}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.75\linewidth, trim=0cm 1.4cm 0cm 1.2cm, clip]{fig/enum_sB32B32_sB256.512.32B512.512.32.txt.pdf} 
+    \caption{Depictions of the systematic Block-Diagonal enumerator $\enum^{\dist }$ with $(t,k,n,\sigma)=(2,256,512,32)$.  See \figureref{fig:blockEnum} for details.  }
+    \label{fig:sBBEnum}\vspace{-0.8cm}
+\end{figure}
+
+
+
+\subsection{Linear Minimum Distance of Pure Block-Diagonal Code}
+
+\begin{theorem}[Linear minimum distance, all constant $t\ge 3$, rate $1/2$]\label{thm:bd-lin-all-tge3}
+Fix any constant $t\ge 3$ and rate $R=1/2$. There exist constants $c>0$, $\delta>0$, and $\gamma>0$ such that the following holds.
+Let $\sigma := \lceil c\,n^{1/t}\rceil$ 
+rounded so that $\sigma\mid n$ and $\sigma\mid k=n/2$, and sample $G$ from the pure block-diagonal serial ensemble above.
+Then for all sufficiently large $n$,
+\[
+\Pr\!\bigl[d_{\min}(G)\le \delta n\bigr]\ \le\ \exp(-\gamma \sigma^2).
+\]
+\end{theorem}
+\noindent See \appendixref{ssec:lin-dist-all-tge3} for the full proof.

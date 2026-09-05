@@ -1,0 +1,3654 @@
+{
+  "schema": "block-expand5-mean-cap-outward-v1",
+  "status": "OUTWARD_MEAN_AND_CAP_EVENT_CONDITIONAL_ON_VARIANCE",
+  "claim": {
+    "mean_spectrum_outward": true,
+    "variance_hypothesis": "Var(A_w) <= 2 E[A_w] for every positive shell",
+    "outer_event_failure_log2_lower": -42.62826052599393,
+    "outer_event_failure_log2_upper": -42.628260525993916,
+    "combined_failure_log2_upper": -42.62547594611109,
+    "combined_margin_bits_lower": 42.62547594611109,
+    "comparison_to_2^-40": true
+  },
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "regions": [
+      [
+        37,
+        8
+      ],
+      [
+        36,
+        6
+      ]
+    ],
+    "left_degree": 14,
+    "accumulator_stages": 5,
+    "variance_factor": 2,
+    "per_positive_shell_failure_log2": -49.74551257165114
+  },
+  "components": {
+    "kernel_log2_bounds": [
+      -57.700823496822885,
+      -57.70082349682287
+    ],
+    "zero_cap_tail_log2_bounds": [
+      -52.67247957168756,
+      -52.672479571687546
+    ],
+    "central_cantelli_log2_bounds": [
+      -42.629669435893454,
+      -42.62966943589344
+    ],
+    "transfer_log2_upper": -51.643958989073376
+  },
+  "method": "exact integer parity-occupancy polynomials for eight length-37 and six length-36 regions; five exact binomial accumulator IOWE transitions; 256-bit Arb enclosure",
+  "shells": [
+    {
+      "weight": 0,
+      "mean_log2_lower": 6.158797033251552e-18,
+      "mean_log2_upper": 6.158797033251553e-18,
+      "binary64_diagnostic_log2": 6.158797033253673e-18,
+      "cap": "0"
+    },
+    {
+      "weight": 1,
+      "mean_log2_lower": -82.66078955289578,
+      "mean_log2_upper": -82.66078955289575,
+      "binary64_diagnostic_log2": -82.66078955289433,
+      "cap": "0"
+    },
+    {
+      "weight": 2,
+      "mean_log2_lower": -82.64429380231456,
+      "mean_log2_upper": -82.64429380231454,
+      "binary64_diagnostic_log2": -82.64429380231326,
+      "cap": "0"
+    },
+    {
+      "weight": 3,
+      "mean_log2_lower": -82.62771672765912,
+      "mean_log2_upper": -82.62771672765909,
+      "binary64_diagnostic_log2": -82.6277167276583,
+      "cap": "0"
+    },
+    {
+      "weight": 4,
+      "mean_log2_lower": -82.61105753443341,
+      "mean_log2_upper": -82.61105753443339,
+      "binary64_diagnostic_log2": -82.61105753443255,
+      "cap": "0"
+    },
+    {
+      "weight": 5,
+      "mean_log2_lower": -82.59431541635628,
+      "mean_log2_upper": -82.59431541635625,
+      "binary64_diagnostic_log2": -82.59431541635546,
+      "cap": "0"
+    },
+    {
+      "weight": 6,
+      "mean_log2_lower": -82.57748955512584,
+      "mean_log2_upper": -82.57748955512581,
+      "binary64_diagnostic_log2": -82.57748955512459,
+      "cap": "0"
+    },
+    {
+      "weight": 7,
+      "mean_log2_lower": -82.56057912017783,
+      "mean_log2_upper": -82.5605791201778,
+      "binary64_diagnostic_log2": -82.56057912017668,
+      "cap": "0"
+    },
+    {
+      "weight": 8,
+      "mean_log2_lower": -82.54358326843796,
+      "mean_log2_upper": -82.54358326843793,
+      "binary64_diagnostic_log2": -82.54358326843693,
+      "cap": "0"
+    },
+    {
+      "weight": 9,
+      "mean_log2_lower": -82.5265011440679,
+      "mean_log2_upper": -82.52650114406786,
+      "binary64_diagnostic_log2": -82.5265011440671,
+      "cap": "0"
+    },
+    {
+      "weight": 10,
+      "mean_log2_lower": -82.50933187820475,
+      "mean_log2_upper": -82.50933187820472,
+      "binary64_diagnostic_log2": -82.50933187820358,
+      "cap": "0"
+    },
+    {
+      "weight": 11,
+      "mean_log2_lower": -82.49207458869391,
+      "mean_log2_upper": -82.49207458869388,
+      "binary64_diagnostic_log2": -82.49207458869296,
+      "cap": "0"
+    },
+    {
+      "weight": 12,
+      "mean_log2_lower": -82.4747283798149,
+      "mean_log2_upper": -82.47472837981488,
+      "binary64_diagnostic_log2": -82.47472837981405,
+      "cap": "0"
+    },
+    {
+      "weight": 13,
+      "mean_log2_lower": -82.45729234200023,
+      "mean_log2_upper": -82.4572923420002,
+      "binary64_diagnostic_log2": -82.45729234199916,
+      "cap": "0"
+    },
+    {
+      "weight": 14,
+      "mean_log2_lower": -82.43976555154678,
+      "mean_log2_upper": -82.43976555154676,
+      "binary64_diagnostic_log2": -82.43976555154596,
+      "cap": "0"
+    },
+    {
+      "weight": 15,
+      "mean_log2_lower": -82.4221470703197,
+      "mean_log2_upper": -82.42214707031967,
+      "binary64_diagnostic_log2": -82.42214707031866,
+      "cap": "0"
+    },
+    {
+      "weight": 16,
+      "mean_log2_lower": -82.40443594544843,
+      "mean_log2_upper": -82.4044359454484,
+      "binary64_diagnostic_log2": -82.40443594544767,
+      "cap": "0"
+    },
+    {
+      "weight": 17,
+      "mean_log2_lower": -82.38663120901478,
+      "mean_log2_upper": -82.38663120901475,
+      "binary64_diagnostic_log2": -82.38663120901398,
+      "cap": "0"
+    },
+    {
+      "weight": 18,
+      "mean_log2_lower": -82.3687318777325,
+      "mean_log2_upper": -82.36873187773247,
+      "binary64_diagnostic_log2": -82.3687318777314,
+      "cap": "0"
+    },
+    {
+      "weight": 19,
+      "mean_log2_lower": -82.35073695261842,
+      "mean_log2_upper": -82.35073695261839,
+      "binary64_diagnostic_log2": -82.35073695261774,
+      "cap": "0"
+    },
+    {
+      "weight": 20,
+      "mean_log2_lower": -82.33264541865466,
+      "mean_log2_upper": -82.33264541865464,
+      "binary64_diagnostic_log2": -82.33264541865363,
+      "cap": "0"
+    },
+    {
+      "weight": 21,
+      "mean_log2_lower": -82.31445624444171,
+      "mean_log2_upper": -82.31445624444169,
+      "binary64_diagnostic_log2": -82.31445624444076,
+      "cap": "0"
+    },
+    {
+      "weight": 22,
+      "mean_log2_lower": -82.29616838184198,
+      "mean_log2_upper": -82.29616838184195,
+      "binary64_diagnostic_log2": -82.29616838184124,
+      "cap": "0"
+    },
+    {
+      "weight": 23,
+      "mean_log2_lower": -82.27778076561333,
+      "mean_log2_upper": -82.2777807656133,
+      "binary64_diagnostic_log2": -82.27778076561303,
+      "cap": "0"
+    },
+    {
+      "weight": 24,
+      "mean_log2_lower": -82.2592923130261,
+      "mean_log2_upper": -82.25929231302607,
+      "binary64_diagnostic_log2": -82.25929231302523,
+      "cap": "0"
+    },
+    {
+      "weight": 25,
+      "mean_log2_lower": -82.24070192335043,
+      "mean_log2_upper": -82.2407019233504,
+      "binary64_diagnostic_log2": -82.24070192334953,
+      "cap": "0"
+    },
+    {
+      "weight": 26,
+      "mean_log2_lower": -82.22200847518482,
+      "mean_log2_upper": -82.2220084751848,
+      "binary64_diagnostic_log2": -82.2220084751843,
+      "cap": "0"
+    },
+    {
+      "weight": 27,
+      "mean_log2_lower": -82.2032107865938,
+      "mean_log2_upper": -82.20321078659377,
+      "binary64_diagnostic_log2": -82.2032107865929,
+      "cap": "0"
+    },
+    {
+      "weight": 28,
+      "mean_log2_lower": -82.1843069555322,
+      "mean_log2_upper": -82.18430695553216,
+      "binary64_diagnostic_log2": -82.18430695553175,
+      "cap": "0"
+    },
+    {
+      "weight": 29,
+      "mean_log2_lower": -82.16528374243805,
+      "mean_log2_upper": -82.16528374243802,
+      "binary64_diagnostic_log2": -82.16528374243657,
+      "cap": "0"
+    },
+    {
+      "weight": 30,
+      "mean_log2_lower": -82.14595153227384,
+      "mean_log2_upper": -82.14595153227381,
+      "binary64_diagnostic_log2": -82.145951532273,
+      "cap": "0"
+    },
+    {
+      "weight": 31,
+      "mean_log2_lower": -82.12346916899817,
+      "mean_log2_upper": -82.12346916899814,
+      "binary64_diagnostic_log2": -82.12346916899754,
+      "cap": "0"
+    },
+    {
+      "weight": 32,
+      "mean_log2_lower": -82.05719590899997,
+      "mean_log2_upper": -82.05719590899994,
+      "binary64_diagnostic_log2": -82.05719590899957,
+      "cap": "0"
+    },
+    {
+      "weight": 33,
+      "mean_log2_lower": -81.497145593454,
+      "mean_log2_upper": -81.49714559345396,
+      "binary64_diagnostic_log2": -81.49714559345229,
+      "cap": "0"
+    },
+    {
+      "weight": 34,
+      "mean_log2_lower": -79.07149012259552,
+      "mean_log2_upper": -79.07149012259549,
+      "binary64_diagnostic_log2": -79.07149012259387,
+      "cap": "0"
+    },
+    {
+      "weight": 35,
+      "mean_log2_lower": -75.48779543443814,
+      "mean_log2_upper": -75.48779543443811,
+      "binary64_diagnostic_log2": -75.48779543443594,
+      "cap": "0"
+    },
+    {
+      "weight": 36,
+      "mean_log2_lower": -71.78356717601,
+      "mean_log2_upper": -71.78356717600997,
+      "binary64_diagnostic_log2": -71.78356717600802,
+      "cap": "0"
+    },
+    {
+      "weight": 37,
+      "mean_log2_lower": -68.10819010973677,
+      "mean_log2_upper": -68.10819010973674,
+      "binary64_diagnostic_log2": -68.10819010973533,
+      "cap": "0"
+    },
+    {
+      "weight": 38,
+      "mean_log2_lower": -64.47272432038785,
+      "mean_log2_upper": -64.47272432038783,
+      "binary64_diagnostic_log2": -64.47272432038655,
+      "cap": "0"
+    },
+    {
+      "weight": 39,
+      "mean_log2_lower": -60.877142170518866,
+      "mean_log2_upper": -60.87714217051885,
+      "binary64_diagnostic_log2": -60.8771421705173,
+      "cap": "0"
+    },
+    {
+      "weight": 40,
+      "mean_log2_lower": -57.32060913507151,
+      "mean_log2_upper": -57.32060913507149,
+      "binary64_diagnostic_log2": -57.320609135070896,
+      "cap": "0"
+    },
+    {
+      "weight": 41,
+      "mean_log2_lower": -53.802268269000834,
+      "mean_log2_upper": -53.80226826900082,
+      "binary64_diagnostic_log2": -53.80226826900048,
+      "cap": "0"
+    },
+    {
+      "weight": 42,
+      "mean_log2_lower": -50.32129871583094,
+      "mean_log2_upper": -50.32129871583093,
+      "binary64_diagnostic_log2": -50.321298715829485,
+      "cap": "1"
+    },
+    {
+      "weight": 43,
+      "mean_log2_lower": -46.876917741196266,
+      "mean_log2_upper": -46.87691774119625,
+      "binary64_diagnostic_log2": -46.87691774119508,
+      "cap": "3"
+    },
+    {
+      "weight": 44,
+      "mean_log2_lower": -43.4683784741844,
+      "mean_log2_upper": -43.468378474184384,
+      "binary64_diagnostic_log2": -43.468378474183176,
+      "cap": "12"
+    },
+    {
+      "weight": 45,
+      "mean_log2_lower": -40.09496751311006,
+      "mean_log2_upper": -40.09496751311005,
+      "binary64_diagnostic_log2": -40.094967513108685,
+      "cap": "40"
+    },
+    {
+      "weight": 46,
+      "mean_log2_lower": -36.75600271435117,
+      "mean_log2_upper": -36.756002714351155,
+      "binary64_diagnostic_log2": -36.756002714349286,
+      "cap": "127"
+    },
+    {
+      "weight": 47,
+      "mean_log2_lower": -33.450831170361,
+      "mean_log2_upper": -33.450831170360985,
+      "binary64_diagnostic_log2": -33.4508311703599,
+      "cap": "400"
+    },
+    {
+      "weight": 48,
+      "mean_log2_lower": -30.178827359185323,
+      "mean_log2_upper": -30.178827359185316,
+      "binary64_diagnostic_log2": -30.17882735918418,
+      "cap": "1246"
+    },
+    {
+      "weight": 49,
+      "mean_log2_lower": -26.93939144798395,
+      "mean_log2_upper": -26.939391447983944,
+      "binary64_diagnostic_log2": -26.93939144798284,
+      "cap": "3829"
+    },
+    {
+      "weight": 50,
+      "mean_log2_lower": -23.731947734985983,
+      "mean_log2_upper": -23.731947734985976,
+      "binary64_diagnostic_log2": -23.731947734984736,
+      "cap": "11639"
+    },
+    {
+      "weight": 51,
+      "mean_log2_lower": -20.555943216130935,
+      "mean_log2_upper": -20.555943216130927,
+      "binary64_diagnostic_log2": -20.55594321612967,
+      "cap": "34993"
+    },
+    {
+      "weight": 52,
+      "mean_log2_lower": -17.410846264238828,
+      "mean_log2_upper": -17.41084626423882,
+      "binary64_diagnostic_log2": -17.410846264237858,
+      "cap": "104079"
+    },
+    {
+      "weight": 53,
+      "mean_log2_lower": -14.296145409934475,
+      "mean_log2_upper": -14.296145409934471,
+      "binary64_diagnostic_log2": -14.296145409933654,
+      "cap": "306320"
+    },
+    {
+      "weight": 54,
+      "mean_log2_lower": -11.211348214754087,
+      "mean_log2_upper": -11.211348214754084,
+      "binary64_diagnostic_log2": -11.211348214752638,
+      "cap": "892246"
+    },
+    {
+      "weight": 55,
+      "mean_log2_lower": -8.155980227912051,
+      "mean_log2_upper": -8.155980227912048,
+      "binary64_diagnostic_log2": -8.155980227910574,
+      "cap": "2572547"
+    },
+    {
+      "weight": 56,
+      "mean_log2_lower": -5.1295840191244615,
+      "mean_log2_upper": -5.12958401912446,
+      "binary64_diagnostic_log2": -5.129584019123231,
+      "cap": "7343132"
+    },
+    {
+      "weight": 57,
+      "mean_log2_lower": -2.1317182806919512,
+      "mean_log2_upper": -2.1317182806919504,
+      "binary64_diagnostic_log2": -2.131718280689902,
+      "cap": "20754159"
+    },
+    {
+      "weight": 58,
+      "mean_log2_lower": 0.8380430072468702,
+      "mean_log2_upper": 0.8380430072468704,
+      "binary64_diagnostic_log2": 0.8380430072483014,
+      "cap": "58089651"
+    },
+    {
+      "weight": 59,
+      "mean_log2_lower": 3.7801113537552107,
+      "mean_log2_upper": 3.7801113537552116,
+      "binary64_diagnostic_log2": 3.7801113537569546,
+      "cap": "161036455"
+    },
+    {
+      "weight": 60,
+      "mean_log2_lower": 6.694884481343007,
+      "mean_log2_upper": 6.694884481343009,
+      "binary64_diagnostic_log2": 6.694884481345048,
+      "cap": "442223013"
+    },
+    {
+      "weight": 61,
+      "mean_log2_lower": 9.582747001840165,
+      "mean_log2_upper": 9.582747001840168,
+      "binary64_diagnostic_log2": 9.582747001841568,
+      "cap": "1203117754"
+    },
+    {
+      "weight": 62,
+      "mean_log2_lower": 12.444071047887867,
+      "mean_log2_upper": 12.44407104788787,
+      "binary64_diagnostic_log2": 12.444071047889858,
+      "cap": "3243252695"
+    },
+    {
+      "weight": 63,
+      "mean_log2_lower": 15.279216863652367,
+      "mean_log2_upper": 15.27921686365237,
+      "binary64_diagnostic_log2": 15.279216863654117,
+      "cap": "8663911374"
+    },
+    {
+      "weight": 64,
+      "mean_log2_lower": 18.08853335802269,
+      "mean_log2_upper": 18.088533358022698,
+      "binary64_diagnostic_log2": 18.088533358024854,
+      "cap": "22938317051"
+    },
+    {
+      "weight": 65,
+      "mean_log2_lower": 20.872358623247578,
+      "mean_log2_upper": 20.872358623247585,
+      "binary64_diagnostic_log2": 20.872358623248527,
+      "cap": "60197378200"
+    },
+    {
+      "weight": 66,
+      "mean_log2_lower": 23.631020421693552,
+      "mean_log2_upper": 23.63102042169356,
+      "binary64_diagnostic_log2": 23.631020421695172,
+      "cap": "156610086445"
+    },
+    {
+      "weight": 67,
+      "mean_log2_lower": 26.36483664316137,
+      "mean_log2_upper": 26.36483664316138,
+      "binary64_diagnostic_log2": 26.364836643163535,
+      "cap": "403977296753"
+    },
+    {
+      "weight": 68,
+      "mean_log2_lower": 29.07411573497863,
+      "mean_log2_upper": 29.074115734978637,
+      "binary64_diagnostic_log2": 29.07411573498022,
+      "cap": "1033448296055"
+    },
+    {
+      "weight": 69,
+      "mean_log2_lower": 31.75915710688937,
+      "mean_log2_upper": 31.759157106889376,
+      "binary64_diagnostic_log2": 31.759157106890672,
+      "cap": "2622964382357"
+    },
+    {
+      "weight": 70,
+      "mean_log2_lower": 34.420251512584514,
+      "mean_log2_upper": 34.42025151258453,
+      "binary64_diagnostic_log2": 34.42025151258634,
+      "cap": "6610552653798"
+    },
+    {
+      "weight": 71,
+      "mean_log2_lower": 37.05768140955741,
+      "mean_log2_upper": 37.057681409557425,
+      "binary64_diagnostic_log2": 37.05768140955882,
+      "cap": "16575314928800"
+    },
+    {
+      "weight": 72,
+      "mean_log2_lower": 39.67172129882514,
+      "mean_log2_upper": 39.671721298825155,
+      "binary64_diagnostic_log2": 39.671721298826746,
+      "cap": "41534096782007"
+    },
+    {
+      "weight": 73,
+      "mean_log2_lower": 42.262638045926316,
+      "mean_log2_upper": 42.26263804592633,
+      "binary64_diagnostic_log2": 42.26263804592753,
+      "cap": "105074148754708"
+    },
+    {
+      "weight": 74,
+      "mean_log2_lower": 44.8306911844889,
+      "mean_log2_upper": 44.83069118448891,
+      "binary64_diagnostic_log2": 44.83069118448992,
+      "cap": "274314001209440"
+    },
+    {
+      "weight": 75,
+      "mean_log2_lower": 47.37613320355522,
+      "mean_log2_upper": 47.376133203555234,
+      "binary64_diagnostic_log2": 47.37613320355675,
+      "cap": "769848237764067"
+    },
+    {
+      "weight": 76,
+      "mean_log2_lower": 49.89920981975525,
+      "mean_log2_upper": 49.899209819755264,
+      "binary64_diagnostic_log2": 49.89920981975664,
+      "cap": "2457723988795713"
+    },
+    {
+      "weight": 77,
+      "mean_log2_lower": 52.40016023533183,
+      "mean_log2_upper": 52.400160235331846,
+      "binary64_diagnostic_log2": 52.40016023533307,
+      "cap": "9292623947745284"
+    },
+    {
+      "weight": 78,
+      "mean_log2_lower": 54.87921738294203,
+      "mean_log2_upper": 54.879217382942045,
+      "binary64_diagnostic_log2": 54.87921738294364,
+      "cap": "41043990713556544"
+    },
+    {
+      "weight": 79,
+      "mean_log2_lower": 57.33660815808692,
+      "mean_log2_upper": 57.33660815808693,
+      "binary64_diagnostic_log2": 57.336608158088325,
+      "cap": "200520857750928822"
+    },
+    {
+      "weight": 80,
+      "mean_log2_lower": 59.7725536399561,
+      "mean_log2_upper": 59.772553639956115,
+      "binary64_diagnostic_log2": 59.77255363995704,
+      "cap": "1027877449962491706"
+    },
+    {
+      "weight": 81,
+      "mean_log2_lower": 62.187269301413636,
+      "mean_log2_upper": 62.18726930141365,
+      "binary64_diagnostic_log2": 62.18726930141513,
+      "cap": "5350454184812058200"
+    },
+    {
+      "weight": 82,
+      "mean_log2_lower": 64.58096520879707,
+      "mean_log2_upper": 64.5809652087971,
+      "binary64_diagnostic_log2": 64.58096520879813,
+      "cap": "27821782012484702588"
+    },
+    {
+      "weight": 83,
+      "mean_log2_lower": 66.9538462121517,
+      "mean_log2_upper": 66.95384621215173,
+      "binary64_diagnostic_log2": 66.953846212153,
+      "cap": "143446998260617875472"
+    },
+    {
+      "weight": 84,
+      "mean_log2_lower": 69.3061121264762,
+      "mean_log2_upper": 69.30611212647622,
+      "binary64_diagnostic_log2": 69.30611212647763,
+      "cap": "730998561799123115399"
+    },
+    {
+      "weight": 85,
+      "mean_log2_lower": 71.6379579045141,
+      "mean_log2_upper": 71.63795790451412,
+      "binary64_diagnostic_log2": 71.63795790451549,
+      "cap": "3676929734809362940102"
+    },
+    {
+      "weight": 86,
+      "mean_log2_lower": 73.9495738015875,
+      "mean_log2_upper": 73.94957380158753,
+      "binary64_diagnostic_log2": 73.94957380158911,
+      "cap": "18246499838341545178846"
+    },
+    {
+      "weight": 87,
+      "mean_log2_lower": 76.24114553293367,
+      "mean_log2_upper": 76.2411455329337,
+      "binary64_diagnostic_log2": 76.24114553293487,
+      "cap": "89317147625667730911780"
+    },
+    {
+      "weight": 88,
+      "mean_log2_lower": 78.51285442397374,
+      "mean_log2_upper": 78.51285442397376,
+      "binary64_diagnostic_log2": 78.51285442397581,
+      "cap": "431273684363964011291060"
+    },
+    {
+      "weight": 89,
+      "mean_log2_lower": 80.76487755391224,
+      "mean_log2_upper": 80.76487755391227,
+      "binary64_diagnostic_log2": 80.76487755391365,
+      "cap": "2054300181970038202258215"
+    },
+    {
+      "weight": 90,
+      "mean_log2_lower": 82.99738789303986,
+      "mean_log2_upper": 82.99738789303989,
+      "binary64_diagnostic_log2": 82.99738789304118,
+      "cap": "9654046590205703293643542"
+    },
+    {
+      "weight": 91,
+      "mean_log2_lower": 85.21055443408548,
+      "mean_log2_upper": 85.21055443408551,
+      "binary64_diagnostic_log2": 85.2105544340872,
+      "cap": "44764697286845660817108237"
+    },
+    {
+      "weight": 92,
+      "mean_log2_lower": 87.40454231794195,
+      "mean_log2_upper": 87.40454231794197,
+      "binary64_diagnostic_log2": 87.4045423179435,
+      "cap": "204828466421447151483117068"
+    },
+    {
+      "weight": 93,
+      "mean_log2_lower": 89.57951295406714,
+      "mean_log2_upper": 89.57951295406717,
+      "binary64_diagnostic_log2": 89.57951295406912,
+      "cap": "924955877851414445182591543"
+    },
+    {
+      "weight": 94,
+      "mean_log2_lower": 91.73562413584342,
+      "mean_log2_upper": 91.73562413584345,
+      "binary64_diagnostic_log2": 91.73562413584463,
+      "cap": "4122634465944783285806690549"
+    },
+    {
+      "weight": 95,
+      "mean_log2_lower": 93.87303015115968,
+      "mean_log2_upper": 93.87303015115971,
+      "binary64_diagnostic_log2": 93.87303015116106,
+      "cap": "18138359256202765984874530569"
+    },
+    {
+      "weight": 96,
+      "mean_log2_lower": 95.99188188846341,
+      "mean_log2_upper": 95.99188188846344,
+      "binary64_diagnostic_log2": 95.9918818884647,
+      "cap": "78783606161448524667373742803"
+    },
+    {
+      "weight": 97,
+      "mean_log2_lower": 98.09232693851501,
+      "mean_log2_upper": 98.09232693851504,
+      "binary64_diagnostic_log2": 98.09232693851659,
+      "cap": "337856894205962261993451754931"
+    },
+    {
+      "weight": 98,
+      "mean_log2_lower": 100.17450969206169,
+      "mean_log2_upper": 100.17450969206172,
+      "binary64_diagnostic_log2": 100.17450969206318,
+      "cap": "1430646161684716752076891892825"
+    },
+    {
+      "weight": 99,
+      "mean_log2_lower": 102.23857143363522,
+      "mean_log2_upper": 102.23857143363524,
+      "binary64_diagnostic_log2": 102.23857143363695,
+      "cap": "5982417566764181381709188125359"
+    },
+    {
+      "weight": 100,
+      "mean_log2_lower": 104.28465043166513,
+      "mean_log2_upper": 104.28465043166516,
+      "binary64_diagnostic_log2": 104.28465043166693,
+      "cap": "24706309128207245079143004915212"
+    },
+    {
+      "weight": 101,
+      "mean_log2_lower": 106.31288202508775,
+      "mean_log2_upper": 106.31288202508777,
+      "binary64_diagnostic_log2": 106.3128820250897,
+      "cap": "100778158176375156978062634812232"
+    },
+    {
+      "weight": 102,
+      "mean_log2_lower": 108.32339870662041,
+      "mean_log2_upper": 108.32339870662044,
+      "binary64_diagnostic_log2": 108.32339870662139,
+      "cap": "406061901407224274233880503833570"
+    },
+    {
+      "weight": 103,
+      "mean_log2_lower": 110.31633020286039,
+      "mean_log2_upper": 110.31633020286041,
+      "binary64_diagnostic_log2": 110.31633020286237,
+      "cap": "1616309044318919805994221165336088"
+    },
+    {
+      "weight": 104,
+      "mean_log2_lower": 112.29180355135883,
+      "mean_log2_upper": 112.29180355135885,
+      "binary64_diagnostic_log2": 112.29180355136118,
+      "cap": "6356252431545589434505607658255832"
+    },
+    {
+      "weight": 105,
+      "mean_log2_lower": 114.24994317481128,
+      "mean_log2_upper": 114.2499431748113,
+      "binary64_diagnostic_log2": 114.24994317481305,
+      "cap": "24697892651190253417642698385005555"
+    },
+    {
+      "weight": 106,
+      "mean_log2_lower": 116.19087095249836,
+      "mean_log2_upper": 116.19087095249839,
+      "binary64_diagnostic_log2": 116.19087095250006,
+      "cap": "94828172071864482492446322067841076"
+    },
+    {
+      "weight": 107,
+      "mean_log2_lower": 118.11470628910247,
+      "mean_log2_upper": 118.1147062891025,
+      "binary64_diagnostic_log2": 118.11470628910449,
+      "cap": "359806928631439888248851807140740774"
+    },
+    {
+      "weight": 108,
+      "mean_log2_lower": 120.02156618101982,
+      "mean_log2_upper": 120.02156618101985,
+      "binary64_diagnostic_log2": 120.02156618102134,
+      "cap": "1349247267095502547361666578206938731"
+    },
+    {
+      "weight": 109,
+      "mean_log2_lower": 121.91156528027992,
+      "mean_log2_upper": 121.91156528027994,
+      "binary64_diagnostic_log2": 121.91156528028168,
+      "cap": "5000782518610387716164262091661481627"
+    },
+    {
+      "weight": 110,
+      "mean_log2_lower": 123.78481595617912,
+      "mean_log2_upper": 123.78481595617914,
+      "binary64_diagnostic_log2": 123.78481595618067,
+      "cap": "18320723088857404248280721372019107250"
+    },
+    {
+      "weight": 111,
+      "mean_log2_lower": 125.64142835472867,
+      "mean_log2_upper": 125.6414283547287,
+      "binary64_diagnostic_log2": 125.6414283547308,
+      "cap": "66349649477027457281830666402482150410"
+    },
+    {
+      "weight": 112,
+      "mean_log2_lower": 127.48151045601251,
+      "mean_log2_upper": 127.48151045601254,
+      "binary64_diagnostic_log2": 127.48151045601419,
+      "cap": "237551917201017605603777673786614803661"
+    },
+    {
+      "weight": 113,
+      "mean_log2_lower": 129.30516812954502,
+      "mean_log2_upper": 129.30516812954508,
+      "binary64_diagnostic_log2": 129.30516812954673,
+      "cap": "840880345202977789875612923898894600436"
+    },
+    {
+      "weight": 114,
+      "mean_log2_lower": 131.11250518771425,
+      "mean_log2_upper": 131.1125051877143,
+      "binary64_diagnostic_log2": 131.11250518771647,
+      "cap": "2943044766309214255557296559714710194886"
+    },
+    {
+      "weight": 115,
+      "mean_log2_lower": 132.90362343739162,
+      "mean_log2_upper": 132.90362343739167,
+      "binary64_diagnostic_log2": 132.9036234373934,
+      "cap": "10185378842029408750655437419694227710806"
+    },
+    {
+      "weight": 116,
+      "mean_log2_lower": 134.6786227297851,
+      "mean_log2_upper": 134.67862272978516,
+      "binary64_diagnostic_log2": 134.67862272978687,
+      "cap": "34858220790619139923011545967892497976661"
+    },
+    {
+      "weight": 117,
+      "mean_log2_lower": 136.43760100860868,
+      "mean_log2_upper": 136.43760100860874,
+      "binary64_diagnostic_log2": 136.43760100861027,
+      "cap": "117980556411317696689324476213040329603363"
+    },
+    {
+      "weight": 118,
+      "mean_log2_lower": 138.18065435663772,
+      "mean_log2_upper": 138.18065435663777,
+      "binary64_diagnostic_log2": 138.18065435663993,
+      "cap": "394931506447087040895802247268981587845803"
+    },
+    {
+      "weight": 119,
+      "mean_log2_lower": 139.9078770407159,
+      "mean_log2_upper": 139.90787704071596,
+      "binary64_diagnostic_log2": 139.9078770407175,
+      "cap": "1307578042027666213002035407064250203035170"
+    },
+    {
+      "weight": 120,
+      "mean_log2_lower": 141.6193615552765,
+      "mean_log2_upper": 141.61936155527656,
+      "binary64_diagnostic_log2": 141.61936155527872,
+      "cap": "4282287241156292316745608909524126638037164"
+    },
+    {
+      "weight": 121,
+      "mean_log2_lower": 143.31519866443747,
+      "mean_log2_upper": 143.31519866443753,
+      "binary64_diagnostic_log2": 143.31519866443952,
+      "cap": "13873103698235213841246593853380279440893963"
+    },
+    {
+      "weight": 122,
+      "mean_log2_lower": 144.99547744272738,
+      "mean_log2_upper": 144.99547744272743,
+      "binary64_diagnostic_log2": 144.995477442729,
+      "cap": "44461892661793960425780037880356418345597069"
+    },
+    {
+      "weight": 123,
+      "mean_log2_lower": 146.6602853144955,
+      "mean_log2_upper": 146.66028531449555,
+      "binary64_diagnostic_log2": 146.66028531449757,
+      "cap": "140975957282425250745075270157285588477418052"
+    },
+    {
+      "weight": 124,
+      "mean_log2_lower": 148.30970809205846,
+      "mean_log2_upper": 148.30970809205851,
+      "binary64_diagnostic_log2": 148.30970809206002,
+      "cap": "442252996205295190427851750713417588946703208"
+    },
+    {
+      "weight": 125,
+      "mean_log2_lower": 149.94383001263157,
+      "mean_log2_upper": 149.94383001263162,
+      "binary64_diagnostic_log2": 149.94383001263338,
+      "cap": "1372746985042972885627250530864153614165084414"
+    },
+    {
+      "weight": 126,
+      "mean_log2_lower": 151.56273377409204,
+      "mean_log2_upper": 151.5627337740921,
+      "binary64_diagnostic_log2": 151.5627337740938,
+      "cap": "4216276568129304537598288723973772970676562714"
+    },
+    {
+      "weight": 127,
+      "mean_log2_lower": 153.1665005696187,
+      "mean_log2_upper": 153.16650056961876,
+      "binary64_diagnostic_log2": 153.16650056962015,
+      "cap": "12814775502611626755394358634082984059288406144"
+    },
+    {
+      "weight": 128,
+      "mean_log2_lower": 154.75521012125037,
+      "mean_log2_upper": 154.75521012125043,
+      "binary64_diagnostic_log2": 154.75521012125205,
+      "cap": "38544306113932436533998953109346626023049727656"
+    },
+    {
+      "weight": 129,
+      "mean_log2_lower": 156.32894071240383,
+      "mean_log2_upper": 156.3289407124039,
+      "binary64_diagnostic_log2": 156.3289407124053,
+      "cap": "114736168989537239694058752655731863231992331816"
+    },
+    {
+      "weight": 130,
+      "mean_log2_lower": 157.88776921939032,
+      "mean_log2_upper": 157.88776921939038,
+      "binary64_diagnostic_log2": 157.8877692193921,
+      "cap": "338029406976960964255887521500849039925971005231"
+    },
+    {
+      "weight": 131,
+      "mean_log2_lower": 159.43177114196678,
+      "mean_log2_upper": 159.43177114196683,
+      "binary64_diagnostic_log2": 159.43177114196857,
+      "cap": "985701404949290779358019121426291704458349201989"
+    },
+    {
+      "weight": 132,
+      "mean_log2_lower": 160.96102063295842,
+      "mean_log2_upper": 160.96102063295848,
+      "binary64_diagnostic_log2": 160.96102063295987,
+      "cap": "2845085637196651937994071608874029932734365386278"
+    },
+    {
+      "weight": 133,
+      "mean_log2_lower": 162.47559052698548,
+      "mean_log2_upper": 162.47559052698554,
+      "binary64_diagnostic_log2": 162.47559052698767,
+      "cap": "8128797631999106029549522930459274733836030212460"
+    },
+    {
+      "weight": 134,
+      "mean_log2_lower": 163.97555236832707,
+      "mean_log2_upper": 163.97555236832713,
+      "binary64_diagnostic_log2": 163.9755523683289,
+      "cap": "22991103601147419617329518776638163309061181134129"
+    },
+    {
+      "weight": 135,
+      "mean_log2_lower": 165.46097643795284,
+      "mean_log2_upper": 165.4609764379529,
+      "binary64_diagnostic_log2": 165.4609764379551,
+      "cap": "64374967037821921889861273080899896991346094031674"
+    },
+    {
+      "weight": 136,
+      "mean_log2_lower": 166.93193177975232,
+      "mean_log2_upper": 166.93193177975238,
+      "binary64_diagnostic_log2": 166.93193177975394,
+      "cap": "178450882421587792848946019808522648011766586539952"
+    },
+    {
+      "weight": 137,
+      "mean_log2_lower": 168.38848622599016,
+      "mean_log2_upper": 168.38848622599022,
+      "binary64_diagnostic_log2": 168.38848622599207,
+      "cap": "489762217340668552698158296865066037325412344111943"
+    },
+    {
+      "weight": 138,
+      "mean_log2_lower": 169.83070642201452,
+      "mean_log2_upper": 169.83070642201457,
+      "binary64_diagnostic_log2": 169.8307064220161,
+      "cap": "1330873623310737626951422466953910758364871066092058"
+    },
+    {
+      "weight": 139,
+      "mean_log2_lower": 171.25865785024445,
+      "mean_log2_upper": 171.2586578502445,
+      "binary64_diagnostic_log2": 171.2586578502464,
+      "cap": "3580906901176217635087975893513271013566975022297745"
+    },
+    {
+      "weight": 140,
+      "mean_log2_lower": 172.67240485346164,
+      "mean_log2_upper": 172.6724048534617,
+      "binary64_diagnostic_log2": 172.67240485346326,
+      "cap": "9540547196959631315473221564515173348803030908535712"
+    },
+    {
+      "weight": 141,
+      "mean_log2_lower": 174.07201065743013,
+      "mean_log2_upper": 174.07201065743018,
+      "binary64_diagnostic_log2": 174.07201065743226,
+      "cap": "25170776500345132415863678465899820306102844898786393"
+    },
+    {
+      "weight": 142,
+      "mean_log2_lower": 175.4575373928669,
+      "mean_log2_upper": 175.45753739286695,
+      "binary64_diagnostic_log2": 175.45753739286872,
+      "cap": "65763015718443796284005173352484624270657724073841739"
+    },
+    {
+      "weight": 143,
+      "mean_log2_lower": 176.8290461167856,
+      "mean_log2_upper": 176.82904611678566,
+      "binary64_diagnostic_log2": 176.82904611678714,
+      "cap": "170155889557016988076554405642319985440316709091984073"
+    },
+    {
+      "weight": 144,
+      "mean_log2_lower": 178.18659683323426,
+      "mean_log2_upper": 178.18659683323432,
+      "binary64_diagnostic_log2": 178.18659683323654,
+      "cap": "436024077667928019508636502114331261585406805063575595"
+    },
+    {
+      "weight": 145,
+      "mean_log2_lower": 179.5302485134475,
+      "mean_log2_upper": 179.53024851344756,
+      "binary64_diagnostic_log2": 179.53024851344964,
+      "cap": "1106598128922008239698126299871118452496554131322308222"
+    },
+    {
+      "weight": 146,
+      "mean_log2_lower": 180.8600591154324,
+      "mean_log2_upper": 180.86005911543245,
+      "binary64_diagnostic_log2": 180.86005911543424,
+      "cap": "2781652095344902601318102712620641565688474179260148389"
+    },
+    {
+      "weight": 147,
+      "mean_log2_lower": 182.17608560300692,
+      "mean_log2_upper": 182.17608560300698,
+      "binary64_diagnostic_log2": 182.17608560300843,
+      "cap": "6925741204552031779103510185772495818167541528077828300"
+    },
+    {
+      "weight": 148,
+      "mean_log2_lower": 183.47838396430893,
+      "mean_log2_upper": 183.478383964309,
+      "binary64_diagnostic_log2": 183.47838396431095,
+      "cap": "17080364294977922064557927962551315132583509257442108150"
+    },
+    {
+      "weight": 149,
+      "mean_log2_lower": 184.7670092297925,
+      "mean_log2_upper": 184.76700922979256,
+      "binary64_diagnostic_log2": 184.76700922979416,
+      "cap": "41726502832167823240120810892630500161351066926791066186"
+    },
+    {
+      "weight": 150,
+      "mean_log2_lower": 186.0420154897289,
+      "mean_log2_upper": 186.04201548972895,
+      "binary64_diagnostic_log2": 186.04201548973052,
+      "cap": "100978081730156267016956889079443936915554839888177877085"
+    },
+    {
+      "weight": 151,
+      "mean_log2_lower": 187.30345591122733,
+      "mean_log2_upper": 187.3034559112274,
+      "binary64_diagnostic_log2": 187.30345591123,
+      "cap": "242079782681150072814208857242451066836367710000575841084"
+    },
+    {
+      "weight": 152,
+      "mean_log2_lower": 188.5513827547914,
+      "mean_log2_upper": 188.55138275479146,
+      "binary64_diagnostic_log2": 188.55138275479342,
+      "cap": "574939216908702334128271799605172783520050863299301038898"
+    },
+    {
+      "weight": 153,
+      "mean_log2_lower": 189.78584739042557,
+      "mean_log2_upper": 189.78584739042563,
+      "binary64_diagnostic_log2": 189.78584739042782,
+      "cap": "1352797577938576126341807065309407963796490738764467615288"
+    },
+    {
+      "weight": 154,
+      "mean_log2_lower": 191.00690031330603,
+      "mean_log2_upper": 191.0069003133061,
+      "binary64_diagnostic_log2": 191.00690031330765,
+      "cap": "3153598302060626480871284317563592083090422208844257513444"
+    },
+    {
+      "weight": 155,
+      "mean_log2_lower": 192.21459115902957,
+      "mean_log2_upper": 192.21459115902962,
+      "binary64_diagnostic_log2": 192.2145911590317,
+      "cap": "7283792131004641977615122413281211600167374057800193110403"
+    },
+    {
+      "weight": 156,
+      "mean_log2_lower": 193.40896871845317,
+      "mean_log2_upper": 193.40896871845322,
+      "binary64_diagnostic_log2": 193.40896871845476,
+      "cap": "16668672533744303789921311892597285218570445291402608790099"
+    },
+    {
+      "weight": 157,
+      "mean_log2_lower": 194.59008095213784,
+      "mean_log2_upper": 194.5900809521379,
+      "binary64_diagnostic_log2": 194.5900809521399,
+      "cap": "37796468647842890208991191983440970101549375479355662800254"
+    },
+    {
+      "weight": 158,
+      "mean_log2_lower": 195.7579750044075,
+      "mean_log2_upper": 195.75797500440757,
+      "binary64_diagnostic_log2": 195.7579750044097,
+      "cap": "84922421013284935101581697197777093040251187173008380290863"
+    },
+    {
+      "weight": 159,
+      "mean_log2_lower": 196.91269721703617,
+      "mean_log2_upper": 196.91269721703623,
+      "binary64_diagnostic_log2": 196.9126972170377,
+      "cap": "189072509906432558763559587008333440152778825755794580728972"
+    },
+    {
+      "weight": 160,
+      "mean_log2_lower": 198.05429314257307,
+      "mean_log2_upper": 198.05429314257313,
+      "binary64_diagnostic_log2": 198.0542931425748,
+      "cap": "417141122958887158066061603813160536897707475950403050442932"
+    },
+    {
+      "weight": 161,
+      "mean_log2_lower": 199.182807557318,
+      "mean_log2_upper": 199.18280755731806,
+      "binary64_diagnostic_log2": 199.18280755731993,
+      "cap": "912010199532649235089667654358813526853427352891249650691596"
+    },
+    {
+      "weight": 162,
+      "mean_log2_lower": 200.29828447395627,
+      "mean_log2_upper": 200.29828447395633,
+      "binary64_diagnostic_log2": 200.29828447395815,
+      "cap": "1976021687014502948829466492247113867148978320271875515952287"
+    },
+    {
+      "weight": 163,
+      "mean_log2_lower": 201.40076715386408,
+      "mean_log2_upper": 201.40076715386414,
+      "binary64_diagnostic_log2": 201.40076715386576,
+      "cap": "4242990535783349541248498663892989901424512369673189328364692"
+    },
+    {
+      "weight": 164,
+      "mean_log2_lower": 202.49029811909338,
+      "mean_log2_upper": 202.49029811909344,
+      "binary64_diagnostic_log2": 202.49029811909526,
+      "cap": "9029289230820507689884150077186334299718197496745629243635408"
+    },
+    {
+      "weight": 165,
+      "mean_log2_lower": 203.56691916404608,
+      "mean_log2_upper": 203.56691916404614,
+      "binary64_diagnostic_log2": 203.56691916404802,
+      "cap": "19043588708491374678927531071558341771584476747656058367788598"
+    },
+    {
+      "weight": 166,
+      "mean_log2_lower": 204.6306713668463,
+      "mean_log2_upper": 204.63067136684634,
+      "binary64_diagnostic_log2": 204.63067136684842,
+      "cap": "39807977598462558987769913105063834392623293210050868142720951"
+    },
+    {
+      "weight": 167,
+      "mean_log2_lower": 205.6815951004195,
+      "mean_log2_upper": 205.68159510041957,
+      "binary64_diagnostic_log2": 205.68159510042173,
+      "cap": "82476397152535996751915426663318342999229273372566059853561640"
+    },
+    {
+      "weight": 168,
+      "mean_log2_lower": 206.71973004328706,
+      "mean_log2_upper": 206.71973004328711,
+      "binary64_diagnostic_log2": 206.71973004328953,
+      "cap": "169371150885489924988206392318292006956055991785426688665800735"
+    },
+    {
+      "weight": 169,
+      "mean_log2_lower": 207.74511519008354,
+      "mean_log2_upper": 207.7451151900836,
+      "binary64_diagnostic_log2": 207.74511519008544,
+      "cap": "344755437713146188761962462830406824002421751345876113531977950"
+    },
+    {
+      "weight": 170,
+      "mean_log2_lower": 208.75778886180575,
+      "mean_log2_upper": 208.7577888618058,
+      "binary64_diagnostic_log2": 208.75778886180765,
+      "cap": "695594718584855764324294764203829306395569693904850405420138748"
+    },
+    {
+      "weight": 171,
+      "mean_log2_lower": 209.75778871580013,
+      "mean_log2_upper": 209.7577887158002,
+      "binary64_diagnostic_log2": 209.75778871580232,
+      "cap": "1391189296376915782509994072122264970144541633134621881540748862"
+    },
+    {
+      "weight": 172,
+      "mean_log2_lower": 210.74515175549587,
+      "mean_log2_upper": 210.74515175549593,
+      "binary64_diagnostic_log2": 210.74515175549794,
+      "cap": "2758113405789890380737819993027314934346217223040751803602404682"
+    },
+    {
+      "weight": 173,
+      "mean_log2_lower": 211.7199143398912,
+      "mean_log2_upper": 211.71991433989126,
+      "binary64_diagnostic_log2": 211.7199143398933,
+      "cap": "5420569232944129821053704841702838520526103272617669309054057219"
+    },
+    {
+      "weight": 174,
+      "mean_log2_lower": 212.6821121927991,
+      "mean_log2_upper": 212.68211219279917,
+      "binary64_diagnostic_log2": 212.6821121928013,
+      "cap": "10560763357941167715160161791712223795990105725812764382550006598"
+    },
+    {
+      "weight": 175,
+      "mean_log2_lower": 213.63178041185947,
+      "mean_log2_upper": 213.63178041185952,
+      "binary64_diagnostic_log2": 213.63178041186137,
+      "cap": "20397358595583539398842667795929597796900751933148124935543780747"
+    },
+    {
+      "weight": 176,
+      "mean_log2_lower": 214.56895347732328,
+      "mean_log2_upper": 214.56895347732333,
+      "binary64_diagnostic_log2": 214.56895347732512,
+      "cap": "39056303319076240412213738874059810878780409132422941231218461371"
+    },
+    {
+      "weight": 177,
+      "mean_log2_lower": 215.49366526061596,
+      "mean_log2_upper": 215.493665260616,
+      "binary64_diagnostic_log2": 215.49366526061775,
+      "cap": "74140774587505775154296322098629367222867942060449788899018591229"
+    },
+    {
+      "weight": 178,
+      "mean_log2_lower": 216.4059490326845,
+      "mean_log2_upper": 216.40594903268456,
+      "binary64_diagnostic_log2": 216.40594903268615,
+      "cap": "139534595897616275622513685477704109134534417583920134085726895773"
+    },
+    {
+      "weight": 179,
+      "mean_log2_lower": 217.30583747213527,
+      "mean_log2_upper": 217.30583747213532,
+      "binary64_diagnostic_log2": 217.30583747213768,
+      "cap": "260360628952641507861563076553549424378373471804546852709033231301"
+    },
+    {
+      "weight": 180,
+      "mean_log2_lower": 218.1933626731671,
+      "mean_log2_upper": 218.19336267316714,
+      "binary64_diagnostic_log2": 218.1933626731688,
+      "cap": "481667140288412647381174464608781161341283140251166688617804979528"
+    },
+    {
+      "weight": 181,
+      "mean_log2_lower": 219.06855615330517,
+      "mean_log2_upper": 219.06855615330522,
+      "binary64_diagnostic_log2": 219.06855615330713,
+      "cap": "883499908662241570718807162945866208384254621210757855117897624115"
+    },
+    {
+      "weight": 182,
+      "mean_log2_lower": 219.9314488609413,
+      "mean_log2_upper": 219.93144886094134,
+      "binary64_diagnostic_log2": 219.93144886094314,
+      "cap": "1606804713259903764599822981559230463165071770805001932376952520935"
+    },
+    {
+      "weight": 183,
+      "mean_log2_lower": 220.78207118268477,
+      "mean_log2_upper": 220.78207118268483,
+      "binary64_diagnostic_log2": 220.78207118268688,
+      "cap": "2897516587150658207297901671565416020413576579918099451899747143004"
+    },
+    {
+      "weight": 184,
+      "mean_log2_lower": 221.620452950529,
+      "mean_log2_upper": 221.62045295052906,
+      "binary64_diagnostic_log2": 221.6204529505312,
+      "cap": "5180885457848037016846554824139200689506029165251062100075663631010"
+    },
+    {
+      "weight": 185,
+      "mean_log2_lower": 222.44662344883864,
+      "mean_log2_upper": 222.4466234488387,
+      "binary64_diagnostic_log2": 222.4466234488405,
+      "cap": "9185569601274970487622805490490593870624791324004102032538169200282"
+    },
+    {
+      "weight": 186,
+      "mean_log2_lower": 223.26061142116143,
+      "mean_log2_upper": 223.26061142116149,
+      "binary64_diagnostic_log2": 223.2606114211638,
+      "cap": "16148823505560082774349242186094533340511328823792593683788678963404"
+    },
+    {
+      "weight": 187,
+      "mean_log2_lower": 224.06244507686898,
+      "mean_log2_upper": 224.06244507686904,
+      "binary64_diagnostic_log2": 224.06244507687111,
+      "cap": "28152493699604998786924398619771311190511781865346077158728681973083"
+    },
+    {
+      "weight": 188,
+      "mean_log2_lower": 224.85215209763115,
+      "mean_log2_upper": 224.8521520976312,
+      "binary64_diagnostic_log2": 224.85215209763317,
+      "cap": "48667873549905887528307835552181554311831391245880079452667905536282"
+    },
+    {
+      "weight": 189,
+      "mean_log2_lower": 225.62975964372743,
+      "mean_log2_upper": 225.62975964372748,
+      "binary64_diagnostic_log2": 225.62975964372927,
+      "cap": "83430638487901234108965825409718417851507163079815643531477839157226"
+    },
+    {
+      "weight": 190,
+      "mean_log2_lower": 226.39529436019964,
+      "mean_log2_upper": 226.3952943601997,
+      "binary64_diagnostic_log2": 226.3952943602017,
+      "cap": "141832082490875844306185156044748243640831045821660532108859917963007"
+    },
+    {
+      "weight": 191,
+      "mean_log2_lower": 227.14878238284967,
+      "mean_log2_upper": 227.14878238284973,
+      "binary64_diagnostic_log2": 227.14878238285192,
+      "cap": "239109579548594431713074869026796030630089677215080054209104851945963"
+    },
+    {
+      "weight": 192,
+      "mean_log2_lower": 227.89024934408576,
+      "mean_log2_upper": 227.89024934408582,
+      "binary64_diagnostic_log2": 227.8902493440876,
+      "cap": "399761321334622694818695850377857153372951952038071889988932953981149"
+    },
+    {
+      "weight": 193,
+      "mean_log2_lower": 228.61972037862074,
+      "mean_log2_upper": 228.6197203786208,
+      "binary64_diagnostic_log2": 228.61972037862247,
+      "cap": "662816687980241475017517779901377440754180134937422253866536984824351"
+    },
+    {
+      "weight": 194,
+      "mean_log2_lower": 229.33722012902612,
+      "mean_log2_upper": 229.33722012902618,
+      "binary64_diagnostic_log2": 229.33722012902805,
+      "cap": "1089889280220345194762784700364019864898285109049156619773429290114256"
+    },
+    {
+      "weight": 195,
+      "mean_log2_lower": 230.04277275114475,
+      "mean_log2_upper": 230.0427727511448,
+      "binary64_diagnostic_log2": 230.04277275114706,
+      "cap": "1777357879208936988009484938001567271054176013133246131921844521575158"
+    },
+    {
+      "weight": 196,
+      "mean_log2_lower": 230.7364019193656,
+      "mean_log2_upper": 230.73640191936565,
+      "binary64_diagnostic_log2": 230.73640191936715,
+      "cap": "2874604289572012526974251186905602780346345030692123531036996776462670"
+    },
+    {
+      "weight": 197,
+      "mean_log2_lower": 231.41813083176356,
+      "mean_log2_upper": 231.41813083176362,
+      "binary64_diagnostic_log2": 231.41813083176555,
+      "cap": "4611040331104595638166017814806704048426134465470221796183617865998671"
+    },
+    {
+      "weight": 198,
+      "mean_log2_lower": 232.08798221510747,
+      "mean_log2_upper": 232.08798221510753,
+      "binary64_diagnostic_log2": 232.08798221510912,
+      "cap": "7335745905214036907398861032737213159245730543469112958228107100744318"
+    },
+    {
+      "weight": 199,
+      "mean_log2_lower": 232.74597832973882,
+      "mean_log2_upper": 232.74597832973888,
+      "binary64_diagnostic_log2": 232.74597832974035,
+      "cap": "11574995941391383116594582201356335711863822139920650622936141594606730"
+    },
+    {
+      "weight": 200,
+      "mean_log2_lower": 233.3921409743243,
+      "mean_log2_upper": 233.39214097432435,
+      "binary64_diagnostic_log2": 233.39214097432586,
+      "cap": "18114868490415166742786394120644877555077958028402710668840328239110953"
+    },
+    {
+      "weight": 201,
+      "mean_log2_lower": 234.02649149048497,
+      "mean_log2_upper": 234.02649149048503,
+      "binary64_diagnostic_log2": 234.02649149048693,
+      "cap": "28118601611296027660543479975596635217758935259748726329391000876888370"
+    },
+    {
+      "weight": 202,
+      "mean_log2_lower": 234.64905076730417,
+      "mean_log2_upper": 234.64905076730423,
+      "binary64_diagnostic_log2": 234.64905076730594,
+      "cap": "43291510084677692774300577050182361548771010263407838209216197091809915"
+    },
+    {
+      "weight": 203,
+      "mean_log2_lower": 235.2598392457171,
+      "mean_log2_upper": 235.25983924571716,
+      "binary64_diagnostic_log2": 235.259839245719,
+      "cap": "66110187370646344990502154702352153065607786640384702120399850866647800"
+    },
+    {
+      "weight": 204,
+      "mean_log2_lower": 235.85887692278433,
+      "mean_log2_upper": 235.8588769227844,
+      "binary64_diagnostic_log2": 235.85887692278664,
+      "cap": "100137489078435891671364811167025325281480354585257119263288448419377641"
+    },
+    {
+      "weight": 205,
+      "mean_log2_lower": 236.44618335585176,
+      "mean_log2_upper": 236.44618335585182,
+      "binary64_diagnostic_log2": 236.44618335585355,
+      "cap": "150450470548840204331585871488840302260812808822428263881685864160811811"
+    },
+    {
+      "weight": 206,
+      "mean_log2_lower": 237.0217776665991,
+      "mean_log2_upper": 237.02177766659915,
+      "binary64_diagnostic_log2": 237.0217776666009,
+      "cap": "224215020486956671166135538879706864708867645504299280663577783599837407"
+    },
+    {
+      "weight": 207,
+      "mean_log2_lower": 237.58567854497912,
+      "mean_log2_upper": 237.58567854497917,
+      "binary64_diagnostic_log2": 237.58567854498077,
+      "cap": "331448289589287850489743396575751651818186424408650467918568877864289937"
+    },
+    {
+      "weight": 208,
+      "mean_log2_lower": 238.13790425305004,
+      "mean_log2_upper": 238.1379042530501,
+      "binary64_diagnostic_log2": 238.13790425305217,
+      "cap": "486017922536752247402586939786206714611953413597604421718691862647936811"
+    },
+    {
+      "weight": 209,
+      "mean_log2_lower": 238.67847262870262,
+      "mean_log2_upper": 238.67847262870268,
+      "binary64_diagnostic_log2": 238.67847262870413,
+      "cap": "706935157255135104301010108561990887436412789117569216130912649968457597"
+    },
+    {
+      "weight": 210,
+      "mean_log2_lower": 239.20740108928456,
+      "mean_log2_upper": 239.20740108928462,
+      "binary64_diagnostic_log2": 239.20740108928626,
+      "cap": "1020006437488475912903383974950151810069716725052130700187040911123004854"
+    },
+    {
+      "weight": 211,
+      "mean_log2_lower": 239.72470663512357,
+      "mean_log2_upper": 239.72470663512362,
+      "binary64_diagnostic_log2": 239.7247066351256,
+      "cap": "1459914422280627996637105123369903371838824337053336513887757120924711186"
+    },
+    {
+      "weight": 212,
+      "mean_log2_lower": 240.23040585295132,
+      "mean_log2_upper": 240.23040585295138,
+      "binary64_diagnostic_log2": 240.23040585295294,
+      "cap": "2072803017809672455377330932173463251265469039791901228104440642329136865"
+    },
+    {
+      "weight": 213,
+      "mean_log2_lower": 240.72451491923002,
+      "mean_log2_upper": 240.72451491923007,
+      "binary64_diagnostic_log2": 240.724514919232,
+      "cap": "2919440862078318523275456196899818990076533923898637973308388448841940669"
+    },
+    {
+      "weight": 214,
+      "mean_log2_lower": 241.207049603383,
+      "mean_log2_upper": 241.20704960338307,
+      "binary64_diagnostic_log2": 241.2070496033849,
+      "cap": "4079031848395059969347645935412977927209854760969079056020508356379942995"
+    },
+    {
+      "weight": 215,
+      "mean_log2_lower": 241.67802527093173,
+      "mean_log2_upper": 241.67802527093178,
+      "binary64_diagnostic_log2": 241.67802527093363,
+      "cap": "5653727851260959474587402320989519147224353982071177304115214853784719039"
+    },
+    {
+      "weight": 216,
+      "mean_log2_lower": 242.13745688653992,
+      "mean_log2_upper": 242.13745688653998,
+      "binary64_diagnostic_log2": 242.13745688654208,
+      "cap": "7773875779163066438345241997885423396804918417222084010749001236632519678"
+    },
+    {
+      "weight": 217,
+      "mean_log2_lower": 242.5853590169672,
+      "mean_log2_upper": 242.58535901696726,
+      "binary64_diagnostic_log2": 242.58535901696914,
+      "cap": "10603996434259202935032965756879814871053715651742720499383642622599424592"
+    },
+    {
+      "weight": 218,
+      "mean_log2_lower": 243.02174583393315,
+      "mean_log2_upper": 243.0217458339332,
+      "binary64_diagnostic_log2": 243.02174583393537,
+      "cap": "14349444691158899923215123572642271835113917008463331142845761869728930183"
+    },
+    {
+      "weight": 219,
+      "mean_log2_lower": 243.44663111689354,
+      "mean_log2_upper": 243.4466311168936,
+      "binary64_diagnostic_log2": 243.44663111689536,
+      "cap": "19263638048162396494956884733256184851131276146008131784438614169209728561"
+    },
+    {
+      "weight": 220,
+      "mean_log2_lower": 243.86002825573007,
+      "mean_log2_upper": 243.86002825573013,
+      "binary64_diagnostic_log2": 243.86002825573237,
+      "cap": "25655663363863667313251796128901119922303873587887241956629035625519516672"
+    },
+    {
+      "weight": 221,
+      "mean_log2_lower": 244.26195025335505,
+      "mean_log2_upper": 244.2619502533551,
+      "binary64_diagnostic_log2": 244.26195025335687,
+      "cap": "33897980509360098506863062238812519657194894211663788483993725394085018048"
+    },
+    {
+      "weight": 222,
+      "mean_log2_lower": 244.652409728232,
+      "mean_log2_upper": 244.65240972823204,
+      "binary64_diagnostic_log2": 244.65240972823378,
+      "cap": "44433839264541549408184770370815518786274411144975070326035901089599155382"
+    },
+    {
+      "weight": 223,
+      "mean_log2_lower": 245.03141891681383,
+      "mean_log2_upper": 245.0314189168139,
+      "binary64_diagnostic_log2": 245.03141891681594,
+      "cap": "57783916471784848170182724447821583239572934979628446588427796890366024780"
+    },
+    {
+      "weight": 224,
+      "mean_log2_lower": 245.3989896758997,
+      "mean_log2_upper": 245.39898967589977,
+      "binary64_diagnostic_log2": 245.39898967590142,
+      "cap": "74551570734961347571833636731582096696510985156312139485837986181472480887"
+    },
+    {
+      "weight": 225,
+      "mean_log2_lower": 245.75513348491148,
+      "mean_log2_upper": 245.75513348491154,
+      "binary64_diagnostic_log2": 245.7551334849134,
+      "cap": "95426010460497196163945783122742848298468056206539228261325012547730923257"
+    },
+    {
+      "weight": 226,
+      "mean_log2_lower": 246.09986144809102,
+      "mean_log2_upper": 246.09986144809108,
+      "binary64_diagnostic_log2": 246.09986144809355,
+      "cap": "121182588414399118073004866249348434095159896336431465107579744110954901008"
+    },
+    {
+      "weight": 227,
+      "mean_log2_lower": 246.43318429661977,
+      "mean_log2_upper": 246.43318429661983,
+      "binary64_diagnostic_log2": 246.43318429662153,
+      "cap": "152679384420564261429521327778640937242658347081277072990877111309161350103"
+    },
+    {
+      "weight": 228,
+      "mean_log2_lower": 246.755112390661,
+      "mean_log2_upper": 246.75511239066105,
+      "binary64_diagnostic_log2": 246.75511239066293,
+      "cap": "190849230413795397380637591826306961212252770278098898423459563259777163886"
+    },
+    {
+      "weight": 229,
+      "mean_log2_lower": 247.06565572132618,
+      "mean_log2_upper": 247.06565572132624,
+      "binary64_diagnostic_log2": 247.06565572132843,
+      "cap": "236686381701451093048597526263300008261315580385968723730321392789123604319"
+    },
+    {
+      "weight": 230,
+      "mean_log2_lower": 247.36482391256618,
+      "mean_log2_upper": 247.36482391256624,
+      "binary64_diagnostic_log2": 247.364823912568,
+      "cap": "291227156484469710352158867156881473603510381198792520768473339478438769284"
+    },
+    {
+      "weight": 231,
+      "mean_log2_lower": 247.65262622298854,
+      "mean_log2_upper": 247.6526262229886,
+      "binary64_diagnostic_log2": 247.6526262229906,
+      "cap": "355524061024822495673637439868635122107936003095068996559903608497937388989"
+    },
+    {
+      "weight": 232,
+      "mean_log2_lower": 247.9290715476011,
+      "mean_log2_upper": 247.92907154760115,
+      "binary64_diagnostic_log2": 247.92907154760314,
+      "cap": "430613194459832271805353837055422992790930723070494391973675390502782493733"
+    },
+    {
+      "weight": 233,
+      "mean_log2_lower": 248.1941684194835,
+      "mean_log2_upper": 248.19416841948356,
+      "binary64_diagnostic_log2": 248.19416841948478,
+      "cap": "517475083324323280276900312615194912012655952421432394742793681028913637063"
+    },
+    {
+      "weight": 234,
+      "mean_log2_lower": 248.4479250113868,
+      "mean_log2_upper": 248.44792501138684,
+      "binary64_diagnostic_log2": 248.44792501138852,
+      "cap": "616989522278873998911906070470041227626851013192009452235742665095204031679"
+    },
+    {
+      "weight": 235,
+      "mean_log2_lower": 248.69034913726227,
+      "mean_log2_upper": 248.69034913726233,
+      "binary64_diagnostic_log2": 248.69034913726387,
+      "cap": "729885477276006808979308021603526228610415980644782262255290085225299272505"
+    },
+    {
+      "weight": 236,
+      "mean_log2_lower": 248.92144825372003,
+      "mean_log2_upper": 248.9214482537201,
+      "binary64_diagnostic_log2": 248.92144825372213,
+      "cap": "856687615141317047119074661663636214913951046096668968138081033817095791335"
+    },
+    {
+      "weight": 237,
+      "mean_log2_lower": 249.14122946141808,
+      "mean_log2_upper": 249.14122946141813,
+      "binary64_diagnostic_log2": 249.14122946142027,
+      "cap": "997661526367982544124710910912538671652323865317685405167265349821593275399"
+    },
+    {
+      "weight": 238,
+      "mean_log2_lower": 249.34969950638265,
+      "mean_log2_upper": 249.3496995063827,
+      "binary64_diagnostic_log2": 249.34969950638532,
+      "cap": "1152760166910743578747654697797613726683594944376964091150949093051850928612"
+    },
+    {
+      "weight": 239,
+      "mean_log2_lower": 249.54686478126015,
+      "mean_log2_upper": 249.5468647812602,
+      "binary64_diagnostic_log2": 249.54686478126217,
+      "cap": "1321574417200877025688994425828924730567782433441366400650808620411904162708"
+    },
+    {
+      "weight": 240,
+      "mean_log2_lower": 249.73273132650164,
+      "mean_log2_upper": 249.7327313265017,
+      "binary64_diagnostic_log2": 249.73273132650337,
+      "cap": "1503290899492914759594916043660099963881105265564016197559082854292621163399"
+    },
+    {
+      "weight": 241,
+      "mean_log2_lower": 249.90730483147996,
+      "mean_log2_upper": 249.90730483148002,
+      "binary64_diagnostic_log2": 249.9073048314817,
+      "cap": "1696660268257902106687622833938059147631144787884120629618416249919963054066"
+    },
+    {
+      "weight": 242,
+      "mean_log2_lower": 250.07059063554075,
+      "mean_log2_upper": 250.0705906355408,
+      "binary64_diagnostic_log2": 250.0705906355424,
+      "cap": "1899979060710631485677002395357951159775885198399400230833087902995451501988"
+    },
+    {
+      "weight": 243,
+      "mean_log2_lower": 250.22259372898677,
+      "mean_log2_upper": 250.22259372898682,
+      "binary64_diagnostic_log2": 250.22259372898895,
+      "cap": "2111087845236233436748755440921322650706885040005335237968474854944936083686"
+    },
+    {
+      "weight": 244,
+      "mean_log2_lower": 250.3633187539972,
+      "mean_log2_upper": 250.36331875399725,
+      "binary64_diagnostic_log2": 250.36331875399904,
+      "cap": "2327387829405660790711398736597126007606740172817121043099192681047541702639"
+    },
+    {
+      "weight": 245,
+      "mean_log2_lower": 250.49277000548125,
+      "mean_log2_upper": 250.4927700054813,
+      "binary64_diagnostic_log2": 250.49277000548327,
+      "cap": "2545877299156187005433763461999265755638114526748861099862768494706050462107"
+    },
+    {
+      "weight": 246,
+      "mean_log2_lower": 250.61095143186733,
+      "mean_log2_upper": 250.6109514318674,
+      "binary64_diagnostic_log2": 250.61095143186927,
+      "cap": "2763208288180728386682617454528038491426226147989226640245633700684031106465"
+    },
+    {
+      "weight": 247,
+      "mean_log2_lower": 250.71786663582753,
+      "mean_log2_upper": 250.7178666358276,
+      "binary64_diagnostic_log2": 250.7178666358292,
+      "cap": "2975762771976521016166657359286774901315342014170589100461631249161549279852"
+    },
+    {
+      "weight": 248,
+      "mean_log2_lower": 250.81351887493807,
+      "mean_log2_upper": 250.81351887493813,
+      "binary64_diagnostic_log2": 250.8135188749399,
+      "cap": "3179746510481707081518826848399404245761811063253643838607854892363362862598"
+    },
+    {
+      "weight": 249,
+      "mean_log2_lower": 250.89791106227605,
+      "mean_log2_upper": 250.8979110622761,
+      "binary64_diagnostic_log2": 250.8979110622778,
+      "cap": "3371297505200161783521314827300593359529701875619999473667018536776215636985"
+    },
+    {
+      "weight": 250,
+      "mean_log2_lower": 250.97104576695236,
+      "mean_log2_upper": 250.97104576695241,
+      "binary64_diagnostic_log2": 250.97104576695438,
+      "cap": "3546604975584505220240156457132568102496187884050541693752361744067626092914"
+    },
+    {
+      "weight": 251,
+      "mean_log2_lower": 251.03292521458175,
+      "mean_log2_upper": 251.0329252145818,
+      "binary64_diagnostic_log2": 251.03292521458343,
+      "cap": "3702033879005709838689980182789180917708194311672596982006644482488501675697"
+    },
+    {
+      "weight": 252,
+      "mean_log2_lower": 251.08355128768937,
+      "mean_log2_upper": 251.08355128768943,
+      "binary64_diagnostic_log2": 251.08355128769156,
+      "cap": "3834249374785919035647149816707968822558028428639182731943836847965211415645"
+    },
+    {
+      "weight": 253,
+      "mean_log2_lower": 251.1229255260548,
+      "mean_log2_upper": 251.12292552605484,
+      "binary64_diagnostic_log2": 251.12292552605652,
+      "cap": "3940335325951107923942316450423769540831671030263613789197309079229551032619"
+    },
+    {
+      "weight": 254,
+      "mean_log2_lower": 251.15104912699297,
+      "mean_log2_upper": 251.15104912699303,
+      "binary64_diagnostic_log2": 251.15104912699474,
+      "cap": "4017900982040127026312712993676561509019297891691359687772404542626854712170"
+    },
+    {
+      "weight": 255,
+      "mean_log2_lower": 251.16792294557288,
+      "mean_log2_upper": 251.16792294557294,
+      "binary64_diagnostic_log2": 251.16792294557433,
+      "cap": "4065170405401079444199868398458346386340834105974382992015972198248144401958"
+    },
+    {
+      "weight": 256,
+      "mean_log2_lower": 251.1735474947735,
+      "mean_log2_upper": 251.17354749477354,
+      "binary64_diagnostic_log2": 251.17354749477545,
+      "cap": "4081049977317651080842058861691984869055733359303191819074609028975126807384"
+    },
+    {
+      "weight": 257,
+      "mean_log2_lower": 251.16792294557737,
+      "mean_log2_upper": 251.16792294557743,
+      "binary64_diagnostic_log2": 251.1679229455793,
+      "cap": "4065170405415094423481885476645738030761049258444847664566536063655342993814"
+    },
+    {
+      "weight": 258,
+      "mean_log2_lower": 251.1510491270018,
+      "mean_log2_upper": 251.15104912700187,
+      "binary64_diagnostic_log2": 251.15104912700338,
+      "cap": "4017900982064189954196032970804356275235207078007343505404738327254221168557"
+    },
+    {
+      "weight": 259,
+      "mean_log2_lower": 251.1229255260677,
+      "mean_log2_upper": 251.12292552606775,
+      "binary64_diagnostic_log2": 251.12292552606942,
+      "cap": "3940335325986350260252913854893546697114532614798569525933926609498553034108"
+    },
+    {
+      "weight": 260,
+      "mean_log2_lower": 251.0835512877059,
+      "mean_log2_upper": 251.08355128770594,
+      "binary64_diagnostic_log2": 251.08355128770776,
+      "cap": "3834249374828974756752271079791363718691357642386711501685637254453151920662"
+    },
+    {
+      "weight": 261,
+      "mean_log2_lower": 251.0329252146013,
+      "mean_log2_upper": 251.03292521460136,
+      "binary64_diagnostic_log2": 251.0329252146035,
+      "cap": "3702033879057199584290988111846380609226640823891054769199474696471655014135"
+    },
+    {
+      "weight": 262,
+      "mean_log2_lower": 250.97104576697427,
+      "mean_log2_upper": 250.97104576697433,
+      "binary64_diagnostic_log2": 250.97104576697598,
+      "cap": "3546604975637606142923400405236916995322647072238080229044937184579570909239"
+    },
+    {
+      "weight": 263,
+      "mean_log2_lower": 250.8979110622994,
+      "mean_log2_upper": 250.89791106229947,
+      "binary64_diagnostic_log2": 250.8979110623014,
+      "cap": "3371297505255287065972919530755618439438303665562757777389291271188895923835"
+    },
+    {
+      "weight": 264,
+      "mean_log2_lower": 250.81351887496194,
+      "mean_log2_upper": 250.813518874962,
+      "binary64_diagnostic_log2": 250.8135188749637,
+      "cap": "3179746510534201384578969719627088141218920269760948502105295513821264516521"
+    },
+    {
+      "weight": 265,
+      "mean_log2_lower": 250.71786663585075,
+      "mean_log2_upper": 250.7178666358508,
+      "binary64_diagnostic_log2": 250.71786663585277,
+      "cap": "2975762772025120145965317283918105528099824953590372616524823879492375715353"
+    },
+    {
+      "weight": 266,
+      "mean_log2_lower": 250.61095143188862,
+      "mean_log2_upper": 250.61095143188868,
+      "binary64_diagnostic_log2": 250.61095143189024,
+      "cap": "2763208288220902439006750577204043224861024077333454709303645553664348694915"
+    },
+    {
+      "weight": 267,
+      "mean_log2_lower": 250.49277000549924,
+      "mean_log2_upper": 250.4927700054993,
+      "binary64_diagnostic_log2": 250.49277000550106,
+      "cap": "2545877299187583955189347254289489268751088016954300913682016117965029733257"
+    },
+    {
+      "weight": 268,
+      "mean_log2_lower": 250.36331875401032,
+      "mean_log2_upper": 250.36331875401038,
+      "binary64_diagnostic_log2": 250.36331875401254,
+      "cap": "2327387829427439795215995082439383316420929741910115249106873537329950583526"
+    },
+    {
+      "weight": 269,
+      "mean_log2_lower": 250.22259372899342,
+      "mean_log2_upper": 250.22259372899347,
+      "binary64_diagnostic_log2": 250.222593728995,
+      "cap": "2111087845245091964802734193173711272245606399510548832593651013433100597142"
+    },
+    {
+      "weight": 270,
+      "mean_log2_lower": 250.07059063553908,
+      "mean_log2_upper": 250.07059063553913,
+      "binary64_diagnostic_log2": 250.0705906355412,
+      "cap": "1899979060709059408867428653378416557713530178058261050893099913243352458241"
+    },
+    {
+      "weight": 271,
+      "mean_log2_lower": 249.90730483146808,
+      "mean_log2_upper": 249.90730483146814,
+      "binary64_diagnostic_log2": 249.90730483146967,
+      "cap": "1696660268243763360009508861207030414749599131987451693370384824867854349641"
+    },
+    {
+      "weight": 272,
+      "mean_log2_lower": 249.73273132647745,
+      "mean_log2_upper": 249.7327313264775,
+      "binary64_diagnostic_log2": 249.73273132647924,
+      "cap": "1503290899467771222368396741566009375923369046336628780740814657260615266625"
+    },
+    {
+      "weight": 273,
+      "mean_log2_lower": 249.54686478122153,
+      "mean_log2_upper": 249.5468647812216,
+      "binary64_diagnostic_log2": 249.54686478122338,
+      "cap": "1321574417165338457169398858297544328335541445427419952603621771128812304946"
+    },
+    {
+      "weight": 274,
+      "mean_log2_lower": 249.34969950632723,
+      "mean_log2_upper": 249.34969950632728,
+      "binary64_diagnostic_log2": 249.34969950632913,
+      "cap": "1152760166865846168939598139361022559189793667184263183315069971571673006446"
+    },
+    {
+      "weight": 275,
+      "mean_log2_lower": 249.1412294613434,
+      "mean_log2_upper": 249.14122946134347,
+      "binary64_diagnostic_log2": 249.14122946134594,
+      "cap": "997661526316586395792054000928049424440057684333369294775759294467593180527"
+    },
+    {
+      "weight": 276,
+      "mean_log2_lower": 248.92144825362354,
+      "mean_log2_upper": 248.9214482536236,
+      "binary64_diagnostic_log2": 248.92144825362564,
+      "cap": "856687615084019250273155722559949327349823141034332626836887794286303049621"
+    },
+    {
+      "weight": 277,
+      "mean_log2_lower": 248.6903491371412,
+      "mean_log2_upper": 248.69034913714125,
+      "binary64_diagnostic_log2": 248.6903491371433,
+      "cap": "729885477215010852933688559365866595631040190756912682010741422154080554409"
+    },
+    {
+      "weight": 278,
+      "mean_log2_lower": 248.44792501123828,
+      "mean_log2_upper": 248.44792501123834,
+      "binary64_diagnostic_log2": 248.4479250112399,
+      "cap": "616989522215315726088427608999538035094289417817194392325925845526937854496"
+    },
+    {
+      "weight": 279,
+      "mean_log2_lower": 248.1941684193045,
+      "mean_log2_upper": 248.19416841930456,
+      "binary64_diagnostic_log2": 248.19416841930635,
+      "cap": "517475083260322331728277502827614742172042737581969081089611908393413668865"
+    },
+    {
+      "weight": 280,
+      "mean_log2_lower": 247.9290715473884,
+      "mean_log2_upper": 247.92907154738845,
+      "binary64_diagnostic_log2": 247.92907154738958,
+      "cap": "430613194396089025142808073559252836777519083483744538345844251695954035209"
+    },
+    {
+      "weight": 281,
+      "mean_log2_lower": 247.65262622273872,
+      "mean_log2_upper": 247.65262622273877,
+      "binary64_diagnostic_log2": 247.65262622274068,
+      "cap": "355524060963236534002388717023525280537245843422393035719444180650987322550"
+    },
+    {
+      "weight": 282,
+      "mean_log2_lower": 247.36482391227568,
+      "mean_log2_upper": 247.36482391227574,
+      "binary64_diagnostic_log2": 247.36482391227753,
+      "cap": "291227156425834508879386560033648697670430566498328508721048859672059464693"
+    },
+    {
+      "weight": 283,
+      "mean_log2_lower": 247.06565572099115,
+      "mean_log2_upper": 247.0656557209912,
+      "binary64_diagnostic_log2": 247.0656557209929,
+      "cap": "236686381646406467963780627855078893145883868047709997184756215378327441433"
+    },
+    {
+      "weight": 284,
+      "mean_log2_lower": 246.75511239027742,
+      "mean_log2_upper": 246.75511239027747,
+      "binary64_diagnostic_log2": 246.75511239027955,
+      "cap": "190849230363079300380744722590849034811458992075088826778156476177663463015"
+    },
+    {
+      "weight": 285,
+      "mean_log2_lower": 246.4331842961833,
+      "mean_log2_upper": 246.43318429618336,
+      "binary64_diagnostic_log2": 246.43318429618526,
+      "cap": "152679384374393776477896981194529270365718846178451763513344653853881498929"
+    },
+    {
+      "weight": 286,
+      "mean_log2_lower": 246.0998614475971,
+      "mean_log2_upper": 246.09986144759716,
+      "binary64_diagnostic_log2": 246.09986144759878,
+      "cap": "121182588372840149671319316494179188081317833079288052233070822357182211890"
+    },
+    {
+      "weight": 287,
+      "mean_log2_lower": 245.75513348435518,
+      "mean_log2_upper": 245.75513348435524,
+      "binary64_diagnostic_log2": 245.75513348435766,
+      "cap": "95426010423738861815809716032468622969136498369353807039247042128417411504"
+    },
+    {
+      "weight": 288,
+      "mean_log2_lower": 245.39898967527583,
+      "mean_log2_upper": 245.39898967527589,
+      "binary64_diagnostic_log2": 245.3989896752777,
+      "cap": "74551570702730773621814675269648525993666490686257424068709980321955358101"
+    },
+    {
+      "weight": 289,
+      "mean_log2_lower": 245.03141891611668,
+      "mean_log2_upper": 245.03141891611673,
+      "binary64_diagnostic_log2": 245.03141891611818,
+      "cap": "57783916443837916918148348922393494126251143650376969261658061755895718595"
+    },
+    {
+      "weight": 290,
+      "mean_log2_lower": 244.65240972745548,
+      "mean_log2_upper": 244.65240972745553,
+      "binary64_diagnostic_log2": 244.65240972745775,
+      "cap": "44433839240640565967533926798158841172419622917804934305879837541389044932"
+    },
+    {
+      "weight": 291,
+      "mean_log2_lower": 244.26195025249265,
+      "mean_log2_upper": 244.2619502524927,
+      "binary64_diagnostic_log2": 244.26195025249422,
+      "cap": "33897980489090889767440633672795853315079129920583059610861682658143323728"
+    },
+    {
+      "weight": 292,
+      "mean_log2_lower": 243.8600282547747,
+      "mean_log2_upper": 243.86002825477476,
+      "binary64_diagnostic_log2": 243.86002825477658,
+      "cap": "25655663346866644485656678407769637827281121381939967833133327007248443567"
+    },
+    {
+      "weight": 293,
+      "mean_log2_lower": 243.4466311158375,
+      "mean_log2_upper": 243.44663111583756,
+      "binary64_diagnostic_log2": 243.44663111583975,
+      "cap": "19263638034067316070780503287666734879269592880664967482514033249095324263"
+    },
+    {
+      "weight": 294,
+      "mean_log2_lower": 243.02174583276812,
+      "mean_log2_upper": 243.02174583276818,
+      "binary64_diagnostic_log2": 243.02174583276997,
+      "cap": "14349444679567471028150833246752407412657060168275299617271589831818651941"
+    },
+    {
+      "weight": 295,
+      "mean_log2_lower": 242.5853590156841,
+      "mean_log2_upper": 242.58535901568416,
+      "binary64_diagnostic_log2": 242.58535901568618,
+      "cap": "10603996424829309525382188064757551399089415703997639907185255987680648156"
+    },
+    {
+      "weight": 296,
+      "mean_log2_lower": 242.13745688512887,
+      "mean_log2_upper": 242.13745688512893,
+      "binary64_diagnostic_log2": 242.1374568851308,
+      "cap": "7773875771558468826539762031405477533812145534122383455417054360874071499"
+    },
+    {
+      "weight": 297,
+      "mean_log2_lower": 241.67802526938198,
+      "mean_log2_upper": 241.67802526938203,
+      "binary64_diagnostic_log2": 241.6780252693841,
+      "cap": "5653727845188586529651712508296201969793698634649712090425768120072444847"
+    },
+    {
+      "weight": 298,
+      "mean_log2_lower": 241.20704960168283,
+      "mean_log2_upper": 241.20704960168288,
+      "binary64_diagnostic_log2": 241.2070496016847,
+      "cap": "4079031843588004197979840763471633965664061322815917604922992736677041045"
+    },
+    {
+      "weight": 299,
+      "mean_log2_lower": 240.72451491736658,
+      "mean_log2_upper": 240.72451491736663,
+      "binary64_diagnostic_log2": 240.72451491736834,
+      "cap": "2919440858306995187093658797786198958351950292739193361054147200120669510"
+    },
+    {
+      "weight": 300,
+      "mean_log2_lower": 240.23040585091064,
+      "mean_log2_upper": 240.2304058509107,
+      "binary64_diagnostic_log2": 240.2304058509125,
+      "cap": "2072803014878038519622292291635234019764550836105312575786598859226261437"
+    },
+    {
+      "weight": 301,
+      "mean_log2_lower": 239.72470663289027,
+      "mean_log2_upper": 239.72470663289033,
+      "binary64_diagnostic_log2": 239.7247066328919,
+      "cap": "1459914420020248311184869160164441869983748413375628424994473279917840183"
+    },
+    {
+      "weight": 302,
+      "mean_log2_lower": 239.20740108684194,
+      "mean_log2_upper": 239.207401086842,
+      "binary64_diagnostic_log2": 239.20740108684393,
+      "cap": "1020006435761709915063411216171429528684885037813068144843602791286209911"
+    },
+    {
+      "weight": 303,
+      "mean_log2_lower": 238.67847262603232,
+      "mean_log2_upper": 238.67847262603237,
+      "binary64_diagnostic_log2": 238.67847262603408,
+      "cap": "706935155946784063747357174407720200099997798795897478605558072199423082"
+    },
+    {
+      "weight": 304,
+      "mean_log2_lower": 238.137904250132,
+      "mean_log2_upper": 238.13790425013207,
+      "binary64_diagnostic_log2": 238.1379042501336,
+      "cap": "486017921553539193682547672619539471899774334513595346055490868110155405"
+    },
+    {
+      "weight": 305,
+      "mean_log2_lower": 237.58567854179145,
+      "mean_log2_upper": 237.5856785417915,
+      "binary64_diagnostic_log2": 237.58567854179356,
+      "cap": "331448288857050311581225780853565647987558647829087159605769747075869086"
+    },
+    {
+      "weight": 306,
+      "mean_log2_lower": 237.0217776631178,
+      "mean_log2_upper": 237.02177766311786,
+      "binary64_diagnostic_log2": 237.02177766311948,
+      "cap": "224215019945893361726259834163127798434462095461248471761629110364696717"
+    },
+    {
+      "weight": 307,
+      "mean_log2_lower": 236.4461833520506,
+      "mean_log2_upper": 236.44618335205067,
+      "binary64_diagnostic_log2": 236.44618335205232,
+      "cap": "150450470152431197223101742505543353042919738501000918742414833498807808"
+    },
+    {
+      "weight": 308,
+      "mean_log2_lower": 235.8588769186347,
+      "mean_log2_upper": 235.85887691863476,
+      "binary64_diagnostic_log2": 235.85887691863655,
+      "cap": "100137488790378682614737575489343381345206129270867748625821131512376547"
+    },
+    {
+      "weight": 309,
+      "mean_log2_lower": 235.25983924118768,
+      "mean_log2_upper": 235.25983924118773,
+      "binary64_diagnostic_log2": 235.25983924118998,
+      "cap": "66110187163107766985919209323569769448547350391242829506596348829890256"
+    },
+    {
+      "weight": 310,
+      "mean_log2_lower": 234.64905076236082,
+      "mean_log2_upper": 234.64905076236087,
+      "binary64_diagnostic_log2": 234.6490507623627,
+      "cap": "43291509936343797169919246685350246899859053053254868683828917073104390"
+    },
+    {
+      "weight": 311,
+      "mean_log2_lower": 234.02649148509042,
+      "mean_log2_upper": 234.02649148509047,
+      "binary64_diagnostic_log2": 234.02649148509212,
+      "cap": "28118601506149405077948581536738849726128163728393937001637961420277014"
+    },
+    {
+      "weight": 312,
+      "mean_log2_lower": 233.39214096843787,
+      "mean_log2_upper": 233.39214096843793,
+      "binary64_diagnostic_log2": 233.39214096843983,
+      "cap": "18114868416508681094452549451690510283962071148834778742237364510971566"
+    },
+    {
+      "weight": 313,
+      "mean_log2_lower": 232.74597832331622,
+      "mean_log2_upper": 232.74597832331628,
+      "binary64_diagnostic_log2": 232.7459783233177,
+      "cap": "11574995889861312051436752526426383324507087578757853156391035727106864"
+    },
+    {
+      "weight": 314,
+      "mean_log2_lower": 232.0879822081005,
+      "mean_log2_upper": 232.08798220810056,
+      "binary64_diagnostic_log2": 232.087982208102,
+      "cap": "7335745869584589381337301962019103438802853287577964487468857496443107"
+    },
+    {
+      "weight": 315,
+      "mean_log2_lower": 231.41813082411966,
+      "mean_log2_upper": 231.41813082411971,
+      "binary64_diagnostic_log2": 231.41813082412136,
+      "cap": "4611040306672776034219677695537411291843064320335566331928763133596320"
+    },
+    {
+      "weight": 316,
+      "mean_log2_lower": 230.73640191102766,
+      "mean_log2_upper": 230.7364019110277,
+      "binary64_diagnostic_log2": 230.73640191102956,
+      "cap": "2874604272959158152019854465560680804956855106225293518752900882801513"
+    },
+    {
+      "weight": 317,
+      "mean_log2_lower": 230.04277274205072,
+      "mean_log2_upper": 230.04277274205077,
+      "binary64_diagnostic_log2": 230.04277274205228,
+      "cap": "1777357868004439751544184437746455706336963795133345867828396866764237"
+    },
+    {
+      "weight": 318,
+      "mean_log2_lower": 229.33722011910854,
+      "mean_log2_upper": 229.3372201191086,
+      "binary64_diagnostic_log2": 229.3372201191107,
+      "cap": "1089889272728240907421124363103783029091064751317745968410846061370889"
+    },
+    {
+      "weight": 319,
+      "mean_log2_lower": 228.61972036780642,
+      "mean_log2_upper": 228.61972036780648,
+      "binary64_diagnostic_log2": 228.6197203678081,
+      "cap": "662816683011798314947719319437619709278203937028893438655710642757404"
+    },
+    {
+      "weight": 320,
+      "mean_log2_lower": 227.8902493322953,
+      "mean_log2_upper": 227.89024933229535,
+      "binary64_diagnostic_log2": 227.890249332297,
+      "cap": "399761318067523757777096036107022580945882935403959250785107026215092"
+    },
+    {
+      "weight": 321,
+      "mean_log2_lower": 227.14878236999692,
+      "mean_log2_upper": 227.14878236999698,
+      "binary64_diagnostic_log2": 227.14878236999868,
+      "cap": "239109577418323309288499153847918988084093391283465933381251770714043"
+    },
+    {
+      "weight": 322,
+      "mean_log2_lower": 226.39529434619126,
+      "mean_log2_upper": 226.39529434619132,
+      "binary64_diagnostic_log2": 226.39529434619342,
+      "cap": "141832081113716223935681298160765165629352991063446279418488205033826"
+    },
+    {
+      "weight": 323,
+      "mean_log2_lower": 225.62975962846238,
+      "mean_log2_upper": 225.62975962846244,
+      "binary64_diagnostic_log2": 225.62975962846443,
+      "cap": "83430637605139628722045808763440321538520664418449710018902025132025"
+    },
+    {
+      "weight": 324,
+      "mean_log2_lower": 224.85215208100004,
+      "mean_log2_upper": 224.8521520810001,
+      "binary64_diagnostic_log2": 224.8521520810018,
+      "cap": "48667872988863563873182123788097336120340157008708357422882078356593"
+    },
+    {
+      "weight": 325,
+      "mean_log2_lower": 224.06244505875344,
+      "mean_log2_upper": 224.0624450587535,
+      "binary64_diagnostic_log2": 224.0624450587554,
+      "cap": "28152493346098201463521403366283484014957611019025224100723108080790"
+    },
+    {
+      "weight": 326,
+      "mean_log2_lower": 223.26061140143338,
+      "mean_log2_upper": 223.26061140143344,
+      "binary64_diagnostic_log2": 223.26061140143557,
+      "cap": "16148823284732037730115880222373124792163396295725845988949632516237"
+    },
+    {
+      "weight": 327,
+      "mean_log2_lower": 222.44662342735975,
+      "mean_log2_upper": 222.4466234273598,
+      "binary64_diagnostic_log2": 222.4466234273619,
+      "cap": "9185569464521773180349434809957538191527512325819856014748263552944"
+    },
+    {
+      "weight": 328,
+      "mean_log2_lower": 221.62045292714964,
+      "mean_log2_upper": 221.6204529271497,
+      "binary64_diagnostic_log2": 221.62045292715138,
+      "cap": "5180885373888417776181583058116781585975823758863904333696228459658"
+    },
+    {
+      "weight": 329,
+      "mean_log2_lower": 220.78207115724342,
+      "mean_log2_upper": 220.78207115724348,
+      "binary64_diagnostic_log2": 220.78207115724547,
+      "cap": "2897516536053994131105759470507922755254154214994006876094505803161"
+    },
+    {
+      "weight": 330,
+      "mean_log2_lower": 219.93144883326346,
+      "mean_log2_upper": 219.93144883326352,
+      "binary64_diagnostic_log2": 219.93144883326556,
+      "cap": "1606804682433948292165520857988591145338441206775710939138579075390"
+    },
+    {
+      "weight": 331,
+      "mean_log2_lower": 219.0685561232024,
+      "mean_log2_upper": 219.06855612320246,
+      "binary64_diagnostic_log2": 219.06855612320413,
+      "cap": "883499890227303570981864948204317839345828731962080900659798218643"
+    },
+    {
+      "weight": 332,
+      "mean_log2_lower": 218.193362640436,
+      "mean_log2_upper": 218.19336264043605,
+      "binary64_diagnostic_log2": 218.19336264043784,
+      "cap": "481667129360653484582106716455549483699340847961363698533931833622"
+    },
+    {
+      "weight": 333,
+      "mean_log2_lower": 217.30583743655632,
+      "mean_log2_upper": 217.30583743655637,
+      "binary64_diagnostic_log2": 217.305837436558,
+      "cap": "260360622531637964835855185949208628861709005009974839507335145621"
+    },
+    {
+      "weight": 334,
+      "mean_log2_lower": 216.4059489940207,
+      "mean_log2_upper": 216.40594899402075,
+      "binary64_diagnostic_log2": 216.40594899402288,
+      "cap": "139534592158181388304368137868361837241281057241231086577246157821"
+    },
+    {
+      "weight": 335,
+      "mean_log2_lower": 215.49366521861157,
+      "mean_log2_upper": 215.49366521861162,
+      "binary64_diagnostic_log2": 215.4936652186132,
+      "cap": "74140772428871873511026004959672008661344254426627715778914254395"
+    },
+    {
+      "weight": 336,
+      "mean_log2_lower": 214.5689534317023,
+      "mean_log2_upper": 214.56895343170237,
+      "binary64_diagnostic_log2": 214.56895343170396,
+      "cap": "39056302084030766520473808376479032443845893415088492725840562504"
+    },
+    {
+      "weight": 337,
+      "mean_log2_lower": 213.63178036232395,
+      "mean_log2_upper": 213.631780362324,
+      "binary64_diagnostic_log2": 213.63178036232554,
+      "cap": "20397357895227609215087270854335459164284584952389354854924211233"
+    },
+    {
+      "weight": 338,
+      "mean_log2_lower": 212.68211213902748,
+      "mean_log2_upper": 212.68211213902754,
+      "binary64_diagnostic_log2": 212.6821121390293,
+      "cap": "10560762964321363245905319777991889717547382676901086248971267314"
+    },
+    {
+      "weight": 339,
+      "mean_log2_lower": 211.7199142815362,
+      "mean_log2_upper": 211.71991428153626,
+      "binary64_diagnostic_log2": 211.7199142815382,
+      "cap": "5420569013689253806509048991548491161528636629734179830009817665"
+    },
+    {
+      "weight": 340,
+      "mean_log2_lower": 210.7451516921826,
+      "mean_log2_upper": 210.74515169218265,
+      "binary64_diagnostic_log2": 210.7451516921845,
+      "cap": "2758113284748597688068385302078436738448859522510546627408251082"
+    },
+    {
+      "weight": 341,
+      "mean_log2_lower": 209.75778864712353,
+      "mean_log2_upper": 209.7577886471236,
+      "binary64_diagnostic_log2": 209.75778864712558,
+      "cap": "1391189230152009171021479605737409370067238942586963335873161927"
+    },
+    {
+      "weight": 342,
+      "mean_log2_lower": 208.75778878732825,
+      "mean_log2_upper": 208.7577887873283,
+      "binary64_diagnostic_log2": 208.75778878733038,
+      "cap": "695594682675676582532313239695719099018831548978629172119687894"
+    },
+    {
+      "weight": 343,
+      "mean_log2_lower": 207.74511510933212,
+      "mean_log2_upper": 207.74511510933218,
+      "binary64_diagnostic_log2": 207.74511510933405,
+      "cap": "344755418416288777348492083994900702931239371048681084992290598"
+    },
+    {
+      "weight": 344,
+      "mean_log2_lower": 206.7197299557503,
+      "mean_log2_upper": 206.71972995575035,
+      "binary64_diagnostic_log2": 206.7197299557522,
+      "cap": "169371140608683320800957002548756171607068979610540620572969871"
+    },
+    {
+      "weight": 345,
+      "mean_log2_lower": 205.68159500554415,
+      "mean_log2_upper": 205.6815950055442,
+      "binary64_diagnostic_log2": 205.6815950055464,
+      "cap": "82476391728676398941860898110075490438655660938242208239085337"
+    },
+    {
+      "weight": 346,
+      "mean_log2_lower": 204.63067126403348,
+      "mean_log2_upper": 204.63067126403354,
+      "binary64_diagnostic_log2": 204.6306712640355,
+      "cap": "39807974761567638559005826404209678661498441980915680002339996"
+    },
+    {
+      "weight": 347,
+      "mean_log2_lower": 203.56691905264745,
+      "mean_log2_upper": 203.5669190526475,
+      "binary64_diagnostic_log2": 203.5669190526495,
+      "cap": "19043587238029865082285007907300267909137952961908043041098250"
+    },
+    {
+      "weight": 348,
+      "mean_log2_lower": 202.49029799840648,
+      "mean_log2_upper": 202.49029799840653,
+      "binary64_diagnostic_log2": 202.49029799840818,
+      "cap": "9029288475485220491402928197710804300578956253261719868319778"
+    },
+    {
+      "weight": 349,
+      "mean_log2_lower": 201.40076702312734,
+      "mean_log2_upper": 201.4007670231274,
+      "binary64_diagnostic_log2": 201.40076702312916,
+      "cap": "4242990151284828430055096111703574129159064614823501179969490"
+    },
+    {
+      "weight": 350,
+      "mean_log2_lower": 200.29828433234368,
+      "mean_log2_upper": 200.29828433234374,
+      "binary64_diagnostic_log2": 200.2982843323454,
+      "cap": "1976021493051218272493725844235066991026548873772459678661302"
+    },
+    {
+      "weight": 351,
+      "mean_log2_lower": 199.18280740393305,
+      "mean_log2_upper": 199.1828074039331,
+      "binary64_diagnostic_log2": 199.1828074039348,
+      "cap": "912010102569115766296368707811516550763333019487258291357436"
+    },
+    {
+      "weight": 352,
+      "mean_log2_lower": 198.05429297644218,
+      "mean_log2_upper": 198.05429297644224,
+      "binary64_diagnostic_log2": 198.05429297644406,
+      "cap": "417141074923813773967812110207607918457420279430877832813241"
+    },
+    {
+      "weight": 353,
+      "mean_log2_lower": 196.91269703710125,
+      "mean_log2_upper": 196.9126970371013,
+      "binary64_diagnostic_log2": 196.91269703710307,
+      "cap": "189072486325087111971938690476438180816413245755208161679500"
+    },
+    {
+      "weight": 354,
+      "mean_log2_lower": 195.75797480951798,
+      "mean_log2_upper": 195.75797480951803,
+      "binary64_diagnostic_log2": 195.7579748095195,
+      "cap": "84922409541320817470125726275313691919392152557178796898630"
+    },
+    {
+      "weight": 355,
+      "mean_log2_lower": 194.5900807410417,
+      "mean_log2_upper": 194.59008074104176,
+      "binary64_diagnostic_log2": 194.59008074104392,
+      "cap": "37796463117441585885564566398041803727724006880448553002492"
+    },
+    {
+      "weight": 356,
+      "mean_log2_lower": 193.40896848978727,
+      "mean_log2_upper": 193.40896848978733,
+      "binary64_diagnostic_log2": 193.40896848978923,
+      "cap": "16668669891778825342323456513688470258660692795282829984903"
+    },
+    {
+      "weight": 357,
+      "mean_log2_lower": 192.2145909113086,
+      "mean_log2_upper": 192.21459091130865,
+      "binary64_diagnostic_log2": 192.2145909113103,
+      "cap": "7283790880323800790304860781955611648467732157797248405133"
+    },
+    {
+      "weight": 358,
+      "mean_log2_lower": 191.00690004491068,
+      "mean_log2_upper": 191.00690004491074,
+      "binary64_diagnostic_log2": 191.00690004491275,
+      "cap": "3153597715374185022117613158891239969169847200181429245874"
+    },
+    {
+      "weight": 359,
+      "mean_log2_lower": 189.78584709958926,
+      "mean_log2_upper": 189.78584709958932,
+      "binary64_diagnostic_log2": 189.78584709959082,
+      "cap": "1352797305224295070709667511892671712293991707746741611470"
+    },
+    {
+      "weight": 360,
+      "mean_log2_lower": 188.55138243958584,
+      "mean_log2_upper": 188.5513824395859,
+      "binary64_diagnostic_log2": 188.5513824395879,
+      "cap": "574939091293804524009048727778510491311295898095731958086"
+    },
+    {
+      "weight": 361,
+      "mean_log2_lower": 187.30345556954634,
+      "mean_log2_upper": 187.3034555695464,
+      "binary64_diagnostic_log2": 187.30345556954848,
+      "cap": "242079725348049321726217467821731136763858827254472588271"
+    },
+    {
+      "weight": 362,
+      "mean_log2_lower": 186.0420151192708,
+      "mean_log2_upper": 186.04201511927084,
+      "binary64_diagnostic_log2": 186.0420151192735,
+      "cap": "100978055800881937588301719718203855134237881892792782034"
+    },
+    {
+      "weight": 363,
+      "mean_log2_lower": 184.7670088280405,
+      "mean_log2_upper": 184.76700882804056,
+      "binary64_diagnostic_log2": 184.76700882804218,
+      "cap": "41726491212454618370559444044402140573758540616706515333"
+    },
+    {
+      "weight": 364,
+      "mean_log2_lower": 183.4783835285098,
+      "mean_log2_upper": 183.47838352850985,
+      "binary64_diagnostic_log2": 183.4783835285116,
+      "cap": "17080359135460431443797710690974632821055480001203167559"
+    },
+    {
+      "weight": 365,
+      "mean_log2_lower": 182.17608513014716,
+      "mean_log2_upper": 182.17608513014721,
+      "binary64_diagnostic_log2": 182.1760851301491,
+      "cap": "6925738934563716491164102128422935823553193713314538302"
+    },
+    {
+      "weight": 366,
+      "mean_log2_lower": 180.86005860221223,
+      "mean_log2_upper": 180.8600586022123,
+      "binary64_diagnostic_log2": 180.8600586022137,
+      "cap": "2781651105807501379416825850585076793510319898432468933"
+    },
+    {
+      "weight": 367,
+      "mean_log2_lower": 179.53024795625228,
+      "mean_log2_upper": 179.53024795625234,
+      "binary64_diagnostic_log2": 179.530247956254,
+      "cap": "1106597701533319152991526040567854402072451535065691865"
+    },
+    {
+      "weight": 368,
+      "mean_log2_lower": 178.18659622810273,
+      "mean_log2_upper": 178.1865962281028,
+      "binary64_diagnostic_log2": 178.18659622810472,
+      "cap": "436023894779667222258245175568250536233567829512369410"
+    },
+    {
+      "weight": 369,
+      "mean_log2_lower": 176.82904545937535,
+      "mean_log2_upper": 176.8290454593754,
+      "binary64_diagnostic_log2": 176.82904545937743,
+      "cap": "170155812020111356804699125143329872101539050596700263"
+    },
+    {
+      "weight": 370,
+      "mean_log2_lower": 175.45753667841618,
+      "mean_log2_upper": 175.45753667841623,
+      "binary64_diagnostic_log2": 175.4575366784178,
+      "cap": "65762983151314846154996873652016670056158999561276030"
+    },
+    {
+      "weight": 371,
+      "mean_log2_lower": 174.07200988071594,
+      "mean_log2_upper": 174.072009880716,
+      "binary64_diagnostic_log2": 174.07200988071764,
+      "cap": "25170762948967920448637374772488861177884995166922252"
+    },
+    {
+      "weight": 372,
+      "mean_log2_lower": 172.67240400875374,
+      "mean_log2_upper": 172.6724040087538,
+      "binary64_diagnostic_log2": 172.67240400875585,
+      "cap": "9540541610908266379110914921743226589146759639596168"
+    },
+    {
+      "weight": 373,
+      "mean_log2_lower": 171.2586569312549,
+      "mean_log2_upper": 171.25865693125496,
+      "binary64_diagnostic_log2": 171.25865693125655,
+      "cap": "3580904620156340204919062403161556301489745338227957"
+    },
+    {
+      "weight": 374,
+      "mean_log2_lower": 169.8307054218423,
+      "mean_log2_upper": 169.83070542184237,
+      "binary64_diagnostic_log2": 169.83070542184421,
+      "cap": "1330872700661188918096765844823303952353618349218945"
+    },
+    {
+      "weight": 375,
+      "mean_log2_lower": 168.38848513706046,
+      "mean_log2_upper": 168.3884851370605,
+      "binary64_diagnostic_log2": 168.38848513706216,
+      "cap": "489761847673823498531635083411459165754745799866666"
+    },
+    {
+      "weight": 376,
+      "mean_log2_lower": 166.93193059375002,
+      "mean_log2_upper": 166.93193059375008,
+      "binary64_diagnostic_log2": 166.93193059375207,
+      "cap": "178450735721844051877491763304998205953048830402366"
+    },
+    {
+      "weight": 377,
+      "mean_log2_lower": 165.46097514574976,
+      "mean_log2_upper": 165.4609751457498,
+      "binary64_diagnostic_log2": 165.4609751457515,
+      "cap": "64374909378007569338143571393427786690381418136966"
+    },
+    {
+      "weight": 378,
+      "mean_log2_lower": 163.97555095990214,
+      "mean_log2_upper": 163.9755509599022,
+      "binary64_diagnostic_log2": 163.97555095990458,
+      "cap": "22991081156200626572799588455910875749707933911368"
+    },
+    {
+      "weight": 379,
+      "mean_log2_lower": 162.47558899133762,
+      "mean_log2_upper": 162.47558899133767,
+      "binary64_diagnostic_log2": 162.47558899133946,
+      "cap": "8128788979465804526812272640475010610578752271729"
+    },
+    {
+      "weight": 380,
+      "mean_log2_lower": 160.96101895801115,
+      "mean_log2_upper": 160.9610189580112,
+      "binary64_diagnostic_log2": 160.96101895801334,
+      "cap": "2845082334098340045341983282631218898404171303705"
+    },
+    {
+      "weight": 381,
+      "mean_log2_lower": 159.43176931446413,
+      "mean_log2_upper": 159.4317693144642,
+      "binary64_diagnostic_log2": 159.43176931446567,
+      "cap": "985700156334037144237679354098062198238499740695"
+    },
+    {
+      "weight": 382,
+      "mean_log2_lower": 157.88776722478306,
+      "mean_log2_upper": 157.88776722478312,
+      "binary64_diagnostic_log2": 157.88776722478497,
+      "cap": "338028939632591183973119280335629625208017058363"
+    },
+    {
+      "weight": 383,
+      "mean_log2_lower": 156.32893853472532,
+      "mean_log2_upper": 156.32893853472538,
+      "binary64_diagnostic_log2": 156.3289385347271,
+      "cap": "114735995800982965299532910014054863832916728216"
+    },
+    {
+      "weight": 384,
+      "mean_log2_lower": 154.7552077429811,
+      "mean_log2_upper": 154.75520774298116,
+      "binary64_diagnostic_log2": 154.75520774298283,
+      "cap": "38544242574058449369480558956919553856142235660"
+    },
+    {
+      "weight": 385,
+      "mean_log2_lower": 153.16649797153872,
+      "mean_log2_upper": 153.16649797153877,
+      "binary64_diagnostic_log2": 153.1664979715406,
+      "cap": "12814752425124428587983088469382639082426600574"
+    },
+    {
+      "weight": 386,
+      "mean_log2_lower": 151.56273093512007,
+      "mean_log2_upper": 151.56273093512013,
+      "binary64_diagnostic_log2": 151.56273093512164,
+      "cap": "4216268271240703755880092353353848828782333763"
+    },
+    {
+      "weight": 387,
+      "mean_log2_lower": 149.94382690964983,
+      "mean_log2_upper": 149.94382690964989,
+      "binary64_diagnostic_log2": 149.9438269096517,
+      "cap": "1372744032510355967710393947183019923915409655"
+    },
+    {
+      "weight": 388,
+      "mean_log2_lower": 148.30970469972206,
+      "mean_log2_upper": 148.30970469972212,
+      "binary64_diagnostic_log2": 148.309704699724,
+      "cap": "442251956298062274639847939401021220939841299"
+    },
+    {
+      "weight": 389,
+      "mean_log2_lower": 146.66028160502503,
+      "mean_log2_upper": 146.6602816050251,
+      "binary64_diagnostic_log2": 146.66028160502685,
+      "cap": "140975594804217189124875171331937185774095139"
+    },
+    {
+      "weight": 390,
+      "mean_log2_lower": 144.9954733856835,
+      "mean_log2_upper": 144.99547338568357,
+      "binary64_diagnostic_log2": 144.9954733856857,
+      "cap": "44461767629430969529798843423562137901237662"
+    },
+    {
+      "weight": 391,
+      "mean_log2_lower": 143.31519422647594,
+      "mean_log2_upper": 143.315194226476,
+      "binary64_diagnostic_log2": 143.31519422647764,
+      "cap": "13873061022403601496883598748348464300342698"
+    },
+    {
+      "weight": 392,
+      "mean_log2_lower": 141.6193566998821,
+      "mean_log2_upper": 141.61935669988216,
+      "binary64_diagnostic_log2": 141.61935669988407,
+      "cap": "4282272829129507259131460910435316679641666"
+    },
+    {
+      "weight": 393,
+      "mean_log2_lower": 139.90787172791394,
+      "mean_log2_upper": 139.907871727914,
+      "binary64_diagnostic_log2": 139.9078717279162,
+      "cap": "1307573226810768725248665818433051095509439"
+    },
+    {
+      "weight": 394,
+      "mean_log2_lower": 138.1806485426806,
+      "mean_log2_upper": 138.18064854268064,
+      "binary64_diagnostic_log2": 138.1806485426822,
+      "cap": "394929914904597354150900676812230796107730"
+    },
+    {
+      "weight": 395,
+      "mean_log2_lower": 136.4375946456365,
+      "mean_log2_upper": 136.43759464563655,
+      "binary64_diagnostic_log2": 136.43759464563865,
+      "cap": "117980036062071899818711896056256688953236"
+    },
+    {
+      "weight": 396,
+      "mean_log2_lower": 134.67861576545772,
+      "mean_log2_upper": 134.67861576545778,
+      "binary64_diagnostic_log2": 134.67861576545943,
+      "cap": "34858052519799086636030154150172965225893"
+    },
+    {
+      "weight": 397,
+      "mean_log2_lower": 132.9036158144902,
+      "mean_log2_upper": 132.90361581449025,
+      "binary64_diagnostic_log2": 132.903615814492,
+      "cap": "10185325024742152458211584913090206513485"
+    },
+    {
+      "weight": 398,
+      "mean_log2_lower": 131.11249684370983,
+      "mean_log2_upper": 131.1124968437099,
+      "binary64_diagnostic_log2": 131.11249684371148,
+      "cap": "2943027744895482958173681754176123937883"
+    },
+    {
+      "weight": 399,
+      "mean_log2_lower": 129.30515899613204,
+      "mean_log2_upper": 129.3051589961321,
+      "binary64_diagnostic_log2": 129.30515899613422,
+      "cap": "840875021775273767344536080905744069938"
+    },
+    {
+      "weight": 400,
+      "mean_log2_lower": 127.4815004586041,
+      "mean_log2_upper": 127.48150045860413,
+      "binary64_diagnostic_log2": 127.48150045860584,
+      "cap": "237550271049040981967460324066932416689"
+    },
+    {
+      "weight": 401,
+      "mean_log2_lower": 125.64141741191136,
+      "mean_log2_upper": 125.64141741191139,
+      "binary64_diagnostic_log2": 125.64141741191304,
+      "cap": "66349146217953997582658661793179811117"
+    },
+    {
+      "weight": 402,
+      "mean_log2_lower": 123.78480397912377,
+      "mean_log2_upper": 123.7848039791238,
+      "binary64_diagnostic_log2": 123.78480397912587,
+      "cap": "18320570993378246525528459276609760129"
+    },
+    {
+      "weight": 403,
+      "mean_log2_lower": 121.91155217210569,
+      "mean_log2_upper": 121.91155217210571,
+      "binary64_diagnostic_log2": 121.91155217210719,
+      "cap": "5000737082235987973087654539478800233"
+    },
+    {
+      "weight": 404,
+      "mean_log2_lower": 120.02155183610789,
+      "mean_log2_upper": 120.02155183610792,
+      "binary64_diagnostic_log2": 120.02155183610958,
+      "cap": "1349233851414281951672362810185417223"
+    },
+    {
+      "weight": 405,
+      "mean_log2_lower": 118.11469059235576,
+      "mean_log2_upper": 118.11469059235579,
+      "binary64_diagnostic_log2": 118.1146905923572,
+      "cap": "359803013897178744136250488039135854"
+    },
+    {
+      "weight": 406,
+      "mean_log2_lower": 116.19085377854347,
+      "mean_log2_upper": 116.1908537785435,
+      "binary64_diagnostic_log2": 116.1908537785454,
+      "cap": "94827043236602632436470094498981578"
+    },
+    {
+      "weight": 407,
+      "mean_log2_lower": 114.24992438713866,
+      "mean_log2_upper": 114.24992438713869,
+      "binary64_diagnostic_log2": 114.24992438714033,
+      "cap": "24697571021954908353305033954489729"
+    },
+    {
+      "weight": 408,
+      "mean_log2_lower": 112.29178300139661,
+      "mean_log2_upper": 112.29178300139664,
+      "binary64_diagnostic_log2": 112.29178300139837,
+      "cap": "6356161892785096048818748348750126"
+    },
+    {
+      "weight": 409,
+      "mean_log2_lower": 110.31630772897749,
+      "mean_log2_upper": 110.31630772897752,
+      "binary64_diagnostic_log2": 110.31630772897987,
+      "cap": "1616283866124231718168322823122953"
+    },
+    {
+      "weight": 410,
+      "mean_log2_lower": 108.32337413305383,
+      "mean_log2_upper": 108.32337413305386,
+      "binary64_diagnostic_log2": 108.32337413305584,
+      "cap": "406054984974105227876507382440911"
+    },
+    {
+      "weight": 411,
+      "mean_log2_lower": 106.31285516078897,
+      "mean_log2_upper": 106.312855160789,
+      "binary64_diagnostic_log2": 106.31285516079004,
+      "cap": "100776281612477382532614085608651"
+    },
+    {
+      "weight": 412,
+      "mean_log2_lower": 104.28462106906002,
+      "mean_log2_upper": 104.28462106906005,
+      "binary64_diagnostic_log2": 104.284621069062,
+      "cap": "24705806295530679541271434179162"
+    },
+    {
+      "weight": 413,
+      "mean_log2_lower": 102.23853934729165,
+      "mean_log2_upper": 102.23853934729168,
+      "binary64_diagnostic_log2": 102.23853934729354,
+      "cap": "5982284515937251502245622447711"
+    },
+    {
+      "weight": 414,
+      "mean_log2_lower": 100.17447463725853,
+      "mean_log2_upper": 100.17447463725856,
+      "binary64_diagnostic_log2": 100.17447463726037,
+      "cap": "1430611400070189395183193803945"
+    },
+    {
+      "weight": 415,
+      "mean_log2_lower": 98.09228864970608,
+      "mean_log2_upper": 98.0922886497061,
+      "binary64_diagnostic_log2": 98.09228864970774,
+      "cap": "337847927677671801034898524275"
+    },
+    {
+      "weight": 416,
+      "mean_log2_lower": 95.99184007762928,
+      "mean_log2_upper": 95.9918400776293,
+      "binary64_diagnostic_log2": 95.99184007763097,
+      "cap": "78781322962173172691261108335"
+    },
+    {
+      "weight": 417,
+      "mean_log2_lower": 93.87298450603998,
+      "mean_log2_upper": 93.87298450604001,
+      "binary64_diagnostic_log2": 93.8729845060415,
+      "cap": "18137785389708031301325520547"
+    },
+    {
+      "weight": 418,
+      "mean_log2_lower": 91.73557431804188,
+      "mean_log2_upper": 91.73557431804191,
+      "binary64_diagnostic_log2": 91.73557431804349,
+      "cap": "4122492109478079072566672734"
+    },
+    {
+      "weight": 419,
+      "mean_log2_lower": 89.57945859702102,
+      "mean_log2_upper": 89.57945859702104,
+      "binary64_diagnostic_log2": 89.57945859702248,
+      "cap": "924921028569138106193250813"
+    },
+    {
+      "weight": 420,
+      "mean_log2_lower": 87.40448302474722,
+      "mean_log2_upper": 87.40448302474725,
+      "binary64_diagnostic_log2": 87.40448302474945,
+      "cap": "204820048380448631036141337"
+    },
+    {
+      "weight": 421,
+      "mean_log2_lower": 85.2104897751684,
+      "mean_log2_upper": 85.21048977516843,
+      "binary64_diagnostic_log2": 85.21048977517025,
+      "cap": "44762691067579496691559872"
+    },
+    {
+      "weight": 422,
+      "mean_log2_lower": 82.99731740366525,
+      "mean_log2_upper": 82.99731740366528,
+      "binary64_diagnostic_log2": 82.99731740366725,
+      "cap": "9653574913032971758002112"
+    },
+    {
+      "weight": 423,
+      "mean_log2_lower": 80.76480073151826,
+      "mean_log2_upper": 80.76480073151829,
+      "binary64_diagnostic_log2": 80.76480073151983,
+      "cap": "2054190796646318144375318"
+    },
+    {
+      "weight": 424,
+      "mean_log2_lower": 78.51277072532204,
+      "mean_log2_upper": 78.51277072532207,
+      "binary64_diagnostic_log2": 78.5127707253237,
+      "cap": "431248665365487912043026"
+    },
+    {
+      "weight": 425,
+      "mean_log2_lower": 76.2410543710638,
+      "mean_log2_upper": 76.24105437106383,
+      "binary64_diagnostic_log2": 76.2410543710661,
+      "cap": "89311504389338645956620"
+    },
+    {
+      "weight": 426,
+      "mean_log2_lower": 73.94947454256308,
+      "mean_log2_upper": 73.94947454256311,
+      "binary64_diagnostic_log2": 73.94947454256456,
+      "cap": "18245244703876494103952"
+    },
+    {
+      "weight": 427,
+      "mean_log2_lower": 71.63784986394842,
+      "mean_log2_upper": 71.63784986394845,
+      "binary64_diagnostic_log2": 71.63784986395031,
+      "cap": "3676654485763850506729"
+    },
+    {
+      "weight": 428,
+      "mean_log2_lower": 69.30599456582353,
+      "mean_log2_upper": 69.30599456582355,
+      "binary64_diagnostic_log2": 69.30599456582523,
+      "cap": "730939045286048916391"
+    },
+    {
+      "weight": 429,
+      "mean_log2_lower": 66.95371833475038,
+      "mean_log2_upper": 66.9537183347504,
+      "binary64_diagnostic_log2": 66.95371833475211,
+      "cap": "143434307007788643485"
+    },
+    {
+      "weight": 430,
+      "mean_log2_lower": 64.58082615564935,
+      "mean_log2_upper": 64.58082615564938,
+      "binary64_diagnostic_log2": 64.58082615565094,
+      "cap": "27819111556705208028"
+    },
+    {
+      "weight": 431,
+      "mean_log2_lower": 62.18711814668675,
+      "mean_log2_upper": 62.187118146686764,
+      "binary64_diagnostic_log2": 62.1871181466881,
+      "cap": "5349898848936004155"
+    },
+    {
+      "weight": 432,
+      "mean_log2_lower": 59.772389386188124,
+      "mean_log2_upper": 59.77238938618814,
+      "binary64_diagnostic_log2": 59.77238938618998,
+      "cap": "1027762884829087068"
+    },
+    {
+      "weight": 433,
+      "mean_log2_lower": 57.336429731080045,
+      "mean_log2_upper": 57.33642973108006,
+      "binary64_diagnostic_log2": 57.33642973108132,
+      "cap": "200497205661240673"
+    },
+    {
+      "weight": 434,
+      "mean_log2_lower": 54.87902362632522,
+      "mean_log2_upper": 54.879023626325235,
+      "binary64_diagnostic_log2": 54.879023626326926,
+      "cap": "41039009823843090"
+    },
+    {
+      "weight": 435,
+      "mean_log2_lower": 52.39994990477372,
+      "mean_log2_upper": 52.399949904773734,
+      "binary64_diagnostic_log2": 52.399949904775596,
+      "cap": "9291513404500218"
+    },
+    {
+      "weight": 436,
+      "mean_log2_lower": 49.898981576807316,
+      "mean_log2_upper": 49.89898157680733,
+      "binary64_diagnostic_log2": 49.89898157680875,
+      "cap": "2457446540736151"
+    },
+    {
+      "weight": 437,
+      "mean_log2_lower": 47.375885609104216,
+      "mean_log2_upper": 47.37588560910423,
+      "binary64_diagnostic_log2": 47.3758856091058,
+      "cap": "769766508398240"
+    },
+    {
+      "weight": 438,
+      "mean_log2_lower": 44.83042269179658,
+      "mean_log2_upper": 44.83042269179659,
+      "binary64_diagnostic_log2": 44.830422691798226,
+      "cap": "274285565747122"
+    },
+    {
+      "weight": 439,
+      "mean_log2_lower": 42.26234699323324,
+      "mean_log2_upper": 42.26234699323325,
+      "binary64_diagnostic_log2": 42.26234699323434,
+      "cap": "105063018199622"
+    },
+    {
+      "weight": 440,
+      "mean_log2_lower": 39.67140590149448,
+      "mean_log2_upper": 39.671405901494495,
+      "binary64_diagnostic_log2": 39.67140590149571,
+      "cap": "41529461294401"
+    },
+    {
+      "weight": 441,
+      "mean_log2_lower": 37.05733975173328,
+      "mean_log2_upper": 37.057339751733295,
+      "binary64_diagnostic_log2": 37.0573397517348,
+      "cap": "16573335434008"
+    },
+    {
+      "weight": 442,
+      "mean_log2_lower": 34.41988153833817,
+      "mean_log2_upper": 34.41988153833818,
+      "binary64_diagnostic_log2": 34.41988153833948,
+      "cap": "6609702134029"
+    },
+    {
+      "weight": 443,
+      "mean_log2_lower": 31.758756610825394,
+      "mean_log2_upper": 31.7587566108254,
+      "binary64_diagnostic_log2": 31.758756610827064,
+      "cap": "2622599832218"
+    },
+    {
+      "weight": 444,
+      "mean_log2_lower": 29.073682352271764,
+      "mean_log2_upper": 29.07368235227177,
+      "binary64_diagnostic_log2": 29.07368235227285,
+      "cap": "1033292999941"
+    },
+    {
+      "weight": 445,
+      "mean_log2_lower": 26.364367838993246,
+      "mean_log2_upper": 26.364367838993253,
+      "binary64_diagnostic_log2": 26.3643678389946,
+      "cap": "403911651778"
+    },
+    {
+      "weight": 446,
+      "mean_log2_lower": 23.630513480056955,
+      "mean_log2_upper": 23.630513480056962,
+      "binary64_diagnostic_log2": 23.630513480058863,
+      "cap": "156582571350"
+    },
+    {
+      "weight": 447,
+      "mean_log2_lower": 20.87181063508429,
+      "mean_log2_upper": 20.871810635084298,
+      "binary64_diagnostic_log2": 20.871810635085673,
+      "cap": "60185946341"
+    },
+    {
+      "weight": 448,
+      "mean_log2_lower": 18.08794120865908,
+      "mean_log2_upper": 18.087941208659085,
+      "binary64_diagnostic_log2": 18.087941208659853,
+      "cap": "22933609999"
+    },
+    {
+      "weight": 449,
+      "mean_log2_lower": 15.27857721949496,
+      "mean_log2_upper": 15.278577219494963,
+      "binary64_diagnostic_log2": 15.278577219497066,
+      "cap": "8661990929"
+    },
+    {
+      "weight": 450,
+      "mean_log2_lower": 12.44338034233903,
+      "mean_log2_upper": 12.443380342339033,
+      "binary64_diagnostic_log2": 12.443380342340825,
+      "cap": "3242476416"
+    },
+    {
+      "weight": 451,
+      "mean_log2_lower": 9.582001420391533,
+      "mean_log2_upper": 9.582001420391537,
+      "binary64_diagnostic_log2": 9.582001420393668,
+      "cap": "1202806910"
+    },
+    {
+      "weight": 452,
+      "mean_log2_lower": 6.694079945801754,
+      "mean_log2_upper": 6.6940799458017555,
+      "binary64_diagnostic_log2": 6.694079945803359,
+      "cap": "442099725"
+    },
+    {
+      "weight": 453,
+      "mean_log2_lower": 3.7792435055552223,
+      "mean_log2_upper": 3.779243505555223,
+      "binary64_diagnostic_log2": 3.779243505557532,
+      "cap": "160988027"
+    },
+    {
+      "weight": 454,
+      "mean_log2_lower": 0.837107189793486,
+      "mean_log2_upper": 0.8371071897934862,
+      "binary64_diagnostic_log2": 0.8371071897954971,
+      "cap": "58070814"
+    },
+    {
+      "weight": 455,
+      "mean_log2_lower": -2.13272704069882,
+      "mean_log2_upper": -2.132727040698819,
+      "binary64_diagnostic_log2": -2.1327270406971564,
+      "cap": "20746904"
+    },
+    {
+      "weight": 456,
+      "mean_log2_lower": -5.130671031448497,
+      "mean_log2_upper": -5.130671031448495,
+      "binary64_diagnostic_log2": -5.130671031446256,
+      "cap": "7340367"
+    },
+    {
+      "weight": 457,
+      "mean_log2_lower": -8.157151159684824,
+      "mean_log2_upper": -8.15715115968482,
+      "binary64_diagnostic_log2": -8.157151159683433,
+      "cap": "2571503"
+    },
+    {
+      "weight": 458,
+      "mean_log2_lower": -11.21260911259638,
+      "mean_log2_upper": -11.212609112596377,
+      "binary64_diagnostic_log2": -11.212609112594718,
+      "cap": "891856"
+    },
+    {
+      "weight": 459,
+      "mean_log2_lower": -14.29750272337262,
+      "mean_log2_upper": -14.297502723372617,
+      "binary64_diagnostic_log2": -14.297502723370961,
+      "cap": "306176"
+    },
+    {
+      "weight": 460,
+      "mean_log2_lower": -17.412306870502448,
+      "mean_log2_upper": -17.41230687050244,
+      "binary64_diagnostic_log2": -17.412306870501432,
+      "cap": "104027"
+    },
+    {
+      "weight": 461,
+      "mean_log2_lower": -20.55751444642834,
+      "mean_log2_upper": -20.557514446428332,
+      "binary64_diagnostic_log2": -20.557514446427163,
+      "cap": "34974"
+    },
+    {
+      "weight": 462,
+      "mean_log2_lower": -23.733637402365268,
+      "mean_log2_upper": -23.73363740236526,
+      "binary64_diagnostic_log2": -23.73363740236387,
+      "cap": "11633"
+    },
+    {
+      "weight": 463,
+      "mean_log2_lower": -26.941207876901792,
+      "mean_log2_upper": -26.941207876901785,
+      "binary64_diagnostic_log2": -26.941207876900492,
+      "cap": "3827"
+    },
+    {
+      "weight": 464,
+      "mean_log2_lower": -30.180779416922075,
+      "mean_log2_upper": -30.180779416922068,
+      "binary64_diagnostic_log2": -30.180779416921048,
+      "cap": "1245"
+    },
+    {
+      "weight": 465,
+      "mean_log2_lower": -33.45292830044055,
+      "mean_log2_upper": -33.45292830044053,
+      "binary64_diagnostic_log2": -33.45292830043957,
+      "cap": "400"
+    },
+    {
+      "weight": 466,
+      "mean_log2_lower": -36.75825497214756,
+      "mean_log2_upper": -36.75825497214755,
+      "binary64_diagnostic_log2": -36.75825497214665,
+      "cap": "127"
+    },
+    {
+      "weight": 467,
+      "mean_log2_lower": -40.09738560385119,
+      "mean_log2_upper": -40.09738560385117,
+      "binary64_diagnostic_log2": -40.09738560384945,
+      "cap": "40"
+    },
+    {
+      "weight": 468,
+      "mean_log2_lower": -43.47097379359758,
+      "mean_log2_upper": -43.470973793597565,
+      "binary64_diagnostic_log2": -43.47097379359623,
+      "cap": "12"
+    },
+    {
+      "weight": 469,
+      "mean_log2_lower": -46.879702419092695,
+      "mean_log2_upper": -46.87970241909268,
+      "binary64_diagnostic_log2": -46.87970241909136,
+      "cap": "3"
+    },
+    {
+      "weight": 470,
+      "mean_log2_lower": -50.324285663108036,
+      "mean_log2_upper": -50.32428566310802,
+      "binary64_diagnostic_log2": -50.324285663106714,
+      "cap": "1"
+    },
+    {
+      "weight": 471,
+      "mean_log2_lower": -53.80547123011323,
+      "mean_log2_upper": -53.80547123011321,
+      "binary64_diagnostic_log2": -53.805471230111706,
+      "cap": "0"
+    },
+    {
+      "weight": 472,
+      "mean_log2_lower": -57.32404276557307,
+      "mean_log2_upper": -57.324042765573054,
+      "binary64_diagnostic_log2": -57.32404276557271,
+      "cap": "0"
+    },
+    {
+      "weight": 473,
+      "mean_log2_lower": -60.8808223664655,
+      "mean_log2_upper": -60.88082236646549,
+      "binary64_diagnostic_log2": -60.88082236646488,
+      "cap": "0"
+    },
+    {
+      "weight": 474,
+      "mean_log2_lower": -64.47667154679809,
+      "mean_log2_upper": -64.47667154679806,
+      "binary64_diagnostic_log2": -64.47667154679658,
+      "cap": "0"
+    },
+    {
+      "weight": 475,
+      "mean_log2_lower": -68.11247000250945,
+      "mean_log2_upper": -68.11247000250943,
+      "binary64_diagnostic_log2": -68.11247000250836,
+      "cap": "0"
+    },
+    {
+      "weight": 476,
+      "mean_log2_lower": -71.78880805604778,
+      "mean_log2_upper": -71.78880805604776,
+      "binary64_diagnostic_log2": -71.78880805604663,
+      "cap": "0"
+    },
+    {
+      "weight": 477,
+      "mean_log2_lower": -75.50193136315443,
+      "mean_log2_upper": -75.5019313631544,
+      "binary64_diagnostic_log2": -75.50193136315269,
+      "cap": "0"
+    },
+    {
+      "weight": 478,
+      "mean_log2_lower": -79.19099208716904,
+      "mean_log2_upper": -79.19099208716901,
+      "binary64_diagnostic_log2": -79.19099208716726,
+      "cap": "0"
+    },
+    {
+      "weight": 479,
+      "mean_log2_lower": -82.25179038105296,
+      "mean_log2_upper": -82.25179038105293,
+      "binary64_diagnostic_log2": -82.25179038105193,
+      "cap": "0"
+    },
+    {
+      "weight": 480,
+      "mean_log2_lower": -83.3526786408631,
+      "mean_log2_upper": -83.35267864086308,
+      "binary64_diagnostic_log2": -83.3526786408619,
+      "cap": "0"
+    },
+    {
+      "weight": 481,
+      "mean_log2_lower": -83.49676575129457,
+      "mean_log2_upper": -83.49676575129455,
+      "binary64_diagnostic_log2": -83.49676575129388,
+      "cap": "0"
+    },
+    {
+      "weight": 482,
+      "mean_log2_lower": -83.53165773553374,
+      "mean_log2_upper": -83.53165773553371,
+      "binary64_diagnostic_log2": -83.53165773553289,
+      "cap": "0"
+    },
+    {
+      "weight": 483,
+      "mean_log2_lower": -83.55860456301053,
+      "mean_log2_upper": -83.5586045630105,
+      "binary64_diagnostic_log2": -83.55860456300962,
+      "cap": "0"
+    },
+    {
+      "weight": 484,
+      "mean_log2_lower": -83.58493615476922,
+      "mean_log2_upper": -83.5849361547692,
+      "binary64_diagnostic_log2": -83.58493615476802,
+      "cap": "0"
+    },
+    {
+      "weight": 485,
+      "mean_log2_lower": -83.6111434662691,
+      "mean_log2_upper": -83.61114346626907,
+      "binary64_diagnostic_log2": -83.61114346626825,
+      "cap": "0"
+    },
+    {
+      "weight": 486,
+      "mean_log2_lower": -83.63725933212692,
+      "mean_log2_upper": -83.63725933212689,
+      "binary64_diagnostic_log2": -83.63725933212598,
+      "cap": "0"
+    },
+    {
+      "weight": 487,
+      "mean_log2_lower": -83.66328702414731,
+      "mean_log2_upper": -83.66328702414728,
+      "binary64_diagnostic_log2": -83.66328702414647,
+      "cap": "0"
+    },
+    {
+      "weight": 488,
+      "mean_log2_lower": -83.68922795769473,
+      "mean_log2_upper": -83.6892279576947,
+      "binary64_diagnostic_log2": -83.68922795769375,
+      "cap": "0"
+    },
+    {
+      "weight": 489,
+      "mean_log2_lower": -83.71508342049921,
+      "mean_log2_upper": -83.71508342049918,
+      "binary64_diagnostic_log2": -83.71508342049819,
+      "cap": "0"
+    },
+    {
+      "weight": 490,
+      "mean_log2_lower": -83.74085467703834,
+      "mean_log2_upper": -83.74085467703831,
+      "binary64_diagnostic_log2": -83.74085467703755,
+      "cap": "0"
+    },
+    {
+      "weight": 491,
+      "mean_log2_lower": -83.76654297498379,
+      "mean_log2_upper": -83.76654297498376,
+      "binary64_diagnostic_log2": -83.76654297498277,
+      "cap": "0"
+    },
+    {
+      "weight": 492,
+      "mean_log2_lower": -83.79214954595338,
+      "mean_log2_upper": -83.79214954595335,
+      "binary64_diagnostic_log2": -83.79214954595231,
+      "cap": "0"
+    },
+    {
+      "weight": 493,
+      "mean_log2_lower": -83.8176756059356,
+      "mean_log2_upper": -83.81767560593558,
+      "binary64_diagnostic_log2": -83.81767560593451,
+      "cap": "0"
+    },
+    {
+      "weight": 494,
+      "mean_log2_lower": -83.84312235568754,
+      "mean_log2_upper": -83.84312235568751,
+      "binary64_diagnostic_log2": -83.84312235568653,
+      "cap": "0"
+    },
+    {
+      "weight": 495,
+      "mean_log2_lower": -83.86849098112228,
+      "mean_log2_upper": -83.86849098112225,
+      "binary64_diagnostic_log2": -83.86849098112116,
+      "cap": "0"
+    },
+    {
+      "weight": 496,
+      "mean_log2_lower": -83.89378265368728,
+      "mean_log2_upper": -83.89378265368725,
+      "binary64_diagnostic_log2": -83.89378265368622,
+      "cap": "0"
+    },
+    {
+      "weight": 497,
+      "mean_log2_lower": -83.91899853073396,
+      "mean_log2_upper": -83.91899853073393,
+      "binary64_diagnostic_log2": -83.91899853073285,
+      "cap": "0"
+    },
+    {
+      "weight": 498,
+      "mean_log2_lower": -83.9441397558787,
+      "mean_log2_upper": -83.94413975587867,
+      "binary64_diagnostic_log2": -83.94413975587756,
+      "cap": "0"
+    },
+    {
+      "weight": 499,
+      "mean_log2_lower": -83.96920745935576,
+      "mean_log2_upper": -83.96920745935573,
+      "binary64_diagnostic_log2": -83.96920745935465,
+      "cap": "0"
+    },
+    {
+      "weight": 500,
+      "mean_log2_lower": -83.99420275836216,
+      "mean_log2_upper": -83.99420275836214,
+      "binary64_diagnostic_log2": -83.99420275836096,
+      "cap": "0"
+    },
+    {
+      "weight": 501,
+      "mean_log2_lower": -84.01912675739513,
+      "mean_log2_upper": -84.0191267573951,
+      "binary64_diagnostic_log2": -84.01912675739395,
+      "cap": "0"
+    },
+    {
+      "weight": 502,
+      "mean_log2_lower": -84.04398054858187,
+      "mean_log2_upper": -84.04398054858184,
+      "binary64_diagnostic_log2": -84.04398054858066,
+      "cap": "0"
+    },
+    {
+      "weight": 503,
+      "mean_log2_lower": -84.06876521200257,
+      "mean_log2_upper": -84.06876521200255,
+      "binary64_diagnostic_log2": -84.0687652120013,
+      "cap": "0"
+    },
+    {
+      "weight": 504,
+      "mean_log2_lower": -84.09348181600633,
+      "mean_log2_upper": -84.0934818160063,
+      "binary64_diagnostic_log2": -84.0934818160051,
+      "cap": "0"
+    },
+    {
+      "weight": 505,
+      "mean_log2_lower": -84.11813141752047,
+      "mean_log2_upper": -84.11813141752044,
+      "binary64_diagnostic_log2": -84.1181314175192,
+      "cap": "0"
+    },
+    {
+      "weight": 506,
+      "mean_log2_lower": -84.14271506235362,
+      "mean_log2_upper": -84.14271506235359,
+      "binary64_diagnostic_log2": -84.14271506235232,
+      "cap": "0"
+    },
+    {
+      "weight": 507,
+      "mean_log2_lower": -84.1672337854924,
+      "mean_log2_upper": -84.16723378549237,
+      "binary64_diagnostic_log2": -84.16723378549106,
+      "cap": "0"
+    },
+    {
+      "weight": 508,
+      "mean_log2_lower": -84.19168861139245,
+      "mean_log2_upper": -84.19168861139242,
+      "binary64_diagnostic_log2": -84.19168861139111,
+      "cap": "0"
+    },
+    {
+      "weight": 509,
+      "mean_log2_lower": -84.21608055426347,
+      "mean_log2_upper": -84.21608055426344,
+      "binary64_diagnostic_log2": -84.21608055426212,
+      "cap": "0"
+    },
+    {
+      "weight": 510,
+      "mean_log2_lower": -84.2404106183489,
+      "mean_log2_upper": -84.24041061834888,
+      "binary64_diagnostic_log2": -84.24041061834752,
+      "cap": "0"
+    },
+    {
+      "weight": 511,
+      "mean_log2_lower": -84.26467979820023,
+      "mean_log2_upper": -84.2646797982002,
+      "binary64_diagnostic_log2": -84.26467979819883,
+      "cap": "0"
+    },
+    {
+      "weight": 512,
+      "mean_log2_lower": -84.28888907894616,
+      "mean_log2_upper": -84.28888907894613,
+      "binary64_diagnostic_log2": -84.28888907894473,
+      "cap": "0"
+    }
+  ],
+  "sources": [
+    {
+      "file": "block_expand_accumulate_512_256_d14_t0_5_spectrum.json",
+      "sha256": "e16ca7a5a8b68ceb7ccbaee330a5b679ec41ad77a182a90ebeaf8bc7a350647f"
+    },
+    {
+      "file": "block_expand5_F2_conditional_transfer_outward.json",
+      "sha256": "cd743f9808e1538f4ce3303fdca3f7ec597d3432261f1d9c478e1cf1819647a3"
+    }
+  ],
+  "limitations": [
+    "The cap event and combined claim remain conditional on the stated length-512 variance inequality.",
+    "The RandomStepConv-M22 inner is a mathematical comparator, not the RM2Sub implementation."
+  ]
+}

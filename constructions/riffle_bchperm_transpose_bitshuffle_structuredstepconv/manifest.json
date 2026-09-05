@@ -1,0 +1,39 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_structuredstepconv",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-StructuredStepConv(t,s)",
+  "status": "ACTIVE_STRUCTURED_DESIGN",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_spectrumperm_transpose_bitshuffle_randomstepconv",
+  "outer": "fixed binary [256,128] code with a supplied spectrum; independent output-coordinate permutation per outer block",
+  "permutation": "transpose to 256 regions and independently permute the bits in every region",
+  "inner_variants": [
+    "FieldMulStepConv(t,s): forward step is the transpose of multiplication by a uniform GF(2^(t+s)) coefficient",
+    "ToeplitzStepConv(t,s): independent uniform square Toeplitz map per step"
+  ],
+  "preferred_preliminary_parameters": {
+    "outer_bits": 256,
+    "step_bits": 32,
+    "state_bits": 32,
+    "one_active_lambda_bits": 80.831429,
+    "one_active_40_bit_relative_distance_diagnostic": 0.1405,
+    "field_median_ms": 27.1398,
+    "toeplitz_median_ms": 25.8285
+  },
+  "implementation_crossover": {
+    "physical_transpose_is_required": false,
+    "near_40_bit_point": {
+      "step_bits": 32,
+      "state_bits": 14,
+      "preferred_measured_kernel": "direct Toeplitz",
+      "median_ms": 17.9484
+    },
+    "balanced_point": {
+      "step_bits": 32,
+      "state_bits": 32,
+      "preferred_measured_kernel": "bitsliced Toeplitz",
+      "median_ms": 25.8285
+    }
+  },
+  "claim_scope": "The spectrum is a modeled BCH-like [256,128,38] profile. Distance values cover one active outer block and are numerical diagnostics. No complete distance certificate is claimed."
+}

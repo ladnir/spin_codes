@@ -1,0 +1,165 @@
+\section{The enumerator method}
+\label{sec:enumerator-method}
+
+The minimum-distance event in \eqref{eq:bad-event} quantifies over all
+nonzero messages.  We first count bad messages in expectation.  Exact
+enumerators make the expectation computable without replacing the recursive
+state process by a concentration inequality.
+
+\subsection{Input--output weight enumerators}
+
+Let $\mathcal D$ be a distribution on matrices in $\F_p^{a\times b}$.  Its
+expected input--output weight enumerator is
+\begin{equation}
+ E^{\mathcal D}_{r,u}:=
+ \E_{\M\gets\mathcal D}
+ \left|\left\{\x\in\F_p^a:
+   \wt(\x)=r,\ \wt(\x\M)=u
+ \right\}\right|.
+ \label{eq:io-enumerator}
+\end{equation}
+This is an expectation over matrices, not a count for one fixed matrix.
+
+For a sampled generator $\G$, define
+\begin{equation}
+ Z_L(\G):=
+ \left|\left\{\x\in\F_p^k\setminus\{0\}:
+ \wt(\x\G)\leq L\right\}\right|.
+ \label{eq:bad-message-count}
+\end{equation}
+The event $\Bad_L(\G)$ implies $Z_L(\G)\geq1$.  Therefore
+\begin{equation}
+ \Pr[\Bad_L(\G)]\leq \E[Z_L(\G)].
+ \label{eq:first-moment}
+\end{equation}
+This is the only use of Markov's inequality in the common argument.  Our
+improvement concerns how $\E[Z_L]$ is evaluated.
+
+\subsection{Composition under exchangeability}
+
+A monomial matrix has one nonzero entry in every row and column.  It permutes
+coordinates and scales them by nonzero field elements.  A random vector whose
+law is invariant under every monomial matrix is uniform on each Hamming shell
+after conditioning on its weight.
+
+\begin{lemma}[Exchangeable serial composition]
+\label{lem:exchangeable-composition}
+Let $\B\in\F_p^{k\times n}$ be sampled so that $\B\Pi$ and $\B$ have the same
+distribution for every monomial matrix $\Pi\in\F_p^{n\times n}$.
+Independently sample $\T\in\F_p^{n\times N}$.  Then
+\begin{equation}
+ E^{\B\T}_{r,h}=
+ \sum_{u=0}^{n}
+ \frac{E^{\B}_{r,u}E^{\T}_{u,h}}
+      {\binom{n}{u}(p-1)^u}.
+ \label{eq:exchangeable-composition}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Fix a message $\x$ and condition on $\wt(\x\B)=u$.  Monomial invariance makes
+$\x\B$ uniform on the $p$-ary weight-$u$ shell.  Averaging the independent
+map $\T$ over that shell
+gives the second enumerator divided by the shell size
+$\binom{n}{u}(p-1)^u$.  Summing over $u$ and then over weight-$r$ messages
+proves the identity.
+\end{proof}
+
+For binary matrices, coordinate-permutation symmetry alone suffices.  The
+Bernoulli and global fixed-row ensembles satisfy the lemma.  A
+region-stratified expander is exchangeable only within each region.  For that
+ensemble we retain the recursive state at regional boundaries instead of
+using \eqref{eq:exchangeable-composition} globally.
+
+\subsection{Transfer matrices}
+
+Suppose a recursive map has a finite state set $\mathcal S$.  Associate a
+monomial $X^aY^b$ with a transition that consumes input weight $a$ and emits
+output weight $b$.  Let $\mathbf T(X,Y)$ contain the transition probabilities
+or expected transition counts.  If $\e_0$ selects the initial state, then
+\begin{equation}
+ [X^uY^h]\,\e_0^{\mathsf T}\mathbf T(X,Y)^n\one
+ \label{eq:transfer-coefficient}
+\end{equation}
+is the expected mass of length-$n$ paths with input weight $u$ and output
+weight $h$.  Matrix multiplication preserves the order of the recursive
+process, while coefficient extraction forgets everything except the two
+weights.
+
+For a one-variable probability generating matrix $\mathbf M(Y)$ with
+nonnegative coefficients, define
+\[
+ F(Y):=\e_0^{\mathsf T}\mathbf M(Y)^n\one.
+\]
+Every numerical marker $z\in(0,1]$ gives
+\begin{equation}
+ \sum_{h=0}^{L}[Y^h]F(Y)
+ \leq z^{-L}F(z).
+ \label{eq:positive-marker-tail}
+\end{equation}
+The left side uses coefficient notation schematically: the matrix on the
+right is evaluated at the fixed marker $z$.  The inequality follows because
+$z^h\geq z^L$ for $h\leq L$.  Optimizing $z$ improves the numerical bound,
+but any fixed valid marker gives a sound bound.
+
+\subsection{Covering all message weights}
+
+A finite certificate must cover every $1\leq r\leq k$.  Evaluating selected
+weights is not sufficient.  Our verifiers use three regimes:
+
+\begin{enumerate}
+  \item exact transfer or shell recurrences for small supports;
+  \item one positive-marker bound for each contiguous support interval;
+  \item a point-mass or Hamming-ball bound for dense supports.
+\end{enumerate}
+
+Every certificate records an explicit partition of $[1,k]$.  Its verifier
+rejects overlapping intervals, gaps, invalid markers, or a final sum above the
+claimed value.  Section~\ref{sec:certificates} describes the trusted
+arithmetic.
+
+The following elementary lemma isolates the common block calculation.  The
+theorem-specific analysis supplies the envelope and proves its shape.  The
+verifier only evaluates the stated endpoints and checks the partition.
+
+\begin{lemma}[Certified support partition]
+\label{lem:certified-support-partition}
+Let $f_r\geq0$ be the first-moment contribution of support $r$, and let
+$\mathcal I$ be a disjoint partition of $\{1,\ldots,k\}$ into integer
+intervals.  For each $I=[a,b]\in\mathcal I$, suppose a fixed valid marker
+defines an upper envelope $F_I:[a,b]\to\mathbb R_{\geq0}$ with
+$f_r\leq F_I(r)$ for every integer $r\in I$.  Define
+\begin{equation}
+ M_I:=
+ \begin{cases}
+  F_I(b),&F_I\text{ is nondecreasing},\\
+  F_I(a),&F_I\text{ is nonincreasing},\\
+  F_I(a)+F_I(b),&F_I>0\text{ and }\ln F_I\text{ is convex}.
+ \end{cases}
+ \label{eq:certified-block-endpoint}
+\end{equation}
+Any applicable line gives
+\begin{equation}
+ \sum_{r=1}^{k}f_r
+ \leq\sum_{I=[a,b]\in\mathcal I}(b-a+1)M_I.
+ \label{eq:certified-partition-sum}
+\end{equation}
+The same conclusion holds when a theorem supplies a direct upper bound
+$B_I\geq\sum_{r\in I}f_r$, with $B_I$ replacing $(b-a+1)M_I$.
+\end{lemma}
+
+\begin{proof}
+Monotonicity gives the first two endpoint bounds.  If $\ln F_I$ is convex,
+its maximum on the real interval $[a,b]$ occurs at an endpoint.  Thus
+$F_I(r)\leq\max\{F_I(a),F_I(b)\}\leq F_I(a)+F_I(b)$.
+Summing the pointwise bound over each interval proves
+\eqref{eq:certified-partition-sum}.  The direct-bound case follows by
+summing the inequalities $\sum_{r\in I}f_r\leq B_I$.
+\end{proof}
+
+An interval verifier implements this lemma with outward-rounded enclosures.
+It checks that the intervals partition $[1,k]$, that each marker is in its
+proved domain, and that the upper endpoint of every computed $M_I$ or $B_I$
+is finite.  Symbolic monotonicity and convexity remain mathematical claims;
+the verifier invokes them only through the named bounds identified in
+Section~\ref{sec:certificates}.

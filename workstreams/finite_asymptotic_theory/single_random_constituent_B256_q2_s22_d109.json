@@ -1,0 +1,226 @@
+{
+  "schema": "single-random-constituent-randomstepconv-q2-v1",
+  "status": "BINARY64_DIAGNOSTIC_EXACT_Q2_SHELL_LAW",
+  "claim": {
+    "q2_log2_expected_bad_upper": -64.15590473220756,
+    "q2_margin_bits": 64.15590473220756,
+    "closes_40_bits": true,
+    "rank_one_log2_expected_bad_upper": -64.15590473223627,
+    "rank_one_margin_bits": 64.15590473223627,
+    "rank_two_log2_expected_bad_upper": -99.7045583515028,
+    "rank_two_margin_bits": 99.7045583515028
+  },
+  "parameters": {
+    "outer_code": "one random [256,128] linear constituent",
+    "outer_rows": 8192,
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "distance_cutoff": 228590,
+    "distance_numerator": 109,
+    "distance_denominator": 1000,
+    "memory_bits": 22,
+    "occupation": 2
+  },
+  "probability_space": "sample one uniform linear injection and reuse it in every outer row; independently sample each row-coordinate permutation, each region permutation, and every RandomStepConv map",
+  "rank_split": {
+    "rank_one": "the two nonzero local messages are equal; their common image is uniform over the nonzero ambient words",
+    "rank_two": "the two nonzero local messages are distinct; their images are a uniform ordered pair of distinct nonzero ambient words",
+    "conditional_routing": "conditional on the two image weights, the independent row-coordinate permutations produce independent uniform supports of those weights"
+  },
+  "mass_checks": {
+    "rank_one_message_count_log2": 128.0,
+    "rank_two_message_count_log2": 256.0,
+    "all_message_pair_count_log2": 256.0,
+    "all_message_pair_count_expected_log2": 256.0,
+    "rank_two_image_pair_count_log2": 511.99999999999983,
+    "rank_two_image_pair_count_expected_log2": 512.0
+  },
+  "top_rank_one_shells": [
+    {
+      "weight": 6,
+      "pointwise_log2_upper": -64.57717404153364,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 7,
+      "pointwise_log2_upper": -66.57201016462703,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 8,
+      "pointwise_log2_upper": -68.9153591374254,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 5,
+      "pointwise_log2_upper": -69.96375509476296,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 9,
+      "pointwise_log2_upper": -71.10747943331468,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 10,
+      "pointwise_log2_upper": -73.16381189389558,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 11,
+      "pointwise_log2_upper": -75.09681456731278,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 4,
+      "pointwise_log2_upper": -75.61910692337541,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 12,
+      "pointwise_log2_upper": -76.91676024090602,
+      "log_surprisal": -8.6
+    },
+    {
+      "weight": 13,
+      "pointwise_log2_upper": -78.63227113593419,
+      "log_surprisal": -8.6
+    }
+  ],
+  "top_rank_two_shells": [
+    {
+      "first_weight": 25,
+      "second_weight": 25,
+      "pointwise_log2_upper": -106.60419185130189,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 25,
+      "second_weight": 26,
+      "pointwise_log2_upper": -106.702128920107,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 26,
+      "second_weight": 25,
+      "pointwise_log2_upper": -106.70212892010704,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 26,
+      "second_weight": 24,
+      "pointwise_log2_upper": -106.71656747276403,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 24,
+      "second_weight": 26,
+      "pointwise_log2_upper": -106.71656747276403,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 26,
+      "second_weight": 26,
+      "pointwise_log2_upper": -106.74697886163925,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 26,
+      "second_weight": 27,
+      "pointwise_log2_upper": -106.84806304048631,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 26,
+      "pointwise_log2_upper": -106.84806304048635,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 25,
+      "second_weight": 27,
+      "pointwise_log2_upper": -106.85532610478765,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 25,
+      "pointwise_log2_upper": -106.85532610478765,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 27,
+      "pointwise_log2_upper": -106.89792277169366,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 24,
+      "pointwise_log2_upper": -106.92274320702387,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 24,
+      "second_weight": 27,
+      "pointwise_log2_upper": -106.92274320702387,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 28,
+      "second_weight": 27,
+      "pointwise_log2_upper": -107.00206846672536,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 28,
+      "pointwise_log2_upper": -107.00206846672536,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 26,
+      "second_weight": 28,
+      "pointwise_log2_upper": -107.00252779467432,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 28,
+      "second_weight": 26,
+      "pointwise_log2_upper": -107.00252779467436,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 23,
+      "second_weight": 27,
+      "pointwise_log2_upper": -107.05355679185196,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 27,
+      "second_weight": 23,
+      "pointwise_log2_upper": -107.053556791852,
+      "log_surprisal": -7.8999999999999995
+    },
+    {
+      "first_weight": 28,
+      "second_weight": 28,
+      "pointwise_log2_upper": -107.05672355109556,
+      "log_surprisal": -7.8999999999999995
+    }
+  ],
+  "grid": {
+    "coarse_minimum": -8.6,
+    "coarse_maximum": -7.9,
+    "coarse_step": 0.7,
+    "fine_minimum": -8.6,
+    "fine_maximum": -7.9,
+    "fine_step": 0.7,
+    "count": 2
+  },
+  "limitations": [
+    "Nearest binary64 arithmetic is not an outward certificate.",
+    "Only occupation two is covered.",
+    "The calculation averages over the one sampled constituent; it does not identify a fixed constituent."
+  ]
+}

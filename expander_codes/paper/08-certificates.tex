@@ -1,0 +1,411 @@
+\section{Certified finite evaluation}
+\label{sec:certificates}
+
+The asymptotic theorems suppress polynomial factors and do not give a failure
+probability at one concrete length.  Our finite certificates retain those
+factors and cover every nonzero message support.  This section states the
+largest results and explains what the verifier checks.
+We call $-\log_2 U$ the \emph{failure exponent in bits}: a larger value means
+a smaller upper bound $U$ on bad sampling.
+
+\subsection{Verifier model}
+
+A certificate contains integer parameters, a partition of the support range,
+and decimal positive markers.  A floating-point optimizer proposes the
+markers.  The verifier parses each decimal as an exact input and recomputes
+the resulting expressions with Arb ball arithmetic through
+\texttt{python-flint}.  A ball is a numerical interval together with a stated
+error radius; every computed ball encloses the exact real value.
+
+The verifier checks four conditions:
+
+\begin{enumerate}
+  \item the stated support intervals are ordered, disjoint, and cover the
+  required range;
+  \item every marker belongs to the domain required by its inequality;
+  \item each matrix, coefficient bound, and Hamming-ball bound is evaluated
+  with outward rounding;
+  \item the outward upper endpoint of the complete sum is below the claimed
+  failure probability.
+\end{enumerate}
+
+The optimizer is outside the trusted base.  A poor marker only weakens a
+bound.  The verification cache is also outside the trusted base: its key
+includes the certificate, verifier source, precision, and
+\texttt{python-flint} version.  A full run can disable the cache.
+
+\begin{proposition}[Certificate soundness]
+\label{prop:certificate-soundness}
+Suppose a verifier evaluates a proved first-moment upper bound, checks a
+partition of every support in $[1,k]$, and returns an Arb interval with upper
+endpoint $U$.  Then the sampled ensemble satisfies
+$\Pr[\Bad_L(\G)]\leq U$.
+\end{proposition}
+
+\begin{proof}
+Each exact or relaxed support contribution is an upper bound by the theorem
+implemented for that interval.  Outward rounding preserves every inequality.
+The checked partition makes the sum cover all nonzero message supports
+exactly once.  The relevant first-moment theorem then gives the probability
+bound.
+\end{proof}
+
+Table~\ref{tab:verifier-correspondence} gives the correspondence between
+verifier branches and proved bounds.  In every row, block assembly uses
+Lemma~\ref{lem:certified-support-partition}.  Exact branches evaluate the
+named nonnegative transfer directly.  Marker branches replace a coefficient
+tail only through \eqref{eq:positive-marker-tail}.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Correspondence between verifier branches and mathematical bounds.}
+\label{tab:verifier-correspondence}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ensemble & branch & bound used by the verifier \\
+\midrule
+Bernoulli EA & exact / block
+ & \eqref{eq:ea-first-moment} / Lemma~\ref{lem:ea-lower-tail} \\
+Bernoulli EC & exact / marker
+ & \eqref{eq:ec-first-moment} / \eqref{eq:ec-marker-bound} \\
+left-regular EA & exact / middle / dense
+ & \eqref{eq:regular-ea-first-moment} / \eqref{eq:regular-ea-poisson-moment} /
+   \eqref{eq:regular-ea-dense} \\
+left-regular EC & exact / middle / dense
+ & \eqref{eq:regular-ec-first-moment} / \eqref{eq:regular-ec-poisson} /
+   \eqref{eq:regular-ec-dense} \\
+two-sided binary EC & exact / outer / central
+ & \eqref{eq:binary-biregular-ec-first-moment} /
+   \eqref{eq:positive-marker-tail} /
+   Lemmas~\ref{lem:degree-three-central-block}--\ref{lem:odd-degree-central-block} \\
+labeled EA & exact / block
+ & \eqref{eq:p-ea-biregular-trace} / \eqref{eq:positive-marker-tail} \\
+labeled EC & exact / block / structural
+ & \eqref{eq:p-ec-trace} / \eqref{eq:positive-marker-tail} /
+   Lemma~\ref{lem:singleton-free-regions} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every numerical verifier validates its own schema, parameter identities,
+marker domains, and support partition before evaluating a bound.  The two
+binary two-sided formats also have independent standard-library structural
+checkers.  We do not claim that the latter checkers cover the other formats.
+
+\subsection{Binary EC near the GV benchmark}
+
+The exact Bernoulli EC verifier gives several rate-one-half tradeoffs at
+$k=2^{20}$, $n=2k$, and $L=230{,}741$.  This cutoff is
+$0.9999819889$ times the binary GV distance.
+
+\begin{table}[t]
+\centering
+\caption{Certified Bernoulli wrapped-EC profiles at rate one half.}
+\label{tab:binary-rate-half-frontier}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$C_0$ & memory $m$ & expected degree $C_0\ln n$ & $U$ & $-\log_2U$ \\
+\midrule
+$3.15$ & $5$  & $45.8517$ & $7.637727109\cdot10^{-7}$ & $20.320353$ \\
+$3.00$ & $7$  & $43.6683$ & $5.278295360\cdot10^{-7}$ & $20.853424$ \\
+$2.90$ & $9$  & $42.2127$ & $5.560776634\cdot10^{-7}$ & $20.778210$ \\
+$2.85$ & $13$ & $41.4849$ & $5.971032143\cdot10^{-7}$ & $20.675516$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At rate $1/5$, the profile with expected degree $77.3619$, memory $9$, and
+cutoff $1{,}274{,}032$ reaches $99.99937\%$ of the binary GV distance.  Its
+failure probability is below $2^{-21.3200}$.  These profiles show the finite
+degree--memory tradeoff before regular incidence is introduced.
+
+\subsection{Binary two-sided regular EC}
+
+The two-sided regular verifier proves
+\eqref{eq:biregular-binary-ec-certificate}.  Exact regional transfers cover
+supports $1$ through $16$.  The verifier uses $111$ convex coefficient
+blocks outside the central range and $47$ local-limit blocks inside it.  A
+separate transfer checks the all-one message.  At 192-bit precision, the
+outward-rounded contributions are at most
+\begin{align*}
+ U_{\mathrm{exact}}&=9.436470\cdot10^{-16},\\
+ U_{\mathrm{outer}}&=1.633667\cdot10^{-10},\\
+ U_{\mathrm{central}}&=1.382398\cdot10^{-12},\\
+ U_{\mathrm{full}}&<10^{-341856}.
+\end{align*}
+Their sum is below $1.6475000\cdot10^{-10}$, which gives $32.4990$ failure
+bits.  The outer range determines the final bound, not the central
+local-limit estimate.
+
+The same verifier, with the odd-degree bound from
+Lemma~\ref{lem:odd-degree-central-block}, certifies the two intermediate
+profiles in Table~\ref{tab:binary-biregular-intermediate-certificates}.
+The column labeled ``exact'' sums the frozen exact-support transfers.  The
+outer and central columns sum their respective support blocks.
+
+\begin{table}[t]
+\centering
+\caption{Components of the intermediate binary two-sided EC certificates.}
+\label{tab:binary-biregular-intermediate-certificates}
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$d_L/d_R$ & $m$ & exact & outer & central & total & bits \\
+\midrule
+$14/7$ & $6$ & $1.393702\cdot10^{-8}$ & $3.872135\cdot10^{-33}$
+ & $8.682238\cdot10^{-11}$ & $1.402384\cdot10^{-8}$ & $26.0875$ \\
+$18/9$ & $4$ & $2.637990\cdot10^{-7}$ & $4.037754\cdot10^{-52}$
+ & $3.493283\cdot10^{-8}$ & $2.987318\cdot10^{-7}$ & $21.6746$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The degree-$14/7$ verifier evaluates exact supports $1$ through $24$, $106$
+outer blocks, and $64$ complemented central blocks.  The degree-$18/9$
+verifier evaluates exact supports $1$ through $32$, $102$ outer blocks, and
+$76$ complemented central blocks.  In both profiles, support two is the
+largest exact term.  The corresponding bounds are $1.108157\cdot10^{-8}$
+and $2.583854\cdot10^{-7}$.
+
+The degree-$6/3$, memory-$79$ verifier proves
+\eqref{eq:biregular-binary-ec-degree-six-certificate}.  Exact regional
+transfers cover supports $1$ through $383$.  The verifier uses $103$ convex
+coefficient blocks outside the central range and $28$ complemented
+degree-three local-limit blocks inside it.  The outward-rounded contributions
+are at most
+\begin{align*}
+ U_{\mathrm{exact}}&=2.829174\cdot10^{-7},\\
+ U_{\mathrm{outer}}&=7.292690\cdot10^{-8},\\
+ U_{\mathrm{central}}&=1.397617\cdot10^{-13},\\
+ U_{\mathrm{full}}&<10^{-315674}.
+\end{align*}
+Their sum is below $3.558444\cdot10^{-7}$, which gives $21.4222$ failure
+bits.  The largest exact block covers supports $112$ through $127$ and is
+below $1.229988\cdot10^{-7}$.
+
+The last exact block requires more dynamic range than one binary64 scale can
+provide.  The verifier writes each nonnegative transfer as a sum of exponent
+layers.  Entries in one layer share a dense mantissa matrix and a power-of-two
+scale.  Matrix multiplication inflates each positive dot product upward.
+Separate layers retain small reachable entries without introducing an
+absolute error into structural zeros.  Arb combines the scaled row sums with
+the message counts and output markers.
+
+A checked-in JSON file for each profile fixes every positive marker and every
+block endpoint.
+A separate checker uses only integer arithmetic and decimal parsing from the
+Python standard library.  It checks the parameter identities, marker domains,
+and a disjoint cover of supports $1$ through $k$.  The numerical verifier runs
+this checker before evaluating the stored markers.  It does not invoke the
+floating-point optimizer during verification.
+
+\subsection{EA over a 127-bit prime field}
+
+The two-sided regular trace in Theorem~\ref{thm:p-ea-biregular-trace} closes a
+large-field EA result at the exact floored GV cutoff.
+
+\begin{theorem}[Finite large-field EA certificate]
+\label{thm:p-ea-certificate}
+Let $p=2^{127}-1$, $d_L=30$, $d_R=15$, $\ell=69{,}905$,
+$n=2{,}097{,}150$, and $k=1{,}048{,}575$.  Let
+\begin{equation}
+ L=1{,}032{,}064
+ =\left\lfloor n\delta_{p,\mathrm{GV}}(1/2)\right\rfloor.
+\end{equation}
+For the labeled two-sided regular EA ensemble,
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\B\A)]
+ <9.499\cdot10^{-10}<2^{-29.97}.
+ \label{eq:p-ea-certificate}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The verifier evaluates support sizes $1$ through $64$ with the exact regional
+trace.  Twelve contiguous blocks cover $65\leq r<k$; a proved convexity
+argument bounds every support inside a block from stored endpoint data.  Full
+support is checked directly.  At 192-bit precision, the three contributions are below
+$7.319\cdot10^{-30}$, $9.499\cdot10^{-10}$, and
+$1.036\cdot10^{-75}$.  Proposition~\ref{prop:certificate-soundness} completes
+the proof.
+\end{proof}
+
+The degree is controlled by a dense-support term.  This is why left
+regularity alone did not improve the large-field EA parameters in our scan.
+Two-sided regularity prevents right coordinates from being entirely empty at
+full message support.
+
+\subsection{EC over fields near 128 bits}
+
+The EC certificates combine the trace bound in
+Theorem~\ref{thm:p-ec-trace}, the singleton refinement, positive-marker
+coefficient bounds, and direct full-support evaluation.
+We first give a degree--memory frontier over the 127-bit prime field
+$\F_{2^{127}-1}$.  We then give two profiles over the 128-bit extension field
+$\F_{2^{128}}$.  These are separate finite experiments: the fields,
+parameters, cutoffs, and sampled generators are fixed independently.
+
+\begin{theorem}[Finite $\F_{2^{127}-1}$ EC certificates]
+\label{thm:p-ec-certificates}
+Fix $p=2^{127}-1$ and rate $1/2$.  For every row of
+Table~\ref{tab:p-ec-frontier} labeled EC, take $d_L$, $d_R$, $n$, $L$, and
+$m$ from that row, and let $\ell=n/d_L$ and $k=n/2$.  Independently sample
+the labeled two-sided regular expander and a finite-field convolution of
+memory $m$.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]<2^{-b},
+\end{equation}
+where $b$ is the displayed failure exponent.
+\end{theorem}
+
+\begin{table}[ht]
+\centering
+\caption{Certified recursive-map frontier over $\F_{2^{127}-1}$ at rate one half.}
+\label{tab:p-ec-frontier}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+map & $m$ & $d_L/d_R$ & $n$ & $L$ & $d_L+m$ & $b$ \\
+\midrule
+EA & $1$  & $30/15$ & $2{,}097{,}150$ & $1{,}032{,}064$ & $31$ & $29.9715$ \\
+EC & $3$  & $28/14$ & $2{,}097{,}144$ & $1{,}032{,}062$ & $31$ & $27.6486$ \\
+EC & $4$  & $26/13$ & $2{,}097{,}134$ & $1{,}032{,}057$ & $30$ & $71.4724$ \\
+EC & $6$  & $24/12$ & $2{,}097{,}144$ & $1{,}032{,}062$ & $30$ & $39.5003$ \\
+EC & $12$ & $22/11$ & $2{,}097{,}150$ & $1{,}032{,}064$ & $34$ & $27.2951$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+Each verifier separates the support range into exact regional bands, convex
+positive-marker blocks, and full support.  The degree-$22$ verifier also uses
+Lemma~\ref{lem:singleton-free-regions} for structural traces through support
+$48$.  Its exact transfer covers supports $49$ through $1400$, and $26$
+convex blocks cover $1401$ through $k-1$.  The complete outward-rounded bound
+is
+\[
+ 6.071991718716554\cdot10^{-9}<2^{-27.2951}.
+\]
+The remaining three EC certificates use the same proved trace bounds without the
+additional low-support regional lemma where it is unnecessary.  Their
+verified sums give the remaining rows.  Proposition
+\ref{prop:certificate-soundness} converts each sum to the stated probability.
+\end{proof}
+
+\begin{theorem}[Finite $\F_{2^{128}}$ EC certificates]
+\label{thm:gf128-ec-certificate}
+Fix the field $\F_{2^{128}}$ and rate $1/2$.  For each row of
+Table~\ref{tab:gf128-ec-certificates}, independently sample the labeled
+two-sided regular expander and the finite-field convolution with the displayed
+parameters.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]<2^{-b},
+ \label{eq:gf128-ec-certificate}
+\end{equation}
+where $b$ is the displayed failure exponent.  Each relative cutoff $L/n$ is
+$98.415\%$ of the rate-one-half $\F_{2^{128}}$ GV distance.
+\end{theorem}
+
+\begin{table}[ht]
+\centering
+\caption{Certified EC profiles over $\F_{2^{128}}$ at rate one half.}
+\label{tab:gf128-ec-certificates}
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$d_L/d_R$ & $m$ & $n$ & $k$ & $L$ & $b$ \\
+\midrule
+$24/12$ & $5$ & $2{,}097{,}144$ & $1{,}048{,}572$ & $1{,}015{,}826$ & $45.0317$ \\
+$26/13$ & $4$ & $2{,}097{,}134$ & $1{,}048{,}567$ & $1{,}015{,}822$ & $135.2018$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+Both verifiers apply the singleton-refined trace bound with field order
+$2^{128}$.  For degrees $24/12$ and memory $5$, the outward-rounded exact-band,
+block, and full-support contributions sum to at most
+$2.781\cdot10^{-14}<2^{-45.0317}$.  For degrees $26/13$ and memory $4$, they
+sum to less than $1.997\cdot10^{-41}<2^{-135.2018}$.  The proof of
+Theorem~\ref{thm:p-ec-trace} uses the field order through cardinalities and
+equation probabilities; it does not require that order to be prime.
+\end{proof}
+
+The next theorem holds the degree and memory fixed while changing the field.
+It therefore isolates field-size scaling from the degree--memory tradeoff.
+Define
+\[
+ \eta:=\frac{1{,}015{,}826}
+ {2{,}097{,}144\,\delta_{2^{128},\mathrm{GV}}(1/2)}.
+\]
+
+\begin{theorem}[Finite EC certificates near 128-bit fields]
+\label{thm:field-size-ec-certificates}
+For each row of Table~\ref{tab:field-size-ec-certificates}, fix the field
+$\F_p$.  Independently sample the labeled two-sided regular expander with
+degrees $24/12$ and a finite-field convolution with memory $5$.  The code has
+length $n=2{,}097{,}144$, dimension $k=1{,}048{,}572$, and cutoff
+\[
+ L=\left\lfloor \eta n\delta_{p,\mathrm{GV}}(1/2)\right\rfloor.
+\]
+Then $\Pr_{\B,\C}[\Bad_L(\B\C)]<2^{-b}$ for the displayed exponent $b$.
+\end{theorem}
+
+\begin{table}[ht]
+\centering
+\caption{Certified field-size profile for degrees $24/12$ and memory $5$.}
+\label{tab:field-size-ec-certificates}
+\begin{tabular}{@{}rrr@{}}
+\toprule
+field order $p$ & cutoff $L$ & failure exponent $b$ \\
+\midrule
+$2^{127}$ & $1{,}015{,}699$ & $45.8357$ \\
+$2^{128}$ & $1{,}015{,}826$ & $45.0317$ \\
+$2^{129}$ & $1{,}015{,}950$ & $44.2357$ \\
+$2^{136}$ & $1{,}016{,}774$ & $38.7836$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+The verifier applies the singleton-refined trace bound from
+Theorem~\ref{thm:p-ec-trace}.  It checks every nonzero message support with
+outward-rounded interval arithmetic.  For field orders $2^{127}$,
+$2^{128}$, and $2^{129}$, it uses one support partition and one set of
+positive markers.  For field order $2^{136}$, it locally retunes the
+structural output marker in five support bands.  The verified failure
+exponents are, in table order,
+\[
+ 45.8357737,\qquad 45.0317394,\qquad
+ 44.2357386,\qquad 38.7836609.
+\]
+Proposition~\ref{prop:certificate-soundness} gives the stated probability
+bounds.
+\end{proof}
+
+The first row of Table~\ref{tab:p-ec-frontier} records EA as a memory-one
+recursive map because the accumulator retains $y_{t-1}$.  It is not the
+memory-one instance of \eqref{eq:prime-convolution}: EA fixes the feedback
+coefficient to one, whereas finite-field EC samples it from $\F_p$.
+
+Among the EC rows, memory $4$ and memory $6$ minimize the simple work proxy
+$d_L+m$, both with value $30$.  Increasing memory to $12$ reduces the
+expander degree to $22$, but raises the proxy to $34$.  Thus a larger
+convolution helps the sparse regime, with diminishing returns.  The
+diagnostic memory-two EC point also has left degree $30$.  It does not improve
+the expander degree over certified EA and requires additional random field
+arithmetic.
+
+The proxy $d_L+m$ counts edges and retained field elements equally.  It does
+not count the multiplications needed for random edge labels or feedback taps.
+Section~\ref{sec:discussion} therefore treats it only as a guide for selecting
+profiles to benchmark.
+
+The present analysis does not certify degree $20$ with memory $21$.  At
+support $512$, the exact structural upper bound is $2^{131.90}$.  A positive
+upper bound is inconclusive; it is not evidence that the sampled ensemble has
+a low-weight codeword.
+
+The diagnostic points $(m,d_L)=(1,38)$ and $(2,30)$ remain outside the
+certified frontier.  Neither improves the implementation-facing choice:
+certified EA already uses degree $30$ with a fixed memory-one recurrence, and
+the memory-two EC diagnostic has only a narrow floating-point margin.  We do
+not use either point in a theorem or parameter recommendation.

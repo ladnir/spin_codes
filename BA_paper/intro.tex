@@ -1,0 +1,43 @@
+\section{Introduction}\label{sec:intro}
+Linear error-correcting codes with fast encoding and provable minimum distance are a fundamental primitive in cryptography. Beyond their classical role in communication, such codes increasingly appear as computational building blocks inside larger cryptographic protocols, where encoding must be performed on vectors of size ranging from millions to billions of symbols. In these settings, the asymptotic encoding complexity and concrete constant factors of the generator matrix dominate performance, often outweighing all other cryptographic costs.
+
+
+\paragraph{Coding-Theoretic Codes vs. Cryptographic Codes.} As discussed in greater detail below, we require $\G$ to support fast matrix multiplication, i.e., computing $\G \cdot \av'$, and to have a high minimum distance. These requirements align with those of a generator matrix for an error-correcting code. Thus, one might simply consult the coding theory literature and select a state-of-the-art code. However, this would result in suboptimal performance. Indeed, typical coding-theoretic constructions optimize for fast encoding of moderately sized codes (on the order of thousands), whereas we are interested in code lengths on the order of millions. More importantly, coding-theoretic constructions have traditionally required an efficient decoder; that is, given $\cv' = \xv\G + \ev$ for sparse $\ev$, one must decode $\cv'$ to recover $\xv$. In contrast, codes used in cryptography typically never rely on a decoder and therefore are not subject to this constraint. Instead, we require $\G$ to have a concretely high minimum distance and efficient encoding. While the minimum distance upper-bounds the decodability of a code, codes with high minimum distance often do not admit efficient decoding algorithms. 
+
+Prior cryptographic code constructions, such as \cite{silver,EA,EC}, have leveraged this fact by adapting constructions from coding theory to amplify minimum distance, albeit at the expense of worse decodability. One can view our work as continuing this trend, but with the added criterion that our codes should be GPU-friendly. 
+
+\subsection{Applications}
+
+
+
+\paragraph{Correlated Randomness and MPC.}
+Correlated randomness is the {\it de facto} foundation for realizing efficient multiparty computation (MPC). Primary examples are oblivious transfer (OT), vector-oblivious linear evaluation (VOLE), and Beaver triple correlations, which drive a large portion of today's MPC constructions. Consequently, the ability to generate such correlated randomness with low overhead is crucial for practical deployment. The development of pseudorandom correlation generators (PCGs)~\cite{silentOTCCS,silentOTcrypto} based on linear codes with high minimum distance has been proposed as a promising direction: they offer sublinear communication complexity and compelling computational overheads. However, more research is needed to fully harness these benefits, including a deeper understanding of the underlying security assumptions and improvements in computational performance.
+
+
+\paragraph{Interactive Zero-Knowledge Proofs and Linear Codes.}
+The same code-based transformation central to PCGs also arises in state-of-the-art zero-knowledge (ZK) protocols. Many modern interactive proof systems, especially those built from linear-time interactive proofs and VOLE-based proof compilers~\cite{wolverine} \cite{ferret}, require the prover to encode vectors using a linear error-correcting code with high minimum distance. This encoding step serves the dual purpose of ensuring soundness (via distance properties) and enabling linear-time arithmetic checks. In these settings, the prover's bottleneck is the cost of multiplying by a large generator matrix $\G$, often of size in the millions. Thus, the ZK literature has emphasized the need for fast, linear-time encoders for codes with strong distance guarantees. Our constructions directly satisfy this need: they drop into existing interactive ZK frameworks, replacing generic coding-theory choices with GPU-friendly codes that deliver linear-time encoding.
+
+\paragraph{Codes in SNARKs and IOPs.}
+Beyond interactive proofs, linear codes with efficient encoding are also a cornerstone of SNARK and STARK systems. Examples include the FRI protocol and its descendants in STARKs~\cite{FRI},  Ligero~\cite{ligero}, Aurora~\cite{aurora}, and more recent transparent SNARKs such as Brakedown~\cite{brakedown}, Plonkish systems~\cite{plonk}, and Spartan~\cite{spartan}. In all of these schemes, prover efficiency is tied to encoding large vectors under a code with strong distance guarantees, often with dimensions in the millions. Recently, several works have pursued designing or applying similar linear codes for this setting \cite{field,liu2025efficient,query},  notably Blaze \cite{blaze}, whose efficiency we improve upon in this work. As in the interactive setting, the dominant cost is multiplying by a generator matrix $\G$, and thus these systems explicitly benefit from linear-time encoders. Our codes can drop directly into such SNARK frameworks, offering provable distance and substantial speedups. 
+
+%We note that some ZK works \cite{field} focus on the non-binary case while we focus on binary codes. Our enumeration techniques can be generalized to this setting by scaling the relevant probabilities by one over the field size. We leave a detailed analysis for future work.
+
+\medskip
+
+\noindent See \appendixref{sec:application} for a more detailed handling of these applications. 
+
+\subsection{Contribution}\label{sec:contrib}
+
+We make the following contributions:
+\begin{itemize}
+    \item New state-of-the-art linear codes for PCGs and zero knowledge that are several times faster than prior art at rate 1/2. On a CPU, our codes require $20$ ms for $k=2^{20}$ correlations and are between $3\times$ to $8\times$ faster than prior art, depending on the parameterization.
+
+    \item GPU-accelerated implementation that takes advantage of the parallel structure of our codes. On a GPU, our code requires just 3.2 ms for $k=2^{20}$ correlations and is approximately $50\times$ faster than prior art. This corresponds to a throughput of roughly 200 million OTs or binary Beaver triples per second.
+    
+    \item We integrate our new codes into the binary zero knowledge system Blaze \cite{blaze}. As a proof of concept, we replace their use of rate 0.25  repeat-accumulate-accumulate (RAA) codes with our new construction and observe a $2\times$ speed up in encoding time and a halving of total memory usage. 
+
+    \item A flexible and extensible framework for proving the minimum distance of codes. In addition to our codes, we anticipate that this framework can be used to prove the minimum distance of a wide variety of codes, possibly resulting in further improvements.
+
+    \item Improved minimum distance compared to prior work. This means that when deployed in a PCG protocol,  smaller-weight noise vectors can be used to achieve the same security, resulting in less communication. 
+    \item Resolving a longstanding open question \cite{spielman,turbo} on the existence of depth $t=2$ turbo codes with sublinear state and linear minimum distance. 
+\end{itemize}

@@ -1,0 +1,109 @@
+{
+  "schema": "riffle-dp-g4-g1-terminal-weight-three-ledger-v2",
+  "candidate": "Riffle DP g=4@g0-v1",
+  "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+  "engine_source_sha256": "d6cc9c1416db633c065ff995ac2781cd6bc86c3ab4acd8fac6c450d53d94e4dd",
+  "scope": "All block-weight-three outer words under the terminal-placement event.",
+  "exact_classification": {
+    "classification_sha256": "f35c733acac6b37b378428601651687e69661f2bda535030946aa5da5340e53e",
+    "classifier_source_sha256": "04d2f05cb6665b593678ac395c42c5f97c2cbdf19ad8ef9f07b6122245e1ac6e",
+    "local_enumerator_source_sha256": "436b5b819ef51f5e9342da6a0c37c1e652dfc1f2cfd60c7007801609b733a77c",
+    "local_message_file_sha256": "a5ad1eb6ee7e5f6cec3134545f5807f0275e73919863657eacc45b355f46c6a7",
+    "exact_minimum_class_counts": {
+      "33": 3,
+      "35": 11,
+      "36": 32779,
+      "additive_37": 0,
+      "additive_38": 49143
+    },
+    "coverage": {
+      "one_data": "exact through support 36",
+      "two_data_weighted_parity": "exact through support 36",
+      "two_data_sum_parity": "exact through support 38",
+      "three_data": "exact through support 38"
+    }
+  },
+  "proof_partition": {
+    "33": {
+      "class_count": "3",
+      "interpretation": "certified minimum-support bucket",
+      "delsarte_degree": 45,
+      "contribution_log2_interval": [
+        "-57.811822709067",
+        "-57.811822709066"
+      ]
+    },
+    "35": {
+      "class_count": "11",
+      "interpretation": "certified minimum-support bucket",
+      "delsarte_degree": 43,
+      "contribution_log2_interval": [
+        "-62.684950871808",
+        "-62.684950871807"
+      ]
+    },
+    "36": {
+      "class_count": "32779",
+      "interpretation": "certified minimum-support bucket",
+      "delsarte_degree": 42,
+      "contribution_log2_interval": [
+        "-54.516206338313",
+        "-54.516206338312"
+      ]
+    },
+    "37": {
+      "class_count": "134225892",
+      "interpretation": "conservative repeated-category remainder",
+      "delsarte_degree": 41,
+      "contribution_log2_interval": [
+        "-45.891870591389",
+        "-45.891870591388"
+      ]
+    },
+    "38": {
+      "class_count": "49143",
+      "interpretation": "certified minimum-support bucket",
+      "delsarte_degree": 40,
+      "contribution_log2_interval": [
+        "-60.687049654358",
+        "-60.687049654357"
+      ]
+    },
+    "39": {
+      "class_count": "733007667212",
+      "interpretation": "certified minimum-support bucket",
+      "delsarte_degree": 39,
+      "contribution_log2_interval": [
+        "-40.241517984267",
+        "-40.241517984266"
+      ]
+    }
+  },
+  "proof_upper_bound": {
+    "evidence_label": "RIGOROUS_BOUND",
+    "numerator": "37316263889039889881416637058418511732575313211901865094851273112926674072205159874348142134419468377996646794405471207681730306842046035755470763819635463156149582393579185853223556567112575882160627158524043157743328395392465927816619583910024449791424370027650277092962233255245214628106540511161981171482438698082376873498320467144580675261133836393202452967946524329256575951976314534167680403103706598271630480235398284217981442986581572401971859772070194120747205805783191",
+    "denominator": "47557189933893740811993195923684037713463334163859301249048635965193615972733488693585510006135185769346275977606783416091988600385658968443065086656479898865109408354167840029674682837631127036761881608965330465434835443767190717473226306478759083697139983201693097510034701175668245831999884445959812732585708626725994797055578157870183890316449400830146566984363394957294411374166557329707196666714676279037170765388213257005642589689182708454991745891545345010006227805356961020380734090",
+    "log2_interval": [
+      "-40.212996059541",
+      "-40.212996059540"
+    ],
+    "meets_2^-40": true,
+    "margin_below_target_bits_interval": [
+      "0.212996059540",
+      "0.212996059541"
+    ]
+  },
+  "refutation_lower_family": {
+    "evidence_label": "EXACT",
+    "description": "All authenticated support-33 and support-35 words under their terminal events.",
+    "numerator": "3311677473673902726342126012323798837492116983323814498616726993351260529967767577051573161473172454699453207423",
+    "denominator": "4136105559979979553771299777878915112225192158903315064954559965719775372668834604689495242025212127129685826847578964606529180482343172187689150",
+    "log2_interval": [
+      "-109.944337962561",
+      "-109.944337962560"
+    ],
+    "exceeds_2^-40": false
+  },
+  "decision": "PASS_TERMINAL_WEIGHT_THREE",
+  "scope_limitation": "This ledger closes only the terminal-placement event for outer block weight three. It does not bound nonterminal inner placements or outer block weights at least four."
+}

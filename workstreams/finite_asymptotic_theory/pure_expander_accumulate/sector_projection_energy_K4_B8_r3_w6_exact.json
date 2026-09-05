@@ -1,0 +1,177 @@
+{
+  "schema": "pure-ea-sector-projection-energy-small-v1",
+  "status": "EXACT_PROJECTOR_ENERGIES_WITH_BINARY64_EIGENVALUE_BOUND",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "shell_weight": 6
+  },
+  "parseval_energy": 7168,
+  "exact_variance_to_mean": 1.2656904734311374,
+  "sector_norm_variance_to_mean_upper": 6.361336337143167,
+  "loss_over_exact": 5.025981051985274,
+  "sectors": [
+    {
+      "sector": 0,
+      "maximum_covariance_eigenvalue": 0.7923816645608508,
+      "projected_coefficient_energy": "7520/7"
+    },
+    {
+      "sector": 1,
+      "maximum_covariance_eigenvalue": 0.38907348712539613,
+      "projected_coefficient_energy": "3616/3"
+    },
+    {
+      "sector": 2,
+      "maximum_covariance_eigenvalue": 0.23019987738212516,
+      "projected_coefficient_energy": "38144/21"
+    },
+    {
+      "sector": 3,
+      "maximum_covariance_eigenvalue": 0.1025390625,
+      "projected_coefficient_energy": "2816/1"
+    },
+    {
+      "sector": 4,
+      "maximum_covariance_eigenvalue": 0.0908203125,
+      "projected_coefficient_energy": "256/1"
+    }
+  ],
+  "level_sector_energies": [
+    {
+      "level": 0,
+      "sector": 0,
+      "energy": "784/1"
+    },
+    {
+      "level": 1,
+      "sector": 0,
+      "energy": "49/2"
+    },
+    {
+      "level": 1,
+      "sector": 1,
+      "energy": "567/2"
+    },
+    {
+      "level": 2,
+      "sector": 0,
+      "energy": "361/7"
+    },
+    {
+      "level": 2,
+      "sector": 1,
+      "energy": "93/1"
+    },
+    {
+      "level": 2,
+      "sector": 2,
+      "energy": "2880/7"
+    },
+    {
+      "level": 3,
+      "sector": 0,
+      "energy": "9/14"
+    },
+    {
+      "level": 3,
+      "sector": 1,
+      "energy": "3191/30"
+    },
+    {
+      "level": 3,
+      "sector": 2,
+      "energy": "6976/21"
+    },
+    {
+      "level": 3,
+      "sector": 3,
+      "energy": "1984/5"
+    },
+    {
+      "level": 4,
+      "sector": 0,
+      "energy": "10/7"
+    },
+    {
+      "level": 4,
+      "sector": 1,
+      "energy": "1326/5"
+    },
+    {
+      "level": 4,
+      "sector": 2,
+      "energy": "2048/7"
+    },
+    {
+      "level": 4,
+      "sector": 3,
+      "energy": "8064/5"
+    },
+    {
+      "level": 4,
+      "sector": 4,
+      "energy": "256/1"
+    },
+    {
+      "level": 5,
+      "sector": 0,
+      "energy": "121/14"
+    },
+    {
+      "level": 5,
+      "sector": 1,
+      "energy": "1181/10"
+    },
+    {
+      "level": 5,
+      "sector": 2,
+      "energy": "3520/7"
+    },
+    {
+      "level": 5,
+      "sector": 3,
+      "energy": "4032/5"
+    },
+    {
+      "level": 6,
+      "sector": 0,
+      "energy": "7/1"
+    },
+    {
+      "level": 6,
+      "sector": 1,
+      "energy": "311/3"
+    },
+    {
+      "level": 6,
+      "sector": 2,
+      "energy": "832/3"
+    },
+    {
+      "level": 7,
+      "sector": 0,
+      "energy": "1/2"
+    },
+    {
+      "level": 7,
+      "sector": 1,
+      "energy": "471/2"
+    },
+    {
+      "level": 8,
+      "sector": 0,
+      "energy": "196/1"
+    }
+  ],
+  "verified_identities": [
+    "sector energies reconstruct every row-subset level energy exactly",
+    "total sector energy equals the exact Parseval energy"
+  ],
+  "scope": [
+    "All projector coefficients and energies use exact rational arithmetic.",
+    "The covariance eigenvalue bound uses nondirected binary64 arithmetic.",
+    "The result validates only the displayed small instance."
+  ]
+}

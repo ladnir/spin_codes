@@ -1,0 +1,1542 @@
+{
+  "schema": "golay-ba3-rm2sub-finite-b240-q1-outward-v1",
+  "status": "OUTWARD_CERTIFICATE",
+  "claim": {
+    "probability_space": "One Golay--BA-3 draw per outer row, independently conditioned on G_240; independent row-to-region permutations and RM2Sub multipliers; full parent message space before shortening.",
+    "occupation": 1,
+    "bad_weight_at_most": 233164,
+    "expected_bad_word_count_upper_hex": "0x1.01326cb5b921ep-48",
+    "certified_integer_margin_bits": 47,
+    "comparison_to_2^-40": true,
+    "comparison_to_2^-47": true,
+    "display_margin_bits_not_used_by_verifier": 47.99327015645502
+  },
+  "parameters": {
+    "message_bits_after_shortening": 1048576,
+    "parent_dimension": 1059840,
+    "shortened_input_coordinates": 11264,
+    "outer_bits": 240,
+    "outer_rows": 8832,
+    "parent_output_bits": 2119680,
+    "inner_epochs": 16560,
+    "epochs_per_region": 69,
+    "permitted_outer_weights": [
+      25,
+      215
+    ]
+  },
+  "outer_conditioning": {
+    "expected_tail_word_count_upper_hex": "0x1.782451687854ap-5",
+    "good_event_probability_lower_hex": "0x1.e87dbae9787aap-1",
+    "expected_trials_upper_display": 1.0481254726988662
+  },
+  "arithmetic": {
+    "format": "IEEE-754 binary64",
+    "proof_rule": "All nonnegative proof-path operations are rounded one ULP toward +infinity; exact integer denominators are rounded toward -infinity before division.",
+    "underflow_rule": "A positive operation that rounds to zero is advanced to the least positive subnormal by the same upward rule.",
+    "transcendental_scope": "exp selects legal binary64 Chernoff witnesses only; no transcendental result enters as a claimed bound.",
+    "python": "3.14.4",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "unique_tilts": 28
+  },
+  "dependencies": [
+    {
+      "path": "workstreams\\finite_asymptotic_theory\\golay_ba3_rm2sub_finite_B240_k20_d11.json",
+      "sha256": "918177cf5fb6f7fa1d2b8749ecc4eebe78f1453d5d2026e64526e6a297f8b85e"
+    },
+    {
+      "path": "constructions\\riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20\\receipts\\min_state\\s19_rm2sub_b_kernel_spectrum.json",
+      "sha256": "bf322cfdb00410ff3aee381389ac899fa0060234edb22106f1d033888c60ea3f"
+    },
+    {
+      "path": "constructions\\riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20\\receipts\\min_state\\s19_rm2sub_a_spectrum_audit.json",
+      "sha256": "75b8d8adb7532d373ad1b5fb895159b18c800107f4ecd9b480d1b59808cb2eb5"
+    }
+  ],
+  "dominant_contributions": [
+    {
+      "outer_weight": 25,
+      "z_binary64_hex_exact": "0x1.ffec3e9e52a39p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.480d919aa61b7p-4",
+      "inner_probability_upper_hex": "0x1.1859973874fbep-59",
+      "contribution_upper_hex": "0x1.8352c6b434911p-50"
+    },
+    {
+      "outer_weight": 26,
+      "z_binary64_hex_exact": "0x1.ffec3e9e52a39p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.794b74796c195p-2",
+      "inner_probability_upper_hex": "0x1.1ef3dbdfd888ep-62",
+      "contribution_upper_hex": "0x1.c7f3f4c4a7d85p-51"
+    },
+    {
+      "outer_weight": 27,
+      "z_binary64_hex_exact": "0x1.ffea2ac5f6431p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d65136526a7ccp+0",
+      "inner_probability_upper_hex": "0x1.2d24893936878p-65",
+      "contribution_upper_hex": "0x1.2a3cd44e81b3fp-51"
+    },
+    {
+      "outer_weight": 28,
+      "z_binary64_hex_exact": "0x1.ffea2ac5f6431p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3704f00e8ca52p+3",
+      "inner_probability_upper_hex": "0x1.2392746c02ab8p-68",
+      "contribution_upper_hex": "0x1.7de94601a26bep-52"
+    },
+    {
+      "outer_weight": 29,
+      "z_binary64_hex_exact": "0x1.ffe7df00d7d72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ad2eaf710e8c3p+5",
+      "inner_probability_upper_hex": "0x1.1be66c2960c33p-71",
+      "contribution_upper_hex": "0x1.009205b88c612p-52"
+    },
+    {
+      "outer_weight": 30,
+      "z_binary64_hex_exact": "0x1.ffe7df00d7d72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.308d8cbb4687ep+8",
+      "inner_probability_upper_hex": "0x1.01898f84422c6p-74",
+      "contribution_upper_hex": "0x1.4a5163d419fcdp-53"
+    },
+    {
+      "outer_weight": 31,
+      "z_binary64_hex_exact": "0x1.ffe5556dd0c93p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b6fd81f7f439ap+10",
+      "inner_probability_upper_hex": "0x1.cf868f390b1f5p-78",
+      "contribution_upper_hex": "0x1.ac7a2e8900da6p-54"
+    },
+    {
+      "outer_weight": 32,
+      "z_binary64_hex_exact": "0x1.ffe5556dd0c93p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3de106908c596p+13",
+      "inner_probability_upper_hex": "0x1.863b9250a17e5p-81",
+      "contribution_upper_hex": "0x1.0534f81b06a59p-54"
+    },
+    {
+      "outer_weight": 33,
+      "z_binary64_hex_exact": "0x1.ffe2878d8db33p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ca665a193a64dp+15",
+      "inner_probability_upper_hex": "0x1.42c6a8c6e6d54p-84",
+      "contribution_upper_hex": "0x1.378feffd6ebd1p-55"
+    },
+    {
+      "outer_weight": 34,
+      "z_binary64_hex_exact": "0x1.ffe2878d8db33p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.46c4f20f7f86fp+18",
+      "inner_probability_upper_hex": "0x1.f38d336667f1cp-88",
+      "contribution_upper_hex": "0x1.57bb8d33dc916p-56"
+    },
+    {
+      "outer_weight": 35,
+      "z_binary64_hex_exact": "0x1.ffdf6e31f2ae6p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ca16dcdd19883p+20",
+      "inner_probability_upper_hex": "0x1.78bf3e9826244p-91",
+      "contribution_upper_hex": "0x1.6b6973ad3e158p-57"
+    },
+    {
+      "outer_weight": 36,
+      "z_binary64_hex_exact": "0x1.ffdf6e31f2ae6p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3a798e5a86504p+23",
+      "inner_probability_upper_hex": "0x1.095547be31e18p-94",
+      "contribution_upper_hex": "0x1.5f6762a24d8e3p-58"
+    },
+    {
+      "outer_weight": 37,
+      "z_binary64_hex_exact": "0x1.ffdc016bc2051p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a5b2711b6ede2p+25",
+      "inner_probability_upper_hex": "0x1.68c806dafea3bp-98",
+      "contribution_upper_hex": "0x1.405d332a81598p-59"
+    },
+    {
+      "outer_weight": 38,
+      "z_binary64_hex_exact": "0x1.ffdc016bc2051p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.13a1634562fb8p+28",
+      "inner_probability_upper_hex": "0x1.c9b69864c2320p-102",
+      "contribution_upper_hex": "0x1.09a7f6822d8dep-60"
+    },
+    {
+      "outer_weight": 39,
+      "z_binary64_hex_exact": "0x1.ffd8387656c1fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5ed8f2299a871p+30",
+      "inner_probability_upper_hex": "0x1.142430e9a0cb8p-105",
+      "contribution_upper_hex": "0x1.98048484411fep-62"
+    },
+    {
+      "outer_weight": 40,
+      "z_binary64_hex_exact": "0x1.ffd8387656c1fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b29087e49ea20p+32",
+      "inner_probability_upper_hex": "0x1.38130bf4f216cp-109",
+      "contribution_upper_hex": "0x1.1d91c21ccc2f1p-63"
+    },
+    {
+      "outer_weight": 41,
+      "z_binary64_hex_exact": "0x1.ffd409a13fc5ap-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.05cccf05ba7cep+35",
+      "inner_probability_upper_hex": "0x1.471d6c5ab4a1dp-113",
+      "contribution_upper_hex": "0x1.68a93977e9970p-65"
+    },
+    {
+      "outer_weight": 42,
+      "z_binary64_hex_exact": "0x1.ffd409a13fc5ap-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.32d4286303ebap+37",
+      "inner_probability_upper_hex": "0x1.456a48e307103p-117",
+      "contribution_upper_hex": "0x1.a47f410bbee75p-67"
+    },
+    {
+      "outer_weight": 43,
+      "z_binary64_hex_exact": "0x1.ffcf6a3782bb9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5dd287331d860p+39",
+      "inner_probability_upper_hex": "0x1.2019dfa86293ep-121",
+      "contribution_upper_hex": "0x1.a871f74ae9bcap-69"
+    },
+    {
+      "outer_weight": 44,
+      "z_binary64_hex_exact": "0x1.ffca4e644870fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.84136c76cef0fp+41",
+      "inner_probability_upper_hex": "0x1.f2482b266d2e0p-126",
+      "contribution_upper_hex": "0x1.972f27ce492fap-71"
+    }
+  ],
+  "weight_witnesses": [
+    {
+      "outer_weight": 25,
+      "z_binary64_hex_exact": "0x1.ffec3e9e52a39p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.480d919aa61b7p-4",
+      "inner_probability_upper_hex": "0x1.1859973874fbep-59",
+      "contribution_upper_hex": "0x1.8352c6b434911p-50"
+    },
+    {
+      "outer_weight": 26,
+      "z_binary64_hex_exact": "0x1.ffec3e9e52a39p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.794b74796c195p-2",
+      "inner_probability_upper_hex": "0x1.1ef3dbdfd888ep-62",
+      "contribution_upper_hex": "0x1.c7f3f4c4a7d85p-51"
+    },
+    {
+      "outer_weight": 27,
+      "z_binary64_hex_exact": "0x1.ffea2ac5f6431p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d65136526a7ccp+0",
+      "inner_probability_upper_hex": "0x1.2d24893936878p-65",
+      "contribution_upper_hex": "0x1.2a3cd44e81b3fp-51"
+    },
+    {
+      "outer_weight": 28,
+      "z_binary64_hex_exact": "0x1.ffea2ac5f6431p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3704f00e8ca52p+3",
+      "inner_probability_upper_hex": "0x1.2392746c02ab8p-68",
+      "contribution_upper_hex": "0x1.7de94601a26bep-52"
+    },
+    {
+      "outer_weight": 29,
+      "z_binary64_hex_exact": "0x1.ffe7df00d7d72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ad2eaf710e8c3p+5",
+      "inner_probability_upper_hex": "0x1.1be66c2960c33p-71",
+      "contribution_upper_hex": "0x1.009205b88c612p-52"
+    },
+    {
+      "outer_weight": 30,
+      "z_binary64_hex_exact": "0x1.ffe7df00d7d72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.308d8cbb4687ep+8",
+      "inner_probability_upper_hex": "0x1.01898f84422c6p-74",
+      "contribution_upper_hex": "0x1.4a5163d419fcdp-53"
+    },
+    {
+      "outer_weight": 31,
+      "z_binary64_hex_exact": "0x1.ffe5556dd0c93p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b6fd81f7f439ap+10",
+      "inner_probability_upper_hex": "0x1.cf868f390b1f5p-78",
+      "contribution_upper_hex": "0x1.ac7a2e8900da6p-54"
+    },
+    {
+      "outer_weight": 32,
+      "z_binary64_hex_exact": "0x1.ffe5556dd0c93p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3de106908c596p+13",
+      "inner_probability_upper_hex": "0x1.863b9250a17e5p-81",
+      "contribution_upper_hex": "0x1.0534f81b06a59p-54"
+    },
+    {
+      "outer_weight": 33,
+      "z_binary64_hex_exact": "0x1.ffe2878d8db33p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ca665a193a64dp+15",
+      "inner_probability_upper_hex": "0x1.42c6a8c6e6d54p-84",
+      "contribution_upper_hex": "0x1.378feffd6ebd1p-55"
+    },
+    {
+      "outer_weight": 34,
+      "z_binary64_hex_exact": "0x1.ffe2878d8db33p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.46c4f20f7f86fp+18",
+      "inner_probability_upper_hex": "0x1.f38d336667f1cp-88",
+      "contribution_upper_hex": "0x1.57bb8d33dc916p-56"
+    },
+    {
+      "outer_weight": 35,
+      "z_binary64_hex_exact": "0x1.ffdf6e31f2ae6p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ca16dcdd19883p+20",
+      "inner_probability_upper_hex": "0x1.78bf3e9826244p-91",
+      "contribution_upper_hex": "0x1.6b6973ad3e158p-57"
+    },
+    {
+      "outer_weight": 36,
+      "z_binary64_hex_exact": "0x1.ffdf6e31f2ae6p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3a798e5a86504p+23",
+      "inner_probability_upper_hex": "0x1.095547be31e18p-94",
+      "contribution_upper_hex": "0x1.5f6762a24d8e3p-58"
+    },
+    {
+      "outer_weight": 37,
+      "z_binary64_hex_exact": "0x1.ffdc016bc2051p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a5b2711b6ede2p+25",
+      "inner_probability_upper_hex": "0x1.68c806dafea3bp-98",
+      "contribution_upper_hex": "0x1.405d332a81598p-59"
+    },
+    {
+      "outer_weight": 38,
+      "z_binary64_hex_exact": "0x1.ffdc016bc2051p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.13a1634562fb8p+28",
+      "inner_probability_upper_hex": "0x1.c9b69864c2320p-102",
+      "contribution_upper_hex": "0x1.09a7f6822d8dep-60"
+    },
+    {
+      "outer_weight": 39,
+      "z_binary64_hex_exact": "0x1.ffd8387656c1fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5ed8f2299a871p+30",
+      "inner_probability_upper_hex": "0x1.142430e9a0cb8p-105",
+      "contribution_upper_hex": "0x1.98048484411fep-62"
+    },
+    {
+      "outer_weight": 40,
+      "z_binary64_hex_exact": "0x1.ffd8387656c1fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b29087e49ea20p+32",
+      "inner_probability_upper_hex": "0x1.38130bf4f216cp-109",
+      "contribution_upper_hex": "0x1.1d91c21ccc2f1p-63"
+    },
+    {
+      "outer_weight": 41,
+      "z_binary64_hex_exact": "0x1.ffd409a13fc5ap-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.05cccf05ba7cep+35",
+      "inner_probability_upper_hex": "0x1.471d6c5ab4a1dp-113",
+      "contribution_upper_hex": "0x1.68a93977e9970p-65"
+    },
+    {
+      "outer_weight": 42,
+      "z_binary64_hex_exact": "0x1.ffd409a13fc5ap-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.32d4286303ebap+37",
+      "inner_probability_upper_hex": "0x1.456a48e307103p-117",
+      "contribution_upper_hex": "0x1.a47f410bbee75p-67"
+    },
+    {
+      "outer_weight": 43,
+      "z_binary64_hex_exact": "0x1.ffcf6a3782bb9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5dd287331d860p+39",
+      "inner_probability_upper_hex": "0x1.2019dfa86293ep-121",
+      "contribution_upper_hex": "0x1.a871f74ae9bcap-69"
+    },
+    {
+      "outer_weight": 44,
+      "z_binary64_hex_exact": "0x1.ffca4e644870fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.84136c76cef0fp+41",
+      "inner_probability_upper_hex": "0x1.f2482b266d2e0p-126",
+      "contribution_upper_hex": "0x1.972f27ce492fap-71"
+    },
+    {
+      "outer_weight": 45,
+      "z_binary64_hex_exact": "0x1.ffca4e644870fp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a303068621784p+43",
+      "inner_probability_upper_hex": "0x1.672951596ed6ep-130",
+      "contribution_upper_hex": "0x1.3ce510181247ap-73"
+    },
+    {
+      "outer_weight": 46,
+      "z_binary64_hex_exact": "0x1.ffc4a914ad9ebp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b878cfee2ccf6p+45",
+      "inner_probability_upper_hex": "0x1.ea5d4d41dccb5p-135",
+      "contribution_upper_hex": "0x1.c6d1112ba1007p-76"
+    },
+    {
+      "outer_weight": 47,
+      "z_binary64_hex_exact": "0x1.ffc4a914ad9ebp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c2f789543741ep+47",
+      "inner_probability_upper_hex": "0x1.2a5f7695996dep-139",
+      "contribution_upper_hex": "0x1.1b564374f85fbp-78"
+    },
+    {
+      "outer_weight": 48,
+      "z_binary64_hex_exact": "0x1.ffbe6bd66c255p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c1d8440e7fa4ap+49",
+      "inner_probability_upper_hex": "0x1.304e89c077639p-144",
+      "contribution_upper_hex": "0x1.2040b59e23201p-81"
+    },
+    {
+      "outer_weight": 49,
+      "z_binary64_hex_exact": "0x1.ffb786b308ebcp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b559e361dcecap+51",
+      "inner_probability_upper_hex": "0x1.1143eb48682b3p-149",
+      "contribution_upper_hex": "0x1.f751d5c663ea2p-85"
+    },
+    {
+      "outer_weight": 50,
+      "z_binary64_hex_exact": "0x1.ffafe8072a06ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9e936b98f51b0p+53",
+      "inner_probability_upper_hex": "0x1.a070ed18114dbp-155",
+      "contribution_upper_hex": "0x1.6b8b37ff8daeap-88"
+    },
+    {
+      "outer_weight": 51,
+      "z_binary64_hex_exact": "0x1.ffafe8072a06ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7f4c880f48ce6p+55",
+      "inner_probability_upper_hex": "0x1.036b9918ccc9ap-160",
+      "contribution_upper_hex": "0x1.a2c3ee7b903c7p-92"
+    },
+    {
+      "outer_weight": 52,
+      "z_binary64_hex_exact": "0x1.ffa77c55af625p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.59c3cb031931ep+57",
+      "inner_probability_upper_hex": "0x1.ea2fb4d2d9cbbp-167",
+      "contribution_upper_hex": "0x1.64e544d1da314p-96"
+    },
+    {
+      "outer_weight": 53,
+      "z_binary64_hex_exact": "0x1.ff9e2e161dd18p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.306c81f1a070dp+59",
+      "inner_probability_upper_hex": "0x1.630fcbb374debp-173",
+      "contribution_upper_hex": "0x1.c735b9d8d7132p-101"
+    },
+    {
+      "outer_weight": 54,
+      "z_binary64_hex_exact": "0x1.ff93e57de1196p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.05ae409fa9529p+61",
+      "inner_probability_upper_hex": "0x1.7f76b7a0663ebp-180",
+      "contribution_upper_hex": "0x1.a69881b241178p-106"
+    },
+    {
+      "outer_weight": 55,
+      "z_binary64_hex_exact": "0x1.ff888843dd151p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b75d5b0a8bd3ep+62",
+      "inner_probability_upper_hex": "0x1.344b41e6a5301p-187",
+      "contribution_upper_hex": "0x1.1d39e44c560aep-111"
+    },
+    {
+      "outer_weight": 56,
+      "z_binary64_hex_exact": "0x1.ff7bf95db87ddp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.6856729fbee72p+64",
+      "inner_probability_upper_hex": "0x1.8661253c71fa6p-195",
+      "contribution_upper_hex": "0x1.2835144317016p-117"
+    },
+    {
+      "outer_weight": 57,
+      "z_binary64_hex_exact": "0x1.ff7bf95db87ddp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.20ca0ca818de9p+66",
+      "inner_probability_upper_hex": "0x1.79837b827a060p-203",
+      "contribution_upper_hex": "0x1.cb2334cf80d69p-124"
+    },
+    {
+      "outer_weight": 58,
+      "z_binary64_hex_exact": "0x1.ff6e18b63cf72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c4786e18b2fc5p+67",
+      "inner_probability_upper_hex": "0x1.2331e14779872p-211",
+      "contribution_upper_hex": "0x1.157149bf62d22p-130"
+    },
+    {
+      "outer_weight": 59,
+      "z_binary64_hex_exact": "0x1.ff6e18b63cf72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5a927b4308d6fp+69",
+      "inner_probability_upper_hex": "0x1.74e27ed1cb3e4p-220",
+      "contribution_upper_hex": "0x1.101fd8e85b219p-137"
+    },
+    {
+      "outer_weight": 60,
+      "z_binary64_hex_exact": "0x1.ff6e18b63cf72p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.039e0a8e7b5dap+71",
+      "inner_probability_upper_hex": "0x1.e7d2c64015659p-229",
+      "contribution_upper_hex": "0x1.0aaedd673ccdap-144"
+    },
+    {
+      "outer_weight": 61,
+      "z_binary64_hex_exact": "0x1.ff5ec2dc17bb5p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7c7e89a02719fp+72",
+      "inner_probability_upper_hex": "0x1.90f364f96c0fcp-238",
+      "contribution_upper_hex": "0x1.413f1759d1005p-152"
+    },
+    {
+      "outer_weight": 62,
+      "z_binary64_hex_exact": "0x1.ff5ec2dc17bb5p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.10d2af237ac73p+74",
+      "inner_probability_upper_hex": "0x1.4db02f53f671ep-247",
+      "contribution_upper_hex": "0x1.7f66256fba97ep-160"
+    },
+    {
+      "outer_weight": 63,
+      "z_binary64_hex_exact": "0x1.ff5ec2dc17bb5p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7ee7f38d66ccdp+75",
+      "inner_probability_upper_hex": "0x1.1b640a0c3503ap-256",
+      "contribution_upper_hex": "0x1.c8fd8ccd40fe5p-168"
+    },
+    {
+      "outer_weight": 64,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.0709b6eec6d02p+77",
+      "inner_probability_upper_hex": "0x1.f9631e5be9e5bp-266",
+      "contribution_upper_hex": "0x1.17ecd0fa4fd75p-175"
+    },
+    {
+      "outer_weight": 65,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.61d82a89958f9p+78",
+      "inner_probability_upper_hex": "0x1.0739eebd55d2ap-275",
+      "contribution_upper_hex": "0x1.8841cdd9d9bd2p-184"
+    },
+    {
+      "outer_weight": 66,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d2288b52178bcp+79",
+      "inner_probability_upper_hex": "0x1.176d6657f6cadp-285",
+      "contribution_upper_hex": "0x1.1248e0b1ac54fp-192"
+    },
+    {
+      "outer_weight": 67,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2cc5c4160f35ep+81",
+      "inner_probability_upper_hex": "0x1.2e3b41921a74cp-295",
+      "contribution_upper_hex": "0x1.7ed4b65ed761bp-201"
+    },
+    {
+      "outer_weight": 68,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7c400d62f9e5fp+82",
+      "inner_probability_upper_hex": "0x1.4d0538d7d5782p-305",
+      "contribution_upper_hex": "0x1.0aa6104b43fbfp-209"
+    },
+    {
+      "outer_weight": 69,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d70fb933e4a9ep+83",
+      "inner_probability_upper_hex": "0x1.75c2d79399117p-315",
+      "contribution_upper_hex": "0x1.72bdbc12c86e1p-218"
+    },
+    {
+      "outer_weight": 70,
+      "z_binary64_hex_exact": "0x1.ff4dd0a8347f9p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.1df680571494fp+85",
+      "inner_probability_upper_hex": "0x1.ab36529326278p-325",
+      "contribution_upper_hex": "0x1.013f8f85db787p-226"
+    },
+    {
+      "outer_weight": 71,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.545484621a00ap+86",
+      "inner_probability_upper_hex": "0x1.b0a042a4c899ap-335",
+      "contribution_upper_hex": "0x1.36093b28bd7c8p-235"
+    },
+    {
+      "outer_weight": 72,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.8d17a9707a269p+87",
+      "inner_probability_upper_hex": "0x1.26473259febe7p-345",
+      "contribution_upper_hex": "0x1.ec20f4767d980p-245"
+    },
+    {
+      "outer_weight": 73,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c64f6e9111232p+88",
+      "inner_probability_upper_hex": "0x1.970da5ddc417cp-356",
+      "contribution_upper_hex": "0x1.856805a1b83d8p-254"
+    },
+    {
+      "outer_weight": 74,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.fdbdde952d183p+89",
+      "inner_probability_upper_hex": "0x1.1e3515091720dp-366",
+      "contribution_upper_hex": "0x1.3334ce96d146ap-263"
+    },
+    {
+      "outer_weight": 75,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.187dadc133b58p+91",
+      "inner_probability_upper_hex": "0x1.9920174afbe38p-377",
+      "contribution_upper_hex": "0x1.e34942e177768p-273"
+    },
+    {
+      "outer_weight": 76,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2ed13f79621d0p+92",
+      "inner_probability_upper_hex": "0x1.2936e2fa65ad7p-387",
+      "contribution_upper_hex": "0x1.7b0910f573ab1p-282"
+    },
+    {
+      "outer_weight": 77,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.40bfe076f9f29p+93",
+      "inner_probability_upper_hex": "0x1.b6de5f349d488p-398",
+      "contribution_upper_hex": "0x1.286a28e9e8fbcp-291"
+    },
+    {
+      "outer_weight": 78,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4d5fdcf07390dp+94",
+      "inner_probability_upper_hex": "0x1.4943d69511b00p-408",
+      "contribution_upper_hex": "0x1.ce4835497c002p-301"
+    },
+    {
+      "outer_weight": 79,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.540b57dad8d36p+95",
+      "inner_probability_upper_hex": "0x1.f604ac9e189aap-419",
+      "contribution_upper_hex": "0x1.677686647f092p-310"
+    },
+    {
+      "outer_weight": 80,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.546e6112a1e19p+96",
+      "inner_probability_upper_hex": "0x1.84d34bbc7baebp-429",
+      "contribution_upper_hex": "0x1.16bac62cca2c3p-319"
+    },
+    {
+      "outer_weight": 81,
+      "z_binary64_hex_exact": "0x1.ff3b16dad8ca1p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4e8db1b9e6f3fp+97",
+      "inner_probability_upper_hex": "0x1.31f166c405d08p-439",
+      "contribution_upper_hex": "0x1.af0eb8402195fp-329"
+    },
+    {
+      "outer_weight": 82,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.42c551e4f77d6p+98",
+      "inner_probability_upper_hex": "0x1.02e137b1824dcp-449",
+      "contribution_upper_hex": "0x1.5fe6da9985a5bp-338"
+    },
+    {
+      "outer_weight": 83,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.31bf70f5e8a7cp+99",
+      "inner_probability_upper_hex": "0x1.df857a27da911p-461",
+      "contribution_upper_hex": "0x1.34b95d8e73ee1p-348"
+    },
+    {
+      "outer_weight": 84,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.1c64afc865bfap+100",
+      "inner_probability_upper_hex": "0x1.c243f4ad77637p-472",
+      "contribution_upper_hex": "0x1.0da44a6411a7ap-358"
+    },
+    {
+      "outer_weight": 85,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.03c7dadbae3b7p+101",
+      "inner_probability_upper_hex": "0x1.aca0649b9b52fp-483",
+      "contribution_upper_hex": "0x1.d4f006ca2a783p-369"
+    },
+    {
+      "outer_weight": 86,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d21f001e722fap+101",
+      "inner_probability_upper_hex": "0x1.9da0aaa6c9f6dp-494",
+      "contribution_upper_hex": "0x1.95fb8c299a3bfp-379"
+    },
+    {
+      "outer_weight": 87,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9abfb7fe1a456p+102",
+      "inner_probability_upper_hex": "0x1.94d12f5af4a03p-505",
+      "contribution_upper_hex": "0x1.5e22565752d5ap-389"
+    },
+    {
+      "outer_weight": 88,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.638ea7daa33d0p+103",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-515",
+      "contribution_upper_hex": "0x1.6b35429cd0ef3p-398"
+    },
+    {
+      "outer_weight": 89,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2e5e4bd6fc42fp+104",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.34dfe8371979dp-398"
+    },
+    {
+      "outer_weight": 90,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.f94518ead8e17p+104",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.02123360f777ap-397"
+    },
+    {
+      "outer_weight": 91,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9ece98733b588p+105",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.a7bb948c5ff26p-397"
+    },
+    {
+      "outer_weight": 92,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4ea1e7b3e810cp+106",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.55d53e89c655fp-396"
+    },
+    {
+      "outer_weight": 93,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.094a5c2468a75p+107",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.0effb9b8ad541p-395"
+    },
+    {
+      "outer_weight": 94,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9d65c493dc03fp+107",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.a64afd0a0444ap-395"
+    },
+    {
+      "outer_weight": 95,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3c9327ccc4bcdp+108",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.436305fe15d78p-394"
+    },
+    {
+      "outer_weight": 96,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.dc94605d6dcefp+108",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.e6d5a3733d8efp-394"
+    },
+    {
+      "outer_weight": 97,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.609fcb0e5a508p+109",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.68363da6d8fe3p-393"
+    },
+    {
+      "outer_weight": 98,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.007c2dd03d4c3p+110",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.06010a2053e7ep-392"
+    },
+    {
+      "outer_weight": 99,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.6ecf16cb428b1p+110",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.76b3ac8f8f529p-392"
+    },
+    {
+      "outer_weight": 100,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.01dff021b9d1ep+111",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.076c742928a67p-391"
+    },
+    {
+      "outer_weight": 101,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.647e300186f73p+111",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.6c29f23cc4556p-391"
+    },
+    {
+      "outer_weight": 102,
+      "z_binary64_hex_exact": "0x1.ff2665ae90e1cp-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.e4920fe7d9038p+111",
+      "inner_probability_upper_hex": "0x1.e51e07ea6051bp-516",
+      "contribution_upper_hex": "0x1.eeff57c034312p-391"
+    },
+    {
+      "outer_weight": 103,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.43d470fc962b3p+112",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.1c7a041195ae7p-331"
+    },
+    {
+      "outer_weight": 104,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a99b74fffced3p+112",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.75e2b633124d0p-331"
+    },
+    {
+      "outer_weight": 105,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.13096e8fc9891p+113",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.e339effaf1ec7p-331"
+    },
+    {
+      "outer_weight": 106,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5d92dc419c3fep+113",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.331789cc34b2bp-330"
+    },
+    {
+      "outer_weight": 107,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b4f4be3d07650p+113",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.7fdaef47bff87p-330"
+    },
+    {
+      "outer_weight": 108,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.0c94379f3cb64p+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.d7e151eb45817p-330"
+    },
+    {
+      "outer_weight": 109,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.44b95efa96196p+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.1d432000e566ep-329"
+    },
+    {
+      "outer_weight": 110,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.8224642e8a9a8p+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.53376a3723b1bp-329"
+    },
+    {
+      "outer_weight": 111,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c3a0c8863e02ep+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.8cbe863ddb134p-329"
+    },
+    {
+      "outer_weight": 112,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.03c61b2378d58p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.c868f4da4d968p-329"
+    },
+    {
+      "outer_weight": 113,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.25f0c7b09b36ap+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.023837d197024p-328"
+    },
+    {
+      "outer_weight": 114,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4727265faa407p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.1f6557b4ae0d8p-328"
+    },
+    {
+      "outer_weight": 115,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.6628bd7bcf192p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.3aa252730bff6p-328"
+    },
+    {
+      "outer_weight": 116,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.81b1312b8c757p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.52d23714b3ac9p-328"
+    },
+    {
+      "outer_weight": 117,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.988de2368c711p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.66e7a976b85acp-328"
+    },
+    {
+      "outer_weight": 118,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a9b3dfe0fdb58p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.75f82971b58f7p-328"
+    },
+    {
+      "outer_weight": 119,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b454019af335bp+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.7f4dbb35aaee5p-328"
+    },
+    {
+      "outer_weight": 120,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b7eb0f3623a00p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.827518d93bf67p-328"
+    },
+    {
+      "outer_weight": 121,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b44c37ba2d628p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.7f46e3a2ecf6cp-328"
+    },
+    {
+      "outer_weight": 122,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a9a4ae2eb257ap+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.75ead070d1a7bp-328"
+    },
+    {
+      "outer_weight": 123,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.987804d851effp+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.66d4744ff9c20p-328"
+    },
+    {
+      "outer_weight": 124,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.8195af51e803cp+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.52ba0cfcbba17p-328"
+    },
+    {
+      "outer_weight": 125,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.6608d4effbdb1p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.3a864a94aed21p-328"
+    },
+    {
+      "outer_weight": 126,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.470433dee7744p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.1f46a46bce170p-328"
+    },
+    {
+      "outer_weight": 127,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.25cc2e8478871p+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.0218113ab07d4p-328"
+    },
+    {
+      "outer_weight": 128,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.03a12e5015d3fp+115",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.c82814b2f3457p-329"
+    },
+    {
+      "outer_weight": 129,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c358a68a0b78ap+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.8c7f2852f3f5ep-329"
+    },
+    {
+      "outer_weight": 130,
+      "z_binary64_hex_exact": "0x1.ff0f885fe89f8p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.81dff52b95b67p+114",
+      "inner_probability_upper_hex": "0x1.a12fd1c605f85p-457",
+      "contribution_upper_hex": "0x1.52fb4c30e5f3ep-329"
+    },
+    {
+      "outer_weight": 131,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.447a294be2c92p+114",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.16209c52989f3p-264"
+    },
+    {
+      "outer_weight": 132,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.0c5b46bc0b4b7p+114",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.cc0bea1b61acdp-265"
+    },
+    {
+      "outer_weight": 133,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b4908faf3b028p+113",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.76342bd168b4dp-265"
+    },
+    {
+      "outer_weight": 134,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5d3cb5fc93febp+113",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.2b59bb97126d3p-265"
+    },
+    {
+      "outer_weight": 135,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.12c0f4f840884p+113",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.d70368799d44ep-266"
+    },
+    {
+      "outer_weight": 136,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a924162484a20p+112",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.6c697116bd307p-266"
+    },
+    {
+      "outer_weight": 137,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.43742926324a3p+112",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.1540091163141p-266"
+    },
+    {
+      "outer_weight": 138,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.e3f9e27440f08p+111",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.9ed7be60f77abp-267"
+    },
+    {
+      "outer_weight": 139,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.640850547f939p+111",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.312cd7c429710p-267"
+    },
+    {
+      "outer_weight": 140,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.01866cc4d2e8cp+111",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.b97a629c9cf1cp-268"
+    },
+    {
+      "outer_weight": 141,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.6e49c587b3fb6p+110",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.39f744ab4b846p-268"
+    },
+    {
+      "outer_weight": 142,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.001ace6744427p+110",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.b70b07a556e45p-269"
+    },
+    {
+      "outer_weight": 143,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.601443ce068cfp+109",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.2dc95c0f769e4p-269"
+    },
+    {
+      "outer_weight": 144,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.dbd03a5854350p+108",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.97d8954707071p-270"
+    },
+    {
+      "outer_weight": 145,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3c0be170f928fp+108",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.0ee6a0eeb9d6cp-270"
+    },
+    {
+      "outer_weight": 146,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9caeaeff11dc3p+107",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.61bba0b41f990p-271"
+    },
+    {
+      "outer_weight": 147,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.08d0c862c1ce2p+107",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.c5f9e71b0336ap-272"
+    },
+    {
+      "outer_weight": 148,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4e0374021591dp+106",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.1e4d2d5b7d3e1p-272"
+    },
+    {
+      "outer_weight": 149,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9e03ef5e34de9p+105",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.62e0221eb1c89p-273"
+    },
+    {
+      "outer_weight": 150,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.f846b936d6f79p+104",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.b03e3e0890d14p-274"
+    },
+    {
+      "outer_weight": 151,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2dc1a100b0357p+104",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.02a6f0379355cp-274"
+    },
+    {
+      "outer_weight": 152,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.62d14590b8529p+103",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.30223b40c6a26p-275"
+    },
+    {
+      "outer_weight": 153,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.99df0eb06aa1ep+102",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.5f52cbd6f1045p-276"
+    },
+    {
+      "outer_weight": 154,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d1197862edb83p+101",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.8ea99d0fb3375p-277"
+    },
+    {
+      "outer_weight": 155,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.03327adfc5235p+101",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.bc58346740ecep-278"
+    },
+    {
+      "outer_weight": 156,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.1bbd416200a70p+100",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.e66ad5b269a4ep-279"
+    },
+    {
+      "outer_weight": 157,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.31074d6ba16a1p+99",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.0574f469a5b70p-279"
+    },
+    {
+      "outer_weight": 158,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.41fea0fdc6d9ap+98",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.13ffdc4d6b2eap-280"
+    },
+    {
+      "outer_weight": 159,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4dbb5ca766fb3p+97",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.1e0f62401ba4dp-281"
+    },
+    {
+      "outer_weight": 160,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5393f508dc192p+96",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.231232d1d2ee9p-282"
+    },
+    {
+      "outer_weight": 161,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.532cd9e68ef62p+95",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.22b9d2165eeadp-283"
+    },
+    {
+      "outer_weight": 162,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.4c81926f27e6ap+94",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.1d026ac457f76p-284"
+    },
+    {
+      "outer_weight": 163,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3fe6110ffab45p+93",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.1233f17e9545ep-285"
+    },
+    {
+      "outer_weight": 164,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2dfff65e0e2c9p+92",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.02dc5e28a6b32p-286"
+    },
+    {
+      "outer_weight": 165,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.17b8802412e29p+91",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.df873aa9dc923p-288"
+    },
+    {
+      "outer_weight": 166,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.fc519abdd69bdp+89",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.b3b54bd084770p-289"
+    },
+    {
+      "outer_weight": 167,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c505979c6737bp+88",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.844f64bc796f0p-290"
+    },
+    {
+      "outer_weight": 168,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.8bf2ea9d8534fp+87",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.5363c6067ba45p-291"
+    },
+    {
+      "outer_weight": 169,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5355e15ff6beep+86",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.22dcfd3281a15p-292"
+    },
+    {
+      "outer_weight": 170,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.1d1d76b70e069p+85",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.e8c6a11a99581p-294"
+    },
+    {
+      "outer_weight": 171,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d5a53b5e70c59p+83",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.928f235c8334ep-295"
+    },
+    {
+      "outer_weight": 172,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7b178337839e4p+82",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.44f0cd3af8171p-296"
+    },
+    {
+      "outer_weight": 173,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2bd829fc7078dp+81",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.0103640e91183p-297"
+    },
+    {
+      "outer_weight": 174,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.d0b3ace3c1fa9p+79",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.8e525c05b95f0p-299"
+    },
+    {
+      "outer_weight": 175,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.60b9b49cc627ap+78",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.2e572affc6aeap-300"
+    },
+    {
+      "outer_weight": 176,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.063246348ab47p+77",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.c17c7156de7cfp-302"
+    },
+    {
+      "outer_weight": 177,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7daac87e36a35p+75",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.4725e628c5c8fp-303"
+    },
+    {
+      "outer_weight": 178,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.0fee39cef9887p+74",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.d22c6c1ec7eccp-305"
+    },
+    {
+      "outer_weight": 179,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7b3c8ab3237e8p+72",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.45108a9edb0a0p-306"
+    },
+    {
+      "outer_weight": 180,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.02c015b571571p+71",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.bb941886da166p-308"
+    },
+    {
+      "outer_weight": 181,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.59673cc3fd338p+69",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.28107519bd1f8p-309"
+    },
+    {
+      "outer_weight": 182,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c2edf96a1b75cp+67",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.828449216aed5p-311"
+    },
+    {
+      "outer_weight": 183,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.1fcbeacc05110p+66",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.ed5f6c849341bp-313"
+    },
+    {
+      "outer_weight": 184,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.67166dda8562ep+64",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.33cb3cbb1f04ep-314"
+    },
+    {
+      "outer_weight": 185,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b5d39a4483d14p+62",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.7749115b65630p-316"
+    },
+    {
+      "outer_weight": 186,
+      "z_binary64_hex_exact": "0x1.fef644a8d199ep-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.04c19c203bcd9p+61",
+      "inner_probability_upper_hex": "0x1.970fd696acaccp-392",
+      "contribution_upper_hex": "0x1.bf046ff96d162p-318"
+    },
+    {
+      "outer_weight": 187,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2f56ae69ca8c4p+59",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.c3bd9141c7878p-248"
+    },
+    {
+      "outer_weight": 188,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.58853c034c564p+57",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.0088eb4fc8097p-249"
+    },
+    {
+      "outer_weight": 189,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7de7cf1906a80p+55",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.1c5f4e38b8c7ap-251"
+    },
+    {
+      "outer_weight": 190,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9d0d431b4cdcdp+53",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.339073d9ee2aap-253"
+    },
+    {
+      "outer_weight": 191,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b3b8fa1c02809p+51",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.4471fb3f4aec5p-255"
+    },
+    {
+      "outer_weight": 192,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c024c6a94f07cp+49",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.4db1b4859b347p-257"
+    },
+    {
+      "outer_weight": 193,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c13a733ce93f3p+47",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.4e80771ca405bp-259"
+    },
+    {
+      "outer_weight": 194,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.b6bb17fddbbd3p+45",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.46af6bdcd0288p-261"
+    },
+    {
+      "outer_weight": 195,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a14cc54c2c77fp+43",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.36ba3a1851a82p-263"
+    },
+    {
+      "outer_weight": 196,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.826b1e979e7d8p+41",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.1fbb90f6109a9p-265"
+    },
+    {
+      "outer_weight": 197,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5c3c8c69b704ep+39",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.034d47fd71309p-267"
+    },
+    {
+      "outer_weight": 198,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.315296c230e81p+37",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.c6b1f538f395dp-270"
+    },
+    {
+      "outer_weight": 199,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.045fa326206b5p+35",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.83c17a2a2ab3fp-272"
+    },
+    {
+      "outer_weight": 200,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.afdbc90a84049p+32",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.41916a4a9439fp-274"
+    },
+    {
+      "outer_weight": 201,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.5c44e594faffep+30",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.03537f5b467c2p-276"
+    },
+    {
+      "outer_weight": 202,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.11290793528d6p+28",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.96cc4e716a3bep-279"
+    },
+    {
+      "outer_weight": 203,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.a0f1aa571d631p+25",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.3676637cfd2a3p-281"
+    },
+    {
+      "outer_weight": 204,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.35e59f7969290p+23",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.cd81e52d0d4c3p-284"
+    },
+    {
+      "outer_weight": 205,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.c14c0d6f3e64fp+20",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.4e8d927d7bda2p-286"
+    },
+    {
+      "outer_weight": 206,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.3e624b26e892ap+18",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.da257f90abc37p-289"
+    },
+    {
+      "outer_weight": 207,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.ba8f3b7fb812dp+15",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.49893f2121fd7p-291"
+    },
+    {
+      "outer_weight": 208,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.2f13d7871f752p+13",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.c35a073cf3659p-294"
+    },
+    {
+      "outer_weight": 209,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.9b978f8884b98p+10",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.327a306940683p-296"
+    },
+    {
+      "outer_weight": 210,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.175775915eb5fp+8",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.a000e7e3eff1ep-299"
+    },
+    {
+      "outer_weight": 211,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.7ebe63fad0166p+5",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.1cff16077fedfp-301"
+    },
+    {
+      "outer_weight": 212,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.0bc9aa045d2e7p+3",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.8ecc12ab0e8bdp-304"
+    },
+    {
+      "outer_weight": 213,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.83d9107cc5950p+0",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.20cc0dd645315p-306"
+    },
+    {
+      "outer_weight": 214,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.27386daabc30dp-2",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.b7a692e89c45bp-309"
+    },
+    {
+      "outer_weight": 215,
+      "z_binary64_hex_exact": "0x1.feda5a2e7d574p-1",
+      "conditioned_expected_multiplicity_upper_hex": "0x1.e14a308a45f1ep-5",
+      "inner_probability_upper_hex": "0x1.619dc1b3be91fp-320",
+      "contribution_upper_hex": "0x1.666010b0a26dbp-311"
+    }
+  ],
+  "limitations": [
+    "This receipt covers occupation Q=1 only.",
+    "The conditioned setup law is specified mathematically; an efficient G_240 decision procedure remains open.",
+    "The activation and live-spectrum source claims are hash-bound but require the separate RM2Sub interface audit."
+  ]
+}

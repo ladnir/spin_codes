@@ -1,0 +1,19 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_spectrumperm_transpose_bitshuffle_randomstepconv",
+  "display_name": "Riffle SpectrumPerm-TransposeBitShuffle-RandomStepConv g",
+  "status": "ACTIVE_MODEL_EXPLORATION",
+  "parent_candidate_id": "riffle_transpose_bitshuffle_randomstepconv",
+  "outer": "one fixed binary linear [B,B/2] code C, reused across blocks, followed by an independent coordinate permutation for every outer block",
+  "outer_summary": "the proof interface is the weight spectrum A_w of C",
+  "packet_bits": "parameter g, formed after the row bit permutation",
+  "permutation": "independently permute coordinates inside every outer block, transpose, independently permute all L bits in every row, then form g-bit inner inputs",
+  "inner": "one-lap RandomStepConv with independent unrestricted (g+sigma)-square binary matrices and discarded terminal state",
+  "goal01_observations": [
+    {"outer_bits": 256, "packet_bits": 4, "sigma": 18, "spectrum": "ideal expected random [256,128]", "one_active_lambda_estimate": 46.621455524074},
+    {"outer_bits": 256, "packet_bits": 8, "sigma": 17, "spectrum": "ideal expected random [256,128]", "one_active_lambda_estimate": 46.623948955456},
+    {"outer_bits": 256, "packet_bits": 4, "sigma": 17, "spectrum": "modeled even random-like [256,128,38]-shaped", "one_active_lambda_estimate": 40.549539935640},
+    {"outer_bits": 256, "packet_bits": 8, "sigma": 16, "spectrum": "modeled even random-like [256,128,38]-shaped", "one_active_lambda_estimate": 40.553889133084}
+  ],
+  "claim_scope": "Active model exploration. No distance claim. Goal 01 evaluates exactly one active outer block from a supplied spectrum."
+}

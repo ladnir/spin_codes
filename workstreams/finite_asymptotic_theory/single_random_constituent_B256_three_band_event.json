@@ -1,0 +1,57 @@
+{
+  "schema": "single-random-constituent-three-band-event-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "parameters": {
+    "outer_code": "one uniform binary [256,128] generator",
+    "extreme_weights": [
+      [
+        1,
+        24
+      ],
+      [
+        232,
+        256
+      ]
+    ],
+    "low_fringe": [
+      25,
+      31
+    ],
+    "central_band": [
+      32,
+      224
+    ],
+    "high_fringe": [
+      225,
+      231
+    ],
+    "fringe_count_cap": 128,
+    "central_shell_factor": 1.5
+  },
+  "event_probability": {
+    "extreme_markov_failure_upper": 2.1774500047437328e-05,
+    "low_fringe_mean": 28.187879871018197,
+    "low_fringe_cantelli_failure_upper": 0.0027658845143880687,
+    "high_fringe_mean": 28.1878798710182,
+    "high_fringe_cantelli_failure_upper": 0.002765884514388069,
+    "central_cantelli_union_upper": 0.05378026234182365,
+    "rank_failure_upper": 2.938735877055719e-39,
+    "total_failure_upper": 0.059333805870647224,
+    "success_probability_lower": 0.9406661941293528,
+    "ten_attempt_abort_log2_upper": -40.75001864677665
+  },
+  "pure_central_distance": {
+    "source_uniform_factor": 8.0,
+    "central_factor": 1.5,
+    "q2_through_L_log2_upper": -92.65146754560992,
+    "q2_through_L_margin_bits": 92.65146754560992,
+    "dominant_occupation": 2,
+    "qL_log2_upper": -1681.7288426263003,
+    "qL_margin_bits": 1681.7288426263003
+  },
+  "limitations": [
+    "Nearest binary64 arithmetic is not an outward certificate.",
+    "The event does not yet imply the distance claim for compositions containing fringe rows.",
+    "Efficiently testing the event is not supplied."
+  ]
+}

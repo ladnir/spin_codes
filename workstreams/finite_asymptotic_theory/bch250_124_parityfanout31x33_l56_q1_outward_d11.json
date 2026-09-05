@@ -1,0 +1,3288 @@
+{
+  "arithmetic": {
+    "format": "IEEE-754 binary64 with one-ULP outward positive operations",
+    "spectrum_shell_uppers": "outward Arb endpoints advanced one binary64 ULP",
+    "transcendentals": "select exact binary64 witnesses and assert no inequality"
+  },
+  "claim": {
+    "bad_weight_at_most": 235840,
+    "comparison_to_2^-40": true,
+    "comparison_to_2^-53": true,
+    "expected_bad_count_upper_scaled": {
+      "binary_exponent": -53,
+      "mantissa_binary64_hex": "0x1.09823a8eabe86p-1"
+    },
+    "occupation": 1,
+    "union_log2_upper_display": -53.947384642541245,
+    "union_margin_bits_display": 53.947384642541245
+  },
+  "limitations": [
+    "Occupations 2 through 8576 use separate receipts.",
+    "Implementation equivalence is outside this receipt."
+  ],
+  "method": "For each exact output weight, a matrix-coefficient recurrence averages the ordered RM2Sub region product over the uniform local coordinate permutation.",
+  "parameters": {
+    "distance": 235840,
+    "fanout_layers": 56,
+    "outer_bits": 250,
+    "outer_dimension": 124,
+    "outer_rows": 8576,
+    "output_bits": 2144000,
+    "spectrum_receipt": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\bch250_124_parityfanout31x33_l56_cutoff12_spectrum_outward.json",
+    "witness_receipt": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\bch250_124_parityfanout31x33_l56_shell_sensitive_q1_d11_diagnostic.json"
+  },
+  "schema": "bch250-124-shell-sensitive-q1-outward-v1",
+  "status": "OUTWARD_CERTIFICATE",
+  "weight_rows": [
+    {
+      "contribution_log2_upper_display": -77.59960303820431,
+      "contribution_upper_scaled": {
+        "binary_exponent": -77,
+        "mantissa_binary64_hex": "0x1.51e31150d972ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": 1,
+        "mantissa_binary64_hex": "0x1.0000000000000p-1"
+      },
+      "output_weight": 1,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -74.16911537001123,
+      "contribution_upper_scaled": {
+        "binary_exponent": -74,
+        "mantissa_binary64_hex": "0x1.c75dd8bb124b9p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": 1,
+        "mantissa_binary64_hex": "0x1.0000000000000p-1"
+      },
+      "output_weight": 2,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -77.75176548586631,
+      "contribution_upper_scaled": {
+        "binary_exponent": -77,
+        "mantissa_binary64_hex": "0x1.30108ffcb30cbp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": 1,
+        "mantissa_binary64_hex": "0x1.0000000000000p-1"
+      },
+      "output_weight": 3,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -76.51956594373826,
+      "contribution_upper_scaled": {
+        "binary_exponent": -76,
+        "mantissa_binary64_hex": "0x1.65296d06e1aaap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2,
+        "mantissa_binary64_hex": "0x1.2b557b8c4aec6p-1"
+      },
+      "output_weight": 4,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -76.60589532694772,
+      "contribution_upper_scaled": {
+        "binary_exponent": -76,
+        "mantissa_binary64_hex": "0x1.506aa0011615cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -6,
+        "mantissa_binary64_hex": "0x1.c5501e490af11p-1"
+      },
+      "output_weight": 5,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -79.38691859686783,
+      "contribution_upper_scaled": {
+        "binary_exponent": -79,
+        "mantissa_binary64_hex": "0x1.878ecaaa0174fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -9,
+        "mantissa_binary64_hex": "0x1.9d9440f2fa83fp-1"
+      },
+      "output_weight": 6,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -77.88644600014284,
+      "contribution_upper_scaled": {
+        "binary_exponent": -77,
+        "mantissa_binary64_hex": "0x1.14f6c07435f68p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -12,
+        "mantissa_binary64_hex": "0x1.ba04a4c73a5adp-1"
+      },
+      "output_weight": 7,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -78.21689453246995,
+      "contribution_upper_scaled": {
+        "binary_exponent": -78,
+        "mantissa_binary64_hex": "0x1.b88862586bfcbp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -14,
+        "mantissa_binary64_hex": "0x1.0f0f4d34faa54p-1"
+      },
+      "output_weight": 8,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -76.08074199443668,
+      "contribution_upper_scaled": {
+        "binary_exponent": -76,
+        "mantissa_binary64_hex": "0x1.e421e8a75a559p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -17,
+        "mantissa_binary64_hex": "0x1.778b66f033c1bp-1"
+      },
+      "output_weight": 9,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -74.61354895175093,
+      "contribution_upper_scaled": {
+        "binary_exponent": -74,
+        "mantissa_binary64_hex": "0x1.4ea2f25792c24p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -19,
+        "mantissa_binary64_hex": "0x1.22419bfa25e8ap-1"
+      },
+      "output_weight": 10,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -72.39490442784025,
+      "contribution_upper_scaled": {
+        "binary_exponent": -72,
+        "mantissa_binary64_hex": "0x1.8565779232e43p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -22,
+        "mantissa_binary64_hex": "0x1.ef98b7ed97f7bp-1"
+      },
+      "output_weight": 11,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -70.39070489352103,
+      "contribution_upper_scaled": {
+        "binary_exponent": -70,
+        "mantissa_binary64_hex": "0x1.868810540d8a7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -24,
+        "mantissa_binary64_hex": "0x1.cf7ea789cf604p-1"
+      },
+      "output_weight": 12,
+      "z_exact_binary64": "0x1.fffa0caa6ce14p-1"
+    },
+    {
+      "contribution_log2_upper_display": -68.67877337405989,
+      "contribution_upper_scaled": {
+        "binary_exponent": -68,
+        "mantissa_binary64_hex": "0x1.3fd82dae319edp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -26,
+        "mantissa_binary64_hex": "0x1.4db8d88ecb896p-1"
+      },
+      "output_weight": 13,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -67.34996502380125,
+      "contribution_upper_scaled": {
+        "binary_exponent": -67,
+        "mantissa_binary64_hex": "0x1.91b78003928bcp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -29,
+        "mantissa_binary64_hex": "0x1.a0f6f5f12ddbap-1"
+      },
+      "output_weight": 14,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -65.96545806747582,
+      "contribution_upper_scaled": {
+        "binary_exponent": -65,
+        "mantissa_binary64_hex": "0x1.06340a4687c16p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -31,
+        "mantissa_binary64_hex": "0x1.1845d4c4fb955p-1"
+      },
+      "output_weight": 15,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -64.58832439754622,
+      "contribution_upper_scaled": {
+        "binary_exponent": -64,
+        "mantissa_binary64_hex": "0x1.5489f25547315p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -34,
+        "mantissa_binary64_hex": "0x1.939c71cf265c7p-1"
+      },
+      "output_weight": 16,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -63.209385302809245,
+      "contribution_upper_scaled": {
+        "binary_exponent": -63,
+        "mantissa_binary64_hex": "0x1.bad4ea6ca9c5cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -36,
+        "mantissa_binary64_hex": "0x1.36182c1e82dc7p-1"
+      },
+      "output_weight": 17,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -61.81211027193795,
+      "contribution_upper_scaled": {
+        "binary_exponent": -61,
+        "mantissa_binary64_hex": "0x1.239bd0cb677ccp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -39,
+        "mantissa_binary64_hex": "0x1.faaec07e5d9c6p-1"
+      },
+      "output_weight": 18,
+      "z_exact_binary64": "0x1.fff6307bbd8aep-1"
+    },
+    {
+      "contribution_log2_upper_display": -60.511534069763485,
+      "contribution_upper_scaled": {
+        "binary_exponent": -60,
+        "mantissa_binary64_hex": "0x1.6727e1501886ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -41,
+        "mantissa_binary64_hex": "0x1.a037f71f89f73p-1"
+      },
+      "output_weight": 19,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -59.98763565091265,
+      "contribution_upper_scaled": {
+        "binary_exponent": -59,
+        "mantissa_binary64_hex": "0x1.023413e9f12adp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -44,
+        "mantissa_binary64_hex": "0x1.9d8738815d9d6p-1"
+      },
+      "output_weight": 20,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -59.49229371004684,
+      "contribution_upper_scaled": {
+        "binary_exponent": -59,
+        "mantissa_binary64_hex": "0x1.6bfa4b2a2d6dbp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -47,
+        "mantissa_binary64_hex": "0x1.b1454dcdbe804p-1"
+      },
+      "output_weight": 21,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -58.96517971380349,
+      "contribution_upper_scaled": {
+        "binary_exponent": -58,
+        "mantissa_binary64_hex": "0x1.0640fe07ae6bdp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -50,
+        "mantissa_binary64_hex": "0x1.dda572d6f06a6p-1"
+      },
+      "output_weight": 22,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -58.46741168411854,
+      "contribution_upper_scaled": {
+        "binary_exponent": -58,
+        "mantissa_binary64_hex": "0x1.724f44e510c89p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -52,
+        "mantissa_binary64_hex": "0x1.1474cb9d4e66dp-1"
+      },
+      "output_weight": 23,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.940038195150365,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.0add3a3632061p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -55,
+        "mantissa_binary64_hex": "0x1.4f66f53c7dac5p-1"
+      },
+      "output_weight": 24,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.43877734648555,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.79bb9fa3c801cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -58,
+        "mantissa_binary64_hex": "0x1.a9be80677de15p-1"
+      },
+      "output_weight": 25,
+      "z_exact_binary64": "0x1.ffefd34f43b38p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.341265712114385,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.94257c5526a8ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -61,
+        "mantissa_binary64_hex": "0x1.a37089c502173p-1"
+      },
+      "output_weight": 26,
+      "z_exact_binary64": "0x1.ffeb3b576c3c0p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.315918225571515,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.9b4f51a2f8c50p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -64,
+        "mantissa_binary64_hex": "0x1.9ffdcd715a19bp-1"
+      },
+      "output_weight": 27,
+      "z_exact_binary64": "0x1.ffeb3b576c3c0p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.27159661568034,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.a824571ac7a34p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -67,
+        "mantissa_binary64_hex": "0x1.adc46b9bfa9aep-1"
+      },
+      "output_weight": 28,
+      "z_exact_binary64": "0x1.ffeb3b576c3c0p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.24236921671964,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.b0d27d9012066p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -70,
+        "mantissa_binary64_hex": "0x1.cdec9bb78b2e5p-1"
+      },
+      "output_weight": 29,
+      "z_exact_binary64": "0x1.ffeb3b576c3c0p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.251696848392214,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.ae086aa2cfe49p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -73,
+        "mantissa_binary64_hex": "0x1.f1cf3d62c45c3p-1"
+      },
+      "output_weight": 30,
+      "z_exact_binary64": "0x1.ffe5556dd0c93p-1"
+    },
+    {
+      "contribution_log2_upper_display": -57.73644521637263,
+      "contribution_upper_scaled": {
+        "binary_exponent": -57,
+        "mantissa_binary64_hex": "0x1.334f9253ea14ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -76,
+        "mantissa_binary64_hex": "0x1.932fd896ce689p-1"
+      },
+      "output_weight": 31,
+      "z_exact_binary64": "0x1.ffe5556dd0c93p-1"
+    },
+    {
+      "contribution_log2_upper_display": -58.213592939956804,
+      "contribution_upper_scaled": {
+        "binary_exponent": -58,
+        "mantissa_binary64_hex": "0x1.b98ac46c58039p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -79,
+        "mantissa_binary64_hex": "0x1.529ea60a1185fp-1"
+      },
+      "output_weight": 32,
+      "z_exact_binary64": "0x1.ffe5556dd0c93p-1"
+    },
+    {
+      "contribution_log2_upper_display": -58.69536419543308,
+      "contribution_upper_scaled": {
+        "binary_exponent": -58,
+        "mantissa_binary64_hex": "0x1.3c2ff5ab6029ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -82,
+        "mantissa_binary64_hex": "0x1.269f47b2007f8p-1"
+      },
+      "output_weight": 33,
+      "z_exact_binary64": "0x1.ffe5556dd0c93p-1"
+    },
+    {
+      "contribution_log2_upper_display": -59.1740825166945,
+      "contribution_upper_scaled": {
+        "binary_exponent": -59,
+        "mantissa_binary64_hex": "0x1.c5cd2d5e59a3cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -85,
+        "mantissa_binary64_hex": "0x1.0952e3392b689p-1"
+      },
+      "output_weight": 34,
+      "z_exact_binary64": "0x1.ffe5556dd0c93p-1"
+    },
+    {
+      "contribution_log2_upper_display": -59.66619788929315,
+      "contribution_upper_scaled": {
+        "binary_exponent": -59,
+        "mantissa_binary64_hex": "0x1.42a5051bed6cdp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -89,
+        "mantissa_binary64_hex": "0x1.e9ddfc6d2b634p-1"
+      },
+      "output_weight": 35,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -60.71433795171758,
+      "contribution_upper_scaled": {
+        "binary_exponent": -60,
+        "mantissa_binary64_hex": "0x1.380e62e0f4763p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -92,
+        "mantissa_binary64_hex": "0x1.3df541a631bb2p-1"
+      },
+      "output_weight": 36,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -61.760187380965526,
+      "contribution_upper_scaled": {
+        "binary_exponent": -61,
+        "mantissa_binary64_hex": "0x1.2e4b7badc21fap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -96,
+        "mantissa_binary64_hex": "0x1.aa323aa69832ap-1"
+      },
+      "output_weight": 37,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -62.80419118595638,
+      "contribution_upper_scaled": {
+        "binary_exponent": -62,
+        "mantissa_binary64_hex": "0x1.2536b6869ec08p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -99,
+        "mantissa_binary64_hex": "0x1.26bbd34eb880cp-1"
+      },
+      "output_weight": 38,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -63.853775302746484,
+      "contribution_upper_scaled": {
+        "binary_exponent": -63,
+        "mantissa_binary64_hex": "0x1.1b4eb49fabfafp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -103,
+        "mantissa_binary64_hex": "0x1.a456a4fec57bbp-1"
+      },
+      "output_weight": 39,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -64.89996692364089,
+      "contribution_upper_scaled": {
+        "binary_exponent": -64,
+        "mantissa_binary64_hex": "0x1.12615b24d575ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -106,
+        "mantissa_binary64_hex": "0x1.34dfcc18dacdfp-1"
+      },
+      "output_weight": 40,
+      "z_exact_binary64": "0x1.ffddc2c3368cap-1"
+    },
+    {
+      "contribution_log2_upper_display": -66.53542636300162,
+      "contribution_upper_scaled": {
+        "binary_exponent": -66,
+        "mantissa_binary64_hex": "0x1.6141bf7ec1fb2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -110,
+        "mantissa_binary64_hex": "0x1.36f04c7b67e3ep-1"
+      },
+      "output_weight": 41,
+      "z_exact_binary64": "0x1.ffd409a13fc5ap-1"
+    },
+    {
+      "contribution_log2_upper_display": -68.21996016711113,
+      "contribution_upper_scaled": {
+        "binary_exponent": -68,
+        "mantissa_binary64_hex": "0x1.b798fef97e87cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -114,
+        "mantissa_binary64_hex": "0x1.377650b586deep-1"
+      },
+      "output_weight": 42,
+      "z_exact_binary64": "0x1.ffd409a13fc5ap-1"
+    },
+    {
+      "contribution_log2_upper_display": -69.90289353699993,
+      "contribution_upper_scaled": {
+        "binary_exponent": -69,
+        "mantissa_binary64_hex": "0x1.11d302bc33611p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -118,
+        "mantissa_binary64_hex": "0x1.40f1c1d7fb82fp-1"
+      },
+      "output_weight": 43,
+      "z_exact_binary64": "0x1.ffd409a13fc5ap-1"
+    },
+    {
+      "contribution_log2_upper_display": -71.58798976884732,
+      "contribution_upper_scaled": {
+        "binary_exponent": -71,
+        "mantissa_binary64_hex": "0x1.549e2b6c02b86p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -122,
+        "mantissa_binary64_hex": "0x1.5408df87c3238p-1"
+      },
+      "output_weight": 44,
+      "z_exact_binary64": "0x1.ffd409a13fc5ap-1"
+    },
+    {
+      "contribution_log2_upper_display": -73.36461658032876,
+      "contribution_upper_scaled": {
+        "binary_exponent": -73,
+        "mantissa_binary64_hex": "0x1.8da86140dc281p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -126,
+        "mantissa_binary64_hex": "0x1.5acdce38f084dp-1"
+      },
+      "output_weight": 45,
+      "z_exact_binary64": "0x1.ffc78dca8544cp-1"
+    },
+    {
+      "contribution_log2_upper_display": -75.78106471260807,
+      "contribution_upper_scaled": {
+        "binary_exponent": -75,
+        "mantissa_binary64_hex": "0x1.29f3aafc183e5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -131,
+        "mantissa_binary64_hex": "0x1.d34aaf4c3d772p-1"
+      },
+      "output_weight": 46,
+      "z_exact_binary64": "0x1.ffc78dca8544cp-1"
+    },
+    {
+      "contribution_log2_upper_display": -78.19450701713461,
+      "contribution_upper_scaled": {
+        "binary_exponent": -78,
+        "mantissa_binary64_hex": "0x1.bf6c1452575ccp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -135,
+        "mantissa_binary64_hex": "0x1.433afaafd6c11p-1"
+      },
+      "output_weight": 47,
+      "z_exact_binary64": "0x1.ffc78dca8544cp-1"
+    },
+    {
+      "contribution_log2_upper_display": -80.61082682938957,
+      "contribution_upper_scaled": {
+        "binary_exponent": -80,
+        "mantissa_binary64_hex": "0x1.4f44bd02eca32p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -140,
+        "mantissa_binary64_hex": "0x1.cae9a60783e00p-1"
+      },
+      "output_weight": 48,
+      "z_exact_binary64": "0x1.ffc78dca8544cp-1"
+    },
+    {
+      "contribution_log2_upper_display": -83.02443582056632,
+      "contribution_upper_scaled": {
+        "binary_exponent": -83,
+        "mantissa_binary64_hex": "0x1.f766a5d0b691ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -144,
+        "mantissa_binary64_hex": "0x1.4e32adae9105ap-1"
+      },
+      "output_weight": 49,
+      "z_exact_binary64": "0x1.ffc78dca8544cp-1"
+    },
+    {
+      "contribution_log2_upper_display": -86.25729951089072,
+      "contribution_upper_scaled": {
+        "binary_exponent": -86,
+        "mantissa_binary64_hex": "0x1.ac5db8780eb95p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -149,
+        "mantissa_binary64_hex": "0x1.1b5c0ad5dd1e5p-1"
+      },
+      "output_weight": 50,
+      "z_exact_binary64": "0x1.ffb786b308ebcp-1"
+    },
+    {
+      "contribution_log2_upper_display": -89.53133456771518,
+      "contribution_upper_scaled": {
+        "binary_exponent": -89,
+        "mantissa_binary64_hex": "0x1.62429a0e25890p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -155,
+        "mantissa_binary64_hex": "0x1.ddfbe7b5a7906p-1"
+      },
+      "output_weight": 51,
+      "z_exact_binary64": "0x1.ffb786b308ebcp-1"
+    },
+    {
+      "contribution_log2_upper_display": -92.80725949710188,
+      "contribution_upper_scaled": {
+        "binary_exponent": -92,
+        "mantissa_binary64_hex": "0x1.24973d6b1f61cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -160,
+        "mantissa_binary64_hex": "0x1.9d16687438543p-1"
+      },
+      "output_weight": 52,
+      "z_exact_binary64": "0x1.ffb786b308ebcp-1"
+    },
+    {
+      "contribution_log2_upper_display": -96.6269074258082,
+      "contribution_upper_scaled": {
+        "binary_exponent": -96,
+        "mantissa_binary64_hex": "0x1.4b8d62590a157p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -166,
+        "mantissa_binary64_hex": "0x1.f53328056dbc7p-1"
+      },
+      "output_weight": 53,
+      "z_exact_binary64": "0x1.ffa2f2f6184eep-1"
+    },
+    {
+      "contribution_log2_upper_display": -100.93838161341483,
+      "contribution_upper_scaled": {
+        "binary_exponent": -100,
+        "mantissa_binary64_hex": "0x1.0b2bb7d171f90p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -172,
+        "mantissa_binary64_hex": "0x1.bb351be5c7a3fp-1"
+      },
+      "output_weight": 54,
+      "z_exact_binary64": "0x1.ffa2f2f6184eep-1"
+    },
+    {
+      "contribution_log2_upper_display": -105.24905400505233,
+      "contribution_upper_scaled": {
+        "binary_exponent": -105,
+        "mantissa_binary64_hex": "0x1.aed24523eef4ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -178,
+        "mantissa_binary64_hex": "0x1.91294d029f638p-1"
+      },
+      "output_weight": 55,
+      "z_exact_binary64": "0x1.ffa2f2f6184eep-1"
+    },
+    {
+      "contribution_log2_upper_display": -110.3150580825171,
+      "contribution_upper_scaled": {
+        "binary_exponent": -110,
+        "mantissa_binary64_hex": "0x1.9b8e1d833bbc7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -185,
+        "mantissa_binary64_hex": "0x1.b88076a2d828fp-1"
+      },
+      "output_weight": 56,
+      "z_exact_binary64": "0x1.ff888843dd151p-1"
+    },
+    {
+      "contribution_log2_upper_display": -115.89796476582846,
+      "contribution_upper_scaled": {
+        "binary_exponent": -115,
+        "mantissa_binary64_hex": "0x1.12c2e769c4968p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -192,
+        "mantissa_binary64_hex": "0x1.59b78ea8c14ddp-1"
+      },
+      "output_weight": 57,
+      "z_exact_binary64": "0x1.ff888843dd151p-1"
+    },
+    {
+      "contribution_log2_upper_display": -121.4817694891479,
+      "contribution_upper_scaled": {
+        "binary_exponent": -121,
+        "mantissa_binary64_hex": "0x1.6ea47fc29b2eap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -199,
+        "mantissa_binary64_hex": "0x1.156a358ecbe4fp-1"
+      },
+      "output_weight": 58,
+      "z_exact_binary64": "0x1.ff888843dd151p-1"
+    },
+    {
+      "contribution_log2_upper_display": -127.12704524996465,
+      "contribution_upper_scaled": {
+        "binary_exponent": -127,
+        "mantissa_binary64_hex": "0x1.d4d747facd840p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -207,
+        "mantissa_binary64_hex": "0x1.b42df10a78d5ep-1"
+      },
+      "output_weight": 59,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -134.28573127383459,
+      "contribution_upper_scaled": {
+        "binary_exponent": -134,
+        "mantissa_binary64_hex": "0x1.a401bacc2ddcep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -216,
+        "mantissa_binary64_hex": "0x1.eb31a2b4e4c65p-1"
+      },
+      "output_weight": 60,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -141.44576344762305,
+      "contribution_upper_scaled": {
+        "binary_exponent": -141,
+        "mantissa_binary64_hex": "0x1.77e87f635fd77p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -224,
+        "mantissa_binary64_hex": "0x1.1a62e74d2a34dp-1"
+      },
+      "output_weight": 61,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -148.6071696410942,
+      "contribution_upper_scaled": {
+        "binary_exponent": -148,
+        "mantissa_binary64_hex": "0x1.501e966c03e1ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -233,
+        "mantissa_binary64_hex": "0x1.4b6f8ef1154d1p-1"
+      },
+      "output_weight": 62,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -155.7699884660072,
+      "contribution_upper_scaled": {
+        "binary_exponent": -155,
+        "mantissa_binary64_hex": "0x1.2c3f869698d4dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -242,
+        "mantissa_binary64_hex": "0x1.8d0132691c356p-1"
+      },
+      "output_weight": 63,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -162.93406832919246,
+      "contribution_upper_scaled": {
+        "binary_exponent": -162,
+        "mantissa_binary64_hex": "0x1.0bf8826e17a3bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -251,
+        "mantissa_binary64_hex": "0x1.e53918057e002p-1"
+      },
+      "output_weight": 64,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -170.09957340968452,
+      "contribution_upper_scaled": {
+        "binary_exponent": -170,
+        "mantissa_binary64_hex": "0x1.dddaaab7442d6p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -259,
+        "mantissa_binary64_hex": "0x1.2e7edcaa1711fp-1"
+      },
+      "output_weight": 65,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -177.266272925192,
+      "contribution_upper_scaled": {
+        "binary_exponent": -177,
+        "mantissa_binary64_hex": "0x1.a9b5c0badb76fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -268,
+        "mantissa_binary64_hex": "0x1.80af08d3c403bp-1"
+      },
+      "output_weight": 66,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -184.43437884168716,
+      "contribution_upper_scaled": {
+        "binary_exponent": -184,
+        "mantissa_binary64_hex": "0x1.7ae2e4724a3c6p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -277,
+        "mantissa_binary64_hex": "0x1.f2ddce1ed8a38p-1"
+      },
+      "output_weight": 67,
+      "z_exact_binary64": "0x1.ff669eca91bc2p-1"
+    },
+    {
+      "contribution_log2_upper_display": -193.14039077052416,
+      "contribution_upper_scaled": {
+        "binary_exponent": -193,
+        "mantissa_binary64_hex": "0x1.d08622d233478p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -287,
+        "mantissa_binary64_hex": "0x1.c6ad71a3a7b27p-1"
+      },
+      "output_weight": 68,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -202.20618274852714,
+      "contribution_upper_scaled": {
+        "binary_exponent": -202,
+        "mantissa_binary64_hex": "0x1.bbd0d8ee10b16p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -297,
+        "mantissa_binary64_hex": "0x1.49833c43ac35ep-1"
+      },
+      "output_weight": 69,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -211.27589485000578,
+      "contribution_upper_scaled": {
+        "binary_exponent": -211,
+        "mantissa_binary64_hex": "0x1.a6e153c8dc7f2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -308,
+        "mantissa_binary64_hex": "0x1.e5dc2bfc7f519p-1"
+      },
+      "output_weight": 70,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -220.3495679090791,
+      "contribution_upper_scaled": {
+        "binary_exponent": -220,
+        "mantissa_binary64_hex": "0x1.91d3cfbac4d7bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -318,
+        "mantissa_binary64_hex": "0x1.6c5595666656bp-1"
+      },
+      "output_weight": 71,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -229.42712604790574,
+      "contribution_upper_scaled": {
+        "binary_exponent": -229,
+        "mantissa_binary64_hex": "0x1.7ccbbcefba54cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -328,
+        "mantissa_binary64_hex": "0x1.15d98acec6a00p-1"
+      },
+      "output_weight": 72,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -238.50853007058896,
+      "contribution_upper_scaled": {
+        "binary_exponent": -238,
+        "mantissa_binary64_hex": "0x1.67e786c0a7a2dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -339,
+        "mantissa_binary64_hex": "0x1.aef0089c40f46p-1"
+      },
+      "output_weight": 73,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -247.59374224311603,
+      "contribution_upper_scaled": {
+        "binary_exponent": -247,
+        "mantissa_binary64_hex": "0x1.53432cf50f019p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -349,
+        "mantissa_binary64_hex": "0x1.53c7cd882a5cap-1"
+      },
+      "output_weight": 74,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -256.68271780067283,
+      "contribution_upper_scaled": {
+        "binary_exponent": -256,
+        "mantissa_binary64_hex": "0x1.3ef89e427d633p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -359,
+        "mantissa_binary64_hex": "0x1.105b7cdd4afbep-1"
+      },
+      "output_weight": 75,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -265.7754185876168,
+      "contribution_upper_scaled": {
+        "binary_exponent": -265,
+        "mantissa_binary64_hex": "0x1.2b1ec3d1c4296p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -370,
+        "mantissa_binary64_hex": "0x1.bbd428273b427p-1"
+      },
+      "output_weight": 76,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -274.87180506760006,
+      "contribution_upper_scaled": {
+        "binary_exponent": -274,
+        "mantissa_binary64_hex": "0x1.17c9f58981952p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -380,
+        "mantissa_binary64_hex": "0x1.6f8d1caa4f26ap-1"
+      },
+      "output_weight": 77,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -283.97184071470525,
+      "contribution_upper_scaled": {
+        "binary_exponent": -283,
+        "mantissa_binary64_hex": "0x1.050bbb4edca5dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -390,
+        "mantissa_binary64_hex": "0x1.3555b3559f281p-1"
+      },
+      "output_weight": 78,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -293.0754895684605,
+      "contribution_upper_scaled": {
+        "binary_exponent": -293,
+        "mantissa_binary64_hex": "0x1.e5e5f3d417cd5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -400,
+        "mantissa_binary64_hex": "0x1.088be26b501b6p-1"
+      },
+      "output_weight": 79,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -302.18271740635606,
+      "contribution_upper_scaled": {
+        "binary_exponent": -302,
+        "mantissa_binary64_hex": "0x1.c317edb0fb689p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -411,
+        "mantissa_binary64_hex": "0x1.cbc047d57bef7p-1"
+      },
+      "output_weight": 80,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -311.2934911154598,
+      "contribution_upper_scaled": {
+        "binary_exponent": -311,
+        "mantissa_binary64_hex": "0x1.a1c0f42a40ce0p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -421,
+        "mantissa_binary64_hex": "0x1.95df0c648d23fp-1"
+      },
+      "output_weight": 81,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -320.4077788921772,
+      "contribution_upper_scaled": {
+        "binary_exponent": -320,
+        "mantissa_binary64_hex": "0x1.81efd770a1091p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -431,
+        "mantissa_binary64_hex": "0x1.6bfce76057da6p-1"
+      },
+      "output_weight": 82,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -329.52555011755607,
+      "contribution_upper_scaled": {
+        "binary_exponent": -329,
+        "mantissa_binary64_hex": "0x1.63aef41540128p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -441,
+        "mantissa_binary64_hex": "0x1.4b928ecb37cefp-1"
+      },
+      "output_weight": 83,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -338.6467753253482,
+      "contribution_upper_scaled": {
+        "binary_exponent": -338,
+        "mantissa_binary64_hex": "0x1.4704846dad258p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -451,
+        "mantissa_binary64_hex": "0x1.32c7284d835f4p-1"
+      },
+      "output_weight": 84,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -347.7714261799817,
+      "contribution_upper_scaled": {
+        "binary_exponent": -347,
+        "mantissa_binary64_hex": "0x1.2bf2f73afc4b2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -461,
+        "mantissa_binary64_hex": "0x1.2042eaed76ee1p-1"
+      },
+      "output_weight": 85,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -356.8994754175889,
+      "contribution_upper_scaled": {
+        "binary_exponent": -356,
+        "mantissa_binary64_hex": "0x1.12794a54cfc24p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -471,
+        "mantissa_binary64_hex": "0x1.130fab6915d19p-1"
+      },
+      "output_weight": 86,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -366.03089682967084,
+      "contribution_upper_scaled": {
+        "binary_exponent": -366,
+        "mantissa_binary64_hex": "0x1.f526ccc7807dap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -481,
+        "mantissa_binary64_hex": "0x1.0a833e21915cap-1"
+      },
+      "output_weight": 87,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -375.1656652165916,
+      "contribution_upper_scaled": {
+        "binary_exponent": -375,
+        "mantissa_binary64_hex": "0x1.c874f65f325c2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -491,
+        "mantissa_binary64_hex": "0x1.0630fc5484561p-1"
+      },
+      "output_weight": 88,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -384.3037563644991,
+      "contribution_upper_scaled": {
+        "binary_exponent": -384,
+        "mantissa_binary64_hex": "0x1.9ecab4c2479bcp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -501,
+        "mantissa_binary64_hex": "0x1.05e0acdf6261fp-1"
+      },
+      "output_weight": 89,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -393.445147010905,
+      "contribution_upper_scaled": {
+        "binary_exponent": -393,
+        "mantissa_binary64_hex": "0x1.78119fef970a5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -511,
+        "mantissa_binary64_hex": "0x1.0989bcc1c96acp-1"
+      },
+      "output_weight": 90,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -402.5898148187323,
+      "contribution_upper_scaled": {
+        "binary_exponent": -402,
+        "mantissa_binary64_hex": "0x1.542fee643b2c2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -521,
+        "mantissa_binary64_hex": "0x1.11523502d5dfbp-1"
+      },
+      "output_weight": 91,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -411.73773834884963,
+      "contribution_upper_scaled": {
+        "binary_exponent": -411,
+        "mantissa_binary64_hex": "0x1.3309166056f97p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -531,
+        "mantissa_binary64_hex": "0x1.1d914664937c5p-1"
+      },
+      "output_weight": 92,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -420.88889703488354,
+      "contribution_upper_scaled": {
+        "binary_exponent": -420,
+        "mantissa_binary64_hex": "0x1.147e6537d389ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -541,
+        "mantissa_binary64_hex": "0x1.2ed5a6fd792e1p-1"
+      },
+      "output_weight": 93,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -430.04327115958733,
+      "contribution_upper_scaled": {
+        "binary_exponent": -430,
+        "mantissa_binary64_hex": "0x1.f0df1769e9e51p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -551,
+        "mantissa_binary64_hex": "0x1.45f0686fdfa40p-1"
+      },
+      "output_weight": 94,
+      "z_exact_binary64": "0x1.ff3b16dad8ca1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -439.34835155352187,
+      "contribution_upper_scaled": {
+        "binary_exponent": -439,
+        "mantissa_binary64_hex": "0x1.922a93c686ab0p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -561,
+        "mantissa_binary64_hex": "0x1.416b2a2873c9fp-1"
+      },
+      "output_weight": 95,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -450.4693142706605,
+      "contribution_upper_scaled": {
+        "binary_exponent": -450,
+        "mantissa_binary64_hex": "0x1.71d25535b4c8bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -573,
+        "mantissa_binary64_hex": "0x1.6e3e8e25e8f5fp-1"
+      },
+      "output_weight": 96,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -461.5999295886022,
+      "contribution_upper_scaled": {
+        "binary_exponent": -461,
+        "mantissa_binary64_hex": "0x1.51cf7db2c29bfp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -585,
+        "mantissa_binary64_hex": "0x1.a5939c2c2409ep-1"
+      },
+      "output_weight": 97,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -472.7401692382349,
+      "contribution_upper_scaled": {
+        "binary_exponent": -472,
+        "mantissa_binary64_hex": "0x1.3284c247fb69ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -597,
+        "mantissa_binary64_hex": "0x1.ea31c50b5054cp-1"
+      },
+      "output_weight": 98,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -483.8900067612113,
+      "contribution_upper_scaled": {
+        "binary_exponent": -483,
+        "mantissa_binary64_hex": "0x1.1447f86197311p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -608,
+        "mantissa_binary64_hex": "0x1.1fdef57e0719dp-1"
+      },
+      "output_weight": 99,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -495.04941748000334,
+      "contribution_upper_scaled": {
+        "binary_exponent": -495,
+        "mantissa_binary64_hex": "0x1.eec25658368aap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -620,
+        "mantissa_binary64_hex": "0x1.55833c497e7dfp-1"
+      },
+      "output_weight": 100,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -506.2183784698856,
+      "contribution_upper_scaled": {
+        "binary_exponent": -506,
+        "mantissa_binary64_hex": "0x1.b81471876eaaep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -632,
+        "mantissa_binary64_hex": "0x1.99362152fc0a2p-1"
+      },
+      "output_weight": 101,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -517.3968685328124,
+      "contribution_upper_scaled": {
+        "binary_exponent": -517,
+        "mantissa_binary64_hex": "0x1.84ddd8a33a0cap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -644,
+        "mantissa_binary64_hex": "0x1.ef39fdc0d59c2p-1"
+      },
+      "output_weight": 102,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -528.584868173147,
+      "contribution_upper_scaled": {
+        "binary_exponent": -528,
+        "mantissa_binary64_hex": "0x1.555b0bf8c03e0p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -655,
+        "mantissa_binary64_hex": "0x1.2ea44a783e6b1p-1"
+      },
+      "output_weight": 103,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -539.7823595751304,
+      "contribution_upper_scaled": {
+        "binary_exponent": -539,
+        "mantissa_binary64_hex": "0x1.29af3d28771b6p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -667,
+        "mantissa_binary64_hex": "0x1.7590cb6d2b3d9p-1"
+      },
+      "output_weight": 104,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -550.9893265820853,
+      "contribution_upper_scaled": {
+        "binary_exponent": -550,
+        "mantissa_binary64_hex": "0x1.01e6a64ec6ce7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -679,
+        "mantissa_binary64_hex": "0x1.d1aa04cca787cp-1"
+      },
+      "output_weight": 105,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -562.2057546772592,
+      "contribution_upper_scaled": {
+        "binary_exponent": -562,
+        "mantissa_binary64_hex": "0x1.bbf2907a43aa3p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -690,
+        "mantissa_binary64_hex": "0x1.251733bad4d48p-1"
+      },
+      "output_weight": 106,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -573.4316309662901,
+      "contribution_upper_scaled": {
+        "binary_exponent": -573,
+        "mantissa_binary64_hex": "0x1.7b9bd017352cep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -702,
+        "mantissa_binary64_hex": "0x1.74903bc31260bp-1"
+      },
+      "output_weight": 107,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -584.6669441612297,
+      "contribution_upper_scaled": {
+        "binary_exponent": -584,
+        "mantissa_binary64_hex": "0x1.427a4e36f3385p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -714,
+        "mantissa_binary64_hex": "0x1.de3743e2f4f88p-1"
+      },
+      "output_weight": 108,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -595.911684566095,
+      "contribution_upper_scaled": {
+        "binary_exponent": -595,
+        "mantissa_binary64_hex": "0x1.102929a92d28ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -725,
+        "mantissa_binary64_hex": "0x1.35e7fb80ca265p-1"
+      },
+      "output_weight": 109,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -607.1658440639083,
+      "contribution_upper_scaled": {
+        "binary_exponent": -607,
+        "mantissa_binary64_hex": "0x1.c8667a316e90ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -737,
+        "mantissa_binary64_hex": "0x1.95920c3fd7e89p-1"
+      },
+      "output_weight": 110,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -618.4294161051906,
+      "contribution_upper_scaled": {
+        "binary_exponent": -618,
+        "mantissa_binary64_hex": "0x1.7c311ecb1ac57p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -748,
+        "mantissa_binary64_hex": "0x1.0bf43adb31c57p-1"
+      },
+      "output_weight": 111,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -629.7023956978834,
+      "contribution_upper_scaled": {
+        "binary_exponent": -629,
+        "mantissa_binary64_hex": "0x1.3aa668d25dbbap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -760,
+        "mantissa_binary64_hex": "0x1.657cb4c3e0f70p-1"
+      },
+      "output_weight": 112,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -640.984779398667,
+      "contribution_upper_scaled": {
+        "binary_exponent": -640,
+        "mantissa_binary64_hex": "0x1.02b7129374c3dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -772,
+        "mantissa_binary64_hex": "0x1.e188558a1a91ap-1"
+      },
+      "output_weight": 113,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -652.2765653056562,
+      "contribution_upper_scaled": {
+        "binary_exponent": -652,
+        "mantissa_binary64_hex": "0x1.a6af0776183bcp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -783,
+        "mantissa_binary64_hex": "0x1.476d7b4fe9f0cp-1"
+      },
+      "output_weight": 114,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -663.577753052451,
+      "contribution_upper_scaled": {
+        "binary_exponent": -663,
+        "mantissa_binary64_hex": "0x1.570b16c64c44bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -795,
+        "mantissa_binary64_hex": "0x1.c18d2a4df17e1p-1"
+      },
+      "output_weight": 115,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -674.888343803526,
+      "contribution_upper_scaled": {
+        "binary_exponent": -674,
+        "mantissa_binary64_hex": "0x1.14998b272f6c7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -806,
+        "mantissa_binary64_hex": "0x1.3790841ed5790p-1"
+      },
+      "output_weight": 116,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -686.2083402509421,
+      "contribution_upper_scaled": {
+        "binary_exponent": -686,
+        "mantissa_binary64_hex": "0x1.bb27106c579b6p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -818,
+        "mantissa_binary64_hex": "0x1.b3fc424ba0632p-1"
+      },
+      "output_weight": 117,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -697.537746612372,
+      "contribution_upper_scaled": {
+        "binary_exponent": -697,
+        "mantissa_binary64_hex": "0x1.60b06c329a40dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -829,
+        "mantissa_binary64_hex": "0x1.33f3996ad555ep-1"
+      },
+      "output_weight": 118,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -708.8765686304275,
+      "contribution_upper_scaled": {
+        "binary_exponent": -708,
+        "mantissa_binary64_hex": "0x1.16ddd9d858774p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -841,
+        "mantissa_binary64_hex": "0x1.b72b19632a5dap-1"
+      },
+      "output_weight": 119,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -720.2248135732846,
+      "contribution_upper_scaled": {
+        "binary_exponent": -720,
+        "mantissa_binary64_hex": "0x1.b61f0b28c2df5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -852,
+        "mantissa_binary64_hex": "0x1.3c1e55b1f7eadp-1"
+      },
+      "output_weight": 120,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -731.5824902366007,
+      "contribution_upper_scaled": {
+        "binary_exponent": -731,
+        "mantissa_binary64_hex": "0x1.55eb33bd6f581p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -864,
+        "mantissa_binary64_hex": "0x1.cb66898027aabp-1"
+      },
+      "output_weight": 121,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -742.9496089467256,
+      "contribution_upper_scaled": {
+        "binary_exponent": -742,
+        "mantissa_binary64_hex": "0x1.091983d7c44cdp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -875,
+        "mantissa_binary64_hex": "0x1.50f7d3607557ap-1"
+      },
+      "output_weight": 122,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -754.3261815652045,
+      "contribution_upper_scaled": {
+        "binary_exponent": -754,
+        "mantissa_binary64_hex": "0x1.9864e7d685ef1p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -887,
+        "mantissa_binary64_hex": "0x1.f2fe5e97b52d4p-1"
+      },
+      "output_weight": 123,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -765.7122214945817,
+      "contribution_upper_scaled": {
+        "binary_exponent": -765,
+        "mantissa_binary64_hex": "0x1.3883aab8b3109p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -898,
+        "mantissa_binary64_hex": "0x1.74f1c0e681896p-1"
+      },
+      "output_weight": 124,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -777.1077277429713,
+      "contribution_upper_scaled": {
+        "binary_exponent": -777,
+        "mantissa_binary64_hex": "0x1.db292f80df595p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -909,
+        "mantissa_binary64_hex": "0x1.195bc58fe5d99p-1"
+      },
+      "output_weight": 125,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -788.5118311468774,
+      "contribution_upper_scaled": {
+        "binary_exponent": -788,
+        "mantissa_binary64_hex": "0x1.6714f2fc5222ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -921,
+        "mantissa_binary64_hex": "0x1.ac8438941d23ep-1"
+      },
+      "output_weight": 126,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -799.9254354478443,
+      "contribution_upper_scaled": {
+        "binary_exponent": -799,
+        "mantissa_binary64_hex": "0x1.0d943c5c50931p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -932,
+        "mantissa_binary64_hex": "0x1.4962218e6b93ep-1"
+      },
+      "output_weight": 127,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -811.3485762366465,
+      "contribution_upper_scaled": {
+        "binary_exponent": -811,
+        "mantissa_binary64_hex": "0x1.921a8b64db813p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -944,
+        "mantissa_binary64_hex": "0x1.ff1d2343bbe92p-1"
+      },
+      "output_weight": 128,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -822.7812747513412,
+      "contribution_upper_scaled": {
+        "binary_exponent": -822,
+        "mantissa_binary64_hex": "0x1.29e8905cade70p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -955,
+        "mantissa_binary64_hex": "0x1.9044bb5229edbp-1"
+      },
+      "output_weight": 129,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -834.2235538336342,
+      "contribution_upper_scaled": {
+        "binary_exponent": -834,
+        "mantissa_binary64_hex": "0x1.b681059ec9005p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -966,
+        "mantissa_binary64_hex": "0x1.3c65077e14972p-1"
+      },
+      "output_weight": 130,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -845.6754379441138,
+      "contribution_upper_scaled": {
+        "binary_exponent": -845,
+        "mantissa_binary64_hex": "0x1.4095b326e54f1p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -978,
+        "mantissa_binary64_hex": "0x1.f8de141755cf0p-1"
+      },
+      "output_weight": 131,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -857.1369531789131,
+      "contribution_upper_scaled": {
+        "binary_exponent": -857,
+        "mantissa_binary64_hex": "0x1.d1a1d3ae88d38p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -989,
+        "mantissa_binary64_hex": "0x1.96916c2483c7ep-1"
+      },
+      "output_weight": 132,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -868.6081272878315,
+      "contribution_upper_scaled": {
+        "binary_exponent": -868,
+        "mantissa_binary64_hex": "0x1.4fe57d5a80dccp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1000,
+        "mantissa_binary64_hex": "0x1.4a76c31772790p-1"
+      },
+      "output_weight": 133,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -880.088989693947,
+      "contribution_upper_scaled": {
+        "binary_exponent": -880,
+        "mantissa_binary64_hex": "0x1.e15f64b4e6a30p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1011,
+        "mantissa_binary64_hex": "0x1.0f1c7baa96c91p-1"
+      },
+      "output_weight": 134,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -891.5795715147551,
+      "contribution_upper_scaled": {
+        "binary_exponent": -891,
+        "mantissa_binary64_hex": "0x1.569c775058880p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1023,
+        "mantissa_binary64_hex": "0x1.c0fc32373b990p-1"
+      },
+      "output_weight": 135,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -903.0799055848728,
+      "contribution_upper_scaled": {
+        "binary_exponent": -903,
+        "mantissa_binary64_hex": "0x1.e469c88314884p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1034,
+        "mantissa_binary64_hex": "0x1.773eeceb6a9f4p-1"
+      },
+      "output_weight": 136,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -914.5900264803511,
+      "contribution_upper_scaled": {
+        "binary_exponent": -914,
+        "mantissa_binary64_hex": "0x1.542327bea207bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1045,
+        "mantissa_binary64_hex": "0x1.3c8a26f8e2f1fp-1"
+      },
+      "output_weight": 137,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -926.1099705446402,
+      "contribution_upper_scaled": {
+        "binary_exponent": -926,
+        "mantissa_binary64_hex": "0x1.da6c3ae7e214fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1056,
+        "mantissa_binary64_hex": "0x1.0d817deeb19a9p-1"
+      },
+      "output_weight": 138,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -937.63977591626,
+      "contribution_upper_scaled": {
+        "binary_exponent": -937,
+        "mantissa_binary64_hex": "0x1.489baa3a19dbfp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1068,
+        "mantissa_binary64_hex": "0x1.cf3269777d80ap-1"
+      },
+      "output_weight": 139,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -949.179482558226,
+      "contribution_upper_scaled": {
+        "binary_exponent": -949,
+        "mantissa_binary64_hex": "0x1.c41b26acb8de9p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1079,
+        "mantissa_binary64_hex": "0x1.91c1279f646eap-1"
+      },
+      "output_weight": 140,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -960.7291322892921,
+      "contribution_upper_scaled": {
+        "binary_exponent": -960,
+        "mantissa_binary64_hex": "0x1.34df5d74febdbp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1090,
+        "mantissa_binary64_hex": "0x1.5fb599ddea7f1p-1"
+      },
+      "output_weight": 141,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -972.2887688170713,
+      "contribution_upper_scaled": {
+        "binary_exponent": -972,
+        "mantissa_binary64_hex": "0x1.a31f95ab34e9ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1101,
+        "mantissa_binary64_hex": "0x1.36c49387e481fp-1"
+      },
+      "output_weight": 142,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -983.8584377730987,
+      "contribution_upper_scaled": {
+        "binary_exponent": -983,
+        "mantissa_binary64_hex": "0x1.1a64b194dfbd8p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1112,
+        "mantissa_binary64_hex": "0x1.1526ffcea29bap-1"
+      },
+      "output_weight": 143,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -995.4381867499145,
+      "contribution_upper_scaled": {
+        "binary_exponent": -995,
+        "mantissa_binary64_hex": "0x1.79e337b83ff34p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1124,
+        "mantissa_binary64_hex": "0x1.f2f4ee109e521p-1"
+      },
+      "output_weight": 144,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1007.0280653402384,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1007,
+        "mantissa_binary64_hex": "0x1.f622d7f248c1ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1135,
+        "mantissa_binary64_hex": "0x1.c553a0247bc3ep-1"
+      },
+      "output_weight": 145,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1018.6281251783198,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1018,
+        "mantissa_binary64_hex": "0x1.4b45c55d05c3ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1146,
+        "mantissa_binary64_hex": "0x1.9fb7213aafafdp-1"
+      },
+      "output_weight": 146,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1030.2384199835558,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1030,
+        "mantissa_binary64_hex": "0x1.b202377ae4297p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1157,
+        "mantissa_binary64_hex": "0x1.80c96b0052937p-1"
+      },
+      "output_weight": 147,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1041.8590056064606,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1041,
+        "mantissa_binary64_hex": "0x1.1a483ed56c242p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1168,
+        "mantissa_binary64_hex": "0x1.677d6ec54abdbp-1"
+      },
+      "output_weight": 148,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1053.4899400771087,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1053,
+        "mantissa_binary64_hex": "0x1.6c926e17f9222p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1179,
+        "mantissa_binary64_hex": "0x1.52fffa1fd42e1p-1"
+      },
+      "output_weight": 149,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1065.1312836561244,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1065,
+        "mantissa_binary64_hex": "0x1.d37730839efbcp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1190,
+        "mantissa_binary64_hex": "0x1.42ac48b5f5356p-1"
+      },
+      "output_weight": 150,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1076.7830988883823,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1076,
+        "mantissa_binary64_hex": "0x1.2988323f9aa92p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1201,
+        "mantissa_binary64_hex": "0x1.3603660ec43f4p-1"
+      },
+      "output_weight": 151,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1088.4454506594861,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1088,
+        "mantissa_binary64_hex": "0x1.77fd5d2674871p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1212,
+        "mantissa_binary64_hex": "0x1.2ca5bde245970p-1"
+      },
+      "output_weight": 152,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1100.1184062552074,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1100,
+        "mantissa_binary64_hex": "0x1.d7a825eb27696p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1223,
+        "mantissa_binary64_hex": "0x1.264e65bc149bap-1"
+      },
+      "output_weight": 153,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1111.8020354240023,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1111,
+        "mantissa_binary64_hex": "0x1.25a6f5c6fba51p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1234,
+        "mantissa_binary64_hex": "0x1.22cfcc659696fp-1"
+      },
+      "output_weight": 154,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1123.4964104427188,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1123,
+        "mantissa_binary64_hex": "0x1.6af0c9c6b840dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1245,
+        "mantissa_binary64_hex": "0x1.221195b5fa3f7p-1"
+      },
+      "output_weight": 155,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1135.201606185807,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1135,
+        "mantissa_binary64_hex": "0x1.bd39d6ae90e6bp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1256,
+        "mantissa_binary64_hex": "0x1.240f7e8d26e14p-1"
+      },
+      "output_weight": 156,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1146.9177001978708,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1146,
+        "mantissa_binary64_hex": "0x1.0f0740087e894p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1267,
+        "mantissa_binary64_hex": "0x1.28d936cddd23ap-1"
+      },
+      "output_weight": 157,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1158.6447727703323,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1158,
+        "mantissa_binary64_hex": "0x1.4778cd4ec56b7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1278,
+        "mantissa_binary64_hex": "0x1.30932fba8ea3dp-1"
+      },
+      "output_weight": 158,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1170.3829070215204,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1170,
+        "mantissa_binary64_hex": "0x1.88a5e79c6aaeap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1289,
+        "mantissa_binary64_hex": "0x1.3b786d98ea559p-1"
+      },
+      "output_weight": 159,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1182.1321889815447,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1182,
+        "mantissa_binary64_hex": "0x1.d32c1dd645514p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1300,
+        "mantissa_binary64_hex": "0x1.49dd7d6389b6ep-1"
+      },
+      "output_weight": 160,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1193.8927076809603,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1193,
+        "mantissa_binary64_hex": "0x1.13c3ae8adf233p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1311,
+        "mantissa_binary64_hex": "0x1.5c34c431e04cfp-1"
+      },
+      "output_weight": 161,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1205.6645552442542,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1205,
+        "mantissa_binary64_hex": "0x1.43031e38b17abp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1322,
+        "mantissa_binary64_hex": "0x1.731477ccd47f1p-1"
+      },
+      "output_weight": 162,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1217.4478269890585,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1217,
+        "mantissa_binary64_hex": "0x1.775ef3757ac23p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1333,
+        "mantissa_binary64_hex": "0x1.8f3eb121648fep-1"
+      },
+      "output_weight": 163,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1229.2426215275011,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1229,
+        "mantissa_binary64_hex": "0x1.b0bf1d351fd31p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1344,
+        "mantissa_binary64_hex": "0x1.b1ac35449ea31p-1"
+      },
+      "output_weight": 164,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1241.049040879881,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1241,
+        "mantissa_binary64_hex": "0x1.eee367870f19cp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1355,
+        "mantissa_binary64_hex": "0x1.db9acd248b395p-1"
+      },
+      "output_weight": 165,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1252.8671905810909,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1252,
+        "mantissa_binary64_hex": "0x1.18af6c3fc00e0p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1365,
+        "mantissa_binary64_hex": "0x1.07502aa6b34a7p-1"
+      },
+      "output_weight": 166,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1264.6971798147983,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1264,
+        "mantissa_binary64_hex": "0x1.3bca280c5613dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1376,
+        "mantissa_binary64_hex": "0x1.26620fc874973p-1"
+      },
+      "output_weight": 167,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1276.5391215220495,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1276,
+        "mantissa_binary64_hex": "0x1.605a6add116c3p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1387,
+        "mantissa_binary64_hex": "0x1.4c506e8a3d787p-1"
+      },
+      "output_weight": 168,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1288.3931325573844,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1288,
+        "mantissa_binary64_hex": "0x1.85dff902353d8p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1398,
+        "mantissa_binary64_hex": "0x1.7ac911b43d986p-1"
+      },
+      "output_weight": 169,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1300.259333813188,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1300,
+        "mantissa_binary64_hex": "0x1.abc332e141fb2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1409,
+        "mantissa_binary64_hex": "0x1.b3f8eb4809cf2p-1"
+      },
+      "output_weight": 170,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1312.1378503594542,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1312,
+        "mantissa_binary64_hex": "0x1.d157b88dccaf5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1420,
+        "mantissa_binary64_hex": "0x1.fab5be7872bfdp-1"
+      },
+      "output_weight": 171,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1324.0288116821662,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1324,
+        "mantissa_binary64_hex": "0x1.f5e05c3a8cb36p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1430,
+        "mantissa_binary64_hex": "0x1.295b7f368b78bp-1"
+      },
+      "output_weight": 172,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1335.9323516034563,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1335,
+        "mantissa_binary64_hex": "0x1.0c4a3056516c3p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1441,
+        "mantissa_binary64_hex": "0x1.6071f59d9705dp-1"
+      },
+      "output_weight": 173,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1347.8486090365552,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1347,
+        "mantissa_binary64_hex": "0x1.1c52e355af8dap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1452,
+        "mantissa_binary64_hex": "0x1.a5dfc73e22da2p-1"
+      },
+      "output_weight": 174,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1359.7777269469277,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1359,
+        "mantissa_binary64_hex": "0x1.2aa4573bbf56ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1463,
+        "mantissa_binary64_hex": "0x1.fdff81649ecf0p-1"
+      },
+      "output_weight": 175,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1371.7198549384775,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1371,
+        "mantissa_binary64_hex": "0x1.36dd7a3575b77p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1473,
+        "mantissa_binary64_hex": "0x1.375700da74b91p-1"
+      },
+      "output_weight": 176,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1383.6751450117108,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1383,
+        "mantissa_binary64_hex": "0x1.40a65d88c8d89p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1484,
+        "mantissa_binary64_hex": "0x1.7fef801c237d4p-1"
+      },
+      "output_weight": 177,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1395.6437597115598,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1395,
+        "mantissa_binary64_hex": "0x1.47b3b0a0b0e3dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1495,
+        "mantissa_binary64_hex": "0x1.de380f6319a35p-1"
+      },
+      "output_weight": 178,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1407.6258586546053,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1407,
+        "mantissa_binary64_hex": "0x1.4bcb1bc3c5c3ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1505,
+        "mantissa_binary64_hex": "0x1.2cd5be6a244bep-1"
+      },
+      "output_weight": 179,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1419.6216071988704,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1419,
+        "mantissa_binary64_hex": "0x1.4cc5c88b5d10ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1516,
+        "mantissa_binary64_hex": "0x1.7e552950a0116p-1"
+      },
+      "output_weight": 180,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1431.6312118516169,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1431,
+        "mantissa_binary64_hex": "0x1.4a9085781d512p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1527,
+        "mantissa_binary64_hex": "0x1.eadb8ee3b24c7p-1"
+      },
+      "output_weight": 181,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1443.6547670745838,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1443,
+        "mantissa_binary64_hex": "0x1.45360e2206482p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1537,
+        "mantissa_binary64_hex": "0x1.3e51547637dc8p-1"
+      },
+      "output_weight": 182,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1455.6926472372566,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1455,
+        "mantissa_binary64_hex": "0x1.3cc88a8841891p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1548,
+        "mantissa_binary64_hex": "0x1.a118ff97c2032p-1"
+      },
+      "output_weight": 183,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1467.7448164917998,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1467,
+        "mantissa_binary64_hex": "0x1.3188664ca7f66p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1558,
+        "mantissa_binary64_hex": "0x1.1416946cbce80p-1"
+      },
+      "output_weight": 184,
+      "z_exact_binary64": "0x1.ff033730cbbfap-1"
+    },
+    {
+      "contribution_log2_upper_display": -1480.9730888583283,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1480,
+        "mantissa_binary64_hex": "0x1.04d1f0db5e99fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1570,
+        "mantissa_binary64_hex": "0x1.4a369ec7c30a4p-1"
+      },
+      "output_weight": 185,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1494.5923613590007,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1494,
+        "mantissa_binary64_hex": "0x1.53965874982d5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1582,
+        "mantissa_binary64_hex": "0x1.33735f72c79ccp-1"
+      },
+      "output_weight": 186,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1508.2345751266712,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1508,
+        "mantissa_binary64_hex": "0x1.b32ab727a092ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1594,
+        "mantissa_binary64_hex": "0x1.1fb368fe60a7dp-1"
+      },
+      "output_weight": 187,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1521.8998637255952,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1521,
+        "mantissa_binary64_hex": "0x1.12666173f2176p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1606,
+        "mantissa_binary64_hex": "0x1.0e938596f0f5ep-1"
+      },
+      "output_weight": 188,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1535.5886870106003,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1535,
+        "mantissa_binary64_hex": "0x1.547409a659377p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1619,
+        "mantissa_binary64_hex": "0x1.ff8122a63c29cp-1"
+      },
+      "output_weight": 189,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1549.301325650723,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1549,
+        "mantissa_binary64_hex": "0x1.9f7dc3c6f769ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1631,
+        "mantissa_binary64_hex": "0x1.e5e9bee23716ap-1"
+      },
+      "output_weight": 190,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1563.038082609969,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1563,
+        "mantissa_binary64_hex": "0x1.f2a960a42c22dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1643,
+        "mantissa_binary64_hex": "0x1.cfec36bc6c0a5p-1"
+      },
+      "output_weight": 191,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1576.799514078016,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1576,
+        "mantissa_binary64_hex": "0x1.262a749ba4ce8p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1655,
+        "mantissa_binary64_hex": "0x1.bd271cf078c26p-1"
+      },
+      "output_weight": 192,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1590.585614344736,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1590,
+        "mantissa_binary64_hex": "0x1.552ddc7cf2321p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1667,
+        "mantissa_binary64_hex": "0x1.ad49706fa80fep-1"
+      },
+      "output_weight": 193,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1604.3974013003844,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1604,
+        "mantissa_binary64_hex": "0x1.84b917337bae5p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1679,
+        "mantissa_binary64_hex": "0x1.a010546cd1bc8p-1"
+      },
+      "output_weight": 194,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1618.234351739602,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1618,
+        "mantissa_binary64_hex": "0x1.b33bf7658ff22p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1691,
+        "mantissa_binary64_hex": "0x1.9545390b3b2edp-1"
+      },
+      "output_weight": 195,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1632.0981849004625,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1632,
+        "mantissa_binary64_hex": "0x1.de5075a948f52p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1703,
+        "mantissa_binary64_hex": "0x1.8cbc62734e8e4p-1"
+      },
+      "output_weight": 196,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1645.9876095394952,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1645,
+        "mantissa_binary64_hex": "0x1.0235462e93a94p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1715,
+        "mantissa_binary64_hex": "0x1.8653bfff7f777p-1"
+      },
+      "output_weight": 197,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1659.9053100949861,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1659,
+        "mantissa_binary64_hex": "0x1.115db0e53d408p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1727,
+        "mantissa_binary64_hex": "0x1.81f2086e7f2b2p-1"
+      },
+      "output_weight": 198,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1673.8489810871715,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1673,
+        "mantissa_binary64_hex": "0x1.1c401ea7356e9p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1739,
+        "mantissa_binary64_hex": "0x1.7f8612baea9f7p-1"
+      },
+      "output_weight": 199,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1687.8224947785686,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1687,
+        "mantissa_binary64_hex": "0x1.218466d80a1d8p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1751,
+        "mantissa_binary64_hex": "0x1.7f0665851bb8ap-1"
+      },
+      "output_weight": 200,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1701.822375430117,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1701,
+        "mantissa_binary64_hex": "0x1.218a88893f6cfp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1763,
+        "mantissa_binary64_hex": "0x1.8070f8ffb48fap-1"
+      },
+      "output_weight": 201,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1715.853757548934,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1715,
+        "mantissa_binary64_hex": "0x1.1b4f991bd41a4p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1775,
+        "mantissa_binary64_hex": "0x1.83cb2922976f6p-1"
+      },
+      "output_weight": 202,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1729.9120553318141,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1729,
+        "mantissa_binary64_hex": "0x1.101742660221dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1787,
+        "mantissa_binary64_hex": "0x1.8921d7a0c063ep-1"
+      },
+      "output_weight": 203,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1744.003448875779,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1744,
+        "mantissa_binary64_hex": "0x1.fec7094c77d79p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1799,
+        "mantissa_binary64_hex": "0x1.9089becfb1626p-1"
+      },
+      "output_weight": 204,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1758.1226735388923,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1758,
+        "mantissa_binary64_hex": "0x1.d6438832f5759p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1811,
+        "mantissa_binary64_hex": "0x1.9a1ff86f249d4p-1"
+      },
+      "output_weight": 205,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1772.2762851847917,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1772,
+        "mantissa_binary64_hex": "0x1.a6c40a8c36fb6p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1823,
+        "mantissa_binary64_hex": "0x1.a60abd21eb9e6p-1"
+      },
+      "output_weight": 206,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1786.4593075686719,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1786,
+        "mantissa_binary64_hex": "0x1.746549abd75d0p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1835,
+        "mantissa_binary64_hex": "0x1.b47a638417acep-1"
+      },
+      "output_weight": 207,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1800.6773845913488,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1800,
+        "mantissa_binary64_hex": "0x1.40270969e7bbcp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1847,
+        "mantissa_binary64_hex": "0x1.c5aaa8387017bp-1"
+      },
+      "output_weight": 208,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1814.9274988340742,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1814,
+        "mantissa_binary64_hex": "0x1.0d319a5a4b642p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1859,
+        "mantissa_binary64_hex": "0x1.d9e44b268ad28p-1"
+      },
+      "output_weight": 209,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1829.2123004780558,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1829,
+        "mantissa_binary64_hex": "0x1.b9f013a21f54dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1871,
+        "mantissa_binary64_hex": "0x1.f17f1198a9c57p-1"
+      },
+      "output_weight": 210,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1843.5333073642619,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1843,
+        "mantissa_binary64_hex": "0x1.61c6ac37856c2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1882,
+        "mantissa_binary64_hex": "0x1.06722091773fap-1"
+      },
+      "output_weight": 211,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1857.8870430843162,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1857,
+        "mantissa_binary64_hex": "0x1.14d969dc7bb31p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1894,
+        "mantissa_binary64_hex": "0x1.1648d63b2c155p-1"
+      },
+      "output_weight": 212,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1872.2833938334481,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1872,
+        "mantissa_binary64_hex": "0x1.a4b0139792df2p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1906,
+        "mantissa_binary64_hex": "0x1.288eb8e168b71p-1"
+      },
+      "output_weight": 213,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1886.7080650704038,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1886,
+        "mantissa_binary64_hex": "0x1.396a7daaa4226p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1918,
+        "mantissa_binary64_hex": "0x1.3d9d493919c54p-1"
+      },
+      "output_weight": 214,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1901.1851330420236,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1901,
+        "mantissa_binary64_hex": "0x1.c256bb5170833p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1930,
+        "mantissa_binary64_hex": "0x1.55df4b25ae251p-1"
+      },
+      "output_weight": 215,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1915.6821532076292,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1915,
+        "mantissa_binary64_hex": "0x1.3f18949890183p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1942,
+        "mantissa_binary64_hex": "0x1.71d43c8626a63p-1"
+      },
+      "output_weight": 216,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1930.2467520659036,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1930,
+        "mantissa_binary64_hex": "0x1.af826345fbf29p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1954,
+        "mantissa_binary64_hex": "0x1.92149907a1c32p-1"
+      },
+      "output_weight": 217,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1944.8160864648491,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1944,
+        "mantissa_binary64_hex": "0x1.22ce5a1b5db62p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1966,
+        "mantissa_binary64_hex": "0x1.b7571d503c3dfp-1"
+      },
+      "output_weight": 218,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1959.4774848552634,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1959,
+        "mantissa_binary64_hex": "0x1.6fbbab0255afdp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1978,
+        "mantissa_binary64_hex": "0x1.e2774950aefc9p-1"
+      },
+      "output_weight": 219,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1974.1545641892487,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1974,
+        "mantissa_binary64_hex": "0x1.cbfb929e38fd9p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -1989,
+        "mantissa_binary64_hex": "0x1.0a3eb96d95c95p-1"
+      },
+      "output_weight": 220,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -1988.8877515426732,
+      "contribution_upper_scaled": {
+        "binary_exponent": -1988,
+        "mantissa_binary64_hex": "0x1.14b69e5919fd4p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2001,
+        "mantissa_binary64_hex": "0x1.275467f5d4b6ap-1"
+      },
+      "output_weight": 221,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2003.6560892966543,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2003,
+        "mantissa_binary64_hex": "0x1.44e9c9cc8c50ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2013,
+        "mantissa_binary64_hex": "0x1.493dfe7083259p-1"
+      },
+      "output_weight": 222,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2018.4893923612094,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2018,
+        "mantissa_binary64_hex": "0x1.6cb5de9555827p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2025,
+        "mantissa_binary64_hex": "0x1.70e65422df92ap-1"
+      },
+      "output_weight": 223,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2033.355408531809,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2033,
+        "mantissa_binary64_hex": "0x1.903433bc5291ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2037,
+        "mantissa_binary64_hex": "0x1.9f6b9f319f6e3p-1"
+      },
+      "output_weight": 224,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2048.2959910902614,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2048,
+        "mantissa_binary64_hex": "0x1.a107cb6cb5fe7p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2049,
+        "mantissa_binary64_hex": "0x1.d62bd7247c3e0p-1"
+      },
+      "output_weight": 225,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2063.267552073277,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2063,
+        "mantissa_binary64_hex": "0x1.a9552b174840ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2060,
+        "mantissa_binary64_hex": "0x1.0b6a2d3e8971fp-1"
+      },
+      "output_weight": 226,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2078.32332725442,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2078,
+        "mantissa_binary64_hex": "0x1.9933f4b80aa54p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2072,
+        "mantissa_binary64_hex": "0x1.31bae22124b09p-1"
+      },
+      "output_weight": 227,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2093.410254180262,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2093,
+        "mantissa_binary64_hex": "0x1.814678dfb627fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2084,
+        "mantissa_binary64_hex": "0x1.5f4e931e444f9p-1"
+      },
+      "output_weight": 228,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2108.5900438359913,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2108,
+        "mantissa_binary64_hex": "0x1.54221b95159eap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2096,
+        "mantissa_binary64_hex": "0x1.95ba1dcfb2b80p-1"
+      },
+      "output_weight": 229,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2123.8047711434924,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2123,
+        "mantissa_binary64_hex": "0x1.25188b4d76147p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2108,
+        "mantissa_binary64_hex": "0x1.d6f552f1be13dp-1"
+      },
+      "output_weight": 230,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2139.1186882473653,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2139,
+        "mantissa_binary64_hex": "0x1.d7908cada7930p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2119,
+        "mantissa_binary64_hex": "0x1.12babb54805ebp-1"
+      },
+      "output_weight": 231,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2154.4770690141922,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2154,
+        "mantissa_binary64_hex": "0x1.6fd6ce804f9bep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2131,
+        "mantissa_binary64_hex": "0x1.4227b7b3b1680p-1"
+      },
+      "output_weight": 232,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2169.9373809624853,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2169,
+        "mantissa_binary64_hex": "0x1.0b5b2c74944b1p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2143,
+        "mantissa_binary64_hex": "0x1.7bb2032ce4804p-1"
+      },
+      "output_weight": 233,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2185.4595344459276,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2185,
+        "mantissa_binary64_hex": "0x1.74564c022ba67p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2155,
+        "mantissa_binary64_hex": "0x1.c1ccb31a4d81dp-1"
+      },
+      "output_weight": 234,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2201.0823742871157,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2201,
+        "mantissa_binary64_hex": "0x1.e395c32bd180dp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2166,
+        "mantissa_binary64_hex": "0x1.0bc9856f92be9p-1"
+      },
+      "output_weight": 235,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2216.793249423882,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2216,
+        "mantissa_binary64_hex": "0x1.27722bfa901f3p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2178,
+        "mantissa_binary64_hex": "0x1.407cc72755c6ap-1"
+      },
+      "output_weight": 236,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2232.6012734054325,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2232,
+        "mantissa_binary64_hex": "0x1.517ef9e06366ep-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2190,
+        "mantissa_binary64_hex": "0x1.81873db005cedp-1"
+      },
+      "output_weight": 237,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2248.53047986871,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2248,
+        "mantissa_binary64_hex": "0x1.62785881c0152p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2202,
+        "mantissa_binary64_hex": "0x1.d22769d6389dap-1"
+      },
+      "output_weight": 238,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2264.555352921578,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2264,
+        "mantissa_binary64_hex": "0x1.5c69429e2eeecp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2213,
+        "mantissa_binary64_hex": "0x1.1b45bcbd58f6dp-1"
+      },
+      "output_weight": 239,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2280.7370147713928,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2280,
+        "mantissa_binary64_hex": "0x1.333084f2d8047p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2225,
+        "mantissa_binary64_hex": "0x1.5a0e0d0d2c38fp-1"
+      },
+      "output_weight": 240,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2297.0203370873205,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2297,
+        "mantissa_binary64_hex": "0x1.f8d54b070c0e9p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2237,
+        "mantissa_binary64_hex": "0x1.a8f027e0ee3e5p-1"
+      },
+      "output_weight": 241,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2313.49766209626,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2313,
+        "mantissa_binary64_hex": "0x1.6aa036bf60198p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2248,
+        "mantissa_binary64_hex": "0x1.0640cd3e1ae5ep-1"
+      },
+      "output_weight": 242,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2330.0960961449914,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2330,
+        "mantissa_binary64_hex": "0x1.df01dee7d3d09p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2260,
+        "mantissa_binary64_hex": "0x1.4561f7e693269p-1"
+      },
+      "output_weight": 243,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2346.9364170175613,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2346,
+        "mantissa_binary64_hex": "0x1.0b88eb6cff45ap-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2272,
+        "mantissa_binary64_hex": "0x1.95cf14119fbbfp-1"
+      },
+      "output_weight": 244,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2363.9416706909897,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2363,
+        "mantissa_binary64_hex": "0x1.0a8ff750c8389p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2284,
+        "mantissa_binary64_hex": "0x1.fcc0b6879cb58p-1"
+      },
+      "output_weight": 245,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2381.2646644515116,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2381,
+        "mantissa_binary64_hex": "0x1.aa2f5349e75f4p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2295,
+        "mantissa_binary64_hex": "0x1.40925402e13a7p-1"
+      },
+      "output_weight": 246,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2398.84715204015,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2398,
+        "mantissa_binary64_hex": "0x1.1c9c6efef9372p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2307,
+        "mantissa_binary64_hex": "0x1.961b97a36f2e4p-1"
+      },
+      "output_weight": 247,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2416.903337695328,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2416,
+        "mantissa_binary64_hex": "0x1.11bd6ecdc4ec8p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2318,
+        "mantissa_binary64_hex": "0x1.029560e5c13a1p-1"
+      },
+      "output_weight": 248,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2435.4777428311327,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2435,
+        "mantissa_binary64_hex": "0x1.6faad5fda2311p-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2330,
+        "mantissa_binary64_hex": "0x1.4b07fc0db8fe7p-1"
+      },
+      "output_weight": 249,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    },
+    {
+      "contribution_log2_upper_display": -2455.1160457921796,
+      "contribution_upper_scaled": {
+        "binary_exponent": -2455,
+        "mantissa_binary64_hex": "0x1.d86ddd7abfd6fp-1"
+      },
+      "inner_probability_upper_scaled": {
+        "binary_exponent": -2342,
+        "mantissa_binary64_hex": "0x1.aa02e262ef76bp-1"
+      },
+      "output_weight": 250,
+      "z_exact_binary64": "0x1.febb81e0554c1p-1"
+    }
+  ]
+}

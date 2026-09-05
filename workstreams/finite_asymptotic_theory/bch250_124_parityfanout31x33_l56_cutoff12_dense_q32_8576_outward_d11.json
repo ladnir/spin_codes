@@ -1,0 +1,425 @@
+{
+  "arithmetic": {
+    "interval_dps": 100,
+    "method": "All transfer, Collatz, logarithm, endpoint, exponential, and union inequalities use 100-digit interval arithmetic. Binary64 values select exact rational witnesses only."
+  },
+  "claim": {
+    "bad_weight_at_most": 235840,
+    "comparison_to_2^-134": false,
+    "comparison_to_2^-40": true,
+    "comparison_to_2^-41": true,
+    "margin_display_is_not_used_for_comparisons": true,
+    "occupations": [
+      32,
+      8576
+    ],
+    "union_log2_upper": -41.620995128862695,
+    "union_margin_bits": 41.620995128862695
+  },
+  "conditional_premise": {
+    "central_weight_interval": [
+      13,
+      237
+    ],
+    "claim": "For every nonzero v, the expected wrapped-row multiplicity mu(v) in the stated central weight interval is at most 2^(389/1250) times the random-injection multiplicity rho=(2^124-1)/(2^250-1).",
+    "eta_bits": "389/1250"
+  },
+  "convexity_rule": "For fixed p,z and Collatz data, the Q-dependent logarithm equals a linear function plus -(B-1)log C(L,Q); log C(L,Q) is concave. The finite log bound is therefore convex, so its maximum on an integer interval occurs at an endpoint.",
+  "intervals": [
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "4389824549852865/576460752303423488",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "33489892237727/36028797018963968",
+        "1073849350402995/1152921504606846976"
+      ],
+      "endpoint_log_uppers_natural": [
+        -89.25556187943398,
+        -574.4214461113351
+      ],
+      "lower_occupation": 32,
+      "matrix_prefactor": "36028797018963968/33489892237727",
+      "radius_upper": "61402523513613727/100000000000000000",
+      "upper_occupation": 48,
+      "z_exact_binary64": "8938402566484409/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "6247405359401175/576460752303423488",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "6810921329627419/9223372036854775808",
+        "3412278820769703/4611686018427387904"
+      ],
+      "endpoint_log_uppers_natural": [
+        -644.0636783678066,
+        -1136.246440945796
+      ],
+      "lower_occupation": 49,
+      "matrix_prefactor": "9223372036854775808/6810921329627419",
+      "radius_upper": "49919581089311887/100000000000000000",
+      "upper_occupation": 65,
+      "z_exact_binary64": "4454662720030265/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "8969807848595167/576460752303423488",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "5241950088586195/9223372036854775808",
+        "5249998180317319/9223372036854775808"
+      ],
+      "endpoint_log_uppers_natural": [
+        -879.4463610796214,
+        -1920.4263584784446
+      ],
+      "lower_occupation": 66,
+      "matrix_prefactor": "9223372036854775808/5241950088586195",
+      "radius_upper": "9208112724061203/25000000000000000",
+      "upper_occupation": 98,
+      "z_exact_binary64": "4433355985870487/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "3595236069122773/144115188075855872",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "6992410895842905/18446744073709551616",
+        "3496700293412943/9223372036854775808"
+      ],
+      "endpoint_log_uppers_natural": [
+        -1177.1539986177668,
+        -3456.7088170529105
+      ],
+      "lower_occupation": 99,
+      "matrix_prefactor": "18446744073709551616/6992410895842905",
+      "radius_upper": "5021180666823611/25000000000000000",
+      "upper_occupation": 165,
+      "z_exact_binary64": "8781999844873219/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "1566626662730029/36028797018963968",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "922394440196187/4611686018427387904",
+        "7366981340389119/36893488147419103232"
+      ],
+      "endpoint_log_uppers_natural": [
+        -1791.2705385063364,
+        -6519.408223323054
+      ],
+      "lower_occupation": 166,
+      "matrix_prefactor": "36893488147419103232/7366981340389119",
+      "radius_upper": "30077393152562651/500000000000000000",
+      "upper_occupation": 299,
+      "z_exact_binary64": "4307307829732643/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "2872108453289093/36028797018963968",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "5020748323992449/73786976294838206464",
+        "1253425973476433/18446744073709551616"
+      ],
+      "endpoint_log_uppers_natural": [
+        -2874.976701246146,
+        -12619.385204350834
+      ],
+      "lower_occupation": 300,
+      "matrix_prefactor": "18446744073709551616/1253425973476433",
+      "radius_upper": "55269675434694307/10000000000000000000",
+      "upper_occupation": 566,
+      "z_exact_binary64": "4143281570606617/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "5280051085566173/36028797018963968",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "3292080208936843/295147905179352825856",
+        "3291396916392579/295147905179352825856"
+      ],
+      "endpoint_log_uppers_natural": [
+        -5014.339993299611,
+        -22352.81676447162
+      ],
+      "lower_occupation": 567,
+      "matrix_prefactor": "295147905179352825856/3291396916392579",
+      "radius_upper": "6200796716749837/100000000000000000000",
+      "upper_occupation": 1100,
+      "z_exact_binary64": "7673588487937261/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "2214732222070131/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "947324560405181/1180591620717411303424",
+        "3789278092598259/4722366482869645213696"
+      ],
+      "endpoint_log_uppers_natural": [
+        -10418.407717493248,
+        -8312.139803123566
+      ],
+      "lower_occupation": 1101,
+      "matrix_prefactor": "4722366482869645213696/3789278092598259",
+      "radius_upper": "3053902022174283/31250000000000000000000",
+      "upper_occupation": 2168,
+      "z_exact_binary64": "6723668777310961/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "2989878319538255/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "5533459909550985/151115727451828646838272",
+        "5533468225367835/151115727451828646838272"
+      ],
+      "endpoint_log_uppers_natural": [
+        -21017.49673289437,
+        -4832.896991575612
+      ],
+      "lower_occupation": 2169,
+      "matrix_prefactor": "151115727451828646838272/5533459909550985",
+      "radius_upper": "97778122190790549/100000000000000000000000000",
+      "upper_occupation": 2702,
+      "z_exact_binary64": "5846582455183315/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "3778244868447575/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "1151141884838343/9671406556917033397649408",
+        "4604576534003755/38685626227668133590597632"
+      ],
+      "endpoint_log_uppers_natural": [
+        -4797.350972139609,
+        -35.129871264630594
+      ],
+      "lower_occupation": 2703,
+      "matrix_prefactor": "9671406556917033397649408/1151141884838343",
+      "radius_upper": "13648288683576859/10000000000000000000000000000",
+      "upper_occupation": 3236,
+      "z_exact_binary64": "2247150709039605/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "4524050459997127/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "6846104548948863/618970019642690137449562112",
+        "6846119075275459/618970019642690137449562112"
+      ],
+      "endpoint_log_uppers_natural": [
+        -569.362325624876,
+        -5029.067429571188
+      ],
+      "lower_occupation": 3237,
+      "matrix_prefactor": "618970019642690137449562112/6846104548948863",
+      "radius_upper": "6968284126303713/5000000000000000000000000000000",
+      "upper_occupation": 3770,
+      "z_exact_binary64": "1778499054330353/4503599627370496"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "5195654646049439/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "3885885030754991/309485009821345068724781056",
+        "1942946620520779/154742504910672534362390528"
+      ],
+      "endpoint_log_uppers_natural": [
+        -5342.44508666367,
+        -16237.607304594465
+      ],
+      "lower_occupation": 3771,
+      "matrix_prefactor": "309485009821345068724781056/3885885030754991",
+      "radius_upper": "20202983582409091/10000000000000000000000000000000000",
+      "upper_occupation": 4304,
+      "z_exact_binary64": "5886041531817917/18014398509481984"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "6086346911748539/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "3339439736738373/19342813113834066795298816",
+        "3339446175277413/19342813113834066795298816"
+      ],
+      "endpoint_log_uppers_natural": [
+        -2428.3889827143826,
+        -37374.469578623495
+      ],
+      "lower_occupation": 4305,
+      "matrix_prefactor": "19342813113834066795298816/3339439736738373",
+      "radius_upper": "5009756113892247/25000000000000000000000000000000000000",
+      "upper_occupation": 5372,
+      "z_exact_binary64": "2337669787833383/9007199254740992"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "7086161885268867/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "193330125160921/4722366482869645213696",
+        "1546643486248415/37778931862957161709568"
+      ],
+      "endpoint_log_uppers_natural": [
+        -36963.611183898116,
+        -80812.0335908562
+      ],
+      "lower_occupation": 5373,
+      "matrix_prefactor": "4722366482869645213696/193330125160921",
+      "radius_upper": "1012712167240661/400000000000000000000000000000000000000000",
+      "upper_occupation": 6440,
+      "z_exact_binary64": "3654611782786141/18014398509481984"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "7712634871558743/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "5335118779025021/2361183241434822606848",
+        "5335117637198541/2361183241434822606848"
+      ],
+      "endpoint_log_uppers_natural": [
+        -84496.58244320202,
+        -72957.63626316666
+      ],
+      "lower_occupation": 6441,
+      "matrix_prefactor": "2361183241434822606848/5335117637198541",
+      "radius_upper": "12864170536094747/25000000000000000000000000000000000000000000000",
+      "upper_occupation": 7508,
+      "z_exact_binary64": "5562015380268035/36028797018963968"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "8173724553411863/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "2411849660358495/18446744073709551616",
+        "4823680211590113/36893488147419103232"
+      ],
+      "endpoint_log_uppers_natural": [
+        -79796.47887164401,
+        -33924.259575747565
+      ],
+      "lower_occupation": 7509,
+      "matrix_prefactor": "36893488147419103232/4823680211590113",
+      "radius_upper": "93119257079349659/10000000000000000000000000000000000000000000000000",
+      "upper_occupation": 8042,
+      "z_exact_binary64": "279092977524139/2251799813685248"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "536694801952605/562949953421312",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "2973828072799207/288230376151711744",
+        "1486915408207717/144115188075855872"
+      ],
+      "endpoint_log_uppers_natural": [
+        -41866.050944230316,
+        -18575.16246894563
+      ],
+      "lower_occupation": 8043,
+      "matrix_prefactor": "288230376151711744/2973828072799207",
+      "radius_upper": "88373788361119103/10000000000000000000000000000000000000000000000000",
+      "upper_occupation": 8309,
+      "z_exact_binary64": "4453036729418275/36028797018963968"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "8797143622267311/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "7170791962636113/72057594037927936",
+        "224087622321967/2251799813685248"
+      ],
+      "endpoint_log_uppers_natural": [
+        -22501.749540846802,
+        -10903.297861216866
+      ],
+      "lower_occupation": 8310,
+      "matrix_prefactor": "72057594037927936/7170791962636113",
+      "radius_upper": "22089316243404889/2500000000000000000000000000000000000000000000000",
+      "upper_occupation": 8443,
+      "z_exact_binary64": "8905995608492413/72057594037927936"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "8903221568737251/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "5718981964152455/18014398509481984",
+        "2859496225216397/9007199254740992"
+      ],
+      "endpoint_log_uppers_natural": [
+        -12815.638397721432,
+        -7192.546129759655
+      ],
+      "lower_occupation": 8444,
+      "matrix_prefactor": "18014398509481984/5718981964152455",
+      "radius_upper": "22089275533370579/2500000000000000000000000000000000000000000000000",
+      "upper_occupation": 8510,
+      "z_exact_binary64": "8905994911712397/72057594037927936"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "8955735543708455/9007199254740992",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "2548993648247343/4503599627370496",
+        "5097996884660367/9007199254740992"
+      ],
+      "endpoint_log_uppers_natural": [
+        -8094.100895568879,
+        -5439.1385028420755
+      ],
+      "lower_occupation": 8511,
+      "matrix_prefactor": "4503599627370496/2548993648247343",
+      "radius_upper": "88357091743892847/10000000000000000000000000000000000000000000000000",
+      "upper_occupation": 8543,
+      "z_exact_binary64": "8905994843731803/72057594037927936"
+    },
+    {
+      "accepted": true,
+      "candidate_probability_exact_binary64": "1123799347227265/1125899906842624",
+      "collatz_vector_exact_binary64": [
+        "1",
+        "7477468233933369/9007199254740992",
+        "7477482446688661/9007199254740992"
+      ],
+      "endpoint_log_uppers_natural": [
+        -4556.22681301022,
+        -215.43255849610185
+      ],
+      "lower_occupation": 8544,
+      "matrix_prefactor": "9007199254740992/7477468233933369",
+      "radius_upper": "88357063064617813/10000000000000000000000000000000000000000000000000",
+      "upper_occupation": 8576,
+      "z_exact_binary64": "8905994638514455/72057594037927936"
+    }
+  ],
+  "limitations": [
+    "The receipt is conditional on the stated one-row density premise.",
+    "Occupations 1 through 31 require separate outward receipts.",
+    "Implementation equivalence is not part of this receipt."
+  ],
+  "parameters": {
+    "accepted_intervals": 21,
+    "distance": 235840,
+    "inner_epochs": 16750,
+    "outer_bits": 250,
+    "outer_dimension": 124,
+    "outer_rows": 8576,
+    "output_bits": 2144000,
+    "relative_distance": 0.11
+  },
+  "schema": "bch250-124-rowlocal-fanout-dense-outward-v1",
+  "status": "CONDITIONAL_OUTWARD_CERTIFICATE"
+}

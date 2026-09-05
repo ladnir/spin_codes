@@ -1,0 +1,47 @@
+{
+  "schema": "single-random-constituent-shared-two-band-dense-outward-v1",
+  "status": "OUTWARD_DENSE_CERTIFICATE",
+  "claim": {
+    "minimum_occupation": 160,
+    "maximum_occupation": 4096,
+    "pointwise_log2_upper": -80,
+    "composition_count": 8381873,
+    "aggregate_log2_upper": -57.001158768388656,
+    "aggregate_margin_bits_lower": 57.001158768388656,
+    "accepted_cells": 884,
+    "unresolved_cells": 37,
+    "lattice_exceptions": 300,
+    "complete_integer_lattice": true
+  },
+  "outward_checks": {
+    "worst_accepted_vertex_log2_upper": -103.65904993052546,
+    "worst_lattice_exception_log2_upper": -708.2087448416329,
+    "partition_reconstructed_exactly": true,
+    "unresolved_lattice_reconstructed_exactly": true,
+    "arithmetic": "192-bit Arb intervals; exact rational caps, probabilities, band majorants, and dyadic geometry"
+  },
+  "constituent_event": {
+    "total_failure_upper": 1.896832534308249e-13,
+    "margin_bits_lower": 42.26147292040985,
+    "comparison_to_2^-40": true
+  },
+  "parameters": {
+    "outer_rows": 4096,
+    "distance_cutoff": 228590,
+    "memory_bits": 22,
+    "minimum_occupation": 160,
+    "target_pointwise_margin_bits": 80.0,
+    "output_bits": 2097152,
+    "block_bits": 512,
+    "dimension": 256
+  },
+  "witness_source": {
+    "file": "single_random_constituent_B512_shared_two_band_dense_cover_s22.json",
+    "sha256": "722839c44a676265ac9e8fdf39e817cc106c17a86941ea6dc14ec8c409b6dcdf"
+  },
+  "proof_rule": "For a fixed categorical witness, both the unclipped reference exponent and, where that exponent is negative, the final log bound are convex in the three type counts. Vertex bounds therefore cover each accepted triangle. The listed point witnesses cover every integer composition in each unresolved triangle.",
+  "limitations": [
+    "This receipt covers occupations 160 through 4096; sparse occupations use separate transfer certificates.",
+    "The inner ensemble is RandomStepConv-M22, not RM2Sub."
+  ]
+}

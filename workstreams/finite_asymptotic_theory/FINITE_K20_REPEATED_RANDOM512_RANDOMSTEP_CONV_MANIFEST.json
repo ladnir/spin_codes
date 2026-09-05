@@ -1,0 +1,76 @@
+{
+  "schema": "finite-k20-repeated-random512-randomstepconv-manifest-v1",
+  "status": "HASH_BOUND_OUTWARD_CERTIFICATE",
+  "assertions": {
+    "outward_status": true,
+    "message_dimension": true,
+    "literal_eleven_percent": true,
+    "all_occupations": true,
+    "conditional_below_2^-108": true,
+    "bounded_setup_below_2^-40": true,
+    "single_sample_success_above_0.63": true,
+    "one_repeated_constituent": true
+  },
+  "claim": {
+    "minimum_distance_at_least": 233165,
+    "relative_distance_lower": 0.11000009435386474,
+    "conditional_bad_probability_log2_upper": -108.16539169026358,
+    "conditional_margin_bits_lower": 108.16539169026358,
+    "comparison_to_2^-40": true,
+    "maximum_pointwise_log2_upper": -120.16539169026359,
+    "dominant_active_outer_rows": 1,
+    "occupation_count": 4096,
+    "bounded_setup_attempts": 28,
+    "unconditional_abort_or_bad_log2_upper": -40.883553495575875,
+    "unconditional_comparison_to_2^-40": true
+  },
+  "constituent_event": {
+    "event": "the one sampled [512,256] generator has full row rank and A_w <= (13/2) E[A_w] for every 1<=w<=512",
+    "low_mean_markov_union_upper": 0.06382497321278031,
+    "central_cantelli_union_upper": 0.2996361818711982,
+    "rank_failure_union_upper": 8.636168555094447e-78,
+    "total_failure_upper": 0.3634611550839785,
+    "success_probability_lower": 0.6365388449160215,
+    "exact_total_failure_numerator_bits": 136692,
+    "exact_total_failure_denominator_bits": 136694,
+    "exact_total_failure_numerator_sha256": "e815face40f65b2fd66093d8cd6ef197ba1bcd278d842b83b8de7cfcbfa88f71",
+    "exact_total_failure_denominator_sha256": "6996b2fe8d26cfd0368da681c7bb8e3220d406077d566002a723e97d49805cf6"
+  },
+  "files": [
+    {
+      "path": "FINITE_K20_REPEATED_RANDOM512_RANDOMSTEP_CONV_CERTIFICATE.md",
+      "bytes": 8375,
+      "sha256": "33c9d0b8b629b58386cd410c13262f64232a1301afa1bb88ab78d8154e282c4b"
+    },
+    {
+      "path": "evaluate_repeated_random512_randomstepconv_g1.py",
+      "bytes": 11254,
+      "sha256": "4ef6b9c839e57061b7c5bce258946a39d0b452253c7c7d6f9f06ec9e142f01ea"
+    },
+    {
+      "path": "repeated_random512_randomstepconv_g1_s30_allq_d11.json",
+      "bytes": 1015836,
+      "sha256": "20ec9079a3c86fbe34f10e0deb23d8b482ae4bf85967cb32bf7e8163196026a4"
+    },
+    {
+      "path": "certify_repeated_random512_randomstepconv_g1_outward.py",
+      "bytes": 17044,
+      "sha256": "08a52141c4f44793d4343412d565d60d24aae881f64681ffffae4a5ab6f9aa9f"
+    },
+    {
+      "path": "build_repeated_random512_randomstepconv_manifest.py",
+      "bytes": 3464,
+      "sha256": "4cb1ed3789296040821d2a4ef3cda6efdc84dd8fb3e1871b9725f43342ee85b0"
+    },
+    {
+      "path": "repeated_random512_randomstepconv_g1_s30_allq_outward_d11.json",
+      "bytes": 799962,
+      "sha256": "6471c7ba50d0a47bb18e5b699bdd6de5e9258de6b35a327bec400705305762ac"
+    }
+  ],
+  "reproduction": [
+    "python workstreams/finite_asymptotic_theory/evaluate_repeated_random512_randomstepconv_g1.py",
+    "python workstreams/finite_asymptotic_theory/certify_repeated_random512_randomstepconv_g1_outward.py",
+    "python workstreams/finite_asymptotic_theory/build_repeated_random512_randomstepconv_manifest.py"
+  ]
+}

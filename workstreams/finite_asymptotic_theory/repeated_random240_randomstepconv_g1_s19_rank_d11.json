@@ -1,0 +1,1136 @@
+{
+  "schema": "repeated-random240-randomstepconv-g1-rank-v1",
+  "status": "BINARY64_DIAGNOSTIC_EXACT_RANK_COUNT",
+  "claim": {
+    "log2_expected_bad_upper": 1039340.0193484052,
+    "margin_bits": -1039340.0193484052,
+    "closes_40_bits": false,
+    "all_nonzero_parent_messages_covered": true,
+    "dominant": {
+      "message_matrix_rank": 120,
+      "pointwise_log2_upper": 1039340.0193484052,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1059840.0000000014,
+      "inner_log2_upper": -20499.980651596146
+    }
+  },
+  "construction": {
+    "outer": "one uniform random binary K-by-B generator, sampled once and repeated in all L rows",
+    "routing": "transpose the B outer coordinates into B length-L regions and independently permute each region",
+    "inner": "independent uniform linear (M+1)-by-(M+1) maps at every bit position, sampled once and shared by all messages",
+    "row_local_outer_coordinate_permutations": "omitted"
+  },
+  "parameters": {
+    "outer_bits": 240,
+    "outer_dimension": 120,
+    "outer_rows": 8832,
+    "output_bits": 2119680,
+    "parent_dimension": 1059840,
+    "target_dimension_after_zero_shortening": 1048576,
+    "distance_cutoff": 233164,
+    "memory_bits": 19
+  },
+  "probability_space": "the one shared random outer generator, the B independent region permutations, and the N independent RandomStepConv maps",
+  "bound": {
+    "rank_count": "prod_{i=0}^{r-1} (2^L-2^i)(2^K-2^i)/(2^r-2^i)",
+    "information_set": "for each fixed rank-r parent message matrix, choose r row coordinates on which its column space projects bijectively",
+    "monotonicity": "delete all input ones outside the information-set rows",
+    "resulting_region_law": "r independent fair candidate bits placed in a uniform r-subset of the L region positions"
+  },
+  "grid": {
+    "minimum": -10.0,
+    "maximum": 1.0,
+    "step": 0.25,
+    "count": 45
+  },
+  "rank_rows": [
+    {
+      "message_matrix_rank": 1,
+      "pointwise_log2_upper": 8798.581395899319,
+      "log_surprisal": -8.5,
+      "surprisal": 0.00020346836901064417,
+      "z": 0.9997965523292741,
+      "message_count_log2": 8952.0,
+      "inner_log2_upper": -153.41860410068156
+    },
+    {
+      "message_matrix_rank": 2,
+      "pointwise_log2_upper": 17577.63283441107,
+      "log_surprisal": -8.0,
+      "surprisal": 0.00033546262790251185,
+      "z": 0.9996645936333934,
+      "message_count_log2": 17901.41503749928,
+      "inner_log2_upper": -323.78220308820744
+    },
+    {
+      "message_matrix_rank": 3,
+      "pointwise_log2_upper": 26349.72937378707,
+      "log_surprisal": -7.5,
+      "surprisal": 0.0005530843701478336,
+      "z": 0.9994470685528181,
+      "message_count_log2": 26848.607682577225,
+      "inner_log2_upper": -498.8783087901524
+    },
+    {
+      "message_matrix_rank": 4,
+      "pointwise_log2_upper": 35118.92856414247,
+      "log_surprisal": -7.25,
+      "surprisal": 0.000710174388842549,
+      "z": 0.9992900777253035,
+      "message_count_log2": 35793.70079198162,
+      "inner_log2_upper": -674.7722278391435
+    },
+    {
+      "message_matrix_rank": 5,
+      "pointwise_log2_upper": 43888.70826173837,
+      "log_surprisal": -7.0,
+      "surprisal": 0.0009118819655545162,
+      "z": 0.9990885336724579,
+      "message_count_log2": 44736.74659567123,
+      "inner_log2_upper": -848.0383339328554
+    },
+    {
+      "message_matrix_rank": 6,
+      "pointwise_log2_upper": 52668.27627584646,
+      "log_surprisal": -6.75,
+      "surprisal": 0.0011708796207911744,
+      "z": 0.9988298055912923,
+      "message_count_log2": 53677.76931574772,
+      "inner_log2_upper": -1009.4930399012542
+    },
+    {
+      "message_matrix_rank": 7,
+      "pointwise_log2_upper": 61416.10845426402,
+      "log_surprisal": -6.75,
+      "surprisal": 0.0011708796207911744,
+      "z": 0.9988298055912923,
+      "message_count_log2": 62616.78063106096,
+      "inner_log2_upper": -1200.6721767969416
+    },
+    {
+      "message_matrix_rank": 8,
+      "pointwise_log2_upper": 70188.9255769456,
+      "log_surprisal": -6.5,
+      "surprisal": 0.0015034391929775724,
+      "z": 0.9984976904055608,
+      "message_count_log2": 71553.7862776241,
+      "inner_log2_upper": -1364.860700678489
+    },
+    {
+      "message_matrix_rank": 9,
+      "pointwise_log2_upper": 78936.30897136388,
+      "log_surprisal": -6.5,
+      "surprisal": 0.0015034391929775724,
+      "z": 0.9984976904055608,
+      "message_count_log2": 80488.78909814316,
+      "inner_log2_upper": -1552.4801267792834
+    },
+    {
+      "message_matrix_rank": 10,
+      "pointwise_log2_upper": 87720.40947105516,
+      "log_surprisal": -6.25,
+      "surprisal": 0.0019304541362277093,
+      "z": 0.9980714079919146,
+      "message_count_log2": 89421.79050771342,
+      "inner_log2_upper": -1701.38103665827
+    },
+    {
+      "message_matrix_rank": 11,
+      "pointwise_log2_upper": 96448.3948910995,
+      "log_surprisal": -6.25,
+      "surprisal": 0.0019304541362277093,
+      "z": 0.9980714079919146,
+      "message_count_log2": 98352.7912123264,
+      "inner_log2_upper": -1904.396321226895
+    },
+    {
+      "message_matrix_rank": 12,
+      "pointwise_log2_upper": 105214.94476660756,
+      "log_surprisal": -6.25,
+      "surprisal": 0.0019304541362277093,
+      "z": 0.9980714079919146,
+      "message_count_log2": 107281.79156458988,
+      "inner_log2_upper": -2066.84679798233
+    },
+    {
+      "message_matrix_rank": 13,
+      "pointwise_log2_upper": 113983.77174551449,
+      "log_surprisal": -6.0,
+      "surprisal": 0.0024787521766663585,
+      "z": 0.9975243173927525,
+      "message_count_log2": 116208.79174071089,
+      "inner_log2_upper": -2225.019995196411
+    },
+    {
+      "message_matrix_rank": 14,
+      "pointwise_log2_upper": 122705.36273583822,
+      "log_surprisal": -6.0,
+      "surprisal": 0.0024787521766663585,
+      "z": 0.9975243173927525,
+      "message_count_log2": 125133.79182876866,
+      "inner_log2_upper": -2428.429092930431
+    },
+    {
+      "message_matrix_rank": 15,
+      "pointwise_log2_upper": 131454.9562351952,
+      "log_surprisal": -6.0,
+      "surprisal": 0.0024787521766663585,
+      "z": 0.9975243173927525,
+      "message_count_log2": 134056.7918727969,
+      "inner_log2_upper": -2601.8356376016873
+    },
+    {
+      "message_matrix_rank": 16,
+      "pointwise_log2_upper": 140248.64132864287,
+      "log_surprisal": -6.0,
+      "surprisal": 0.0024787521766663585,
+      "z": 0.9975243173927525,
+      "message_count_log2": 142977.79189481083,
+      "inner_log2_upper": -2729.150566167929
+    },
+    {
+      "message_matrix_rank": 17,
+      "pointwise_log2_upper": 148968.97837894753,
+      "log_surprisal": -5.75,
+      "surprisal": 0.003182780796509667,
+      "z": 0.9968222788809181,
+      "message_count_log2": 151896.79190581775,
+      "inner_log2_upper": -2927.8135268702167
+    },
+    {
+      "message_matrix_rank": 18,
+      "pointwise_log2_upper": 157686.16085406343,
+      "log_surprisal": -5.75,
+      "surprisal": 0.003182780796509667,
+      "z": 0.9968222788809181,
+      "message_count_log2": 160813.79191132123,
+      "inner_log2_upper": -3127.631057257795
+    },
+    {
+      "message_matrix_rank": 19,
+      "pointwise_log2_upper": 166425.72851338275,
+      "log_surprisal": -5.75,
+      "surprisal": 0.003182780796509667,
+      "z": 0.9968222788809181,
+      "message_count_log2": 169728.79191407294,
+      "inner_log2_upper": -3303.0634006901987
+    },
+    {
+      "message_matrix_rank": 20,
+      "pointwise_log2_upper": 175197.2611758022,
+      "log_surprisal": -5.75,
+      "surprisal": 0.003182780796509667,
+      "z": 0.9968222788809181,
+      "message_count_log2": 178641.79191544882,
+      "inner_log2_upper": -3444.530739646618
+    },
+    {
+      "message_matrix_rank": 21,
+      "pointwise_log2_upper": 183964.26239619358,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 187552.79191613678,
+      "inner_log2_upper": -3588.529519943193
+    },
+    {
+      "message_matrix_rank": 22,
+      "pointwise_log2_upper": 192662.22338117572,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 196461.79191648072,
+      "inner_log2_upper": -3799.5685353049935
+    },
+    {
+      "message_matrix_rank": 23,
+      "pointwise_log2_upper": 201371.9929688559,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 205368.79191665276,
+      "inner_log2_upper": -3996.7989477969013
+    },
+    {
+      "message_matrix_rank": 24,
+      "pointwise_log2_upper": 210099.06549200535,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 214273.79191673876,
+      "inner_log2_upper": -4174.726424733392
+    },
+    {
+      "message_matrix_rank": 25,
+      "pointwise_log2_upper": 218848.63038857476,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 223176.79191678177,
+      "inner_log2_upper": -4328.161528207012
+    },
+    {
+      "message_matrix_rank": 26,
+      "pointwise_log2_upper": 227623.67347470243,
+      "log_surprisal": -5.5,
+      "surprisal": 0.004086771438464067,
+      "z": 0.9959215680475387,
+      "message_count_log2": 232077.79191680322,
+      "inner_log2_upper": -4454.118442100806
+    },
+    {
+      "message_matrix_rank": 27,
+      "pointwise_log2_upper": 236356.24828809805,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 240976.7919168141,
+      "inner_log2_upper": -4620.543628716058
+    },
+    {
+      "message_matrix_rank": 28,
+      "pointwise_log2_upper": 245043.1413419139,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 249873.79191681943,
+      "inner_log2_upper": -4830.65057490557
+    },
+    {
+      "message_matrix_rank": 29,
+      "pointwise_log2_upper": 253739.29677906728,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 258768.7919168221,
+      "inner_log2_upper": -5029.495137754794
+    },
+    {
+      "message_matrix_rank": 30,
+      "pointwise_log2_upper": 262447.88625593274,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 267661.7919168236,
+      "inner_log2_upper": -5213.90566089086
+    },
+    {
+      "message_matrix_rank": 31,
+      "pointwise_log2_upper": 271171.71568087325,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 276552.7919168242,
+      "inner_log2_upper": -5381.076235950882
+    },
+    {
+      "message_matrix_rank": 32,
+      "pointwise_log2_upper": 279912.6293282806,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 285441.79191682464,
+      "inner_log2_upper": -5529.162588544082
+    },
+    {
+      "message_matrix_rank": 33,
+      "pointwise_log2_upper": 288671.23452952795,
+      "log_surprisal": -5.25,
+      "surprisal": 0.005247518399181385,
+      "z": 0.9947662257740503,
+      "message_count_log2": 294328.7919168247,
+      "inner_log2_upper": -5657.557387296776
+    },
+    {
+      "message_matrix_rank": 34,
+      "pointwise_log2_upper": 297420.45496034087,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 303213.79191682494,
+      "inner_log2_upper": -5793.336956484056
+    },
+    {
+      "message_matrix_rank": 35,
+      "pointwise_log2_upper": 306089.63709016517,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 312096.79191682494,
+      "inner_log2_upper": -6007.154826659791
+    },
+    {
+      "message_matrix_rank": 36,
+      "pointwise_log2_upper": 314765.0129544176,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 320977.79191682505,
+      "inner_log2_upper": -6212.7789624074
+    },
+    {
+      "message_matrix_rank": 37,
+      "pointwise_log2_upper": 323448.54775151424,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 329856.79191682505,
+      "inner_log2_upper": -6408.244165310842
+    },
+    {
+      "message_matrix_rank": 38,
+      "pointwise_log2_upper": 332142.03198409075,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 338733.79191682505,
+      "inner_log2_upper": -6591.759932734318
+    },
+    {
+      "message_matrix_rank": 39,
+      "pointwise_log2_upper": 340846.78842639487,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 347608.7919168251,
+      "inner_log2_upper": -6762.0034904302365
+    },
+    {
+      "message_matrix_rank": 40,
+      "pointwise_log2_upper": 349563.5080678846,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 356481.791916825,
+      "inner_log2_upper": -6918.283848940404
+    },
+    {
+      "message_matrix_rank": 41,
+      "pointwise_log2_upper": 358292.27919537795,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 365352.79191682505,
+      "inner_log2_upper": -7060.51272144705
+    },
+    {
+      "message_matrix_rank": 42,
+      "pointwise_log2_upper": 367032.7555488872,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 374221.79191682517,
+      "inner_log2_upper": -7189.0363679379525
+    },
+    {
+      "message_matrix_rank": 43,
+      "pointwise_log2_upper": 375784.35724496434,
+      "log_surprisal": -5.0,
+      "surprisal": 0.006737946999085467,
+      "z": 0.9932847020678415,
+      "message_count_log2": 383088.791916825,
+      "inner_log2_upper": -7304.434671860666
+    },
+    {
+      "message_matrix_rank": 44,
+      "pointwise_log2_upper": 384436.6946915234,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 391953.7919168253,
+      "inner_log2_upper": -7517.097225301869
+    },
+    {
+      "message_matrix_rank": 45,
+      "pointwise_log2_upper": 393089.74216755334,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 400816.79191682517,
+      "inner_log2_upper": -7727.049749271866
+    },
+    {
+      "message_matrix_rank": 46,
+      "pointwise_log2_upper": 401748.3554004091,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 409677.791916825,
+      "inner_log2_upper": -7929.436516415876
+    },
+    {
+      "message_matrix_rank": 47,
+      "pointwise_log2_upper": 410413.75260111026,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 418536.7919168251,
+      "inner_log2_upper": -8123.039315714912
+    },
+    {
+      "message_matrix_rank": 48,
+      "pointwise_log2_upper": 419086.90589041077,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 427393.7919168249,
+      "inner_log2_upper": -8306.886026414122
+    },
+    {
+      "message_matrix_rank": 49,
+      "pointwise_log2_upper": 427768.42180628295,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 436248.7919168251,
+      "inner_log2_upper": -8480.370110542159
+    },
+    {
+      "message_matrix_rank": 50,
+      "pointwise_log2_upper": 436458.5102300119,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 445101.7919168247,
+      "inner_log2_upper": -8643.281686812814
+    },
+    {
+      "message_matrix_rank": 51,
+      "pointwise_log2_upper": 445157.04242028395,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 453952.7919168251,
+      "inner_log2_upper": -8795.749496541237
+    },
+    {
+      "message_matrix_rank": 52,
+      "pointwise_log2_upper": 453863.6607371438,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 462801.79191682476,
+      "inner_log2_upper": -8938.131179680968
+    },
+    {
+      "message_matrix_rank": 53,
+      "pointwise_log2_upper": 462577.8950776225,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 471648.7919168255,
+      "inner_log2_upper": -9070.896839203042
+    },
+    {
+      "message_matrix_rank": 54,
+      "pointwise_log2_upper": 471299.2568428009,
+      "log_surprisal": -4.75,
+      "surprisal": 0.008651695203120634,
+      "z": 0.9913856230123335,
+      "message_count_log2": 480493.791916825,
+      "inner_log2_upper": -9194.535074024034
+    },
+    {
+      "message_matrix_rank": 55,
+      "pointwise_log2_upper": 480003.33935902826,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 489336.7919168245,
+      "inner_log2_upper": -9333.45255779627
+    },
+    {
+      "message_matrix_rank": 56,
+      "pointwise_log2_upper": 488628.5778783392,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 498177.79191682494,
+      "inner_log2_upper": -9549.214038485743
+    },
+    {
+      "message_matrix_rank": 57,
+      "pointwise_log2_upper": 497257.13006731175,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 507016.7919168245,
+      "inner_log2_upper": -9759.661849512842
+    },
+    {
+      "message_matrix_rank": 58,
+      "pointwise_log2_upper": 505889.86902731133,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 515853.79191682505,
+      "inner_log2_upper": -9963.922889513671
+    },
+    {
+      "message_matrix_rank": 59,
+      "pointwise_log2_upper": 514527.5915425805,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 524688.7919168246,
+      "inner_log2_upper": -10161.200374244143
+    },
+    {
+      "message_matrix_rank": 60,
+      "pointwise_log2_upper": 523170.9340578208,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 533521.791916825,
+      "inner_log2_upper": -10350.85785900427
+    },
+    {
+      "message_matrix_rank": 61,
+      "pointwise_log2_upper": 531820.3112743864,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 542352.7919168245,
+      "inner_log2_upper": -10532.4806424382
+    },
+    {
+      "message_matrix_rank": 62,
+      "pointwise_log2_upper": 540475.8952353662,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 551181.7919168245,
+      "inner_log2_upper": -10705.896681458422
+    },
+    {
+      "message_matrix_rank": 63,
+      "pointwise_log2_upper": 549137.6368497922,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 560008.7919168245,
+      "inner_log2_upper": -10871.155067032365
+    },
+    {
+      "message_matrix_rank": 64,
+      "pointwise_log2_upper": 557805.3169323349,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 568833.7919168244,
+      "inner_log2_upper": -11028.47498448948
+    },
+    {
+      "message_matrix_rank": 65,
+      "pointwise_log2_upper": 566478.6081355269,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 577656.7919168249,
+      "inner_log2_upper": -11178.18378129802
+    },
+    {
+      "message_matrix_rank": 66,
+      "pointwise_log2_upper": 575157.1325353553,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 586477.7919168248,
+      "inner_log2_upper": -11320.659381469533
+    },
+    {
+      "message_matrix_rank": 67,
+      "pointwise_log2_upper": 583840.5068079714,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 595296.7919168245,
+      "inner_log2_upper": -11456.285108853222
+    },
+    {
+      "message_matrix_rank": 68,
+      "pointwise_log2_upper": 592528.373181515,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 604113.7919168243,
+      "inner_log2_upper": -11585.418735309304
+    },
+    {
+      "message_matrix_rank": 69,
+      "pointwise_log2_upper": 601220.4179082738,
+      "log_surprisal": -4.5,
+      "surprisal": 0.011108996538242306,
+      "z": 0.9889524805037951,
+      "message_count_log2": 612928.791916825,
+      "inner_log2_upper": -11708.374008551387
+    },
+    {
+      "message_matrix_rank": 70,
+      "pointwise_log2_upper": 609887.6732328109,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 621741.7919168251,
+      "inner_log2_upper": -11854.118684014156
+    },
+    {
+      "message_matrix_rank": 71,
+      "pointwise_log2_upper": 618482.1027697432,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 630552.7919168242,
+      "inner_log2_upper": -12070.68914708094
+    },
+    {
+      "message_matrix_rank": 72,
+      "pointwise_log2_upper": 627078.8425979214,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 639361.7919168245,
+      "inner_log2_upper": -12282.949318903185
+    },
+    {
+      "message_matrix_rank": 73,
+      "pointwise_log2_upper": 635678.4794182134,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 648168.7919168245,
+      "inner_log2_upper": -12490.312498611147
+    },
+    {
+      "message_matrix_rank": 74,
+      "pointwise_log2_upper": 644281.5521091552,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 656973.7919168242,
+      "inner_log2_upper": -12692.239807668971
+    },
+    {
+      "message_matrix_rank": 75,
+      "pointwise_log2_upper": 652888.5086555913,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 665776.7919168242,
+      "inner_log2_upper": -12888.283261232822
+    },
+    {
+      "message_matrix_rank": 76,
+      "pointwise_log2_upper": 661499.6722227416,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 674577.7919168249,
+      "inner_log2_upper": -13078.119694083258
+    },
+    {
+      "message_matrix_rank": 77,
+      "pointwise_log2_upper": 670115.2241047914,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 683376.791916825,
+      "inner_log2_upper": -13261.567812033632
+    },
+    {
+      "message_matrix_rank": 78,
+      "pointwise_log2_upper": 678735.2062161149,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 692173.7919168244,
+      "inner_log2_upper": -13438.585700709531
+    },
+    {
+      "message_matrix_rank": 79,
+      "pointwise_log2_upper": 687359.5400885798,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 700968.7919168243,
+      "inner_log2_upper": -13609.25182824454
+    },
+    {
+      "message_matrix_rank": 80,
+      "pointwise_log2_upper": 695988.055717569,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 709761.7919168245,
+      "inner_log2_upper": -13773.73619925552
+    },
+    {
+      "message_matrix_rank": 81,
+      "pointwise_log2_upper": 704620.5230825891,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 718552.7919168238,
+      "inner_log2_upper": -13932.268834234812
+    },
+    {
+      "message_matrix_rank": 82,
+      "pointwise_log2_upper": 713256.6809257519,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 727341.7919168237,
+      "inner_log2_upper": -14085.110991071862
+    },
+    {
+      "message_matrix_rank": 83,
+      "pointwise_log2_upper": 721896.2598799728,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 736128.7919168246,
+      "inner_log2_upper": -14232.532036851873
+    },
+    {
+      "message_matrix_rank": 84,
+      "pointwise_log2_upper": 730538.9991650289,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 744913.7919168248,
+      "inner_log2_upper": -14374.79275179578
+    },
+    {
+      "message_matrix_rank": 85,
+      "pointwise_log2_upper": 739184.6573930663,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 753696.7919168238,
+      "inner_log2_upper": -14512.134523757431
+    },
+    {
+      "message_matrix_rank": 86,
+      "pointwise_log2_upper": 747833.0186201393,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 762477.791916824,
+      "inner_log2_upper": -14644.773296684489
+    },
+    {
+      "message_matrix_rank": 87,
+      "pointwise_log2_upper": 756483.8948982646,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 771256.7919168248,
+      "inner_log2_upper": -14772.897018560283
+    },
+    {
+      "message_matrix_rank": 88,
+      "pointwise_log2_upper": 765137.1264565882,
+      "log_surprisal": -4.25,
+      "surprisal": 0.014264233908999256,
+      "z": 0.9858370182755026,
+      "message_count_log2": 780033.791916825,
+      "inner_log2_upper": -14896.665460236849
+    },
+    {
+      "message_matrix_rank": 89,
+      "pointwise_log2_upper": 773775.1621854055,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 788808.7919168228,
+      "inner_log2_upper": -15033.629731417423
+    },
+    {
+      "message_matrix_rank": 90,
+      "pointwise_log2_upper": 782330.4060868724,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 797581.7919168231,
+      "inner_log2_upper": -15251.385829950656
+    },
+    {
+      "message_matrix_rank": 91,
+      "pointwise_log2_upper": 790887.0954453318,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 806352.7919168222,
+      "inner_log2_upper": -15465.696471490452
+    },
+    {
+      "message_matrix_rank": 92,
+      "pointwise_log2_upper": 799445.6236398973,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 815121.7919168184,
+      "inner_log2_upper": -15676.168276920995
+    },
+    {
+      "message_matrix_rank": 93,
+      "pointwise_log2_upper": 808006.3561353412,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 823888.7919168131,
+      "inner_log2_upper": -15882.435781471755
+    },
+    {
+      "message_matrix_rank": 94,
+      "pointwise_log2_upper": 816569.6086476683,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 832653.7919168038,
+      "inner_log2_upper": -16084.183269135672
+    },
+    {
+      "message_matrix_rank": 95,
+      "pointwise_log2_upper": 825135.6287359527,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 841416.7919167832,
+      "inner_log2_upper": -16281.163180830617
+    },
+    {
+      "message_matrix_rank": 96,
+      "pointwise_log2_upper": 833704.584058724,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 850177.791916738,
+      "inner_log2_upper": -16473.207858014026
+    },
+    {
+      "message_matrix_rank": 97,
+      "pointwise_log2_upper": 842276.5590713978,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 858936.7919166527,
+      "inner_log2_upper": -16660.232845254934
+    },
+    {
+      "message_matrix_rank": 98,
+      "pointwise_log2_upper": 850851.5599837567,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 867693.7919164816,
+      "inner_log2_upper": -16842.231932724837
+    },
+    {
+      "message_matrix_rank": 99,
+      "pointwise_log2_upper": 859429.5261142028,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 876448.7919161358,
+      "inner_log2_upper": -17019.26580193297
+    },
+    {
+      "message_matrix_rank": 100,
+      "pointwise_log2_upper": 868010.3449090385,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 885201.791915448,
+      "inner_log2_upper": -17191.44700640945
+    },
+    {
+      "message_matrix_rank": 101,
+      "pointwise_log2_upper": 876593.8679184923,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 893952.7919140736,
+      "inner_log2_upper": -17358.923995581317
+    },
+    {
+      "message_matrix_rank": 102,
+      "pointwise_log2_upper": 885179.9256496913,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 902701.7919113226,
+      "inner_log2_upper": -17521.866261631363
+    },
+    {
+      "message_matrix_rank": 103,
+      "pointwise_log2_upper": 893768.3400560701,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 911448.7919058173,
+      "inner_log2_upper": -17680.45184974711
+    },
+    {
+      "message_matrix_rank": 104,
+      "pointwise_log2_upper": 902358.9341758316,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 920193.7918948116,
+      "inner_log2_upper": -17834.857718979998
+    },
+    {
+      "message_matrix_rank": 105,
+      "pointwise_log2_upper": 910951.5389637675,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 928936.7918727988,
+      "inner_log2_upper": -17985.252909031264
+    },
+    {
+      "message_matrix_rank": 106,
+      "pointwise_log2_upper": 919545.9976623988,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 937677.7918287708,
+      "inner_log2_upper": -18131.79416637195
+    },
+    {
+      "message_matrix_rank": 107,
+      "pointwise_log2_upper": 928142.1681824343,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 946416.7917407111,
+      "inner_log2_upper": -18274.623558276762
+    },
+    {
+      "message_matrix_rank": 108,
+      "pointwise_log2_upper": 936739.9239739208,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 955153.7915645909,
+      "inner_log2_upper": -18413.86759067007
+    },
+    {
+      "message_matrix_rank": 109,
+      "pointwise_log2_upper": 945339.1538199966,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 963888.7912123278,
+      "inner_log2_upper": -18549.637392331093
+    },
+    {
+      "message_matrix_rank": 110,
+      "pointwise_log2_upper": 953939.7609086548,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 972621.7905077137,
+      "inner_log2_upper": -18682.029599058915
+    },
+    {
+      "message_matrix_rank": 111,
+      "pointwise_log2_upper": 962541.6614511962,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 981352.789098143,
+      "inner_log2_upper": -18811.1276469469
+    },
+    {
+      "message_matrix_rank": 112,
+      "pointwise_log2_upper": 971144.7830235454,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 990081.7862776249,
+      "inner_log2_upper": -18937.003254079376
+    },
+    {
+      "message_matrix_rank": 113,
+      "pointwise_log2_upper": 979749.0627004148,
+      "log_surprisal": -4.0,
+      "surprisal": 0.01831563888873418,
+      "z": 0.9818510730616665,
+      "message_count_log2": 998808.7806310634,
+      "inner_log2_upper": -19059.717930648665
+    },
+    {
+      "message_matrix_rank": 114,
+      "pointwise_log2_upper": 988285.5843283113,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1007533.7693157475,
+      "inner_log2_upper": -19248.18498743629
+    },
+    {
+      "message_matrix_rank": 115,
+      "pointwise_log2_upper": 996791.775854513,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1016256.7465956714,
+      "inner_log2_upper": -19464.970741158333
+    },
+    {
+      "message_matrix_rank": 116,
+      "pointwise_log2_upper": 1005298.9011367394,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1024977.7007919833,
+      "inner_log2_upper": -19678.79965524382
+    },
+    {
+      "message_matrix_rank": 117,
+      "pointwise_log2_upper": 1013807.1860961175,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1033696.6076825763,
+      "inner_log2_upper": -19889.421586458775
+    },
+    {
+      "message_matrix_rank": 118,
+      "pointwise_log2_upper": 1022316.8033822263,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1042413.4150375006,
+      "inner_log2_upper": -20096.61165527424
+    },
+    {
+      "message_matrix_rank": 119,
+      "pointwise_log2_upper": 1030827.819756503,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1051128.0000000014,
+      "inner_log2_upper": -20300.18024349851
+    },
+    {
+      "message_matrix_rank": 120,
+      "pointwise_log2_upper": 1039340.0193484052,
+      "log_surprisal": -3.75,
+      "surprisal": 0.023517745856009107,
+      "z": 0.9767566411323356,
+      "message_count_log2": 1059840.0000000014,
+      "inner_log2_upper": -20499.980651596146
+    }
+  ],
+  "limitations": [
+    "The logarithmic calculation uses nearest binary64 arithmetic.",
+    "The result is not yet an outward-rounded certificate.",
+    "The outer is a random constituent, not Golay--BA-3.",
+    "The result proves no implementation-cost bound."
+  ]
+}

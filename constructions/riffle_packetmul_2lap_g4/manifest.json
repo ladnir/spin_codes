@@ -1,0 +1,34 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_packetmul_2lap_g4",
+  "display_name": "Riffle PacketMul-2Lap g=4",
+  "status": "PAUSED_OPEN",
+  "approved_date": "2026-08-21",
+  "parent_candidate_id": "riffle_dp_2lap_g4",
+  "packet_width_bits": 4,
+  "lap_count": 2,
+  "retains_first_lap_terminal_state": true,
+  "fresh_randomness_between_laps": false,
+  "packet_multiplier": {
+    "field": "GF(2^4)",
+    "basis": "polynomial",
+    "coefficient_bit_order": [
+      "1",
+      "alpha",
+      "alpha^2",
+      "alpha^3"
+    ],
+    "modulus_polynomial": "x^4+x+1",
+    "modulus_hex": "0x13",
+    "scalar_domain": "GF(16)^*",
+    "sampling": "independent_uniform_rejection",
+    "scope": "one scalar per input packet coordinate",
+    "application": "once_before_packet_permutation",
+    "public_schedule": true,
+    "preserves_zero_packet_support": true
+  },
+  "proof_status": "NO_SECURITY_OR_DISTANCE_CERTIFICATE",
+  "performance_status": "NOT_BENCHMARKED_AS_AN_INTEGRATED_CANDIDATE",
+  "active_goal": null,
+  "successor_candidate_id": "riffle_packetmul_wrapmul_2lap_g4"
+}

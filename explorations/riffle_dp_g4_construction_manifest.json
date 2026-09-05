@@ -1,0 +1,99 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate": {
+    "name": "Riffle DP g=4",
+    "revision": "g0-v1",
+    "modification_policy": "Any change to a mathematical field below requires a distinct candidate name and a new manifest."
+  },
+  "claim_under_study": {
+    "message_dimension_bits": 1048576,
+    "binary_length": 2097408,
+    "failure_weight_inclusive": 188766,
+    "random_variable": "Z_d counts nonzero messages whose forward encoded word has Hamming weight at most d.",
+    "target": "E[Z_d] <= 2^-40"
+  },
+  "field": {
+    "degree": 64,
+    "basis": "polynomial basis, bit i is the coefficient of x^i",
+    "modulus": "x^64 + x^4 + x^3 + x + 1",
+    "left_shift_reduction_hex": "0x1b",
+    "coefficient_generator": "x",
+    "coefficient_generator_is_primitive": true
+  },
+  "outer_code": {
+    "data_symbol_count": 16384,
+    "symbol_bits": 64,
+    "parity_symbol_count": 2,
+    "symbol_order": "m_0,...,m_16383,p_0,p_1",
+    "parity_0": "p_0 = sum_{i=0}^{16383} m_i",
+    "parity_1": "p_1 = sum_{i=0}^{16383} x^i m_i",
+    "coefficient_schedule": "alpha_i = x^i for 0 <= i < 16384",
+    "minimum_field_block_distance": 3
+  },
+  "local_code": {
+    "name": "extended primitive narrow-sense BCH [128,64,22]",
+    "dimension": 64,
+    "length": 128,
+    "minimum_distance": 22,
+    "primitive_polynomial_hex": "0x83",
+    "primitive_designed_distance": 21,
+    "cyclic_generator_polynomial_hex": "0xf4845518b9582a1f",
+    "coordinate_127": "extension parity coordinate",
+    "encoding": "For message polynomial m, coordinates 0..126 are m(x)g(x); coordinate 127 is their parity.",
+    "generator_rows_sha256_little_endian_128": "972cfc1c6de12e4ddc0c67680fd8e3cddedbd84d0a409c7061e09a86b818ca56"
+  },
+  "layout": {
+    "outer_word_count": 16386,
+    "punctured_coordinates": 0,
+    "outer_binary_layout": "The 128 coordinates of each local word are contiguous, in outer symbol order.",
+    "packet_width_bits": 4,
+    "packets_per_local_word": 32,
+    "packet_count": 524352,
+    "packet_layout": "Consecutive four-bit groups of the sequential outer binary layout.",
+    "striped_layout": false,
+    "additional_mixer": false,
+    "independent_lane_bijections": false,
+    "per_node_packet_relabeling": false
+  },
+  "ensemble": {
+    "sample_space": "All bijections from 524352 logical packet positions to 524352 physical outer packets.",
+    "distribution": "uniform",
+    "only_random_choice": "the global packet bijection",
+    "packet_order_semantics": "packet_order[j] is the physical outer packet gathered at logical inner packet position j",
+    "implementation_sampler_scope": "init(seed) is a finite-seed implementation adapter and is not the exact theorem-facing uniform distribution on the symmetric group.",
+    "exact_conditional_interface": "initOrder(packet_order) realizes the binary matrix for a specified bijection."
+  },
+  "inner_map": {
+    "node_width_bits": 64,
+    "packets_per_node": 16,
+    "node_count": 32772,
+    "initial_state": "64 zero symbols",
+    "node_order": "logical nodes 32771 down to 0",
+    "step": "Gather the node's 16 packets through packet_order, apply the extended-BCH systematic packet transpose state step, write the result to the same physical packets, and use that result as the next state.",
+    "matrix_orientation": "The forward code matrix is the transpose of the implemented composite transpose map: inner transpose followed by outer transpose."
+  },
+  "derived_terminal_event": {
+    "terminal_node_count": 2949,
+    "terminal_packet_count": 47184,
+    "event": "All nonzero outer packets occupy the final 2949 logical inner nodes."
+  },
+  "source_binding": {
+    "algorithm": "sha256",
+    "root_argument": "--libote-root",
+    "files": {
+      "libOTe/Tools/RiffleCode/RiffleDoubleParityG4.h": "66dc5008d26a91acdb0174f84b68124be08d2f01cb180229ca5dd09a911025b0",
+      "libOTe/Tools/RiffleCode/RifflePacketInnerChain.h": "82127e32656343c0a7526e8c7a36a8e67d99d6edd78affa6503cf2a19e932702",
+      "libOTe/Tools/RiffleCode/ExtendedBch128x64.h": "5c1372334ac6bda4ef121bbeb445794ce0687fb66b7878f38d5deb3a07ee8a57",
+      "libOTe/Tools/RiffleCode/ExtendedBch128x64SystematicPacketTransposeCircuit.h": "ea3498636b9cdc81f2c5e4ec21d571dd1a02844dd47a8dd214db21e40ddf4cd2",
+      "libOTe/Tools/RiffleCode/ExtendedBch128x64TransposeAddCircuit4.h": "5219661b5067b3a131e232339f9ec401586d5acec4e49ade0f1122a481e9d163"
+    }
+  },
+  "verification": {
+    "source_compile": "The RiffleCode_Tests.cpp and UnitTests.cpp object targets compile under x64-Debug.",
+    "equivalence_test_source": "scripts/test_riffle_dp_g4_manifest.cpp",
+    "equivalence_test_source_sha256": "76bce2d103e0e0123ed10446a29e0ff1cd222857f1be052673c330347c563445",
+    "runtime_test": "Passed: symbolic basis batches establish the local BCH kernel, packet-four inner kernel, and every x^i coefficient recurrence; one full-size explicit-order input also matched independent inner and outer references.",
+    "runtime_receipt": "status=EXACT_IMPLEMENTATION_EQUIVALENCE_VERIFIED",
+    "evidence_label": "EXACT for manifest arithmetic, source hashes, and the tested conditional matrix evaluation"
+  }
+}

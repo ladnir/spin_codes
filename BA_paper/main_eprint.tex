@@ -1,0 +1,81 @@
+\documentclass[]{llncs}
+\pagestyle{plain}
+
+\let\proof\relax
+\let\endproof\relax
+
+% 1 for submission
+% 0 for full version
+\def\submission{0}
+\def\showTodos{0}
+
+\input{packages}
+\input{macros}
+
+
+%\title{Parallel PCG: GPU-Accelerated Linear Codes \\for Pseudorandom Correlation Generators}
+\title{Block-Accumulate Codes: Accelerated Linear Codes for PCGs and ZK}
+
+\if\submission1
+\author{Anonymous Author(s)}
+\institute{Anonymous Institution}
+
+\author{}
+\institute{}
+\else
+\author{Vladimir Kolesnikov\inst{1} \and Stanislav Peceny\inst{2}\thanks{Part of this work was done while the author was at Visa Research and Georgia Tech.} \and
+Rahul Rachuri\inst{3} \and \\ Srinivasan Raghuraman\inst{4} \and  Peter Rindal\inst{5} \and Harshal Shah\inst{3}}
+\institute{Georgia Institute of Technology \and Stealth Software Technologies, Inc. \and Visa Research \and Visa Research and MIT \and Category Labs}
+\fi
+\date{}
+\begin{document}
+
+\maketitle
+
+\input{abstract}
+
+\input{intro}
+\input{relwork}
+\input{overview}
+\input{prelim}
+\input{turbo}
+
+%\input{permutemultiply}
+\input{block}
+\input{blockAcc}
+\input{blockSerial}
+\input{banded}
+%\input{recursiveblock}
+\input{eval}
+
+\newpage
+\bibliographystyle{alpha}
+\bibliography{bib/abbrev3,bib/crypto,ref}
+
+\newpage
+
+{\LARGE \bf \verb+    + Supplementary Material}
+
+\begin{appendix}
+  \input{application}
+  \input{BAProofApx}
+  \input{ballsBinsSlots}
+  \input{RepeatAcc}
+  \input{full}
+  \input{blockApx}
+  \input{BBProofApx}
+  \input{bandedApx}
+
+  \if\submission1
+  \else
+
+    \newpage
+    \section*{Disclaimer}
+    Case studies, comparisons, statistics, research and recommendations are provided “AS IS” and intended for informational purposes only and should not be relied upon for operational, marketing, legal, technical, tax, financial or other advice.  Visa Inc. neither makes any warranty or representation as to the completeness or accuracy of the information within this document, nor assumes any liability or responsibility that may result from reliance on such information.  The Information contained herein is not intended as investment or legal advice, and readers are encouraged to seek the advice of a competent professional where such advice is required.
+
+    These materials and best practice recommendations are provided for informational purposes only and should not be relied upon for marketing, legal, regulatory or other advice. Recommended marketing materials should be independently evaluated in light of your specific business needs and any applicable laws and regulations. Visa is not responsible for your use of the marketing materials, best practice recommendations, or other information, including errors of any kind, contained in this document.
+  \fi
+
+\end{appendix}
+
+\end{document}

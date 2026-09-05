@@ -1,0 +1,146 @@
+{
+  "arithmetic": "IEEE-754 binary64 with scipy.optimize.minimize_scalar; reported constants are reproducible diagnostics, not directed-rounding certificates",
+  "limiting_matrices": {
+    "definitions": {
+      "M": "2^s-1",
+      "a": "exp(-gamma)",
+      "f": "(1-exp(-gamma))/gamma",
+      "gamma": "theta*2^(s-1)/M"
+    },
+    "inactive": [
+      [
+        "1",
+        "0"
+      ],
+      [
+        "0",
+        "a"
+      ]
+    ],
+    "marked": [
+      [
+        "0",
+        "f"
+      ],
+      [
+        "f/M",
+        "(1-1/M)a"
+      ]
+    ]
+  },
+  "live_coordinate_one_probability": 0.5000009536761354,
+  "nonzero_state_count": 524287,
+  "optimization": [
+    {
+      "averaged_suffix_factor": 0.7208182079675568,
+      "delta": 0.09,
+      "gamma": 0.6948055775922269,
+      "live_region_factor": 0.49917148867410777,
+      "objective_bits_per_outer_coordinate": 0.18110315073687983,
+      "one_active_gap_bits_per_outer_coordinate": 0.3188968492631202,
+      "optimizer_success": true,
+      "spectral_radius": 1.0004664816685036,
+      "strict_log2_block_threshold": 3.135810222994411,
+      "theta": 1.389608504711517
+    },
+    {
+      "averaged_suffix_factor": 0.7208709196017533,
+      "delta": 0.1,
+      "gamma": 0.694640348698751,
+      "live_region_factor": 0.4992539730410488,
+      "objective_bits_per_outer_coordinate": 0.20114853191022286,
+      "one_active_gap_bits_per_outer_coordinate": 0.29885146808977714,
+      "optimizer_success": true,
+      "spectral_radius": 1.0004978569014862,
+      "strict_log2_block_threshold": 3.3461438432672943,
+      "theta": 1.3892780475548632
+    },
+    {
+      "averaged_suffix_factor": 0.7208950796343717,
+      "delta": 0.105,
+      "gamma": 0.6945646228316523,
+      "live_region_factor": 0.49929178091255866,
+      "objective_bits_per_outer_coordinate": 0.21116950343742016,
+      "one_active_gap_bits_per_outer_coordinate": 0.28883049656257986,
+      "optimizer_success": true,
+      "spectral_radius": 1.000513385073421,
+      "strict_log2_block_threshold": 3.462238274355262,
+      "theta": 1.3891265961095371
+    },
+    {
+      "averaged_suffix_factor": 0.7209112511027765,
+      "delta": 0.1085,
+      "gamma": 0.6945139378842256,
+      "live_region_factor": 0.49931708813156694,
+      "objective_bits_per_outer_coordinate": 0.21818354713903773,
+      "one_active_gap_bits_per_outer_coordinate": 0.28181645286096224,
+      "optimizer_success": true,
+      "spectral_radius": 1.000524210829219,
+      "strict_log2_block_threshold": 3.5484088662962585,
+      "theta": 1.3890252264080314
+    },
+    {
+      "averaged_suffix_factor": 0.7209180075963093,
+      "delta": 0.11,
+      "gamma": 0.6944927620204561,
+      "live_region_factor": 0.499327661714155,
+      "objective_bits_per_outer_coordinate": 0.2211894109056764,
+      "one_active_gap_bits_per_outer_coordinate": 0.2788105890943236,
+      "optimizer_success": true,
+      "spectral_radius": 1.0005288401018906,
+      "strict_log2_block_threshold": 3.5866643488985024,
+      "theta": 1.3889828747612718
+    },
+    {
+      "averaged_suffix_factor": 0.7209180971170341,
+      "delta": 0.11002,
+      "gamma": 0.6944924814509675,
+      "live_region_factor": 0.4993278018102813,
+      "objective_bits_per_outer_coordinate": 0.22122948847158164,
+      "one_active_gap_bits_per_outer_coordinate": 0.27877051152841836,
+      "optimizer_success": true,
+      "spectral_radius": 1.0005289018652463,
+      "strict_log2_block_threshold": 3.5871799872851984,
+      "theta": 1.388982313623365
+    }
+  ],
+  "rational_certificate_delta_0_11002": {
+    "block_constant": "18/5",
+    "delta": "5501/50000",
+    "lambda_upper": {
+      "binary64_display": 1.0009957541544472,
+      "denominator": "524287000000000000000000000000000000",
+      "numerator": "524809060958372625284760006186710017"
+    },
+    "ln2_lower": {
+      "binary64_display": 0.6931471805599345,
+      "denominator": "22502862809398568025",
+      "numerator": "15597795910861623574"
+    },
+    "ln2_lower_terms": 13,
+    "one_active_gap_lower": {
+      "binary64_display": 0.2785238501124277,
+      "denominator": "327108864988716321549669520000000000000000000000000000",
+      "numerator": "91107620482563566055038773674336969520740323171063743"
+    },
+    "polynomial_decay_exponent_lower": {
+      "binary64_display": 0.002685860404739635,
+      "denominator": "817772162471790803874173800000000000000000000000000000",
+      "numerator": "2196421871281290621175163069032725686662908539573687"
+    },
+    "sqrt_upper_decimal_scale": 1000000000000000000000000000000,
+    "status": "EXACT_RATIONAL_INEQUALITY_CERTIFICATE",
+    "theta": "ln(2)/p"
+  },
+  "schema": "rm2sub-one-active-continuum-v1",
+  "selected_delta_0_11002_polynomial_exponents": {
+    "17.0": 3.7390986959831123,
+    "3.6": 0.0035738415023061076,
+    "3.75": 0.045389418231568834,
+    "4.0": 0.11508204611367345,
+    "5.0": 0.3938525576420919,
+    "8.0": 1.230164092227347
+  },
+  "state_bits": 19,
+  "status": "PROVED_FORMULA_BINARY64_OPTIMIZATION_NOT_OUTWARD_ROUNDED"
+}

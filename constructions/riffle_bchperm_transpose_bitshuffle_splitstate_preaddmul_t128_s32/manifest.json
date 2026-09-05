@@ -1,0 +1,45 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_t128_s32",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-SplitState-PreAddMul t=128 s=32",
+  "status": "FIXED_INNER_REGULAR_PROOF_CLOSED",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_t128_s32",
+  "modification": "replace Q'=alpha*(Q+B(X)) with Q'=alpha*Q+B(X)",
+  "operation_delta_from_parent": "none in the logical operation count",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_bits": 256,
+    "step_bits": 128,
+    "state_bits": 32,
+    "constituent_distance_required": 20,
+    "constituent_distance_fixed_A": 28,
+    "relative_distance_target": 0.09,
+    "target_distance": 188743,
+    "logical_inner_xor_per_output_proxy": 9.36572265625
+  },
+  "regular_results": {
+    "aggregate_margin_bits_float": 80.8139155117839,
+    "two_active_margin_bits": 126.213544666528,
+    "five_hundred_twelve_active_margin_bits": 25350.98,
+    "one_thousand_twenty_four_active_margin_bits": 39521.59
+  },
+  "all_one_results": {
+    "pure_checkpoint_minimum_margin_bits": 3472.65,
+    "one_all_one_checkpoint_minimum_margin_bits": 3472.65,
+    "mixed_total_at_most_64_aggregate_margin_bits": 3985.991085577,
+    "larger_mixed_cases": "open"
+  },
+  "proof_status": {
+    "random_affine_coset_assumption": "removed",
+    "structured_termination_obstruction": "resolved by PreAddMul",
+    "regular_occupations_given_profiles": "closed in nearest-binary64 arithmetic",
+    "fixed_A_profile": "closed by complete 2^32-word enumeration; distance 28, full support, and three-coordinate independence",
+    "fixed_B_activation_profile": "closed by complete dual enumeration and MacWilliams transform; fixed profile dominates the target on all 128 shells",
+    "explicit_outer_spectrum": "open",
+    "mixed_all_one_tail": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "claim_scope": "Fixed-inner regular theorem. The regular proof uses the explicitly recorded A and B maps and is conditional only on the modeled outer spectrum, except for nearest-binary64 rounding. Mixed occupations with at least two all-one outer words and total count above 64 remain open."
+}

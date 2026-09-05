@@ -1,0 +1,64 @@
+{
+  "schema": "pure-ea-sector-zero-complement-orbits-rust-outward-v1",
+  "status": "OUTWARD_BINARY64_UPPER_BOUND",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3
+  },
+  "entries": [
+    {
+      "sector": 0,
+      "level": 2,
+      "scaled_diagonal_upper": 0.6177606582641965,
+      "positive_orbit_lower": 0.8136835098266405,
+      "positive_orbit_upper": 0.8136835098266816,
+      "signed_orbit_lower": 0.6177606582641274,
+      "signed_orbit_upper": 0.6177606582641965,
+      "selected_upper_source": "signed_global_orbit_sum"
+    },
+    {
+      "sector": 1,
+      "level": 1,
+      "scaled_diagonal_upper": 3.0820312500000266,
+      "positive_orbit_lower": 3.263671874999976,
+      "positive_orbit_upper": 3.2636718750000258,
+      "signed_orbit_lower": 3.0820312499999742,
+      "signed_orbit_upper": 3.0820312500000266,
+      "selected_upper_source": "signed_global_orbit_sum"
+    },
+    {
+      "sector": 1,
+      "level": 3,
+      "scaled_diagonal_upper": 0.5273437500000093,
+      "positive_orbit_lower": 0.6386718749999958,
+      "positive_orbit_upper": 0.6386718750000053,
+      "signed_orbit_lower": 0.5273437499999917,
+      "signed_orbit_upper": 0.5273437500000093,
+      "selected_upper_source": "signed_global_orbit_sum"
+    },
+    {
+      "sector": 2,
+      "level": 4,
+      "scaled_diagonal_upper": 1.4531250000000102,
+      "positive_orbit_lower": 1.453124999999993,
+      "positive_orbit_upper": 1.4531250000000102,
+      "signed_orbit_lower": 1.453124999999993,
+      "signed_orbit_upper": 1.4531250000000102,
+      "selected_upper_source": "signed_global_orbit_sum"
+    }
+  ],
+  "enumerated_pair_types": 8,
+  "covered_pair_types": 35,
+  "canonical_complement_swap_orbits": true,
+  "worker_threads": 1,
+  "elapsed_seconds": 0.0003565,
+  "scope": [
+    "Complement-orbit averaging is exact for odd row degree.",
+    "Exact big-integer comparisons bracket every rational bias, determinant, coefficient, and multiplicity in binary64.",
+    "Every arithmetic operation expands its result by one adjacent binary64 value.",
+    "Each thread performs upward summation; the main thread combines chunk sums upward in deterministic order.",
+    "The bound sums positive orbit upper endpoints and does not assume orbit positivity.",
+    "The receipt bounds only the listed sector-zero diagonals."
+  ]
+}

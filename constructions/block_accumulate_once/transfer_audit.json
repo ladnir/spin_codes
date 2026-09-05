@@ -1,0 +1,73 @@
+{
+  "checked_input_output_cells": 650,
+  "checked_nonzero_inputs": 8178,
+  "length_rows": [
+    {
+      "input_output_cells": 1,
+      "length": 1,
+      "nonzero_inputs": 1
+    },
+    {
+      "input_output_cells": 4,
+      "length": 2,
+      "nonzero_inputs": 3
+    },
+    {
+      "input_output_cells": 9,
+      "length": 3,
+      "nonzero_inputs": 7
+    },
+    {
+      "input_output_cells": 16,
+      "length": 4,
+      "nonzero_inputs": 15
+    },
+    {
+      "input_output_cells": 25,
+      "length": 5,
+      "nonzero_inputs": 31
+    },
+    {
+      "input_output_cells": 36,
+      "length": 6,
+      "nonzero_inputs": 63
+    },
+    {
+      "input_output_cells": 49,
+      "length": 7,
+      "nonzero_inputs": 127
+    },
+    {
+      "input_output_cells": 64,
+      "length": 8,
+      "nonzero_inputs": 255
+    },
+    {
+      "input_output_cells": 81,
+      "length": 9,
+      "nonzero_inputs": 511
+    },
+    {
+      "input_output_cells": 100,
+      "length": 10,
+      "nonzero_inputs": 1023
+    },
+    {
+      "input_output_cells": 121,
+      "length": 11,
+      "nonzero_inputs": 2047
+    },
+    {
+      "input_output_cells": 144,
+      "length": 12,
+      "nonzero_inputs": 4095
+    }
+  ],
+  "maximum_length": 12,
+  "schema": "block-accumulate-once-transfer-audit-v1",
+  "scope": "Exhaustive finite-state audit of the accumulator count T_N(h,w). The union-bound theorem is an analytic consequence of this count.",
+  "validation": {
+    "every_input_weight_row_sums_to_binomial": true,
+    "exhaustive_input_output_counts_match_formula": true
+  }
+}

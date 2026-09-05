@@ -1,0 +1,2638 @@
+{
+  "audit_status": {
+    "coverage_checks": [
+      "low-weight first-active rows",
+      "post-prefix h intervals",
+      "late-prefix bucket",
+      "high-density and complement intervals"
+    ],
+    "exact_integer_checks": [
+      "RM direct-sum low-weight outer coefficients",
+      "RM support floor and first support gap",
+      "dominant h=32 peak placement numerator/denominator",
+      "prefix placement-ratio cross multiplication"
+    ],
+    "focused_numerical_recomputations": [
+      "dominant T=5949,H=31 inner knot from EBCH spectrum"
+    ],
+    "focused_threshold_checks": [
+      "dominant prefix peak-to-family inflation",
+      "exact ultra-late prefix contribution",
+      "h>=501 post-prefix aggregate contribution"
+    ],
+    "level": "checked finite numerical certificate",
+    "remaining_formalization": "replace floating logarithmic row arithmetic by interval, rational, or exact-integer upper bounds",
+    "tolerance": 5e-06
+  },
+  "checks": {
+    "complement_high_cover": {
+      "cover_range": [
+        1048577,
+        2097152
+      ],
+      "high_overlap_count": 100160,
+      "high_overlap_range": [
+        1048577,
+        1148736
+      ],
+      "interval_count": 7,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1048577:1148736:1 --lambda-value 2.3",
+          "log2": -128915.315746,
+          "range": [
+            1048577,
+            1148736
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1148737:1300000:1 --lambda-value 2.3",
+          "log2": -124889.651755,
+          "range": [
+            1148737,
+            1300000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1300001:1500000:1 --lambda-value 2.3",
+          "log2": -113710.357653,
+          "range": [
+            1300001,
+            1500000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1500001:1700000:1 --lambda-value 2.3",
+          "log2": -35150.097366,
+          "range": [
+            1500001,
+            1700000
+          ],
+          "rho": 1.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1700001:1900000:10 --lambda-value 2.3",
+          "log2": -524628.366199,
+          "range": [
+            1700001,
+            1900000
+          ],
+          "rho": 10.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1900001:2097089:10 --lambda-value 2.3",
+          "log2": -894140.350713,
+          "range": [
+            1900001,
+            2097089
+          ],
+          "rho": 10.0
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 2097090:2097152:10 --lambda-value 2.3",
+          "log2": -893792.28501,
+          "range": [
+            2097090,
+            2097152
+          ],
+          "rho": 10.0
+        }
+      ],
+      "overlap_treatment": "deliberate union-bound overcount",
+      "status": "PASS"
+    },
+    "complement_high_shape": {
+      "e0_outer_endpoint_rule": "z<1 makes complement-side e=0 outer bound largest at h_min",
+      "ege1_outer_volume_rule": "discrete convexity makes the outer/volume/rho term largest at an endpoint",
+      "interval_count": 7,
+      "intervals": [
+        {
+          "convexity_growth_bits": 0.27644972356737024,
+          "e0_endpoint": 1048577,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1048577,
+            1148736
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.42912366123339646,
+          "e0_endpoint": 1148737,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1148737,
+            1300000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.6232010699197045,
+          "e0_endpoint": 1300001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1300001,
+            1500000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 0.7689712090490578,
+          "e0_endpoint": 1500001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1500001,
+            1700000
+          ],
+          "rho": 1.0
+        },
+        {
+          "convexity_growth_bits": 1.1708349472808788,
+          "e0_endpoint": 1700001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1700001,
+            1900000
+          ],
+          "rho": 10.0
+        },
+        {
+          "convexity_growth_bits": 11.731328655832206,
+          "e0_endpoint": 1900001,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            1900001,
+            2097089
+          ],
+          "rho": 10.0
+        },
+        {
+          "convexity_growth_bits": 5.954238274763999,
+          "e0_endpoint": 2097090,
+          "ege1_outer_volume_maxima": "endpoints",
+          "range": [
+            2097090,
+            2097152
+          ],
+          "rho": 10.0
+        }
+      ],
+      "min_convexity_growth_bits": 0.27644972356737024,
+      "status": "PASS"
+    },
+    "dominant_inner_knot_recompute": {
+      "H": 31,
+      "T": 5949,
+      "distance": 188743,
+      "e_max": 1,
+      "extra_turnoff_log2": -67.63641049043137,
+      "inner_knot_csv": "scripts\\fast_fullsplit_e01_T5949_H0_499_all.csv",
+      "inner_spectrum": "scripts\\EBCH128_64.wd",
+      "interpretation": "Recomputes the dominant inner knot from EBCH spectrum data and the e<=1 full-split episode formula using the stored effective turnoff convention, then checks it against the stored knot table.",
+      "lambda_grid": {
+        "max": 2.0,
+        "min": 0.001,
+        "step": 0.004
+      },
+      "raw_turnoff_log2": -64.00457432724919,
+      "recomputed": {
+        "e0_log2": -20.011734892647837,
+        "e1_log2": -59.18669427029984,
+        "total_log2": -20.011734892645514
+      },
+      "status": "PASS",
+      "table": {
+        "e0_log2": -20.011734892647837,
+        "e1_log2": -59.186694308334786,
+        "total_log2": -20.011734892645514
+      },
+      "total_delta_bits": 0.0,
+      "turnoff_log2": -63.8926492
+    },
+    "dominant_peak_arithmetic": {
+      "global_outer_count_weight_32": 216907579392,
+      "inner_e0_log2": -20.011734892647837,
+      "inner_e1_log2": -59.186694308334786,
+      "inner_knot_csv": "scripts\\fast_fullsplit_e01_T5949_H0_499_all.csv",
+      "inner_log2": -20.011734892645514,
+      "interpretation": "Recomputes the dominant h=32 peak row from exact RM min-weight count, exact first-gap placement numerator/denominator, and the checked T=5949,H=31 inner knot value.",
+      "local_outer_count_weight_32": 52955952,
+      "outer_log2": 37.65828950968128,
+      "placement_den_bits": 555,
+      "placement_log2": -55.03232145938108,
+      "placement_num_bits": 500,
+      "selector": {
+        "bucket_T": 5949,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "outer_weight": 32,
+        "remaining_ones": 31
+      },
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv",
+      "status": "PASS",
+      "term_log2": -37.38576684234531,
+      "threshold_log2": -37.38575
+    },
+    "dominant_prefix_inflation": {
+      "interpretation": "Thresholded audit that the dominant peak row controls the entire exact-RM-reweighted prefix family.",
+      "observed": {
+        "above_split_gap_bits": 13.352485666805116,
+        "above_split_to_peak_ratio": 9.560955517109951e-05,
+        "split_inflation_factor": 1.0015848233469529,
+        "split_minus_peak_bits": 0.0022846069119495382,
+        "split_remainder_log2": -46.68722908748783,
+        "total_inflation_factor": 1.001680432902098,
+        "total_minus_peak_bits": 0.002422317512923655,
+        "total_remainder_log2": -46.602718187648264,
+        "total_remainder_to_peak_ratio": 0.0016804329020979284
+      },
+      "row_family": "prefix_32_500_e_le8",
+      "status": "PASS",
+      "thresholds": {
+        "above_split_min_gap_bits": 13.35,
+        "split_minus_peak_max_bits": 0.00229,
+        "split_remainder_max_log2": -46.68,
+        "total_minus_peak_max_bits": 0.00243,
+        "total_remainder_max_log2": -46.6
+      }
+    },
+    "dominant_prefix_row": {
+      "above_split_gap_bits": 13.352485666805116,
+      "above_split_log2": -50.738252508305614,
+      "interpretation": "After exact RM outer reweighting, the checked prefix family is peak-dominated by the h=32, first_r=1, gap=1..4000 row.",
+      "row_family": "prefix_32_500_e_le8",
+      "selector": {
+        "bucket_T": 5949,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "inner_mode": "csv",
+        "outer_weight": 32,
+        "remaining_ones": 31
+      },
+      "split_h": 32,
+      "split_log2": -37.38348223458855,
+      "split_minus_peak_bits": 0.0022846069119495382,
+      "split_remainder_log2": -46.68722908748783,
+      "status": "PASS",
+      "term_log2": -37.3857668415005,
+      "tolerance": 5e-06,
+      "total_log2": -37.383344523987574,
+      "total_minus_peak_bits": 0.002422317512923655,
+      "total_remainder_log2": -46.602718187648264
+    },
+    "eallratio_branch_semantics": {
+      "max_code_delta_bits": 2.842170943040401e-14,
+      "min_formula_slack_bits": 0.0,
+      "rows": [
+        {
+          "H": 4,
+          "T": 6,
+          "exact_selected_gap_chernoff_log2": -13.67676701831034,
+          "formula_slack_bits": 0.0,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -13.67676701831034,
+          "independent_formula_log2": -13.67676701831034,
+          "lambda": 0.05,
+          "rho": 0.03,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 12,
+          "T": 9,
+          "exact_selected_gap_chernoff_log2": -78.9511791308498,
+          "formula_slack_bits": 3.3468639770717346e-06,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -78.95117578398582,
+          "independent_formula_log2": -78.95117578398582,
+          "lambda": 0.2,
+          "rho": 0.1,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 32,
+          "T": 12,
+          "exact_selected_gap_chernoff_log2": -187.51304135596433,
+          "formula_slack_bits": 32.866551215030114,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -154.64649014093422,
+          "independent_formula_log2": -154.64649014093422,
+          "lambda": 0.5,
+          "rho": 0.1,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 60,
+          "T": 10,
+          "exact_selected_gap_chernoff_log2": -202.2729507544939,
+          "formula_slack_bits": 4.599154761355919,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -197.673795993138,
+          "independent_formula_log2": -197.673795993138,
+          "lambda": 0.5,
+          "rho": 0.3,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 250,
+          "T": 4,
+          "exact_selected_gap_chernoff_log2": -158.76190475747208,
+          "formula_slack_bits": 0.0,
+          "implementation_delta_bits": 0.0,
+          "implementation_log2": -158.76190475747208,
+          "independent_formula_log2": -158.76190475747208,
+          "lambda": 1.2,
+          "rho": 30.0,
+          "term_log2": -62.4078758
+        },
+        {
+          "H": 20,
+          "T": 8,
+          "exact_selected_gap_chernoff_log2": -69.85805257563521,
+          "formula_slack_bits": 3.6261066585991557,
+          "implementation_delta_bits": 2.842170943040401e-14,
+          "implementation_log2": -66.23194591703603,
+          "independent_formula_log2": -66.23194591703606,
+          "lambda": 0.2,
+          "rho": 0.1,
+          "term_log2": -20.0
+        }
+      ],
+      "rule": "fixed-pole eallratio branch dominates exact finite selected-gap Chernoff sums in audit samples",
+      "sample_count": 6,
+      "status": "PASS"
+    },
+    "eallratio_tail_semantics": {
+      "max_current_T": 32767,
+      "max_current_adjacent_ratio_log2": -28.99297107470794,
+      "max_sample_slack_bits": 0.0,
+      "rows": [
+        {
+          "H": 10,
+          "M": 0.5289824342075774,
+          "T": 10,
+          "checked_cutoff20_log2": -57.85016684143367,
+          "checked_default_log2": -57.85016684143367,
+          "cutoff20_slack_bits": 0.0,
+          "default_slack_bits": 0.0,
+          "exact_log2": -57.85016684143367,
+          "lambda": 0.02,
+          "log_q": -63.4940230312084
+        },
+        {
+          "H": 64,
+          "M": 0.20597466916204796,
+          "T": 64,
+          "checked_cutoff20_log2": -51.74061886221502,
+          "checked_default_log2": -51.74061886221502,
+          "cutoff20_slack_bits": 0.0,
+          "default_slack_bits": 0.0,
+          "exact_log2": -51.74061886221502,
+          "lambda": 0.05,
+          "log_q": -62.740618862215136
+        },
+        {
+          "H": 127,
+          "M": 0.002286959860133211,
+          "T": 128,
+          "checked_cutoff20_log2": -49.422494277420036,
+          "checked_default_log2": -49.422494277420036,
+          "cutoff20_slack_bits": 0.0,
+          "default_slack_bits": 0.0,
+          "exact_log2": -49.422494277420036,
+          "lambda": 0.2,
+          "log_q": -62.41117896419222
+        },
+        {
+          "H": 1000,
+          "M": 1.1271354905940311e-12,
+          "T": 1000,
+          "checked_cutoff20_log2": -43.476307230677165,
+          "checked_default_log2": -43.476307230677165,
+          "cutoff20_slack_bits": 0.0,
+          "default_slack_bits": 0.0,
+          "exact_log2": -43.476307230677165,
+          "lambda": 1.2,
+          "log_q": -62.40787580000163
+        },
+        {
+          "H": 3000,
+          "M": 0.20597466916204796,
+          "T": 9949,
+          "checked_cutoff20_log2": -38.90953626823953,
+          "checked_default_log2": -38.90953626823953,
+          "cutoff20_slack_bits": 0.0,
+          "default_slack_bits": 0.0,
+          "exact_log2": -38.90953626823953,
+          "lambda": 0.05,
+          "log_q": -62.740618862215136
+        }
+      ],
+      "rule": "R_{H,T} truncation is closed by a decreasing-ratio geometric tail bound",
+      "sample_count": 5,
+      "status": "PASS"
+    },
+    "early_accelerated_cover": {
+      "cover_range": [
+        75001,
+        1048576
+      ],
+      "endpoint_interval_count": 7,
+      "endpoint_range": [
+        75001,
+        350000
+      ],
+      "interval_count": 10,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 75001:90000:0.2:0.1",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.2,
+          "log2": -28574.869802,
+          "range": [
+            75001,
+            90000
+          ],
+          "rho": 0.1
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 90001:100000:0.2:0.1",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.2,
+          "log2": -22149.918612,
+          "range": [
+            90001,
+            100000
+          ],
+          "rho": 0.1
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 100001:110000:0.5:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.5,
+          "log2": -1056.187188,
+          "range": [
+            100001,
+            110000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 110001:125000:0.5:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.5,
+          "log2": -10362.025949,
+          "range": [
+            110001,
+            125000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 125001:160000:0.8:0.3",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 0.8,
+          "log2": -45589.980049,
+          "range": [
+            125001,
+            160000
+          ],
+          "rho": 0.3
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 160001:250000:1.2:0.5",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 1.2,
+          "log2": -60293.751685,
+          "range": [
+            160001,
+            250000
+          ],
+          "rho": 0.5
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 250001:350000:1.2:0.5",
+          "helper": "certify_fullsplit_early_endpoint_interval.py",
+          "kind": "endpoint",
+          "lambda": 1.2,
+          "log2": -94682.265141,
+          "range": [
+            250001,
+            350000
+          ],
+          "rho": 0.5
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 350001:524288:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -181215.853042,
+          "range": [
+            350001,
+            524288
+          ],
+          "rho": 0.8
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 524289:750000:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -194565.849984,
+          "range": [
+            524289,
+            750000
+          ],
+          "rho": 0.8
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 750001:1048576:2:0.8",
+          "helper": "certify_fullsplit_early_paired_interval.py",
+          "kind": "paired",
+          "lambda": 2.0,
+          "log2": -98386.449256,
+          "range": [
+            750001,
+            1048576
+          ],
+          "rho": 0.8
+        }
+      ],
+      "paired_interval_count": 3,
+      "paired_range": [
+        350001,
+        1048576
+      ],
+      "status": "PASS"
+    },
+    "endpoint_gap_sum_semantics": {
+      "bucket_count": 3,
+      "max_bucket_loss_bits": 11.965784284662087,
+      "max_sample_slack_bits": 11.965784284662089,
+      "min_sample_slack_bits": 1.7763568394002505e-14,
+      "rows": [
+        {
+          "T_range": [
+            5949,
+            9948
+          ],
+          "endpoint_loss_bits": 11.965784284662087,
+          "gap_count": 4000,
+          "max_sample_slack_bits": 11.965784284662089,
+          "min_sample_slack_bits": 1.7763568394002505e-14,
+          "name": "gap_1_4000",
+          "sample_count": 11,
+          "samples": [
+            {
+              "H": 0,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 11.96578428466207,
+              "slack_bits": 1.7763568394002505e-14
+            },
+            {
+              "H": 1,
+              "endpoint_log2": 31.24597507634291,
+              "exact_log2": 30.92225119742525,
+              "slack_bits": 0.32372387891765797
+            },
+            {
+              "H": 63,
+              "endpoint_log2": 936.6182346195837,
+              "exact_log2": 931.9372092955651,
+              "slack_bits": 4.681025324018606
+            },
+            {
+              "H": 64,
+              "endpoint_log2": 949.8982826491773,
+              "exact_log2": 945.1949608175332,
+              "slack_bits": 4.703321831644075
+            },
+            {
+              "H": 65,
+              "endpoint_log2": 963.1559605957472,
+              "exact_log2": 958.430683763697,
+              "slack_bits": 4.725276832050213
+            },
+            {
+              "H": 380735,
+              "endpoint_log2": 618913.3460511727,
+              "exact_log2": 618901.3802668881,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 380736,
+              "endpoint_log2": 618912.7730489123,
+              "exact_log2": 618900.8072646277,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 380737,
+              "endpoint_log2": 618912.2000372276,
+              "exact_log2": 618900.234252943,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 636671,
+              "endpoint_log2": 31.24597507634291,
+              "exact_log2": 19.28019079168082,
+              "slack_bits": 11.965784284662089
+            },
+            {
+              "H": 636672,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 0.0,
+              "slack_bits": 11.965784284662087
+            },
+            {
+              "H": 636673,
+              "endpoint_log2": null,
+              "exact_log2": null,
+              "slack_bits": null
+            }
+          ],
+          "support_cutoff_H": 636672,
+          "support_cutoff_h": 636736
+        },
+        {
+          "T_range": [
+            9949,
+            13948
+          ],
+          "endpoint_loss_bits": 11.965784284662087,
+          "gap_count": 4000,
+          "max_sample_slack_bits": 11.965784284662089,
+          "min_sample_slack_bits": 1.7763568394002505e-14,
+          "name": "gap_4001_8000",
+          "sample_count": 11,
+          "samples": [
+            {
+              "H": 0,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 11.96578428466207,
+              "slack_bits": 1.7763568394002505e-14
+            },
+            {
+              "H": 1,
+              "endpoint_log2": 31.733554932720672,
+              "exact_log2": 31.510326179591566,
+              "slack_bits": 0.2232287531291064
+            },
+            {
+              "H": 63,
+              "endpoint_log2": 967.3370347912537,
+              "exact_log2": 963.1422797471674,
+              "slack_bits": 4.194755044086264
+            },
+            {
+              "H": 64,
+              "endpoint_log2": 981.1047036171576,
+              "exact_log2": 976.887631633547,
+              "slack_bits": 4.2170719836105945
+            },
+            {
+              "H": 65,
+              "endpoint_log2": 994.8500030170653,
+              "exact_log2": 990.6109555985619,
+              "slack_bits": 4.239047418503446
+            },
+            {
+              "H": 636735,
+              "endpoint_log2": 771656.0293973122,
+              "exact_log2": 771644.0636130276,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 636736,
+              "endpoint_log2": 771654.714490707,
+              "exact_log2": 771642.7487064224,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 636737,
+              "endpoint_log2": 771653.3995761987,
+              "exact_log2": 771641.433791914,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 892671,
+              "endpoint_log2": 31.733554932720672,
+              "exact_log2": 19.767770648058583,
+              "slack_bits": 11.965784284662089
+            },
+            {
+              "H": 892672,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 0.0,
+              "slack_bits": 11.965784284662087
+            },
+            {
+              "H": 892673,
+              "endpoint_log2": null,
+              "exact_log2": null,
+              "slack_bits": null
+            }
+          ],
+          "support_cutoff_H": 892672,
+          "support_cutoff_h": 892736
+        },
+        {
+          "T_range": [
+            13949,
+            17948
+          ],
+          "endpoint_loss_bits": 11.965784284662087,
+          "gap_count": 4000,
+          "max_sample_slack_bits": 11.965784284662087,
+          "min_sample_slack_bits": 1.7763568394002505e-14,
+          "name": "gap_8001_12000",
+          "sample_count": 11,
+          "samples": [
+            {
+              "H": 0,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 11.96578428466207,
+              "slack_bits": 1.7763568394002505e-14
+            },
+            {
+              "H": 1,
+              "endpoint_log2": 32.09731975325024,
+              "exact_log2": 31.9269174051308,
+              "slack_bits": 0.17040234811943833
+            },
+            {
+              "H": 63,
+              "endpoint_log2": 990.2549219178437,
+              "exact_log2": 986.4232055290543,
+              "slack_bits": 3.8317163887894594
+            },
+            {
+              "H": 64,
+              "endpoint_log2": 1004.3863782579255,
+              "exact_log2": 1000.5323336285829,
+              "slack_bits": 3.854044629342525
+            },
+            {
+              "H": 65,
+              "endpoint_log2": 1018.4954655320996,
+              "exact_log2": 1014.6194341602031,
+              "slack_bits": 3.876031371896488
+            },
+            {
+              "H": 892735,
+              "endpoint_log2": 879043.2720369834,
+              "exact_log2": 879031.3062526988,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 892736,
+              "endpoint_log2": 879041.4695921066,
+              "exact_log2": 879029.503807822,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 892737,
+              "endpoint_log2": 879039.6671399785,
+              "exact_log2": 879027.7013556939,
+              "slack_bits": 11.965784284635447
+            },
+            {
+              "H": 1148671,
+              "endpoint_log2": 32.09731975325024,
+              "exact_log2": 20.131535468588154,
+              "slack_bits": 11.965784284662085
+            },
+            {
+              "H": 1148672,
+              "endpoint_log2": 11.965784284662087,
+              "exact_log2": 0.0,
+              "slack_bits": 11.965784284662087
+            },
+            {
+              "H": 1148673,
+              "endpoint_log2": null,
+              "exact_log2": null,
+              "slack_bits": null
+            }
+          ],
+          "support_cutoff_H": 1148672,
+          "support_cutoff_h": 1148736
+        }
+      ],
+      "rule": "sum over a gap bucket is bounded by bucket_size times the right-endpoint binomial",
+      "sample_count": 33,
+      "status": "PASS"
+    },
+    "exact_outer_support": {
+      "coefficient_build_exponent": 4096,
+      "coefficient_build_max_coefficient_bits": 663,
+      "coefficient_build_max_coefficient_weight": 500,
+      "coefficient_build_multiply_steps": 1,
+      "coefficient_build_square_steps": 12,
+      "first_positive_le_80": [
+        32,
+        48,
+        56,
+        60,
+        64,
+        68,
+        72,
+        76,
+        80
+      ],
+      "gap_after_min": [
+        33,
+        47
+      ],
+      "local_first_positive_le_80": [
+        32,
+        48,
+        56,
+        60,
+        64,
+        68,
+        72,
+        76,
+        80
+      ],
+      "local_min_positive": 32,
+      "local_nonzero_terms": 106,
+      "min_positive": 32,
+      "next_coefficient_bits": 52,
+      "next_positive_after_min": 48,
+      "positive_count": 114,
+      "split_coefficient_bits": 38,
+      "split_h": 32,
+      "status": "PASS",
+      "support_count": 115,
+      "zero_prefix": [
+        1,
+        31
+      ]
+    },
+    "high_feasible_min_T": {
+      "buckets": [
+        {
+          "T_range": [
+            5949,
+            9948
+          ],
+          "cutoff_h": 636736,
+          "name": "gap_1_4000"
+        },
+        {
+          "T_range": [
+            9949,
+            13948
+          ],
+          "cutoff_h": 892736,
+          "name": "gap_4001_8000"
+        },
+        {
+          "T_range": [
+            13949,
+            17948
+          ],
+          "cutoff_h": 1148736,
+          "name": "gap_8001_12000"
+        }
+      ],
+      "far_cutoff_h": 1148736,
+      "rule": "T_eff=max(T_min,ceil(H/block_bits)); h cutoff is block_bits*T_max+block_bits",
+      "status": "PASS"
+    },
+    "high_interval_cover": {
+      "cover_range": [
+        2001,
+        1148736
+      ],
+      "interval_count": 15,
+      "intervals": [
+        {
+          "adjusted_log2": -586.597103,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+          "lambda": 0.02,
+          "range": [
+            2001,
+            7858
+          ],
+          "raw_log2": -588.081877,
+          "rho": 0.01
+        },
+        {
+          "adjusted_log2": -2655.944828,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+          "lambda": 0.05,
+          "range": [
+            7859,
+            20550
+          ],
+          "raw_log2": -2657.429602,
+          "rho": 0.03
+        },
+        {
+          "adjusted_log2": -6025.574047,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:75000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+          "lambda": 0.2,
+          "range": [
+            20551,
+            75000
+          ],
+          "raw_log2": -6027.058821,
+          "rho": 0.1
+        },
+        {
+          "adjusted_log2": -12844.868837,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 75001:250000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.5 --rhos 0.3",
+          "lambda": 0.5,
+          "range": [
+            75001,
+            250000
+          ],
+          "raw_log2": -12846.353611,
+          "rho": 0.3
+        },
+        {
+          "adjusted_log2": -28476.640541,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 250001:350000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 0.5",
+          "lambda": 1.2,
+          "range": [
+            250001,
+            350000
+          ],
+          "raw_log2": -28478.125315,
+          "rho": 0.5
+        },
+        {
+          "adjusted_log2": -81555.594538,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 350001:400000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            350001,
+            400000
+          ],
+          "raw_log2": -81557.079312,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -91421.772986,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 400001:450000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            400001,
+            450000
+          ],
+          "raw_log2": -91423.25776,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -82081.961328,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 450001:550000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            450001,
+            550000
+          ],
+          "raw_log2": -82083.446102,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -1518.493461,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 550001:650000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+          "lambda": 1.2,
+          "range": [
+            550001,
+            650000
+          ],
+          "raw_log2": -1519.978235,
+          "rho": 1.0
+        },
+        {
+          "adjusted_log2": -116328.133946,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 650001:725000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 2",
+          "lambda": 1.2,
+          "range": [
+            650001,
+            725000
+          ],
+          "raw_log2": -116329.61872,
+          "rho": 2.0
+        },
+        {
+          "adjusted_log2": -169887.902921,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 725001:750000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            725001,
+            750000
+          ],
+          "raw_log2": -169889.387695,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -134523.58364599998,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 750001:850000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            750001,
+            850000
+          ],
+          "raw_log2": -134525.06842,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -117534.84353,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 850001:950000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            850001,
+            950000
+          ],
+          "raw_log2": -117536.328304,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -285052.550668,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 950001:1050000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            950001,
+            1050000
+          ],
+          "raw_log2": -285054.035442,
+          "rho": 3.0
+        },
+        {
+          "adjusted_log2": -562860.716638,
+          "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 1050001:1148736 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+          "lambda": 1.2,
+          "range": [
+            1050001,
+            1148736
+          ],
+          "raw_log2": -562862.201412,
+          "rho": 3.0
+        }
+      ],
+      "status": "PASS",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    "late_postprefix_cover": {
+      "cover_range": [
+        501,
+        380736
+      ],
+      "cutoff_reason": "block_bits * late_blocks",
+      "feasible_cutoff_h": 380736,
+      "interval_count": 7,
+      "intervals": [
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 501:2000:0.39605985943459426",
+          "log2": -545.690526,
+          "range": [
+            501,
+            2000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 2001:7858:0.39605985943459426",
+          "log2": -2237.593414,
+          "range": [
+            2001,
+            7858
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 7859:20550:0.39605985943459426",
+          "log2": -8919.160723,
+          "range": [
+            7859,
+            20550
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 20551:75000:0.39605985943459426",
+          "log2": -23772.761808,
+          "range": [
+            20551,
+            75000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 75001:150000:0.39605985943459426",
+          "log2": -93856.032305,
+          "range": [
+            75001,
+            150000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 150001:250000:0.39605985943459426",
+          "log2": -210536.528296,
+          "range": [
+            150001,
+            250000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 250001:380736:0.39605985943459426",
+          "log2": -417970.896784,
+          "range": [
+            250001,
+            380736
+          ],
+          "z": 0.39605985943459426
+        }
+      ],
+      "status": "PASS",
+      "z": 0.39605985943459426
+    },
+    "late_postprefix_shape": {
+      "critical_peaks": 0,
+      "interval_count": 7,
+      "intervals": [
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 501,
+          "peak_source": "left_endpoint",
+          "range": [
+            501,
+            2000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 2001,
+          "peak_source": "left_endpoint",
+          "range": [
+            2001,
+            7858
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 7859,
+          "peak_source": "left_endpoint",
+          "range": [
+            7859,
+            20550
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 20551,
+          "peak_source": "left_endpoint",
+          "range": [
+            20551,
+            75000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 75001,
+          "peak_source": "left_endpoint",
+          "range": [
+            75001,
+            150000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 150001,
+          "peak_source": "left_endpoint",
+          "range": [
+            150001,
+            250000
+          ],
+          "z": 0.39605985943459426
+        },
+        {
+          "critical_h": -744878.003823061,
+          "peak_h": 250001,
+          "peak_source": "left_endpoint",
+          "range": [
+            250001,
+            380736
+          ],
+          "z": 0.39605985943459426
+        }
+      ],
+      "left_endpoint_peaks": 7,
+      "peak_h_range": [
+        501,
+        250001
+      ],
+      "right_endpoint_peaks": 0,
+      "shape_rule": "adjacent ratio ((m-h)/(N-h))/z is decreasing, so each row is checked at endpoints and the critical point",
+      "status": "PASS"
+    },
+    "late_prefix_exact_outer_thresholds": {
+      "interpretation": "Thresholded audit for the ultra-late prefix T<late_blocks using exact RM direct-sum outer coefficients and placement-only late probability.",
+      "observed": {
+        "above_split_gap_bits": 25.303060148808072,
+        "above_split_log2": -66.4165021170476,
+        "above_split_to_peak_ratio": 2.415571589850349e-08,
+        "peak_h": 32,
+        "peak_late_log2": -78.77173147792081,
+        "peak_outer_log2": 37.65828950968128,
+        "peak_term_log2": -41.11344196823953,
+        "rows": 114,
+        "split_h": 32,
+        "split_log2": -41.11344196823953,
+        "total_log2": -41.1134419333902
+      },
+      "status": "PASS",
+      "thresholds": {
+        "above_split_max_log2": -66.4,
+        "above_split_min_gap_bits": 25.3,
+        "peak_max_log2": -41.11,
+        "split_max_log2": -41.11,
+        "total_max_log2": -41.11
+      }
+    },
+    "postprefix_h501_plus_thresholds": {
+      "interpretation": "Thresholded audit for the h>=501 row-family aggregate. The 501..2000 all-episode CSV aggregate dominates the h>=501 remainder; all other post-prefix and high-weight covers are far below it.",
+      "observed": {
+        "components": {
+          "complement_interval_1048577_2097152": -35150.097366,
+          "early_accelerated_75001_1048576": -1056.187188,
+          "early_postprefix_501_75000": -380.829185,
+          "high_interval_2001_1148736": -586.597103,
+          "late_postprefix_501_380736": -545.690526,
+          "postprefix_501_2000_eall": -182.25973862499328
+        },
+        "h501_plus_checked_rows_log2": -182.25973862499328,
+        "largest_component": "postprefix_501_2000_eall",
+        "largest_other_component_log2": -380.829185,
+        "postprefix_501_2000_dominance_gap_bits": 198.56944637500672
+      },
+      "status": "PASS",
+      "thresholds": {
+        "complement_high_max_log2": -35150.0,
+        "early_accelerated_max_log2": -1056.18,
+        "early_endpoint_max_log2": -380.82,
+        "h501_plus_max_log2": -182.25,
+        "high_max_log2": -586.5,
+        "late_max_log2": -545.69,
+        "postprefix_501_2000_dominance_min_gap_bits": 198.0,
+        "postprefix_501_2000_max_log2": -182.25
+      }
+    },
+    "prefix_interior_audit": {
+      "buckets": [
+        {
+          "T_count": 4000,
+          "T_range": [
+            5949,
+            9948
+          ],
+          "name": "gap_1_4000",
+          "rows": 500
+        },
+        {
+          "T_count": 4000,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "name": "gap_4001_8000",
+          "rows": 500
+        },
+        {
+          "T_count": 4000,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "name": "gap_8001_12000",
+          "rows": 500
+        }
+      ],
+      "h_count": 500,
+      "h_range": [
+        0,
+        499
+      ],
+      "left_endpoint_maxima": true,
+      "reproduction_tolerance_bits": 5e-06,
+      "rows": 1500,
+      "status": "PASS",
+      "tolerance_bits": 1e-07,
+      "worst": {
+        "H": "75",
+        "T_at_max": "13949",
+        "T_count": "4000",
+        "bucket": "gap_8001_12000",
+        "left_log2": "-150.568129429",
+        "left_reproduction_delta": "2.19205276153e-09",
+        "max_log2": "-150.568129427",
+        "max_log2_minus_left": "2.19205276153e-09"
+      },
+      "worst_reproduction": {
+        "H": "185",
+        "T_at_max": "13949",
+        "T_count": "4000",
+        "bucket": "gap_8001_12000",
+        "left_log2": "-285.570795148",
+        "left_reproduction_delta": "-5.52478240934e-09",
+        "max_log2": "-285.570795153",
+        "max_log2_minus_left": "-5.52478240934e-09"
+      },
+      "worst_reproduction_slack_bits": 4.99447521759066e-06,
+      "worst_slack_bits": 9.780794723847e-08
+    },
+    "prefix_placement_ratio": {
+      "endpoint_bound_at_h_min": 0.31306555240043515,
+      "endpoint_bound_at_h_min_log2": -1.6754633220068946,
+      "endpoint_slack_factor": 1.0311989761397868,
+      "exact_comparisons": 468,
+      "exact_cross_multiply_status": "PASS",
+      "gap_range": [
+        1,
+        4000
+      ],
+      "h_range": [
+        32,
+        500
+      ],
+      "peak_den_bits": 515,
+      "peak_h": 32,
+      "peak_log2": -1.7197860583920601,
+      "peak_num_bits": 513,
+      "peak_ratio": 0.3035937385938729,
+      "peak_to_h": 33,
+      "status": "PASS",
+      "threshold": "0.303594",
+      "threshold_den": 500000,
+      "threshold_gap_log2": -21.86720365947997,
+      "threshold_num": 151797,
+      "threshold_slack_bits": 512
+    },
+    "prefix_ridge_ratio": {
+      "first_inner_ratio": 1.0000000000000393,
+      "first_outer_ratio": 2.808685390696199,
+      "first_placement_ratio": 0.3035937391739889,
+      "first_ratio": 0.8526992999248486,
+      "geometric_bound_log2": -34.76978522910598,
+      "inner_span_bits": 3.147704319417244e-12,
+      "interpretation": "Shape audit for the first-r/gap=1..4000 prefix ridge. The placement component has a separate exact cross-multiplication certificate.",
+      "remainder_exact_log2": -43.86017926542517,
+      "ridge_exact_log2": -34.76981855267534,
+      "ridge_rows": 469,
+      "ridge_selector": {
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1
+      },
+      "rows": 88464,
+      "status": "PASS",
+      "tail_inner_ratio": 1.0000000000000393,
+      "tail_outer_ratio": 2.7464194576751995,
+      "tail_placement_ratio": 0.3035934024219713,
+      "tail_ratio": 0.8337948276335436,
+      "thresholds": {
+        "first_outer_ratio_max": 2.809,
+        "first_ratio_max": 0.8527,
+        "inner_ratio_max": 1.000000001,
+        "inner_span_tolerance_bits": 1e-09,
+        "placement_ratio_max": 0.303594,
+        "tail_outer_ratio_max": 2.747,
+        "tail_ratio_max": 0.833795,
+        "total_bound_max_log2": -34.76713
+      },
+      "total_ratio_bound_log2": -34.76714102358159,
+      "total_ratio_bound_slack_bits": 3.3262548498669275e-05
+    },
+    "t_monotonicity_sufficient_reduction": {
+      "bucket_count": 2,
+      "interval_count": 9,
+      "min_slack_bits": 0.154986964096055,
+      "row_count": 18,
+      "rows": [
+        {
+          "H_new": null,
+          "T_new": null,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            2001,
+            7858
+          ],
+          "lambda": 0.02,
+          "min_slack_bits": 0.20057609405312984,
+          "new_slack_bits": null,
+          "no_new_slack_bits": 0.20057609405312984,
+          "rho": 0.01
+        },
+        {
+          "H_new": null,
+          "T_new": null,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            2001,
+            7858
+          ],
+          "lambda": 0.02,
+          "min_slack_bits": 0.1558355222326918,
+          "new_slack_bits": null,
+          "no_new_slack_bits": 0.1558355222326918,
+          "rho": 0.01
+        },
+        {
+          "H_new": 9951,
+          "T_new": 9950,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            7859,
+            20550
+          ],
+          "lambda": 0.05,
+          "min_slack_bits": 0.154986964096055,
+          "new_slack_bits": 0.154986964096055,
+          "no_new_slack_bits": 0.8098362704135967,
+          "rho": 0.03
+        },
+        {
+          "H_new": 13951,
+          "T_new": 13950,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            7859,
+            20550
+          ],
+          "lambda": 0.05,
+          "min_slack_bits": 0.15499084733829221,
+          "new_slack_bits": 0.15499084733829221,
+          "no_new_slack_bits": 0.6287301871289295,
+          "rho": 0.03
+        },
+        {
+          "H_new": 20487,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            20551,
+            75000
+          ],
+          "lambda": 0.2,
+          "min_slack_bits": 1.1297326304852762,
+          "new_slack_bits": 1.1297326304852762,
+          "no_new_slack_bits": null,
+          "rho": 0.1
+        },
+        {
+          "H_new": 20487,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            20551,
+            75000
+          ],
+          "lambda": 0.2,
+          "min_slack_bits": 0.6476172891201193,
+          "new_slack_bits": 0.6476172891201193,
+          "no_new_slack_bits": null,
+          "rho": 0.1
+        },
+        {
+          "H_new": 74937,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            75001,
+            250000
+          ],
+          "lambda": 0.5,
+          "min_slack_bits": 4.010932545883001,
+          "new_slack_bits": 4.010932545883001,
+          "no_new_slack_bits": null,
+          "rho": 0.3
+        },
+        {
+          "H_new": 74937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            75001,
+            250000
+          ],
+          "lambda": 0.5,
+          "min_slack_bits": 2.1440892272873895,
+          "new_slack_bits": 2.1440892272873895,
+          "no_new_slack_bits": null,
+          "rho": 0.3
+        },
+        {
+          "H_new": 249937,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            250001,
+            350000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 30.05646692927947,
+          "new_slack_bits": 30.05646692927947,
+          "no_new_slack_bits": null,
+          "rho": 0.5
+        },
+        {
+          "H_new": 249937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            250001,
+            350000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 22.381864474516952,
+          "new_slack_bits": 22.381864474516952,
+          "no_new_slack_bits": null,
+          "rho": 0.5
+        },
+        {
+          "H_new": 349937,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            350001,
+            650000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 21.636936026724044,
+          "new_slack_bits": 21.636936026724044,
+          "no_new_slack_bits": null,
+          "rho": 1.0
+        },
+        {
+          "H_new": 349937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            350001,
+            650000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 9.238901027689597,
+          "new_slack_bits": 9.238901027689597,
+          "no_new_slack_bits": null,
+          "rho": 1.0
+        },
+        {
+          "H_new": 649937,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            650001,
+            725000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 58.501371420670445,
+          "new_slack_bits": 58.501371420670445,
+          "no_new_slack_bits": null,
+          "rho": 2.0
+        },
+        {
+          "H_new": 649937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            650001,
+            725000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 15.28787437460039,
+          "new_slack_bits": 15.28787437460039,
+          "no_new_slack_bits": null,
+          "rho": 2.0
+        },
+        {
+          "H_new": 724937,
+          "T_new": 13947,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            725001,
+            950000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 66.06902712497373,
+          "new_slack_bits": 66.06902712497373,
+          "no_new_slack_bits": null,
+          "rho": 3.0
+        },
+        {
+          "H_new": 724937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            725001,
+            950000
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 3.7736204953817225,
+          "new_slack_bits": 3.7736204953817225,
+          "no_new_slack_bits": null,
+          "rho": 3.0
+        },
+        {
+          "H_new": null,
+          "T_new": null,
+          "T_range": [
+            9949,
+            13948
+          ],
+          "bucket": "gap_4001_8000",
+          "h_range": [
+            950001,
+            1148736
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": null,
+          "new_slack_bits": null,
+          "no_new_slack_bits": null,
+          "rho": 3.0
+        },
+        {
+          "H_new": 949937,
+          "T_new": 17947,
+          "T_range": [
+            13949,
+            17948
+          ],
+          "bucket": "gap_8001_12000",
+          "h_range": [
+            950001,
+            1148736
+          ],
+          "lambda": 1.2,
+          "min_slack_bits": 73.68963753673566,
+          "new_slack_bits": 73.68963753673566,
+          "no_new_slack_bits": null,
+          "rho": 3.0
+        }
+      ],
+      "rule": "two-case sufficient endpoint reduction for fixed-pole e>=1 envelope monotonicity in T",
+      "status": "PASS",
+      "worst_row": {
+        "H_new": 9951,
+        "T_new": 9950,
+        "T_range": [
+          9949,
+          13948
+        ],
+        "bucket": "gap_4001_8000",
+        "h_range": [
+          7859,
+          20550
+        ],
+        "lambda": 0.05,
+        "min_slack_bits": 0.154986964096055,
+        "new_slack_bits": 0.154986964096055,
+        "no_new_slack_bits": 0.8098362704135967,
+        "rho": 0.03
+      }
+    }
+  },
+  "construction": "RM512_256 block outer with full-split EBCH inner",
+  "parameters": {
+    "block_bits": 64,
+    "current_eallratio_max_T": 32767,
+    "current_eallratio_max_gap": 26819,
+    "exact_outer_blocks": 4096,
+    "exact_outer_h_max": 500,
+    "exact_outer_local_spectrum_csv": "scripts\\rm512_256_spectrum.csv",
+    "first_active_T_convention": "if the first active inner block is i, T=B-i+1 remaining output blocks",
+    "gap_to_T_convention": "for named gap buckets, T=late_blocks+gap-1; T<late_blocks is the ultra-late prefix",
+    "global_turnoff_log2": -62.4078758,
+    "high_interval_turnoff_adjustment_bits": 1.484774,
+    "initial_state": "S_0=0",
+    "inner_blocks": 32768,
+    "inner_spectrum": "scripts\\EBCH128_64.wd",
+    "late_blocks": 5949,
+    "late_coordinates": 380736,
+    "terminal_state_convention": "S_B is discarded and unconstrained; it is not emitted"
+  },
+  "row_families": [
+    {
+      "h_range": [
+        1,
+        500
+      ],
+      "log2": -40.11543146973484,
+      "name": "late_prefix_T_lt_5949_cap_h_le_500",
+      "notes": "Placement-only ultra-late cap using the outer-prefix CSV coefficients.",
+      "peak": {
+        "h": 32.0,
+        "late_log2": -78.77173147792081,
+        "outer_log2": 37.629712,
+        "term_log2": -41.14201947792081
+      },
+      "role": "diagnostic_cap",
+      "rows": 469
+    },
+    {
+      "above_split_log2": -66.4165021170476,
+      "h_range": [
+        1,
+        500
+      ],
+      "log2": -41.1134419333902,
+      "name": "late_prefix_T_lt_5949_exact_outer_h_le_500",
+      "notes": "Exact RM direct-sum outer coefficients for the ultra-late prefix.",
+      "peak": {
+        "h": 32,
+        "late_log2": -78.77173147792081,
+        "outer_log2": 37.65828950968128,
+        "term_log2": -41.11344196823953
+      },
+      "role": "active_h_le_500",
+      "rows": 114,
+      "split_h": 32,
+      "split_log2": -41.11344196823953
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -34.767174,
+      "log2": -34.767174286130086,
+      "name": "prefix_32_500_e_le8",
+      "peak": {
+        "best_alpha": "nan",
+        "best_lambda": "nan",
+        "best_rho": "nan",
+        "bucket_T": "5949",
+        "first_r": "1",
+        "gap_max": "4000",
+        "gap_min": "1",
+        "inner_log2": "-20.011734892645514",
+        "inner_mode": "csv",
+        "outer_log2_bound": "37.65828950968125",
+        "outer_weight": "32",
+        "outer_z": "9.999999999999982e-09",
+        "placement_log2": "-55.03232145853627",
+        "remaining_ones": "31",
+        "term_log2": "-37.38576684150053"
+      },
+      "role": "raw_csv_check",
+      "rows": 88464,
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -269.335258,
+      "log2": -269.3352579715279,
+      "name": "prefix_32_500_e_ge9_tail",
+      "peak": {
+        "first_r": "1",
+        "gap_max": "12000",
+        "gap_min": "8001",
+        "outer_log2": "676.056993",
+        "outer_weight": "500",
+        "placement_log2": "-434.2827771434713",
+        "remaining_ones": "499",
+        "tail_log2": "-512.915384957545",
+        "term_log2": "-271.1411691010163"
+      },
+      "role": "raw_csv_check",
+      "rows": 87588,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -85.403338,
+      "log2": -85.40333786206811,
+      "name": "early_32_500_e_le16_uniformsurv",
+      "peak": {
+        "best_alpha": "nan",
+        "best_lambda": "nan",
+        "best_rho": "nan",
+        "bucket_T": "17949",
+        "first_r": "1",
+        "gap_max": "17000",
+        "gap_min": "12001",
+        "inner_log2": "-108.57658824597326",
+        "inner_mode": "csv",
+        "outer_log2_bound": "37.65828950968125",
+        "outer_weight": "32",
+        "outer_z": "9.999999999999982e-09",
+        "placement_log2": "-16.445093443249107",
+        "remaining_ones": "31",
+        "term_log2": "-87.36339217954111"
+      },
+      "role": "raw_csv_check",
+      "rows": 88464,
+      "source_csv": "scripts\\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv"
+    },
+    {
+      "column": "term_log2",
+      "expected_log2": -305.738816,
+      "log2": -305.7388164635216,
+      "name": "early_32_500_e_ge17_tail",
+      "peak": {
+        "first_r": "1",
+        "gap_max": "26819",
+        "gap_min": "22001",
+        "outer_log2": "676.056993",
+        "outer_weight": "500",
+        "placement_log2": "-0.010850246336303826",
+        "remaining_ones": "499",
+        "tail_log2": "-982.4911090629782",
+        "term_log2": "-306.4449663093145"
+      },
+      "role": "raw_csv_check",
+      "rows": 86520,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv"
+    },
+    {
+      "column": "aggregate_log2",
+      "expected_log2": -182.259739,
+      "log2": -182.25973862499328,
+      "name": "postprefix_501_2000_eall",
+      "peak": {
+        "aggregate_log2": "-184.35624892645725",
+        "outer_weight": "501",
+        "peak_best_alpha": "nan",
+        "peak_best_lambda": "nan",
+        "peak_best_rho": "nan",
+        "peak_first_r": "1",
+        "peak_gap_max": "4000",
+        "peak_gap_min": "1",
+        "peak_inner_log2": "0.0",
+        "peak_inner_mode": "cap",
+        "peak_outer_log2_bound": "677.3932024505685",
+        "peak_placement_log2": "-861.7853757248122",
+        "peak_remaining_ones": "500",
+        "peak_term_log2": "-184.39217327424365"
+      },
+      "role": "raw_csv_check",
+      "rows": 1500,
+      "source_csv": "scripts\\fullsplit_piecewise_h501_2000_eall_hsummary.csv"
+    },
+    {
+      "above_split_log2": -50.738252508305614,
+      "dominant": {
+        "above_split_gap_bits": 13.352485666805116,
+        "bucket_T": 5949,
+        "exact_outer_log2": 37.65828950968128,
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "inner_log2": -20.011734892645514,
+        "inner_mode": "csv",
+        "old_outer_log2": 37.65828950968125,
+        "outer_weight": 32,
+        "placement_log2": -55.03232145853627,
+        "remaining_ones": 31,
+        "split_minus_peak_bits": 0.0022846069119495382,
+        "split_remainder_log2": -46.68722908748783,
+        "term_log2": -37.3857668415005,
+        "total_minus_peak_bits": 0.002422317512923655,
+        "total_remainder_log2": -46.602718187648264
+      },
+      "log2": -37.383344523987574,
+      "name": "prefix_32_500_e_le8_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 4000,
+        "gap_min": 1,
+        "outer_log2": 37.65828950968128,
+        "outer_weight": 32,
+        "term_log2": -37.3857668415005
+      },
+      "role": "active_h_le_500",
+      "rows": 21708,
+      "source_csv": "scripts\\fullsplit_piecewise_h32_500_csv.csv",
+      "split_h": 32,
+      "split_log2": -37.38348223458855
+    },
+    {
+      "above_split_log2": -284.00480466197814,
+      "log2": -284.00480466197814,
+      "name": "prefix_32_500_e_ge9_tail_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 12000,
+        "gap_min": 8001,
+        "outer_log2": 662.4660134755578,
+        "outer_weight": 500,
+        "term_log2": -284.73214862545854
+      },
+      "role": "active_h_le_500",
+      "rows": 21576,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_h32_500_r1_64_emin9.csv",
+      "split_h": 32,
+      "split_log2": -540.4230482869045
+    },
+    {
+      "above_split_log2": -106.3522886081795,
+      "log2": -86.91045616174831,
+      "name": "early_32_500_e_le16_uniformsurv_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 17000,
+        "gap_min": 12001,
+        "outer_log2": 37.65828950968128,
+        "outer_weight": 32,
+        "term_log2": -87.36339217954108
+      },
+      "role": "active_h_le_500",
+      "rows": 21708,
+      "source_csv": "scripts\\fullsplit_piecewise_early_h32_500_e16_uniformsurv.csv",
+      "split_h": 32,
+      "split_log2": -86.9104581875648
+    },
+    {
+      "above_split_log2": -319.97780844645155,
+      "log2": -319.97780844645155,
+      "name": "early_32_500_e_ge17_tail_exact_outer",
+      "peak": {
+        "first_r": 1,
+        "gap_max": 26819,
+        "gap_min": 22001,
+        "outer_log2": 662.4660134755578,
+        "outer_weight": 500,
+        "term_log2": -320.0359458337567
+      },
+      "role": "active_h_le_500",
+      "rows": 21396,
+      "source_csv": "scripts\\fullsplit_turnoff_tail_early_h32_500_r1_64_emin17.csv",
+      "split_h": 32,
+      "split_log2": -1019.4415954617978
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "lambda_value": 0.02,
+      "log2": -586.597103,
+      "name": "interval_2001--7858",
+      "raw_log2": -588.081877,
+      "rho": 0.01,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "lambda_value": 0.05,
+      "log2": -2655.944828,
+      "name": "interval_7859--20550",
+      "raw_log2": -2657.429602,
+      "rho": 0.03,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:75000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        20551,
+        75000
+      ],
+      "lambda_value": 0.2,
+      "log2": -6025.574047,
+      "name": "interval_20551--75000",
+      "raw_log2": -6027.058821,
+      "rho": 0.1,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 75001:250000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.5 --rhos 0.3",
+      "h_range": [
+        75001,
+        250000
+      ],
+      "lambda_value": 0.5,
+      "log2": -12844.868837,
+      "name": "interval_75001--250000",
+      "raw_log2": -12846.353611,
+      "rho": 0.3,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 250001:350000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 0.5",
+      "h_range": [
+        250001,
+        350000
+      ],
+      "lambda_value": 1.2,
+      "log2": -28476.640541,
+      "name": "interval_250001--350000",
+      "raw_log2": -28478.125315,
+      "rho": 0.5,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 350001:400000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        350001,
+        400000
+      ],
+      "lambda_value": 1.2,
+      "log2": -81555.594538,
+      "name": "interval_350001--400000",
+      "raw_log2": -81557.079312,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 400001:450000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        400001,
+        450000
+      ],
+      "lambda_value": 1.2,
+      "log2": -91421.772986,
+      "name": "interval_400001--450000",
+      "raw_log2": -91423.25776,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 450001:550000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        450001,
+        550000
+      ],
+      "lambda_value": 1.2,
+      "log2": -82081.961328,
+      "name": "interval_450001--550000",
+      "raw_log2": -82083.446102,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 550001:650000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 1",
+      "h_range": [
+        550001,
+        650000
+      ],
+      "lambda_value": 1.2,
+      "log2": -1518.493461,
+      "name": "interval_550001--650000",
+      "raw_log2": -1519.978235,
+      "rho": 1.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 650001:725000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 2",
+      "h_range": [
+        650001,
+        725000
+      ],
+      "lambda_value": 1.2,
+      "log2": -116328.133946,
+      "name": "interval_650001--725000",
+      "raw_log2": -116329.61872,
+      "rho": 2.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 725001:750000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        725001,
+        750000
+      ],
+      "lambda_value": 1.2,
+      "log2": -169887.902921,
+      "name": "interval_725001--750000",
+      "raw_log2": -169889.387695,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 750001:850000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        750001,
+        850000
+      ],
+      "lambda_value": 1.2,
+      "log2": -134523.58364599998,
+      "name": "interval_750001--850000",
+      "raw_log2": -134525.06842,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 850001:950000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        850001,
+        950000
+      ],
+      "lambda_value": 1.2,
+      "log2": -117534.84353,
+      "name": "interval_850001--950000",
+      "raw_log2": -117536.328304,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 950001:1050000 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        950001,
+        1050000
+      ],
+      "lambda_value": 1.2,
+      "log2": -285052.550668,
+      "name": "interval_950001--1050000",
+      "raw_log2": -285054.035442,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 1050001:1148736 --inner-mode-by-gap cap,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 1.2 --rhos 3",
+      "h_range": [
+        1050001,
+        1148736
+      ],
+      "lambda_value": 1.2,
+      "log2": -562860.716638,
+      "name": "interval_1050001--1148736",
+      "raw_log2": -562862.201412,
+      "rho": 3.0,
+      "role": "active_postprefix_late_window_fixed_pole",
+      "turnoff_adjustment_bits": 1.484774
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1048577:1148736:1 --lambda-value 2.3",
+      "h_range": [
+        1048577,
+        1148736
+      ],
+      "log2": -128915.315746,
+      "name": "complement_interval_1048577--1148736",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1148737:1300000:1 --lambda-value 2.3",
+      "h_range": [
+        1148737,
+        1300000
+      ],
+      "log2": -124889.651755,
+      "name": "complement_interval_1148737--1300000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1300001:1500000:1 --lambda-value 2.3",
+      "h_range": [
+        1300001,
+        1500000
+      ],
+      "log2": -113710.357653,
+      "name": "complement_interval_1300001--1500000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1500001:1700000:1 --lambda-value 2.3",
+      "h_range": [
+        1500001,
+        1700000
+      ],
+      "log2": -35150.097366,
+      "name": "complement_interval_1500001--1700000",
+      "rho": 1.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1700001:1900000:10 --lambda-value 2.3",
+      "h_range": [
+        1700001,
+        1900000
+      ],
+      "log2": -524628.366199,
+      "name": "complement_interval_1700001--1900000",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 1900001:2097089:10 --lambda-value 2.3",
+      "h_range": [
+        1900001,
+        2097089
+      ],
+      "log2": -894140.350713,
+      "name": "complement_interval_1900001--2097089",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_high_density_interval.py --intervals 2097090:2097152:10 --lambda-value 2.3",
+      "h_range": [
+        2097090,
+        2097152
+      ],
+      "log2": -893792.28501,
+      "name": "complement_interval_2097090--2097152",
+      "rho": 10.0,
+      "role": "active_complement_high_density"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 501:2000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758",
+      "h_range": [
+        501,
+        2000
+      ],
+      "lambdas": null,
+      "log2": -380.829185,
+      "name": "early_postprefix_interval_501--2000",
+      "rhos": null,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 2001:7858 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.02 --rhos 0.01",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "lambdas": "0.02",
+      "log2": -852.998772,
+      "name": "early_postprefix_interval_2001--7858",
+      "rhos": "0.01",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 7859:20550 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.05 --rhos 0.03",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "lambdas": "0.05",
+      "log2": -3712.365087,
+      "name": "early_postprefix_interval_7859--20550",
+      "rhos": "0.03",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 20551:30000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        20551,
+        30000
+      ],
+      "lambdas": "0.2",
+      "log2": -8614.382763,
+      "name": "early_postprefix_interval_20551--30000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 30001:50000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        30001,
+        50000
+      ],
+      "lambdas": "0.2",
+      "log2": -21332.131033,
+      "name": "early_postprefix_interval_30001--50000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\sum_fullsplit_piecewise_certificate.py --h-values 50001:75000 --gap-start 12001 --gap-stop 26819 --gap-step 5000 --inner-mode-by-gap eallratio,eallratio,eallratio --gap-sum-mode endpoint --inner-T-by-gap feasible-min --turnoff-log2 -62.4078758 --lambdas 0.2 --rhos 0.1",
+      "h_range": [
+        50001,
+        75000
+      ],
+      "lambdas": "0.2",
+      "log2": -34847.929043,
+      "name": "early_postprefix_interval_50001--75000",
+      "rhos": "0.1",
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 75001:90000:0.2:0.1",
+      "h_range": [
+        75001,
+        90000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.2,
+      "log2": -28574.869802,
+      "name": "early_accelerated_interval_75001--90000",
+      "rho": 0.1,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 90001:100000:0.2:0.1",
+      "h_range": [
+        90001,
+        100000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.2,
+      "log2": -22149.918612,
+      "name": "early_accelerated_interval_90001--100000",
+      "rho": 0.1,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 100001:110000:0.5:0.3",
+      "h_range": [
+        100001,
+        110000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.5,
+      "log2": -1056.187188,
+      "name": "early_accelerated_interval_100001--110000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 110001:125000:0.5:0.3",
+      "h_range": [
+        110001,
+        125000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.5,
+      "log2": -10362.025949,
+      "name": "early_accelerated_interval_110001--125000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 125001:160000:0.8:0.3",
+      "h_range": [
+        125001,
+        160000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 0.8,
+      "log2": -45589.980049,
+      "name": "early_accelerated_interval_125001--160000",
+      "rho": 0.3,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 160001:250000:1.2:0.5",
+      "h_range": [
+        160001,
+        250000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 1.2,
+      "log2": -60293.751685,
+      "name": "early_accelerated_interval_160001--250000",
+      "rho": 0.5,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_endpoint_interval.py --intervals 250001:350000:1.2:0.5",
+      "h_range": [
+        250001,
+        350000
+      ],
+      "helper": "certify_fullsplit_early_endpoint_interval.py",
+      "lambda_value": 1.2,
+      "log2": -94682.265141,
+      "name": "early_accelerated_interval_250001--350000",
+      "rho": 0.5,
+      "role": "active_postprefix_early_endpoint"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 350001:524288:2:0.8",
+      "h_range": [
+        350001,
+        524288
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -181215.853042,
+      "name": "early_accelerated_interval_350001--524288",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 524289:750000:2:0.8",
+      "h_range": [
+        524289,
+        750000
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -194565.849984,
+      "name": "early_accelerated_interval_524289--750000",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_early_paired_interval.py --intervals 750001:1048576:2:0.8",
+      "h_range": [
+        750001,
+        1048576
+      ],
+      "helper": "certify_fullsplit_early_paired_interval.py",
+      "lambda_value": 2.0,
+      "log2": -98386.449256,
+      "name": "early_accelerated_interval_750001--1048576",
+      "rho": 0.8,
+      "role": "active_postprefix_early_paired"
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 501:2000:0.39605985943459426",
+      "h_range": [
+        501,
+        2000
+      ],
+      "log2": -545.690526,
+      "name": "late_postprefix_interval_501--2000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 2001:7858:0.39605985943459426",
+      "h_range": [
+        2001,
+        7858
+      ],
+      "log2": -2237.593414,
+      "name": "late_postprefix_interval_2001--7858",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 7859:20550:0.39605985943459426",
+      "h_range": [
+        7859,
+        20550
+      ],
+      "log2": -8919.160723,
+      "name": "late_postprefix_interval_7859--20550",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 20551:75000:0.39605985943459426",
+      "h_range": [
+        20551,
+        75000
+      ],
+      "log2": -23772.761808,
+      "name": "late_postprefix_interval_20551--75000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 75001:150000:0.39605985943459426",
+      "h_range": [
+        75001,
+        150000
+      ],
+      "log2": -93856.032305,
+      "name": "late_postprefix_interval_75001--150000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 150001:250000:0.39605985943459426",
+      "h_range": [
+        150001,
+        250000
+      ],
+      "log2": -210536.528296,
+      "name": "late_postprefix_interval_150001--250000",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    },
+    {
+      "command": "python scripts\\certify_fullsplit_late_prefix_interval.py --intervals 250001:380736:0.39605985943459426",
+      "h_range": [
+        250001,
+        380736
+      ],
+      "log2": -417970.896784,
+      "name": "late_postprefix_interval_250001--380736",
+      "role": "active_postprefix_ultralate_placement",
+      "z": 0.39605985943459426
+    }
+  ],
+  "schema": "fullsplit_finite_ledger.v1",
+  "target": {
+    "N": 2097152,
+    "delta": 0.09,
+    "quantity": "first-moment upper bound for checked finite dense+dense rows"
+  },
+  "totals": {
+    "complement_interval_1048577_2097152_total_log2": -35150.097366,
+    "current_checked_ledger_margin_bits": 37.27852762602124,
+    "current_checked_ledger_total_log2": -37.27852762602124,
+    "early_32_500_all_e_exact_outer_log2": -86.91045616174831,
+    "early_accelerated_75001_1048576_total_log2": -1056.187188,
+    "early_accelerated_endpoint_75001_350000_total_log2": -1056.187188,
+    "early_accelerated_paired_350001_1048576_total_log2": -98386.449256,
+    "early_postprefix_501_75000_total_log2": -380.829185,
+    "finite_ledger_margin_bits": 37.383344523987574,
+    "finite_ledger_total_log2": -37.383344523987574,
+    "h32_500_all_first_active_positions_log2": -37.27852762602124,
+    "h32_500_all_first_active_positions_margin_bits": 37.27852762602124,
+    "h501_plus_checked_rows_log2": -182.25973862499328,
+    "interval_2001_1148736_total_log2": -586.597103,
+    "late_plus_window_margin_bits": 37.27852762602124,
+    "late_plus_window_total_log2": -37.27852762602124,
+    "late_postprefix_501_380736_total_log2": -545.690526,
+    "prefix_32_500_all_e_exact_outer_log2": -37.383344523987574
+  }
+}

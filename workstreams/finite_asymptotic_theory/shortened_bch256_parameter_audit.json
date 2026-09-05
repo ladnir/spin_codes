@@ -1,0 +1,62 @@
+{
+  "parent": {
+    "construction": "parity extension of primitive narrow-sense binary BCH(255,37)",
+    "contains_all_one_word": true,
+    "parameters": {
+      "dimension": 131,
+      "length": 256,
+      "minimum_distance_floor": 38
+    },
+    "parity_check_rank": 125
+  },
+  "schema": "shortened-extended-bch256-audit-v1",
+  "scope": "The GF(2) rank computations, shortening dimensions, and generator hashes are exact. The distance floor is inherited from the standard BCH bound and parity extension; this script does not enumerate minimum-weight codewords. Shortening coordinates are fixed and are not sampled.",
+  "shortenings": [
+    {
+      "check_rank_ladder": [
+        125,
+        126,
+        127,
+        128
+      ],
+      "generator_rank_after_puncture": 128,
+      "generator_rows_sha256": "8441176d2af4c9e93cf4858b14170191e09c404e00bdfdcb9b047e351c5beb2d",
+      "parameters": {
+        "dimension": 128,
+        "length": 253,
+        "minimum_distance_floor": 38
+      },
+      "shortened_coordinates": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "check_rank_ladder": [
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131
+      ],
+      "generator_rank_after_puncture": 125,
+      "generator_rows_sha256": "f8c1e0e2feb58574aa9b61d660d5ec5e50b8c0385a67ba2c27496896957a1e66",
+      "parameters": {
+        "dimension": 125,
+        "length": 250,
+        "minimum_distance_floor": 38
+      },
+      "shortened_coordinates": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ]
+}

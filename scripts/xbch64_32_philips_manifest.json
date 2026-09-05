@@ -1,0 +1,32 @@
+{
+  "schema": "explicit-binary-code-manifest-v1",
+  "name": "Philips shortened-XBCH [64,32,12] diffusion code",
+  "parameters": {
+    "length": 64,
+    "dimension": 32,
+    "minimum_distance_exact": 12
+  },
+  "construction": {
+    "generator_form": "(I_32 | A)",
+    "row_encoding": "low 32 bits contain the corresponding row of I_32; high 32 bits contain the published row of A",
+    "source": "https://patents.justia.com/patent/20020101986",
+    "source_location": "paragraphs 45-59; the rows of A appear in paragraph 59",
+    "independent_reconstruction": {
+      "script": "scripts/reconstruct_xbch64_32_philips.py",
+      "receipt": "constructions/riffle_paritymix8_b1024_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s16/xbch64_philips_reconstruction.json",
+      "receipt_sha256": "1855a22f6158760486068772e0564ed13f3685652a0a476412346f93fd7b94b9",
+      "result": "puncturing zero-based A columns 5,9,28,31 recovers the independently reconstructed extended shortened BCH [60,32,>=12] code up to coordinate permutation"
+    }
+  },
+  "generator_rows": {
+    "path": "scripts/xbch64_32_philips_generator_rows.txt",
+    "sha256": "68a60b201af9cb8f2918f553d540b2d491da8c9156054c113f748fd3dbd56eca"
+  },
+  "spectrum": {
+    "path": "scripts/xbch64_32_philips_spectrum.csv",
+    "sha256": "8b89591a98e585740626b1af493f6aa317861f506e5f8e87dbb3912f122c216d",
+    "enumeration": "all 2^32 codewords",
+    "mass": 4294967296,
+    "weight_12_multiplicity": 787
+  }
+}

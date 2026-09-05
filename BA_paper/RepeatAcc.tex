@@ -1,0 +1,16 @@
+
+\section{Repeat-Accumulate Codes}
+
+\cite{spielman} proved that $t=2$ must result in sublinear minimum distance, while at $t=3$ the code can achieve linear minimum distance. In fact, Repeat-Accumulate (RA-$3$) codes, where $\B$ is replaced by a repeater, achieve a concretely high linear minimum distance at rate 1/4. For efficiency reasons, we focus on rate 1/2 to avoid the high cost of large permutations.  
+%We implement the enumerator for these codes and confirm that in expectation they achieve expected minimum distance of approximately $0.03n$. 
+We implement the code for rate 1/2 and depict the result in \figureref{fig:RAADist} for $k\in\{512,1024,2048\}$. As can be seen, the probability of having a weight-$h=1$ codeword is approximately $1/k$ and increases with $h$ until around $h/n=0.03$, at which point we expect there to be a single codeword. 
+While the asymptotic properties of rate-1/2 RA-3 codes remain unclear, our experiments show their concrete minimum distance is poor.
+
+
+\begin{figure}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.75\linewidth, trim=0cm 1.0cm 0cm 1.2cm, clip]{fig/dist_RAA.pdf} 
+    \caption{Depictions of the Repeat-Accumulate enumerator. The dashed lines denote the log number of codewords with at most $h/n$ relative minimum distance, as opposed to exactly $h/n$.   See \figureref{fig:blockEnum} for details.  }
+    \label{fig:RAADist}
+\end{figure}

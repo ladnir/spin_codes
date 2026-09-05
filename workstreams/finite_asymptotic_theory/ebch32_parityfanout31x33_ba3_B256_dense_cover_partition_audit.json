@@ -1,0 +1,94 @@
+{
+  "schema": "ebch32-parityfanout31x33-b256-dense-cover-partition-audit-v1",
+  "status": "EXACT_SUBDIVISION_TREE_AUDIT",
+  "claim": {
+    "partition_valid": true,
+    "all_receipt_leaves_consumed_once": true,
+    "recorded_depths_valid": true,
+    "accepted_box_counts_valid": true,
+    "leaf_count": 4106,
+    "root_count": 3,
+    "root_six_volumes": [
+      545393737728,
+      4327464960,
+      34336575
+    ],
+    "shell_six_volume": 549755539263,
+    "root_volume_identity_valid": true,
+    "explicit_pulling_triangulation_valid": true,
+    "internal_node_count": 4103,
+    "visited_node_count": 8209,
+    "maximum_leaf_depth": 50,
+    "kind_histogram": {
+      "accepted": 3957,
+      "pending": 149,
+      "rejected": 0
+    },
+    "depth_histogram": {
+      "16": 378,
+      "18": 244,
+      "21": 193,
+      "24": 625,
+      "26": 66,
+      "25": 66,
+      "23": 233,
+      "22": 215,
+      "20": 212,
+      "19": 235,
+      "17": 257,
+      "15": 328,
+      "14": 242,
+      "13": 125,
+      "12": 105,
+      "11": 102,
+      "10": 88,
+      "9": 70,
+      "8": 33,
+      "6": 13,
+      "7": 17,
+      "3": 9,
+      "27": 42,
+      "28": 27,
+      "30": 9,
+      "31": 7,
+      "32": 9,
+      "29": 10,
+      "34": 5,
+      "35": 4,
+      "33": 5,
+      "37": 10,
+      "36": 3,
+      "39": 8,
+      "38": 9,
+      "41": 4,
+      "42": 10,
+      "43": 5,
+      "44": 8,
+      "45": 6,
+      "47": 4,
+      "48": 8,
+      "50": 14,
+      "49": 9,
+      "46": 6,
+      "40": 6,
+      "5": 10,
+      "4": 12
+    },
+    "sum_recorded_accepted_box_counts_with_overlap": 69880842387
+  },
+  "scope": "The audit proves that the receipt leaves are exactly the leaves of the deterministic longest-edge subdivision forest generated from the explicit three-cell pulling triangulation. The exact integer volume identity is checked here. The audit does not prove the numerical witness bounds.",
+  "dependencies": [
+    {
+      "path": "ebch32_parityfanout31x33_ba3_B256_three_band_cover_all_q_d11.json",
+      "sha256": "459df43428113a676c2cf0bddab62691c2c919aec4bdb00acd90dd07800f5547"
+    },
+    {
+      "path": "audit_ebch32_parityfanout_dense_cover_partition.py",
+      "sha256": "1a0f3236c80643e32a93ca78197a195f706fa2d7789b0340181e4811804a3c25"
+    },
+    {
+      "path": "diagnose_ebch32_parityfanout_ba_three_band_cover_all_q.py",
+      "sha256": "4f843d2f9cdbb8638d2a7838d0732cd7186b2355faa98f8b9f594e4cbbf59d5d"
+    }
+  ]
+}

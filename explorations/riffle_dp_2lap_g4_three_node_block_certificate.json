@@ -1,0 +1,27 @@
+{
+  "schema": "riffle-dp-2lap-g4-three-node-block-certificate-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT",
+  "autonomous_output_map": "U(o)=Acc(P(o))",
+  "enumerated_output_weight_maximum": 7,
+  "enumerated_nonzero_outputs": 704494192,
+  "rejected_three_node_weight_maximum": 21,
+  "rejected_triples_found": 0,
+  "minimum_weight_among_triples_containing_an_enumerated_output": 25,
+  "minimum_witness": {
+    "alignment": "ending",
+    "low_output_hex": "0x208008",
+    "left2_hex": "0x1450050",
+    "left1_hex": "0x8218522240b0089",
+    "right1_hex": "0xd76e26fece652644",
+    "right2_hex": "0x8000000000054001"
+  },
+  "three_node_weight_lower_bound": 22,
+  "prefix_length": 26832,
+  "three_node_blocks": 8944,
+  "certified_nonzero_terminal_prefix_weight": 196768,
+  "distance_threshold": 188766,
+  "margin_above_distance": 8002,
+  "proof": "A triple of total weight at most 21 has an output of weight at most 7. The exhaustive enumeration checks all three alignments containing every such nonzero output. The autonomous map is invertible, so each block entered from a nonzero terminal state is nonzero.",
+  "scope_limitation": "The certificate proves sufficient wrapped-prefix weight for every nonzero first-lap terminal state. It gives no weight when that terminal state is zero."
+}

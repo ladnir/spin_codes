@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{url}
+
+\input{macros}
+
+\title{Exact Enumerator Bounds for Expand--Accumulate and
+Expand--Convolute Codes}
+\author{Stanislav Peceny \and Rahul Rachuri \and
+Srinivasan Raghuraman \and Peter Rindal}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Expand--Accumulate (EA) and Expand--Convolute (EC) codes combine a sparse
+random linear map with an invertible recursive map.  Cryptographic
+applications require the sampled generator to have no low-weight nonzero
+codeword.  Published proofs replace the recursive state process by
+concentration bounds.  We instead compute its exact input--output weight
+enumerator.
+
+For the original binary ensembles, the new bounds recover the
+Gilbert--Varshamov exponent for messages of linear weight and reduce the
+expander density needed for sparse messages.  We then replace independent
+incidence by region-stratified regular incidence.  At rate one half, a
+two-sided regular EC ensemble with left/right degrees $10/5$ and memory $15$
+reaches $99.993\%$ of the binary Gilbert--Varshamov distance.  The probability
+of sampling a generator below this distance is less than $2^{-32.4990}$.
+
+We extend the construction to finite fields using independent nonzero edge
+labels and full-field convolution coefficients.  These coefficients mix
+field components; scalar extension of a binary matrix does not.  Over
+$\F_{2^{128}}$, degrees $24/12$ with memory $5$ reach $98.415\%$ of the
+rate-one-half Gilbert--Varshamov distance with sampling failure below
+$2^{-45.03}$.  Outward-rounded verifiers certify every finite claim.  The
+results concern minimum distance of sampled ensembles; they do not provide a
+decoder or a complete protocol-security proof.
+\end{abstract}
+
+\input{01-introduction}
+\input{02-constructions}
+\input{03-enumerator-method}
+\input{04-binary-ea}
+\input{05-binary-ec}
+\input{06-regular-expanders}
+\input{07-prime-fields}
+\input{08-certificates}
+\input{09-discussion}
+
+\appendix
+\input{appendix-additional-ensembles}
+\input{appendix-nonwrapping}
+\input{appendix-analytic-details}
+\input{appendix-artifact}
+
+\bibliographystyle{alpha}
+\bibliography{references}
+\end{document}

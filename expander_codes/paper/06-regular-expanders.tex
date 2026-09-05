@@ -1,0 +1,838 @@
+\section{Regular expander variants}
+\label{sec:regular}
+
+Sections~\ref{sec:binary-ea} and~\ref{sec:binary-ec} separate the distance
+proof into sparse, intermediate, and dense message weights.  The dense regime
+already attains the GV exponent.  The remaining expander cost comes from small
+supports.  Region-stratified regularity reduces the chance that their edges
+cluster in a small part of the output.
+
+\subsection{The regional shell law}
+
+Assume $n=d_L\ell$ and sample the left-regular expander from
+Section~\ref{sec:constructions}.  Fix a binary message of weight $r$.  Within
+one region, its image is the parity of $r$ independent uniform unit vectors in
+$\F_2^\ell$.  A unit vector has one coordinate equal to one and all other
+coordinates equal to zero.
+
+Let $\pi^{(\ell)}_{r,u}$ be the probability that this regional image has
+weight $u$.  Initialize $\pi^{(\ell)}_{0,0}:=1$.  Terms outside
+$\{0,\ldots,\ell\}$ are zero, and
+\begin{equation}
+ \pi^{(\ell)}_{r+1,v}=
+ \pi^{(\ell)}_{r,v-1}\frac{\ell-v+1}{\ell}
+ +\pi^{(\ell)}_{r,v+1}\frac{v+1}{\ell}.
+ \label{eq:regular-shell-recurrence}
+\end{equation}
+
+\begin{lemma}[Regional shell law]
+\label{lem:regular-shell-law}
+For a fixed weight-$r$ message, the $d_L$ regional images are independent.
+Their weights have distribution $\pi^{(\ell)}_{r,\cdot}$.  Conditional on
+weight $u$, a regional image is uniform among the binary vectors of weight
+$u$.
+\end{lemma}
+
+\begin{proof}
+If the current regional image has weight $u$, the next unit vector decreases
+its weight with probability $u/\ell$ and increases it otherwise.  This proves
+\eqref{eq:regular-shell-recurrence}.  Coordinate-permutation symmetry gives
+conditional uniformity.  Incidences in distinct regions are independent.
+\end{proof}
+
+The recurrence is exact and contains only nonnegative quantities.  It is
+practical for small message supports.  Two comparison bounds cover larger
+supports.  Define
+\begin{equation}
+ a^{\Reg}_r:=\frac{1-e^{-2r/\ell}}2,
+ \qquad
+ \gamma_r:=\frac{e^r r!}{r^r}.
+ \label{eq:regular-poisson-parameters}
+\end{equation}
+
+\begin{lemma}[Poisson comparison]
+\label{lem:regular-poisson}
+Let $\mathbf Z\in\F_2^n$ have independent $\Ber(a^{\Reg}_r)$ coordinates.
+For every nonnegative function $F:\F_2^n\to\mathbb R_{\geq0}$,
+\begin{equation}
+ \E_{\B}[F(\x\B)]
+ \leq\gamma_r^{d_L}\E[F(\mathbf Z)].
+ \label{eq:regular-poisson}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+In each region, replace the $r$ unit-vector samples by independent Poisson
+counts of mean $r/\ell$.  Conditional on total count $r$, the counts have the
+original multinomial law.  Without conditioning, their parities are
+independent $\Ber(a^{\Reg}_r)$ variables.  A Poisson variable of mean $r$
+equals $r$ with probability $\gamma_r^{-1}$.  Dropping the independent
+conditioning event in all $d_L$ regions proves the claim.
+\end{proof}
+
+Stirling's formula gives $\gamma_r=\Theta(\sqrt r)$.  Thus the comparison
+cost is polynomial in $r$ when $d_L$ is fixed.
+
+The next lemma bounds the probability of each particular expanded vector,
+rather than only its weight.  We call such a probability a point mass.
+
+\begin{lemma}[Regular point-mass bound]
+\label{lem:regular-point-mass}
+For every fixed weight-$r$ message and every $\y\in\F_2^n$,
+\begin{equation}
+ \Pr_{\B}[\x\B=\y]
+ \leq 2^{d_L-n}\left(1+e^{-2r/\ell}\right)^n.
+ \label{eq:regular-point-mass}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For one region, test a vector by the parity of a fixed set of $j$
+coordinates.  One uniform unit step preserves this parity minus the
+probability that it flips it, giving average $1-2j/\ell$; after $r$
+independent steps the average is $(1-2j/\ell)^r$.  Fourier inversion and
+$1-x\leq e^{-x}$ bound every regional point probability by
+$2^{1-\ell}(1+e^{-2r/\ell})^\ell$.  Multiply the bounds for the independent
+regions.
+\end{proof}
+
+\subsection{Application to binary EA}
+
+The accumulator state must cross regional boundaries.  Let
+\begin{equation}
+ \mathbf U(X,Y):=
+ \begin{pmatrix}1&XY\\X&Y\end{pmatrix}.
+ \label{eq:regular-ea-input-transfer}
+\end{equation}
+For a uniform regional input of weight $u$, define
+\begin{align}
+ \mathbf S^{\EA}_{\ell,u}(Y)
+ &:=\binom{\ell}{u}^{-1}[X^u]\mathbf U(X,Y)^\ell,
+ \label{eq:regular-ea-slice}\\
+ \mathbf R^{\EA}_{\ell,r}(Y)
+ &:=\sum_{u=0}^{\ell}\pi^{(\ell)}_{r,u}
+ \mathbf S^{\EA}_{\ell,u}(Y).
+ \label{eq:regular-ea-region}
+\end{align}
+
+\begin{theorem}[Exact left-regular EA first moment]
+\label{thm:regular-ea-first-moment}
+For $\G=\B\A$ with a region-stratified left-regular expander,
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\G)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}\sum_{h=0}^{L}[Y^h]\,
+ \e_0^{\mathsf T}
+ \mathbf R^{\EA}_{\ell,r}(Y)^{d_L}\one.
+ \label{eq:regular-ea-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:regular-shell-law} expresses one regional input as a mixture of
+uniform Hamming shells.  Matrix \eqref{eq:regular-ea-slice} averages the
+accumulator transfer over one shell.  Matrix multiplication preserves the
+accumulator state between regions.  Sum the low-weight coefficients and apply
+\eqref{eq:first-moment}.
+\end{proof}
+
+For intermediate supports, Lemma~\ref{lem:regular-poisson} bounds the output
+moment by
+\begin{equation}
+ \gamma_r^{d_L}\e_0^{\mathsf T}
+ \mathbf T_{a^{\Reg}_r}(z)^n\one.
+ \label{eq:regular-ea-poisson-moment}
+\end{equation}
+For dense supports, invertibility of the accumulator and
+Lemma~\ref{lem:regular-point-mass} give
+\begin{equation}
+ \Pr[\wt(\x\B\A)\leq L]
+ \leq V_{2,n}(L)2^{d_L-n}(1+e^{-2r/\ell})^n,
+ \quad
+ V_{2,n}(L):=\sum_{h=0}^{L}\binom nh.
+ \label{eq:regular-ea-dense}
+\end{equation}
+
+\subsection{Application to binary EC}
+
+For a regional convolution input of weight $u$, define
+\begin{align}
+ \mathbf S^{\EC}_{\ell,u}(Y)
+ &:=\binom{\ell}{u}^{-1}[X^u]\mathbf W_m(X,Y)^\ell,
+ \label{eq:regular-ec-slice}\\
+ \mathbf R^{\EC}_{\ell,r}(Y)
+ &:=\sum_{u=0}^{\ell}\pi^{(\ell)}_{r,u}
+ \mathbf S^{\EC}_{\ell,u}(Y).
+ \label{eq:regular-ec-region}
+\end{align}
+
+\begin{theorem}[Exact left-regular wrapped-EC first moment]
+\label{thm:regular-ec-first-moment}
+Independently sample a region-stratified left-regular expander $\B$ and a
+wrapped convolution $\C$ of memory $m$.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}\sum_{h=0}^{L}[Y^h]\,
+ \e_m^{\mathsf T}
+ \mathbf R^{\EC}_{\ell,r}(Y)^{d_L}\one.
+ \label{eq:regular-ec-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The proof is the regional version of
+Theorem~\ref{thm:ec-exact-first-moment}.  Lemma~\ref{lem:regular-shell-law}
+gives the input mixture in each region.  Matrix multiplication retains the
+convolution state at regional boundaries.  The first-moment bound completes
+the proof.
+\end{proof}
+
+The Poisson and dense bounds become
+\begin{align}
+ \E[z^{\wt(\x\B\C)}]
+ &\leq\gamma_r^{d_L}
+ \e_m^{\mathsf T}\mathbf N_{m,a^{\Reg}_r}(z)^n\one,
+ \label{eq:regular-ec-poisson}\\
+ \Pr[\wt(\x\B\C)\leq L]
+ &\leq V_{2,n}(L)2^{d_L-n}(1+e^{-2r/\ell})^n.
+ \label{eq:regular-ec-dense}
+\end{align}
+Equation~\eqref{eq:regular-ec-dense} holds for every fixed invertible binary
+map $\C$ and therefore also after averaging the convolution.
+
+\subsection{Two-sided regular incidence over the binary field}
+\label{sec:binary-two-sided-regular}
+
+Fix a right degree $d_R$ and let $k=d_R\ell$.  In each region, the
+two-sided regular expander partitions the $k$ left vertices into $\ell$
+groups of size $d_R$.  A right coordinate is one when its group contains an
+odd number of vertices from the message support.  Define
+\begin{align}
+ E_{d_R}(X)&:=\frac{(1+X)^{d_R}+(1-X)^{d_R}}2,
+ &
+ O_{d_R}(X)&:=\frac{(1+X)^{d_R}-(1-X)^{d_R}}2.
+ \label{eq:binary-biregular-parity-polynomials}
+\end{align}
+The coefficient of $X^j$ in $E_{d_R}$ is $\binom{d_R}{j}$ for even $j$
+and zero for odd $j$.  The polynomial $O_{d_R}$ gives the complementary
+odd coefficients.
+
+Write the accumulator transfer as
+$\mathbf U(X,Y)=\mathbf U_0(Y)+X\mathbf U_1(Y)$.  Similarly, write the
+wrapped-convolution transfer as
+$\mathbf W_m(X,Y)=\mathbf W_{m,0}(Y)+X\mathbf W_{m,1}(Y)$.  For
+$\mathsf R\in\{\EA,\EC\}$, let $(\mathbf Q_0,\mathbf Q_1)$ denote the
+corresponding pair of input-conditioned matrices.  Define
+\begin{equation}
+ \mathbf R^{\mathsf R,\mathrm{bi}}_{\ell,d_R,r}(Y):=
+ \binom{k}{r}^{-1}[X^r]
+ \left(E_{d_R}(X)\mathbf Q_0(Y)
+       +O_{d_R}(X)\mathbf Q_1(Y)\right)^\ell.
+ \label{eq:binary-biregular-region-transfer}
+\end{equation}
+
+\begin{theorem}[Exact two-sided regular binary first moment]
+\label{thm:binary-biregular-first-moment}
+Let $n=d_L\ell$.  Sample $\B$ from the two-sided regular ensemble by
+sampling the regional permutations independently.  For binary EA,
+\begin{equation}
+ \Pr_{\B}[\Bad_L(\B\A)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}\sum_{h=0}^{L}[Y^h]\,
+ \e_0^{\mathsf T}
+ \mathbf R^{\EA,\mathrm{bi}}_{\ell,d_R,r}(Y)^{d_L}\one.
+ \label{eq:binary-biregular-ea-first-moment}
+\end{equation}
+For binary wrapped EC, independently sample a wrapped convolution $\C$ of
+memory $m$ and replace $\EA$ by
+$\EC$ in \eqref{eq:binary-biregular-region-transfer}.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]\leq
+ \sum_{r=1}^{k}\binom{k}{r}\sum_{h=0}^{L}[Y^h]\,
+ \e_m^{\mathsf T}
+ \mathbf R^{\EC,\mathrm{bi}}_{\ell,d_R,r}(Y)^{d_L}\one.
+ \label{eq:binary-biregular-ec-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Fix a message support of size $r$.  Its positions in one regional
+permutation form a uniform $r$-subset of the $k$ slots.  Within one group,
+$E_{d_R}$ counts selections that produce input zero, and $O_{d_R}$ counts
+selections that produce input one.  The coefficient of $X^r$ in
+\eqref{eq:binary-biregular-region-transfer} counts all regional selections
+and retains the state of the recursive map.  Division by $\binom{k}{r}$
+averages over the uniform subset.  The regional permutations are independent,
+so matrix multiplication composes their transfers.  Summing over message
+supports and low output weights gives the two bounds.
+\end{proof}
+
+The all-one message imposes a parity restriction that has no labeled
+large-field analogue.
+
+\begin{proposition}[Binary right-degree parity]
+\label{prop:binary-right-degree-parity}
+For a binary two-sided regular expander,
+\begin{equation}
+ \one\B=(d_R\bmod 2)\one.
+ \label{eq:binary-right-degree-parity}
+\end{equation}
+If $d_R$ is even, both $\B\A$ and $\B\C$ are noninjective and have minimum
+distance zero.
+\end{proposition}
+
+\begin{proof}
+Every right coordinate has exactly $d_R$ incident edges.  This proves
+\eqref{eq:binary-right-degree-parity}.  If $d_R$ is even, the nonzero
+all-one message maps to zero before the invertible recursive map.
+\end{proof}
+
+At rate one half, $d_L=2d_R$.  A usable binary two-sided regular ensemble
+therefore requires $d_L\equiv2\pmod4$.  This excludes the current left-regular
+degrees $64$ for EA and $28$ for EC.
+
+For right degree five, a local concentration argument removes the
+square-root loss from the positive coefficient saddle.  Fix
+$r\in\{1,\ldots,k-1\}$ and put $\theta_r:=r/k$.  Let
+\begin{equation}
+ q_1(\theta):=\frac{1-(1-2\theta)^5}{2},
+ \qquad q_0(\theta):=1-q_1(\theta).
+ \label{eq:degree-five-parity-probabilities}
+\end{equation}
+For $b\in\{0,1\}$, define a random variable $Z_b\in\{0,1,2\}$ by
+\begin{equation}
+ \Pr[Z_b=j]:=
+ \frac{\binom{5}{2j+b}\theta_r^{2j+b}(1-\theta_r)^{5-2j-b}}
+ {q_b(\theta_r)}.
+ \label{eq:degree-five-conditioned-half-count}
+\end{equation}
+Thus $2Z_b+b$ is the number of selected slots in one group, conditioned on
+parity $b$.  Define
+\begin{align}
+ v_*(\theta_r)&:=\min_{b\in\{0,1\}}\operatorname{Var}(Z_b),
+&
+ \beta_{k,r}&:=\binom{k}{r}\theta_r^r(1-\theta_r)^{k-r},
+ \label{eq:degree-five-local-parameters}\\
+ M_{k,r}&:=
+ \frac{\max\{q_0(\theta_r),q_1(\theta_r)\}^{\ell}}{\beta_{k,r}}
+ \min\left\{1,\sqrt{\frac{\pi}{8\ell v_*(\theta_r)}}\right\}.
+ \label{eq:degree-five-point-mass}
+\end{align}
+
+\begin{lemma}[Point mass for right degree five]
+\label{lem:degree-five-point-mass}
+Let $\mathbf Y\in\F_2^\ell$ be the image of a fixed weight-$r$ support in
+one region of a two-sided regular expander with $d_R=5$.  Then
+\begin{equation}
+ \max_{\y\in\F_2^\ell}\Pr[\mathbf Y=\y]\leq M_{k,r}.
+ \label{eq:degree-five-regional-point-mass}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Independently select each of the $k$ regional slots with probability $\theta_r$.
+Conditioning on exactly $r$ selected slots gives the uniform $r$-subset in
+the two-sided regular ensemble.  Before conditioning, the group parities are
+independent and have probabilities $q_0(\theta_r)$ and $q_1(\theta_r)$.
+
+Fix a parity vector $\y$ of weight $u$.  Conditional on $\mathbf Y=\y$, the
+selected-slot count equals
+\begin{equation}
+ u+2\sum_{i=1}^{\ell} Z_{y_i}.
+ \label{eq:degree-five-conditioned-total}
+\end{equation}
+The probability-generating polynomials of $Z_0$ and $Z_1$, before
+normalization, are
+\begin{align*}
+ &(1-\theta_r)^5+10\theta_r^2(1-\theta_r)^3T
+   +5\theta_r^4(1-\theta_r)T^2,\\
+ &5\theta_r(1-\theta_r)^4+10\theta_r^3(1-\theta_r)^2T
+   +\theta_r^5T^2.
+\end{align*}
+Their discriminants are $80\theta_r^4(1-\theta_r)^6$ and
+$80\theta_r^6(1-\theta_r)^4$.  Thus both polynomials have two real negative
+roots.
+After normalization, each $Z_b$ has the distribution of a sum of two
+independent Bernoulli variables.
+
+Consequently, the sum in \eqref{eq:degree-five-conditioned-total} is a sum
+of independent Bernoulli variables with variance at least
+$\ell v_*(\theta_r)$.  If such a sum has variance $V$, Fourier inversion gives
+\begin{equation}
+ \max_j\Pr[Z=j]
+ \leq\frac1{2\pi}\int_{-\pi}^{\pi}
+ e^{-2V\sin^2(t/2)}\,dt
+ \leq\sqrt{\frac{\pi}{8V}}.
+ \label{eq:poisson-binomial-local-mass}
+\end{equation}
+The last inequality uses $\sin(|t|/2)\geq |t|/\pi$ on this interval.
+Bayes' rule now gives
+\begin{equation*}
+ \Pr[\mathbf Y=\y\mid\text{$r$ selected slots}]
+ \leq
+ \frac{\max\{q_0(\theta_r),q_1(\theta_r)\}^{\ell}}{\beta_{k,r}}
+ \min\left\{1,\sqrt{\frac{\pi}{8\ell v_*(\theta_r)}}\right\}.
+\end{equation*}
+This is \eqref{eq:degree-five-regional-point-mass}.
+\end{proof}
+
+The certificate evaluates \eqref{eq:degree-five-regional-point-mass} in
+blocks.  The following endpoint bound makes that evaluation rigorous.  Put
+$r_{\mathrm{mid}}:=(k-1)/2$ and $\theta_a:=a/k$.  For
+$k/5\leq a\leq b\leq r_{\mathrm{mid}}$, define
+\begin{equation}
+ \widehat M_{a,b}:=
+ \frac{q_0(\theta_a)^\ell}{\beta_{k,b}}
+ \sqrt{\frac{\pi}{8\ell\operatorname{Var}(Z_1(\theta_a))}}.
+ \label{eq:degree-five-block-point-mass}
+\end{equation}
+Here $Z_1(\theta)$ denotes the variable from
+\eqref{eq:degree-five-conditioned-half-count} with parameter $\theta$.
+
+\begin{lemma}[Endpoint bound for the central range]
+\label{lem:degree-five-central-block}
+For $k/5\leq a\leq b\leq r_{\mathrm{mid}}$ and every fixed invertible
+$\mathbf D$,
+\begin{equation}
+ \sum_{r=a}^{b}\binom{k}{r}
+ \Pr_{\B}[\wt(\x_r\B\mathbf D)\leq L]
+ \leq
+ (b-a+1)\binom{k}{b}V_{2,n}(L)\widehat M_{a,b}^{d_L},
+ \label{eq:degree-five-central-block}
+\end{equation}
+where $\x_r$ is any fixed weight-$r$ message.  The same bound applies to
+the complementary supports $k-b\leq r\leq k-a$.
+\end{lemma}
+
+\begin{proof}
+For $\theta\in[1/5,1/2]$, $q_0(\theta)$ decreases.  In the same interval,
+$v_*(\theta)=\operatorname{Var}(Z_1(\theta))$, and this variance increases.
+To verify the latter claim, write
+\begin{equation*}
+ \operatorname{Var}(Z_1(\theta))=
+ \frac{10\theta^2(1-\theta)^2
+ (8\theta^4-24\theta^3+32\theta^2-20\theta+5)}
+ {(16\theta^4-40\theta^3+40\theta^2-20\theta+5)^2}.
+\end{equation*}
+Its derivative has the same sign as
+\begin{equation*}
+ \theta(\theta-1)(2\theta-1)(4\theta^2-10\theta+5)
+ (4\theta^4-20\theta^3+30\theta^2-20\theta+5),
+\end{equation*}
+ which is nonnegative on $[1/5,1/2]$.  Indeed, after setting $t=1-2\theta$,
+ the last two factors become
+ $t^2+3t+1$ and
+ $(t^4+6t^3+6t^2+6t+1)/4$.
+ The same substitution gives
+ \begin{equation*}
+  \operatorname{Var}(Z_0(\theta))-\operatorname{Var}(Z_1(\theta))=
+  \frac{5t^3(1-t)^2(1+t)^2(t^2+1)(2t^4+t^2+2)}
+  {4(t^4-t^3+t^2-t+1)^2(t^4+t^3+t^2+t+1)^2},
+ \end{equation*}
+ which is nonnegative for $t\in[0,3/5]$.  Hence
+ $v_*(\theta)=\operatorname{Var}(Z_1(\theta))$ throughout the interval.
+
+It remains to control $\beta_{k,r}$.  Its consecutive ratio is
+\begin{equation*}
+ \frac{\beta_{k,r+1}}{\beta_{k,r}}
+ =\left(1+\frac1r\right)^r
+  \left(1-\frac1{k-r}\right)^{k-r-1}\leq1
+ \qquad(r\leq r_{\mathrm{mid}}).
+\end{equation*}
+ Here the second factor is the reciprocal of
+ $(1+1/(k-r-1))^{k-r-1}$.  The inequality follows because
+ $(1+1/s)^s$ increases with $s$ and $r\leq k-r-1$.
+Consequently, every point mass in a block is at most
+$\widehat M_{a,b}^{d_L}$.  The message count is at most $\binom{k}{b}$.
+Lemma~\ref{lem:degree-five-point-mass}, invertibility of $\mathbf D$, and a
+sum over the block prove \eqref{eq:degree-five-central-block}.  Replacing a
+selected set by its complement exchanges even and odd group parities.  All
+terms in the bound are therefore unchanged.
+\end{proof}
+
+\begin{corollary}[Dense degree-five bound]
+\label{cor:degree-five-dense-bound}
+Let $\mathbf D$ be any fixed invertible binary map on $\F_2^n$.  For a fixed
+weight-$r$ message $\x$,
+\begin{equation}
+ \Pr_{\B}[\wt(\x\B\mathbf D)\leq L]
+ \leq V_{2,n}(L)M_{k,r}^{d_L}.
+ \label{eq:degree-five-dense-bound}
+\end{equation}
+The same bound holds when $\mathbf D$ is sampled independently of $\B$.
+\end{corollary}
+
+\begin{proof}
+The regional permutations are independent, so every point probability of
+$\x\B$ is at most $M_{k,r}^{d_L}$.  Invertibility gives exactly
+$V_{2,n}(L)$ expanded vectors whose image under $\mathbf D$ has weight at most
+$L$.  Summing their point probabilities proves the fixed-map claim.
+Averaging over an independent $\mathbf D$ proves the second claim.
+\end{proof}
+
+Right degree three admits the same local argument with a simpler conditional
+distribution.  For $\theta:=r/k$, define
+\begin{equation}
+ q^{(3)}_1(\theta):=\frac{1-(1-2\theta)^3}{2},
+ \qquad q^{(3)}_0(\theta):=1-q^{(3)}_1(\theta).
+ \label{eq:degree-three-parity-probabilities}
+\end{equation}
+For $s\in\{0,1\}$, let $Z^{(3)}_s(\theta)\in\{0,1\}$ satisfy
+\begin{equation}
+ \Pr[Z^{(3)}_s(\theta)=j]
+ :=\frac{\binom{3}{2j+s}\theta^{2j+s}(1-\theta)^{3-2j-s}}
+ {q^{(3)}_s(\theta)}.
+ \label{eq:degree-three-conditioned-half-count}
+\end{equation}
+Thus $2Z^{(3)}_s(\theta)+s$ is the selected-slot count in a three-slot group,
+conditioned on its parity.  Put
+\begin{equation}
+ M^{(3)}_{k,r}:=
+ \frac{\max\{q^{(3)}_0(\theta),q^{(3)}_1(\theta)\}^{\ell}}{\beta_{k,r}}
+ \min\left\{1,
+ \sqrt{\frac{\pi}{8\ell\min_s\operatorname{Var}(Z^{(3)}_s(\theta))}}
+ \right\}.
+ \label{eq:degree-three-point-mass}
+\end{equation}
+
+\begin{lemma}[Central blocks for right degree three]
+\label{lem:degree-three-central-block}
+Let $r_{\mathrm{mid}}=(k-1)/2$, and let
+$1\leq a\leq b\leq r_{\mathrm{mid}}$.  Suppose
+\begin{equation*}
+ \sqrt{\frac{\pi}
+ {8\ell\operatorname{Var}(Z^{(3)}_1(a/k))}}\leq1.
+\end{equation*}
+Define
+\begin{equation}
+ \widehat M^{(3)}_{a,b}:=
+ \frac{q^{(3)}_0(a/k)^\ell}{\beta_{k,b}}
+ \sqrt{\frac{\pi}
+ {8\ell\operatorname{Var}(Z^{(3)}_1(a/k))}}.
+ \label{eq:degree-three-block-point-mass}
+\end{equation}
+Then, for every fixed invertible $\mathbf D$,
+\begin{equation}
+ \sum_{r=a}^{b}\binom{k}{r}
+ \Pr_{\B}[\wt(\x_r\B\mathbf D)\leq L]
+ \leq(b-a+1)\binom{k}{b}V_{2,n}(L)
+ \bigl(\widehat M^{(3)}_{a,b}\bigr)^{d_L}.
+ \label{eq:degree-three-central-block}
+\end{equation}
+The same bound applies to supports $k-b\leq r\leq k-a$.
+\end{lemma}
+
+\begin{proof}
+Conditioning independent slot selections on their total count gives a uniform
+weight-$r$ support.  Conditional on the parity vector, the remaining count is
+a sum of the independent Bernoulli variables in
+\eqref{eq:degree-three-conditioned-half-count}.  The Fourier bound
+\eqref{eq:poisson-binomial-local-mass} therefore gives
+\begin{equation*}
+ \max_{\y\in\F_2^\ell}\Pr[\mathbf Y=\y]
+ \leq M^{(3)}_{k,r}.
+\end{equation*}
+
+For $0<\theta\leq1/2$, direct calculation gives
+\begin{align*}
+ \operatorname{Var}(Z^{(3)}_0(\theta))
+ &=\frac{3\theta^2(1-\theta)^2}{(4\theta^2-2\theta+1)^2},\\
+ \operatorname{Var}(Z^{(3)}_1(\theta))
+ &=\frac{3\theta^2(1-\theta)^2}{(4\theta^2-6\theta+3)^2}.
+\end{align*}
+The second variance is no larger than the first and increases on this
+interval.  Indeed, their difference has the sign of $1-2\theta$, and
+\begin{equation*}
+ \frac{d}{d\theta}\operatorname{Var}(Z^{(3)}_1)
+ =\frac{-6\theta(\theta-1)(2\theta^2-6\theta+3)}
+ {(4\theta^2-6\theta+3)^3}\geq0.
+\end{equation*}
+Also, $q^{(3)}_0(\theta)$ decreases for $\theta\leq1/2$, and
+$\beta_{k,r}$ decreases for integer $r\leq r_{\mathrm{mid}}$, as shown in
+the proof of Lemma~\ref{lem:degree-five-central-block}.  Hence every regional point mass
+in the block is at most $\widehat M^{(3)}_{a,b}$.  Independence of the
+regions, invertibility of $\mathbf D$, and a sum over the block prove
+\eqref{eq:degree-three-central-block}.  Complementing all selected slots
+exchanges the two group parities and proves the final claim.
+\end{proof}
+
+The same argument extends to every odd right degree.  The following form is
+weaker than the specialized degree-three and degree-five bounds, but it is
+sufficient for the intermediate finite profiles.  Let $d=2h+1$ and define
+\begin{align*}
+ \Theta_0(d)&:=\left\{\frac{(2j+1)\pi}{2d}:0\leq j<h\right\},&
+ \Theta_1(d)&:=\left\{\frac{j\pi}{d}:1\leq j\leq h\right\},\\
+ f(t)&:=\frac{t}{(1+t)^2},&c_a&:=\frac{k-a}{a}.
+\end{align*}
+For $s\in\{0,1\}$, put
+\begin{equation}
+ v_{d,s}(a):=
+ \sum_{\theta\in\Theta_s(d)}
+ \min\left\{f\bigl(c_a^2\tan^2\theta\bigr),
+                   f\bigl(\tan^2\theta\bigr)\right\},
+ \qquad
+ v_d(a):=\min_s v_{d,s}(a).
+ \label{eq:odd-degree-uniform-variance}
+\end{equation}
+
+\begin{lemma}[Central blocks for odd right degree]
+\label{lem:odd-degree-central-block}
+Let $d_R=d$ be odd, let $r_{\mathrm{mid}}=(k-1)/2$, and let
+$1\leq a\leq b\leq r_{\mathrm{mid}}$.  Define $\theta_a:=a/k$ and
+\begin{equation}
+ \widehat M^{(d)}_{a,b}:=
+ \frac{q_{0,d}(\theta_a)^\ell}{\beta_{k,b}}
+ \sqrt{\frac{\pi}{8\ell v_d(a)}},
+ \qquad
+ q_{0,d}(\theta):=\frac{1+(1-2\theta)^d}{2}.
+ \label{eq:odd-degree-block-point-mass}
+\end{equation}
+Suppose the square-root factor in
+\eqref{eq:odd-degree-block-point-mass} is at most one.  For every fixed
+invertible $\mathbf D$,
+\begin{equation}
+ \sum_{r=a}^{b}\binom{k}{r}
+ \Pr_{\B}[\wt(\x_r\B\mathbf D)\leq L]
+ \leq(b-a+1)\binom{k}{b}V_{2,n}(L)
+ \bigl(\widehat M^{(d)}_{a,b}\bigr)^{d_L}.
+ \label{eq:odd-degree-central-block}
+\end{equation}
+The same bound applies to supports $k-b\leq r\leq k-a$.
+\end{lemma}
+
+\begin{proof}
+Fix $\theta\in[\theta_a,1/2]$.  In one right group, let $J$ count independently
+selected slots.  Conditional on $J\bmod2=s$, the probability-generating
+polynomial of $(J-s)/2$ is proportional to
+\begin{equation*}
+ \sum_{j=0}^{h}\binom{d}{2j+s}
+ \theta^{2j+s}(1-\theta)^{d-2j-s}T^j.
+\end{equation*}
+For $s=0$, its roots are
+\begin{equation*}
+ -\left(\frac{1-\theta}{\theta}\right)^2\tan^2\varphi,
+ \qquad \varphi\in\Theta_0(d).
+\end{equation*}
+For $s=1$, the same formula holds with $\varphi\in\Theta_1(d)$.  These
+identities follow by taking the even part of
+$(1-\theta+\theta\sqrt T)^d$ and by
+dividing its odd part by $\sqrt T$.
+
+All roots are negative.  After normalization, each polynomial is therefore
+the generating polynomial of a sum of independent Bernoulli variables.  A
+root $-\rho$ contributes variance $f(\rho)$.  As $\theta$ runs from
+$\theta_a$ to
+$1/2$, each $\rho$ changes monotonically between
+$c_a^2\tan^2\varphi$ and $\tan^2\varphi$.  The function $f$ increases on
+$(0,1]$ and decreases on $[1,\infty)$.  Its minimum on this interval is at
+an endpoint.  Hence either conditional half-count has variance at least
+$v_d(a)$.
+
+The Fourier estimate \eqref{eq:poisson-binomial-local-mass} now bounds the
+conditional total-count point mass.  For $\theta\leq1/2$,
+$q_{0,d}(\theta)$ is the larger parity probability and decreases with
+$\theta$.  Also, $\beta_{k,r}$ decreases for
+$r\leq r_{\mathrm{mid}}$.  The endpoint argument
+from Lemma~\ref{lem:degree-five-central-block} proves
+\eqref{eq:odd-degree-central-block}.  Complementing all slots exchanges the
+two parity laws and proves the final claim.
+\end{proof}
+
+\subsection{Certified improvements at rate one half}
+
+\begin{theorem}[Regular binary EA and EC certificates]
+\label{thm:regular-binary-certificates}
+The following claims hold.
+\begin{enumerate}
+  \item Let $k=1{,}048{,}576$, $d_L=64$, $\ell=32{,}768$,
+  $n=d_L\ell=2k$, and $L=230{,}718$.  Sample $\B$ from the
+  region-stratified left-regular ensemble.  Then
+  \begin{equation}
+   \Pr_{\B}[\Bad_L(\B\A)]
+   \leq8.982345581\cdot10^{-7}<2^{-20.0864}.
+   \label{eq:regular-ea-certificate}
+  \end{equation}
+  \item Let $k=1{,}048{,}572$, $d_L=28$, $\ell=74{,}898$,
+  $n=d_L\ell=2k$, and $L=230{,}730$.  Sample $\B$ from the
+  region-stratified left-regular ensemble and independently sample a wrapped
+  convolution $\C$ of memory $9$.  Then
+  \begin{equation}
+   \Pr_{\B,\C}[\Bad_L(\B\C)]
+   <2.036627\cdot10^{-7}<2^{-22.2273}.
+   \label{eq:regular-ec-certificate}
+  \end{equation}
+  \item Let $k=1{,}048{,}575$, $d_L=10$, $d_R=5$,
+  $\ell=209{,}715$, $n=2k$, and $L=230{,}729$.  Sample $\B$ from the
+  two-sided regular ensemble and independently sample a wrapped convolution
+  $\C$ of memory $15$.  Then
+  \begin{equation}
+   \Pr_{\B,\C}[\Bad_L(\B\C)]
+   <1.6475000\cdot10^{-10}<2^{-32.4990}.
+   \label{eq:biregular-binary-ec-certificate}
+  \end{equation}
+  \item Let $k=1{,}048{,}635$, $d_L=14$, $d_R=7$,
+  $\ell=149{,}805$, $n=2k$, and $L=230{,}742$.  Sample $\B$ from the
+  two-sided regular ensemble and independently sample a wrapped convolution
+  $\C$ of memory $6$.  Then
+  \begin{equation}
+   \Pr_{\B,\C}[\Bad_L(\B\C)]
+   <1.402384\cdot10^{-8}<2^{-26.0875}.
+   \label{eq:biregular-binary-ec-degree-fourteen-certificate}
+  \end{equation}
+  \item Let $k=1{,}048{,}635$, $d_L=18$, $d_R=9$,
+  $\ell=116{,}515$, $n=2k$, and $L=230{,}742$.  Sample $\B$ from the
+  two-sided regular ensemble and independently sample a wrapped convolution
+  $\C$ of memory $4$.  Then
+  \begin{equation}
+   \Pr_{\B,\C}[\Bad_L(\B\C)]
+   <2.987318\cdot10^{-7}<2^{-21.6746}.
+   \label{eq:biregular-binary-ec-degree-eighteen-certificate}
+  \end{equation}
+  \item Let $k=1{,}048{,}575$, $d_L=6$, $d_R=3$,
+  $\ell=349{,}525$, $n=2k$, and $L=230{,}729$.  Sample $\B$ from the
+  two-sided regular ensemble and independently sample a wrapped convolution
+  $\C$ of memory $79$.  Then
+  \begin{equation}
+   \Pr_{\B,\C}[\Bad_L(\B\C)]
+   <3.558444\cdot10^{-7}<2^{-21.4222}.
+   \label{eq:biregular-binary-ec-degree-six-certificate}
+  \end{equation}
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For EA, the verifier combines the exact regional transfer for small supports,
+\eqref{eq:regular-ea-poisson-moment} for intermediate supports, and
+\eqref{eq:regular-ea-dense} for dense supports.  For EC it applies the
+corresponding three bounds from
+\eqref{eq:regular-ec-first-moment}--\eqref{eq:regular-ec-dense}.  The support
+intervals cover $[1,k]$.
+
+For the degree-$10/5$ EC result, the verifier uses exact regional transfers for
+supports $1$ through $16$.  It uses $111$ positive coefficient blocks for
+the two outer ranges and $47$ applications of
+Lemma~\ref{lem:degree-five-central-block} for the central range.  It checks
+the all-one support directly.  Outward-rounded Arb arithmetic gives the
+displayed values.  Section~\ref{sec:certificates} gives the verifier details.
+
+For the degree-$14/7$ and degree-$18/9$ results, exact regional transfers
+cover supports $1$ through $24$ and $1$ through $32$, respectively.  Positive
+coefficient blocks cover the two outer ranges.  The central ranges use
+Lemma~\ref{lem:odd-degree-central-block}.  A separate transfer checks each
+all-one support.
+
+For the degree-$6/3$ result, exact regional transfers cover supports $1$
+through $383$.  A layered representation allows each reachable matrix entry
+to use an independent power-of-two scale.  The representation uses only positive
+operations and rounds every operation upward.  It therefore retains entries
+below the ordinary binary64 range without adding a matrix-wide absolute
+error.  The verifier uses $103$ coefficient blocks outside the central range
+and $28$ applications of Lemma~\ref{lem:degree-three-central-block} inside
+that range.  It checks the all-one support separately.
+Section~\ref{sec:certificates} gives the resulting bounds.
+\end{proof}
+
+The EA cutoff is $0.9998823119$ times the binary rate-one-half GV distance.
+A matched Bernoulli certificate requires expected degree $75$.  Left
+regularity therefore removes $14.67\%$ of the expander edges.
+
+The EC cutoff is $0.9999381317$ times the binary rate-one-half GV distance.
+The comparable Bernoulli memory-$9$ profile has expected degree $42.2127$.
+Replacing it by degree $28$ removes $33.67\%$ of the expander edges while
+losing eleven units of output weight.
+
+The two-sided EC cutoff is $0.9999309371$ times the binary rate-one-half GV
+distance.  Relative to the left-regular degree-$28$ profile, two-sided
+regularity and six additional memory words remove $64.29\%$ of the expander
+edges.  The simple work proxy $d_L+m$ decreases from $37$ to $25$.
+
+Table~\ref{tab:binary-recursive-map-frontier} gives the certified binary
+frontier.  We record the accumulator as a memory-one recursive map because it
+retains only $y_{t-1}$.  Over $\F_2$, this map is also the memory-one instance
+of the wrapped convolution in \eqref{eq:wrapped-convolution}.  Its certified
+expander is left regular; the four other rows use two-sided regular incidence.
+A dash in the $d_R$ column means that the distribution does not fix the right
+degree.
+The degree-$14/7$, memory-$6$ profile minimizes the proxy $d_L+m$, with value
+$20$.  Reducing the left degree to $10$ or $6$ requires substantially more
+convolution memory.
+
+\begin{table}[t]
+\centering
+\caption{Certified binary recursive-map frontier at rate one half.}
+\label{tab:binary-recursive-map-frontier}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+map & expander & $d_L$ & $d_R$ & memory $m$ & $d_L+m$ & failure bits \\
+\midrule
+EA & left regular & $64$ & -- & $1$  & $65$ & $20.0864$ \\
+EC & two-sided regular & $18$ & $9$ & $4$  & $22$ & $21.6746$ \\
+EC & two-sided regular & $14$ & $7$ & $6$  & $20$ & $26.0875$ \\
+EC & two-sided regular & $10$ & $5$ & $15$ & $25$ & $32.4990$ \\
+EC & two-sided regular & $6$  & $3$ & $79$ & $85$ & $21.4222$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At rate one half, the degrees satisfy $d_L=2d_R$.  The binary construction
+also requires odd $d_R$: if $d_R$ is even, the all-one message contributes an
+even number of ones to every right vertex and therefore encodes to zero.
+Consequently, degree $8/4$ is not an intermediate candidate between $6/3$
+and $10/5$.  The usable left degrees at rate one half are congruent to two
+modulo four; Table~\ref{tab:binary-recursive-map-frontier} lists four such EC
+profiles.
+
+The EA outcome is different.  At the same cutoff, the $d_L/d_R=62/31$
+diagnostic is dominated by message weight two and does not reach a $2^{-20}$
+first moment.  Fixing the right degrees does not recover the two removed EA
+edges.
+
+The degree-$6/3$ calculation also illustrates a numerical issue in exact
+enumerator proofs.  Some reachable transfer entries lie below the ordinary
+binary64 range.  A global underflow allowance becomes useless after the union
+bound multiplies it by the number of messages.  The layered verifier avoids
+this loss by retaining each exponent band as a separate positive matrix.
+The matrix products use relative upward rounding; Arb evaluates the remaining
+scalar expressions.
+
+\subsection{Scalar extension preserves distance but not field mixing}
+
+The binary generators above can act on messages over an extension field of
+$\F_2$, and this reinterpretation preserves minimum distance.  It does not,
+however, turn a binary encoder into a field-mixing encoder.
+
+\begin{lemma}[Distance under scalar extension]
+\label{lem:binary-scalar-extension}
+Let $\G\in\F_2^{k\times n}$, and let $K$ be a finite extension of $\F_2$.
+View the entries of $\G$ as elements of $K$.  Then
+\begin{equation}
+ \min_{\x\in K^k\setminus\{0\}}\wt(\x\G)
+ =
+ \min_{\x\in\F_2^k\setminus\{0\}}\wt(\x\G).
+ \label{eq:binary-scalar-extension-distance}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Fix an $\F_2$-basis $\beta_1,\ldots,\beta_t$ of $K$.  Every
+$\x\in K^k$ has a unique decomposition
+\begin{equation*}
+ \x=\sum_{j=1}^{t}\beta_j\x_j,
+ \qquad \x_j\in\F_2^k.
+\end{equation*}
+Because $\G$ is binary,
+$\x\G=\sum_j\beta_j(\x_j\G)$.  A coordinate of $\x\G$ is zero exactly when
+that coordinate is zero in every $\x_j\G$.  Hence
+\begin{equation*}
+ \supp(\x\G)=\bigcup_{j=1}^{t}\supp(\x_j\G).
+\end{equation*}
+If $\x\ne0$, some $\x_j$ is nonzero.  The union therefore has size at least
+the binary minimum distance.  Conversely, binary messages form a subset of
+$K^k$, which gives the reverse inequality.
+\end{proof}
+
+Indeed, the proof writes the extension-field message as $t$ binary component
+messages and applies the same binary matrix to each component independently.
+This decomposition is useful for binary-choice Silent OT.  It is not the
+mixing required by a field-valued Silent VOLE instance.  For that application
+we instead use the labeled finite-field construction of
+Section~\ref{sec:prime-fields}, whose edge labels and convolution coefficients
+are sampled in the ambient field.

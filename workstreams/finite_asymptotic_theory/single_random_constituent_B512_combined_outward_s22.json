@@ -1,0 +1,56 @@
+{
+  "schema": "single-random-constituent-combined-outward-v1",
+  "status": "OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "claim": {
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "conditional_bad_probability_log2_upper": -51.64395898907337,
+    "conditional_margin_bits_lower": 51.64395898907337,
+    "constituent_event_failure_upper": 1.896832534308249e-13,
+    "constituent_event_margin_bits_lower": 42.26147292040985,
+    "unconditional_setup_or_bad_log2_upper": -42.259312990512214,
+    "unconditional_margin_bits_lower": 42.259312990512214,
+    "comparison_to_2^-40": true
+  },
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "distance_cutoff": 228590,
+    "memory_bits": 22
+  },
+  "probability_space": {
+    "outer": "sample one uniform binary 256-by-512 matrix and reuse it in all 4096 outer rows; no rejection test is performed",
+    "routing": "independently sample one uniform 512-coordinate permutation per outer row and one uniform 4096-position permutation per transposed region",
+    "inner": "independently sample one uniform binary 23-by-23 linear map at each of the 2^21 RandomStepConv positions; all maps are fixed and shared by every message"
+  },
+  "proof_accounting": {
+    "sparse_occupations": [
+      1,
+      159
+    ],
+    "dense_occupations": [
+      160,
+      4096
+    ],
+    "outer_event": "full row rank and the integer shell caps generated with per-shell target 2^-51",
+    "failure_union": "Pr[outer event fails] plus the conditional expected number of nonzero messages below the distance cutoff"
+  },
+  "component_receipts": [
+    {
+      "file": "single_random_constituent_B512_sparse_outward_s22.json",
+      "sha256": "6e34039c98b77d98c7c3c94d1344828970099290f8d7703f8fe3f3a76e99ffcc"
+    },
+    {
+      "file": "single_random_constituent_B512_shared_two_band_dense_cover_outward_s22.json",
+      "sha256": "939d495262fe67719519ddd9180d900eafe97c30e3504153a3348838c68658cd"
+    }
+  ],
+  "limitations": [
+    "The theorem concerns the RandomStepConv-M22 comparison ensemble, not RM2Sub.",
+    "The information-theoretic inner samples a fresh 23-by-23 binary matrix at every position; no compact implementation claim is made.",
+    "The theorem is a finite k=2^20 result. An asymptotic family requires a separate parameter schedule."
+  ]
+}

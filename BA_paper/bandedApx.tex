@@ -1,0 +1,174 @@
+\section{Banded-Diagonal Codes}\label{sec:bandedApx}
+
+We consider an alternative formulation of our Block-Diagonal code, which we refer to as the Banded-Diagonal code. Instead of having submatrices along the diagonal, this code has a diagonal band of random values. The width of the band is $\sigma$.  Asymptotically, we suspect this code performs similarly but conceptually offers some advantages. 
+
+In particular, consider a Block-Diagonal code and the string $\xv=0...0110...0$ which has two 1s somewhere in the string. Moreover, let us assume these two 1s fall within the same block. Then the minimum distance behavior of this $\xv$ and that of $\xv'$ which has only one of these 1s set is identical. That is, once a block is ``on'', having additional 1s in the input for this block does not change the output distribution, since in both cases it is uniform. 
+
+If we contrast this with the Banded-Diagonal construction, each additional 1 in the input does change the distribution as the non-zeros in the generator $\G$ do not perfectly overlap. In the worst case, $\xv$ has two consecutive 1s, and there is then one additional output bit that will be uniform.
+
+Next, we define the enumerator for this code. However, the resulting enumerator is more computationally expensive to compute and therefore we chose not to implement it. We leave further investigation of this approach to future work. 
+
+\subsection{The Enumerator}
+
+The generator matrix $\mbf{G} \in \{0,1\}^{k \times n}$ is of the form%$$\mbf{G} = \mbf{Wrap}_n(\mbf{G}'),$$where
+$$
+    \mathbf{G} = \left(\begin{matrix}
+    \mathbf{\alpha}_{1,1}&\mathbf{\alpha}_{1,2}& ...  & \mathbf{\alpha}_{1,\sigma}& & &&\mathbf{O}\\
+    &\mathbf{\alpha}_{2,1}& \mathbf{\alpha}_{1,2}&...  & \mathbf{\alpha}_{1,\sigma}&  &&\\
+     &  &\ddots&\ddots&&\ddots&&\\
+   \mathbf{O} &  &&\mathbf{\alpha}_{k,1} &\mathbf{\alpha}_{k,2}&...  & \mathbf{\alpha}_{k,\sigma}
+   \end{matrix}\right),
+$$
+
+Each $\boldsymbol{\alpha}_{i}$ for $i\in[k]$ is sampled independently and uniformly at random from $\{0,1\}^{\sigma_i}$. Let $$\boldsymbol{\alpha}_{i} = \left(\begin{matrix}\alpha_{i,1} & \alpha_{i,2} &\ldots&\alpha_{i, \sigma_i}\end{matrix}\right),$$where $\alpha_{i,j} \in \{0,1\}$, $i \in [k]$, $j\in [\sigma_i]$. Here, we assume that $k,n,\sigma\in\mathbb{N}$, and $k,\sigma\le n$.
+
+Let $\mbf{x} \in \{0,1\}^k$ be an input word. Let $$\mbf{x} = \left(\begin{matrix}x_1 & x_2 &\ldots&x_{k}\end{matrix}\right),$$where $x_i \in \{0,1\}$, $i \in [k]$. Then, the codeword $\mbf{c}=\mbf{x}\mbf{G}$ corresponding to $\mbf{x}$ is given by $$\mbf{c} = \left(\begin{matrix}c_1 & c_2 &\ldots&c_{n}\end{matrix}\right),$$where$$c_i = \sum_{j = \max\{i-\sigma+1,1\}}^{\min\{i,k\}}x_j\alpha_{j,i+1-j},$$$i \in [n]$. 
+
+Suppose $\mbf{wt}_1(\mbf{x}) = w$. Define $\mbf{Q}_{\bt}:\{0,1\}^{k} \rightarrow 2^{[n]}$, where $\mbf{Q}_{\bt}(\mbf{x}) \subseteq [n]$ is defined as$$\mbf{Q}_{\bt}(\mbf{x}) := \left\{i \in [n] : \bigvee_{j = \max\{i-\sigma+1,1\}}^{\min\{i,k\}}\left(x_{j} = 1\right) \right\},$$i.e., the set of $i$ such that $c_i$ is not guaranteed to be zero. Additionally, define $\mbf{q}_{\bt}:\{0,1\}^{k} \rightarrow [0,n]$, where $\mbf{q}_{\bt}(\mbf{x}) =|\mbf{Q}_{\bt}(\mbf{x})|$. Also, define $\mbf{Q}:\{0,1\}^{n} \rightarrow 2^{[n]}$, where $\mbf{Q}(\mbf{c}) \subseteq [n]$ is the set of $i$ such that $c_i=1$. We will abuse notation slightly to also have $\mbf{Q}:\{0,1\}^{k} \rightarrow 2^{[k]}$, where $\mbf{Q}(\mbf{x}) \subseteq [k]$ is the set of $i$ such that $x_i=1$. Note that $|\mbf{Q}(\mbf{x})| = w$. We now have the following lemma.
+
+\begin{lemma}
+For any $\mbf{x}\in \{0,1\}^k$ and $\mbf{y} \in \{0,1\}^n$,$$\Pr\left[X_{\mbf{x}, \mbf{G}, \mbf{y}}=1\right] = \begin{cases}2^{-\mbf{q}_{\bt}(\mbf{x})}&\textrm{if } \mbf{Q}(\mbf{y})\subseteq \mbf{Q}_{\bt}(\mbf{x}) \\0&\textrm{otherwise}\end{cases}.$$
+\end{lemma}
+
+\begin{proof}
+Clearly, if $i \not\in \mbf{Q}_{\bt}(\mbf{x})$, then $c_i = 0$. Thus, $\mbf{Q}(\mbf{c}) \subseteq \mbf{Q}_{\bt}(\mbf{x})$. In other words, if $\mbf{Q}(\mbf{y}) \not\subseteq \mbf{Q}_{\bt}(\mbf{x})$, then $\Pr\left[X_{\mbf{x}, \mbf{G}, \mbf{y}}=1\right]=0$.
+
+Consider any $\mbf{x}\in \{0,1\}^k$ and $\mbf{y} \in \{0,1\}^n$ such that $\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})$. Let $$\mbf{y} = \left(\begin{matrix}y_1 & y_2 &\ldots&y_{n}\end{matrix}\right),$$where $y_i \in \{0,1\}$, $i \in [n]$. Consider $i \in \mbf{Q}_{\bt}(\mbf{x})$, i.e., an $i$ such that $x_{j} = 1$ for some $j \in [\max\{i-\sigma+1,1\},\min\{i,k\}]$. Then,$$\Pr\left[y_i = \sum_{j = \max\{i-\sigma+1,1\}}^{\min\{i,k\}}x_j\alpha_{j,i+1-j}\right]=\frac{1}{2}.$$Therefore,$$\Pr\left[\forall i \in \mbf{Q}_{\bt}(\mbf{x}) : y_i = \sum_{j = \max\{i-\sigma+1,1\}}^{\min\{i,k\}}x_j\alpha_{j,i+1-j}\right]=2^{-\mbf{q}_{\bt}(\mbf{x})}.$$Since $\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})$, $$\Pr\left[\forall i \not\in \mbf{Q}_{\bt}(\mbf{x}) : y_i = \sum_{j = \max\{i-\sigma+1,1\}}^{\min\{i,k\}}x_j\alpha_{j,i+1-j}\right]=1.$$Therefore,$$\Pr\left[X_{\mbf{x}, \mbf{G}, \mbf{y}}=1\right]=2^{-\mbf{q}_{\bt}(\mbf{x})}.$$ 
+\end{proof}
+
+\noindent We now have
+
+\begin{equation}
+\mathbb{E}_{\mbf{G} \gets \mathcal{D}}\left[E^{\mbf{G}}_{w,h}\right]=\sum_{\substack{\mbf{x}\in \{0,1\}^k, \mbf{y} \in \{0,1\}^n\\\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})\\\mbf{wt}_1(\mbf{x}) = w,\mbf{wt}_1(\mbf{y}) = h}}2^{-\mbf{q}_{\bt}(\mbf{x})},
+\end{equation}
+
+i.e., we need to count the number of $\mbf{x}\in \{0,1\}^k$, $\mbf{y} \in \{0,1\}^n$ with $\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})$, $\mbf{wt}_1(\mbf{x}) = w$, and $\mbf{wt}_1(\mbf{y}) = h$. We perform this count using two intermediate variables. The first is $q = \mbf{q}_{\bt}(\mbf{x})$. $q\in[w, n]$, $w$ being the worst case, when all the 1s in $\mbf{x}$ appear at the tail end. The second is $r$ which denotes the number of \emph{runs} in $\mbf{Q}_{\bt}(\mbf{x})$. To define runs, we begin by alternatively defining $\mbf{Q}_{\bt}(\mbf{x})$. For $i \in [k]$, let $I_i = [i,\min\{i+\sigma-1,n\}]$. It is immediate to see that$$\mbf{Q}_{\bt}(\mbf{x}) = \bigcup_{i \in \mbf{Q}(\mbf{x})}I_i.$$%Note that $|I_i| = \sigma$ and $I_i$ is a contiguous (with wrapping) set of $\sigma$ indices starting at $i \in [n]$ for all $i\in[k]$. Thus, if $I_i \cap I_j = \emptyset$ for all $i\ne j$, $i, j\in[k]$, then $q = \mbf{q}_{\bt}(\mbf{x}) = |\mbf{Q}_{\bt}(\mbf{x})| = \sum_{\substack{i\in[k]\\x_i=1}}|I_i| = \sigma w$. This also proves that $q \le \sigma w$.
+
+We use the way $I_i$s, for $i\in\mbf{Q}(\mbf{x})$, overlap to define the runs in $\mbf{Q}_{\bt}(\mbf{x})$. Define$$\mbf{first}(\mbf{x}) := \min_{t \in \mbf{Q}(\mbf{x})}t.$$Note that if there exists no $t \in \mbf{Q}(\mbf{x})$ (i.e., if $\mbf{x} = 0^k$), then $\mbf{first}(\mbf{x}) := 0$. For any $i \in [n]$, define$$\mbf{next}_{\mbf{x}}^{\Delta}(i) := \min_{\substack{t \in \mathbb{N}\\ i+t \in \mbf{Q}(\mbf{x})}}t.$$Note that if for any $i \in [n]$ there exists no $t \in \mathbb{N}$ such that $i+t \in \mbf{Q}(\mbf{x})$, then $\mbf{next}_{\mbf{x}}^{\Delta}(i) := \infty$. For any $i\in[n]$, define$$\mbf{next}_{\mbf{x}}(i) := i+\mbf{next}_{\mbf{x}}^{\Delta}(i).$$Define $\mbf{R}:\{0,1\}^k\rightarrow 2^{2^{[n]}}$, where $\mbf{R}(\mbf{x}) \subseteq 2^{[n]}$, constructively as follows:
+\begin{enumerate}
+\item Let $i = \mbf{first}(\mbf{x})$. If $i = 0$, return $\mbf{R}(\mbf{x}) = \emptyset$. 
+\item Set $\mbf{r} := \{i\}$, $r=1$, and $j := i$. 
+\item \texttt{// $I_j$ and $I_{\mbf{next}_{\mbf{x}}(j)}$ do not overlap, so start a new run}
+
+If $\mbf{next}_{\mbf{x}}^{\Delta}(j) \ge \sigma-1$, add $R_r= \bigcup_{t \in \mbf{r}}I_t$ to $\mbf{R}(\mbf{x})$ and set $i := \mbf{next}_{\mbf{x}}(j)$ and $r = r+1$. Return $\mbf{R}(\mbf{x})$ if $i = \infty$, otherwise, go back to Step 2.
+
+\texttt{// $I_j$ and $I_{\mbf{next}_{\mbf{x}}(j)}$ overlap, so continue the same run}
+
+If $\mbf{next}_{\mbf{x}}^{\Delta}(j) < \sigma-1$, add $\mbf{next}_{\mbf{x}}(j)$ to $\mbf{r}$, set $j := \mbf{next}_{\mbf{x}}(j)$, and go back to Step 3.
+\end{enumerate}
+
+Essentially, a run is a maximal set of contiguous indices in $\mbf{Q}_{\bt}(\mbf{x})$ belonging to overlapping $I_i$s for $i\in\mbf{Q}(\mbf{x})$, and $\mbf{R}(\mbf{x})$ is the set of runs in $\mbf{Q}_{\bt}(\mbf{x})$. The intermediate variable $r$ is defined as $r = |\mbf{R}(\mbf{x})|$. Since $|\mbf{x}| = w$, $r \in [0,w]$ by definition. %The case of $r = 0$ is a special one. There are two kinds of $\mbf{x}$ for which $\mbf{R}(\mbf{x}) = \emptyset$. The first one is the trivial $\mbf{x} = 0^k$, i.e., $\mbf{Q}(\mbf{x}) = \emptyset$. The other is where $\mbf{Q}(\mbf{x}) \ne \emptyset$ but there exists no $t \in \mbf{Q}(\mbf{x})$ such that $\forall j\in[\sigma-1]$, $[t-j]_n \not\in \mbf{Q}(\mbf{x})$. We will handle these cases separately ahead.
+
+We now compute the number of $\mbf{x} \in \{0,1\}^{k}$ such that $\mbf{wt}_1(\mbf{x}) = w$, $\mbf{q}_{\bt}(\mbf{x}) = q$, and $|\mbf{R}(\mbf{x})| = r$ in two cases. %If $q=r=0$, then the number of such $\mbf{x} \in \{0,1\}^k$ is$$E_{w,0,0} = \mathbb{I}[w=0],$$as the only such $\mbf{x}\in \{0,1\}^k$ is $\mbf{x}=0^k$. If $q > 0$ but $r=0$, then the number of such $\mbf{x} \in \{0,1\}^k$ is$$E_{w,q,0} = \mathbb{I}[w=0],$$
+
+\paragraph{Case 1:} $q, r, w > 0$.
+
+Let $\mbf{R}(\mbf{x}) = \{R_1, \ldots, R_r\}$ as determined by the algorithm above for constructing $\mbf{R}(\mbf{x})$, where $R_i \subseteq [n]$ for $i \in [r]$. By definition, $\mbf{x}_{R_r}$ must be of the form
+
+\begin{equation*}
+    \mbf{x}_{R_r} = \mbf{u}_r10^{c},
+\end{equation*}
+
+for some $\mbf{u}_r \in \{0,1\}^{*}$ and $\alpha \in [0, \sigma-1]$. Furthermore, for $i \in [r-1]$, $\mbf{x}_{R_i}$ must be of the form
+
+\begin{equation*}
+    \mbf{x}_{R_i} = \mbf{u}_i10^{\sigma-1},
+\end{equation*}
+
+for some $\mbf{u}_i \in \{0,1\}^{*}$. We call a run $R$, complete, if $\mbf{x}_{R}$ is of the form $\mbf{x}_{R} = \mbf{u}10^{\sigma-1}$ for some $\mbf{u} \in \{0,1\}^{*}$. Similarly, we call it $\alpha$-incomplete, if $\mbf{x}_{R}$ is of the form $\mbf{x}_{R} = \mbf{u}10^{\sigma - 1 - \alpha}$, for some $\mbf{u} \in \{0,1\}^{*}$ and $\alpha\in[\sigma-1]$. Our prior observation can now be restated as for $i \in [r-1]$, $R_i$ is complete, while $R_r$ may either be complete or $\alpha$-incomplete for some $\alpha\in[\sigma-1]$.
+
+We next consider $\mbf{u}_i$ for $i\in[r]$. By definition, each $\mbf{u}_i$ for $i \in [r]$ must be of the form$$\mbf{u}_i = 10^{\ell_{i,1}}\ldots10^{\ell_{i,t_i}}$$where $t_i \in \mathbb{N}\cup\{0\}$, and $\ell_{i,j} \in [0, \sigma-2]$ for all $j \in [t_i]$. We call the (ordered) collection of strings $10^{\ell_{i,j}}$ for $i\in[r]$ and $j\in[t_i]$ the set of mini-runs of $\mbf{x}$. By definition, the number of mini-runs is given by
+\begin{equation*}
+    \sum_{i\in[r]}t_i = w-r.
+\end{equation*}
+
+Also,
+\begin{equation*}
+    \tilde{q} := \sum_{i\in[r]}|\mbf{x}_{R_i}| = q - \min\{\sigma - 1 - \alpha, n - k\},
+\end{equation*}
+
+and
+\begin{equation*}
+    \sum_{i\in[r]}\mbf{wt}_1(\mbf{x}_{R_i}) = \mbf{wt}_1(\mbf{x}) = w.
+\end{equation*}
+
+Therefore,
+\begin{equation*}
+    \sum_{i\in[r]}\mbf{wt}_0(\mbf{x}_{R_i}) = \tilde{q} - w,
+\end{equation*}
+
+and
+\begin{align*}
+    \sum_{i \in [r]} \mbf{wt}_0(\mbf{u}_i) &= \sum_{i \in [r]} \mbf{wt}_0(\mbf{x}_{R_i}) - (r - 1)(\sigma - 1) - \alpha\\
+    &=\tilde{q} - w - (r - 1)(\sigma - 1) - \alpha.
+\end{align*}
+
+Finally,$$\mbf{wt}_0(\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})}) = n-\tilde{q}$$
+
+Now, enumerating the $\mbf{x} \in \{0,1\}^{k}$ such that $\mbf{wt}_1(\mbf{x}) = w$, $\mbf{q}_{\bt}(\mbf{x}) = q$, and $|\mbf{R}(\mbf{x})| = r$ can be broken down into the following four steps:
+\renewcommand\labelenumi{(\theenumi)}
+\begin{enumerate}
+\item Enumerate over $\alpha \in [0, \sigma - 1]$, i.e., over whether the $r$th run is complete or $\alpha$-incomplete.
+\item For each $\alpha$, enumerate over the possible sets of mini-runs of $\mbf{x}$.
+\item For each set of mini-runs of $\mbf{x}$, enumerate over the possible assignments of the mini-runs to each of the $r$ runs.
+\item For each assignment of the mini-runs of $\mbf{x}$ to each of the $r$ runs, enumerate over the possible assignments $0$s from $\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})}$ to the regions surrounding each of the $r$ runs.
+\end{enumerate}
+
+We proceed to work through each step. For each $\alpha \in [0, \sigma - 1]$, enumerating over the possible sets of mini-runs of $\mbf{x}$ is equivalent to the number of ways in which we can assign $\sum_{i\in[r]}\mbf{wt}_0(\mbf{u}_i)$ identical balls into $\sum_{i\in[r]}t_i$ labeled bins, each filled with at most $\sigma-2$ balls. The number of ways to do this is thus
+\begin{align*}
+E_{w, q, r}^{(2), c}  &:= N\left( \sum_{i\in[r]} \mbf{wt}_0(\mbf{u}_i), \sum_{i\in[r]}t_i, \sigma - 2 \right) \\
+&= \sum_{i = 0}^{w - r} (-1)^i {w - r \choose i} {\tilde{q} - \sigma(r + i - 1) + i - \alpha - 2 \choose w - r - 1}.
+\end{align*}
+
+For each set of mini-runs of $\mbf{x}$, enumerating over the possible assignments of the mini-runs to each of the $r$ runs is equivalent to the number of solutions to $\sum_{i\in[r]}t_i = w-r$ where $t_i \in \mathbb{N}\cup\{0\}$ for $i\in[r]$. This is equal to$$E_{w,q,r}^{(3),c} := \mathcal{B}(w-r, r) = {w-1 \choose r-1}.$$
+
+For each assignment of the mini-runs of $\mbf{x}$ to each of the $r$ runs, enumerating over the possible assignments $0$s from $\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})}$ to the regions surrounding each of the $r$ runs is equivalent to the number of ways in which we can assign $\mbf{wt}_0(\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})})$ identical balls into $r+1$ labeled bins, if $c = \sigma-1$ (i.e., if the $r$th run is complete), and into $r$ labeled bins, if $c < \sigma-1$ (i.e., if the $r$th run is $\alpha$-incomplete for some $\alpha \in [\sigma-1]$), since $0$s cannot follow an incomplete run. The number of ways to do this is thus
+\begin{align*}
+E_{w,q,r}^{(4),c}  &:= \begin{cases}\mathcal{B}(\mbf{wt}_0(\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})}),r+1) &\textrm{if }c=\sigma-1\\\mathcal{B}(\mbf{wt}_0(\mbf{x}_{[k]\setminus \mbf{Q}_{\bt}(\mbf{x})}),r)&\textrm{otherwise}\end{cases} \\
+&= \begin{cases}{n-\tilde{q}+r \choose r} &\textrm{if }c=\sigma-1\\{n-\tilde{q}+r-1 \choose r-1}&\textrm{otherwise}\end{cases}.
+\end{align*}
+
+Putting the four steps together, the number of $\mbf{x} \in \{0,1\}^{k}$ such that $\mbf{wt}_1(\mbf{x}) = w$, $\mbf{q}_{\bt}(\mbf{x}) = q$, and $|\mbf{R}(\mbf{x})| = r$ is
+\begin{align*}
+E_{w,q,r} &:= \sum_{c=0}^{\sigma-1}E_{w,q,r}^{(2),c}\cdot E_{w,q,r}^{(3),c}\cdot E_{w,q,r}^{(4),c} \\
+&= {w-1 \choose r-1}\cdot\left[\sum_{i=0}^{w-r} (-1)^i {w-r \choose i}{n-\tilde{q}+r \choose r} {\tilde{q} -\sigma(r+i) + i-1 \choose w-r-1}\right.\\&\left.+\sum_{c=0}^{\sigma-2}\sum_{i=0}^{w-r} (-1)^i {w-r \choose i}{n-\tilde{q}+r-1 \choose r-1} {\tilde{q} -\sigma(r+i-1) + i-c-2 \choose w-r-1}\right]
+\end{align*}
+where $\tilde{q} = q - \min\{\sigma-1-c,n-k\}$.
+
+\paragraph{Case 2:} We now consider the cases where at least one of $q,r,w$ is $0$. Here, note that $E_{0,0,0} := 1$ but at least one of $q,r,w$ are $> 0$ while at least one of them is $0$, then $E_{w,q,r} := 0$.  
+
+Now, consider any $\mbf{x} \in \{0,1\}^{k}$ such that $\mbf{wt}_1(\mbf{x}) = w$, $\mbf{q}_{\bt}(\mbf{x}) = q$, and $|\mbf{R}(\mbf{x})| = r$. We will count the number of $\mbf{y} \in \{0,1\}^n$ such that $\mbf{wt}_1(\mbf{y}) = h$ and $\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})$. This is simply equal to the number of ways of choosing $h$ bits among the $q$ bits of $y_i$ for $i\in \mbf{Q}_{\bt}(\mbf{x})$ to set to $1$. The number of ways to do this is thus$$\mathbb{E}_{q,r,h} := { q \choose h }.$$Note that $\mathbb{E}_{q,r,h}$ does not depend on $r$. Putting everything together, we have
+\begin{align*}
+\mathbb{E}_{\mbf{G} \gets \mathcal{D}}\left[E^{\mbf{G}}_{w,h}\right]&\sum_{\substack{\mbf{x} \in \{0,1\}^k, \mbf{y} \in \{0,1\}^n\\\mbf{Q}(\mbf{y}) \subseteq \mbf{Q}_{\bt}(\mbf{x})\\\mbf{wt}_1(\mbf{x}) = w,\mbf{wt}_1(\mbf{y}) = h}}2^{-\mbf{q}_{\bt}(\mbf{x})}\\
+&=\sum_{q=w}^{n}\sum_{r=0}^{w}2^{-q} \cdot \mathbb{E}_{w,q,r} \cdot\mathbb{E}_{q,r,h}\\
+&=\sum_{q=w}^{n}\sum_{r=0}^{w}\left[2^{-q} \cdot{q \choose h }\cdot E_{w,q,r}\right].
+\end{align*}
+
+\iffalse
+\newpage
+\textbf{========== STAN STARTS HERE =========}
+
+looks like in standard convolution but has no dependencies on the previous $y_{i-1}, \ldots, y_{i-\sigma}$. $\mbf{G}$ looks like $n$ uniformly sampled sliding windows of length $\sigma$ on the diagonal and $0$ elsewhere. This technique is equivalent to
+
+$$y_i := \sum_{j:=0}^{\sigma-1}\mbf{x}_{i-j}\mbf{\alpha}_{i - j,i},$$
+where all elements of $\mbf{\alpha}$ are drawn uniformly and $i-j$ is taken $\mod n$ (assume for now $|x|=|y|=n$ so we wrap around). We now compute the enumerator $\mathbb{E}_{w,h}$. Let $w,h$ be same as above. Let $q$ be a helper variable that denotes how many elements of $\mbf{y}$ are on, i.e. each nonzero $\mbf{x}_i$ can result in up to $\sigma$ $1$s in $\mbf{y}$. These elements of $\mbf{y}$ are called on. The challenge will be to deal with overlaps due to two nonzero $\mbf{x_i}$s being less than $\sigma$ elements apart in $\mbf{x}$.
+Let $r$ be another helper variable that denotes the number of runs.
+We use a similar equation for the enumerator to the one in previous section:
+
+$$\mathbb{E}_{w,h} := \sum_{q=\sigma}^{n}\sum_{r=1}^{q/\sigma}\left(\mathbb{E}_{w,q,r} \cdot\mathbb{E}_{q,h}\cdot\mathbb{E}_{q,r}\cdot 2^{-q}\right).$$
+
+We first compute $\mathbb{E}_{w,q,r}$. We know that the $w$ nonzero $\mbf{x}_i$ can result in up to $w\sigma$ on elements in $\mbf{y}$. $q$ is the actual number of on elements. Thus, their difference $w\sigma-q$ gives us the number of overlapping elements, i.e. shadows. These shadows house some 1s and 0s and the number of 1s is $w-r$ as we know $r$ elements have no shadows (the elements starting a run). Thus, there are $w-r$ fixed 1s (fixed shadows that form bins with exactly one $1$) and $w\sigma-q-w+r$ free 0s (free shadows) that need to be placed in those bins after the 1.  %For that reason, the number of shadows can be reduced by $w-r$ as we force 1 shadow per bin.
+%I.e., there are only $w\sigma-q-w+r$ shadows. 
+Each of these bins can have at most $\sigma-2$ additional elements. To see this, think of the scenario with most overlap with two 1's right after each other in x. They can overlap in at most $\sigma-1$ places, and the first element of the overlap is a $1$. Thus, we have at most $\sigma-2$ places to place free zeros. Thus,we have again balls into bins with capacity \cite{bro19}. We have $w\sigma-q-w+r$ balls, and $w-r$ bins of $\sigma-2$ capacity:
+
+$$\mathbb{E}_{w,q}  = N(w\sigma-q-w+r, w-r, \sigma-2) := \sum_{i=0}^{w-r} (-1)^i {w-r \choose i} {w\sigma-q-i \sigma+i-1 \choose w-r-1}$$
+
+
+\noindent $\mathbb{E}_{q,h}$ is straightforward. We pick some subset of $h$ elements from $q$. Thus,
+
+$$\mathbb{E}_{q,h} := {q \choose h}.$$
+
+\noindent $\mathbb{E}_{q,r}$ is also straightforward and concerns the number of zeros between runs. We have $n-q$ balls, $r$ bins, and no capacity restriction:
+
+$$\mathbb{E}_{q,r} := \mathbb{B}(n-q,r) = {n-q+r-1 \choose r-1}.$$
+\fi

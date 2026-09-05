@@ -1,0 +1,187 @@
+\section{Endpoint analysis for wrapped EC}
+\label{app:analytic-details}
+
+This appendix proves the sparse and dense claims used in
+Lemma~\ref{lem:ec-endpoints}.  It also explains why one set of constants
+controls a whole interval of input probabilities.  Fix $m\geq1$ and write
+$\varrho_m(a,z)$ for the largest absolute eigenvalue of
+$\mathbf N_{m,a}(z)$.
+
+At $(a,z)=(0,1)$, the reduced state chain has two closed classes.  The active
+class consists of states $0,\ldots,m-1$, and state $m$ is the all-zero class.
+Define
+\begin{equation}
+ c_m:=\frac{1}{2^m-1},\qquad
+ \alpha_m:=\frac{2^{m-1}}{2^m-1}.
+ \label{eq:ec-class-parameters}
+\end{equation}
+Within the active class, the stationary probability of state $j$ is
+$\alpha_m2^{-j}$.  Thus $c_m$ is the probability of the boundary state
+$m-1$, and $\alpha_m$ is the mean emitted weight in one active step.
+
+Set $z=e^{-\theta a}$ for $\theta\geq0$.  Restricting the first-order
+perturbation of $\mathbf N_{m,a}(e^{-\theta a})$ to the two closed classes
+gives
+\begin{equation}
+ \mathbf G_m(\theta):=
+ \begin{pmatrix}
+  -c_m-\theta\alpha_m&c_m\\
+  1&-1
+ \end{pmatrix}.
+ \label{eq:ec-effective-generator}
+\end{equation}
+The first row represents the active class and the second the all-zero class.
+The off-diagonal entries are the first-order rates at which a small input
+probability moves between the classes.  The marker contributes the additional
+rate $\theta\alpha_m$ while the chain is active.
+
+The larger eigenvalue of \eqref{eq:ec-effective-generator} is
+\begin{equation}
+ g_m(\theta)=
+ -\frac{1+c_m+\theta\alpha_m}{2}
+ +\frac{\sqrt{(1-c_m-\theta\alpha_m)^2+4c_m}}{2}.
+ \label{eq:ec-effective-eigenvalue}
+\end{equation}
+
+The next lemma supplies the uniform remainder needed by the sparse-message
+argument.  It is stated for a bounded marker parameter because the proof of
+Lemma~\ref{lem:ec-endpoints} fixes one value of $\theta$.
+
+\begin{lemma}[Two-class perturbation]
+\label{lem:ec-two-class-perturbation}
+Fix $m\geq1$ and $\Theta<\infty$.  There are constants
+$a_0,K>0$, depending only on $m$ and $\Theta$, such that
+\begin{equation}
+ \left|
+ \ln\varrho_m(a,e^{-\theta a})-a g_m(\theta)
+ \right|\leq Ka^2
+ \label{eq:ec-uniform-perturbation}
+\end{equation}
+for $0<a\leq a_0$ and $0\leq\theta\leq\Theta$.
+The positive Perron eigenvector can be normalized so that the ratio of its
+largest coordinate to its smallest coordinate is at most $K$ on the same
+domain.
+\end{lemma}
+
+\begin{proof}
+Put $\mathbf P(a,\theta):=\mathbf N_{m,a}(e^{-\theta a})$.
+Its entries are analytic in $(a,\theta)$ near
+$\{0\}\times[0,\Theta]$.  After decreasing $a_0$ if necessary, Taylor's
+theorem on the resulting compact set gives
+\begin{equation}
+ \mathbf P(a,\theta)=\mathbf P_0+a\mathbf P_1(\theta)
+ +\mathbf E(a,\theta),
+ \qquad \|\mathbf E(a,\theta)\|\leq K_0a^2,
+ \label{eq:ec-matrix-taylor}
+\end{equation}
+for a constant $K_0$ and any fixed matrix norm.
+
+The eigenvalue one of $\mathbf P_0$ is semisimple with multiplicity two.
+Its two right eigenspaces are the active and all-zero closed classes.
+All remaining eigenvalues have modulus less than one.  Let $\mathbf U$
+contain one right eigenvector for each closed class, and let $\mathbf V$
+contain the dual stationary left eigenvectors, normalized by
+$\mathbf V^{\mathsf T}\mathbf U=\mathbf I_2$.  Direct substitution of the
+transitions in \eqref{eq:ec-ber-active}--\eqref{eq:ec-ber-zero} gives
+\begin{equation}
+ \mathbf V^{\mathsf T}\mathbf P_1(\theta)\mathbf U
+ =\mathbf G_m(\theta).
+ \label{eq:ec-compressed-derivative}
+\end{equation}
+
+Use the spectral projection of $\mathbf P_0$ to decompose the state space
+into the two-dimensional one-eigenspace and its invariant complement.  In
+this basis, the lower-right block of
+$\mathbf P_0-\lambda\mathbf I$ is uniformly invertible whenever
+$|\lambda-1|$ is sufficiently small.  The Schur complement of that block,
+together with \eqref{eq:ec-matrix-taylor}, is
+\begin{equation}
+ (1-\lambda)\mathbf I_2
+ +a\mathbf G_m(\theta)+\mathbf R(a,\theta,\lambda),
+ \qquad \|\mathbf R(a,\theta,\lambda)\|\leq K_1a^2.
+ \label{eq:ec-schur-complement}
+\end{equation}
+The constants are uniform for $\theta\in[0,\Theta]$.  Therefore the two
+eigenvalues near one are
+$1+a\mu_i(\theta)+O(a^2)$, where the $\mu_i(\theta)$ are the eigenvalues of
+$\mathbf G_m(\theta)$.  The remaining eigenvalues stay a fixed distance
+inside the unit circle.
+
+For $a>0$ and $e^{-\theta a}>0$, the nonnegative matrix
+$\mathbf P(a,\theta)$ is irreducible.  Its Perron eigenvalue is therefore the
+branch associated with the larger eigenvalue $g_m(\theta)$.  The two
+eigenvalues of $\mathbf G_m(\theta)$ are distinct throughout the compact
+interval because $c_m>0$.  The Schur-complement equation also shows that the
+normalized Perron eigenvector converges uniformly to the lift of the positive
+eigenvector of $\mathbf G_m(\theta)$.  Its coordinates are consequently
+bounded above and away from zero.  Finally,
+$\ln(1+a g_m(\theta)+O(a^2))=a g_m(\theta)+O(a^2)$, with a uniform constant.
+This proves both claims.
+\end{proof}
+
+Lemma~\ref{lem:ec-two-class-perturbation} gives
+\begin{equation}
+ \ln\varrho_m(a,e^{-\theta a})
+ =a g_m(\theta)+O(a^2).
+ \label{eq:ec-sparse-expansion}
+\end{equation}
+
+Substituting this marker into \eqref{eq:ec-rate-function} gives
+\begin{equation}
+ \liminf_{a\downarrow0}\frac{J^{\mathrm w}_{m,\delta}(a)}a
+ \geq\sup_{\theta\geq0}\{-\delta\theta-g_m(\theta)\}.
+ \label{eq:ec-effective-optimization}
+\end{equation}
+Put $x:=\delta/\alpha_m$.  Direct one-variable optimization yields
+\begin{align}
+ \sup_{\theta\geq0}\{-\delta\theta-g_m(\theta)\}
+ &=\left(\sqrt{1-x}-\sqrt{c_mx}\right)^2\\
+ &=\left(
+ \sqrt{1-2\delta+2^{1-m}\delta}
+ -\sqrt{2^{1-m}\delta}
+ \right)^2
+ =I^{\mathrm w}_{m,\delta}.
+ \label{eq:ec-effective-rate}
+\end{align}
+This proves the sparse exponent in \eqref{eq:ec-sparse-endpoint}.
+
+We next justify the uniform probability bound that the asymptotic distance
+proof needs.  For a positive matrix and a positive right eigenvector $v$ with
+eigenvalue $\lambda$, componentwise comparison gives
+\begin{equation}
+ \e_m^{\mathsf T}\mathbf N_{m,a}(z)^n\one
+ \leq \frac{\max_i v_i}{\min_i v_i}\lambda^n.
+ \label{eq:ec-perron-prefactor}
+\end{equation}
+For a fixed $\theta$ below the sparse threshold,
+Lemma~\ref{lem:ec-two-class-perturbation} bounds the coordinate ratio of the
+Perron eigenvector for all sufficiently small $a$.  Equations
+\eqref{eq:ec-sparse-expansion} and \eqref{eq:ec-perron-prefactor}, together
+with the marker inequality, give constants $K,a_0>0$ such that
+\begin{equation}
+ \Pr[H_{n,a}\leq\lfloor\delta n\rfloor]
+ \leq K\exp\{-na(I^{\mathrm w}_{m,\delta}-\varepsilon)\}
+ \label{eq:ec-uniform-sparse-tail}
+\end{equation}
+for all $n\geq1$ and $a\in(0,a_0]$.
+
+For input probabilities bounded away from zero, the matrix at $z=1$ is a
+finite irreducible Markov transition matrix.  Its stationary law satisfies
+\begin{equation}
+ \pi_j=\pi_0 2^{-j}\ (1\leq j<m),\qquad
+ \pi_m=\pi_{m-1},\qquad \pi_0=1/2.
+ \label{eq:ec-stationary-law}
+\end{equation}
+Consequently, the derivative of $\ln\varrho_m(a,z)$ with respect to $\ln z$
+at $z=1$ is $1/2$.  Because $\delta<1/2$, a marker slightly below one gives
+a positive lower-tail exponent.  Continuity and a finite cover of every
+closed interval $[a_*,1/2]$ give constants that are uniform throughout that
+interval.
+
+Finally, when $a=1/2$, every row of $\mathbf N_{m,1/2}(z)$ sums to
+$(1+z)/2$.  Hence
+\begin{equation}
+ \varrho_m(1/2,z)=\frac{1+z}{2}.
+\end{equation}
+Optimizing $\delta\ln z-\ln((1+z)/2)$ gives
+$\ln2-h(\delta)$ and proves \eqref{eq:ec-dense-endpoint}.

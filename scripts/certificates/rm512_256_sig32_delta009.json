@@ -1,0 +1,81 @@
+{
+  "schema": "permute-conv.block-certificate.v1",
+  "name": "rm512_256_sig32_delta009",
+  "description": "RM(4,9) direct-sum block outer, fixed-tap dense recursive inner, delta=0.09 finite checkpoint.",
+  "parameters": {
+    "k": 1048576,
+    "n": 2097152,
+    "delta": 0.09,
+    "d": 188743,
+    "sigma": 32,
+    "block_bits": 256,
+    "blocks": 4096,
+    "h_max": 500,
+    "certified_total_log2_max": -40.5
+  },
+  "local_code": {
+    "name": "RM(4,9)",
+    "length": 512,
+    "dimension": 256,
+    "distance": 32,
+    "spectrum_csv": "scripts/rm512_256_spectrum.csv",
+    "spectrum_sha256": "995aab561da18f22074b5c6f5413882f492084510aa1cd19b848355f1fcd4ed7",
+    "spectrum_source": "Markov-Borissov 2025 Table 6, checked against the Gleason-form verifier"
+  },
+  "artifacts": {
+    "summary_csv": {
+      "path": "scripts/block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact_summary.csv",
+      "sha256": "9b06dde33af081129fa78fce237ce98543bb00fd5f514aba38b7c9e8ba604fd8"
+    },
+    "prefix_csv": {
+      "path": "scripts/block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact.csv",
+      "sha256": "ffe97dc4438387aa9c46fe2721b1a356caff34d785656f28abac898eeec36e30"
+    },
+    "tailcert_csv": {
+      "path": "scripts/block_outer_probe_k1048576_rm512_256_sig32_d009_h500_exact_tailcert.csv",
+      "sha256": "faec98e6f82b7ec94f4d41f9718da3823622e1bf8b4c6210fcec59a273d488ec"
+    }
+  },
+  "prefix": {
+    "total_log2": -40.520728,
+    "peak_h": 32,
+    "peak_term_log2": -41.535025,
+    "peak_outer_log2": 37.629712,
+    "peak_inner_log2": -79.164737
+  },
+  "tail": {
+    "check_from": 300,
+    "tail_after": 500,
+    "observed_worst_log2_ratio": -0.990724,
+    "max_observed_log2_ratio": -0.9,
+    "tail_residual_log2": -504.095345,
+    "max_tail_residual_log2": -500.0,
+    "analytic_ratio_log2": -0.119385964068,
+    "max_analytic_tail_residual_log2": -500.0
+  },
+  "residual": {
+    "h_min": 500,
+    "r_cap": 12,
+    "theta_slot": 0.35,
+    "z": 0.4,
+    "eta": 0.25,
+    "linear_eta_hi": 0.2928932188134524,
+    "run_theta": 0.001,
+    "xi": 8.0,
+    "gap_step": 0.0001,
+    "log2_w_out": 33.494442005122,
+    "bounded_r_low_slot_log2_q": -0.119385964068,
+    "bounded_r_high_slot_exponent": 0.062158520916,
+    "large_r_low_slot_ledger_log2": -271.720147769424,
+    "large_r_low_slot_union_log2": -186.135185268703,
+    "linear_handoff_gap": -0.002901634061,
+    "thresholds": {
+      "log2_w_out_max": 40.0,
+      "bounded_r_low_slot_log2_q_max": -0.1,
+      "bounded_r_high_slot_exponent_min": 0.05,
+      "large_r_low_slot_ledger_log2_max": -250.0,
+      "large_r_low_slot_union_log2_max": -160.0,
+      "linear_handoff_gap_max": -0.002
+    }
+  }
+}

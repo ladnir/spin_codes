@@ -1,0 +1,25 @@
+{
+  "schema": "riffle-construction-model-manifest-v1",
+  "model_id": "riffle_rm512_randomstepconv_g4_sigma20",
+  "display_name": "Riffle RM512-RandomStepConv g=4 sigma=20",
+  "status": "PAUSED_MODEL_EXPLORATION",
+  "is_construction": false,
+  "parent_candidate_id": "riffle_randomstepconv_g4_sigma20",
+  "fixed_parameters": {
+    "data_local_code": "RM(4,9) [512,256,32]",
+    "data_groups": 4096,
+    "parity_input_bits": 128,
+    "parity_output_bits": 256,
+    "packet_bits": 4,
+    "packet_positions": 524352,
+    "inner_laps": 1,
+    "state_bits": 20
+  },
+  "receipts": [
+    "receipts/rm512_randomstepconv_distance09.json",
+    "receipts/inner_episode_structure_audit.json"
+  ],
+  "source_spectrum": "../../scripts/rm512_256_spectrum.csv",
+  "diagnostic_result": "The +3003.95 bulk result loses 10779.31 bits by reusing wide-interval inner parameters. Pointwise optimization makes the bulk contribution -7787.91. At data support 95, an explicit six-episode family has exponent +8.28 for zero parity support and becomes negative at four parity packets.",
+  "claim_scope": "The RM data spectrum, packet-support law, and explicit episode-family count are exact. Pointwise upper bounds and FFT coefficients are floating diagnostics. The joint spectrum with the determined parity block remains open."
+}

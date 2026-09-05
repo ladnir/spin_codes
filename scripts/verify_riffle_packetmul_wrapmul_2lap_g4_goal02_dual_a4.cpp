@@ -1,0 +1,2 @@
+#define INDEPENDENT_VERIFIER 1
+#include "certify_riffle_packetmul_wrapmul_2lap_g4_goal02_dual_a4.cpp"

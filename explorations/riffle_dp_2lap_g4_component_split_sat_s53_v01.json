@@ -1,0 +1,58 @@
+{
+  "schema": "riffle-dp-2lap-g4-component-split-sat-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT_SAT_RESULT_OR_TIMEOUT_DIAGNOSTIC",
+  "source_sha256": "888f08467ee56e8dcc49ccac555af9c1202d63f25fa4d33f1cff8ecc126bc23c",
+  "support_mask_hex": "0x53",
+  "support_degrees": [
+    1,
+    2,
+    10,
+    20
+  ],
+  "code_dimension": 33,
+  "packet_value": 1,
+  "window_nodes": 24,
+  "code_length": 384,
+  "required_two_sided_distance": 97,
+  "left_support_mask_hex": "0x40",
+  "left_support_degrees": [
+    20
+  ],
+  "left_dimension": 20,
+  "right_support_mask_hex": "0x13",
+  "right_support_degrees": [
+    1,
+    2,
+    10
+  ],
+  "right_dimension": 13,
+  "rows": [
+    {
+      "side": "weight",
+      "timeout_seconds": 10.0,
+      "elapsed_seconds": 10.667256599990651,
+      "solver": "CryptoMiniSat through python-sat",
+      "cardinality_encoding": "sequential_counter",
+      "cnf_variable_count": 28833,
+      "cnf_clause_count_before_xors": 55489,
+      "native_xor_count": 1152,
+      "solver_statistics": {},
+      "result": "UNKNOWN"
+    },
+    {
+      "side": "complement",
+      "timeout_seconds": 10.0,
+      "elapsed_seconds": 10.96056330006104,
+      "solver": "CryptoMiniSat through python-sat",
+      "cardinality_encoding": "sequential_counter",
+      "cnf_variable_count": 28833,
+      "cnf_clause_count_before_xors": 55489,
+      "native_xor_count": 1152,
+      "solver_statistics": {},
+      "result": "UNKNOWN"
+    }
+  ],
+  "result": "UNKNOWN",
+  "scope_limitation": "PASS or COUNTEREXAMPLE is an exact solver conclusion with an exact witness replay for counterexamples. UNKNOWN reports only a timeout. This prototype does not emit an independently checkable UNSAT proof."
+}

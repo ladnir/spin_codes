@@ -1,0 +1,81 @@
+{
+  "schema": "pure-ea-sector-zero-hoeffding-radial-arb-v1",
+  "status": "OUTWARD_FIXED_ORDER_PARTIAL_SUM",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "level": 2,
+    "minimum_order": 1,
+    "maximum_order": 8,
+    "precision_bits": 256,
+    "transform_mode": "polynomial"
+  },
+  "orders": [
+    {
+      "order": 1,
+      "aggregate": "0",
+      "nonnegative_aggregate": "0",
+      "scaled_diagonal_contribution": "0",
+      "convolution_terms": null
+    },
+    {
+      "order": 2,
+      "aggregate": "0.04055500030517578125000000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.04055500030517578125000000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.02317428588867187500000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 3,
+      "aggregate": "0.08723831176757812500000000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.08723831176757812500000000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.04985046386718750000000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 4,
+      "aggregate": "0.1878046989440917968750000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.1878046989440917968750000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.1073169708251953125000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 5,
+      "aggregate": "0.2891921997070312500000000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.2891921997070312500000000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.1652526855468750000000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 6,
+      "aggregate": "0.2580499649047851562500000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.2580499649047851562500000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.1474571228027343750000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 7,
+      "aggregate": "0.05102920532226562500000000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.05102920532226562500000000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.02915954589843750000000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    },
+    {
+      "order": 8,
+      "aggregate": "0.1672117710113525390625000000000000000000000000000000000000000000000000000000",
+      "nonnegative_aggregate": "0.1672117710113525390625000000000000000000000000000000000000000000000000000000",
+      "scaled_diagonal_contribution": "0.09554958343505859375000000000000000000000000000000000000000000000000000000000",
+      "convolution_terms": null
+    }
+  ],
+  "scaled_diagonal_range_sum": "0.6177606582641601562500000000000000000000000000000000000000000000000000000000",
+  "scaled_diagonal_partial_sum": "0.6177606582641601562500000000000000000000000000000000000000000000000000000000",
+  "elapsed_seconds": 0.0014852999593131244,
+  "scope": [
+    "Each fixed-order aggregate is evaluated by the exact radial identity with Arb intervals.",
+    "The Arb interval encloses the exact sum over the reported order range.",
+    "A range starting at order one is a lower bound on the complete sector-zero diagonal because omitted orders are nonnegative.",
+    "No upper bound or variance certificate follows until every omitted order is included or bounded."
+  ]
+}

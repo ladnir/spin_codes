@@ -1,0 +1,36 @@
+{
+  "schema": "riffle-construction-model-manifest-v1",
+  "model_id": "riffle_fieldpair512_p2_scalarstepconv_g4_sigma18",
+  "display_name": "Riffle FieldPair512-P2-ScalarStepConv g=4 sigma=18",
+  "status": "ACTIVE_ENTROPY_OPTIMIZATION",
+  "is_construction": false,
+  "parent_candidate_id": "riffle_frozenrandom512_p2_randomstepconv_g4_sigma20",
+  "fixed_parameters": {
+    "data_groups": 4096,
+    "data_map": "(a_i*m_i,b_i*m_i) over GF(2^256), independent by group",
+    "field_parity_symbols": 2,
+    "parity_symbol_code": "extended BCH [128,64,22]",
+    "packet_bits": 4,
+    "packet_positions": 524352,
+    "inner_map": "c_j*(x_j,s_j) over GF(2^22), independent by step",
+    "inner_laps": 1,
+    "state_bits": 18
+  },
+  "setup_entropy_bits": {
+    "outer_maps": 2097152,
+    "inner_maps": 11535744,
+    "global_packet_permutation": 9206311.13387405,
+    "parity_local_permutations": 1432.323444167244,
+    "total": 22840639.45731822
+  },
+  "receipts": [
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_pointwise_p2_sigma19.json",
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_pointwise_p2_sigma18.json",
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_exact_saddle_p2_sigma18_low.json",
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_exact_saddle_p2_sigma18.json",
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_exact_saddle_p2_sigma18_high.json",
+    "../riffle_frozenrandom512_p2_randomstepconv_g4_sigma20/receipts/global_exact_saddle_p2_sigma17.json"
+  ],
+  "diagnostic_result": "Sigma 18 has evaluated total exponent -43.598633 across supports 50 through 3200. Sigma 17 has positive central-interval upper +2.273900. The sigma-18 tails and rounding remain to be certified.",
+  "claim_scope": "The field-multiplier families preserve the exact marginal laws used by the first-moment proof. The sigma-18 end-to-end number is diagnostic, not yet a complete certificate."
+}

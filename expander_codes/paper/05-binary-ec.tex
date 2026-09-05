@@ -1,0 +1,241 @@
+\section{Binary Expand--Convolute}
+\label{sec:binary-ec}
+
+The accumulator has one state bit.  A random convolution has $m$ state bits,
+but its output-weight law does not require all $2^m$ bit patterns.  It is
+enough to record how many consecutive zeros end the current output prefix.
+This reduction gives an exact transfer matrix with $m+1$ states.
+
+We analyze the wrapped convolution from \eqref{eq:wrapped-convolution}.  The
+fixed oldest tap forces the process to leave the almost-zero state unless the
+next input cancels it.  This behavior improves the sparse-message exponent.
+
+\subsection{Exact transfer matrix}
+
+Index the reduced states by $0,\ldots,m$.  State $j<m$ means that the current
+output prefix ends in exactly $j$ zeros.  State $m$ means that its last $m$
+outputs are all zero.  The initial state is $m$.
+
+Let $X$ mark nonzero input bits and let $Y$ mark nonzero output bits.  Define
+the $(m+1)\times(m+1)$ matrix $\mathbf W_m(X,Y)$ by its nonzero entries:
+\begin{align}
+ (\mathbf W_m)_{j,0}&=\frac{1+X}{2}Y,&
+ (\mathbf W_m)_{j,j+1}&=\frac{1+X}{2}
+ &&(0\leq j<m-1),
+ \label{eq:ec-active-transitions}\\
+ (\mathbf W_m)_{m-1,0}&=Y,&
+ (\mathbf W_m)_{m-1,m}&=X,
+ \label{eq:ec-critical-transitions}\\
+ (\mathbf W_m)_{m,0}&=XY,&
+ (\mathbf W_m)_{m,m}&=1.
+ \label{eq:ec-zero-transitions}
+\end{align}
+
+\begin{lemma}[Exact wrapped-convolution enumerator]
+\label{lem:ec-exact-enumerator}
+Let $E^{\mathrm{wConv}}_{u,h}$ be the expected number of weight-$u$ inputs
+that a sampled wrapped convolution maps to weight $h$.  Then
+\begin{equation}
+ E^{\mathrm{wConv}}_{u,h}=
+ [X^uY^h]\,\e_m^{\mathsf T}\mathbf W_m(X,Y)^n\one,
+ \label{eq:ec-exact-enumerator}
+\end{equation}
+where $\e_m$ selects the all-zero initial state.
+\end{lemma}
+
+\begin{proof}
+If $j<m-1$, at least one state bit with a random tap is nonzero.  Its inner
+product with the sampled taps is uniform, independently of the input bit.
+This gives \eqref{eq:ec-active-transitions}.  In state $m-1$, only the fixed
+oldest tap is active.  Input zero produces output one; input one produces zero
+and enters state $m$.  This gives \eqref{eq:ec-critical-transitions}.  In
+state $m$, the feedback is zero and the output equals the input.  Matrix
+multiplication concatenates the transitions.
+\end{proof}
+
+If the input bits are independent $\Ber(a)$ variables, averaging the input
+marker gives a one-variable matrix $\mathbf N_{m,a}(Y)$ with nonzero entries
+\begin{align}
+ (\mathbf N_{m,a})_{j,0}&=Y/2,&
+ (\mathbf N_{m,a})_{j,j+1}&=1/2
+ &&(0\leq j<m-1),
+ \label{eq:ec-ber-active}\\
+ (\mathbf N_{m,a})_{m-1,0}&=(1-a)Y,&
+ (\mathbf N_{m,a})_{m-1,m}&=a,
+ \label{eq:ec-ber-critical}\\
+ (\mathbf N_{m,a})_{m,0}&=aY,&
+ (\mathbf N_{m,a})_{m,m}&=1-a.
+ \label{eq:ec-ber-zero}
+\end{align}
+
+\begin{theorem}[Exact Bernoulli wrapped-EC first moment]
+\label{thm:ec-exact-first-moment}
+Independently sample
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$ and a wrapped convolution
+$\C$ of memory $m$.  Let $a_r$ be defined by \eqref{eq:ea-activation}.  Then
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]
+ \leq
+ \sum_{r=1}^{k}\binom{k}{r}
+ \sum_{h=0}^{L}[Y^h]\,
+ \e_m^{\mathsf T}\mathbf N_{m,a_r}(Y)^n\one.
+ \label{eq:ec-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For a fixed weight-$r$ message, the Bernoulli expander produces independent
+$\Ber(a_r)$ inputs to the convolution.  Matrix $\mathbf N_{m,a_r}$ gives the
+exact output-weight generating function.  Sum over output weights and
+messages, then apply \eqref{eq:first-moment}.
+\end{proof}
+
+For a numerical marker $z\in(0,1]$, the inner tail in
+\eqref{eq:ec-first-moment} is at most
+\begin{equation}
+ z^{-L}\e_m^{\mathsf T}\mathbf N_{m,a_r}(z)^n\one.
+ \label{eq:ec-marker-bound}
+\end{equation}
+The calculation uses $m+1$ states and remains exact before the positive-marker
+bound.
+
+\subsection{Asymptotic distance}
+
+Let $\varrho_m(a,z)$ be the spectral radius of
+$\mathbf N_{m,a}(z)$, namely the largest absolute value of its eigenvalues.
+Define
+\begin{align}
+ J^{\mathrm w}_{m,\delta}(a)
+ &:=\sup_{0<z\leq1}
+ \{\delta\ln z-\ln\varrho_m(a,z)\},
+ \label{eq:ec-rate-function}\\
+ I^{\mathrm w}_{m,\delta}
+ &:=\left(
+ \sqrt{1-2\delta+2^{1-m}\delta}
+ -\sqrt{2^{1-m}\delta}
+ \right)^2.
+ \label{eq:ec-sparse-rate}
+\end{align}
+
+\begin{lemma}[Wrapped-convolution endpoint exponents]
+\label{lem:ec-endpoints}
+For fixed $m\geq1$ and $\delta\in(0,1/2)$,
+$J^{\mathrm w}_{m,\delta}$ is continuous and positive on $(0,1/2]$.
+Moreover,
+\begin{align}
+ \liminf_{a\downarrow0}
+ \frac{J^{\mathrm w}_{m,\delta}(a)}a
+ &\geq I^{\mathrm w}_{m,\delta},
+ \label{eq:ec-sparse-endpoint}\\
+ J^{\mathrm w}_{m,\delta}(1/2)
+ &=\ln2-h(\delta).
+ \label{eq:ec-dense-endpoint}
+\end{align}
+The associated lower-tail bounds can be chosen uniformly for $a$ near zero
+and for $a$ in any closed interval bounded away from zero.
+\end{lemma}
+
+\begin{proof}
+Perron--Frobenius theory bounds
+$\e_m^{\mathsf T}\mathbf N_{m,a}(z)^n\one$ by a constant times
+$\varrho_m(a,z)^n$.  At $a=0$ and $z=1$, the chain has an active class and an
+all-zero class.  First-order perturbation with $z=e^{-\theta a}$ reduces the
+calculation to a two-state continuous-time generator.  Optimizing its larger
+eigenvalue gives \eqref{eq:ec-sparse-rate}.  At $a=1/2$, every row of
+$\mathbf N_{m,1/2}(z)$ sums to $(1+z)/2$.  Hence
+$\varrho_m(1/2,z)=(1+z)/2$, which gives
+\eqref{eq:ec-dense-endpoint}.  Appendix~\ref{app:analytic-details} gives the
+perturbation and proves a uniform quadratic remainder in
+Lemma~\ref{lem:ec-two-class-perturbation}.  It also proves the uniform
+prefactor claim.
+\end{proof}
+
+\begin{theorem}[Binary wrapped-EC distance]
+\label{thm:ec-distance}
+Fix $m\geq1$ and $\delta\in(0,1/2)$.  Let $k/n\to R\in(0,1)$ and set
+$\rho_n=C\ln(n)/n$.  Independently sample
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho_n}$ and a wrapped convolution
+$\C$ of memory $m$.  If
+\begin{align}
+ C I^{\mathrm w}_{m,\delta}&>1,
+ \label{eq:ec-sparse-condition}\\
+ h(\delta)&<(1-R)\ln2,
+ \label{eq:ec-gv-condition}
+\end{align}
+then
+\begin{equation}
+ \Pr_{\B,\C}[d_{\min}(\B\C)\leq\lfloor\delta n\rfloor]=o(1).
+ \label{eq:ec-distance-conclusion}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Apply Lemma~\ref{lem:ec-endpoints} to the exact first moment in
+Theorem~\ref{thm:ec-exact-first-moment}.  For sparse messages,
+$a_r=r\rho_n(1-o(1))$, and \eqref{eq:ec-sparse-condition} makes the
+support-$r$ contribution summable.  For intermediate weights, $a_r$ is
+bounded away from zero, so a uniform exponential tail dominates the number
+of messages.  For every $r>\eta n$, one has $a_r=1/2-o(1)$ uniformly.  The
+dense endpoint and the bound of $2^k$ messages give exponent
+\[
+ R\ln2+h(\delta)-\ln2+o(1),
+\]
+which is negative by \eqref{eq:ec-gv-condition}.  These three ranges cover
+$[1,k]$.
+\end{proof}
+
+For $m=1$, equation~\eqref{eq:ec-sparse-rate} equals the EA value
+$I_\delta$.  As $m\to\infty$, it tends to $1-2\delta$.  At
+$\delta=0.05$ and $m=21$, the new sparse condition is $C>1.111623$.
+The published nonwrapping theorem requires $C>10.4344$ and $R<0.1278$ at the
+same distance~\cite{EC}.  The wrapped theorem permits every $R<0.7136$, the
+binary GV rate at distance $0.05$.
+
+The asymptotic comparison changes the analyzed member of the EC family: the
+published theorem is nonwrapping, while Theorem~\ref{thm:ec-distance} is for
+the wrapped construction already proposed in~\cite{EC}.  The next comparison
+holds the wrapped finite ensemble fixed.
+
+\subsection{Finite same-ensemble comparison}
+
+Set $k:=2^{20}$, $n:=5k$, $L:=n/20$, and $m:=5$.  For each row of
+Table~\ref{tab:ec-same-ensemble}, set $\rho:=C_0\ln(n)/n$.  The boundary state
+and expander distribution match the zero-state wrapped rows of
+\cite[Table~4]{EC}.
+
+\begin{theorem}[Finite wrapped-EC comparison]
+\label{thm:ec-finite-comparison}
+For each row, independently sample
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$ and a wrapped convolution
+$\C$ of memory $5$.  The exact-transfer column of
+Table~\ref{tab:ec-same-ensemble} upper-bounds
+$\Pr_{\B,\C}[\Bad_L(\B\C)]$.
+\end{theorem}
+
+\begin{table}[t]
+\centering
+\caption{Same-ensemble comparison with the prior wrapped-EC calculation.}
+\label{tab:ec-same-ensemble}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$C_0$ & expected degree & prior bound & exact transfer & failure exponent \\
+\midrule
+$3.0$ & $46.4171$ & $2.26\cdot10^{-7}$ & $2.187816572\cdot10^{-10}$ & $32.089789$ \\
+$2.5$ & $38.6810$ & $1.72\cdot10^{-5}$ & $9.485867880\cdot10^{-8}$ & $23.329645$ \\
+$2.3$ & $35.5865$ & $1.73\cdot10^{-4}$ & $1.124903039\cdot10^{-6}$ & $19.761768$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+The verifier evaluates weights $1$ through $32$ individually with
+\eqref{eq:ec-marker-bound}.  It covers the remaining weights below $k/4$
+with contiguous transfer blocks.  From $k/4$ onward, invertibility bounds each
+preimage by the output Hamming ball.  The verified sums are the displayed
+exact-transfer values.  Theorem~\ref{thm:ec-exact-first-moment} gives the
+probability statement.
+\end{proof}
+
+The improvement factors are at least $1032$, $181$, and $153$.  The prior
+finite calculation assumes an extension of its comparison lemma.  The exact
+transfer calculation does not use that assumption.

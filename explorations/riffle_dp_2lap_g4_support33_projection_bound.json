@@ -1,0 +1,427 @@
+{
+  "schema": "riffle-dp-2lap-g4-support33-projection-bound-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "RIGOROUS_BOUND",
+  "outer_receipt_sha256": "592bc077e577d6f565142f49d5af7004a6ad29b2ffea9cb509dceaaaf9d2c400",
+  "projection_component_degree": 20,
+  "projection_dimension": 20,
+  "packet_positions": 524352,
+  "packet_support": 33,
+  "distinctness_probability_numerator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+  "distinctness_probability_denominator": "34608680103696515617857435394947922922475373234733884684182133325626783781225066411118409759751687307289554574839331920390002744555726539497105260096038876209727143936",
+  "reduction": "First sample the 33 labeled packet cells independently and uniformly. Conditioned on all cells being distinct, their law is the uniform ordered injection induced by the global packet permutation. Hence a point probability under the permutation is at most its iid value divided by the exact distinctness probability.",
+  "fourier_bound": "For iid cells, Fourier inversion expresses the zero-syndrome probability as 2^-20 times the sum of the profile products of character biases. The calculation takes absolute values only for nontrivial characters and rounds every operation upward.",
+  "rounding": "Bias division, profile products, summation, Fourier normalization, and conditioning division are rounded upward. The positive sum uses the standard gamma_n binary64 error envelope. The distinctness probability is rounded downward before division.",
+  "profile_rows": [
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        6,
+        3,
+        3,
+        0,
+        0,
+        6,
+        3,
+        3,
+        0,
+        6,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i4-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i8-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i0-t013fa47fb3512a50",
+        "terminal-w3-s33-one-i4-t013fa47fb3512a50",
+        "terminal-w3-s33-one-i0-t13fa47fb3512a500"
+      ],
+      "nontrivial_fourier_l1_upper": 1.754858773267262e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        6,
+        6,
+        0,
+        0,
+        3,
+        0,
+        0,
+        3,
+        9
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t013f5f6d7a607131",
+        "terminal-w3-s33-one-i4-t013f5f6d7a607131",
+        "terminal-w3-s33-one-i0-t13f5f6d7a6071310"
+      ],
+      "nontrivial_fourier_l1_upper": 1.8359734665557934e-87,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        0,
+        6,
+        6,
+        3,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t013fb79e0c15f9e9",
+        "terminal-w3-s33-one-i4-t013fb79e0c15f9e9",
+        "terminal-w3-s33-one-i0-t13fb79e0c15f9e90"
+      ],
+      "nontrivial_fourier_l1_upper": 3.557269542747751e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        9,
+        0,
+        3,
+        6,
+        3,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t014b26c75925b3f7",
+        "terminal-w3-s33-one-i4-t014b26c75925b3f7",
+        "terminal-w3-s33-one-i0-t14b26c75925b3f70"
+      ],
+      "nontrivial_fourier_l1_upper": 4.644539557366641e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        6,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        6,
+        3,
+        9,
+        3,
+        0,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t15aad8f5346444f7"
+      ],
+      "nontrivial_fourier_l1_upper": 4.64501479004076e-87,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3,
+        6,
+        0,
+        3,
+        9,
+        3,
+        0,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t32444f38b60d0000"
+      ],
+      "nontrivial_fourier_l1_upper": 1.858283063230059e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        3,
+        3,
+        3,
+        6,
+        12,
+        3,
+        0,
+        0,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t56e790b14459bed0"
+      ],
+      "nontrivial_fourier_l1_upper": 9.165908907449141e-87,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6,
+        0,
+        9,
+        0,
+        3,
+        3,
+        9
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t5739d03a129b5831",
+        "terminal-w3-s33-one-i0-t83f66eb300000000"
+      ],
+      "nontrivial_fourier_l1_upper": 1.7023821259313846e-86,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        3,
+        3,
+        0,
+        0,
+        3,
+        3,
+        9,
+        0,
+        0,
+        6,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t5c222cbcb161bd00"
+      ],
+      "nontrivial_fourier_l1_upper": 3.488684194244379e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        0,
+        9,
+        0,
+        3,
+        0,
+        0,
+        9,
+        3,
+        3,
+        0,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t6b16d09000000000"
+      ],
+      "nontrivial_fourier_l1_upper": 1.127833153972714e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        9,
+        0,
+        0,
+        3,
+        0,
+        6,
+        3,
+        0,
+        0,
+        3,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tacf2ca0f00000000"
+      ],
+      "nontrivial_fourier_l1_upper": 2.2007732312199857e-86,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        3,
+        3,
+        0,
+        0,
+        3,
+        3,
+        6,
+        0,
+        0,
+        9,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tadfb2f65b715f54a"
+      ],
+      "nontrivial_fourier_l1_upper": 9.540789666371159e-88,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        3,
+        3,
+        0,
+        3,
+        0,
+        0,
+        9,
+        3,
+        3,
+        3,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tfaecebffc51f71e0"
+      ],
+      "nontrivial_fourier_l1_upper": 7.552948879595453e-89,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        3,
+        6,
+        0,
+        3,
+        0,
+        0,
+        6,
+        3,
+        3,
+        3,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tfbfc4e34c1f4398c"
+      ],
+      "nontrivial_fourier_l1_upper": 2.771397452942313e-89,
+      "iid_projection_zero_upper": 9.536743164062504e-07,
+      "conditioned_projection_zero_upper": 9.546351291045065e-07,
+      "conditioned_projection_zero_log2_upper": -19.99854723788598
+    }
+  ],
+  "worst_profile": {
+    "packet_value_counts_1_through_15": [
+      0,
+      0,
+      3,
+      0,
+      6,
+      3,
+      3,
+      0,
+      0,
+      6,
+      3,
+      3,
+      0,
+      6,
+      0
+    ],
+    "family_ids": [
+      "terminal-w3-s33-one-i0-t0013fa47fb3512a5",
+      "terminal-w3-s33-one-i4-t0013fa47fb3512a5",
+      "terminal-w3-s33-one-i8-t0013fa47fb3512a5",
+      "terminal-w3-s33-one-i0-t013fa47fb3512a50",
+      "terminal-w3-s33-one-i4-t013fa47fb3512a50",
+      "terminal-w3-s33-one-i0-t13fa47fb3512a500"
+    ],
+    "nontrivial_fourier_l1_upper": 1.754858773267262e-88,
+    "iid_projection_zero_upper": 9.536743164062504e-07,
+    "conditioned_projection_zero_upper": 9.546351291045065e-07,
+    "conditioned_projection_zero_log2_upper": -19.99854723788598
+  },
+  "aggregate_over_26_words_upper": 2.4820513356717205e-05,
+  "aggregate_over_26_words_log2_upper": -15.298107519744887,
+  "scope_limitation": "The bound controls only the event that the first-lap terminal state is zero through its degree-20 projection. It does not bound output weight or cover outer words beyond the 26 authenticated support-33 receipts."
+}

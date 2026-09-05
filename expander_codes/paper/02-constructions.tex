@@ -1,0 +1,184 @@
+\section{Code ensembles and distance events}
+\label{sec:constructions}
+
+This section defines the objects sampled in the paper.  We use row vectors,
+so a message $\x\in\F_p^k$ is encoded as $\x\G\in\F_p^n$ by a matrix
+$\G\in\F_p^{k\times n}$.
+Throughout the paper, $p$ denotes the order of the field.  It may be a prime
+power; it does not necessarily denote the characteristic.
+
+\subsection{Distance and the GV benchmark}
+
+For $\y\in\F_p^n$, its support is
+$\supp(\y):=\{i:y_i\ne0\}$, and its Hamming weight is
+$\wt(\y):=|\supp(\y)|$.  Vectors of the same weight form a \emph{Hamming
+shell}.  Define
+\begin{equation}
+ d_{\min}(\G):=
+ \min_{\x\in\F_p^k\setminus\{0\}}\wt(\x\G).
+ \label{eq:minimum-distance}
+\end{equation}
+This convention assigns distance zero to a noninjective generator.  If
+$d_{\min}(\G)>0$, the matrix is injective and
+\eqref{eq:minimum-distance} equals the usual minimum distance of its image.
+The relative minimum distance is $d_{\min}(\G)/n$.
+
+For an integer cutoff $L$, define the bad-sampling event
+\begin{equation}
+ \Bad_L(\G):=\{d_{\min}(\G)\leq L\}.
+ \label{eq:bad-event}
+\end{equation}
+Every probability in this paper is over the stated random choices used to
+sample $\G$.  A bound $\Pr[\Bad_L(\G)]\leq U$ shows that a sampled generator
+has distance above $L$ except with probability at most $U$.
+
+The code rate is $R:=k/n$.  We use natural logarithms and define
+\begin{align}
+ h(x)&:=-x\ln x-(1-x)\ln(1-x),\label{eq:binary-entropy}\\
+ h_p(x)&:=h(x)+x\ln(p-1).\label{eq:p-ary-entropy}
+\end{align}
+The $p$-ary GV relative distance $\delta_{p,\mathrm{GV}}(R)$ is the solution
+in $(0,(p-1)/p)$ to
+\begin{equation}
+ h_p(\delta_{p,\mathrm{GV}}(R))=(1-R)\ln p.
+ \label{eq:gv-definition}
+\end{equation}
+This equation balances the number $p^k$ of messages against the exponential
+volume of a radius-$\delta n$ Hamming ball.  We use it only as a distance
+benchmark.
+Here a radius-$L$ Hamming ball centered at zero is the set of vectors of
+weight at most $L$; it contains
+$\sum_{h=0}^{L}\binom nh(p-1)^h$ vectors.
+
+\subsection{The common architecture}
+
+Every construction has the form
+\begin{equation}
+ \G=\B\T,
+ \label{eq:common-architecture}
+\end{equation}
+where $\B\in\F_p^{k\times n}$ is sparse and
+$\T\in\F_p^{n\times n}$ is an invertible recursive map.  We call $\B$ the
+expander matrix, following the EA and EC literature.  No spectral or
+combinatorial expansion property is implicit in that name.
+
+The rows of $\B$ correspond to message coordinates.  Its columns correspond
+to the intermediate coordinates supplied to $\T$.  Thus the bipartite graph
+of $\B$ has $k$ left vertices and $n$ right vertices.  A matrix entry is an
+edge when it is nonzero.
+
+\paragraph{Accumulator.}
+Given $\mathbf u\in\F_p^n$, initialize $y_0:=0$ and compute
+\begin{equation}
+ y_t:=u_t+y_{t-1},\qquad t\in\{1,\ldots,n\}.
+ \label{eq:accumulator-definition}
+\end{equation}
+The resulting linear map is the accumulator $\A$.  It is invertible because
+$u_t=y_t-y_{t-1}$.  The EA generator is $\G=\B\A$.
+
+\paragraph{Wrapped binary convolution.}
+Fix a memory $m\geq1$.  Initialize $y_j:=0$ for $j\leq0$.  For each time
+$t$, sample independent bits $b_{t,1},\ldots,b_{t,m-1}$ and compute
+\begin{equation}
+ y_t:=u_t+y_{t-m}+\sum_{j=1}^{m-1}b_{t,j}y_{t-j}
+ \quad\text{over }\F_2.
+ \label{eq:wrapped-convolution}
+\end{equation}
+The coefficient of the oldest state bit is fixed to one.  This is the wrapped
+EC convolution of~\cite{EC}.  Its coefficient on $u_t$ is one, so every
+sampled convolution is invertible.
+
+\paragraph{Finite-field convolution.}
+Fix a prime power $p$, choose the field $\F_p$, and fix memory $m$.  At time
+$t$, independently sample
+$\boldsymbol\alpha_t\in\F_p^m$ and compute
+\begin{equation}
+ y_t:=u_t+
+ \left\langle\boldsymbol\alpha_t,
+ (y_{t-1},\ldots,y_{t-m})\right\rangle.
+ \label{eq:prime-convolution}
+\end{equation}
+This map is also invertible.  Sampling from the full field is essential for
+the reduced-state analysis in Section~\ref{sec:prime-fields}.
+
+\subsection{Expander distributions}
+
+We use three principal distributions for $\B$.
+
+\paragraph{Bernoulli incidence.}
+Over $\F_2$, independently set each entry of $\B$ to one with probability
+$\rho$ and to zero otherwise.  We write
+$\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$.  A row has expected weight
+$\rho n$.
+
+Over $\F_p$, an entry is zero with probability $1-\rho$.  Otherwise it is
+sampled from $\F_p^*$.  We call the nonzero value an edge label.  All
+incidence and label choices are independent unless stated otherwise.
+
+\paragraph{Region-stratified left regularity.}
+Assume $n=d_L\ell$ and partition the right coordinates into $d_L$ consecutive
+regions of length $\ell$.  For each left vertex and each region, choose one
+right coordinate uniformly and independently.  Place one edge there.  Over
+$\F_p$, independently label the edge with an element of $\F_p^*$.
+
+Every left vertex has degree $d_L$, with one edge in every region.  Right
+degrees remain random.  We call this distribution a
+\emph{region-stratified left-regular expander}.  We use
+\emph{regular expander} when the one-sided meaning is already clear.
+
+\paragraph{Two-sided regularity.}
+Assume $k=d_R\ell$ and $n=d_L\ell$, so $kd_L=nd_R$.  Within each region,
+sample a permutation of the $k$ left vertices.  Split the permuted list into
+$\ell$ groups of size $d_R$ and connect each group to one right coordinate.
+Every left vertex has one edge per region, and every right vertex has degree
+$d_R$.  We call this a \emph{two-sided regular expander}.
+
+At rate one half, $d_R=d_L/2$.  The finite-field EC certificates in
+Section~\ref{sec:certificates} use this distribution.  The binary regular
+EA certificate uses left regularity.  The binary EC frontier includes both
+left-regular and two-sided regular ensembles.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Random choices in the principal ensembles.}
+\label{tab:ensemble-definitions}
+\begin{tabular}{@{}llll@{}}
+\toprule
+name & field & expander & recursive map \\
+\midrule
+binary EA & $\F_2$ & Bernoulli & fixed accumulator \\
+binary wrapped EC & $\F_2$ & Bernoulli & independent wrapped convolution \\
+regular binary EA & $\F_2$ & left regular & fixed accumulator \\
+regular binary EC & $\F_2$ & left regular & independent wrapped convolution \\
+labeled $p$-ary EA & $\F_p$ & labeled Bernoulli or regular & fixed accumulator \\
+labeled $p$-ary EC & $\F_p$ & labeled two-sided regular & independent full-field convolution \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The word \emph{independent} in Table~\ref{tab:ensemble-definitions} means that
+the expander and recursive-map randomness are sampled independently.  Within
+the regular expander, incidences have the dependencies imposed by the stated
+degree constraints.
+
+\paragraph{Sampling and cost.}
+The following procedures make the setup cost explicit.  For a left-regular
+expander, process regions $j=1,\ldots,d_L$.  For every left vertex $i$, sample
+$c_{i,j}\gets\{1,\ldots,\ell\}$ and connect $i$ to coordinate
+$(j-1)\ell+c_{i,j}$.  For a two-sided regular expander, sample a permutation
+$\pi_j$ of the $k$ left vertices in each region.  Connect
+$\pi_j((q-1)d_R+1),\ldots,\pi_j(qd_R)$ to the $q$th coordinate of that region.
+Over $\F_p$, sample one independent label from $\F_p^*$ for every generated
+edge.
+
+Both procedures generate exactly $kd_L=nd_R$ edges.  A materialized encoder
+stores that many indices and, over $\F_p$, the same number of labels.  It uses
+one scatter-add per binary edge or one multiply-add per labeled edge.
+Left-regular setup samples $kd_L$ independent indices.  Two-sided setup uses
+$d_L$ permutations of length $k$; a Fisher--Yates implementation takes
+$O(kd_L)$ random words and $O(k)$ reusable workspace.  A streaming encoder
+may regenerate one region at a time from a public seed and reduce storage to
+$O(k)$ indices.  The certificate comparisons count edges only.  They do not
+claim that permutations, transposition, and field multiplications have equal
+cost.

@@ -1,0 +1,19 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_shiftalpha64_bchblockperm_parallelacc_g4",
+  "display_name": "Riffle ShiftAlpha64-BCHBlockPerm-ParallelAcc g=4",
+  "status": "FINITE_DISTANCE_PROVED",
+  "parent_candidate_id": "riffle_bchblockperm_parallelacc_g4",
+  "inherited": [
+    "extended BCH [128,64,22] local encoder",
+    "independent uniform 128-bit permutation inside every BCH block",
+    "uniform global permutation of four-bit packets",
+    "four lane-parallel accumulators"
+  ],
+  "modified_mechanism": "double-parity coefficient schedule",
+  "old_schedule": "alpha_i = gamma^i for 0 <= i < 16384",
+  "new_schedule": "alpha_i = gamma^(64+i) for 0 <= i < 16384",
+  "implementation": "compute q=sum_i gamma^i m_i with the existing recurrence, then p1=gamma^64 q",
+  "added_online_work": "one fixed multiplication by gamma^64 per complete outer word",
+  "claim_scope": "deterministic all-setup theorem d_min >= 33 at binary length 2097408; rigorous low-block occupation bounds at threshold 188766 are 2^-40.2950 for (24,24,24) and 2^-44.6721 for (22,22,22,22); no complete outer-spectrum, d_min >= 34, or positive-relative-distance claim"
+}

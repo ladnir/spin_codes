@@ -1,0 +1,42 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate_t128_s32",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-SplitState t=128 s=32",
+  "status": "PROMISING_CONDITIONAL_COSET_EXPLORATION",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate",
+  "modification": "halve the SplitState epoch and state from t=256,s=64 to t=128,s=32",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "step_bits": 128,
+    "state_bits": 32,
+    "constituent_dimension": 32,
+    "constituent_length": 128,
+    "constituent_distance": 20,
+    "relative_distance_target": 0.09,
+    "logical_inner_xor_per_output_proxy": 9.36572265625
+  },
+  "constituent_existence": {
+    "expected_nonzero_words_weight_at_most_19": 0.0010311211901125193,
+    "distinct_mixed_columns_probability": 0.39640742935474876,
+    "joint_good_probability_lower_bound": 0.39537630816463626,
+    "scope": "nonconstructive ensemble existence; no fixed pair is recorded"
+  },
+  "regular_results": {
+    "exact_modeled_one_active_margin_bits": 80.50451896489376,
+    "aggregate_margin_after_one_active_splice_bits": 80.5044507668536,
+    "fixed_coset_exponent_at_1024_active_blocks": 36331.41125131461,
+    "combined_coset_exponent_at_1024_active_blocks": -64225.03263975937
+  },
+  "proof_status": {
+    "regular_occupations_under_averaged_coset_lemma": "complete floating-point modeled-spectrum diagnostic",
+    "averaged_coset_lemma_for_fixed_constituent": "open",
+    "fixed_constituent_generation_and_audit": "open",
+    "all_one_outer_cases": "open",
+    "explicit_outer_spectrum": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "claim_scope": "The 9% regular-occupation result assumes an unproved averaged affine-coset moment. The constituent calculation proves ensemble existence but does not identify a fixed pair. The outer spectrum is modeled, all-one cases are excluded, and arithmetic is not outward rounded."
+}
+

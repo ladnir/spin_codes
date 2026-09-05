@@ -1,0 +1,77 @@
+\section{Preliminaries}
+\label{sec:preliminaries}
+
+\subsection{Notation}
+
+For an integer $n\ge0$, let $[n]:=\{1,\ldots,n\}$, with $[0]:=\varnothing$.
+All vector spaces are over $\F_2$. We write vectors as rows. For
+$u\in\F_2^n$, let $\wt(u)$ be its Hamming weight and let
+$\supp(u):=\{i\in[n]:u_i\ne0\}$ be its support. Let $S_n$ denote the symmetric
+group on $[n]$; a permutation acts on vectors by permuting their coordinates.
+
+If $S$ is a finite set, then $X\gets S$ denotes a uniform sample from $S$. If
+$\mathcal D$ is a distribution, then $X\gets\mathcal D$ denotes a sample from
+$\mathcal D$. Separate sampling statements use independent randomness unless
+a joint distribution is declared.
+
+For $q\in[0,1]$, define the binary entropy function
+\[
+  H_2(q):=-q\log_2q-(1-q)\log_2(1-q),
+\]
+where $0\log_20:=0$. For integers $a,b$, we set $\binom{a}{b}:=0$ unless
+$0\le b\le a$. These conventions shorten the enumerator formulas below.
+
+\subsection{Linear encoders and codes}
+
+Fix integers $1\le K\le N$. A binary linear encoder is a map
+\[
+  E:\F_2^K\longrightarrow\F_2^N.
+\]
+Under the row-vector convention, there is a unique generator matrix
+$G_E\in\F_2^{K\times N}$ satisfying $E(x)=xG_E$. The associated linear code is
+the image
+\[
+  \mathcal C(E):=E(\F_2^K)\subseteq\F_2^N.
+\]
+Its rate is $\dim(\mathcal C(E))/N$. In particular, an injective encoder has
+rate $K/N$.
+
+For a nonzero linear code $\mathcal C\subseteq\F_2^N$, define
+\[
+  d_{\min}(\mathcal C)
+  :=\min_{c\in\mathcal C\setminus\{0\}}\wt(c).
+\]
+For bookkeeping in statements that test injectivity separately, set
+$d_{\min}(\{0\}):=+\infty$, and write
+$d_{\min}(E):=d_{\min}(\mathcal C(E))$. The relative distance is
+$d_{\min}(\mathcal C)/N$.
+
+We keep injectivity separate from the distance of the image. A noninjective
+map can have an image of positive minimum distance, while a nonzero kernel
+message encodes to zero. Accordingly, a claim that a $K$-to-$N$ encoder has
+rate $K/N$ and relative distance $\delta$ includes injectivity and the bound
+$d_{\min}(E)\ge\delta N$.
+
+The transposed encoder is the linear map
+\[
+  E^\top:\F_2^N\longrightarrow\F_2^K,
+  \qquad
+  E^\top(q):=qG_E^\top.
+\]
+It satisfies $\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$. Ordinary
+encoding work refers to evaluating $E$; transposed work refers to evaluating
+$E^\top$. Unless stated otherwise, work bounds count bit operations. We discuss
+long-range data movement separately because the bit-operation count does not
+capture it.
+
+\subsection{Sampled families and asymptotics}
+
+A sampled encoder includes its setup distribution. After setup, the realized
+linear map and its image code are fixed. Expectations and probabilities refer
+to the declared setup distribution unless a subscript specifies a smaller
+probability space.
+
+For a family indexed by native lengths $N_m\to\infty$, the notation $o(1)$
+refers to the limit $m\to\infty$. An event holds \emph{with high probability}
+if its failure probability is $o(1)$ over setup. A deterministic wrapper may
+map these native members to a denser set of requested lengths.

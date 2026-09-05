@@ -1,0 +1,58 @@
+{
+  "schema": "pure-ea-primal-schur-diagonal-target-probe-v1",
+  "status": "EXTENDED_FLOAT_WITH_EXACT_MULTINOMIAL_WEIGHTS_DIAGNOSTIC",
+  "result": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "enumerated_pair_types": 35,
+    "arithmetic": "numpy.longdouble with exact integer multinomial conversion",
+    "entries": [
+      {
+        "sector": 0,
+        "level": 2,
+        "scaled_diagonal": 0.6177606582641602,
+        "scaled_uncentered_pair_sum": 2.71875,
+        "scaled_positive_part": null,
+        "scaled_centered_positive_part": 0.888510525226593,
+        "scaled_locally_centered_sum": 0.6177606582641602,
+        "positive_part_over_value": null,
+        "unscaled_log2": -4.694880098208737,
+        "full_block_scaled_diagonal": 0.6177606582641603,
+        "relative_residual": 1.1102230246251565e-16
+      },
+      {
+        "sector": 1,
+        "level": 3,
+        "scaled_diagonal": 0.52734375,
+        "scaled_uncentered_pair_sum": null,
+        "scaled_positive_part": 0.87890625,
+        "scaled_centered_positive_part": null,
+        "scaled_locally_centered_sum": null,
+        "positive_part_over_value": 1.6666666666666667,
+        "unscaled_log2": -4.923184402949169,
+        "full_block_scaled_diagonal": 0.5273437500000001,
+        "relative_residual": 1.1102230246251565e-16
+      },
+      {
+        "sector": 2,
+        "level": 4,
+        "scaled_diagonal": 1.453125,
+        "scaled_uncentered_pair_sum": null,
+        "scaled_positive_part": null,
+        "scaled_centered_positive_part": null,
+        "scaled_locally_centered_sum": null,
+        "positive_part_over_value": null,
+        "unscaled_log2": -3.4608411888919686,
+        "full_block_scaled_diagonal": 1.4531249999999998,
+        "relative_residual": 1.5280488941077425e-16
+      }
+    ],
+    "maximum_relative_validation_residual": 1.5280488941077425e-16
+  },
+  "scope": [
+    "The streamed pair-type and Schur-power formulas are exact identities.",
+    "Vector operations and reductions use nondirected numpy.longdouble. Multinomial weights are converted from exact integers.",
+    "The output is not a rigorous interval certificate."
+  ]
+}

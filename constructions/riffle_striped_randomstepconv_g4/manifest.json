@@ -1,0 +1,17 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_striped_randomstepconv_g4",
+  "display_name": "Riffle S-Stripe RandomStepConv g=4",
+  "status": "PROMISING_PROVISIONAL_BOUND",
+  "parent_candidate_id": "riffle_random_outer_landscape",
+  "outer": "independent uniform random rate-half linear injections of B/2 bits into B bits",
+  "packet_bits": 4,
+  "permutation": "full stripe: independently permute every packet-coordinate column across outer blocks and emit columns consecutively",
+  "inner": "one-lap RandomStepConv with independent unrestricted (4+sigma)-square binary matrices and discarded terminal state",
+  "observed_positive_cells": [
+    {"outer_bits": 512, "sigma": 20, "lambda_bits": 118.516904},
+    {"outer_bits": 1024, "sigma": 15, "lambda_bits": 110.033707},
+    {"outer_bits": 2048, "sigma": 13, "lambda_bits": 84.317784}
+  ],
+  "claim_scope": "Exact full-stripe regional coefficients and complete occupation sums. Floating-point rounding is not yet certified; no closed minimum-distance claim."
+}

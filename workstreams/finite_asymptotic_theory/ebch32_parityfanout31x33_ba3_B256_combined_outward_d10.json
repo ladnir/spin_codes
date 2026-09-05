@@ -1,0 +1,62 @@
+{
+  "schema": "ebch32-parityfanout31x33-ba3-b256-combined-d10-v1",
+  "status": "COMPLETE_OUTWARD_FIRST_MOMENT_CERTIFICATE",
+  "claim": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "bad_weight_at_most": 209715,
+    "minimum_distance_if_good": 209716,
+    "relative_distance_if_good": 0.10000038146972656,
+    "occupations_covered": [
+      1,
+      8192
+    ],
+    "expected_bad_word_count_less_than_2^-51": true,
+    "setup_failure_probability_less_than_2^-51": true,
+    "setup_failure_probability_less_than_2^-40": true,
+    "combined_margin_bits_lower_display": 51.84563234887174
+  },
+  "exact_combination": {
+    "q1_upper_numerator": 2506103899214197,
+    "q1_upper_denominator": 10141204801825835211973625643008,
+    "q2_64_upper_numerator": 189302882538907,
+    "q2_64_upper_denominator": 11150372599265311570767859136324180752990208,
+    "dense_upper_used": "2^-468",
+    "total_upper_numerator": 188342135173135641974238565912994391881054627334935612720631485770160337945280711323668642672023813209108887026201585965334529,
+    "total_upper_denominator": 762145642166990290864647761179972242614403843424065222377723867096038022172794340849684107193235344521442121855812163792833978437326241529856
+  },
+  "reasoning": [
+    "The occupation-one and occupation-2..64 receipts bound the larger event of weight at most 230686, so they also bound weight at most 209715.",
+    "The dense receipt covers every occupation from 65 through 8192 at weight at most 209715.",
+    "The three occupation ranges partition all nonzero messages.",
+    "Markov's inequality bounds the probability of any bad nonzero message by its expected count."
+  ],
+  "outer_setup": {
+    "good_probability_lower_hex": "0x1.ff64efceff611p-1",
+    "expected_trials_upper_hex": "0x1.004d9f9ac6153p+0",
+    "law": "Independent row draws conditioned on G_256 by conceptual rejection sampling."
+  },
+  "dependencies": [
+    {
+      "path": "ebch32_parityfanout31x33_ba3_rm2sub_B256_q1_outward_d11.json",
+      "sha256": "8363cffa1005df2c218e8abae0bc87671d225c58ab6d36255b974154d5c7a280"
+    },
+    {
+      "path": "ebch32_parityfanout31x33_ba3_rm2sub_B256_q2_64_outward_d11.json",
+      "sha256": "2717d28500f4f668fc37abd0c36bd5e820581c1ea51a9b903d3f87eb9bc15c45"
+    },
+    {
+      "path": "ebch32_parityfanout31x33_ba3_B256_one_band_interval_cover_d10_outward.json",
+      "sha256": "f8177501152791e8ae081b390a1986a90f78a952933c4de20f699adf7e21599b"
+    },
+    {
+      "path": "ebch32_parityfanout31x33_ba3_B256_setup_outward.json",
+      "sha256": "3faa62d0eff91fff311e8aab6673781b769470820ef038f6d450e3e554cb193b"
+    },
+    {
+      "path": "certify_ebch32_parityfanout_ba_combined_d10.py",
+      "sha256": "432d068eea26c335095e3f32cb618bc3e368b52e72d43bedf38d9addfa1a6343"
+    }
+  ],
+  "scope": "This receipt proves the finite first-moment claim for the declared conditional mathematical ensemble. It does not supply an efficient test for G_256 or prove equivalence with a particular optimized implementation."
+}

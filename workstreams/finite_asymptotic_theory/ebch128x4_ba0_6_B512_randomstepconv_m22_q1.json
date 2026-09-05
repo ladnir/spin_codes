@@ -1,0 +1,80 @@
+{
+  "schema": "ebch128x4-ba-randomstepconv-q1-v1",
+  "status": "BINARY64_ENSEMBLE_EXPECTATION_DIAGNOSTIC",
+  "parameters": {
+    "base": "direct sum of four extended BCH [128,64,22] codes",
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "output_bits": 2097152,
+    "distance_cutoff": 228590,
+    "memory_bits": 22,
+    "accumulator_range": [
+      0,
+      6
+    ]
+  },
+  "rows": [
+    {
+      "accumulators": 0,
+      "q1_log2_expected_bad_upper": -7.3628937384213,
+      "q1_margin_bits": 7.3628937384213,
+      "dominant_weight": 24,
+      "dominant_pointwise_log2_upper": -8.94194742126527,
+      "dominant_log_surprisal": -9.0
+    },
+    {
+      "accumulators": 1,
+      "q1_log2_expected_bad_upper": -34.852608348031225,
+      "q1_margin_bits": 34.852608348031225,
+      "dominant_weight": 15,
+      "dominant_pointwise_log2_upper": -37.35815564241727,
+      "dominant_log_surprisal": -9.5
+    },
+    {
+      "accumulators": 2,
+      "q1_log2_expected_bad_upper": -57.94679959484361,
+      "q1_margin_bits": 57.94679959484361,
+      "dominant_weight": 8,
+      "dominant_pointwise_log2_upper": -60.208580707714404,
+      "dominant_log_surprisal": -10.25
+    },
+    {
+      "accumulators": 3,
+      "q1_log2_expected_bad_upper": -74.34905595817338,
+      "q1_margin_bits": 74.34905595817338,
+      "dominant_weight": 4,
+      "dominant_pointwise_log2_upper": -76.1600490853239,
+      "dominant_log_surprisal": -11.0
+    },
+    {
+      "accumulators": 4,
+      "q1_log2_expected_bad_upper": -85.95840328604793,
+      "q1_margin_bits": 85.95840328604793,
+      "dominant_weight": 2,
+      "dominant_pointwise_log2_upper": -87.16890327939369,
+      "dominant_log_surprisal": -11.75
+    },
+    {
+      "accumulators": 5,
+      "q1_log2_expected_bad_upper": -93.00274608284019,
+      "q1_margin_bits": 93.00274608284019,
+      "dominant_weight": 1,
+      "dominant_pointwise_log2_upper": -93.64032282854579,
+      "dominant_log_surprisal": -12.0
+    },
+    {
+      "accumulators": 6,
+      "q1_log2_expected_bad_upper": -100.39827942170902,
+      "q1_margin_bits": 100.39827942170902,
+      "dominant_weight": 1,
+      "dominant_pointwise_log2_upper": -101.00822655068161,
+      "dominant_log_surprisal": -12.0
+    }
+  ],
+  "limitations": [
+    "Nearest binary64 arithmetic makes the result diagnostic.",
+    "Only messages with one active outer row are covered.",
+    "The spectrum is averaged over the BA sampler; reuse across two or more active rows requires joint moments or a high-probability fixed-code event."
+  ]
+}

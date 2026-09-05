@@ -1,0 +1,388 @@
+{
+  "attack": {
+    "bucket_key": "unordered region multiset of each expander row",
+    "constraints": "zero convolution state before every unselected gap",
+    "partition": "equal contiguous regions"
+  },
+  "ensemble": {
+    "code": "systematic [I | B C] at rate one half",
+    "convolution": "one pass, fixed oldest feedback tap, zero initial state",
+    "expander": "independent uniform fixed-size row subsets",
+    "prng": "NumPy PCG64 ensemble sampler"
+  },
+  "experiment": "paper-exact-row-ec-region-nullspace",
+  "result": {
+    "best_witness": {
+      "bucket_key": -1,
+      "codeword_sha256": "3da69389f884cc489b7f228023e11f45e51049e7c24a5a51e70ce73cea28685f",
+      "codeword_weight": 21344,
+      "expander_support": [
+        1005910,
+        1011372,
+        1037456,
+        1039829,
+        1042887
+      ],
+      "message_rows": [
+        284248
+      ],
+      "message_weight": 1,
+      "method": "late-row-sweep",
+      "outside_region_weight": 0,
+      "parity_weight": 21343,
+      "regions": [
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "relative_weight": 0.0101776123046875
+    },
+    "boundaries": [
+      0,
+      65536,
+      131072,
+      196608,
+      262144,
+      327680,
+      393216,
+      458752,
+      524288,
+      589824,
+      655360,
+      720896,
+      786432,
+      851968,
+      917504,
+      983040,
+      1048576
+    ],
+    "bucket_receipts": [
+      {
+        "bucket": {
+          "allowed_coordinates": 65536,
+          "constraint_count": 0,
+          "key": 1048575,
+          "regions": [
+            15,
+            15,
+            15,
+            15,
+            15
+          ],
+          "row_count": 1,
+          "start": 1048575
+        },
+        "evaluated_kernel_vectors": 1,
+        "kernel_dimension": 1
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 131072,
+          "constraint_count": 0,
+          "key": 1048302,
+          "regions": [
+            14,
+            14,
+            14,
+            15,
+            15
+          ],
+          "row_count": 12,
+          "start": 1046257
+        },
+        "evaluated_kernel_vectors": 43,
+        "kernel_dimension": 12
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 131072,
+          "constraint_count": 0,
+          "key": 1048558,
+          "regions": [
+            14,
+            14,
+            15,
+            15,
+            15
+          ],
+          "row_count": 9,
+          "start": 1048489
+        },
+        "evaluated_kernel_vectors": 39,
+        "kernel_dimension": 9
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 131072,
+          "constraint_count": 0,
+          "key": 1048574,
+          "regions": [
+            14,
+            15,
+            15,
+            15,
+            15
+          ],
+          "row_count": 4,
+          "start": 1048571
+        },
+        "evaluated_kernel_vectors": 15,
+        "kernel_dimension": 4
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 698760,
+          "regions": [
+            8,
+            8,
+            9,
+            10,
+            10
+          ],
+          "row_count": 50,
+          "start": 160266
+        },
+        "evaluated_kernel_vectors": 57,
+        "kernel_dimension": 25
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1022344,
+          "regions": [
+            8,
+            8,
+            9,
+            9,
+            15
+          ],
+          "row_count": 44,
+          "start": 809032
+        },
+        "evaluated_kernel_vectors": 51,
+        "kernel_dimension": 19
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1048299,
+          "regions": [
+            11,
+            14,
+            14,
+            15,
+            15
+          ],
+          "row_count": 43,
+          "start": 1046157
+        },
+        "evaluated_kernel_vectors": 50,
+        "kernel_dimension": 18
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1045555,
+          "regions": [
+            3,
+            3,
+            4,
+            15,
+            15
+          ],
+          "row_count": 39,
+          "start": 1013720
+        },
+        "evaluated_kernel_vectors": 46,
+        "kernel_dimension": 14
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1013606,
+          "regions": [
+            6,
+            6,
+            7,
+            7,
+            15
+          ],
+          "row_count": 38,
+          "start": 779856
+        },
+        "evaluated_kernel_vectors": 45,
+        "kernel_dimension": 13
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1047193,
+          "regions": [
+            9,
+            9,
+            10,
+            15,
+            15
+          ],
+          "row_count": 38,
+          "start": 1025538
+        },
+        "evaluated_kernel_vectors": 45,
+        "kernel_dimension": 13
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1048064,
+          "regions": [
+            0,
+            0,
+            14,
+            15,
+            15
+          ],
+          "row_count": 38,
+          "start": 1040005
+        },
+        "evaluated_kernel_vectors": 45,
+        "kernel_dimension": 13
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 559222,
+          "regions": [
+            6,
+            7,
+            8,
+            8,
+            8
+          ],
+          "row_count": 37,
+          "start": 59463
+        },
+        "evaluated_kernel_vectors": 43,
+        "kernel_dimension": 12
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1000499,
+          "regions": [
+            3,
+            3,
+            4,
+            4,
+            15
+          ],
+          "row_count": 37,
+          "start": 762575
+        },
+        "evaluated_kernel_vectors": 44,
+        "kernel_dimension": 12
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 0,
+          "key": 1048285,
+          "regions": [
+            13,
+            13,
+            14,
+            15,
+            15
+          ],
+          "row_count": 37,
+          "start": 1045791
+        },
+        "evaluated_kernel_vectors": 69,
+        "kernel_dimension": 37
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 1048296,
+          "regions": [
+            8,
+            14,
+            14,
+            15,
+            15
+          ],
+          "row_count": 37,
+          "start": 1046061
+        },
+        "evaluated_kernel_vectors": 44,
+        "kernel_dimension": 12
+      },
+      {
+        "bucket": {
+          "allowed_coordinates": 196608,
+          "constraint_count": 25,
+          "key": 209425,
+          "regions": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "row_count": 36,
+          "start": 842
+        },
+        "evaluated_kernel_vectors": 43,
+        "kernel_dimension": 11
+      }
+    ],
+    "k": 1048576,
+    "late_row_best": {
+      "bucket_key": -1,
+      "codeword_sha256": "",
+      "codeword_weight": 21344,
+      "expander_support": [
+        1005910,
+        1011372,
+        1037456,
+        1039829,
+        1042887
+      ],
+      "message_rows": [
+        284248
+      ],
+      "message_weight": 1,
+      "method": "late-row-sweep",
+      "outside_region_weight": 0,
+      "parity_weight": 21343,
+      "regions": [
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "relative_weight": 0.0101776123046875
+    },
+    "late_row_candidates": 256,
+    "memory": 25,
+    "n": 2097152,
+    "processed_buckets": 16,
+    "qualifying_buckets": 5818,
+    "regions": 16,
+    "row_weight": 5,
+    "seed": 1
+  }
+}

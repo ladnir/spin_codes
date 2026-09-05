@@ -1,0 +1,45 @@
+{
+  "schema": "pure-ea-dominant-character-deviation-outward-v1",
+  "status": "OUTWARD_ARB_AND_BINARY64_CERTIFICATE",
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "right_degree": 33,
+    "arb_precision_bits": 1536
+  },
+  "ordered_pair_types": 2861440,
+  "elapsed_seconds": 8.517767799959984,
+  "shells": [
+    {
+      "shell_weight": 416,
+      "mean_ratio_lower": 0.9999999999999842,
+      "mean_ratio_upper": 1.0000000000000226,
+      "positive_pair_excess_normalized_upper": 5.09017412174718e-19,
+      "variance_to_mean_upper": 40075533983.23963,
+      "passes_factor_512": false
+    },
+    {
+      "shell_weight": 432,
+      "mean_ratio_lower": 0.9999999999999842,
+      "mean_ratio_upper": 1.0000000000000226,
+      "positive_pair_excess_normalized_upper": 5.397538364565675e-19,
+      "variance_to_mean_upper": 1.5300928981118822,
+      "passes_factor_512": true
+    }
+  ],
+  "claim": {
+    "all_requested_shells_pass_factor_512": false,
+    "maximum_variance_to_mean_upper": 40075533983.23963
+  },
+  "proved_reduction": [
+    "For each ordered nonzero distinct pair, retain one row-character bias of maximum absolute value.",
+    "Arb encloses each one-word and correlated-reference ratio and its absolute deviation from one.",
+    "The pair excess over independent marginals is bounded by a sum of nonnegative deviation and likelihood terms; no near-one subtraction occurs in binary64.",
+    "Pairs with a deterministic all-ones marginal have zero covariance. Complement pairs use their exact two-atom support and a likelihood factor 1+abs(beta(x))."
+  ],
+  "scope": [
+    "Arb encloses every reference polynomial evaluation and deviation.",
+    "Binary64 combines only nonnegative upper endpoints and advances each basic operation outward.",
+    "The receipt covers exactly the requested shells and assumes no realized-spectrum complement symmetry."
+  ]
+}

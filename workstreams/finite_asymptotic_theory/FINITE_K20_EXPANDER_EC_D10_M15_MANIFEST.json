@@ -1,0 +1,91 @@
+{
+  "schema": "finite-k20-expander-ec-d10-m15-manifest-v1",
+  "status": "OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "claim": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "failure_probability_upper": "[7.70311144615061362732969068224966467995825893389853286117e-16 +/- 1.30e-73]",
+    "failure_margin_bits_lower": "[50.2054082202816788347083311557281444768590509197015245073 +/- 1.52e-56]",
+    "comparison_to_2^-40": true
+  },
+  "construction": {
+    "family": "binary two-sided regular Expand--Convolute",
+    "parent": "[2097170,1048585] ensemble with degrees 10/5 and wrapped-convolution memory 15",
+    "wrapper": "shorten nine input coordinates and puncture eighteen output coordinates"
+  },
+  "artifacts": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_EXPANDER_EC_D10_M15_CERTIFICATE.md",
+      "sha256": "57fbc5f2068d8791cc9af88f9dc5acd6665b400e0213a2fa9da44a862b1c1681",
+      "size_bytes": 4546
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/EXPANDER_CODE_ALTERNATIVE_AUDIT.md",
+      "sha256": "9564cd7883929414bec4a7a9bd5b4fcec4b5492b8ca3b83383c034124e54b988",
+      "size_bytes": 6198
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/expander_ec_d10_m15_k20_parent_candidate.json",
+      "sha256": "250ea3e3759ba1ec42dc0bda3324de074d8dbb067f43b5af2e90aaccb64d37ee",
+      "size_bytes": 20353
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/expander_ec_d10_m15_k20_wrapper_outward.json",
+      "sha256": "93695fbfc8a6b4ceba431c30c9184561ee9870042322f4743741f6eb91c58a28",
+      "size_bytes": 4480
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/generate_expander_ec_k20_candidate.py",
+      "sha256": "f8418690da3bddc1fda1326a7a8ef140aea52651d7ef25ab45828502a48ab1ef",
+      "size_bytes": 1643
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_expander_ec_k20_wrapper.py",
+      "sha256": "edc68500103543734af7def5b88c4fde44fc5eb874ee927c541d18ffd3005346",
+      "size_bytes": 5877
+    }
+  ],
+  "external_verifier_dependencies": [
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\binary_biregular_ec_certificate.py",
+      "sha256": "409a29a0373e9896a0b1e62f9412e5c5bd7f1490c644905c840c0d7ae8888290"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\check_binary_biregular_ec_certificate.py",
+      "sha256": "4393ece013bb04e93d737cb4a362a04bb79c3cc321b85fe5e46afb6e4fbbd060"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\binary_biregular_diagnostic.py",
+      "sha256": "e8399b179fa98e0078fba02116cc6c7a96eaca6cd1a55e452822879a18011ea0"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\ea_certificate.py",
+      "sha256": "422a61a3fee32b460e22f80d87950c10ac7f2812a60893a378de059883c09e98"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\regular_ec_certificate.py",
+      "sha256": "d84df83be9d8dd33dc30ffa4362522cd97968fbd8b227d4fc97c8874e728ce1b"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\regular_ec_diagnostic.py",
+      "sha256": "f37db922b982a59c3a2dd84746d26e5cfcf917180f0e329a495b5f03257b7c3a"
+    },
+    {
+      "path": "C:\\Users\\peter\\.codex\\worktrees\\30ff\\permute_conv\\expander_codes\\scripts\\expander_bounds.py",
+      "sha256": "4676834858780d3d028b00699710b324c7b075e4b4b3ddd30f80d396523714da"
+    }
+  ],
+  "reproduction": [
+    "python workstreams/finite_asymptotic_theory/generate_expander_ec_k20_candidate.py",
+    "python workstreams/finite_asymptotic_theory/certify_expander_ec_k20_wrapper.py",
+    "python workstreams/finite_asymptotic_theory/build_expander_ec_k20_manifest.py"
+  ],
+  "limitations": [
+    "This is an Expand--Convolute code, not the structured SPIN construction.",
+    "The theorem proves minimum distance and does not provide a decoding theorem.",
+    "Linear ordinary and transposed encoding time is an operation-count statement; no implementation benchmark has been run.",
+    "The verifier currently depends on the cited expander-code worktree paths and hashes."
+  ]
+}

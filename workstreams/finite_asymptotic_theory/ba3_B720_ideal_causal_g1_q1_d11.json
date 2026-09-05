@@ -1,0 +1,334 @@
+{
+  "schema": "ba3-b720-ideal-causal-g1-q1-d11-v2",
+  "status": "BINARY64_DIAGNOSTIC",
+  "parameters": {
+    "outer": "one sampled Golay--BA-3 code reused in every row",
+    "outer_bits": 720,
+    "outer_dimension": 360,
+    "outer_rows": 2944,
+    "parent_message_bits": 1059840,
+    "target_message_bits": 1048576,
+    "zero_shortened_input_bits": 11264,
+    "output_bits": 2119680,
+    "bad_output_weight_at_most": 233164,
+    "relative_distance_target": 0.11,
+    "inner": "ideal invertible no-reset zero-state causal random linear inner",
+    "packet_bits": 1
+  },
+  "probability_space": [
+    "the two BA-3 interleavers sampled once",
+    "one independent local coordinate permutation per outer row",
+    "one independent permutation within each transposed region",
+    "the ideal random linear inner; for each fixed nonzero difference, its activation output is one and its later outputs are independent fair bits"
+  ],
+  "q1_bounds": {
+    "naive_row_union_log2": -20.244610427224192,
+    "naive_row_union_margin_bits": 20.244610427224192,
+    "reuse_aware_log2": -24.305345243906107,
+    "reuse_aware_margin_bits": 24.305345243906107
+  },
+  "dominant_rows_reuse_aware": [
+    {
+      "outer_weight": 5,
+      "single_row_bad_log2": -10.993875866828281,
+      "single_row_forced_late_log2": -16.08738743405612,
+      "expected_outer_multiplicity_log2": -25.841077107843752,
+      "naive_row_union_contribution_log2": -25.31139101861502,
+      "reuse_aware_contribution_log2": -25.841077107843752
+    },
+    {
+      "outer_weight": 4,
+      "single_row_bad_log2": -8.780643261622687,
+      "single_row_forced_late_log2": -12.8363869044497,
+      "expected_outer_multiplicity_log2": -26.35990722069,
+      "naive_row_union_contribution_log2": -23.61698852625568,
+      "reuse_aware_contribution_log2": -26.35990722069
+    },
+    {
+      "outer_weight": 3,
+      "single_row_bad_log2": -6.57469563263952,
+      "single_row_forced_late_log2": -9.602388532391394,
+      "expected_outer_multiplicity_log2": -27.05206029720103,
+      "naive_row_union_contribution_log2": -22.10319397378354,
+      "reuse_aware_contribution_log2": -27.05206029720103
+    },
+    {
+      "outer_weight": 6,
+      "single_row_bad_log2": -13.214450841832027,
+      "single_row_forced_late_log2": -19.35564041962319,
+      "expected_outer_multiplicity_log2": -25.41843665137165,
+      "naive_row_union_contribution_log2": -27.109325537146667,
+      "reuse_aware_contribution_log2": -27.109325537146667
+    },
+    {
+      "outer_weight": 2,
+      "single_row_bad_log2": -4.375976347637997,
+      "single_row_forced_late_log2": -6.385148560334344,
+      "expected_outer_multiplicity_log2": -28.163016766653012,
+      "naive_row_union_contribution_log2": -21.015431158234,
+      "reuse_aware_contribution_log2": -28.163016766653012
+    },
+    {
+      "outer_weight": 7,
+      "single_row_bad_log2": -15.442426356534687,
+      "single_row_forced_late_log2": -22.641402964374855,
+      "expected_outer_multiplicity_log2": -25.057493865278197,
+      "naive_row_union_contribution_log2": -28.976358265755877,
+      "reuse_aware_contribution_log2": -28.97635826575587
+    },
+    {
+      "outer_weight": 8,
+      "single_row_bad_log2": -17.677861372546975,
+      "single_row_forced_late_log2": -25.944939254658266,
+      "expected_outer_multiplicity_log2": -24.739755269850676,
+      "naive_row_union_contribution_log2": -30.894054686340642,
+      "reuse_aware_contribution_log2": -30.89405468634064
+    },
+    {
+      "outer_weight": 9,
+      "single_row_bad_log2": -19.920815658986523,
+      "single_row_forced_late_log2": -29.266520853617088,
+      "expected_outer_multiplicity_log2": -24.454113394730456,
+      "naive_row_union_contribution_log2": -32.85136709765997,
+      "reuse_aware_contribution_log2": -32.85136709765997
+    },
+    {
+      "outer_weight": 10,
+      "single_row_bad_log2": -22.171349808682784,
+      "single_row_forced_late_log2": -32.606427011280836,
+      "expected_outer_multiplicity_log2": -24.19335261132679,
+      "naive_row_union_contribution_log2": -34.84114046395256,
+      "reuse_aware_contribution_log2": -34.84114046395256
+    },
+    {
+      "outer_weight": 11,
+      "single_row_bad_log2": -24.42952525482759,
+      "single_row_forced_late_log2": -35.96494499225916,
+      "expected_outer_multiplicity_log2": -23.952507210866358,
+      "naive_row_union_contribution_log2": -36.85847050963694,
+      "reuse_aware_contribution_log2": -36.85847050963694
+    },
+    {
+      "outer_weight": 12,
+      "single_row_bad_log2": -26.69540428807715,
+      "single_row_forced_late_log2": -39.34237042229558,
+      "expected_outer_multiplicity_log2": -23.728005143190057,
+      "naive_row_union_contribution_log2": -38.899847475210194,
+      "reuse_aware_contribution_log2": -38.899847475210194
+    },
+    {
+      "outer_weight": 13,
+      "single_row_bad_log2": -28.9690500741001,
+      "single_row_forced_late_log2": -42.73900765503674,
+      "expected_outer_multiplicity_log2": -23.51718512126076,
+      "naive_row_union_contribution_log2": -40.96267323930385,
+      "reuse_aware_contribution_log2": -40.96267323930385
+    },
+    {
+      "outer_weight": 14,
+      "single_row_bad_log2": -31.250526671620754,
+      "single_row_forced_late_log2": -46.15517016054616,
+      "expected_outer_multiplicity_log2": -23.318007099931034,
+      "naive_row_union_contribution_log2": -43.044971815494776,
+      "reuse_aware_contribution_log2": -43.044971815494776
+    },
+    {
+      "outer_weight": 15,
+      "single_row_bad_log2": -33.53989905096018,
+      "single_row_forced_late_log2": -49.59118093718285,
+      "expected_outer_multiplicity_log2": -23.128869921972132,
+      "naive_row_union_contribution_log2": -45.145207016875304,
+      "reuse_aware_contribution_log2": -45.145207016875304
+    },
+    {
+      "outer_weight": 16,
+      "single_row_bad_log2": -35.83723311308233,
+      "single_row_forced_late_log2": -53.047372948615646,
+      "expected_outer_multiplicity_log2": -22.94849170194217,
+      "naive_row_union_contribution_log2": -47.262162858967486,
+      "reuse_aware_contribution_log2": -47.262162858967486
+    },
+    {
+      "outer_weight": 17,
+      "single_row_bad_log2": -38.14259570917131,
+      "single_row_forced_late_log2": -56.52408958792729,
+      "expected_outer_multiplicity_log2": -22.775828642888932,
+      "naive_row_union_contribution_log2": -49.394862396003234,
+      "reuse_aware_contribution_log2": -49.394862396003234
+    },
+    {
+      "outer_weight": 18,
+      "single_row_bad_log2": -40.456054660768785,
+      "single_row_forced_late_log2": -60.02168517095188,
+      "expected_outer_multiplicity_log2": -22.61001831432996,
+      "naive_row_union_contribution_log2": -51.54251101904173,
+      "reuse_aware_contribution_log2": -51.54251101904173
+    },
+    {
+      "outer_weight": 19,
+      "single_row_bad_log2": -42.777678780469394,
+      "single_row_forced_late_log2": -63.54052546115797,
+      "expected_outer_multiplicity_log2": -22.45033901631862,
+      "naive_row_union_contribution_log2": -53.70445584073099,
+      "reuse_aware_contribution_log2": -53.70445584073101
+    },
+    {
+      "outer_weight": 20,
+      "single_row_bad_log2": -45.10753789321662,
+      "single_row_forced_late_log2": -67.08098822866094,
+      "expected_outer_multiplicity_log2": -22.296180025420174,
+      "naive_row_union_contribution_log2": -55.88015596257978,
+      "reuse_aware_contribution_log2": -55.88015596257979
+    },
+    {
+      "outer_weight": 21,
+      "single_row_bad_log2": -47.44570285820199,
+      "single_row_forced_late_log2": -70.64346384616593,
+      "expected_outer_multiplicity_log2": -22.14701938636268,
+      "naive_row_union_contribution_log2": -58.06916028850766,
+      "reuse_aware_contribution_log2": -58.06916028850766
+    },
+    {
+      "outer_weight": 22,
+      "single_row_bad_log2": -49.792245591393,
+      "single_row_forced_late_log2": -74.22835592494174,
+      "expected_outer_multiplicity_log2": -22.002407051325832,
+      "naive_row_union_contribution_log2": -60.27109068666182,
+      "reuse_aware_contribution_log2": -60.27109068666182
+    },
+    {
+      "outer_weight": 23,
+      "single_row_bad_log2": -52.147239088735915,
+      "single_row_forced_late_log2": -77.83608199426774,
+      "expected_outer_multiplicity_log2": -21.861951883302222,
+      "naive_row_union_contribution_log2": -62.485629015981125,
+      "reuse_aware_contribution_log2": -62.485629015981125
+    },
+    {
+      "outer_weight": 24,
+      "single_row_bad_log2": -54.51075745001785,
+      "single_row_forced_late_log2": -81.46707422808652,
+      "expected_outer_multiplicity_log2": -21.725311500323727,
+      "naive_row_union_contribution_log2": -64.71250699428457,
+      "reuse_aware_contribution_log2": -64.71250699428457
+    },
+    {
+      "outer_weight": 25,
+      "single_row_bad_log2": -56.88287590344415,
+      "single_row_forced_late_log2": -85.12178022306956,
+      "expected_outer_multiplicity_log2": -21.592184241196893,
+      "naive_row_union_contribution_log2": -66.95149818858404,
+      "reuse_aware_contribution_log2": -66.95149818858404
+    }
+  ],
+  "deleted_low_shell_diagnostic": [
+    {
+      "retain_outer_weights_at_least": 1,
+      "reuse_aware_q1_margin_bits": 24.305345243906107
+    },
+    {
+      "retain_outer_weights_at_least": 2,
+      "reuse_aware_q1_margin_bits": 24.305345243906107
+    },
+    {
+      "retain_outer_weights_at_least": 3,
+      "reuse_aware_q1_margin_bits": 24.408461663391297
+    },
+    {
+      "retain_outer_weights_at_least": 4,
+      "reuse_aware_q1_margin_bits": 24.66004949387989
+    },
+    {
+      "retain_outer_weights_at_least": 5,
+      "reuse_aware_q1_margin_bits": 25.19082294877261
+    },
+    {
+      "retain_outer_weights_at_least": 6,
+      "reuse_aware_q1_margin_bits": 26.653449558689907
+    },
+    {
+      "retain_outer_weights_at_least": 7,
+      "reuse_aware_q1_margin_bits": 28.537443450112253
+    },
+    {
+      "retain_outer_weights_at_least": 8,
+      "reuse_aware_q1_margin_bits": 30.468094800619593
+    },
+    {
+      "retain_outer_weights_at_least": 9,
+      "reuse_aware_q1_margin_bits": 32.43581519475691
+    },
+    {
+      "retain_outer_weights_at_least": 10,
+      "reuse_aware_q1_margin_bits": 34.434273083456155
+    },
+    {
+      "retain_outer_weights_at_least": 11,
+      "reuse_aware_q1_margin_bits": 36.45906477206766
+    },
+    {
+      "retain_outer_weights_at_least": 12,
+      "reuse_aware_q1_margin_bits": 38.50700272912374
+    },
+    {
+      "retain_outer_weights_at_least": 13,
+      "reuse_aware_q1_margin_bits": 40.57570591649922
+    },
+    {
+      "retain_outer_weights_at_least": 14,
+      "reuse_aware_q1_margin_bits": 42.66335012364631
+    },
+    {
+      "retain_outer_weights_at_least": 15,
+      "reuse_aware_q1_margin_bits": 44.76850860190347
+    },
+    {
+      "retain_outer_weights_at_least": 16,
+      "reuse_aware_q1_margin_bits": 46.89004635853795
+    },
+    {
+      "retain_outer_weights_at_least": 17,
+      "reuse_aware_q1_margin_bits": 49.02704773705492
+    },
+    {
+      "retain_outer_weights_at_least": 18,
+      "reuse_aware_q1_margin_bits": 51.178765410502656
+    },
+    {
+      "retain_outer_weights_at_least": 19,
+      "reuse_aware_q1_margin_bits": 53.344583586532615
+    },
+    {
+      "retain_outer_weights_at_least": 20,
+      "reuse_aware_q1_margin_bits": 55.52399090398566
+    },
+    {
+      "retain_outer_weights_at_least": 21,
+      "reuse_aware_q1_margin_bits": 57.71656009745104
+    },
+    {
+      "retain_outer_weights_at_least": 22,
+      "reuse_aware_q1_margin_bits": 59.92193248858073
+    },
+    {
+      "retain_outer_weights_at_least": 23,
+      "reuse_aware_q1_margin_bits": 62.13980598481903
+    },
+    {
+      "retain_outer_weights_at_least": 24,
+      "reuse_aware_q1_margin_bits": 64.36992566992639
+    }
+  ],
+  "interpretation": [
+    "The reuse-aware bound groups all outer-row placements of the same outer codeword before averaging over the one sampled BA code.",
+    "The forced-late column is a lower bound on the single-row bad probability for every causal inner because a suffix no longer than the distance threshold cannot have larger weight.",
+    "Deleting low shells is an algebraic diagnostic, not conditioning on a verified minimum-distance event."
+  ],
+  "limitations": [
+    "SciPy binomial tails and all arithmetic use nearest binary64.",
+    "The result covers occupation one only.",
+    "The no-reset ideal inner is a proof-of-concept benchmark, not the current RM2Sub-S19 inner.",
+    "A full repeated-code theorem still requires every occupation and cannot multiply expected BA spectra across rows.",
+    "An ensemble-average upper bound above the target does not prove that a typical sampled code fails."
+  ]
+}

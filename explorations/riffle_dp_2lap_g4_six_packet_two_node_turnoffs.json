@@ -1,0 +1,18 @@
+{
+  "schema": "riffle-dp-2lap-g4-six-packet-two-node-turnoffs-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT_BOUNDED_SEARCH",
+  "coverage": "Exactly two active nodes containing all six packets; all splits 1+5 through 5+1; value multisets 10^3 13^3 and 5^3 13^3; every reset offset through 32771",
+  "maximum_reset_node": 32771,
+  "distance_threshold": 188766,
+  "profiles": [
+    {"packet_value_counts":{"10":3,"13":3},"splits":[{"initial_packets":1,"reset_packets":5,"tested_orbit_steps":1048672,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":2,"reset_packets":4,"tested_orbit_steps":15730080,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":3,"reset_packets":3,"tested_orbit_steps":146814080,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":4,"reset_packets":2,"tested_orbit_steps":15730080,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":5,"reset_packets":1,"tested_orbit_steps":1048672,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0}]},
+    {"packet_value_counts":{"5":3,"13":3},"splits":[{"initial_packets":1,"reset_packets":5,"tested_orbit_steps":1048672,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":2,"reset_packets":4,"tested_orbit_steps":15730080,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":3,"reset_packets":3,"tested_orbit_steps":146814080,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0},{"initial_packets":4,"reset_packets":2,"tested_orbit_steps":15730080,"first_lap_turnoffs":2,"below_threshold_double_turnoffs":2},{"initial_packets":5,"reset_packets":1,"tested_orbit_steps":1048672,"first_lap_turnoffs":0,"below_threshold_double_turnoffs":0}]}
+  ],
+  "below_threshold_double_turnoffs": 2,
+  "witnesses": [
+    {"packet_value_counts":{"5":3,"13":3},"initial_packets":4,"initial_nibbles":[{"slot":5,"value":13},{"slot":7,"value":13},{"slot":10,"value":5},{"slot":12,"value":5}],"reset_nibbles":[{"slot":4,"value":13},{"slot":9,"value":5}],"reset_node":8,"first_lap_weight":149,"two_lap_weight":29},
+    {"packet_value_counts":{"5":3,"13":3},"initial_packets":4,"initial_nibbles":[{"slot":1,"value":5},{"slot":3,"value":5},{"slot":11,"value":13},{"slot":13,"value":13}],"reset_nibbles":[{"slot":0,"value":5},{"slot":10,"value":13}],"reset_node":8,"first_lap_weight":181,"two_lap_weight":29}
+  ],
+  "scope_limitation": "The search excludes six-packet episodes with three or more active nodes and excludes other value multisets."
+}

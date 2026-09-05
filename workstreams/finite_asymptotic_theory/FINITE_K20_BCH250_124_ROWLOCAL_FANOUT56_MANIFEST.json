@@ -1,0 +1,162 @@
+{
+  "blocking_obligations": [
+    "implementation-equivalence audit",
+    "optimized implementation and performance measurement"
+  ],
+  "certified_failure_probability": {
+    "certified_integer_margin_bits": 40,
+    "combined_strictly_below": "2^-40",
+    "dense_on_central_event_strictly_below": "2^-41",
+    "q1_strictly_below": "2^-53",
+    "q2_through_q31_strictly_below": "2^-52",
+    "tail_event_strictly_below": "2^-45"
+  },
+  "displayed_margins_bits": {
+    "combined_union": 41.50728135273102,
+    "q1": 53.947384642541245,
+    "q2_through_q31_union": 53.044344734222136,
+    "q32_through_q8576_union_on_central_event": 41.620995128862695,
+    "tail_event": 45.238916408915486
+  },
+  "fanout_operation_proxy": {
+    "reduction_from_256_layers_fraction": "25/32",
+    "scalar_xors_all_rows": 30256128,
+    "scalar_xors_per_row": 3528,
+    "speedup_factor_against_256_layer_proxy": 4.571428571428571
+  },
+  "files": [
+    {
+      "path": "FINITE_K20_BCH250_124_ROWLOCAL_FANOUT56_CERTIFICATE.md",
+      "role": "certificate",
+      "sha256": "c102e4f3ed8d913a0c691256794a5de04a150434d30eb937ee717063c5788f12"
+    },
+    {
+      "path": "shortened_bch250_124_subcode_constant_weight_envelope.json",
+      "role": "subcode_envelope",
+      "sha256": "8fca1d7c6f6d5f01fa1cde8d4602f333d397539b54a961292aec28c4c68345f6"
+    },
+    {
+      "path": "shortened_bch250_125_constant_weight_envelope.json",
+      "role": "parent_packing_envelope",
+      "sha256": "7f840e536df2a9067eb67439cc9d988d5f9fd4f8117fff3998cdbb62dd27afb8"
+    },
+    {
+      "path": "shortened_bch256_parameter_audit.json",
+      "role": "parameter_audit",
+      "sha256": "3a05d0e94ab1536336a63185188e5596532ba30db571ef6ab10051afd35e6d31"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_cutoff12_spectrum_outward.json",
+      "role": "spectrum_outward",
+      "sha256": "13741e2bbe04dd3fbd7daaf552eb4c39e0d2f205764bfa8a4d8ce5229fa38034"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_q1_outward_d11.json",
+      "role": "q1_outward",
+      "sha256": "93d854d8b20804a9fac2fcac8bb673edea26469e26e77257d94a56c7447f20ac"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_q2_31_outward_d11.json",
+      "role": "q2_31_outward",
+      "sha256": "8401bc2d671d8df0d2083d093709343c181808d1429164026578dd9f9324c746"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_cutoff12_dense_q32_8576_outward_d11.json",
+      "role": "dense_outward",
+      "sha256": "2f43ac9678aba844744a3d1be8a772fc33561f4687ec752f2bebfdff36dc7275"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_shell_sensitive_q1_d11_diagnostic.json",
+      "role": "q1_witnesses",
+      "sha256": "a8e2fa9ed1d53eca9b3885e1c63baa9e5200d752c539513625b0776eb44934d2"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l256_packing_expected_q2_31_d11_diagnostic.json",
+      "role": "q2_31_witnesses",
+      "sha256": "5e89e158116eb9765f84c257acc0f8c5eaf9cf355a08a3905ccf4ba5db17b1cb"
+    },
+    {
+      "path": "bch250_124_parityfanout31x33_l56_cutoff12_finite_interval_cover_q32_8576_d11_diagnostic.json",
+      "role": "dense_witnesses",
+      "sha256": "8657db9b7540875a782be4c522a95c915442fa1727b5b5dfb309d288bb6f26f8"
+    },
+    {
+      "path": "certify_bch250_124_rowlocal_fanout_spectrum_arb.py",
+      "role": "spectrum_verifier",
+      "sha256": "51b575d192bdbb2e603035cf21f00393a1febf034527b7e5c7bb4ab3f59b0648"
+    },
+    {
+      "path": "certify_bch250_124_shell_sensitive_q1_outward.py",
+      "role": "q1_verifier",
+      "sha256": "d30a4ae0431370908e028bfac34f5145285e03093703a27d083d3e27c964d167"
+    },
+    {
+      "path": "certify_bch250_124_shell_sensitive_q2_31_outward.py",
+      "role": "q2_31_verifier",
+      "sha256": "c3ad4104079557371f9a57a7a5ad9af8b7774eec0471520b32c8ee2d796c1aaa"
+    },
+    {
+      "path": "certify_bch250_124_rowlocal_fanout_dense_intervals_outward.py",
+      "role": "dense_verifier",
+      "sha256": "d326ede4322bb633d270b366a640d2abdc0f8d13d205c5db475755f7772fece5"
+    },
+    {
+      "path": "diagnose_bch250_rowlocal_fanout_finite_interval_cover.py",
+      "role": "dense_witness_builder",
+      "sha256": "06dc91dbd0526e0031bd9f98f00530c7a2ccd0e3f8e5889bade2dd687c900304"
+    },
+    {
+      "path": "evaluate_bch250_rowlocal_fanout_finite_cover.py",
+      "role": "finite_cover_evaluator",
+      "sha256": "d3bf65c4e2763a669c544f4ddda5c044fe1d8b6ed7ea158013cc590b421695a6"
+    },
+    {
+      "path": "build_shortened_bch250_subcode_envelope.py",
+      "role": "subcode_builder",
+      "sha256": "cb761a2a1d62b2c37cbaf1d0482c60c7d8e76712f73fc3c9155f8b1a61d06346"
+    },
+    {
+      "path": "build_bch250_124_rowlocal_fanout56_manifest.py",
+      "role": "manifest_builder",
+      "sha256": "dae08776c45a30d4c105e9b79d637bd1ff1104abaea1461fd324d897866c3ef6"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_selection.json",
+      "role": "rm2sub_selection",
+      "sha256": "e2658fefdb787d5946c4c0a1dc4c8c530414fae1f6ef8bcf9c40298e6e13f117"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_b_kernel_spectrum.json",
+      "role": "rm2sub_activation",
+      "sha256": "bf322cfdb00410ff3aee381389ac899fa0060234edb22106f1d033888c60ea3f"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_a_spectrum_audit.json",
+      "role": "rm2sub_live_spectrum",
+      "sha256": "75b8d8adb7532d373ad1b5fb895159b18c800107f4ecd9b480d1b59808cb2eb5"
+    }
+  ],
+  "parameters": {
+    "central_density_excess_bits": "389/1250",
+    "distance": 235840,
+    "fanout_layers_per_row": 56,
+    "outer_bits": 250,
+    "outer_dimension": 124,
+    "outer_rows": 8576,
+    "output_bits": 2144000,
+    "parent_message_bits": 1063424,
+    "relative_distance": 0.11,
+    "requested_message_bits": 1048576,
+    "shortened_input_coordinates": 14848,
+    "tail_weight_interval_high": [
+      238,
+      250
+    ],
+    "tail_weight_interval_low": [
+      1,
+      12
+    ]
+  },
+  "schema": "bch250-124-rowlocal-fanout56-certificate-manifest-v1",
+  "status": "HASH_BOUND_OUTWARD_PROOF_MODEL_CERTIFICATE"
+}

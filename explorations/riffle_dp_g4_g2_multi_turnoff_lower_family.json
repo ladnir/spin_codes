@@ -1,0 +1,140 @@
+{
+  "schema": "riffle-dp-g4-g2-multi-turnoff-lower-family-v1",
+  "candidate": "Riffle DP g=4@g0-v1",
+  "evidence_label": "EXACT",
+  "outer_receipt_sha256": "592bc077e577d6f565142f49d5af7004a6ad29b2ffea9cb509dceaaaf9d2c400",
+  "orbit_receipt_sha256": "377a5a20d1eebae9c0c1e31ee04e39a4acfb46f493aecd7b36a85a7b80a82de1",
+  "outer_member_count": 4,
+  "episode_span_nodes": 3,
+  "aggregate_probability": {
+    "numerator": "21047730649874835753859744358820526625024425838277364158217554388229475040128832679293619714043",
+    "denominator": "231641498464868812250997880852041184541795976246905321736041224220641396760710832536682344997867895171391534411766551574121876130384",
+    "log2": -123.04956855404038,
+    "exceeds_2^-40": false
+  },
+  "members": [
+    {
+      "outer_family_id": "terminal-w3-s33-one-i0-t6b16d09000000000",
+      "active_packet_value_counts": {
+        "1": 3,
+        "5": 9,
+        "7": 3,
+        "10": 9,
+        "11": 3,
+        "12": 3,
+        "14": 3
+      },
+      "episode_probabilities": [
+        {
+          "episode_count": 1,
+          "log2": -125.10846224309392
+        },
+        {
+          "episode_count": 2,
+          "log2": -137.29385120505708
+        },
+        {
+          "episode_count": 3,
+          "log2": -151.2702861096417
+        }
+      ],
+      "selected_episode_count": 1,
+      "probability_numerator": "63143191949624507261579233076461579875073277514832092474652663164688425120386498037880859142129",
+      "probability_denominator": "2895518730810860153137473510650514806772449703086316521700515302758017459508885406708529312473348689642394180147081894676523451629800"
+    },
+    {
+      "outer_family_id": "terminal-w3-s33-one-i0-tacf2ca0f00000000",
+      "active_packet_value_counts": {
+        "2": 3,
+        "3": 3,
+        "5": 9,
+        "8": 3,
+        "10": 6,
+        "11": 3,
+        "14": 3,
+        "15": 3
+      },
+      "episode_probabilities": [
+        {
+          "episode_count": 1,
+          "log2": -124.52349974237279
+        },
+        {
+          "episode_count": 2,
+          "log2": -136.12392620361476
+        },
+        {
+          "episode_count": 3,
+          "log2": -149.5115124570977
+        }
+      ],
+      "selected_episode_count": 1,
+      "probability_numerator": "189429575848873521784737699229384739625219832544496277423957989494065275361159494113642577426387",
+      "probability_denominator": "5791037461621720306274947021301029613544899406172633043401030605516034919017770813417058624946697379284788360294163789353046903259600"
+    },
+    {
+      "outer_family_id": "terminal-w3-s33-one-i0-tfaecebffc51f71e0",
+      "active_packet_value_counts": {
+        "1": 3,
+        "4": 3,
+        "5": 3,
+        "7": 3,
+        "10": 9,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3
+      },
+      "episode_probabilities": [
+        {
+          "episode_count": 1,
+          "log2": -125.10846224309392
+        },
+        {
+          "episode_count": 2,
+          "log2": -137.29385120505708
+        },
+        {
+          "episode_count": 3,
+          "log2": -151.2702861096417
+        }
+      ],
+      "selected_episode_count": 1,
+      "probability_numerator": "63143191949624507261579233076461579875073277514832092474652663164688425120386498037880859142129",
+      "probability_denominator": "2895518730810860153137473510650514806772449703086316521700515302758017459508885406708529312473348689642394180147081894676523451629800"
+    },
+    {
+      "outer_family_id": "terminal-w3-s33-one-i0-tfbfc4e34c1f4398c",
+      "active_packet_value_counts": {
+        "1": 3,
+        "4": 3,
+        "5": 6,
+        "7": 3,
+        "10": 6,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3
+      },
+      "episode_probabilities": [
+        {
+          "episode_count": 1,
+          "log2": -125.69342474381511
+        },
+        {
+          "episode_count": 2,
+          "log2": -138.5568856108909
+        },
+        {
+          "episode_count": 3,
+          "log2": -153.34067543753304
+        }
+      ],
+      "selected_episode_count": 1,
+      "probability_numerator": "21047730649874835753859744358820526625024425838277364158217554388229475040128832679293619714043",
+      "probability_denominator": "1447759365405430076568736755325257403386224851543158260850257651379008729754442703354264656236674344821197090073540947338261725814900"
+    }
+  ],
+  "scope": "For each included support-33 outer word, use the episode count with the largest exact probability. Each episode has the committed fixed span and resets the state. All other packets occupy a terminal suffix.",
+  "disjointness": "Within one selected episode count, a placement uniquely determines its chronological episode starts, transition slots, and labeled packets."
+}

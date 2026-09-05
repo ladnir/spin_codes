@@ -1,0 +1,14 @@
+
+\section{Fully Systematic Block-Diagonal}
+A common technique in coding theory is to describe a systematic code where the generator $\G$ can be expressed as 
+$
+    \G := (\I || \G').
+$
+This approach can be more efficient because the codeword contains the input as its first part. Therefore, one needs only to compute the remaining part of the codeword. 
+While any arbitrary code can be converted into systematic form, such a conversion is typically costly, as it requires Gaussian elimination and eliminates the possibility of fast encoding.
+
+\cite{EC} and others have shown that it can be possible to instantiate codes already in systematic form such that the computation of $\xv\G'$ retains the fast encoding structure. In particular, the idea is to simply instantiate $\G'$ as an instance of the structured code, in our case a serially concatenated Block-Diagonal code. If we restrict our attention to rate $1/2$ codes, this implies that $\G'$ is a square $k\times k$ matrix that can be expressed as
+$
+\G':=\G'_1\pi_1\G'_2 ... \pi_{t-1}\G'_t,
+$
+where each $\G'_i$ is a Block-Diagonal matrix. We observe that one must approximately double the size of $\sigma$ to maintain the same minimum distance behavior. This doubling results in four times the amount of work to multiply but halves the amount of work to permute. Based on the current running time numbers we conclude this approach does not result in an overall reduction in running time. 

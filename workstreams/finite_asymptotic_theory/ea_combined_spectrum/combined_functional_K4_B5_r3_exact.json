@@ -1,0 +1,31 @@
+{
+  "schema": "ea-transfer-weighted-functional-small-v1",
+  "status": "EXACT_RATIONAL_SMALL_MODEL",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 5,
+    "right_degree": 3,
+    "enumerated_maps": 1024,
+    "functional_weights": [
+      "1/2",
+      "1/2",
+      "3/8",
+      "1/4",
+      "5/32",
+      "3/32"
+    ]
+  },
+  "claim": {
+    "analytic_first_moment": "2429/512",
+    "exhaustive_first_moment": "2429/512",
+    "analytic_second_moment": "372883/16384",
+    "exhaustive_second_moment": "372883/16384",
+    "variance": "66087/262144",
+    "identities_match": true
+  },
+  "scope": [
+    "This proves the displayed small finite instance exactly.",
+    "The same pair-kernel formula applies to any fixed nonnegative weight vector f.",
+    "It does not extrapolate a numerical moment bound to K=256,B=512."
+  ]
+}

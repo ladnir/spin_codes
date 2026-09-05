@@ -1,0 +1,153 @@
+<div id="rm2sub-family-curves">
+  <h2>RM2Sub(t=64), persistence-matched state schedule: occupation-one margins at 10% distance</h2>
+  <div class="legend" aria-label="Series legend"></div>
+  <section>
+    <h3>Authenticated structured constituents</h3>
+    <div class="plot" data-panel="structured"></div>
+  </section>
+  <section>
+    <h3>Random controls, block length 8–128</h3>
+    <div class="plot" data-panel="random-small"></div>
+  </section>
+  <section>
+    <h3>Random controls, block length 256–1024</h3>
+    <div class="plot" data-panel="random-large"></div>
+  </section>
+  <div class="tooltip" role="tooltip" hidden></div>
+</div>
+
+<style>
+  #rm2sub-family-curves { width: 100%; color: var(--foreground); }
+  #rm2sub-family-curves h2 { margin: 0 0 12px; font-weight: 500; }
+  #rm2sub-family-curves h3 { margin: 18px 0 4px; font-weight: 500; }
+  #rm2sub-family-curves .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  #rm2sub-family-curves .legend button { background: transparent; border: 0; color: var(--foreground); padding: 4px 0; display: inline-flex; align-items: center; gap: 6px; }
+  #rm2sub-family-curves .swatch { width: 18px; height: 3px; display: inline-block; }
+  #rm2sub-family-curves .legend button[aria-pressed="false"] { opacity: 0.42; }
+  #rm2sub-family-curves .plot { width: 100%; min-height: 260px; }
+  #rm2sub-family-curves .chart { display: block; width: 100%; }
+  #rm2sub-family-curves text { fill: var(--foreground); font-size: 12px; }
+  #rm2sub-family-curves .axis path,
+  #rm2sub-family-curves .axis line { stroke: var(--border); }
+  #rm2sub-family-curves .grid line { stroke: var(--border); opacity: 0.45; }
+  #rm2sub-family-curves .grid path { display: none; }
+  #rm2sub-family-curves .threshold { stroke: var(--foreground); stroke-width: 1; stroke-dasharray: 5 4; opacity: 0.7; }
+  #rm2sub-family-curves .series-line { fill: none; stroke-width: 2; }
+  #rm2sub-family-curves .series-point { stroke: var(--background); stroke-width: 1; }
+  #rm2sub-family-curves .hover-guide { stroke: var(--foreground); stroke-width: 1; opacity: 0.45; pointer-events: none; }
+  #rm2sub-family-curves .hover-marker { stroke: var(--background); stroke-width: 1.5; pointer-events: none; }
+  #rm2sub-family-curves .tooltip { position: absolute; pointer-events: none; z-index: 4; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); padding: 8px 10px; max-width: 320px; }
+  #rm2sub-family-curves .tooltip-row { display: flex; justify-content: space-between; gap: 14px; }
+  #rm2sub-family-curves .tooltip-value { font-variant-numeric: tabular-nums; }
+  @media (max-width: 420px) {
+    #rm2sub-family-curves .plot { min-height: 240px; }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(() => {
+  const root = document.getElementById("rm2sub-family-curves");
+  const data = [{"name":"extended BCH [128,64,22] exact","family":"bch","block":128,"points":[[12,38.7156],[13,38.546],[14,38.0175],[15,37.2487],[16,36.3608],[17,35.4089],[18,34.4147],[19,33.3929],[20,32.3378]]},{"name":"extended BCH [32,16,8] exact","family":"bch","block":32,"points":[[10,10.4049],[11,10.3855],[12,10.0479],[13,9.4674],[14,8.7174],[15,7.8485],[16,6.9143],[17,5.9433],[18,4.9444],[19,3.9166],[20,2.8464]]},{"name":"extended BCH [8,4,4] exact","family":"bch","block":8,"points":[[8,14.2649],[9,9.3795],[10,8.2452],[11,7.4946],[12,6.7293],[13,5.888],[14,4.9751],[15,4.017],[16,3.0352],[17,2.0379],[18,1.0242],[19,-0.0128],[20,-1.0917]]},{"name":"Philips shortened-XBCH [64,32,12] exact","family":"bch","block":64,"points":[[11,17.5503],[12,17.2822],[13,16.7364],[14,15.9886],[15,15.1102],[16,14.1666],[17,13.1876],[18,12.1821],[19,11.1529],[20,10.0893]]},{"name":"random full-rank [1024,512] reused","family":"random","block":1024,"points":[[15,293.4307],[16,293.1504],[17,292.5228],[18,291.6983],[19,290.7597],[20,289.7345]]},{"name":"random full-rank [128,64] reused","family":"random","block":128,"points":[[12,28.5624],[13,27.8496],[14,27.0069],[15,26.0824],[16,25.1171],[17,24.1292],[18,23.1211],[19,22.0891],[20,21.0174]]},{"name":"random full-rank [16,8] reused","family":"random","block":16,"points":[[9,-3.4],[10,-4.1402],[11,-5.0057],[12,-5.9377],[13,-6.8984],[14,-7.8794],[15,-8.8722],[16,-9.872],[17,-10.8787],[18,-11.8961],[19,-12.9332],[20,-14.0127]]},{"name":"random full-rank [256,128] reused","family":"random","block":256,"points":[[13,66.2399],[14,65.6022],[15,64.7772],[16,63.8613],[17,62.8996],[18,61.9066],[19,60.8837],[20,59.8173]]},{"name":"random full-rank [32,16] reused","family":"random","block":32,"points":[[10,0.8912],[11,0.1273],[12,-0.749],[13,-1.6779],[14,-2.642],[15,-3.627],[16,-4.6231],[17,-5.6281],[18,-6.6448],[19,-7.6818],[20,-8.7548]]},{"name":"random full-rank [512,256] reused","family":"random","block":512,"points":[[14,141.9484],[15,141.4178],[16,140.6578],[17,139.7756],[18,138.8229],[19,137.8178],[20,136.7611]]},{"name":"random full-rank [64,32] reused","family":"random","block":64,"points":[[11,9.9603],[12,9.2092],[13,8.3445],[14,7.4109],[15,6.4445],[16,5.4581],[17,4.4597],[18,3.4474],[19,2.4141],[20,1.3432]]},{"name":"random full-rank [8,4] reused","family":"random","block":8,"points":[[8,-5.1582],[9,-5.8877],[10,-6.7284],[11,-7.6473],[12,-8.6044],[13,-9.582],[14,-10.5712],[15,-11.5679],[16,-12.5697],[17,-13.5768],[18,-14.594],[19,-15.6304],[20,-16.7219]]},{"name":"RM(1,3) [8,4,4] exact","family":"rm","block":8,"points":[[8,14.2649],[9,9.3795],[10,8.2452],[11,7.4946],[12,6.7293],[13,5.888],[14,4.9751],[15,4.017],[16,3.0352],[17,2.0379],[18,1.0242],[19,-0.0128],[20,-1.0917]]},{"name":"RM(2,5) [32,16,8] exact","family":"rm","block":32,"points":[[10,10.4049],[11,10.3855],[12,10.0479],[13,9.4674],[14,8.7174],[15,7.8485],[16,6.9143],[17,5.9433],[18,4.9444],[19,3.9166],[20,2.8464]]},{"name":"RM(3,7) [128,64,16] exact","family":"rm","block":128,"points":[[12,17.7559],[13,17.138],[14,16.3563],[15,15.4607],[16,14.5096],[17,13.5278],[18,12.5218],[19,11.489],[20,10.4148]]},{"name":"RM(4,9) [512,256,32] exact","family":"rm","block":512,"points":[[14,44.6847],[15,43.8495],[16,42.9374],[17,41.9947],[18,41.0142],[19,39.9997],[20,38.9405]]}];
+  const matchedData = [{"name":"extended BCH [128,64,22] exact","family":"bch","block":128,"points":[[12,29.3857,8],[13,31.1741,9],[14,32.6083,10],[15,33.5341,11],[16,33.9663,12],[17,33.9468,13],[18,33.6661,14],[19,33.083,15],[20,32.3378,16]]},{"name":"extended BCH [32,16,8] exact","family":"bch","block":32,"points":[[10,4.1952,7],[11,2.9677,7],[12,3.4953,8],[13,3.912,9],[14,4.1398,10],[15,4.1901,11],[16,4.0986,12],[17,3.896,13],[18,3.6066,14],[19,3.2515,15],[20,2.8464,16]]},{"name":"extended BCH [8,4,4] exact","family":"bch","block":8,"points":[[8,20.3605,7],[9,1.0402,7],[10,-0.0947,7],[11,-1.055,7],[12,-0.9035,8],[13,-0.7915,9],[14,-0.7429,10],[15,-0.7454,11],[16,-0.7614,12],[17,-0.8268,13],[18,-0.8905,14],[19,-0.9836,15],[20,-1.0917,16]]},{"name":"Philips shortened-XBCH [64,32,12] exact","family":"bch","block":64,"points":[[11,10.9282,7],[12,11.7771,8],[13,12.5386,9],[14,12.9594,10],[15,13.0362,11],[16,12.816,12],[17,12.365,13],[18,11.7366,14],[19,10.9569,15],[20,10.0893,16]]},{"name":"random full-rank [1024,512] reused","family":"random","block":1024,"points":[[15,279.7998,11],[16,284.2868,12],[17,287.1858,13],[18,288.8377,14],[19,289.5981,15],[20,289.7345,16]]},{"name":"random full-rank [128,64] reused","family":"random","block":128,"points":[[12,24.5134,8],[13,25.1944,9],[14,25.3646,10],[15,25.1051,11],[16,24.5289,12],[17,23.7841,13],[18,22.9181,14],[19,21.9851,15],[20,21.0174,16]]},{"name":"random full-rank [16,8] reused","family":"random","block":16,"points":[[9,-3.659,7],[10,-4.4944,7],[11,-5.4598,7],[12,-6.2661,8],[13,-7.1498,9],[14,-8.0858,10],[15,-9.0494,11],[16,-10.0296,12],[17,-11.0185,13],[18,-12.0115,14],[19,-13.0072,15],[20,-14.0127,16]]},{"name":"random full-rank [256,128] reused","family":"random","block":256,"points":[[13,59.8869,9],[14,61.3968,10],[15,62.16,11],[16,62.3181,12],[17,62.0432,13],[18,61.4578,14],[19,60.6933,15],[20,59.8173,16]]},{"name":"random full-rank [32,16] reused","family":"random","block":32,"points":[[10,0.0508,7],[11,-0.8775,7],[12,-1.4026,8],[13,-2.1102,9],[14,-2.9398,10],[15,-3.8503,11],[16,-4.8018,12],[17,-5.7766,13],[18,-6.7642,14],[19,-7.7578,15],[20,-8.7548,16]]},{"name":"random full-rank [512,256] reused","family":"random","block":512,"points":[[14,132.393,10],[15,135.0914,11],[16,136.7255,12],[17,137.4995,13],[18,137.6469,14],[19,137.3517,15],[20,136.7611,16]]},{"name":"random full-rank [64,32] reused","family":"random","block":64,"points":[[11,7.4923,7],[12,7.5652,8],[13,7.3215,9],[14,6.7881,10],[15,6.0504,11],[16,5.1903,12],[17,4.2701,13],[18,3.3122,14],[19,2.3328,15],[20,1.3432,16]]},{"name":"random full-rank [8,4] reused","family":"random","block":8,"points":[[8,-5.2446,7],[9,-6.0182,7],[10,-6.9049,7],[11,-7.9007,7],[12,-8.8183,8],[13,-9.7686,9],[14,-10.7408,10],[15,-11.7249,11],[16,-12.7151,12],[17,-13.709,13],[18,-14.7052,14],[19,-15.7029,15],[20,-16.7219,16]]},{"name":"RM(1,3) [8,4,4] exact","family":"rm","block":8,"points":[[8,20.3605,7],[9,1.0402,7],[10,-0.0947,7],[11,-1.055,7],[12,-0.9035,8],[13,-0.7915,9],[14,-0.7429,10],[15,-0.7454,11],[16,-0.7614,12],[17,-0.8268,13],[18,-0.8905,14],[19,-0.9836,15],[20,-1.0917,16]]},{"name":"RM(2,5) [32,16,8] exact","family":"rm","block":32,"points":[[10,4.1952,7],[11,2.9677,7],[12,3.4953,8],[13,3.912,9],[14,4.1398,10],[15,4.1901,11],[16,4.0986,12],[17,3.896,13],[18,3.6066,14],[19,3.2515,15],[20,2.8464,16]]},{"name":"RM(3,7) [128,64,16] exact","family":"rm","block":128,"points":[[12,13.1753,8],[13,13.9079,9],[14,14.1952,10],[15,14.111,11],[16,13.6776,12],[17,13.0557,13],[18,12.2604,14],[19,11.3646,15],[20,10.4148,16]]},{"name":"RM(4,9) [512,256,32] exact","family":"rm","block":512,"points":[[14,40.7185,10],[15,41.3746,11],[16,41.4616,12],[17,41.1271,13],[18,40.5571,14],[19,39.8077,15],[20,38.9405,16]]}];
+  const displayData = matchedData;
+  const visible = new Set(displayData.map(d => d.name));
+  const seriesTokens = ["--viz-series-1", "--viz-series-2", "--viz-series-3", "--viz-series-4", "--viz-series-5", "--viz-series-6"];
+  const blockOrder = [8, 16, 32, 64, 128, 256, 512, 1024];
+  const color = d => `var(${seriesTokens[blockOrder.indexOf(d.block) % seriesTokens.length]})`;
+  const dash = d => d.family === "rm" ? "6 3" : d.family === "bch" ? null : "2 2";
+  const panels = {
+    structured: displayData.filter(d => d.family !== "random"),
+    "random-small": displayData.filter(d => d.family === "random" && d.block <= 128),
+    "random-large": displayData.filter(d => d.family === "random" && d.block >= 256)
+  };
+  const shortName = d => d.family === "random" ? `random B=${d.block}` : d.name.replace(" exact", "");
+
+  const legend = d3.select(root).select(".legend");
+  legend.selectAll("button").data(displayData).join("button")
+    .attr("type", "button")
+    .attr("aria-pressed", "true")
+    .html(d => `<span class="swatch"></span><span>${shortName(d)}</span>`)
+    .each(function(d) { d3.select(this).select(".swatch").style("background", color(d)); })
+    .on("click", function(event, d) {
+      if (visible.has(d.name)) visible.delete(d.name); else visible.add(d.name);
+      this.setAttribute("aria-pressed", visible.has(d.name) ? "true" : "false");
+      drawAll();
+    });
+
+  function draw(container, series) {
+    const width = Math.max(320, container.clientWidth || 736);
+    const height = width < 430 ? 250 : 285;
+    const margin = {top: 14, right: 16, bottom: 48, left: 68};
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const shown = series.filter(d => visible.has(d.name));
+    const domainSeries = shown.length ? shown : series;
+    const observations = domainSeries.flatMap(d => d.points.map(p => ({x:p[0], y:p[1]})));
+    observations.push({x:8, y:40}, {x:20, y:40});
+    const xExtent = d3.extent(observations, d => d.x);
+    const yExtent = d3.extent(observations, d => d.y);
+    const yPad = Math.max(3, (yExtent[1] - yExtent[0]) * 0.08);
+    const x = d3.scaleLinear().domain([xExtent[0] - 0.25, xExtent[1] + 0.25]).range([0, innerWidth]);
+    const y = d3.scaleLinear().domain([yExtent[0] - yPad, yExtent[1] + yPad]).nice().range([innerHeight, 0]);
+    const svg = d3.select(container).selectAll("svg").data([null]).join("svg")
+      .attr("class", "chart").attr("viewBox", `0 0 ${width} ${height}`)
+      .attr("role", "img").attr("aria-label", "Occupation-one security margin by message-size exponent");
+    svg.selectAll("*").remove();
+    svg.append("title").text("Occupation-one margin curves");
+    svg.append("desc").text("Margins in bits versus log base two of message length. A dashed horizontal line marks 40 bits.");
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    g.append("rect").attr("data-chart-frame", "").attr("width", innerWidth).attr("height", innerHeight).attr("fill", "none").attr("stroke", "var(--border)");
+    const xTicks = width < 430 ? 4 : 7;
+    g.append("g").attr("class", "grid").attr("transform", `translate(0,${innerHeight})`).call(d3.axisBottom(x).ticks(xTicks).tickSize(-innerHeight).tickFormat(""));
+    g.append("g").attr("class", "grid").call(d3.axisLeft(y).ticks(6).tickSize(-innerWidth).tickFormat(""));
+    g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerHeight})`).call(d3.axisBottom(x).ticks(xTicks).tickFormat(d3.format("d")));
+    g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(6));
+    svg.append("text").attr("class", "axis-title").attr("data-axis", "x").attr("x", margin.left + innerWidth / 2).attr("y", height - 8).attr("text-anchor", "middle").text("message exponent e, where k = 2ᵉ bits");
+    svg.append("text").attr("class", "axis-title").attr("data-axis", "y").attr("transform", `translate(16,${margin.top + innerHeight / 2}) rotate(-90)`).attr("text-anchor", "middle").text("Q1 margin (bits)");
+    if (y.domain()[0] <= 40 && y.domain()[1] >= 40) {
+      g.append("line").attr("class", "threshold").attr("x1", 0).attr("x2", innerWidth).attr("y1", y(40)).attr("y2", y(40));
+      g.append("text").attr("x", innerWidth - 4).attr("y", y(40) - 5).attr("text-anchor", "end").text("40-bit screen");
+    }
+    const line = d3.line().x(p => x(p[0])).y(p => y(p[1]));
+    const seriesGroup = g.selectAll("g.series").data(shown, d => d.name).join("g").attr("class", "series");
+    seriesGroup.append("path").attr("class", "series-line").attr("d", d => line(d.points)).attr("stroke", d => color(d)).attr("stroke-dasharray", d => dash(d));
+    seriesGroup.selectAll("circle").data(d => d.points.map(p => ({series:d, point:p}))).join("circle")
+      .attr("class", "series-point").attr("cx", d => x(d.point[0])).attr("cy", d => y(d.point[1])).attr("r", 2.8).attr("fill", d => color(d.series));
+    const guide = g.append("line").attr("class", "hover-guide").attr("data-chart-hover-guide", "").attr("y1", 0).attr("y2", innerHeight).style("display", "none");
+    const markers = g.append("g");
+    const tooltip = d3.select(root).select(".tooltip");
+    g.append("rect").attr("data-chart-hit", "").attr("data-chart-hover-overlay", "cross-series").attr("width", innerWidth).attr("height", innerHeight).attr("fill", "transparent")
+      .on("pointermove", function(event) {
+        const [mx] = d3.pointer(event, this);
+        const exponent = x.invert(mx);
+        guide.attr("x1", mx).attr("x2", mx).style("display", null);
+        const values = shown.map(s => {
+          const pts = s.points;
+          const idx = d3.bisector(p => p[0]).center(pts, exponent);
+          if (idx < 0) return null;
+          const left = pts[Math.max(0, Math.min(idx, pts.length - 1))];
+          const right = pts[Math.max(0, Math.min(idx + (left[0] < exponent ? 1 : -1), pts.length - 1))];
+          const a = left[0] <= right[0] ? left : right;
+          const b = left[0] <= right[0] ? right : left;
+          if (exponent < pts[0][0] || exponent > pts[pts.length - 1][0]) return null;
+          const fraction = b[0] === a[0] ? 0 : (exponent - a[0]) / (b[0] - a[0]);
+          return {series:s, value:a[1] + fraction * (b[1] - a[1])};
+        }).filter(Boolean);
+        markers.selectAll("circle").data(values, d => d.series.name).join("circle").attr("class", "hover-marker").attr("data-chart-hover-marker", "").attr("cx", mx).attr("cy", d => y(d.value)).attr("r", 4).attr("fill", d => color(d.series));
+        tooltip.hidden = false;
+        tooltip.html(`<div>e = ${exponent.toFixed(2)}</div>` + values.map(d => `<div class="tooltip-row"><span>${shortName(d.series)}</span><span class="tooltip-value">${d.value.toFixed(2)} bits</span></div>`).join(""));
+        const rootBox = root.getBoundingClientRect();
+        tooltip.style("left", `${Math.min(rootBox.width - 325, Math.max(0, event.clientX - rootBox.left + 12))}px`).style("top", `${event.clientY - rootBox.top + 12}px`).attr("hidden", null);
+      })
+      .on("pointerleave", function() { guide.style("display", "none"); markers.selectAll("*").remove(); tooltip.attr("hidden", true); });
+  }
+
+  function drawAll() {
+    root.querySelectorAll(".plot").forEach(container => draw(container, panels[container.dataset.panel]));
+  }
+  const observer = new ResizeObserver(drawAll);
+  root.querySelectorAll(".plot").forEach(node => observer.observe(node));
+  drawAll();
+})();
+</script>

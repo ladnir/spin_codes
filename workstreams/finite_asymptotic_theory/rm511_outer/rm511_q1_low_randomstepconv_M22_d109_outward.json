@@ -1,0 +1,56 @@
+{
+  "schema": "rm511-exact-low-q1-randomstepconv-outward-v1",
+  "status": "OUTWARD_PARTIAL_Q1_CERTIFICATE",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer": "one fixed RM(5,11) [2048,1024,64] constituent repeated 1024 times",
+    "outer_rows": 1024,
+    "distance_cutoff": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "inner_memory_bits": 22
+  },
+  "probability_space": {
+    "outer": "fixed deterministic RM(5,11); no outer setup event",
+    "routing": "independent uniform 2048-coordinate permutation per row and uniform 1024-position permutation per transposed region",
+    "inner": "independent uniform binary 23-by-23 linear map at each of 2^21 RandomStepConv positions"
+  },
+  "claim": {
+    "occupation": 1,
+    "covered_outer_weights": [
+      64,
+      96,
+      112,
+      120,
+      124
+    ],
+    "covered_range": "every nonzero RM(5,11) shell below weight 128",
+    "partial_q1_log2_upper": -83.37433140006874,
+    "partial_q1_margin_bits_lower": 83.37433140006874,
+    "dominant_weight": 64,
+    "dominant_pointwise_log2_upper": -83.37433140006875,
+    "covered_sum_below_2_minus_40": true
+  },
+  "pointwise_log2_upper": {
+    "64": -83.37433140006875,
+    "96": -138.702970610721,
+    "112": -166.42479866837252,
+    "120": -181.37702134940446,
+    "124": -189.57767323318896
+  },
+  "sources": [
+    {
+      "file": "rm511_low_weight_exact.json",
+      "sha256": "3b1788618eec3a5696acb0567838779af493f64ad6274fc13e02ae8f2e8b7838"
+    },
+    {
+      "file": "rm511_q1_low_randomstepconv_M22_d109_diagnostic.json",
+      "sha256": "635f340758df9d4cd29dc0cad4d8734853154e4d9e6ff172edc38c65a55dd47f"
+    }
+  ],
+  "scope": [
+    "The bound sums every nonzero RM(5,11) weight shell below 128 with outward arithmetic.",
+    "The diagnostic supplies only tilt witnesses; the certificate does not require them to be optimal.",
+    "Weights 128 and above are not covered. This is not a complete occupation-one or minimum-distance certificate."
+  ]
+}

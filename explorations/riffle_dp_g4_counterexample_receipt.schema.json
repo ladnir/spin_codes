@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "riffle-dp-g4-counterexample-receipt-v1",
+  "title": "Riffle DP g=4 counterexample-family receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "candidate",
+    "manifest_sha256",
+    "evidence_label",
+    "family_id",
+    "outer_family",
+    "local_words",
+    "inner_event",
+    "population",
+    "event_probability",
+    "first_moment_contribution",
+    "authentication"
+  ],
+  "properties": {
+    "schema": { "const": "riffle-dp-g4-counterexample-receipt-v1" },
+    "candidate": { "const": "Riffle DP g=4@g0-v1" },
+    "manifest_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "evidence_label": { "enum": ["EXACT", "RIGOROUS_BOUND", "DIAGNOSTIC"] },
+    "family_id": { "type": "string", "minLength": 1 },
+    "outer_family": {
+      "type": "object",
+      "required": ["block_weight", "category", "parameterization", "coefficient_relation"],
+      "properties": {
+        "block_weight": { "type": "integer", "minimum": 3 },
+        "category": { "type": "string" },
+        "parameterization": { "type": "string" },
+        "coefficient_relation": { "type": "string" }
+      }
+    },
+    "local_words": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["message_hex", "codeword_hex", "nibble_support"],
+        "properties": {
+          "message_hex": { "type": "string", "pattern": "^0x[0-9a-f]{1,16}$" },
+          "codeword_hex": { "type": "string", "pattern": "^0x[0-9a-f]{1,32}$" },
+          "nibble_support": { "type": "integer", "minimum": 11, "maximum": 32 }
+        }
+      }
+    },
+    "inner_event": {
+      "type": "object",
+      "required": ["description", "output_weight_upper"],
+      "properties": {
+        "description": { "type": "string" },
+        "packet_profile": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "output_weight_upper": { "type": "integer", "minimum": 0, "maximum": 188766 }
+      }
+    },
+    "population": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "event_probability": {
+      "type": "object",
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": { "type": "string", "pattern": "^[0-9]+$" },
+        "denominator": { "type": "string", "pattern": "^[1-9][0-9]*$" }
+      }
+    },
+    "first_moment_contribution": {
+      "type": "object",
+      "required": ["exact_expression", "log2_interval", "exceeds_2^-40"],
+      "properties": {
+        "exact_expression": { "type": "string" },
+        "log2_interval": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "number" }
+        },
+        "exceeds_2^-40": { "type": "boolean" }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "required": ["command", "source_sha256", "independent_checks"],
+      "properties": {
+        "command": { "type": "string" },
+        "source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "independent_checks": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

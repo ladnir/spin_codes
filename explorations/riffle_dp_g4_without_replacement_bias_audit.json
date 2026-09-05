@@ -1,0 +1,21 @@
+{
+  "schema": "riffle-dp-g4-without-replacement-bias-audit-v1",
+  "evidence_label": "EXACT_REFUTATION_OF_BOUNDING_STEP",
+  "component_receipt_sha256": "91de334b9c00ef1e1e623fb4995b534b654cbaa9cfcfce3f3768e663108c549e",
+  "packet_positions": 524352,
+  "component_degree": 1,
+  "packet_value": 4,
+  "character_sum": 0,
+  "exact_two_draw_character_expectation": {
+    "sign": -1,
+    "magnitude_numerator": "1",
+    "magnitude_denominator": "524351"
+  },
+  "retired_product_magnitude": {
+    "numerator": "1",
+    "denominator": "274943971201"
+  },
+  "underestimate_factor": 524351,
+  "derivation": "For signs s_p in {+1,-1} with sum_p s_p=0, the ordered sum over distinct p,q of s_p s_q equals -M. Division by M(M-1) gives -1/(M-1). The retired argument multiplied two marginal caps instead.",
+  "replacement": "Sample labeled cells independently and uniformly, then condition on all cells being distinct. The conditioned law is the uniform ordered injection, so P_perm(E) <= P_iid(E)/P_iid(distinct)."
+}

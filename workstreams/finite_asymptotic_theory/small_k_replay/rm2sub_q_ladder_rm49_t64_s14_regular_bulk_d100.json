@@ -1,0 +1,381 @@
+{
+  "schema": "rm2sub-fixed-occupation-rm-spectrum-envelope-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "construction": "one fixed RM(4,9) constituent repeated in every row, uniform routing, and one fixed audited RM2Sub A/B pair",
+  "probability_space": {
+    "outer": "one fixed authenticated RM(4,9) constituent",
+    "routing": "independent uniform row-coordinate and region permutations",
+    "inner": "independent nonzero field scalar in every RM2Sub epoch"
+  },
+  "parameters": {
+    "message_exponent": 16,
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "outer_rows": 256,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "bad_weight": 13107,
+    "distance_numerator": 100,
+    "distance_denominator": 1000,
+    "step_bits": 64,
+    "state_bits": 14,
+    "persistence_exponent": 20,
+    "epochs_per_region": 4,
+    "occupations": [
+      30,
+      32,
+      36,
+      40,
+      48,
+      64,
+      80,
+      96,
+      112,
+      128,
+      160,
+      192,
+      224,
+      256
+    ],
+    "log_surprisals": [
+      -8.0,
+      -7.5,
+      -7.0,
+      -6.5,
+      -6.0,
+      -5.5,
+      -5.0,
+      -4.5,
+      -4.0,
+      -3.5,
+      -3.0,
+      -2.5,
+      -2.0,
+      -1.5,
+      -1.0,
+      -0.5,
+      0.0
+    ],
+    "candidate_probabilities": [
+      0.5
+    ],
+    "a_minimum_distance": 24,
+    "kernel_minimum_distance": 6,
+    "kernel_weight_four": 0
+  },
+  "outer_envelopes": [
+    {
+      "candidate_probability": 0.5,
+      "log2_mass": 368.7487413146182,
+      "maximizing_weight": 480
+    }
+  ],
+  "holder_change_of_measure": {
+    "reference": "uniform measure on F_2^512 for each regular row",
+    "density": "exact nonzero, non-all-one RM(4,9) counting measure after a uniform coordinate permutation",
+    "order_grid_size": 1281,
+    "order_grid_minimum": 1.0000009536743164,
+    "order_grid_maximum": 1048577.0,
+    "maximum_log2_density": 368.7487413146182,
+    "maximum_density_weight": 480
+  },
+  "proof_reduction": [
+    "Separate the unique all-one codeword from the other nonzero RM codewords.",
+    "Express each routed non-all-one RM counting measure by its exact density relative to the uniform product measure.",
+    "For fixed Q, sum exactly over the number of rows carrying the all-one codeword.",
+    "A positive two-colour hypergeometric recurrence places ordinary candidate rows and forced all-one rows without overlap in every transposed region.",
+    "Apply Holder across the independent regular-row density factors and the uniform-reference bad event.",
+    "Optimize the Chernoff and Holder witnesses separately for every mixture term before summing positive terms."
+  ],
+  "occupation_rows": [
+    {
+      "occupation": 30,
+      "log2_upper_diagnostic": 322.8020719907385,
+      "margin_bits_diagnostic": -322.8020719907385,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 30,
+      "mixture_rows": [
+        {
+          "regular_rows": 30,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 129.73948410451982,
+          "inner_plus_envelope_log2_upper": 193.0625878862187,
+          "pointwise_log2_upper": 322.8020719907385,
+          "pointwise_margin_bits": -322.8020719907385,
+          "log_surprisal": -1.5,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        }
+      ]
+    },
+    {
+      "occupation": 32,
+      "log2_upper_diagnostic": 285.3314687107779,
+      "margin_bits_diagnostic": -285.3314687107779,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 32,
+      "mixture_rows": [
+        {
+          "regular_rows": 32,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 135.41924794776506,
+          "inner_plus_envelope_log2_upper": 149.91222076301284,
+          "pointwise_log2_upper": 285.3314687107779,
+          "pointwise_margin_bits": -285.3314687107779,
+          "log_surprisal": -1.5,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        }
+      ]
+    },
+    {
+      "occupation": 36,
+      "log2_upper_diagnostic": 561.7048826508292,
+      "margin_bits_diagnostic": -561.7048826508292,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 36,
+      "mixture_rows": [
+        {
+          "regular_rows": 36,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 146.17875621648895,
+          "inner_plus_envelope_log2_upper": 415.52612643434026,
+          "pointwise_log2_upper": 561.7048826508292,
+          "pointwise_margin_bits": -561.7048826508292,
+          "log_surprisal": -1.5,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        }
+      ]
+    },
+    {
+      "occupation": 40,
+      "log2_upper_diagnostic": 1225.6232328268334,
+      "margin_bits_diagnostic": -1225.6232328268334,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 40,
+      "mixture_rows": [
+        {
+          "regular_rows": 40,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 156.1999273540137,
+          "inner_plus_envelope_log2_upper": 1069.4233054728197,
+          "pointwise_log2_upper": 1225.6232328268334,
+          "pointwise_margin_bits": -1225.6232328268334,
+          "log_surprisal": -1.5,
+          "candidate_probability": 0.5,
+          "holder_order": 3.1810154653305154
+        }
+      ]
+    },
+    {
+      "occupation": 48,
+      "log2_upper_diagnostic": 2145.486189104647,
+      "margin_bits_diagnostic": -2145.486189104647,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 48,
+      "mixture_rows": [
+        {
+          "regular_rows": 48,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 174.2592763998895,
+          "inner_plus_envelope_log2_upper": 1971.2269127047575,
+          "pointwise_log2_upper": 2145.486189104647,
+          "pointwise_margin_bits": -2145.486189104647,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.1342808013536474
+        }
+      ]
+    },
+    {
+      "occupation": 64,
+      "log2_upper_diagnostic": 4799.563492137755,
+      "margin_bits_diagnostic": -4799.563492137755,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 64,
+      "mixture_rows": [
+        {
+          "regular_rows": 64,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 203.56693551045632,
+          "inner_plus_envelope_log2_upper": 4595.996556627298,
+          "pointwise_log2_upper": 4799.563492137755,
+          "pointwise_margin_bits": -4799.563492137755,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0885475648548275
+        }
+      ]
+    },
+    {
+      "occupation": 80,
+      "log2_upper_diagnostic": 8757.033299908539,
+      "margin_bits_diagnostic": -8757.033299908539,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 80,
+      "mixture_rows": [
+        {
+          "regular_rows": 80,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 225.16764334138617,
+          "inner_plus_envelope_log2_upper": 8531.865656567154,
+          "pointwise_log2_upper": 8757.033299908539,
+          "pointwise_margin_bits": -8757.033299908539,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0885475648548275
+        }
+      ]
+    },
+    {
+      "occupation": 96,
+      "log2_upper_diagnostic": 12999.288048444549,
+      "margin_bits_diagnostic": -12999.288048444549,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 96,
+      "mixture_rows": [
+        {
+          "regular_rows": 96,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 240.05437727569912,
+          "inner_plus_envelope_log2_upper": 12759.23367116885,
+          "pointwise_log2_upper": 12999.288048444549,
+          "pointwise_margin_bits": -12999.288048444549,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0885475648548275
+        }
+      ]
+    },
+    {
+      "occupation": 112,
+      "log2_upper_diagnostic": 17246.463955877247,
+      "margin_bits_diagnostic": -17246.463955877247,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 112,
+      "mixture_rows": [
+        {
+          "regular_rows": 112,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 248.79122179984313,
+          "inner_plus_envelope_log2_upper": 16997.6727340774,
+          "pointwise_log2_upper": 17246.463955877247,
+          "pointwise_margin_bits": -17246.463955877247,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0885475648548275
+        }
+      ]
+    },
+    {
+      "occupation": 128,
+      "log2_upper_diagnostic": 21438.055542558806,
+      "margin_bits_diagnostic": -21438.055542558806,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 128,
+      "mixture_rows": [
+        {
+          "regular_rows": 128,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 251.67284305697086,
+          "inner_plus_envelope_log2_upper": 21186.382699501835,
+          "pointwise_log2_upper": 21438.055542558806,
+          "pointwise_margin_bits": -21438.055542558806,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0437942973082333
+        }
+      ]
+    },
+    {
+      "occupation": 160,
+      "log2_upper_diagnostic": 29523.519490933213,
+      "margin_bits_diagnostic": -29523.519490933213,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 160,
+      "mixture_rows": [
+        {
+          "regular_rows": 160,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 240.05437727569912,
+          "inner_plus_envelope_log2_upper": 29283.465113657516,
+          "pointwise_log2_upper": 29523.519490933213,
+          "pointwise_margin_bits": -29523.519490933213,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0437942973082333
+        }
+      ]
+    },
+    {
+      "occupation": 192,
+      "log2_upper_diagnostic": 37199.57477050861,
+      "margin_bits_diagnostic": -37199.57477050861,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 192,
+      "mixture_rows": [
+        {
+          "regular_rows": 192,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 203.5669355104564,
+          "inner_plus_envelope_log2_upper": 36996.007834998156,
+          "pointwise_log2_upper": 37199.57477050861,
+          "pointwise_margin_bits": -37199.57477050861,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0437942973082333
+        }
+      ]
+    },
+    {
+      "occupation": 224,
+      "log2_upper_diagnostic": 44716.0161128014,
+      "margin_bits_diagnostic": -44716.0161128014,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 224,
+      "mixture_rows": [
+        {
+          "regular_rows": 224,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 135.419247947765,
+          "inner_plus_envelope_log2_upper": 44580.596864853636,
+          "pointwise_log2_upper": 44716.0161128014,
+          "pointwise_margin_bits": -44716.0161128014,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0437942973082333
+        }
+      ]
+    },
+    {
+      "occupation": 256,
+      "log2_upper_diagnostic": 52353.18015725856,
+      "margin_bits_diagnostic": -52353.18015725856,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 256,
+      "mixture_rows": [
+        {
+          "regular_rows": 256,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 0.0,
+          "inner_plus_envelope_log2_upper": 52353.18015725856,
+          "pointwise_log2_upper": 52353.18015725856,
+          "pointwise_margin_bits": -52353.18015725856,
+          "log_surprisal": -1.0,
+          "candidate_probability": 0.5,
+          "holder_order": 3.0437942973082333
+        }
+      ]
+    }
+  ],
+  "partial_log2_upper": 52353.18015725856,
+  "partial_margin_bits": -52353.18015725856,
+  "limitations": [
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "The finite tilt and Bernoulli grids are not asserted optimal.",
+    "The finite Holder-order grid is not asserted optimal.",
+    "Only the displayed occupations are covered.",
+    "Only the no-all-one-row face is covered."
+  ]
+}

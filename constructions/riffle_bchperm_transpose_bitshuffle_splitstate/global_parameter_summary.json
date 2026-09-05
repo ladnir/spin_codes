@@ -1,0 +1,57 @@
+{
+  "schema": "riffle-bitshuffle-splitstate-global-parameter-summary-v1",
+  "candidate": "Riffle BCHPerm-TransposeBitShuffle-SplitState t=256 s=64",
+  "target": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "relative_distance": 0.09,
+    "target_margin_bits": 40
+  },
+  "splitstate_audited_point": {
+    "outer_bits": 256,
+    "step_bits": 256,
+    "state_bits": 64,
+    "constituent_distance": 40,
+    "one_active_margin_bits": 79.39524266758124,
+    "combined_regular_margin_bits": 79.39521128298072,
+    "logical_inner_xor_per_output_proxy": 10.61474609375
+  },
+  "preferred_existing_inner": {
+    "candidate": "Riffle FieldCheckpointAccumulate t=32 s=64 K=8",
+    "outer_bits": 256,
+    "checkpoint_epoch_bits": 256,
+    "state_bits": 64,
+    "regular_aggregate_margin_bits": 55.9506625823938,
+    "occupation_1024_pointwise_margin_bits": 30347.96,
+    "logical_inner_xor_per_output_proxy": 4.12255859375,
+    "status": "all regular occupations close numerically at 9%; all-one cases, explicit outer spectrum, and outward rounding remain open"
+  },
+  "canonical_middle_density_comparison": {
+    "active_regular_outer_blocks": 1024,
+    "fieldcheckpoint_k32_pointwise_log2_upper": 16038.896956377179,
+    "fieldcheckpoint_k8_pointwise_log2_upper": -30347.96,
+    "splitstate_fixed_coset_pointwise_log2_upper": 5549.821918,
+    "splitstate_combined_coset_pointwise_log2_upper": -67523.983218
+  },
+  "outer_block_conclusion": {
+    "B128": "below the 40-bit target in the one-active calculation",
+    "B256": "smallest tested audited point above the target",
+    "B512": "more margin but unnecessary outer work"
+  },
+  "lower_cost_unverified_point": {
+    "outer_bits": 256,
+    "step_bits": 128,
+    "state_bits": 32,
+    "one_active_margin_bits": 80.504519,
+    "logical_inner_xor_per_output_proxy": 9.36572265625,
+    "status": "extrapolated; no fixed constituent or activation audit"
+  },
+  "open_conditions": [
+    "prove the combined averaged affine-coset envelope for the fixed inner constituent and bit-shuffled input law",
+    "handle configurations containing the all-one outer word",
+    "replace the modeled outer spectrum or state its final assumption",
+    "outward-round the numerical calculation",
+    "measure a bit-transpose implementation of this inner"
+  ],
+  "conclusion": "SplitState is not currently competitive with FieldCheckpoint K=8. It costs more under the logical XOR proxy and requires an additional averaged-coset lemma to reproduce a regular-occupation result that K=8 already has."
+}

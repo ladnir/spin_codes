@@ -1,0 +1,150 @@
+\section{A common first-moment framework}
+\label{sec:framework}
+
+This section isolates the calculation shared by all SPIN families. We first
+define the complete sampled encoder. We then count low-weight outputs of
+nonzero messages.
+
+Fix lengths $K,N\ge1$. The construction samples an outer encoder
+$O:\F_2^K\to\F_2^N$ and a pair $(\Pi,I)$, where $\Pi$ is a permutation of
+$[N]$ and $I:\F_2^N\to\F_2^N$ is linear. Assume that $O$ is independent
+of $(\Pi,I)$. The realized SPIN encoder is
+\[
+  E:=I\circ\Pi\circ O.
+\]
+
+Fix a finite class set $\mathcal T$ and a class map
+$c:\F_2^N\to\mathcal T$. The class map records the information about an
+outer word that remains relevant after the outer stage.
+
+For a fixed outer word $u\in\F_2^N$, define its conditional failure
+probability
+\begin{equation}
+  q_d(u)
+  :=
+  \Prob_{\Pi,I}[\wt(I(\Pi(u)))\le d].
+  \label{eq:conditional-inner-failure}
+\end{equation}
+The probability is over the interleaver and inner setup; the word $u$ is
+fixed. For every class $\tau\in\mathcal T$, let $Q_\tau(d)$ be any certified
+envelope satisfying
+\begin{equation}
+  q_d(u)\le Q_\tau(d)
+  \qquad\text{for every $u$ with $c(u)=\tau$}.
+  \label{eq:class-failure-envelope}
+\end{equation}
+Set $Q_\tau(d):=0$ when the class has no preimage. The class need not determine
+the exact failure probability. It need only expose enough information to prove
+the uniform bound in~\eqref{eq:class-failure-envelope}.
+
+For $\tau\in\mathcal T$, define the expected outer multiplicity
+\begin{equation}
+  A_\tau^{\mathrm{out}}
+  :=
+  \E_O\!\left[
+    \sum_{x\in\F_2^K\setminus\{0\}}
+    \1\{c(O(x))=\tau\}
+  \right].
+  \label{eq:outer-class-multiplicity}
+\end{equation}
+
+\begin{theorem}[Class-indexed first-moment envelope]
+\label{thm:class-first-moment}
+For $d\in\{0,\ldots,N\}$, define
+\[
+  Z_d
+  :=
+  \bigl|\{x\in\F_2^K\setminus\{0\}:
+  \wt(E(x))\le d\}\bigr|.
+\]
+Then
+\begin{equation}
+\begin{split}
+  \Prob[E\text{ is not injective or }d_{\min}(E(\F_2^K))\le d]
+  \le
+  \E[Z_d]
+  &=
+  \E_O\!\left[
+    \sum_{x\in\F_2^K\setminus\{0\}}q_d(O(x))
+  \right]\\
+  &\le
+  \sum_{\tau\in\mathcal T}
+  A_\tau^{\mathrm{out}}Q_\tau(d).
+\end{split}
+  \label{eq:class-first-moment}
+\end{equation}
+If $q_d$ is constant on every class and $Q_\tau(d)$ equals that constant,
+then the final inequality is an equality.
+\end{theorem}
+
+\begin{proof}
+The bad event in~\eqref{eq:class-first-moment} occurs exactly when
+$Z_d\ge1$. Indeed, a nonzero kernel message contributes output weight zero,
+and every nonzero image word of weight at most $d$ has a nonzero preimage.
+Markov's inequality gives $\Prob[Z_d\ge1]\le\E[Z_d]$.
+
+For the identity, expand $Z_d$ as a sum over nonzero messages and condition
+on the outer realization. Independence of $O$ from $(\Pi,I)$ gives
+\[
+  \E[Z_d]
+  =
+  \E_O\!\left[
+    \sum_{x\ne0}q_d(O(x))
+  \right].
+\]
+Group the terms by $\tau=c(O(x))$ and apply
+\eqref{eq:class-failure-envelope}. Equation
+\eqref{eq:outer-class-multiplicity} gives the final inequality. Equality holds
+under the condition in the theorem statement.
+\end{proof}
+
+If $\mathcal G$ is an event determined only by the outer setup, the theorem
+also applies under the conditional law $O\mid\mathcal G$. The pair $(\Pi,I)$
+remains independent of the conditioned outer encoder. This observation lets a
+proof first select an outer spectrum event and then certify route envelopes on
+that event.
+
+\subsection{Uniform-interleaver specialization}
+
+Suppose $\Pi$ is uniform over all permutations of $[N]$. If $u$ has
+weight $w$, then $\Pi(u)$ is uniform over the Hamming slice
+\[
+  \mathcal H_{N,w}:=\{v\in\F_2^N:\wt(v)=w\}.
+\]
+Indeed, every vector in $\mathcal H_{N,w}$ has exactly
+$w!(N-w)!$ preimages among the permutations of $u$.
+
+Let $U_w$ be uniform over $\mathcal H_{N,w}$, independent of the inner
+setup, and define
+\begin{equation}
+  p_w^{\mathrm{in}}(d)
+  :=
+  \Prob_{U_w,I}[\wt(I(U_w))\le d].
+  \label{eq:inner-slice-tail}
+\end{equation}
+Also define
+\[
+  A_w^{\mathrm{out}}
+  :=
+  \E_O\bigl[
+    |\{x\ne0:\wt(O(x))=w\}|
+  \bigr].
+\]
+
+\begin{corollary}[Weight-indexed first moment]
+\label{cor:weight-first-moment}
+Under a uniform interleaver independent of $O$ and $I$,
+\[
+  \E[Z_d]
+  =
+  \sum_{w=0}^N
+  A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d).
+\]
+\end{corollary}
+
+Accumulator SPIN and Random SPIN use
+Corollary~\ref{cor:weight-first-moment}. Structured SPIN uses
+Theorem~\ref{thm:class-first-moment} with occupation and row-weight classes.
+The structured-route analysis supplies a uniform failure envelope for every
+such class; it does not require the conditional probability to be identical
+for all words in the class.

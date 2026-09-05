@@ -1,0 +1,41 @@
+{
+  "candidate": "Riffle BCHPerm-TransposeBitShuffle-RandomStepConv t=128 s=16",
+  "schema": "riffle-randomstepconv-t128-s16-summary-v1",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_bits": 256,
+    "outer_dimension": 128,
+    "epochs": 16384,
+    "step_bits": 128,
+    "state_bits": 16
+  },
+  "distance_011": {
+    "distance": 230686,
+    "relative_distance": 0.1099996566772461,
+    "aggregate_margin_bits": 42.90005925104205,
+    "dominant_active_outer_blocks": 1,
+    "all_active_pointwise_margin_bits": 174.43497929698788
+  },
+  "distance_40_endpoint": {
+    "distance": 230730,
+    "relative_distance": 0.11002063751220703,
+    "aggregate_margin_bits": 40.95099876339013,
+    "dominant_active_outer_blocks": 8192,
+    "dominant_pointwise_margin_bits": 41.38796529453248,
+    "next_distance": 230731,
+    "next_distance_margin_bits": 38.302732230755886
+  },
+  "modeled_bch_one_active_at_endpoint": {
+    "aggregate_margin_bits": 53.56115661143491,
+    "dominant_outer_weight": 38,
+    "dominant_pointwise_margin_bits": 54.076378341951155
+  },
+  "comparators": {
+    "asymptotic_rate_half_gv_relative_distance": 0.11002786443835955,
+    "finite_random_code_40_bit_distance": 230735,
+    "finite_random_code_40_bit_relative_distance": 0.11002302169799805
+  },
+  "larger_state_required": false,
+  "scope": "Exact two-state random-inner transfer with floating-point Chernoff optimization. Full occupations use the uniform-nonzero random outer model; the modeled BCH spectrum is inserted exactly for one active outer block. This is benchmark evidence, not an outward-rounded explicit-BCH certificate."
+}

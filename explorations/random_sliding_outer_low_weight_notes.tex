@@ -1,0 +1,60 @@
+\section{Random sliding outer low-weight notes}
+\label{sec:random-sliding-outer-low-weight-notes}
+
+This note preserves fixed-tap low-weight facts for the random sliding dense outer. They are useful for finite scalar
+diagnostics and for comparing sliding-band and block-code outer spectra, but they are not consumed by the current
+compiled dense+dense asymptotic theorem.
+
+\subsection{Demoted dense-outer orientation notes}
+
+The compiled random sliding outer section keeps the fixed-word law, the global generating-function envelope, and the
+linear-weight exponent.  The following orientation notes were demoted during cleanup because they duplicate the role of
+the integration section.
+
+\paragraph{Spectrum-control interpretation.}
+The parameter \(z\) is the spectrum-control knob in the global generating-function proof.
+Choosing \(z\) closer to \(\sqrt2-1\) improves the exponential base \(\beta_{\mathrm{out}}=O(1/z)\), but requires a
+larger memory constant \(c\) to make \(ka(z)^M\) decay.
+This tradeoff is what the dense+dense proof optimizes against the inner contraction factor.
+
+\paragraph{Why the linear exponent matters.}
+The baseline theorem only needs the crude global envelope \(A_h\le z^{-h}\).
+The linear-weight exponent is the sharper object that interfaces naturally with the dense-inner linear-weight exponent,
+and it is the analytic substitute for guidance from the exact enumerator.
+
+\paragraph{Interface summary.}
+For the systematic dense outer, the theorem-facing ingredients are: the fixed-word law, the global generating-function
+bound, the resulting geometric expected-spectrum envelope, the explicit linear-weight spectrum exponent, and the
+low-linear-weight envelope.
+
+\begin{lemma}[Fixed-tap outer removes weight one]
+\label{lem:outer-fixedtap-no-weight-one}
+For the fixed-tap systematic banded outer,
+\[
+\enum_{\Cone,1}=0
+\]
+deterministically.
+\end{lemma}
+
+\begin{proof}
+A nonzero systematic outer codeword of weight one would have to come from a weight-one message \(x=e_i\) whose parity
+part is zero. But the fixed diagonal tap gives \(p_i=1\), so the parity part has weight at least one.
+\end{proof}
+
+\begin{lemma}[Fixed-tap banded low-weight parity law]
+\label{lem:outer-fixedtap-banded-lowweight-law}
+Fix a message word \(x\) of weight \(w\). Let \(q(x)\) be the size of the union of the parity-band intervals touched by
+the support of \(x\), and let \(r(x)\) be the number of band-clusters of that support, where adjacent support positions
+are in the same cluster when their separation is at most \(M\). Then the fixed-tap parity weight
+has the form
+\[
+r(x)+\Binomial(q(x)-r(x),\tfrac12).
+\]
+\end{lemma}
+
+\begin{proof}
+The first support position in each \(\sigma\)-cluster has a parity coordinate where only its fixed diagonal tap is
+active, so that coordinate contributes a deterministic one. These give \(r(x)\) parity ones. Every other active parity
+coordinate sees at least one random tap from the band, so its output is an independent fair bit. There are
+\(q(x)-r(x)\) such coordinates.
+\end{proof}

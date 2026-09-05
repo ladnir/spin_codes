@@ -1,0 +1,200 @@
+{
+  "all_sampled_closed": true,
+  "association_matrix": [
+    [
+      1,
+      5040,
+      110848,
+      292510,
+      110848,
+      5040,
+      1
+    ],
+    [
+      5040,
+      -6408,
+      41280,
+      -37596,
+      -320,
+      -3256,
+      1260
+    ],
+    [
+      110848,
+      41280,
+      -39680,
+      -93216,
+      -33024,
+      -64,
+      13856
+    ],
+    [
+      292510,
+      -37596,
+      -93216,
+      -76862,
+      -80352,
+      -4484,
+      0
+    ],
+    [
+      110848,
+      -320,
+      -33024,
+      -80352,
+      19712,
+      -3008,
+      -13856
+    ],
+    [
+      5040,
+      -3256,
+      -64,
+      -4484,
+      -3008,
+      7032,
+      -1260
+    ],
+    [
+      1,
+      1260,
+      13856,
+      0,
+      -13856,
+      -1260,
+      -1
+    ]
+  ],
+  "checks": {
+    "B_is_transpose_of_A": true,
+    "association_axis_sums": true,
+    "spectrum_mass": 524288
+  },
+  "delta": 0.11,
+  "limitations": [
+    "The association matrix and transpose checks use exact integers.",
+    "The continuous saddle and Perron roots use binary64 arithmetic.",
+    "A sampled alpha list is not a uniform interval certificate.",
+    "The three-state and four-state transfers are entrywise envelopes, not equalities.",
+    "The four-state active-event split uses a rigorous but loose probability bound."
+  ],
+  "maximum_sampled_objective": {
+    "alpha": 1.0,
+    "candidate_probability": 0.9999999999,
+    "deterministic_moment": 8.83567484795441e-33,
+    "envelope": "three_state",
+    "margin_bits_per_output_bit": 8.399869558095574e-05,
+    "objective_bits_per_output_bit": -8.399869558095574e-05,
+    "optimizer_success": true,
+    "perron_radius": 8.835708553411398e-33,
+    "punctured_live_moment": 8.835691700731035e-33,
+    "surprisal": 2.0907410934939987,
+    "variant_rows": [
+      {
+        "alpha": 1.0,
+        "candidate_probability": 0.9999999999,
+        "deterministic_moment": 8.83567484795441e-33,
+        "envelope": "three_state",
+        "margin_bits_per_output_bit": 8.399869558095574e-05,
+        "objective_bits_per_output_bit": -8.399869558095574e-05,
+        "optimizer_success": true,
+        "perron_radius": 8.835708553411398e-33,
+        "punctured_live_moment": 8.835691700731035e-33,
+        "surprisal": 2.0907410934939987,
+        "z": 0.12359550604311771,
+        "zero_to_deterministic": 8.835655184288332e-33,
+        "zero_to_zero": 1.97518816219203e-38
+      },
+      {
+        "alpha": 1.0,
+        "candidate_probability": 0.9999999999,
+        "deterministic_moment": 8.83567484795441e-33,
+        "envelope": "four_state",
+        "margin_bits_per_output_bit": -0.0077284636832554154,
+        "objective_bits_per_output_bit": 0.0077284636832554154,
+        "optimizer_success": true,
+        "perron_radius": 1.7671358122267693e-32,
+        "punctured_live_moment": 8.835691700731035e-33,
+        "surprisal": 2.0907410934939987,
+        "z": 0.12359550604311771,
+        "zero_to_deterministic": 8.835655184288332e-33,
+        "zero_to_zero": 1.97518816219203e-38
+      }
+    ],
+    "z": 0.12359550604311771,
+    "zero_to_deterministic": 8.835655184288332e-33,
+    "zero_to_zero": 1.97518816219203e-38
+  },
+  "rows": [
+    {
+      "alpha": 1.0,
+      "candidate_probability": 0.9999999999,
+      "deterministic_moment": 8.83567484795441e-33,
+      "envelope": "three_state",
+      "margin_bits_per_output_bit": 8.399869558095574e-05,
+      "objective_bits_per_output_bit": -8.399869558095574e-05,
+      "optimizer_success": true,
+      "perron_radius": 8.835708553411398e-33,
+      "punctured_live_moment": 8.835691700731035e-33,
+      "surprisal": 2.0907410934939987,
+      "variant_rows": [
+        {
+          "alpha": 1.0,
+          "candidate_probability": 0.9999999999,
+          "deterministic_moment": 8.83567484795441e-33,
+          "envelope": "three_state",
+          "margin_bits_per_output_bit": 8.399869558095574e-05,
+          "objective_bits_per_output_bit": -8.399869558095574e-05,
+          "optimizer_success": true,
+          "perron_radius": 8.835708553411398e-33,
+          "punctured_live_moment": 8.835691700731035e-33,
+          "surprisal": 2.0907410934939987,
+          "z": 0.12359550604311771,
+          "zero_to_deterministic": 8.835655184288332e-33,
+          "zero_to_zero": 1.97518816219203e-38
+        },
+        {
+          "alpha": 1.0,
+          "candidate_probability": 0.9999999999,
+          "deterministic_moment": 8.83567484795441e-33,
+          "envelope": "four_state",
+          "margin_bits_per_output_bit": -0.0077284636832554154,
+          "objective_bits_per_output_bit": 0.0077284636832554154,
+          "optimizer_success": true,
+          "perron_radius": 1.7671358122267693e-32,
+          "punctured_live_moment": 8.835691700731035e-33,
+          "surprisal": 2.0907410934939987,
+          "z": 0.12359550604311771,
+          "zero_to_deterministic": 8.835655184288332e-33,
+          "zero_to_zero": 1.97518816219203e-38
+        }
+      ],
+      "z": 0.12359550604311771,
+      "zero_to_deterministic": 8.835655184288332e-33,
+      "zero_to_zero": 1.97518816219203e-38
+    }
+  ],
+  "schema": "rm2sub-dense-occupation-v2",
+  "selection": "constructions\\riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20\\receipts\\min_state\\s19_rm2sub_selection.json",
+  "state_bits": 19,
+  "status": "EXACT_INTEGER_ASSOCIATION_BINARY64_SADDLE_DIAGNOSTIC",
+  "step_bits": 128,
+  "weight_classes": [
+    0,
+    48,
+    56,
+    64,
+    72,
+    80,
+    128
+  ],
+  "weight_counts": [
+    1,
+    5040,
+    110848,
+    292510,
+    110848,
+    5040,
+    1
+  ]
+}

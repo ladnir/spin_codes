@@ -1,0 +1,226 @@
+\section{Proof details and artifact interfaces}
+
+This appendix records proof details that are not needed to understand the
+construction progression.
+
+\subsection{Random SPIN exponent closure}
+\label{app:random-spin-exponents}
+
+This subsection proves the two estimates used by
+Theorem~\ref{thm:independent-random-spin}. The outer exponent follows from
+the exact injection law in~\eqref{eq:injection-global-mass}. For a sequence
+$h/N\to\eta\in(0,1)$, coefficient extraction gives
+\begin{equation}
+  \Phi_{\mathrm{blk}}(\eta)
+  =
+  \begin{cases}
+    \eta\log_2(1+\sqrt2),
+      &0<\eta\le1-2^{-1/2},\\[1mm]
+    H_2(\eta)-1/2,
+      &1-2^{-1/2}\le\eta<1.
+  \end{cases}
+  \label{eq:random-outer-linear-exponent}
+\end{equation}
+
+The inner exponent comes from the transfer matrix in
+\eqref{eq:random-transfer-matrix}. For $a>0$ and $S\in(0,1)$, define
+\[
+  \lambda_\infty(a,S)
+  :=
+  \max\left\{1,\frac{(1+a)(1+S)}2\right\}.
+\]
+
+\begin{lemma}[Limiting convolution growth]
+\label{lem:limiting-convolution-growth}
+If $m_N=\Theta(\log N)$, then
+\begin{equation}
+  \limsup_{N\to\infty}\frac1N\log_2
+  \left(
+    e_{m_N}^{\mathsf T}T_{m_N}(a,S)^N\boldsymbol 1
+  \right)
+  \le\log_2\lambda_\infty(a,S).
+  \label{eq:limiting-convolution-growth}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Set $b:=(1+a)/2$ and let $\lambda_m$ be the Perron root of
+$T_m(a,S)$. The right Perron-vector equations give
+\begin{equation}
+  1
+  =
+  \frac{bS}{\lambda_m}
+  \frac{1-(b/\lambda_m)^m}{1-b/\lambda_m}
+  +
+  \left(\frac b{\lambda_m}\right)^m
+  \frac{aS}{\lambda_m-1}.
+  \label{eq:perron-root-identity}
+\end{equation}
+If $b(1+S)<1$, this identity gives $\lambda_m\to1$. If
+$b(1+S)>1$, the active-state principal submatrix and
+\eqref{eq:perron-root-identity} give
+$\lambda_m\to b(1+S)$. At equality, any subsequential limit greater than one
+contradicts~\eqref{eq:perron-root-identity}.
+
+Normalize the Perron vector at state zero. The same equations show that the
+ratio of its largest and smallest coordinates is $\exp(O(m))$. Comparing the
+all-ones vector with coordinatewise multiples of this Perron vector bounds the
+matrix power by $\lambda_m^N\exp(O(m))$. Since $m_N=O(\log N)$, this factor is
+subexponential and proves~\eqref{eq:limiting-convolution-growth}.
+\end{proof}
+
+For $\delta\in(0,1/2)$, equations
+\eqref{eq:random-convolution-tail} and
+\eqref{eq:limiting-convolution-growth} give the inner exponent
+\begin{equation}
+  F_\delta(\eta)
+  :=
+  \inf_{\substack{a>0\\0<S<1}}
+  \left[
+    \log_2\lambda_\infty(a,S)
+    -\eta\log_2a
+    -\delta\log_2S
+    -H_2(\eta)
+  \right].
+  \label{eq:random-inner-linear-exponent}
+\end{equation}
+Set
+\[
+  \eta_{\mathrm{conv}}(\delta)
+  :=1-\frac1{2(1-\delta)},
+  \quad
+  a_\eta
+  :=\frac{\eta}{\sqrt{\eta^2+\delta^2}+\delta},
+  \quad
+  S_\eta:=\frac{1-a_\eta}{1+a_\eta}.
+\]
+Direct minimization yields
+\begin{equation}
+  F_\delta(\eta)
+  =
+  \begin{cases}
+    -\eta\log_2a_\eta-\delta\log_2S_\eta-H_2(\eta),
+      &0<\eta\le\eta_{\mathrm{conv}}(\delta),\\[1mm]
+    H_2(\delta)-1,
+      &\eta_{\mathrm{conv}}(\delta)\le\eta<1.
+  \end{cases}
+  \label{eq:closed-random-inner-exponent}
+\end{equation}
+
+\begin{lemma}[Linear-weight closure]
+\label{lem:random-spin-linear-closure}
+Set $\delta_*:=5501/50000$ and
+$J_{\delta_*}:=\Phi_{\mathrm{blk}}+F_{\delta_*}$. Then
+\[
+  J_{\delta_*}(\eta)<0
+  \qquad(0<\eta<1).
+\]
+The inequality is uniform on every compact subinterval of $(0,1)$.
+\end{lemma}
+
+\begin{proof}
+Set $\eta_{\mathrm{blk}}:=1-2^{-1/2}$. On
+$(0,\eta_{\mathrm{blk}}]$, the derivative of $J_{\delta_*}$ is increasing,
+so $J_{\delta_*}$ is convex and $J_{\delta_*}(0)=0$. Outward interval
+arithmetic gives
+\[
+  J_{\delta_*}(\eta_{\mathrm{blk}})
+  \in[-0.074030,-0.074029].
+\]
+Convexity proves strict negativity on the first region. On
+$[\eta_{\mathrm{blk}},\eta_{\mathrm{conv}}(\delta_*)]$, the entropy terms
+cancel and the remaining expression is increasing. Its right endpoint lies
+in $[-0.011076,-0.011075]$. On the final region,
+\[
+  J_{\delta_*}(\eta)
+  =H_2(\eta)+H_2(\delta_*)-\frac32
+  \le H_2(\delta_*)-\frac12,
+\]
+and the last value lies in
+$[-0.000023719,-0.000023718]$. These strict intervals prove the claim.
+\end{proof}
+
+The remaining issue is uniformity as $\eta\downarrow0$. Define
+\[
+  \eta_*:=\frac1{5000},
+  \qquad
+  \chi:=\frac{101}{100},
+  \qquad
+  \gamma:=\frac{51}{50}.
+\]
+Set
+\begin{align*}
+  a_*&:=\frac{\eta_*}{\delta_*(\chi+1)},
+  &b_*&:=\frac{1+a_*}{2},\\
+  \epsilon_*&:=
+  \frac{\chi^2a_*}{(\chi+1)(1-\chi a_*)}
+  +\frac{\eta_*}{2(1-\eta_*)},
+  &\rho_*&:=\delta_*(\chi+1)e^{\epsilon_*}.
+\end{align*}
+
+\begin{lemma}[Sparse-weight closure]
+\label{lem:random-spin-sparse-closure}
+Let $m_N:=\lceil\gamma\log_2N\rceil$. There are constants $C,N_0$ such
+that, for $N\ge N_0$ and $1\le h\le\eta_*N$,
+\begin{equation}
+  p_{N,h}(\delta_*)
+  \le C N^{2\gamma}\sqrt h\,\rho_*^h.
+  \label{eq:random-spin-sparse-tail}
+\end{equation}
+If $B_N$ is even, divides $N$, and satisfies
+$B_N\ge17\log_2N$, then
+\begin{equation}
+  \sum_{h=1}^{\lfloor\eta_*N\rfloor}
+  \E[A_{N,h}^{\mathrm{out}}]p_{N,h}(\delta_*)
+  =o(1).
+  \label{eq:random-spin-sparse-sum}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For $\eta:=h/N$, evaluate~\eqref{eq:random-convolution-tail} at
+\[
+  a:=\frac{\eta}{\delta_*(\chi+1)},
+  \qquad
+  S:=\frac{1-\chi a}{1+a}.
+\]
+The active-state row sum equals $1-(\chi-1)a/2<1$. The Perron-root identity
+then bounds the matrix power by $CN^{2\gamma}$ uniformly over the stated
+range. A standard lower bound on $\binom Nh$ gives
+\eqref{eq:random-spin-sparse-tail}; the exponent correction increases with
+$\eta$ and is at most $\epsilon_*$. Interval arithmetic certifies
+\begin{align*}
+  \rho_*&\in
+  [0.2212639483446276,0.2212639483446278],\\
+  \gamma\log_2(1/b_*)-1&>0.0186697.
+\end{align*}
+In particular, $\rho_*<\sqrt2-1$.
+
+The exact independent-block outer law gives
+\[
+  \sum_{h\le\eta_*N}
+  \E[A_{N,h}^{\mathrm{out}}]p_{N,h}(\delta_*)
+  \le
+  C N^{2\gamma+1/2}
+  \left[(1+G_{B_N,1/2}(\rho_*))^{N/B_N}-1\right].
+\]
+Using~\eqref{eq:injection-local-mass}, the right side is bounded by a
+constant times
+\[
+  \frac{N^{2\gamma+3/2}}{B_N}
+  \left(\frac{1+\rho_*}{\sqrt2}\right)^{B_N}.
+\]
+Finally, outward arithmetic gives
+\[
+  17\log_2\!\left(\frac{\sqrt2}{1+\rho_*}\right)
+  -(2\gamma+3/2)>0.0576243.
+\]
+Thus the last expression tends to zero.
+\end{proof}
+
+The hash-bound artifact named in
+Appendix~\ref{app:structured-scalable-certificate} contains the complete
+structured-route and RM2Sub transfer derivations, verifier sources, receipts,
+and arithmetic semantics. The theorem uses the probability space and
+inequalities stated in the main text and appendices; the artifact supplies the
+independently checkable arithmetic witnesses.

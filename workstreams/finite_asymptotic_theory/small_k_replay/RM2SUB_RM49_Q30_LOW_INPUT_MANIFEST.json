@@ -1,0 +1,33 @@
+{
+  "schema": "rm2sub-rm49-q30-low-input-manifest-v1",
+  "status": "FROZEN_CERTIFICATE_INPUTS",
+  "claim": {
+    "occupation": 30,
+    "composition": {
+      "low_rows": 30,
+      "central_rows": 0,
+      "high_rows": 0
+    },
+    "low_weight_band": [1, 95],
+    "low_reference_probability": "1/4",
+    "bad_weight_upper": 13107
+  },
+  "files": [
+    {
+      "role": "q1_input_manifest",
+      "path": "RM2SUB_RM49_Q1_INPUT_MANIFEST.json",
+      "sha256": "a06c1f5ecf0e33d17753cb1924a81f78e7238e183e1eec7941ba2d268a4801e5"
+    },
+    {
+      "role": "shared_outward_helpers",
+      "path": "certify_rm2sub_rm49_q1_outward.py",
+      "sha256": "e71d757394cb453209db4875f803f04daabd9d4382ea6de7d988272d9b5da4cd"
+    },
+    {
+      "role": "binary64_composition_witness",
+      "path": "rm2sub_refined_q30_witness_d100.json",
+      "sha256": "48d42f6ea61a5a69b8154c613573f29e7521beb83366ca12069047d8f14e5cda"
+    }
+  ],
+  "scope": "This manifest freezes one representative refined-band composition. It does not cover the other 495 compositions at occupation 30."
+}

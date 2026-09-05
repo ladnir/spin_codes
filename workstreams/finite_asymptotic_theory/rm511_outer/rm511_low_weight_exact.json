@@ -1,0 +1,32 @@
+{
+  "schema": "rm511-low-weight-enumerator-v1",
+  "status": "EXACT_INTEGER_FORMULA_CHECK",
+  "code": {
+    "name": "RM(5,11)",
+    "length": 2048,
+    "dimension": 1024,
+    "distance": 64
+  },
+  "scope": "all nonzero coefficients below twice the minimum distance",
+  "coefficients": {
+    "64": "113562778208",
+    "96": "36668966832250368",
+    "112": "54200225260621496320",
+    "120": "1213348790503877902336",
+    "124": "3841018795264309198848"
+  },
+  "regression": {
+    "code": "RM(4,9)",
+    "matched_weights": [
+      32,
+      48,
+      56,
+      60
+    ],
+    "matches_authenticated_full_spectrum": true
+  },
+  "source": {
+    "result": "Kasami--Tokura formula for weights below twice the minimum distance",
+    "doi": "10.1109/TIT.1970.1054545"
+  }
+}

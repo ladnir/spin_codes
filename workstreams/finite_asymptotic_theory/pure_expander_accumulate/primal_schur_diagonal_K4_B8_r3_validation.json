@@ -1,0 +1,50 @@
+{
+  "schema": "pure-ea-primal-schur-diagonal-target-probe-v1",
+  "status": "BINARY64_WITH_LONGDOUBLE_REDUCTION_DIAGNOSTIC",
+  "result": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "enumerated_pair_types": 35,
+    "entries": [
+      {
+        "sector": 0,
+        "level": 2,
+        "scaled_diagonal": 0.6177606582641593,
+        "unscaled_log2": -4.694880098208738,
+        "full_block_scaled_diagonal": 0.6177606582641603,
+        "relative_residual": 9.992007221626409e-16
+      },
+      {
+        "sector": 1,
+        "level": 1,
+        "scaled_diagonal": 3.0820312499999973,
+        "unscaled_log2": -2.3761185099865427,
+        "full_block_scaled_diagonal": 3.08203125,
+        "relative_residual": 8.645386898982208e-16
+      },
+      {
+        "sector": 1,
+        "level": 3,
+        "scaled_diagonal": 0.5273437499999997,
+        "unscaled_log2": -4.92318440294917,
+        "full_block_scaled_diagonal": 0.5273437500000001,
+        "relative_residual": 4.440892098500626e-16
+      },
+      {
+        "sector": 2,
+        "level": 4,
+        "scaled_diagonal": 1.4531249999999996,
+        "unscaled_log2": -3.460841188891969,
+        "full_block_scaled_diagonal": 1.4531249999999998,
+        "relative_residual": 1.5280488941077425e-16
+      }
+    ],
+    "maximum_relative_validation_residual": 9.992007221626409e-16
+  },
+  "scope": [
+    "The streamed pair-type and Schur-power formulas are exact identities.",
+    "Vector operations use nondirected binary64; reductions use numpy.longdouble.",
+    "The output is not a rigorous interval certificate."
+  ]
+}

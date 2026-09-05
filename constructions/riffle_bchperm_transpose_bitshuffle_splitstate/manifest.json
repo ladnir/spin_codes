@@ -1,0 +1,31 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_bchperm_transpose_bitshuffle_splitstate",
+  "display_name": "Riffle BCHPerm-TransposeBitShuffle-SplitState(t,s)",
+  "status": "DIAGNOSTIC_COSET_EXPLORATION",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_structuredstepconv",
+  "outer": "fixed binary [256,128] code with a modeled distance-38 spectrum and an independent output-coordinate permutation per outer block",
+  "permutation": "transpose to 256 regions and independently permute every bit in each region",
+  "inner": "fixed nested maps A:F2^64->F2^256 and B:F2^256->F2^64 with BA=0; output X+A(Q), compress with B, and randomize each nonzero 64-bit next state by a fixed nonzero field scalar",
+  "preferred_parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "step_bits": 256,
+    "state_bits": 64,
+    "constituent_distance": 40,
+    "relative_distance_target": 0.09,
+    "logical_inner_xor_per_output_proxy": 10.61474609375
+  },
+  "proof_status": {
+    "one_active": "79.3952 modeled bits at 9%",
+    "fixed_coset_middle_density": "occupation 1024 still fails by 5549.82 bits",
+    "combined_coset_middle_density": "occupation 1024 has 67523.98 bits of pointwise margin",
+    "regular_occupation_sum": "79.3952 floating-point bits after using the exact modeled spectrum at occupation one and the density envelope from occupation two onward",
+    "fieldcheckpoint_k8_comparison": "the established K=8 FieldCheckpoint regular calculation already closes occupation 1024 by 30347.96 bits and all regular occupations by 55.9507 aggregate bits",
+    "averaged_coset_lemma": "required and open",
+    "all_one_outer_cases": "open",
+    "end_to_end_distance": "open"
+  },
+  "claim_scope": "This is a diagnostic alternative, not the preferred construction. Its regular-occupation result assumes a random-like affine-coset moment averaged over the bit-shuffled outer input. That assumption is not proved for the fixed constituent. The outer spectrum is modeled, the all-one outer word is excluded, and numerical arithmetic is not outward rounded."
+}

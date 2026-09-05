@@ -1,0 +1,75 @@
+{
+  "schema": "one-stage-sparse-ea-randomstepconv-finite-outward-v1",
+  "status": "OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "sparse_right_degree": 33,
+    "distance_cutoff": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "inner_memory_bits": 22,
+    "rank_test_attempts": 16
+  },
+  "probability_space": {
+    "outer_attempt": "sample 512 independent uniform weight-33 row vectors in F_2^256, then apply the zero-initialized accumulator",
+    "outer_setup": "sample independent attempts, accept the first full-rank constituent, and abort after 16 failures",
+    "outer_reuse": "reuse the accepted constituent in all 4096 outer rows",
+    "routing": "independently sample one uniform 512-coordinate permutation per outer row and one uniform 4096-position permutation per transposed region",
+    "inner": "independently sample one uniform binary 23-by-23 linear map at each of the 2^21 RandomStepConv positions; fix all maps for the code"
+  },
+  "claim": {
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "q1_log2_upper": -61.389512531186,
+    "q2_log2_upper": -105.27347401089473,
+    "q3_159_log2_upper": -51.679610031721595,
+    "q160_4096_log2_upper": -57.001158768388656,
+    "conditional_bad_probability_log2_upper": -51.64229720135326,
+    "conditional_margin_bits_lower": 51.64229720135326,
+    "setup_failure_log2_upper": -41.36329660902265,
+    "setup_margin_bits_lower": 41.36329660902265,
+    "setup_or_bad_log2_upper": -41.3621359294963,
+    "overall_margin_bits_lower": 41.3621359294963,
+    "comparison_to_2^-40": true
+  },
+  "transfer_checks": {
+    "band_majorant_domination": {
+      "low": true,
+      "central": true,
+      "high": true
+    },
+    "q1_recomputed_with_exact_caps": {
+      "shells": 429,
+      "maximum_pointwise_log2_upper": -70.13434636868556
+    },
+    "q2_recomputed_with_exact_caps": {
+      "shell_pairs": 184041,
+      "maximum_pointwise_log2_upper": -122.76314168589384
+    },
+    "q3_159_reused_by_band_monotonicity": true,
+    "q160_4096_reused_by_band_monotonicity": true
+  },
+  "sources": [
+    {
+      "file": "one_stage_sparse_ea_K256_B512_r33_spectrum_caps_outward.json",
+      "sha256": "cc665bd4cb6e6c7b5aa88d32ee373a918399035b851d6b6d8d8bffbd1492d78a"
+    },
+    {
+      "file": "single_random_constituent_B512_sparse_outward_s22.json",
+      "sha256": "6e34039c98b77d98c7c3c94d1344828970099290f8d7703f8fe3f3a76e99ffcc"
+    },
+    {
+      "file": "single_random_constituent_B512_shared_two_band_dense_cover_outward_s22.json",
+      "sha256": "939d495262fe67719519ddd9180d900eafe97c30e3504153a3348838c68658cd"
+    }
+  ],
+  "scope": [
+    "The distance statement is unconditional over bounded rank-tested outer setup, routing, and RandomStepConv setup.",
+    "The certificate applies to RandomStepConv-M22, not RM2Sub.",
+    "The routing includes independent uniform row-coordinate and region permutations; no structured-permutation replacement is proved here.",
+    "The encoder reuses one accepted outer constituent; it does not resample a constituent per outer row."
+  ]
+}

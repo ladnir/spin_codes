@@ -1,0 +1,35 @@
+{
+  "schema": "ebch128-pow2-spectrum-budget-v1",
+  "status": "DIAGNOSTIC",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "distance_cutoff": 230687,
+    "outer_rows": 16384
+  },
+  "uniform_random_linear_code": {
+    "first_moment_margin_bits": 188.37938519427553,
+    "event": "nonzero codeword weight strictly below the distance cutoff"
+  },
+  "body_spectrum_vs_uniform_even_body": {
+    "excluded_weights": [
+      0,
+      128
+    ],
+    "kl_bits_per_row": 4.40280065097029e-05,
+    "kl_bits_at_full_occupation": 0.7213548586549723,
+    "renyi2_bits_per_row": 8.805243013242725e-05,
+    "renyi2_bits_at_full_occupation": 1.442651015289688,
+    "max_log2_density_ratio_per_row": 0.0674346406455965,
+    "max_log2_density_ratio_at_full_occupation": 1104.849152337453,
+    "maximizing_weights": [
+      24,
+      104
+    ]
+  },
+  "interpretation": [
+    "The existing dense proof pays the maximum density ratio independently in every active row.",
+    "The small KL and Renyi-2 values show that this pointwise payment is not representative of the average body spectrum.",
+    "These diagnostics do not themselves imply a distance bound; a shell-sensitive transfer is still required."
+  ]
+}

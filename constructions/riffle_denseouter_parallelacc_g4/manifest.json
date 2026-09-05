@@ -1,0 +1,25 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_denseouter_parallelacc_g4",
+  "display_name": "Riffle DenseOuter-ParallelAcc g=4",
+  "status": "PROVED_ASYMPTOTIC_WARMUP",
+  "parent_candidate_id": null,
+  "baseline": [
+    "outerDense.tex",
+    "innerAcc.tex"
+  ],
+  "randomness": [
+    "independent dense outer taps sampled at code construction",
+    "one uniform global permutation of four-bit packet positions"
+  ],
+  "constituent": {
+    "packet_alphabet": "F_2^4",
+    "initial_state": 0,
+    "state_update": "s_t = s_{t-1} XOR x_t",
+    "output": "y_t = s_t",
+    "termination": "outer emits M termination parities; accumulator is unterminated",
+    "lap_count": 1
+  },
+  "claim_scope": "proved asymptotic linear distance for the terminated dense outer and a uniform packet permutation"
+}
+

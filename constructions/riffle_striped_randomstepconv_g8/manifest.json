@@ -1,0 +1,22 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_striped_randomstepconv_g8",
+  "display_name": "Riffle S-Stripe RandomStepConv g=8",
+  "status": "PROMISING_PROVISIONAL_BOUND",
+  "parent_candidate_id": "riffle_random_outer_landscape",
+  "outer": "independent random rate-half linear injections of B/2 bits into B bits",
+  "packet_bits": 8,
+  "permutation": "divide the B/g packet coordinates into S equal classes; independently permute all packets assigned to each class; emit classes as consecutive regions",
+  "stripe_instances": [
+    "S=1 global-permutation control",
+    "S=2 half-stripe",
+    "S=4 four-stripe",
+    "S=B/g full-stripe"
+  ],
+  "inner": "one-lap RandomStepConv with independent unrestricted (g+sigma)-square binary matrices and discarded terminal state",
+  "baseline": {
+    "message_bits": 1048576,
+    "relative_distance": 0.09
+  },
+  "claim_scope": "Exact full-stripe regional coefficients and complete occupation sums give provisional margins above 700 bits at (B,sigma)=(32768,28) and above 1000 bits at (16384,51). Floating-point rounding is not yet certified; no closed minimum-distance claim."
+}

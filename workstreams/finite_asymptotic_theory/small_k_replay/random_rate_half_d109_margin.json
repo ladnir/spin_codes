@@ -1,0 +1,144 @@
+{
+  "schema": "random-linear-rate-half-first-moment-margin-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "experiment": "sample a uniform binary linear map from k input bits to N=2k output bits and union-bound all nonzero messages",
+  "claim": {
+    "first_message_exponent_closing_40_bits": 13,
+    "rows": [
+      {
+        "message_exponent": 8,
+        "message_bits": 256,
+        "output_bits": 512,
+        "distance_cutoff": 56,
+        "relative_distance_lower": 0.109375,
+        "expected_bad_log2_diagnostic": -8.002438213568727,
+        "margin_bits_diagnostic": 8.002438213568727,
+        "closes_40_bits_diagnostic": false
+      },
+      {
+        "message_exponent": 9,
+        "message_bits": 512,
+        "output_bits": 1024,
+        "distance_cutoff": 112,
+        "relative_distance_lower": 0.109375,
+        "expected_bad_log2_diagnostic": -9.507001741431836,
+        "margin_bits_diagnostic": 9.507001741431836,
+        "closes_40_bits_diagnostic": false
+      },
+      {
+        "message_exponent": 10,
+        "message_bits": 1024,
+        "output_bits": 2048,
+        "distance_cutoff": 224,
+        "relative_distance_lower": 0.109375,
+        "expected_bad_log2_diagnostic": -12.023856487319156,
+        "margin_bits_diagnostic": 12.023856487319156,
+        "closes_40_bits_diagnostic": false
+      },
+      {
+        "message_exponent": 11,
+        "message_bits": 2048,
+        "output_bits": 4096,
+        "distance_cutoff": 447,
+        "relative_distance_lower": 0.109130859375,
+        "expected_bad_log2_diagnostic": -19.591502389707273,
+        "margin_bits_diagnostic": 19.591502389707273,
+        "closes_40_bits_diagnostic": false
+      },
+      {
+        "message_exponent": 12,
+        "message_bits": 4096,
+        "output_bits": 8192,
+        "distance_cutoff": 893,
+        "relative_distance_lower": 0.1090087890625,
+        "expected_bad_log2_diagnostic": -34.227391198717974,
+        "margin_bits_diagnostic": 34.227391198717974,
+        "closes_40_bits_diagnostic": false
+      },
+      {
+        "message_exponent": 13,
+        "message_bits": 8192,
+        "output_bits": 16384,
+        "distance_cutoff": 1786,
+        "relative_distance_lower": 0.1090087890625,
+        "expected_bad_log2_diagnostic": -59.96736880604495,
+        "margin_bits_diagnostic": 59.96736880604495,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 14,
+        "message_bits": 16384,
+        "output_bits": 32768,
+        "distance_cutoff": 3572,
+        "relative_distance_lower": 0.1090087890625,
+        "expected_bad_log2_diagnostic": -110.94781096308161,
+        "margin_bits_diagnostic": 110.94781096308161,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 15,
+        "message_bits": 32768,
+        "output_bits": 65536,
+        "distance_cutoff": 7144,
+        "relative_distance_lower": 0.1090087890625,
+        "expected_bad_log2_diagnostic": -212.40893881920678,
+        "margin_bits_diagnostic": 212.40893881920678,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 16,
+        "message_bits": 65536,
+        "output_bits": 131072,
+        "distance_cutoff": 14287,
+        "relative_distance_lower": 0.10900115966796875,
+        "expected_bad_log2_diagnostic": -417.86242454021243,
+        "margin_bits_diagnostic": 417.86242454021243,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 17,
+        "message_bits": 131072,
+        "output_bits": 262144,
+        "distance_cutoff": 28574,
+        "relative_distance_lower": 0.10900115966796875,
+        "expected_bad_log2_diagnostic": -825.2382638455916,
+        "margin_bits_diagnostic": 825.2382638455916,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 18,
+        "message_bits": 262144,
+        "output_bits": 524288,
+        "distance_cutoff": 57148,
+        "relative_distance_lower": 0.10900115966796875,
+        "expected_bad_log2_diagnostic": -1639.4899729066124,
+        "margin_bits_diagnostic": 1639.4899729066124,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 19,
+        "message_bits": 524288,
+        "output_bits": 1048576,
+        "distance_cutoff": 114295,
+        "relative_distance_lower": 0.10900020599365234,
+        "expected_bad_log2_diagnostic": -3270.524504008012,
+        "margin_bits_diagnostic": 3270.524504008012,
+        "closes_40_bits_diagnostic": true
+      },
+      {
+        "message_exponent": 20,
+        "message_bits": 1048576,
+        "output_bits": 2097152,
+        "distance_cutoff": 228590,
+        "relative_distance_lower": 0.10900020599365234,
+        "expected_bad_log2_diagnostic": -6529.062465468277,
+        "margin_bits_diagnostic": 6529.062465468277,
+        "closes_40_bits_diagnostic": true
+      }
+    ]
+  },
+  "limitations": [
+    "Nearest binary64 log-gamma arithmetic is not outward rounded.",
+    "This is a first-moment benchmark for a uniform random linear code, not a theorem about BCH, RM, routing, or RandomStepConv."
+  ]
+}

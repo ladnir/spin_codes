@@ -1,0 +1,92 @@
+\section{The nonwrapping convolution}
+\label{app:nonwrapping}
+
+The main EC construction fixes the coefficient on the oldest of the $m$
+feedback symbols to one; the EC literature calls this choice
+\emph{wrapping}.  The earlier nonwrapping variant samples that coefficient
+with the other feedback coefficients.  Both variants start from an all-zero
+feedback state.  We give the nonwrapping enumerator to separate the two
+ensembles.
+
+For an output prefix, let state $j\in\{0,\ldots,m\}$ record the number of
+trailing zero output bits, capped at $m$.  State $m$ means that all $m$
+feedback bits are zero.  From a state $j<m$, the feedback vector is nonzero,
+so a uniform binary tap vector makes the next output bit uniform.  From state
+$m$, the feedback term is zero and the next output equals the next input.
+
+Let $\mathbf T_m(X,Y)$ be the $(m+1)\times(m+1)$ matrix with nonzero entries
+\begin{align}
+ (\mathbf T_m)_{j,0}&=\frac{1+X}{2}Y,&
+ (\mathbf T_m)_{j,j+1}&=\frac{1+X}{2} &&(0\leq j<m),
+ \label{eq:nonwrapping-active}\\
+ (\mathbf T_m)_{m,0}&=XY,&
+ (\mathbf T_m)_{m,m}&=1.
+ \label{eq:nonwrapping-zero}
+\end{align}
+The exponent of $X$ records input weight and the exponent of $Y$ records
+output weight.
+
+\begin{lemma}[Exact nonwrapping enumerator]
+\label{lem:nonwrapping-enumerator}
+Let $\e_m$ select state $m$.  The expected number of weight-$u$ inputs that
+produce a weight-$h$ output under a nonwrapping binary convolution is
+\begin{equation}
+ [X^uY^h]\,\e_m^{\mathsf T}\mathbf T_m(X,Y)^n\one.
+ \label{eq:nonwrapping-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The two entries from an active feedback state average over the equally likely
+zero and one outputs.  The two entries from the zero state copy the input.
+Matrix multiplication concatenates the transitions.  The left vector selects
+the all-zero initial state, and the right vector sums over the final state.
+\end{proof}
+
+For an independent Bernoulli input with nonzero probability $q$, averaging
+over the input marker gives a one-variable matrix $\mathbf V_{m,q}(Y)$:
+\begin{align}
+ (\mathbf V_{m,q})_{j,0}&=Y/2,&
+ (\mathbf V_{m,q})_{j,j+1}&=1/2 &&(0\leq j<m),
+ \label{eq:nonwrapping-ber-active}\\
+ (\mathbf V_{m,q})_{m,0}&=qY,&
+ (\mathbf V_{m,q})_{m,m}&=1-q.
+ \label{eq:nonwrapping-ber-zero}
+\end{align}
+
+\begin{theorem}[Nonwrapping EC first moment]
+\label{thm:nonwrapping-first-moment}
+Sample $\B\gets\mathcal B^{\mathrm{Ber}}_{k,n,\rho}$ and an independent
+nonwrapping convolution $\C$ of memory $m$.  With $a_r$ as in
+\eqref{eq:ea-activation},
+\begin{equation}
+ \Pr_{\B,\C}[\Bad_L(\B\C)]
+ \leq
+ \sum_{r=1}^{k}\binom kr\sum_{h=0}^{L}[Y^h]\,
+ \e_m^{\mathsf T}\mathbf V_{m,a_r}(Y)^n\one.
+ \label{eq:nonwrapping-first-moment}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+A fixed weight-$r$ message has an independent Bernoulli expanded word with
+parameter $a_r$.  Equations \eqref{eq:nonwrapping-ber-active} and
+\eqref{eq:nonwrapping-ber-zero} give its exact output-weight generating
+function.  Summing the low-weight coefficients and then the message shells
+gives an expected count of bad messages.  Markov's inequality gives the
+claim.
+\end{proof}
+
+For any $z\in(0,1]$, the inner coefficient sum in
+\eqref{eq:nonwrapping-first-moment} is at most
+\begin{equation}
+ z^{-L}\e_m^{\mathsf T}\mathbf V_{m,a_r}(z)^n\one.
+ \label{eq:nonwrapping-marker}
+\end{equation}
+This is the same positive-marker relaxation used in the main proof.  The
+difference between the wrapping and nonwrapping schemes is therefore confined
+to the transfer matrix and its boundary condition.
+
+The finite certificates in this paper target the wrapped construction.  The
+matrices above reduce a same-parameter comparison with nonwrapping EC to a
+finite numerical calculation, but we make no finite nonwrapping claim.

@@ -1,0 +1,260 @@
+{
+  "schema": "riffle-b1024-outer-replacement-menu-v3",
+  "scope": {
+    "rate": 0.5,
+    "architectures": "rate-1/2 length-1024 outer-block replacements inside the Riffle bit-transpose construction",
+    "metric": "log2 cumulative expected number of nonzero words through the specified weight",
+    "warning": "These are complete outer-block spectra, not end-to-end Riffle distance certificates. They must be composed with the per-block output permutation, bit transpose, region permutations, and RM2Sub inner."
+  },
+  "sampling_order": [
+    "dba3-ebch8",
+    "dba3-ebch32",
+    "dba3-ebch64-conjectured",
+    "dba3-ebch128",
+    "ea3-d12",
+    "ea3-d16",
+    "paritymix8-l4-acc2"
+  ],
+  "candidates": [
+    {
+      "id": "dba3-ebch8",
+      "name": "Outer DBA-3(EBCH [8,4,4])",
+      "family": "designed_block_accumulate",
+      "status": "rejected_by_end_to_end_one_active_gate",
+      "local_randomness": "none",
+      "permutation_scope": "two independent permutations inside each 1024-bit outer block; schedules sampled independently by outer-block instance",
+      "accumulator_scope": "two length-1024 accumulators inside each outer block",
+      "constituent": {
+        "length": 8,
+        "dimension": 4,
+        "minimum_distance": 4,
+        "copies": 128,
+        "spectrum": "scripts/ebch8_4_delta4_spectrum.csv"
+      },
+      "accumulators": 2,
+      "interleavers": 2,
+      "outer_block_spectrum_summary": {
+        "first_cumulative_mass_at_least_1": 95,
+        "cumulative_log2_through_37": -8.79380761785915,
+        "cumulative_log2_through_95": 1.2150729841661259
+      },
+      "end_to_end_one_active": {
+        "margin_bits_float": 2.373332769,
+        "dominant_outer_weight": 2,
+        "decision": "reject"
+      },
+      "cost": {
+        "constituent_xors_per_output": null,
+        "accumulator_xors_per_output": 2.0,
+        "status": "constituent circuit benchmark required"
+      }
+    },
+    {
+      "id": "dba3-ebch32",
+      "name": "Outer DBA-3(EBCH [32,16,8])",
+      "family": "designed_block_accumulate",
+      "status": "rejected_by_end_to_end_one_active_gate",
+      "local_randomness": "none",
+      "permutation_scope": "two independent permutations inside each 1024-bit outer block; schedules sampled independently by outer-block instance",
+      "accumulator_scope": "two length-1024 accumulators inside each outer block",
+      "constituent": {
+        "length": 32,
+        "dimension": 16,
+        "minimum_distance": 8,
+        "copies": 32,
+        "spectrum": "scripts/ebch32_16_delta8_spectrum.csv"
+      },
+      "accumulators": 2,
+      "interleavers": 2,
+      "outer_block_spectrum_summary": {
+        "first_cumulative_mass_at_least_1": 111,
+        "cumulative_log2_through_37": -20.473315691848562,
+        "cumulative_log2_through_95": -15.66415116162119
+      },
+      "end_to_end_one_active": {
+        "margin_bits_float": 19.652326594,
+        "dominant_outer_weight": 2,
+        "decision": "reject"
+      },
+      "cost": {
+        "constituent_xors_per_output": null,
+        "accumulator_xors_per_output": 2.0,
+        "status": "constituent circuit benchmark required"
+      }
+    },
+    {
+      "id": "dba3-xbch64-philips-explicit",
+      "name": "Outer DBA-3(explicit shortened-XBCH [64,32,12])",
+      "family": "designed_block_accumulate",
+      "status": "passes_complete_tail_body_decomposition_outward_rounded",
+      "local_randomness": "none; one fixed constituent is reused",
+      "permutation_scope": "two independent permutations inside each 1024-bit outer block; schedules sampled independently by outer-block instance",
+      "accumulator_scope": "two length-1024 accumulators inside each outer block",
+      "constituent": {
+        "length": 64,
+        "dimension": 32,
+        "minimum_distance": 12,
+        "weight_12_multiplicity": 787,
+        "copies": 16,
+        "generator_rows": "scripts/xbch64_32_philips_generator_rows.txt",
+        "spectrum": "scripts/xbch64_32_philips_spectrum.csv",
+        "spectrum_status": "exact enumeration of all 2^32 words",
+        "source": "US patent application 20020101986, paragraphs 45-59"
+      },
+      "accumulators": 2,
+      "interleavers": 2,
+      "outer_block_spectrum_summary": {
+        "first_cumulative_mass_at_least_1": 114,
+        "cumulative_log2_through_37": -34.18084381240258,
+        "cumulative_log2_through_95": -26.384789440342058
+      },
+      "end_to_end": {
+        "one_active_margin_bits_float": 40.46490227837263,
+        "combined_margin_bits_float": 40.44846312463374,
+        "combined_margin_bits_outward_lower": 40.448462678054,
+        "outward_receipt": "constructions/riffle_paritymix8_b1024_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s16/receipts/outward_full_endpoint97_dba_xbch64_philips.json",
+        "dominant_outer_weight": 3,
+        "decision": "promote for constituent reconstruction and circuit benchmarking"
+      },
+      "cost": {
+        "constituent_xors_per_output": null,
+        "accumulator_xors_per_output": 2.0,
+        "status": "constituent circuit benchmark required"
+      }
+    },
+    {
+      "id": "dba3-ebch64-conjectured",
+      "name": "Outer DBA-3(conjectured EBCH [64,32,12] subcode)",
+      "family": "designed_block_accumulate",
+      "status": "near_miss_at_end_to_end_one_active_gate_conjectural_spectrum",
+      "local_randomness": "one-time random dimension-32 subcode selection; no encoder-time randomness",
+      "permutation_scope": "two independent permutations inside each 1024-bit outer block; schedules sampled independently by outer-block instance",
+      "accumulator_scope": "two length-1024 accumulators inside each outer block",
+      "constituent": {
+        "length": 64,
+        "dimension": 32,
+        "minimum_distance_lower_bound": 12,
+        "copies": 16,
+        "spectrum": "scripts/ebch64_32_delta12_conjectured_spectrum.csv",
+        "spectrum_status": "rounded conditional mean for a random dimension-32 subcode of the exact EBCH [64,36,12] code, conditioned to contain the all-ones word; not a fixed-code enumerator"
+      },
+      "accumulators": 2,
+      "interleavers": 2,
+      "outer_block_spectrum_summary": {
+        "first_cumulative_mass_at_least_1": 114,
+        "cumulative_log2_through_37": -33.03063684715175,
+        "cumulative_log2_through_95": -25.36478076831559
+      },
+      "end_to_end_one_active": {
+        "margin_bits_float": 39.203575765,
+        "dominant_outer_weight": 3,
+        "decision": "near miss; use to locate the BA threshold, not as a certificate"
+      },
+      "cost": {
+        "constituent_xors_per_output": null,
+        "accumulator_xors_per_output": 2.0,
+        "status": "constituent circuit benchmark required"
+      }
+    },
+    {
+      "id": "dba3-ebch128",
+      "name": "Outer DBA-3(EBCH [128,64,22])",
+      "family": "designed_block_accumulate",
+      "status": "passes_one_active_gate_multi_active_open",
+      "local_randomness": "none",
+      "permutation_scope": "two independent permutations inside each 1024-bit outer block; schedules sampled independently by outer-block instance",
+      "accumulator_scope": "two length-1024 accumulators inside each outer block",
+      "constituent": {
+        "length": 128,
+        "dimension": 64,
+        "minimum_distance": 22,
+        "copies": 8,
+        "spectrum": "scripts/ebch128_64_spectrum.csv"
+      },
+      "accumulators": 2,
+      "interleavers": 2,
+      "outer_block_spectrum_summary": {
+        "first_cumulative_mass_at_least_1": 114,
+        "cumulative_log2_through_37": -56.04755911132915,
+        "cumulative_log2_through_95": -40.72257347345644
+      },
+      "end_to_end_one_active": {
+        "margin_bits_float": 80.229449144,
+        "dominant_outer_weight": 6,
+        "decision": "continue to multi-active analysis"
+      },
+      "cost": {
+        "constituent_xors_per_output": null,
+        "accumulator_xors_per_output": 2.0,
+        "status": "reuse or refresh the existing EBCH circuit benchmark"
+      }
+    },
+    {
+      "id": "ea3-d12",
+      "name": "Outer EA-3(12)",
+      "family": "systematic_expander_accumulate",
+      "status": "B1024_local_diagnostic",
+      "analysis_scope": "length 1024 only",
+      "local_randomness": "fixed sampled check supports",
+      "degree": 12,
+      "accumulators": 2,
+      "interleavers": 2,
+      "result": {
+        "first_cumulative_mass_at_least_1": 115,
+        "cumulative_log2_through_37": -16.71,
+        "cumulative_log2_through_95": -14.98
+      },
+      "cost": {
+        "nominal_xors_per_output": 7.5,
+        "status": "implementation benchmark required"
+      }
+    },
+    {
+      "id": "ea3-d16",
+      "name": "Outer EA-3(16)",
+      "family": "systematic_expander_accumulate",
+      "status": "B1024_local_diagnostic",
+      "analysis_scope": "length 1024 only",
+      "local_randomness": "fixed sampled check supports",
+      "degree": 16,
+      "accumulators": 2,
+      "interleavers": 2,
+      "result": {
+        "first_cumulative_mass_at_least_1": 115,
+        "cumulative_log2_through_37": -22.09,
+        "cumulative_log2_through_95": -20.27
+      },
+      "cost": {
+        "nominal_xors_per_output": 9.5,
+        "status": "implementation benchmark required"
+      }
+    },
+    {
+      "id": "paritymix8-l4-acc2",
+      "name": "Outer ParityMix8-4 + Acc + Acc",
+      "family": "local_mixer_accumulate",
+      "status": "B1024_local_diagnostic",
+      "analysis_scope": "length 1024 only",
+      "local_randomness": "fixed sampled layer permutations",
+      "layers": 4,
+      "accumulators": 2,
+      "interleavers": 6,
+      "result": {
+        "first_cumulative_mass_at_least_1": 115,
+        "cumulative_log2_through_37": -23.78768685588784,
+        "cumulative_log2_through_95": -22.172715129928292
+      },
+      "cost": {
+        "nominal_xors_per_output": 9.5,
+        "status": "permutation-heavy; benchmark only after certificate"
+      }
+    }
+  ],
+  "comparison_baselines": [
+    "random BA-3(16)",
+    "random BA-3(32)",
+    "RA-2",
+    "RAA-3"
+  ],
+  "selection_rule": "Feed each complete B=1024 spectrum into the existing Riffle end-to-end evaluator. Retain the separate per-block output permutation that makes weight sufficient. Benchmark only outer replacements that preserve at least 40 end-to-end bits."
+}

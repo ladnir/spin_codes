@@ -1,0 +1,494 @@
+% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
+% Source: innerDense.tex, lines 2044--2535. Preserved exploration; not included in the main spine.
+
+\subsection{Prospective block-recursive BCH inner}
+\label{subsec:block-recursive-bch-inner}
+
+This subsection records a possible replacement for the scalar fixed-tap dense inner.  It is not used in the proved
+theorems above.  The point is to keep the recursive spreading mechanism, but replace the one-bit fixed-tap termination
+rule by a short block-code expansion/collision rule.
+
+Assume for simplicity that \(N=Mb\).  Partition the interleaved input into blocks
+\[
+U=(U_1,\ldots,U_M),\qquad U_i\in\F_2^b.
+\]
+Let \(C\subseteq\F_2^{2b}\) be a binary \([2b,b,d_0]\) code with a systematic generator written in
+output-state coordinates as
+\[
+C=\{(v,Pv):v\in\F_2^b\},
+\qquad
+P:\F_2^b\to\F_2^b.
+\]
+For example, \(C\) could be an extended BCH or RM block code after choosing a systematic coordinate half.  The preferred
+rate-one block recursion includes fixed state-coordinate permutations between blocks:
+\begin{equation}
+\label{eq:block-recursive-bch-inner}
+V_i := U_i+S_{i-1},\qquad
+Y_i := V_i,\qquad
+S_i := \pi_i(P V_i),
+\end{equation}
+with \(S_0=0\), where the \(\pi_i\)'s are public fixed permutations of the \(b\) state coordinates.  Thus the current
+mismatch \(V_i\) is emitted immediately, while a permuted copy of the parity half \(PV_i\) is stored as the next
+feedback state.  Since \((V_i,PV_i)\in C\), every nonzero branch satisfies
+\[
+\wt(Y_i)+\wt(S_i)=\wt(V_i)+\wt(PV_i)\ge d_0.
+\]
+The orientation in \eqref{eq:block-recursive-bch-inner} is intentional.  A systematic encoder of the opposite form
+\((Pv,v)\) gives dense immediate output but leaves a sparse feedback state when \(v\) is sparse, making a later
+cancellation too cheap.  In the output-systematic orientation, a sparse input burst may emit only a few symbols in the
+first block, but the stored state is the parity expansion \(Pv\), which is the object that the next input block must
+hit exactly to turn the episode off.
+
+\paragraph{State permutations and weight-only transitions.}
+The state permutations in \eqref{eq:block-recursive-bch-inner} are not a rate cost, and for \(b=64\) they are only a
+small fixed bit permutation per block.  They also remove low-power algebraic resonances of the deterministic map \(P\).
+For the analysis we treat the \(\pi_i\)'s as independent uniform permutations, or equivalently prove that a typical
+fixed draw has the desired finite certificate.  The update is
+\begin{equation}
+\label{eq:block-recursive-virtual-perm}
+S_i := \pi_i(PV_i),
+\end{equation}
+where each \(\pi_i\) is uniform on the \(b\) coordinates.  After conditioning on \(\wt(S_i)\), this lets us track only
+the state weight, rather than the exact support of \(S_i\), when upper bounding the probability that \(U_{i+1}=S_i\).
+This is the same weight-only transition law that the earlier virtual-permutation analysis suggested, but now the
+randomization is part of the candidate construction rather than only a proof convenience.
+
+The local statistic needed for this analysis is the parity-expansion profile
+\begin{equation}
+\label{eq:block-recursive-expansion-profile}
+B_{j,q}
+:=
+\#\{v\in\F_2^b:\wt(v)=j,\ \wt(Pv)=q\}.
+\end{equation}
+This replaces the ordinary local weight enumerator for the inner proof.  A branch with \(\wt(V_i)=j\) emits \(j\)
+ones immediately and creates a state of weight \(q\) with multiplicity \(B_{j,q}\).
+
+\begin{lemma}[One-block interleaver law against a fixed state]
+\label{lem:block-recursive-one-block-law}
+Expose any history that is independent of the labels in the next \(b\)-block, and suppose that \(h_{\rm rem}\) input
+ones remain to be placed among \(N_{\rm rem}\) unexposed coordinates, including the next block.  Let
+\(S\subseteq[b]\) be any fixed state support of size \(q\).  If \(U\) denotes the next input block, then for every
+\(r,\ell\),
+\begin{equation}
+\label{eq:block-recursive-overlap-law}
+\PP[\wt(U)=r,\ |U\cap S|=\ell]
+=
+\frac{\binom{q}{\ell}\binom{b-q}{r-\ell}\binom{N_{\rm rem}-b}{h_{\rm rem}-r}}
+{\binom{N_{\rm rem}}{h_{\rm rem}}}.
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:block-recursive-collision-prob}
+\PP[U_{i+1}=S_i]
+\;=\;
+\frac{\binom{N_{\rm rem}-b}{h_{\rm rem}-q}}{\binom{N_{\rm rem}}{h_{\rm rem}}},
+\end{equation}
+with the usual convention that impossible binomial coefficients vanish.  Thus turn-off is controlled by the random
+interleaver collision with the current state, not by an additional dense random tap.
+\end{lemma}
+
+\begin{proof}
+Choose the \(h_{\rm rem}\) remaining input positions uniformly from the \(N_{\rm rem}\) unexposed coordinates.  To have
+\(\wt(U)=r\) and \(|U\cap S|=\ell\), choose \(\ell\) positions from \(S\), \(r-\ell\) positions from the other
+\(b-q\) coordinates of the block, and the remaining \(h_{\rm rem}-r\) positions outside the block.  This gives
+\eqref{eq:block-recursive-overlap-law}.  The exact-collision event is the special case \(r=\ell=q\).
+\end{proof}
+
+\begin{corollary}[Virtual permutations give a weight-only transition]
+\label{cor:block-recursive-virtual-weight-law}
+In the virtual-permuted recursion \eqref{eq:block-recursive-virtual-perm}, conditional on the current state weight
+\(q\), the joint law of
+\[
+\wt(U_i),\qquad |U_i\cap S_{i-1}|,\qquad \wt(V_i)=\wt(U_i+S_{i-1})
+\]
+depends only on \(q\), \(b\), \(h_{\rm rem}\), and \(N_{\rm rem}\), not on the support labels of \(S_{i-1}\).  Moreover,
+conditional on \(\wt(V_i)=j\), the support of \(V_i\) is uniform over the \(j\)-subsets of the block.
+\end{corollary}
+
+\begin{proof}
+The first statement is immediate from Lemma~\ref{lem:block-recursive-one-block-law}, since
+\(\wt(U_i+S_{i-1})=r+q-2\ell\).  For the uniformity statement, fix any two \(j\)-subsets \(A,A'\subseteq[b]\).  A block
+coordinate permutation maps \(A\) to \(A'\) and preserves the law of the virtual state and of the next input block under
+the uniform interleaver exposure.  Hence the conditional probabilities of \(V_i=A\) and \(V_i=A'\), given
+\(\wt(V_i)=j\), are equal.
+\end{proof}
+
+\begin{corollary}[Branch expansion through the local profile]
+\label{cor:block-recursive-profile-transition}
+Under the virtual-permuted analysis model, conditional on \(\wt(V_i)=j\),
+\[
+\PP[\wt(S_i)=q\mid \wt(V_i)=j]
+=
+\frac{B_{j,q}}{\binom{b}{j}}.
+\]
+Consequently a weight-only episode ledger may use the transition
+\[
+q_{\mathrm{old}}
+\longrightarrow
+(r,\ell,j=q_{\mathrm{old}}+r-2\ell)
+\longrightarrow
+q_{\mathrm{new}},
+\]
+where the first arrow is governed by \eqref{eq:block-recursive-overlap-law} and the second by
+\eqref{eq:block-recursive-expansion-profile}.
+\end{corollary}
+
+\begin{proof}
+By Corollary~\ref{cor:block-recursive-virtual-weight-law}, conditional on \(\wt(V_i)=j\), the mismatch support is
+uniform among all \(\binom{b}{j}\) \(j\)-subsets.  The number of such supports whose parity image has weight \(q\) is
+exactly \(B_{j,q}\).
+\end{proof}
+
+\begin{corollary}[Heavy states cannot be canceled by too little remaining input]
+\label{cor:block-recursive-heavy-state-charge}
+At the start of any block, suppose the current state has weight \(q\) and at most \(H\) input ones remain in the whole
+unexposed suffix.  Then the next emitted block satisfies
+\[
+\wt(Y_i)=\wt(U_i+S_{i-1})\ge (q-H)_+.
+\]
+In particular, if \(q>H\), exact turn-off in the next block is impossible.
+\end{corollary}
+
+\begin{proof}
+Let \(r=\wt(U_i)\).  Since \(r\le H\), the symmetric difference of \(U_i\) and \(S_{i-1}\) has size at least
+\(q-r\ge q-H\).  Exact turn-off would require \(U_i=S_{i-1}\), hence \(r=q\), impossible when \(q>H\).
+\end{proof}
+
+\paragraph{Dynamic-programming certificate form.}
+The previous corollaries give an exact finite-state law for the virtual weight process before imposing the distance
+budget.  If \(H\) input ones remain among \(R\) unexposed coordinates at the start of a block and the current state has
+weight \(q\), define
+\[
+K_{R,H}^{(b,P)}(q;r,\ell,j,q')
+:=
+\frac{\binom{q}{\ell}\binom{b-q}{r-\ell}\binom{R-b}{H-r}}{\binom{R}{H}}\,
+\mathbf{1}_{j=q+r-2\ell}\,
+\frac{B_{j,q'}}{\binom{b}{j}}.
+\]
+This kernel simultaneously records the number \(r\) of input ones consumed in the block, the overlap \(\ell\) with the
+current state, the emitted weight \(j=\wt(Y_i)\), and the next state weight \(q'=\wt(S_i)\).  Thus a certificate for
+\[
+p_h^{\mathrm{block\mbox{-}rec}}(\delta)
+=
+\PP[\wt(Y_1,\ldots,Y_M)\le d\mid \wt(U)=h]
+\]
+can be organized by the recursion
+\[
+F_i(H,q,D)
+\le
+\sum_{r,\ell,j,q'}
+K_{R_i,H}^{(b,P)}(q;r,\ell,j,q')\,
+F_{i+1}(H-r,q',D-j),
+\]
+with \(R_i=(M-i+1)b\), and impossible or negative-budget states set to zero.  The terminal condition depends on the
+chosen boundary convention.  If a terminal state cost \(T(q)\) is charged, take
+\[
+F_{M+1}(0,q,D)=\mathbf{1}_{D\ge T(q)}.
+\]
+Tail-biting or forced termination corresponds to \(T(0)=0\) and \(T(q)=+\infty\) for \(q>0\); an explicit flush tail is
+modeled by appending the corresponding zero-input transfer blocks.  This is the finite analogue of the scalar episode
+ledger, but the termination/collision probabilities are now the hypergeometric terms in \(K\), while the local
+spreading is captured by \(B_{j,q'}\).
+
+There is one boundary convention that must be fixed before this becomes a theorem for a finite code.  The final state
+\(S_M\) is not emitted by \eqref{eq:block-recursive-bch-inner}.  One can handle this by appending a short deterministic
+flush/tail, by using a tail-biting block recursion, or by adding \(S_M\) to the distance ledger as an explicit terminal
+state cost.  The analysis should not simply ignore \(S_M\), since doing so would create the same kind of artificial
+late-tail loophole that appeared in the scalar finite-\(N\) diagnostics.
+
+\paragraph{Proof target.}
+The desired small-weight inner theorem would combine \eqref{eq:block-recursive-expansion-profile} and
+\eqref{eq:block-recursive-collision-prob} in an episode ledger.  Each active block either:
+\begin{itemize}
+\item emits the current mismatch weight \(j\) and stores a state of weight \(q\);
+\item terminates in the next block only if the interleaver places exactly that \(q\)-set as \(U_{i+1}\);
+\item or survives, in which case the next mismatch is \(U_{i+1}+S_i\) and the process repeats.
+\end{itemize}
+The finite-\(N\) bottleneck should then be governed by expansion of low-weight words under \(P\) and by the exact
+hypergeometric collision factors above.  For an extended BCH \([128,64,22]\)-shaped block, initial diagnostics of the
+output-systematic parity half give \(\wt(Pv)\) near \(32\) on average for \(\wt(v)=1,2,3,4\), with sampled minima in
+the high teens or above.  This is only evidence, but it suggests that the recursion may suppress the tiny-weight
+turn-off modes that dominate the scalar fixed-tap finite-\(N\) certificate.  Indeed, once a tiny mismatch creates a
+state with \(\wt(Pv)>h_{\rm rem}\), Corollary~\ref{cor:block-recursive-heavy-state-charge} says that the episode cannot
+turn off immediately; the excess state weight must be emitted in later blocks or charged at the boundary.
+
+The first finite probe supports this interpretation.  With \(N=2^{21}\), \(b=64\), the output-systematic extended BCH
+\([128,64,22]\) parity half, and terminal-state weight charged at the end, the exact \(h=1\) failure probability is just
+the block-level late-start effect:
+\[
+\begin{array}{c|c|c|c}
+\delta & d=\lfloor\delta N\rfloor & p_1^{\mathrm{block\mbox{-}rec}}(\delta) & \log_2 p_1\\
+\hline
+.106 & 222298 & .212075233 & -2.237352\\
+.09 & 188743 & .180082321 & -2.473272
+\end{array}
+\]
+In contrast, a Monte Carlo probe at \(\delta=.106\) saw no failures in \(3000\) trials at \(h=22\), and no failures in
+\(1000\) trials for \(h\in\{8,16,22,24,25,32,40,64\}\).  This is not a certificate, but it is qualitatively different
+from the scalar fixed-tap bottleneck: the dangerous mass appears to collapse to genuinely tiny \(h\), while the
+old \(h\approx22\text{--}32\) ridge is not visible in the probe.  The diagnostic entry point is
+\[
+\texttt{python scripts/probe\_block\_recursive\_inner.py}.
+\]
+
+The same probe also warns against overreading the zero-failure samples.  Once turn-off is suppressed, the remaining
+first-order obstruction is ordinary block-level late placement.  If a live zero-input trajectory emits about \(b/2=32\)
+ones per block, then a support of weight \(h\) can still fit below \(d\) when its first active block lies in roughly the
+last \(\lfloor d/32\rfloor\) block positions.  The crude placement factor
+\[
+\frac{\binom{64\lfloor d/32\rfloor}{h}}{\binom{N}{h}}
+\]
+therefore gives a useful calibration.  At \(N=2^{21}\) and \(\delta=.106\), this factor contributes about
+\(-71.62\) bits at \(h=32\).  Paired with the RM block-outer \(h=32\) coefficient (\(\log_2 A_{32}^{\rm out}\approx
+37.63\)), the resulting single-term margin is only about \(34\) bits.  At \(\delta=.09\), the same calculation gives
+about \(41.54\) bits.  Thus the block-recursive inner appears to remove the scalar termination ridge, but a \(40\)-bit
+\(\delta=.106\) finite checkpoint would still need a slightly stronger outer floor/spectrum, a sharper output-growth
+certificate, or a smaller target distance.  The late-start balance diagnostic is
+\[
+\texttt{python scripts/estimate\_block\_recursive\_late\_start.py}.
+\]
+
+The sharper version of this calibration is the zero-input column profile
+\[
+D_L(P):=\min_{s\ne0}\sum_{t=0}^{L-1}\wt(P^t s).
+\]
+For the small exact \([32,16,8]\) toy, \(D_L(P)\) initially follows the two-block bound \(D_L\ge\lfloor L/2\rfloor d_0\)
+but improves for longer windows.  For the \([128,64,22]\) candidate, exact enumeration over all weight-one and
+weight-two initial states gives the largest live zero-input windows that still fit under the target budgets:
+\[
+\begin{array}{c|c|c|c}
+\wt(s_0) & \delta & \max\{L:D_L(s_0)\le \lfloor\delta N\rfloor\} & \log_2(L/32768)\\
+\hline
+1 & .106 & 6978 & -2.231402\\
+2 & .106 & 7003 & -2.226243\\
+1 & .09 & 5930 & -2.466184\\
+2 & .09 & 5949 & -2.461569
+\end{array}
+\]
+Thus the actual low-weight column growth is close to the crude \(32\)-per-block late-start estimate, not to the weak
+pair bound.  This supports a concrete proof target: certify a usable column-distance/profile lower bound for the
+reachable low-weight state classes, then add the hypergeometric cancellation terms from
+Lemma~\ref{lem:block-recursive-one-block-law}.  The column-profile diagnostics are
+\[
+\texttt{python scripts/profile\_block\_recursive\_column.py}
+\qquad\text{and}\qquad
+\texttt{python scripts/profile\_block\_recursive\_late\_threshold.py}.
+\]
+
+Combining the exact low-weight threshold with the exact first-active-block occupancy law isolates the first realistic
+finite certificate target.  If a weight-\(h\) input is uniform over \(M=N/b\) blocks, the probability that its first
+active block lies in the last \(L\) blocks is
+\[
+\sum_{r=1}^h\sum_{t=M-L+1}^{M}
+\frac{\binom{b}{r}\binom{b(M-t)}{h-r}}{\binom{N}{h}},
+\]
+where \(r\) is the occupancy of the first active block.  For the RM block outer, the first nonzero outer weight is
+\(h=32\).  At \(\delta=.09\), the exact weight-one/two column thresholds above give \(L=5949\) blocks, and the
+first-active late probability has logarithm \(-78.771731\).  Multiplying by the RM \(h=32\) outer coefficient
+\(\log_2 A_{32}^{\rm out}=37.629712\) leaves \(41.142\) bits of margin before handling the remaining branches.
+At \(\delta=.106\), the analogous \(L=7003\) calculation leaves only \(33.611\) bits at \(h=32\).  Thus the clean
+first target is a finite \(\delta=.09\) block-recursive certificate: prove that the early-first-active branch cannot
+recover enough distance through later hypergeometric cancellations, then sum the already-negative late branch against
+the RM outer spectrum.
+
+A conditioned early-branch probe shows that this split should include a small buffer.  At \(\delta=.09\), \(h=32\),
+and \(L=5949\), forcing the first active block to be exactly one block before the late threshold still produced rare
+Monte Carlo failures, because the zero-input trajectory is only barely above the distance budget and later input blocks
+can cancel the first trajectory.  By ten blocks before the threshold no failures appeared in the same small probe, and
+by \(100\) blocks before the threshold the zero-input excess was already several thousand output symbols.  Thus the
+certificate should use a buffered late window
+\[
+L_{\mathrm{late}}=5949+B
+\]
+and prove the complement only after this buffer.  The RM \(h=32\) margin remains about \(40.75\) bits at
+\(L_{\mathrm{late}}=6000\) and about \(40.36\) bits at \(L_{\mathrm{late}}=6050\), while \(L_{\mathrm{late}}=6100\) is
+essentially break-even for a \(40\)-bit margin.  Since the \(40\)-bit target is only a calibration point, the important
+lesson is structural: the finite proof should have three branches, not two--a late/buffer branch, an early branch with
+substantial column-distance excess, and a hypergeometric cancellation ledger for the buffer boundary.  The conditioned
+diagnostic is
+\[
+\texttt{python scripts/probe\_block\_recursive\_early\_branch.py}.
+\]
+
+For the actual first-moment sum one should not quote only the \(h=32\) peak term.  Summing the exact late/buffer
+probability against the RM outer prefix through \(h=500\) gives
+\[
+\begin{array}{c|c|c}
+L_{\mathrm{late}} & \log_2\sum_{h\le 500}A_h^{\rm RM}\Pr[\text{first active block in final }L_{\mathrm{late}}]
+& \text{margin bits}\\
+\hline
+5949 & -40.115431 & 40.115431\\
+6000 & -39.708713 & 39.708713\\
+6050 & -39.313105 & 39.313105
+\end{array}
+\]
+Thus the late/buffer branch is already in certificate form, but the full prefix is roughly one bit worse than the
+single \(h=32\) term.  The remaining proof obligation is entirely in the complement: either show that the early branch
+has enough zero-input column-distance surplus, or charge a boundary failure to a large hypergeometric overlap between
+the later input trajectories and the first trajectory.  A deliberately pessimistic diagnostic for this last step is
+\[
+\texttt{python scripts/bound\_block\_recursive\_cancellation.py},
+\]
+which computes exact trajectory-overlap populations and applies an exponential-moment bound; its current role is to
+size the cancellation lemma, not yet to serve as the final certificate.
+
+There is also a useful bookkeeping simplification.  Instead of proving a delicate cancellation statement immediately at
+the boundary, one may simply union-bound a short strip before the exact \(L=5949\) threshold.  For the same RM prefix,
+the strip \(1\le g\le 51\) blocks before the threshold has total first-moment mass \(2^{-41.733963}\), and the strip
+\(1\le g\le 101\) has total mass \(2^{-40.542230}\).  The peak contribution in both cases is still \(h=32\),
+first-block occupancy \(r=1\), at the far edge of the strip.  Thus a clean finite split is:
+\[
+\begin{array}{c}
+\text{exact late threshold}\\
+\text{short boundary strip by union bound}\\
+\text{early branch with column-distance surplus}
+\end{array}
+\]
+The strip diagnostic is
+\[
+\texttt{python scripts/certify\_block\_recursive\_boundary\_strip.py}.
+\]
+
+The first cancellation ledger also changes the proof target.  A naive bound that treats an exact turnoff as immediate
+failure is much too pessimistic, because the remaining input weight must still generate a low-weight continuation.  In
+fact the dominant exact-turnoff row for \(h=32,r=1\) is a very short pair: after two zero-input BCH steps, some
+weight-one states return to weight one, and a single later input can turn the episode off after only about \(36\)
+output symbols.  This is not by itself a bad codeword, but it means the early-branch proof must count short
+cancellation chains or clusters.  The low-state recurrence profile begins
+\[
+\begin{array}{c|c|c|c|c}
+\wt(s_0) & t & \min \wt(P^t s_0) & \mathbb{E}\wt(P^t s_0) &
+\#\{s_0:\wt(P^t s_0)\le 1\}\\
+\hline
+1&2&1&15.562500&30\\
+1&4&1&23.875000&16\\
+1&6&1&28.093750&7\\
+1&8&1&30.906250&2
+\end{array}
+\]
+and there are no weight-one returns among unit states for \(10\le t\le 12\) in the same diagnostic.  Thus the revised
+early theorem should be an episode/cluster theorem: supports with many short cancellation edges are combinatorially
+rare under the interleaver, while supports without such a cluster accumulate the column-distance surplus.  The relevant
+diagnostics are
+\[
+\begin{array}{c}
+\texttt{python scripts/certify\_block\_recursive\_exact\_turnoff.py}\\
+\texttt{python scripts/profile\_block\_recursive\_low\_state\_recurrence.py}
+\end{array}
+\]
+
+This short-return obstruction appears to be an artifact of iterating the same parity map \(P\).  With independent
+state-coordinate permutations between BCH blocks, the trajectory is no longer \(P^t s_0\) but
+\[
+S_t=\pi_t P\pi_{t-1}P\cdots \pi_1P s_0.
+\]
+In a small diagnostic with \(20\) random permutation schedules and \(t\le 12\), every unit start became dense after the
+first step and no unit trajectory returned to weight at most \(16\).  Weight-two starts also stayed essentially dense:
+there were no returns to weight at most \(8\), and only isolated returns to weight at most \(16\) among the \(2016\)
+weight-two starts.  This is the main reason to make the \(\pi_i\)'s part of the construction rather than merely a
+virtual proof device.  A full Monte Carlo probe with the same state permutations still sees \(h=1\) failures from
+ordinary late placement, but in a small \(\delta=.09\) run saw no \(h\ge 2\) failures except rates consistent with
+late placement for \(h=2\).  The permutation recurrence diagnostic is
+\[
+\texttt{python scripts/profile\_block\_recursive\_permuted\_recurrence.py}.
+\]
+
+With the state permutations included, the natural proof object is a finite weight-chain certificate.  Conditional on
+the current state weight \(q\), the current block occupancy \(r\), and the overlap \(\ell\), the emitted weight is
+\[
+j=q+r-2\ell,
+\]
+and the next state weight is distributed according to \(B_{j,q'}/\binom{b}{j}\).  Thus one can upper-bound a continuation
+probability by the Chernoff transfer
+\[
+\Pr[\wt(Y_{\rm cont})\le d_{\rm rem}]
+\le
+\exp(\lambda d_{\rm rem})
+\mathbb{E}\exp\{-\lambda\wt(Y_{\rm cont})\},
+\]
+where the expectation is over the exact without-replacement block occupancies and the local BCH profile \(B_{j,q'}\).
+This is the theorem-shaped replacement for the deterministic \(P^t\) column-profile proof.  The present Python
+prototype,
+\[
+\texttt{python scripts/certify\_permuted\_inner\_chernoff.py},
+\]
+is only a skeleton: exact profiling for all \(j\) is impossible by enumeration, and the current conservative fallback
+for unprofiled \(j\)'s is too loose near the finite \(\delta=.09\) threshold.  The next certificate step is therefore
+to replace the fallback by a rigorous local BCH lower-tail bound for \(B_{j,q'}\), or to implement the same transfer
+with a coarser but certified local profile.
+
+For proof development it is useful to separate this missing local theorem as a hypothesis.  Assume that for every
+\(j\) there is an explicit envelope \(\Phi_b(j,q)\) such that
+\[
+\Pr_{v:\wt(v)=j}\big[\wt(Pv)\le q\big]\le \Phi_b(j,q),
+\qquad
+\Phi_b(j,q)=0\quad(q<d_0-j).
+\]
+The working guess is the BCH floor plus a random-vector lower tail with slack,
+\[
+\Phi_b(j,q)\approx
+\min\left\{1,\;2^{s}\Pr[{\rm Bin}(b,1/2)\le q]\right\},
+\]
+where \(s\) is a slack budget to be determined.  Conditional on this local hypothesis, the rest of the inner proof is
+finite and mechanical: convert \(\Phi_b\) into a pessimistic next-state distribution by placing as much mass as allowed
+on small \(q'\), run the Chernoff transfer, and sum the resulting continuation bound against the outer spectrum and the
+first-active-block placement law.
+
+The first conditional runs with the zero-slack random-tail guess and coarse \(16\)-weight state buckets show the shape
+of the remaining finite problem.  For \(h=32,r=1,q\approx32\) at \(N=2^{21}\), \(\delta=.09\), and remaining distance
+about \(188710\), the continuation Chernoff bound is still trivial at \(6050\) live blocks, buys only a few bits around
+\(8000\) live blocks, and buys about \(15.5\) bits by \(10000\) live blocks:
+\[
+\begin{array}{c|c}
+\text{live blocks after first} & \text{best observed }\log_2\text{ continuation bound}\\
+\hline
+6050 & +5.59\\
+8000 & -2.66\\
+10000 & -15.54
+\end{array}
+\]
+Thus the near-boundary region cannot be ignored entirely, but farther early starts should be controllable once the
+local envelope is made rigorous and the transfer is optimized.  The exact placement mass of a boundary strip also has a
+closed form:
+\[
+\Pr[\text{first active block in the }G\text{-block strip before }L]
+=
+\frac{\binom{b(L+G)}{h}-\binom{bL}{h}}{\binom{N}{h}}.
+\]
+Against the RM prefix through \(h=500\), \(L=5949\) and \(G=1051\) give total mass \(2^{-32.326936}\), while
+\(G=2051\) gives \(2^{-25.823633}\).  These are useful bookkeeping numbers, but they are not enough on their own; the
+conditional continuation certificate must be included for the longer early range.
+
+The first bucketed conditional first-moment check is encouraging in the limited sense we need at this stage.  Using the
+zero-slack random-tail envelope, \(16\)-weight state buckets, and the convention that each gap bucket uses the
+continuation bound at its near edge, the dominant \(h=32,r=1\) branch over the whole non-late range has total exponent
+roughly in the mid-teens below zero.  A coarse split gives
+\[
+\begin{array}{c|c|c}
+\text{gap range} & \log_2\text{ placement+continuation+outer term} & \text{near-edge live blocks}\\
+\hline
+1\text{--}12000 & -16.17 & 5949,9949,13949\text{ buckets}\\
+12001\text{--}19000 & -17.25 & 17949\\
+19001\text{--}26819 & -19.39 & 24949
+\end{array}
+\]
+For \(r=2\), the same \(1\text{--}12000\) coarse split gives \(-25.48\) bits, and for \(r=3,4\) it gives
+\(-35.38\) bits combined.  Finally, \(r\ge5\) has total exponent \(-9.79\) by placement alone across the whole
+non-late range.  Therefore the guessed local envelope appears strong enough to make the \(h=32\) ridge negative, even
+with very coarse bucketing.  This is not yet a certificate: the final version must refine or justify the bucket
+monotonicity convention, include all relevant \(h\), and replace the guessed \(\Phi_b\) by a proved local BCH bound.
+The bucketed diagnostic is
+\[
+\texttt{python scripts/certify\_permuted\_inner\_bucket\_sum.py}.
+\]
+
+The first nearby-\(h\) probes suggest that the \(h\)-summation still deserves real attention.  Under the same guessed
+zero-slack random-tail envelope and \(16\)-weight state buckets, \(h=40,r=1\) remains negative on the three coarse
+gap buckets \(1\text{--}4000\), \(4001\text{--}8000\), and \(8001\text{--}12000\), with exponents approximately
+\(-19.44\), \(-16.49\), and \(-24.11\).  However, the same middle bucket at \(h=64,r=1\) gives only about
+\(-11.22\) bits, and at \(h=80,r=1\) it gives about \(-7.62\) bits.  Thus the conditional certificate is not merely a
+tiny-\(h\) check: larger intermediate \(h\)'s may be closer to the ridge once the outer spectrum growth is included.
+The current pure-Python transfer becomes slow in this regime.  Replacing huge binomial evaluations by a recurrence for
+the block-occupancy hypergeometric law gives a useful speedup, but broad \(h\)-sweeps are still too slow.  The next
+finite-certificate step is either to accelerate the weight-chain kernel, compress the rare high-occupancy block tail
+with a certified upper bound, or add an analytic tail envelope in \(h\) before sweeping broadly.

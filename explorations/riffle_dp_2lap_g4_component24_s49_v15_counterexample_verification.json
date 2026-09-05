@@ -1,0 +1,55 @@
+{
+  "schema": "riffle-dp-2lap-g4-component24-counterexample-verification-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT_COUNTEREXAMPLE_VERIFICATION",
+  "source_sha256": "e7d46b843d073b7aac9d7f672c7cdcc76c3305ad47b4ce3a16becc7601821a23",
+  "certificate_receipt_sha256": "d291b8c5e8e4d1c71033b84a3a5aa1d6356050d6a372df67304fd444cfa1e5ff",
+  "autonomous_map_sha256": "0458e349ccdb1bd773db256e7ca87b7c3bbc6be128fdbc482125a109f1764376",
+  "component_support_mask_hex": "0x49",
+  "component_degrees": [
+    1,
+    9,
+    20
+  ],
+  "component_annihilator_hex": "0x68e86373",
+  "component_annihilator_residual_hex": "0x0",
+  "degree_factor_residuals_hex": {
+    "1": "0x0",
+    "9": "0xa685aac60e5acfb3",
+    "20": "0xa685aac60e5acfb3"
+  },
+  "character_hex": "0xa685aac60e5acfb3",
+  "pure_degree_one_character": true,
+  "packet_value": 15,
+  "window_nodes": 24,
+  "code_length": 384,
+  "observed_word_limbs_hex": [
+    "0xffffff000000",
+    "0x0",
+    "0xffffff0000",
+    "0x0",
+    "0xff00000000000000",
+    "0xffff"
+  ],
+  "observed_weight": 72,
+  "complement_weight": 312,
+  "required_two_sided_distance": 73,
+  "refutes_required_distance": true,
+  "full_orbit": {
+    "nodes": 32772,
+    "bits": 524352,
+    "blocks_of_12": 2731,
+    "constant_12_node_weight": 36,
+    "complete_blocks_of_24": 1365,
+    "constant_24_node_weight": 72,
+    "remaining_12_node_weight": 36,
+    "weight": 98316,
+    "character_sum": 327720,
+    "absolute_bias_numerator": 327720,
+    "absolute_bias_denominator": 524352,
+    "absolute_bias": 0.625,
+    "equals_required_value15_cap": true
+  },
+  "status": "PASS_EXACT_COUNTEREXAMPLE_REPLAY",
+  "scope_limitation": "The witness refutes the stronger 24-node distance-73 lemma. Its full-orbit bias equals 5/8, so it does not refute the desired value-15 global character cap."
+}

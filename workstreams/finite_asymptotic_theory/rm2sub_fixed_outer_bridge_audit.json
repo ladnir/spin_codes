@@ -1,0 +1,195 @@
+{
+  "schema": "rm2sub-s19-fixed-outer-bridge-audit-v1",
+  "status": "EXACT_STRUCTURE_AND_BINARY64_DIAGNOSTIC",
+  "conclusion": {
+    "prefix_rank_port_is_not_direct": true,
+    "reason": "RM2Sub observes at most 19 syndrome bits per 128-bit epoch. A large subcode has zero syndrome in every epoch and bypasses all random multipliers. Raw prefix dimensions do not bound the weight spectrum of this silent subcode.",
+    "next_exact_object": "the weight enumerators of suffix-silent subcodes, together with a zero/live/punctured RM2Sub transfer"
+  },
+  "parameters": {
+    "output_bits": 2119680,
+    "parent_dimension": 1059840,
+    "target_dimension": 1048576,
+    "distance_cutoff": 233164,
+    "step_bits": 128,
+    "state_bits": 19,
+    "epochs": 16560
+  },
+  "exact_checks": {
+    "rank_A": 19,
+    "rank_B": 19,
+    "BA_zero": true,
+    "A_spectrum_matches_receipt": true,
+    "A_minimum_distance": 48,
+    "B_kernel_dimension": 109,
+    "B_kernel_minimum_distance": 6
+  },
+  "silent_subcode_rank_budget": {
+    "maximum_total_syndrome_rank": 314640,
+    "parent_silent_dimension_lower": 745200,
+    "parent_silent_rate_lower": 0.3515625,
+    "shortened_silent_dimension_lower": 733936,
+    "shortened_silent_rate_lower": 0.34624849033816424,
+    "identity_on_silent_subcode": true
+  },
+  "silent_subcode_spectrum_diagnostics": {
+    "uniform_random_code_log2_expected_bad_words": -326094.52169158286,
+    "uniform_random_code_margin_bits": 326094.52169158286,
+    "B_squared_selection_cost_all_rows_bits": 139667.31548082887,
+    "random_benchmark_margin_after_B_squared_cost_bits": 186427.206210754,
+    "dimension_only_systematic_enumerator": {
+      "log2_upper": 661901.2931912858,
+      "z": 0.46560917662830054
+    },
+    "interpretation": "A random code at the forced silent dimension has enormous margin, but dimension alone gives no useful upper bound. The missing information is the silent subcode's spectrum."
+  },
+  "selected_B_nonactivation_probabilities": [
+    {
+      "input_weight": 0,
+      "kernel_words": 1,
+      "shell_size": 1,
+      "probability": 1.0,
+      "log2_probability": 0.0
+    },
+    {
+      "input_weight": 1,
+      "kernel_words": 0,
+      "shell_size": 128,
+      "probability": 0.0,
+      "log2_probability": null
+    },
+    {
+      "input_weight": 2,
+      "kernel_words": 0,
+      "shell_size": 8128,
+      "probability": 0.0,
+      "log2_probability": null
+    },
+    {
+      "input_weight": 3,
+      "kernel_words": 0,
+      "shell_size": 341376,
+      "probability": 0.0,
+      "log2_probability": null
+    },
+    {
+      "input_weight": 4,
+      "kernel_words": 0,
+      "shell_size": 10668000,
+      "probability": 0.0,
+      "log2_probability": null
+    },
+    {
+      "input_weight": 5,
+      "kernel_words": 0,
+      "shell_size": 264566400,
+      "probability": 0.0,
+      "log2_probability": null
+    },
+    {
+      "input_weight": 6,
+      "kernel_words": 18816,
+      "shell_size": 5423611200,
+      "probability": 3.4692752312333894e-06,
+      "log2_probability": -18.136934269494244
+    },
+    {
+      "input_weight": 8,
+      "kernel_words": 5542704,
+      "shell_size": 1429702652400,
+      "probability": 3.876822911880051e-06,
+      "log2_probability": -17.97669373312274
+    },
+    {
+      "input_weight": 64,
+      "kernel_words": 91366371314730666955104343859270,
+      "shell_size": 23951146041928082866135587776380551750,
+      "probability": 3.8146972656251076e-06,
+      "log2_probability": -17.99999999999996
+    },
+    {
+      "input_weight": 120,
+      "kernel_words": 5542704,
+      "shell_size": 1429702652400,
+      "probability": 3.876822911880051e-06,
+      "log2_probability": -17.97669373312274
+    },
+    {
+      "input_weight": 128,
+      "kernel_words": 1,
+      "shell_size": 1,
+      "probability": 1.0,
+      "log2_probability": 0.0
+    }
+  ],
+  "optimistic_live_only_diagnostic": {
+    "scope": "Uses the proved maximum-coset bound W_A(z)/(2^19-1), but ignores state termination and every deterministic-output segment. It is not an RM2Sub code bound.",
+    "minimum_live_epochs_for_single_word_40_bit_bound": 3684,
+    "rows": [
+      {
+        "live_epochs": 16559,
+        "z": 0.7890809594331466,
+        "log2_chernoff_bound": -228109.24824381046,
+        "margin_bits": 228109.24824381046
+      },
+      {
+        "live_epochs": 10000,
+        "z": 0.799388197571529,
+        "log2_chernoff_bound": -107096.2562466163,
+        "margin_bits": 107096.2562466163
+      },
+      {
+        "live_epochs": 5000,
+        "z": 0.8245956132110951,
+        "log2_chernoff_bound": -18342.130606929077,
+        "margin_bits": 18342.130606929077
+      },
+      {
+        "live_epochs": 4000,
+        "z": 0.862373732333438,
+        "log2_chernoff_bound": -2764.624205866962,
+        "margin_bits": 2764.624205866962
+      },
+      {
+        "live_epochs": 3700,
+        "z": 0.969756545889367,
+        "log2_chernoff_bound": -80.5369446799578,
+        "margin_bits": 80.5369446799578
+      },
+      {
+        "live_epochs": 3684,
+        "z": 0.9780864518344674,
+        "log2_chernoff_bound": -41.73714204077554,
+        "margin_bits": 41.73714204077554
+      },
+      {
+        "live_epochs": 3683,
+        "z": 0.9786118675207458,
+        "log2_chernoff_bound": -39.72716468607264,
+        "margin_bits": 39.72716468607264
+      }
+    ]
+  },
+  "dependencies": [
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_selection.json",
+      "sha256": "e2658fefdb787d5946c4c0a1dc4c8c530414fae1f6ef8bcf9c40298e6e13f117"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_b_kernel_spectrum.json",
+      "sha256": "bf322cfdb00410ff3aee381389ac899fa0060234edb22106f1d033888c60ea3f"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_a_spectrum_audit.json",
+      "sha256": "75b8d8adb7532d373ad1b5fb895159b18c800107f4ecd9b480d1b59808cb2eb5"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ba3_B240_repeated_toeplitz_prefix_outward.json",
+      "sha256": "481e6af56ea562917c2e58b660d11eb8a89da8a2259c9ab0a9fbbb137a6cddf5"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/audit_rm2sub_fixed_outer_bridge.py",
+      "sha256": "bfd6ccd6496b900fba9db9759a9522edc4139e4fa0ececc82457286377c27875"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "riffle-construction-model-manifest-v1",
+  "model_id": "riffle_frozenrandom512_p2_randomstepconv_g4_sigma20",
+  "display_name": "Riffle FrozenRandom512-P2-RandomStepConv g=4 sigma=20",
+  "status": "ACTIVE_MODEL_EXPLORATION",
+  "is_construction": false,
+  "parent_candidate_id": "riffle_randomstepconv_g4_sigma20",
+  "fixed_parameters": {
+    "data_local_code": "independent frozen uniform [512,256] linear codes",
+    "data_groups": 4096,
+    "field_parity_symbols": 2,
+    "parity_symbol_code": "extended BCH [128,64,22]",
+    "packet_bits": 4,
+    "packet_positions": 524352,
+    "inner_laps": 1,
+    "state_bits": 20
+  },
+  "randomness_scope": {
+    "setup": "independent uniform random linear injection for each data group, then frozen",
+    "encoding": "deterministic after setup",
+    "packet_permutation": "inherited global packet permutation",
+    "inner": "inherited independent random step maps"
+  },
+  "receipts": [
+    "receipts/frozenrandom512_p2_distance09.json",
+    "receipts/onegroup_exact_p2.json",
+    "receipts/global_pointwise_p2.json"
+  ],
+  "diagnostic_result": "Retaining the exact two-parity BCH spectrum closes the one-active-group contribution at -91.83. The global pointwise scan has sampled maximum -84.40 at support 360 with occupation mode three. A complete support cover remains open.",
+  "claim_scope": "The model uses the exact ensemble-average random-linear spectrum and imposes no local distance floor. It does not claim an efficient dense random-code implementation or replacement by one reused constituent."
+}

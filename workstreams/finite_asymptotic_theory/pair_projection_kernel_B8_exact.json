@@ -1,0 +1,74 @@
+{
+  "schema": "pair-projection-kernel-exact-v1",
+  "status": "EXACT_INTEGER_RATIONAL_VERIFICATION",
+  "parameters": {
+    "length": 8,
+    "rank_two_input_types": 140,
+    "projection_inequalities_checked": 17025
+  },
+  "claim": "r_ij(n) P(n,m) <= Q(h_i,w_i) Q(h_j,w_j) for all three binary-character pairs",
+  "maximum_ratios": [
+    {
+      "omitted_character": 0,
+      "numerator": 1,
+      "denominator": 1,
+      "witness": {
+        "input_type": [
+          0,
+          1,
+          0,
+          7
+        ],
+        "output_type": [
+          0,
+          4,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "omitted_character": 1,
+      "numerator": 1,
+      "denominator": 1,
+      "witness": {
+        "input_type": [
+          0,
+          0,
+          1,
+          7
+        ],
+        "output_type": [
+          0,
+          4,
+          4,
+          0
+        ]
+      }
+    },
+    {
+      "omitted_character": 2,
+      "numerator": 1,
+      "denominator": 1,
+      "witness": {
+        "input_type": [
+          0,
+          0,
+          6,
+          2
+        ],
+        "output_type": [
+          3,
+          1,
+          3,
+          1
+        ]
+      }
+    }
+  ],
+  "consequence": "Taking the geometric mean gives the three-projection pair-kernel majorant used by probe_pair_projection_holder_bound_small.py.",
+  "limitations": [
+    "The finite verification is at a small length; the conditioning argument proving the inequality is length independent.",
+    "The inequality is valid but its iterated factored envelope is too loose for the BA variance target."
+  ]
+}

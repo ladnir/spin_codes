@@ -1,0 +1,91 @@
+{
+  "schema": "rm2sub-fixed-rm-dense-pure-band-probe-v1",
+  "status": "BINARY64_PARTIAL_DIAGNOSTIC",
+  "parameters": {
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "outer_rows": 256,
+    "outer_bits": 512,
+    "step_bits": 64,
+    "state_bits": 14,
+    "bad_weight": 13107,
+    "occupations": [
+      52,
+      53,
+      54,
+      55
+    ]
+  },
+  "bands": [
+    {
+      "lower": 1,
+      "upper": 47,
+      "bit_probability": 0.06249999989283405,
+      "envelope_log2": 29.44125542252923,
+      "maximizing_weight": 32
+    }
+  ],
+  "rows": [
+    {
+      "occupation": 52,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.2360125805843722,
+      "selected_band_envelope_log2": 109.82882228249338,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.23826579512007073,
+      "surprisal": 0.12115544672852024,
+      "margin_bits_diagnostic": -29.39127987163759,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 53,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.23574755650479065,
+      "selected_band_envelope_log2": 109.64051105047017,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.24257834938207462,
+      "surprisal": 0.1233536103609417,
+      "margin_bits_diagnostic": 4.780317934118888,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 54,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.23548003101372056,
+      "selected_band_envelope_log2": 109.45056608671567,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.246881326772232,
+      "surprisal": 0.12554540948951712,
+      "margin_bits_diagnostic": 39.05737516933387,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 55,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.23521022777553494,
+      "selected_band_envelope_log2": 109.2591501370302,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.25117489658415926,
+      "surprisal": 0.12773095845644575,
+      "margin_bits_diagnostic": 73.43407017309909,
+      "optimizer_success": true
+    }
+  ],
+  "limitations": [
+    "Only pure band faces are evaluated; mixed band compositions remain open.",
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "Continuous optimizers are diagnostic and not globally certified."
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "rm2sub-t64-state-calibration-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "quantity": "shell-separated occupation-one union-bound margin in bits",
+  "integer_event": "output weight at most floor((distance_numerator/distance_denominator)*N)",
+  "probability_space": {
+    "outer": "one fixed exact-spectrum BCH constituent reused in every row",
+    "routing": "independent uniform row-coordinate and transposed-region permutations",
+    "randomstep": "independent random linear transitions at every bit",
+    "rm2sub": "one fixed, exactly audited A/B pair with BA=0 for each state dimension; independent nonzero state multipliers per epoch"
+  },
+  "parameters": {
+    "step_bits": 64,
+    "message_exponents": [
+      20
+    ],
+    "constituents": [
+      "ebch128"
+    ],
+    "state_bits": [
+      16
+    ],
+    "distance_numerator": 100,
+    "distance_denominator": 1000,
+    "persistence_matching_rule": "RandomStepConv M=s+log2(64)=s+6",
+    "tilt_count": 121
+  },
+  "cases": [
+    {
+      "inner": "RandomStepConv",
+      "state_bits": 16,
+      "step_bits": 1,
+      "epochs_per_region": 16384,
+      "margin_bits": -30.810809097889155,
+      "dominant_weight": 32,
+      "dominant_log_surprisal": -9.0,
+      "configuration": "m16",
+      "comparison": "same-stored-state-bits",
+      "reference_rm2sub_state_bits": 16,
+      "persistence_exponent": 16.0,
+      "constituent": "extended BCH [128,64,22]",
+      "block_bits": 128,
+      "dimension": 64,
+      "message_exponent": 20,
+      "message_bits": 1048576,
+      "outer_rows": 16384,
+      "output_bits": 2097152,
+      "bad_weight": 209715
+    },
+    {
+      "inner": "RandomStepConv",
+      "state_bits": 22,
+      "step_bits": 1,
+      "epochs_per_region": 16384,
+      "margin_bits": 22.102468644744995,
+      "dominant_weight": 22,
+      "dominant_log_surprisal": -8.7,
+      "configuration": "m22",
+      "comparison": "same-live-state-reset-rate",
+      "reference_rm2sub_state_bits": 16,
+      "persistence_exponent": 22.0,
+      "constituent": "extended BCH [128,64,22]",
+      "block_bits": 128,
+      "dimension": 64,
+      "message_exponent": 20,
+      "message_bits": 1048576,
+      "outer_rows": 16384,
+      "output_bits": 2097152,
+      "bad_weight": 209715
+    },
+    {
+      "inner": "RM2Sub",
+      "configuration": "t64_s16",
+      "step_bits": 64,
+      "state_bits": 16,
+      "persistence_exponent": 22.0,
+      "epochs_per_region": 256,
+      "a_minimum_distance": 16,
+      "kernel_minimum_distance": 6,
+      "kernel_weight_four": 0,
+      "margin_bits": 32.33784925772823,
+      "dominant_weight": 22,
+      "dominant_log_surprisal": -8.4,
+      "comparison": "rm2sub",
+      "reference_rm2sub_state_bits": 16,
+      "constituent": "extended BCH [128,64,22]",
+      "block_bits": 128,
+      "dimension": 64,
+      "message_exponent": 20,
+      "message_bits": 1048576,
+      "outer_rows": 16384,
+      "output_bits": 2097152,
+      "bad_weight": 209715
+    }
+  ],
+  "limitations": [
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "Only occupation one is covered.",
+    "The selected A/B samples are exactly audited but not proven optimal.",
+    "Persistence matching equates a first-order reset exponent, not the full transition law.",
+    "The comparison does not measure implementation cost or randomness cost."
+  ]
+}

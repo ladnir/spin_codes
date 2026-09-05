@@ -1,0 +1,67 @@
+{
+  "schema": "block-expand5-F2-conditional-transfer-outward-v1",
+  "status": "OUTWARD_TRANSFER_CONDITIONAL_ON_UNPROVED_CAP_EVENT",
+  "claim": {
+    "conditional_distance_failure_log2_upper": -51.643958989073376,
+    "diagnostic_outer_event_failure_log2": -41.006225075853656,
+    "diagnostic_combined_failure_log2_upper": -41.00531984095898,
+    "diagnostic_combined_margin_bits": 41.00531984095898,
+    "comparison_to_2^-40": true
+  },
+  "hypothesis": "outward shell means equal the recorded values within a certified enclosure and Var(A_w) <= 2 E[A_w] for every positive shell",
+  "parameters": {
+    "message_bits_per_constituent": 256,
+    "output_bits_per_constituent": 512,
+    "expander_left_degree": 14,
+    "accumulator_stages": 5,
+    "outer_rows": 4096,
+    "inner": "RandomStepConv-M22",
+    "positive_cap_shells_before_recentring": 429,
+    "positive_cap_shells_after_recentring": 429,
+    "per_shell_failure_log2": -49.74551257165114
+  },
+  "transfer": {
+    "q1_log2_upper": -67.94410138286364,
+    "q1_details": {
+      "positive_cap_shells": 429,
+      "maximum_pointwise_log2_upper": -76.68893522036319
+    },
+    "q2_log2_upper": -105.35776097524938,
+    "q2_details": {
+      "shell_pairs": 184041,
+      "maximum_pointwise_log2_upper": -122.84742865024849
+    },
+    "q3_159_log2_upper_reused": -51.679610031721595,
+    "q160_4096_log2_upper_reused": -57.001158768388656,
+    "band_majorant_domination": {
+      "low": true,
+      "high": true,
+      "central": true
+    },
+    "rule": "Q=1 and Q=2 are reevaluated with the exact integer caps. For Q>=3, each new band majorant is no larger than the one used by the cited outward receipts."
+  },
+  "setup_accounting_diagnostic": {
+    "kernel_log2": -57.70082349682239,
+    "zero_cap_tail_log2": -52.67247957168666,
+    "central_cantelli_union_log2": -41.00668264709488
+  },
+  "sources": [
+    {
+      "file": "block_expand_accumulate_512_256_d14_t0_5_spectrum.json",
+      "sha256": "e16ca7a5a8b68ceb7ccbaee330a5b679ec41ad77a182a90ebeaf8bc7a350647f"
+    },
+    {
+      "file": "single_random_constituent_B512_sparse_outward_s22.json",
+      "sha256": "6e34039c98b77d98c7c3c94d1344828970099290f8d7703f8fe3f3a76e99ffcc"
+    },
+    {
+      "file": "single_random_constituent_B512_shared_two_band_dense_cover_outward_s22.json",
+      "sha256": "939d495262fe67719519ddd9180d900eafe97c30e3504153a3348838c68658cd"
+    }
+  ],
+  "limitations": [
+    "The shell means are binary64 diagnostics and are not outward enclosures.",
+    "The variance-factor-two hypothesis is open at length 512.",
+    "The reported combined margin is conditional accounting, not an unconditional distance theorem."
+  ]
+}

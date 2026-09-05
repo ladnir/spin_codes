@@ -1,0 +1,31 @@
+{
+  "schema": "ebch128x4-ba-variance-proxy-q1q2-v1",
+  "status": "CONDITIONAL_BINARY64_EXACT_SHELL_DIAGNOSTIC",
+  "parameters": {
+    "accumulator_stages": 2,
+    "variance_inflation_bits": 9.0,
+    "variance_hypothesis": "Var(A_w) <= 2^9.0 E[A_w] for every nonzero shell",
+    "memory_bits": 24,
+    "distance_cutoff": 228590
+  },
+  "cap_event_failure_log2_upper": -42.08934503271639,
+  "q1": {
+    "log2_upper": -16.338209739433037,
+    "margin_bits": 16.338209739433037,
+    "dominant_weight": 15,
+    "dominant_log_surprisal": -9.5
+  },
+  "q2": {
+    "log2_upper": -36.89570708294052,
+    "margin_bits": 36.89570708294052,
+    "dominant_weights": [
+      15,
+      15
+    ],
+    "dominant_log_surprisal": -9.0
+  },
+  "limitations": [
+    "The shell-variance hypothesis is not proved.",
+    "Nearest binary64 arithmetic is not an outward certificate."
+  ]
+}

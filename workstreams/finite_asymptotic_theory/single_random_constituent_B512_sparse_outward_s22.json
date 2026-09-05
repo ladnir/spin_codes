@@ -1,0 +1,70 @@
+{
+  "schema": "single-random-constituent-sparse-outward-v1",
+  "status": "OUTWARD_SPARSE_CERTIFICATE",
+  "claim": {
+    "minimum_occupation": 1,
+    "maximum_occupation": 159,
+    "q1_log2_upper": -67.94410138286364,
+    "q2_log2_upper": -105.35776097493742,
+    "q3_159_log2_upper": -51.679610031721595,
+    "aggregate_log2_upper": -51.679591705538556,
+    "aggregate_margin_bits_lower": 51.679591705538556
+  },
+  "parameters": {
+    "outer_code": "one uniform binary [512,256] generator, repeated in all 4096 rows",
+    "outer_rows": 4096,
+    "output_bits": 2097152,
+    "distance_cutoff": 228590,
+    "memory_bits": 22
+  },
+  "details": {
+    "q1": {
+      "shells": 429,
+      "maximum_pointwise_log2_upper": -76.68893522036319
+    },
+    "q2": {
+      "shell_pairs": 184041,
+      "maximum_pointwise_log2_upper": -122.84742864993653
+    },
+    "q3_159": {
+      "compositions": 12874,
+      "witness_groups": 23,
+      "maximum_pointwise_log2_upper": -51.679610878068324,
+      "worst_composition": [
+        3,
+        0
+      ],
+      "witness_sources": [
+        {
+          "file": "single_random_constituent_B512_shared_two_band_q3_16_s22.json",
+          "sha256": "af55d89f529883db8af8dc4c42fec8c205343fb66b1cb7f92936b5ba5b0a88d9"
+        },
+        {
+          "file": "single_random_constituent_B512_shared_two_band_q17_32_s22.json",
+          "sha256": "38ccd4bdeff88815cb1c825fa0e4c6e0e19a38624a39b84f2204000024983954"
+        },
+        {
+          "file": "single_random_constituent_B512_shared_two_band_q33_64_s22.json",
+          "sha256": "4b59968e8be9da9cafc2e0819f41afea615750ddc8591dbb0903ecccc5a43666"
+        },
+        {
+          "file": "single_random_constituent_B512_shared_two_band_q65_128_s22.json",
+          "sha256": "efccca864d5a4a79f30aab4c3f0af7f186762ae912273657fed8db1e2ffe2352"
+        },
+        {
+          "file": "single_random_constituent_B512_shared_two_band_q129_159_s22.json",
+          "sha256": "da4b4010db5d81245dc33d212f8d594ebe0ff91810414438b198eba6486e87f2"
+        }
+      ]
+    }
+  },
+  "constituent_event": {
+    "total_failure_upper": 1.896832534308249e-13,
+    "margin_bits_lower": 42.26147292040985
+  },
+  "arithmetic": "192-bit Arb transcendental endpoints and exact rational spectrum data; positive binary64 recurrences advanced one ULP after every addition, multiplication, division, and power-of-two scaling",
+  "limitations": [
+    "Occupations 160 through 4096 use the separate outward dense cover.",
+    "The inner ensemble is RandomStepConv-M22, not RM2Sub."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "riffle-dp-2lap-g4-terminal-turnoff-replay-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT",
+  "three_packet_receipt_sha256": "d222ee1765ca4d495d89b637834a41480b4bd3775f1bb4529a3d9c275dee28b3",
+  "collision_receipt_sha256": "ee2f19e86f78eac06a32c9ced0bdf4c805c0baec0c9bf13a71fbac15a747878a",
+  "distance_threshold": 188766,
+  "placement": "Each isolated episode is shifted so its reset node is the final node. The preceding nodes and the retained first-lap terminal state are zero.",
+  "three_packet": {
+    "witness_count": 27,
+    "terminally_shifted_below_distance_count": 27,
+    "first_lap_weight_minimum": 27,
+    "first_lap_weight_maximum": 117,
+    "two_lap_weight_minimum": 2,
+    "two_lap_weight_maximum": 185,
+    "two_lap_weight_mean": 41.111111111111114,
+    "second_lap_terminal_zero_count": 17
+  },
+  "one_or_two_packet_collision": {
+    "witness_count": 539,
+    "terminally_shifted_below_distance_count": 539,
+    "first_lap_weight_minimum": 25,
+    "first_lap_weight_maximum": 155,
+    "two_lap_weight_minimum": 1,
+    "two_lap_weight_maximum": 250,
+    "two_lap_weight_mean": 30.22077922077922,
+    "second_lap_terminal_zero_count": 342
+  },
+  "scope_limitation": "The replay proves that isolated terminal turnoffs remain low-weight after two laps. It does not show that an authenticated support-33 outer word can consist of one isolated episode, and it does not reuse the old lower-family probabilities."
+}

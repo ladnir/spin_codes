@@ -1,0 +1,66 @@
+{
+  "schema": "ebch128x4-ba128-randomstepconv-combined-v1",
+  "status": "CONDITIONAL_OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "claim": {
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "cap_conditional_bad_probability_log2_upper": -51.64395898907337,
+    "cap_conditional_margin_bits_lower": 51.64395898907337,
+    "constituent_event_failure_upper": 7.148497217296157e-13,
+    "constituent_event_margin_bits_lower": 40.34742524829178,
+    "total_failure_log2_upper": -40.346851802036795,
+    "total_margin_bits_lower": 40.346851802036795,
+    "comparison_to_2^-40": true
+  },
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "distance_cutoff": 228590,
+    "memory_bits": 22,
+    "accumulator_stages": 128,
+    "singular_value_upper_hypothesis": "63/1000"
+  },
+  "outer_constituent": {
+    "base": "direct sum of four copies of the fixed extended BCH [128,64,22] code",
+    "stage": "independent uniform permutation of 512 coordinates followed by the zero-state binary prefix accumulator",
+    "reuse": "the 128 sampled stage permutations define one constituent, repeated in all 4096 outer rows"
+  },
+  "probability_space": {
+    "outer": "128 independent uniform elements of S_512 sampled once",
+    "routing": "independently sample one uniform 512-coordinate permutation per outer row and one uniform 4096-position permutation per transposed region",
+    "inner": "independently sample one uniform binary 23-by-23 linear map at each of the 2^21 RandomStepConv positions; all maps are fixed and shared by every message"
+  },
+  "hypothesis": "in stationary L2, the second singular values of the one-word and ordered-distinct-pair type operators for one permuted accumulator are each at most 63/1000",
+  "proof_accounting": {
+    "outer_event": "the exact integer cap vector used by the certified random-[512,256] transfer",
+    "conditional_transfer": "the existing outward sparse and dense receipts depend only on that cap vector",
+    "failure_union": "BA-128 cap-event failure plus the cap-conditional expected number of low-weight nonzero messages"
+  },
+  "component_receipts": [
+    {
+      "file": "ba128_pair_singular_random_cap_event_outward_B512.json",
+      "sha256": "847834a1cc0e515498f4b9e43111921beea3edce5bf91426217b3c6901422d4c",
+      "role": "conditional BA-128 cap event"
+    },
+    {
+      "file": "single_random_constituent_B512_sparse_outward_s22.json",
+      "sha256": "6e34039c98b77d98c7c3c94d1344828970099290f8d7703f8fe3f3a76e99ffcc",
+      "role": "cap-conditional occupations 1 through 159"
+    },
+    {
+      "file": "single_random_constituent_B512_shared_two_band_dense_cover_outward_s22.json",
+      "sha256": "939d495262fe67719519ddd9180d900eafe97c30e3504153a3348838c68658cd",
+      "role": "cap-conditional occupations 160 through 4096"
+    }
+  ],
+  "limitations": [
+    "The accumulator singular-value hypothesis is an open proof obligation; this is not yet an unconditional construction certificate.",
+    "The theorem concerns RandomStepConv-M22, not RM2Sub.",
+    "The 128 accumulator stages are a proof fallback, not a performance-competitive design.",
+    "The inner samples a fresh 23-by-23 binary matrix at every position; no compact inner implementation claim is made.",
+    "The theorem is finite at k=2^20; it does not by itself provide an asymptotic schedule."
+  ]
+}

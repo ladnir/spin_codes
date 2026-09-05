@@ -1,0 +1,1235 @@
+\section{Scalar dense inner refinements}
+\label{sec:scalar-dense-inner-refinements}
+
+This note preserves scalar dense-inner refinements that are useful for finite diagnostics and possible sharper theorem
+work, but are not part of the current compiled main proof spine. The main paper now keeps only the lemmas needed for the
+random sliding dense asymptotic theorem: the three-term tail, run lower-tail exponent, forced-termination contraction,
+and the packaged inner interface.
+
+\subsection{Envelope interpretation note}
+
+The compiled dense-inner section keeps the packaged global, run-aware, and
+small-weight envelopes.  Their roles are:
+\begin{itemize}
+\item the global envelope is designed for the linear-weight regime; its first
+term decays exponentially in the input weight, its second term exposes the
+ON\(\to\)OFF memory penalty \(N2^{-m}\), and its third term is a pure
+large-deviation term in \(N\);
+\item the run-aware envelope preserves the exact interleaved run-count
+combinatorics and turns the OFF mechanism into the multiplicative term
+\((L2^{-m})^r\);
+\item the fixed-tap small-weight envelope specializes the isolated-start regime,
+where genuine termination candidates must be aligned with later input-one
+positions.
+\end{itemize}
+
+\subsection{Demoted geometric-envelope bookkeeping}
+
+The compiled scalar dense-inner section keeps the constant-factor geometric envelope because it is the form consumed by
+the dense+dense integration theorem.  The more general polynomial-prefactor variant and the explanatory OFF-term remark
+are preserved here.
+
+\begin{corollary}[Geometric dense-inner envelope above a logarithmic cutoff]
+\label{cor:dense-inner-geometric-cutoff}
+Consider the dense time-varying recursive inner encoder with memory
+\[
+m \;:=\; \gamma \log_2 n
+\qquad\text{for a constant }\gamma>1.
+\]
+Fix $\delta\in(0,1/2)$ and choose any fixed $\varepsilon\in(0,1)$.
+Let $p_w(\delta)$ denote the slice-to-tail probability from the dense-inner global envelope.
+Assume the dense-inner tail bound gives
+\begin{equation}
+\label{eq:dense-three-term-recall}
+p_w(\delta)
+\;\le\;
+(1-\varepsilon)^w \;+\; n\,2^{-m} \;+\; q_{\delta,\varepsilon}(n),
+\end{equation}
+where $q_{\delta,\varepsilon}(n)\le 2^{-c n}$ for some $c=c(\delta,\varepsilon)>0$.
+
+Then there exist constants $\rho\in(0,1)$, $a\ge 0$, and $\kappa>0$
+(depending only on $\delta,\varepsilon,\gamma$) such that
+for every fixed cutoff $w_0(n)\ge \kappa\log_2 n$,
+for all sufficiently large $n$, and for all $w\ge w_0(n)$,
+\[
+p_w(\delta)\;\le\; n^{a}\,\rho^{\,w}.
+\]
+\end{corollary}
+
+\begin{proof}
+Let $\rho:=1-\varepsilon\in(0,1)$.
+We bound each term in \eqref{eq:dense-three-term-recall} by a common expression $n^a\rho^w$ for all
+$w\ge w_0(n)\ge \kappa\log_2 n$.
+
+\paragraph{Term 1.}
+$(1-\varepsilon)^w=\rho^w\le n^a\rho^w$ for any $a\ge 0$.
+
+\paragraph{Term 2.}
+Since $m=\gamma\log_2 n$, we have $n\,2^{-m}=n\cdot n^{-\gamma}=n^{1-\gamma}$.
+Then for all $w\ge w_0(n)\ge \kappa\log_2 n$,
+\[
+\rho^{\,w}\ \le\ \rho^{\,\kappa\log_2 n}
+\ =\ n^{-\kappa\log_2(1/\rho)}.
+\]
+Choose any constant $a$ such that
+\[
+a - \kappa\log_2(1/\rho)\ \ge\ 1-\gamma.
+\]
+Then $n^{1-\gamma}\le n^{a}\rho^{\,w}$ for all $w\ge w_0(n)$.
+
+\paragraph{Term 3.}
+Since $q_{\delta,\varepsilon}(n)\le 2^{-cn}$ and $\rho^w\ge \rho^n$ is exponentially small in $n$ as well,
+we have $q_{\delta,\varepsilon}(n)\le n^{a}\rho^{\,w}$ for all sufficiently large $n$ after increasing $a$ by an absolute constant if needed.
+
+Combining the three bounds yields $p_w(\delta)\le n^a\rho^w$ for all $w\ge w_0(n)$.
+\end{proof}
+
+\begin{remark}[The ON$\to$OFF term and why it is harmless in the framework]
+\label{rem:dense-off-harmless}
+The term $n2^{-m}$ in \eqref{eq:dense-three-term-recall} corresponds to the event that, while ON, the output stream
+contains a length-$m$ all-zero window, causing an ON$\to$OFF transition.
+For dense taps the expected ON lifetime under zero input is $\Theta(2^m)$, hence this term is unavoidable in a pointwise bound.
+However, the serial concatenation framework never uses $p_w(\delta)$ for $w<d_{\min}(\Cone)$,
+and for $w\ge d_{\min}(\Cone)=\Omega(\log n)$ the geometric factor $\rho^w$ yields an additional $n^{-\Omega(1)}$
+that easily absorbs $n2^{-m}=n^{1-\gamma}$ as soon as $\gamma>1$.
+Thus the dense inner conforms to the single inner interface without weakening the end-to-end guarantee.
+\end{remark}
+
+\subsection{Run-tail exponent derivation}
+
+This note preserves the expanded Stirling calculation behind the run lower-tail exponent used in the main scalar dense
+inner section.  Let \(U\) be uniform over weight-\(w\) words in \(\{0,1\}^N\), set
+\[
+w=\lfloor\omega N\rfloor,\qquad r=\lfloor\rho N\rfloor,
+\]
+and assume \(0<\rho<\omega(1-\omega)\).  The exact run-count formula gives
+\[
+\Pr[R(U)<r]
+=
+\frac{1}{\binom{N}{w}}
+\sum_{s=1}^{r-1}
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
+For \(s=\lfloor\sigma N\rfloor\), Stirling's formula gives
+\[
+\log_2\binom{w-1}{s-1}
+=
+\omega N H_2\!\left(\frac{\sigma}{\omega}\right)+O(\log N),
+\]
+\[
+\log_2\binom{N-w+1}{s}
+=
+(1-\omega)N H_2\!\left(\frac{\sigma}{1-\omega}\right)+O(\log N),
+\]
+and
+\[
+\log_2\binom{N}{w}=NH_2(\omega)+O(\log N).
+\]
+Thus the summand exponent is
+\[
+-N\Psi_{\rm run}(\omega,\sigma)+O(\log N),
+\]
+where
+\[
+\Psi_{\rm run}(\omega,\sigma)
+:=
+H_2(\omega)
+-\omega H_2\!\left(\frac{\sigma}{\omega}\right)
+-(1-\omega)H_2\!\left(\frac{\sigma}{1-\omega}\right).
+\]
+The derivative is
+\[
+\frac{\partial}{\partial\sigma}\Psi_{\rm run}(\omega,\sigma)
+=
+\log_2\!\left(\frac{\sigma^2}{(\omega-\sigma)(1-\omega-\sigma)}\right),
+\]
+which is negative for \(\sigma<\omega(1-\omega)\).  Hence the largest summand in the lower tail occurs at the boundary
+\(\sigma=\rho+O(1/N)\), and the whole sum is bounded by
+\[
+N^{O(1)}2^{-N\Psi_{\rm run}(\omega,\rho)}.
+\]
+
+\subsection{Demoted fixed-tap candidate bookkeeping}
+
+The following fixed-tap lemmas are useful for finite scalar diagnostics and for the older isolated-slice correction
+program, but they are not consumed by the current random sliding dense asymptotic theorem. They were therefore moved out
+of the compiled scalar dense spine during the cleanup pass.
+
+\begin{lemma}[Exact final-survivor suffix average]
+\label{lem:fixedtap-final-survivor-suffix}
+Let \(U\) be uniform on the weight-\(h\) slice of \(\{0,1\}^N\), and let
+\[
+\tau(U):=\min\supp(U),\qquad S(U):=N-\tau(U)+1.
+\]
+Let \(\mathcal{S}_{\mathrm{fin}}\) be the event that the ON episode started by the first input one survives through the
+end of the block. Then, for every \(d\ge 0\),
+\[
+\PP\!\left[
+\mathcal{S}_{\mathrm{fin}}\wedge \wt(Y)\le d
+\middle| \wt(U)=h
+\right]
+\le
+\sum_{S=h}^{N}
+\frac{\binom{S-1}{h-1}}{\binom{N}{h}}\,
+\PP[\Binomial(S,\tfrac12)\le d].
+\]
+\end{lemma}
+
+\begin{proof}
+Condition on the first input-one position \(\tau=t\), and put \(S=N-t+1\). The first output is deterministically one,
+and on \(\mathcal{S}_{\mathrm{fin}}\) the remaining suffix stays on a surviving ON episode, so the suffix lower tail is
+bounded by the corresponding fair-coin tail. Under the uniform weight-\(h\) law,
+\[
+\PP[S(U)=S\mid \wt(U)=h]=\frac{\binom{S-1}{h-1}}{\binom{N}{h}},
+\]
+and averaging over \(S\) gives the displayed bound.
+\end{proof}
+
+\begin{lemma}[Fixed-tap episode budget]
+\label{lem:fixedtap-episode-budget}
+For a fixed input-output trajectory of the fixed-tap dense recursive inner, let
+\[
+S:=|\{t:\OFF_t,\ \ON_{t+1}\}|,
+\qquad
+D:=|\{t:\ON_t,\ \OFF_{t+1}\}|
+\]
+be the number of genuine starts and genuine terminations inside the block. Then
+\[
+S+D \le \wt(U).
+\]
+Moreover, each termination time is an input-one position that is not a start time.
+\end{lemma}
+
+\begin{proof}
+Both a genuine start and a genuine termination require \(u_t=1\); the termination statement follows from
+Lemma~\ref{lem:fixedtap-termination-needs-input-one}. The two cases are disjoint at a fixed time because \(s_t\)
+cannot be both zero and nonzero.
+\end{proof}
+
+\begin{lemma}[Fixed-tap multi-candidate termination bound]
+\label{lem:fixedtap-multicandidate-termination}
+Fix an input word \(u\), and fix \(r\) distinct input-one positions
+\[
+t_1<\cdots<t_r.
+\]
+The probability that all \(r\) of these positions are genuine fixed-tap termination times is at most
+\[
+2^{-r(m-1)}.
+\]
+\end{lemma}
+
+\begin{proof}
+Expose the trajectory from left to right. Each requested termination imposes \(m-1\) predictable free-time zero
+constraints after the leading one in the critical state, unless the requested pattern is already impossible. By
+Lemma~\ref{lem:dense-on-time-domination}, each requested termination costs at most \(2^{-(m-1)}\) conditional on the
+compatible past. Multiplying over the \(r\) requested positions gives the claim.
+\end{proof}
+
+\begin{corollary}[Isolated fixed-tap termination candidates are pair-controlled]
+\label{cor:fixedtap-isolated-pair-candidates}
+Let \(U\) be uniform on the isolated slice \(\{\wt(U)=h,\ R(U)=h\}\). Let
+\[
+\mathcal{P}_L(U)
+:=
+|\{(i,j): i<j,\ U_i=U_j=1,\ j-i\le L\}|
+\]
+be the number of isolated input-one pairs with separation at most \(L\). Then
+\[
+\EE[\mathcal{P}_L(U)\mid \wt(U)=h,\ R(U)=h]
+\le
+\binom{h}{2}\frac{2L}{N-h}.
+\]
+Consequently, the expected number of possible within-\(L\) fixed-tap termination candidates over all isolated starts is
+bounded by the same quantity.
+\end{corollary}
+
+\begin{proof}
+On the isolated slice, write the support positions as
+\[
+1\le x_1<\cdots<x_h\le N,\qquad x_{a+1}-x_a\ge 2.
+\]
+The shifted coordinates \(z_a:=x_a-(a-1)\) form a uniformly random \(h\)-subset of \([M]\), where \(M=N-h+1\). For any
+unordered pair of selected shifted coordinates, the probability that their distance is at most \(L\) is at most
+\[
+\frac{ML}{\binom{M}{2}}\le \frac{2L}{M-1}=\frac{2L}{N-h}.
+\]
+Since \(x_b-x_a\le L\) implies \(z_b-z_a\le L\), linearity of expectation proves the displayed bound.
+\end{proof}
+
+\subsection{Demoted first-start and single-run diagnostics}
+
+These position-sensitive scalar dense diagnostics are useful for finite calibration and for understanding why the
+\(h=1\) inner slice has a \(2\delta\)-type late-start base. They are not used by the current analytic dense+dense
+theorem, so the compiled main spine keeps only the coarser three-term tail and the run/forced-termination envelopes.
+
+\begin{corollary}[Zero-input gaps survive in the fixed-tap inner]
+\label{cor:dense-gap-survival}
+Fix an interval of \(g\ge0\) consecutive zero inputs, and condition on the event that the encoder is ON at the start of
+that interval. Then the encoder remains ON throughout the whole gap:
+\begin{equation}
+\label{eq:dense-gap-survival}
+\PP[\text{survive a zero gap of length }g \mid \ON]
+\;=\;
+1,
+\end{equation}
+apart from the harmless convention at the block boundary after time \(N\).
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:fixedtap-termination-needs-input-one}, a genuine ON\(\to\)OFF transition requires the final zero of
+the terminating \(10^m\) pattern to be aligned with an input one. Inside a zero-input gap no such aligned one exists,
+so no ON\(\to\)OFF transition can occur there.
+\end{proof}
+
+\begin{lemma}[First-start-aware no-OFF tail]
+\label{lem:dense-first-start-nooff-tail}
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=w\ge 1\), and let
+\[
+T:=\min\{t:U_t=1\}.
+\]
+Let \(Y=\Enc_{\mathrm{in}}(U)\), and let \(\mathcal{E}_{\mathrm{off}}\) be the event that after the first activation
+at time \(T\), the encoder later returns to \(\OFF\). Then for every integer \(d\ge 0\),
+\begin{equation}
+\label{eq:dense-first-start-nooff-tail}
+\PP[\wt(Y)\le d\ \wedge\ \mathcal{E}_{\mathrm{off}}^c\mid \wt(U)=w]
+\;\le\;
+\sum_{t=1}^{N-w+1}
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}}\,
+\PP[\Binomial(N-t,\tfrac12)\le d].
+\end{equation}
+Consequently,
+\begin{equation}
+\label{eq:dense-first-start-with-off-remainder}
+p_w(\delta)
+\;\le\;
+\sum_{t=1}^{N-w+1}
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}}\,
+\PP[\Binomial(N-t,\tfrac12)\le \lfloor\delta N\rfloor]
+\;+\;
+\PP[\mathcal{E}_{\mathrm{off}}\mid \wt(U)=w].
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The exact first-start law under the uniform weight-\(w\) model is
+\[
+\PP[T=t\mid \wt(U)=w]
+=
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}},
+\qquad 1\le t\le N-w+1.
+\]
+Condition on \(T=t\). At time \(t\), the encoder is still \(\OFF\), so \(Y_t=U_t=1\) and the next state is nonzero.
+On \(\mathcal{E}_{\mathrm{off}}^c\), the encoder remains \(\ON\) throughout the suffix \(t+1,\dots,N\). Hence
+Lemma~\ref{lem:dense-on-time-domination} bounds the joint probability that the suffix has at most \(d\) ones by
+\(\PP[\Binomial(N-t,\tfrac12)\le d]\). Average over \(T\), then add the OFF event for the final display.
+\end{proof}
+
+\paragraph{Position-aware first-start tail.}
+For \(w=\eta N\) and \(t=\alpha N\), the summand in
+\eqref{eq:dense-first-start-nooff-tail} has exponent
+\[
+H_2(\eta)
+-
+(1-\alpha)H_2\!\left(\frac{\eta}{1-\alpha}\right)
+\;+\;
+(1-\alpha)
+\left[
+1-H_2\!\left(\frac{\delta}{1-\alpha}\right)
+\right],
+\]
+whenever \(\alpha\le 1-\eta\) and \(\delta/(1-\alpha)<1/2\). Optimizing over \(\alpha\) gives the correct
+first-start-aware replacement for the earlier coarse \((1-\varepsilon)^w\) splice. The remaining linear-window task is
+to replace the raw OFF remainder in \eqref{eq:dense-first-start-with-off-remainder} by an exponentially small
+restart/episode bound.
+
+\begin{corollary}[Single-run base factor]
+\label{cor:dense-inner-single-run}
+Fix \(\delta\in(0,1/2)\) and let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=1\).
+Let \(Y=\Enc_{\mathrm{in}}(U)\) be produced by \eqref{eq:dense-inner-def}. Then
+\begin{equation}
+\label{eq:dense-inner-single-run}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+\frac{\lceil 2\delta N\rceil}{N}
+\;+\;
+N2^{-m}
+\;+\;
+\PP[\Binomial(\lceil 2\delta N\rceil,\tfrac12)\le \delta N].
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:dense-inner-single-run-asym}
+\PP[\wt(Y)\le \delta N \mid \wt(U)=1]
+\;\le\;
+2\delta
+\;+\;
+O\!\left(\frac{1}{N}\right)
+\;+\;
+N2^{-m}
+\;+\;
+2^{-\Omega_\delta(N)}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Let \(T\) be the unique index with \(U_T=1\). Under the uniform weight-\(1\) model, \(T\) is uniform on \(\{1,\dots,N\}\).
+If there is no later ON\(\to\)OFF transition and \(N-T\ge \lceil2\delta N\rceil\), the low-weight suffix event is bounded
+by the displayed binomial tail. The complementary late-start event has probability at most \(\lceil2\delta N\rceil/N\).
+Finally, Lemma~\ref{lem:dense-off-requires-mzeros} and the same union bound as in Lemma~\ref{lem:dense-three-term-tail}
+give the \(N2^{-m}\) OFF term.
+\end{proof}
+
+\subsection{Gap, isolated-slice, and paired-cover refinements}
+\begin{lemma}[Gap composition conditioned on weight and run count]
+\label{lem:gap-composition-given-runs}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Write the zero gaps around the $s$ runs as
+\[
+z_0,\ z_1,\ \dots,\ z_{s-1},\ z_s,
+\]
+where $z_0$ and $z_s$ are the leading and trailing zero counts and each internal gap $z_i$ for
+$1\le i\le s-1$ is at least $1$. Define shifted internal gaps
+\[
+y_0:=z_0,\qquad y_i:=z_i-1 \ (1\le i\le s-1),\qquad y_s:=z_s.
+\]
+Then $(y_0,\dots,y_s)$ is uniform over all weak compositions of
+\[
+M:=N-w-(s-1)
+\]
+into $s+1$ parts.
+
+In particular, for any fixed internal gap $G=z_i$ with $1\le i\le s-1$,
+\begin{equation}
+\label{eq:internal-gap-marginal}
+\PP[G=g \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-g+s-1}{s-1}}{\binom{M+s}{s}}
+\qquad (g\ge 1),
+\end{equation}
+whenever $M-g\ge 0$, and therefore
+\begin{equation}
+\label{eq:internal-gap-mean}
+\EE[G \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+1+\frac{M}{s+1}
+\;=\;
+\frac{N-w+2}{s+1}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Conditioned on $\wt(U)=w$ and $R(U)=s$, a word is specified by:
+\begin{itemize}
+\item a composition of $w$ into $s$ positive run lengths, and
+\item a choice of zero gaps $z_0,z_1,\dots,z_s$ with $z_0,z_s\ge 0$, $z_i\ge 1$ for $1\le i\le s-1$, and
+\(\sum_{i=0}^s z_i=N-w\).
+\end{itemize}
+After the shift $y_i=z_i-1$ on the internal gaps, the second datum becomes a weak composition of
+$M=N-w-(s-1)$ into $s+1$ parts. For each fixed shifted gap vector there are exactly
+$\binom{w-1}{s-1}$ compatible run-length compositions, so under the uniform law on the $(w,s)$-slice the shifted
+gap vector is itself uniform over those weak compositions.
+
+Fix an internal gap $G=z_i$ and write $G=1+Y_i$. The event $\{G=g\}$ is equivalent to $Y_i=g-1$, leaving
+$M-(g-1)=M-g+1$ units to be distributed across the remaining $s$ coordinates. Hence
+\[
+\PP[G=g \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-g+s-1}{s-1}}{\binom{M+s}{s}},
+\]
+which is \eqref{eq:internal-gap-marginal}. Finally, by symmetry of the uniform composition law,
+$\EE[Y_i]=M/(s+1)$, so \eqref{eq:internal-gap-mean} follows from $G=1+Y_i$.
+\end{proof}
+
+\begin{corollary}[Forced-cluster count from short gaps]
+\label{cor:forced-cluster-count}
+Fix a memory parameter $m\ge 1$. Under the same conditioning as
+Lemma~\ref{lem:gap-composition-given-runs}, define the \emph{forced cluster count}
+\[
+C_m(U)
+\;:=\;
+1+\#\{\,i\in\{1,\dots,s-1\}: z_i\ge m\,\}.
+\]
+Equivalently, one merges adjacent runs whenever their separating zero gap is $<m$.
+Then
+\begin{equation}
+\label{eq:forced-cluster-prob}
+\PP[z_i\ge m \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}}
+\end{equation}
+for each internal gap \(z_i\), whenever \(M-m+1\ge 0\), and therefore
+\begin{equation}
+\label{eq:forced-cluster-mean}
+\EE[C_m(U)\mid \wt(U)=w,\ R(U)=s]
+\;=\;
+1+(s-1)\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+By definition, \(z_i\ge m\) if and only if \(y_i=z_i-1\ge m-1\).
+Under Lemma~\ref{lem:gap-composition-given-runs}, the shifted gap vector is uniform over weak compositions of
+\(M\) into \(s+1\) parts. So fixing \(y_i\ge m-1\) and subtracting \(m-1\) from that coordinate leaves a weak
+composition of \(M-(m-1)\) into \(s+1\) parts. Hence
+\[
+\PP[z_i\ge m \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{M-(m-1)+s}{s}}{\binom{M+s}{s}}
+\;=\;
+\frac{\binom{M-m+s+1}{s}}{\binom{M+s}{s}},
+\]
+which is \eqref{eq:forced-cluster-prob}. The expectation formula
+\eqref{eq:forced-cluster-mean} then follows by linearity of expectation over the \(s-1\) exchangeable internal gaps.
+\end{proof}
+
+\begin{lemma}[First-run late tail conditioned on the run count]
+\label{lem:first-run-late-given-runs}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Let $T_1(U)$ denote the start position of the first run of ones.
+Then for every integer $t\in\{0,1,\dots,N-w\}$,
+\begin{equation}
+\label{eq:first-run-late-given-runs}
+\PP[T_1(U)>t \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{N-t-w+1}{s}}{\binom{N-w+1}{s}}.
+\end{equation}
+Consequently,
+\begin{equation}
+\label{eq:first-run-late-given-runs-simple}
+\PP[T_1(U)>t \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\left(1-\frac{t}{N}\right)^s.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The event $\{T_1(U)>t\}$ means that the first $t$ coordinates are all zero, so the entire weight-$w$, $s$-run pattern
+must be placed in the remaining $N-t$ coordinates. By Lemma~\ref{lem:run-count-distribution}, the number of such words is
+\[
+\binom{w-1}{s-1}\binom{N-t-w+1}{s},
+\]
+while the total number of weight-$w$, $s$-run words is
+\[
+\binom{w-1}{s-1}\binom{N-w+1}{s}.
+\]
+Taking the ratio gives \eqref{eq:first-run-late-given-runs}.
+
+For the bound, write
+\[
+\frac{\binom{N-t-w+1}{s}}{\binom{N-w+1}{s}}
+\;=\;
+\prod_{j=0}^{s-1}\frac{N-t-w+1-j}{N-w+1-j}
+\;=\;
+\prod_{j=0}^{s-1}\left(1-\frac{t}{N-w+1-j}\right).
+\]
+Since $N-w+1-j\le N$, each factor is at most $1-t/N$, proving
+\eqref{eq:first-run-late-given-runs-simple}.
+\end{proof}
+
+\begin{corollary}[Conditioned late-start base factor]
+\label{cor:first-run-late-qbase}
+Fix $\delta\in(0,1/2)$ and let
+\[
+L:=\lceil 2\delta N\rceil.
+\]
+Under the same conditioning as Lemma~\ref{lem:first-run-late-given-runs},
+\begin{equation}
+\label{eq:first-run-late-qbase}
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;\le\;
+\left(\frac{L}{N}\right)^s.
+\end{equation}
+In particular,
+\begin{equation}
+\label{eq:first-run-late-qbase-asym}
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\left(2\delta + O\!\left(\frac{1}{N}\right)\right)^s.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:first-run-late-given-runs} with $t=N-L$.
+Then
+\[
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;=\;
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}.
+\]
+The bound follows from
+\[
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;=\;
+\prod_{j=0}^{s-1}\frac{L-w+1-j}{N-w+1-j}
+\;\le\;
+\left(\frac{L}{N}\right)^s,
+\]
+and $L/N = 2\delta + O(1/N)$ gives \eqref{eq:first-run-late-qbase-asym}.
+\end{proof}
+
+\begin{corollary}[Two isolated ones: exact late-placement factor]
+\label{cor:first-run-late-two-run}
+Fix $\delta\in(0,1/2)$ and let $L=\lceil 2\delta N\rceil$.
+If $U$ is uniform over $\{0,1\}^N$ conditioned on $\wt(U)=2$ and $R(U)=2$, then
+\begin{equation}
+\label{eq:first-run-late-two-run}
+\PP[T_1(U)>N-L \mid \wt(U)=2,\ R(U)=2]
+\;=\;
+\frac{\binom{L-1}{2}}{\binom{N-1}{2}}.
+\end{equation}
+Equivalently,
+\begin{equation}
+\label{eq:first-run-late-two-run-asym}
+\PP[T_1(U)>N-L \mid \wt(U)=2,\ R(U)=2]
+\;=\;
+\left(\frac{L}{N}\right)^2
+\left(1+O\!\left(\frac{1}{L}\right)\right).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+This is the special case $(w,s)=(2,2)$ of Corollary~\ref{cor:first-run-late-qbase}. The asymptotic form follows from
+\[
+\frac{\binom{L-1}{2}}{\binom{N-1}{2}}
+\;=\;
+\left(\frac{L}{N}\right)^2
+\frac{(1-1/L)(1-2/L)}{(1-1/N)(1-2/N)}.
+\]
+\end{proof}
+
+\begin{corollary}[Isolated order statistics: exact late tail]
+\label{cor:isolated-order-late}
+Fix integers \(1\le r\le h\le N\) and let \(L\in\{1,\dots,N\}\).
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=h\) and \(R(U)=h\), and write
+\[
+X_1(U)<X_2(U)<\cdots<X_h(U)
+\]
+for the ordered one positions.
+Then
+\begin{equation}
+\label{eq:isolated-order-late}
+\PP[X_r(U)>N-L \mid \wt(U)=h,\ R(U)=h]
+\;=\;
+\frac{1}{\binom{N-h+1}{h}}
+\sum_{j=0}^{r-1}
+\binom{N-L-r+1}{j}\binom{L-h+r}{h-j},
+\end{equation}
+with the convention that the sum is interpreted as \(1\) when \(N-L-r+1<0\).
+\end{corollary}
+
+\begin{proof}
+Conditioned on \(\wt(U)=h\) and \(R(U)=h\), the isolated one positions satisfy
+\[
+1\le X_1<\cdots<X_h\le N,
+\qquad
+X_{i+1}\ge X_i+2.
+\]
+Define
+\[
+Y_i:=X_i-i+1,\qquad i=1,\dots,h.
+\]
+Then
+\[
+1\le Y_1<\cdots<Y_h\le N-h+1,
+\]
+and the map \(X\mapsto Y\) is a bijection from isolated \(h\)-subsets of \([N]\) to ordinary \(h\)-subsets of
+\([N-h+1]\). Hence \(Y_1<\cdots<Y_h\) is uniform over all \(h\)-subsets of \([N-h+1]\).
+
+Now \(X_r>N-L\) is equivalent to
+\[
+Y_r=X_r-r+1 > N-L-r+1.
+\]
+So among the \(Y_i\), at most \(r-1\) may lie in the prefix \(\{1,\dots,N-L-r+1\}\), while the remaining
+\(h-j\) elements must lie in the tail of size
+\[
+(N-h+1)-(N-L-r+1)=L-h+r.
+\]
+Choosing exactly \(j\) prefix elements gives
+\[
+\binom{N-L-r+1}{j}\binom{L-h+r}{h-j},
+\]
+and summing over \(j=0,\dots,r-1\) proves \eqref{eq:isolated-order-late}.
+\end{proof}
+
+\begin{corollary}[Isolated early-count decomposition]
+\label{cor:isolated-early-count}
+Fix \(h\le N\) and let \(L\in\{1,\dots,N\}\).
+Let \(U\) be uniform over \(\{0,1\}^N\) conditioned on \(\wt(U)=h\) and \(R(U)=h\), and define
+\[
+J_L(U)
+\;:=\;
+\#\{\,i\in\{1,\dots,h\}: X_i(U)\le N-L\,\},
+\]
+the number of isolated one-positions that start before the final \(L\) coordinates.
+Then for every \(j\in\{0,\dots,h\}\),
+\begin{equation}
+\label{eq:isolated-early-count}
+\PP[J_L(U)=j \mid \wt(U)=h,\ R(U)=h]
+\;=\;
+\frac{\binom{N-L}{j}\binom{L-h+1}{h-j}}{\binom{N-h+1}{h}},
+\end{equation}
+with the convention that the right-hand side is \(0\) when either binomial coefficient is undefined.
+\end{corollary}
+
+\begin{proof}
+Under the shift \(Y_i=X_i-i+1\) from the proof of Corollary~\ref{cor:isolated-order-late},
+the isolated slice \(\wt(U)=h,\ R(U)=h\) becomes a uniform \(h\)-subset
+\[
+1\le Y_1<\cdots<Y_h\le N-h+1.
+\]
+The condition \(X_i\le N-L\) is equivalent to \(Y_i\le N-L-i+1\), and therefore
+\(J_L(U)=j\) means exactly \(j\) of the shifted positions lie in the prefix \(\{1,\dots,N-L\}\),
+while the remaining \(h-j\) lie in the tail of size
+\[
+(N-h+1)-(N-L)=L-h+1.
+\]
+Choosing those two groups independently gives
+\[
+\binom{N-L}{j}\binom{L-h+1}{h-j}
+\]
+valid isolated \(h\)-subsets. Dividing by the total \(\binom{N-h+1}{h}\) proves
+\eqref{eq:isolated-early-count}.
+\end{proof}
+
+\begin{corollary}[Expected number of early isolated pairs]
+\label{cor:isolated-early-pair-mean}
+Under the same conditioning and notation as Corollary~\ref{cor:isolated-early-count},
+\begin{equation}
+\label{eq:isolated-early-pair-mean}
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+\;=\;
+\binom{h}{2}\,
+\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Under the shift \(Y_i=X_i-i+1\) from the proof of Corollary~\ref{cor:isolated-order-late}, the isolated slice becomes a
+uniform \(h\)-subset of \([N-h+1]\), and \(J_L(U)\) counts how many of those \(h\) points land in the distinguished
+prefix of size \(N-L\). So \(J_L(U)\) has the usual hypergeometric distribution with population size \(N-h+1\),
+success population \(N-L\), and sample size \(h\). The factorial second moment of a hypergeometric variable gives
+\[
+\EE[J_L(U)(J_L(U)-1)\mid \wt(U)=h,\ R(U)=h]
+\;=\;
+h(h-1)\frac{(N-L)(N-L-1)}{(N-h+1)(N-h)}.
+\]
+Dividing by \(2\) proves \eqref{eq:isolated-early-pair-mean}.
+\end{proof}
+
+\begin{corollary}[Tiny weights are almost all isolated]
+\label{cor:run-count-full}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=h\ge 1$.
+Then
+\begin{equation}
+\label{eq:run-count-full}
+\PP[R(U)=h]
+\;=\;
+\frac{\binom{N-h+1}{h}}{\binom{N}{h}}.
+\end{equation}
+In particular, for every fixed $h$,
+\begin{equation}
+\label{eq:run-count-full-asym}
+\PP[R(U)=h]
+\;=\;
+1-O_h\!\left(\frac{1}{N}\right),
+\end{equation}
+and more concretely,
+\begin{equation}
+\label{eq:run-count-full-lower}
+\PP[R(U)=h]
+\;\ge\;
+1-\frac{h(h-1)}{N}.
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+The exact formula is the case $s=h$ of Lemma~\ref{lem:run-count-distribution}. For the lower bound, let
+\[
+A_i:=\{U_i=U_{i+1}=1\},\qquad i=1,\dots,N-1.
+\]
+If $R(U)<h$, then at least one adjacency event $A_i$ occurs. Under the uniform weight-$h$ model,
+\[
+\PP[A_i]
+\;=\;
+\frac{\binom{N-2}{h-2}}{\binom{N}{h}}
+\;=\;
+\frac{h(h-1)}{N(N-1)}.
+\]
+Hence by a union bound,
+\[
+\PP[R(U)<h]
+\;\le\;
+(N-1)\frac{h(h-1)}{N(N-1)}
+\;=\;
+\frac{h(h-1)}{N},
+\]
+which proves \eqref{eq:run-count-full-lower}. The asymptotic claim \eqref{eq:run-count-full-asym} is immediate for
+fixed \(h\).
+\end{proof}
+
+\begin{lemma}[Fixed-tap late-start plus one-episode correction]
+\label{lem:dense-late-start-one-episode}
+Let $U$ be uniform over $\{0,1\}^N$ conditioned on $\wt(U)=w\ge 1$ and $R(U)=s$.
+Let $Y=\Enc_{\mathrm{in}}(U)$, fix an integer $L$ with $1\le L\le N$, and let $T_1(U)$ be the first run start.
+For a fixed input \(u\), let
+\[
+B_{T_1}(u;L):=
+|\{j\in\supp(u):T_1(u)<j\le T_1(u)+L\}|.
+\]
+Then for every threshold $d\ge 0$,
+\begin{equation}
+\label{eq:dense-late-start-one-episode}
+\PP[\wt(Y)\le d \mid \wt(U)=w,\ R(U)=s]
+\;\le\;
+\PP[T_1(U)>N-L \mid \wt(U)=w,\ R(U)=s]
+\;+\;
+2^{-(m-1)}\EE[B_{T_1}(U;L)\mid \wt(U)=w,\ R(U)=s]
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d].
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let $E_{\mathrm{late}}:=\{T_1(U)>N-L\}$.
+On the complementary event $E_{\mathrm{late}}^c$, the first run starts by time $N-L$.
+As in the proof of Corollary~\ref{cor:dense-inner-single-run}, that first run forces the encoder into the ON state at
+the next time step, thereby initiating the first ON-episode.
+
+If that first ON-episode terminates within its first $L$ steps, then
+Lemma~\ref{lem:fixedtap-one-episode-termination} bounds its probability by
+\(B_{T_1}(U;L)2^{-(m-1)}\) for the fixed input \(U\).
+
+Otherwise the first ON-episode survives for at least $L$ steps. Since the total weight of $Y$ is at most $d$, in
+particular those first \(L\) output bits of the episode must contain at most \(d\) ones.
+Lemma~\ref{lem:fixedtap-surviving-episode-tail} bounds the joint probability of that event by
+\(\PP[\Binomial(L,\tfrac12)\le d]\).
+
+Thus, on $E_{\mathrm{late}}^c$, the low-weight event is contained in the union of the ``early termination within $L$''
+event and the length-$L$ binomial tail event. Adding back the late-start event $E_{\mathrm{late}}$ proves
+\eqref{eq:dense-late-start-one-episode}.
+\end{proof}
+
+\begin{corollary}[Run-mixture slice bound from one episode]
+\label{cor:dense-late-start-slice}
+Fix $\delta\in(0,1/2)$ and let $d=\lfloor \delta N\rfloor$.
+Then for every $w\ge 1$,
+\begin{equation}
+\label{eq:dense-late-start-slice}
+p_w(\delta)
+\;\le\;
+\sum_{s=1}^{w}
+\PP[R(U)=s]\,
+\frac{\binom{L-w+1}{s}}{\binom{N-w+1}{s}}
+\;+\;
+w2^{-(m-1)}
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d],
+\end{equation}
+where \(U\) is uniform on the weight-\(w\) slice and \(L\in\{1,\dots,N\}\) is arbitrary.
+\end{corollary}
+
+\begin{proof}
+Average Lemma~\ref{lem:dense-late-start-one-episode} over the conditional run-count law from
+Lemma~\ref{lem:run-count-distribution}, then substitute Corollary~\ref{cor:first-run-late-qbase} for the
+late-start term. The fixed-tap candidate term is at most \(w2^{-(m-1)}\), since there are at most \(w-1\) later
+input-one positions after the first run start.
+\end{proof}
+
+\begin{corollary}[Isolated fixed-tap one-episode bound]
+\label{cor:fixedtap-isolated-one-episode}
+Let \(U\) be uniform conditioned on \(\wt(U)=h\) and \(R(U)=h\). For \(1\le L\le N\) and \(d\ge 0\),
+\[
+\PP[\wt(Y)\le d\mid \wt(U)=h,\ R(U)=h]
+\le
+\frac{\binom{L-h+1}{h}}{\binom{N-h+1}{h}}
+\;+\;
+2^{-(m-1)}\binom{h}{2}\frac{2L}{N-h}
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d],
+\]
+with the convention that undefined binomial coefficients are zero.
+\end{corollary}
+
+\begin{proof}
+Apply Lemma~\ref{lem:dense-late-start-one-episode} with \(w=s=h\). The late-start term is the exact isolated
+late-placement base from Corollary~\ref{cor:first-run-late-qbase}, and the fixed-tap candidate expectation is bounded
+by Corollary~\ref{cor:fixedtap-isolated-pair-candidates}.
+\end{proof}
+
+\begin{lemma}[Fixed-tap multi-episode early-span certificate]
+\label{lem:fixedtap-multiepisode-earlyspan}
+Fix an input word \(u\) of weight \(h\), let
+\[
+E_L(u):=\supp(u)\cap\{1,\dots,N-L\},
+\qquad
+\Delta_L(u):=
+\begin{cases}
+0, & E_L(u)=\emptyset,\\
+\max E_L(u)-\min E_L(u)+1, & E_L(u)\ne\emptyset,
+\end{cases}
+\]
+and
+\[
+r_L(u):=\left\lceil \frac{\Delta_L(u)}{L+1}\right\rceil,
+\]
+and set \(d\ge 0\). Then the fixed-tap dense recursive inner satisfies
+\[
+\PP[\wt(Y)\le d\mid U=u]
+\le
+\mathbf{1}_{\{\Delta_L(u)=0\}}
+\;+\;
+\mathbf{1}_{\{\Delta_L(u)>0\}}\,
+\binom{h}{r_L(u)}2^{-r_L(u)(m-1)}
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d].
+\]
+\end{lemma}
+
+\begin{proof}
+If \(\Delta_L(u)=0\), the displayed bound is immediate from the first term. Otherwise let \(a:=\min E_L(u)\). At time
+\(a\) the encoder is \(\OFF\), so this input one starts an ON episode. If any ON episode that starts at an input-one
+position in \(E_L(u)\) survives for \(L\) output times, then Lemma~\ref{lem:fixedtap-surviving-episode-tail} bounds the
+joint low-weight event by the displayed binomial tail, choosing the first such surviving episode predictably.
+
+On the complementary event, each ON episode that starts inside the early span terminates within its next \(L\) output
+times. A single such episode can cover input-one positions from its start through at most \(L\) later positions, hence
+across a span of at most \(L+1\). Since the early input-one positions have span \(\Delta_L(u)\), covering that span
+without a surviving length-\(L\) episode requires at least
+\(r_L(u)\) genuine fixed-tap terminations. There are at most
+\(\binom{h}{r_L(u)}\) possible choices for a subcollection of \(r_L(u)\) terminating input-one positions, and
+Lemma~\ref{lem:fixedtap-multicandidate-termination} gives cost \(2^{-r_L(u)(m-1)}\) for each choice. A union bound
+proves the claim.
+\end{proof}
+
+\begin{corollary}[Full weight-slice multi-episode span bound]
+\label{cor:fixedtap-weight-slice-multiepisode}
+Let \(h\ge 2\), let \(U\) be uniform on the weight-\(h\) slice, let \(d=\lfloor\delta N\rfloor\), and let
+\[
+\Pi_{N,h,L}(r):=\PP\!\left[
+\left\lceil\frac{\Delta_L(U)}{L+1}\right\rceil=r
+\middle| \wt(U)=h
+\right].
+\]
+Then
+\[
+p_h(\delta)
+\le
+\Pi_{N,h,L}(0)
+\;+\;
+\sum_{r\ge 1}
+\Pi_{N,h,L}(r)
+\left(
+\binom{h}{r}2^{-r(m-1)}
+\right)
+\;+\;
+\PP[\Binomial(L,\tfrac12)\le d].
+\]
+Moreover, the full-slice span law is explicit. Writing \(P=N-L\),
+\[
+\Pi_{N,h,L}(0)=\frac{\binom{L}{h}}{\binom{N}{h}},
+\]
+and for \(r\ge 1\),
+\[
+\Pi_{N,h,L}(r)
+=
+\frac{1}{\binom{N}{h}}
+\sum_{s=(r-1)(L+1)+1}^{\min\{r(L+1),P\}}
+(P-s+1)\binom{s-2+L}{h-2},
+\]
+with the \(s=1\) term interpreted as \(P\binom{L}{h-1}\).
+\end{corollary}
+
+\begin{proof}
+Average Lemma~\ref{lem:fixedtap-multiepisode-earlyspan} over the uniform weight-\(h\) law. The event
+\(\Delta_L(U)=0\) means all \(h\) input ones are in the final \(L\) positions. If the early span is \(s\ge 2\), choose
+its first early position in \(P-s+1\) ways, force the endpoints of the span to be selected, and choose the remaining
+\(h-2\) input ones from the \(s-2\) interior positions together with the final \(L\) positions. If \(s=1\), choose the
+unique early position in \(P\) ways and choose the remaining \(h-1\) positions from the final \(L\) positions. Grouping
+the span values by \(r=\lceil s/(L+1)\rceil\) gives the displayed law.
+\end{proof}
+
+\begin{definition}[Paired cover of the early support]
+\label{def:fixedtap-paired-cover}
+Fix an input word \(u\) and \(L\ge 1\). A paired \(L\)-cover of the early support
+\[
+E_L(u)=\supp(u)\cap\{1,\dots,N-L\}
+\]
+is a collection of disjoint intervals
+\[
+I_a=[\alpha_a,\beta_a]\qquad (a=1,\dots,r)
+\]
+such that
+\[
+\alpha_a,\beta_a\in\supp(u),\qquad
+1\le \beta_a-\alpha_a\le L,
+\]
+the intervals are ordered by time, and every point of \(E_L(u)\) lies in \(\bigcup_a I_a\).
+The total live length of the cover is
+\[
+T(I_1,\dots,I_r):=\sum_{a=1}^r |I_a|.
+\]
+\end{definition}
+
+\begin{lemma}[No-survival trajectories induce paired covers]
+\label{lem:fixedtap-no-survival-paired-cover}
+Fix an input word \(u\) and \(L\ge 1\). On the event that every ON episode whose start position lies in \(E_L(u)\)
+terminates within its next \(L\) output times, the early support \(E_L(u)\) admits a paired \(L\)-cover. Moreover the
+right endpoint of each cover interval is a genuine fixed-tap termination time.
+\end{lemma}
+
+\begin{proof}
+Scan the process from left to right. Whenever the encoder is \(\OFF\) at an input-one position
+\(\alpha\in E_L(u)\), a new ON episode starts. By the no-survival assumption this episode terminates at some input-one
+position \(\beta\le \alpha+L\); Lemma~\ref{lem:fixedtap-termination-needs-input-one} gives that \(\beta\in\supp(u)\).
+The interval \([\alpha,\beta]\) covers all input-one positions encountered while that episode is live. After the
+termination the encoder is \(\OFF\), so the next uncovered early input-one position, if any, starts the next interval.
+The resulting intervals are disjoint, have input-one endpoints, have length at most \(L+1\), and cover \(E_L(u)\).
+\end{proof}
+
+\begin{lemma}[Fixed paired-cover stochastic charge]
+\label{lem:fixedtap-paired-cover-charge}
+Fix an input word \(u\) and a paired \(L\)-cover
+\[
+I_a=[\alpha_a,\beta_a]\qquad (a=1,\dots,r)
+\]
+with total live length \(T\). Let \(\mathcal{C}(I_1,\dots,I_r)\) be the event that these intervals are realized as ON
+episodes: each \(\alpha_a\) starts an episode, each \(\beta_a\) is the corresponding genuine fixed-tap termination,
+and no interval contains an earlier termination. Then for every \(d\ge 0\),
+\[
+\PP\!\left[
+\mathcal{C}(I_1,\dots,I_r)
+\wedge
+\wt(Y)\le d
+\mid U=u
+\right]
+\le
+2^{-r(m-1)}
+\Pr\!\left[\Binomial\!\left((T-rm)_+,\tfrac12\right)\le d\right].
+\]
+\end{lemma}
+
+\begin{proof}
+Expose the intervals in time order. For each interval, the fixed-tap termination at its right endpoint costs
+\(2^{-(m-1)}\) by the same conditional argument as Lemma~\ref{lem:fixedtap-multicandidate-termination}; multiplying
+over the \(r\) endpoints gives the factor \(2^{-r(m-1)}\).
+
+It remains to charge the live outputs not used by the terminal \(m\)-zero windows. In each realized interval the
+episode survives up to the terminal zero window. Before that terminal window, every exposed live output either occurs
+in the \(\FREE\) state, where Lemma~\ref{lem:dense-fair-while-on} gives a fresh fair bit, or in the \(\CRIT\) state
+while termination has not yet occurred, where the fixed tap forces the output to be \(1\). Thus these nonterminal live
+outputs stochastically dominate fair coins in the lower-tail direction, exactly as in
+Lemma~\ref{lem:fixedtap-surviving-episode-tail}. Across the \(r\) disjoint intervals there are at least
+\((T-rm)_+\) such chargeable live outputs. If the total block weight is at most \(d\), then these chargeable outputs
+also contain at most \(d\) ones. The binomial lower-tail bound follows by the same stopping-time induction as
+Lemma~\ref{lem:dense-on-time-domination}.
+\end{proof}
+
+\begin{corollary}[Full weight-slice paired-cover bound]
+\label{cor:fixedtap-weight-slice-paired-cover}
+Let \(h\ge 1\), let \(U\) be uniform on the weight-\(h\) slice, let \(d=\lfloor\delta N\rfloor\), and fix
+\(1\le L\le N\). Put
+\[
+\Gamma_{N,h,L}(r,T)
+:=
+\frac{
+\binom{N-T+r}{r}
+\binom{T-r-1}{r-1}
+\binom{T+L-2r}{h-2r}
+}{
+\binom{N}{h}
+},
+\]
+with the convention that impossible binomial coefficients are zero. Then the fixed-tap dense recursive inner satisfies
+\[
+p_h(\delta)
+\le
+\frac{\binom{L}{h}}{\binom{N}{h}}
+\;+\;
+\Pr[\Binomial(L,\tfrac12)\le d]
+\;+\;
+\sum_{r=1}^{\lfloor h/2\rfloor}
+\sum_{T=2r}^{\min\{N,r(L+1)\}}
+\Gamma_{N,h,L}(r,T)\,
+2^{-r(m-1)}
+\Pr\!\left[\Binomial((T-rm)_+,\tfrac12)\le d\right].
+\]
+\end{corollary}
+
+\begin{proof}
+If \(E_L(U)=\emptyset\), then all \(h\) input ones lie in the last \(L\) positions, which gives the first term.
+Otherwise consider the first ON episode started by an input-one position in \(E_L(U)\). If this episode, or any later
+episode started inside \(E_L(U)\), survives for \(L\) output times, then choosing the first such episode predictably and
+applying Lemma~\ref{lem:fixedtap-surviving-episode-tail} gives the displayed binomial-tail term.
+
+It remains to bound the event that every episode started inside \(E_L(U)\) terminates within \(L\) output times.
+Lemma~\ref{lem:fixedtap-no-survival-paired-cover} then produces a paired \(L\)-cover. For a fixed ordered cover with
+\(r\) intervals and total live length \(T\), Lemma~\ref{lem:fixedtap-paired-cover-charge} bounds the joint probability
+of realizing that cover and having \(\wt(Y)\le d\) by the stochastic factor displayed above.
+
+We now union bound over possible covers and average over the weight-\(h\) input slice. The number of ordered disjoint
+intervals in \([N]\) with lengths at least \(2\) and total length \(T\) is at most
+\[
+\binom{T-r-1}{r-1}\binom{N-T+r}{r}.
+\]
+Indeed, first choose the \(r\) lengths \(\ell_a\ge2\) summing to \(T\), then distribute the \(N-T\) unused positions
+among the \(r+1\) gaps before, between, and after the intervals. Once the \(2r\) endpoints are forced into the support
+of \(U\), every remaining input-one position must lie either in the interiors of the cover intervals or in the last
+\(L\) positions; this gives at most \(\binom{T+L-2r}{h-2r}\) possible completions. Dividing by \(\binom{N}{h}\) gives
+\(\Gamma_{N,h,L}(r,T)\). The interval count ignores the extra restriction that starts lie in \(E_L(U)\), so it is an
+upper bound. Summing over \(r\) and \(T\) proves the claim.
+\end{proof}
+
+
+\subsection{Linear OFF-budget refinement}
+\begin{lemma}[Long zero-gap mass is exponentially unlikely]
+\label{lem:dense-long-gap-mass}
+Fix constants \(0<\eta_0<\eta_1<1\) and \(b>0\). For a binary word \(u\), let \(Z_G(u)\) be the number of zero
+coordinates belonging to a zero-run of length greater than \(G\). Then there are constants \(G_0\) and
+\(c_{\mathrm{gap}}>0\), depending only on \(\eta_0,\eta_1,b\), such that for every fixed \(G\ge G_0\), uniformly over
+\(\eta_0N\le w\le \eta_1N\),
+\[
+\PP[Z_G(U)\ge bN\mid \wt(U)=w]
+\le
+2^{-c_{\mathrm{gap}}N}
+\]
+for all sufficiently large \(N\).
+\end{lemma}
+
+\begin{proof}
+If \(Z_G(u)\ge bN\), then the zero-runs of length greater than \(G\) contain at least
+\[
+q:=\left\lfloor \frac{bN}{2G}\right\rfloor
+\]
+pairwise disjoint all-zero intervals of length \(G\). Indeed, a zero-run of length \(\ell>G\) contains
+\(\lfloor \ell/G\rfloor\ge \ell/(2G)\) such intervals.
+
+For a fixed collection of \(q\) disjoint length-\(G\) intervals, the probability that all coordinates in their union
+are zero under the uniform weight-\(w\) model is
+\[
+\frac{\binom{N-qG}{w}}{\binom{N}{w}}
+\le
+\left(1-\frac{qG}{N}\right)^w
+\le
+2^{-\eta_0 qG\log_2 e}.
+\]
+There are at most \(\binom{N}{q}\) possible choices for the left endpoints of such an interval collection, so the union
+bound gives
+\[
+\PP[Z_G(U)\ge bN\mid \wt(U)=w]
+\le
+\binom{N}{q}2^{-\eta_0 qG\log_2 e}.
+\]
+For all large \(N\), \(q/N\le b/(2G)\) and \(qG/N\ge b/4\). Hence
+\[
+\frac1N\log_2 \PP[Z_G(U)\ge bN\mid \wt(U)=w]
+\le
+H_2\!\left(\frac{b}{2G}\right)-\frac{\eta_0 b}{4}\log_2 e+o(1).
+\]
+Choosing \(G\) large enough makes the right-hand side negative, proving the claim.
+\end{proof}
+
+\begin{lemma}[Short-gap witness packing]
+\label{lem:dense-short-gap-witness-packing}
+Fix constants \(a>0\) and \(G\ge 1\), and let
+\[
+m=\gamma\log_2 N
+\qquad(\gamma>1).
+\]
+There is a constant \(c_{\mathrm{pack}}=c_{\mathrm{pack}}(a,G,\gamma)>0\) such that, for every input weight \(w\),
+\[
+\PP[\mathrm{OffAfter}(T)\ge aN\ \wedge\ Z_G(U)<aN/4\mid \wt(U)=w]
+\le
+2^{-c_{\mathrm{pack}}N}
+\]
+for all sufficiently large \(N\).
+\end{lemma}
+
+\begin{proof}
+Call a post-start OFF episode \emph{long-gap-touching} if it contains a zero coordinate that belongs to a zero-run of
+length greater than \(G\). On the event \(Z_G(U)<aN/4\), the number of such long zero coordinates is less than \(aN/4\).
+Each long-gap-touching OFF episode contains at least one such coordinate and contributes at most one additional
+reactivating \(1\)-coordinate after its zero part. Hence all long-gap-touching OFF episodes together contribute less
+than \(aN/2\) OFF times.
+
+Therefore, if also \(\mathrm{OffAfter}(T)\ge aN\), then at least \(aN/2\) OFF times lie in OFF episodes that do not
+touch a long zero-run. Such an episode is contained in a zero-run of length at most \(G\), together with possibly one
+reactivating \(1\)-coordinate, so it has length at most \(G+1\). Thus the trajectory must contain at least
+\[
+K:=\left\lfloor \frac{aN}{2(G+1)}\right\rfloor
+\]
+distinct post-start ON\(\to\)OFF transitions.
+
+Every ON\(\to\)OFF transition has a length-\(m\) all-zero output witness by
+Lemma~\ref{lem:dense-off-requires-mzeros}. Witnesses belonging to distinct ON\(\to\)OFF transitions are disjoint: after
+one transition, the encoder must first see a \(1\)-output to become ON again, and the next all-zero witness cannot
+include that \(1\)-output. Hence \(K\) such transitions require at least \(Km\) distinct time coordinates. But
+\[
+Km
+\ge
+\left(\frac{aN}{3(G+1)}\right)\gamma\log_2N
+>
+N
+\]
+for all sufficiently large \(N\). Thus the event in the lemma is eventually empty, which is stronger than the claimed
+exponential bound.
+\end{proof}
+
+\begin{lemma}[Linear-weight OFF-time is exponentially unlikely]
+\label{lem:dense-linear-offtime-target}
+Fix constants \(\eta_0,\eta_1,a\) with \(0<\eta_0<\eta_1<1\) and \(a>0\), and let
+\[
+m=\gamma\log_2 N
+\qquad(\gamma>1).
+\]
+There is a constant \(c_{\mathrm{off}}=c_{\mathrm{off}}(\eta_0,\eta_1,a,\gamma)>0\) such that, uniformly for
+\[
+\eta_0N\le w\le \eta_1N,
+\]
+\begin{equation}
+\label{eq:dense-linear-offtime-target}
+\PP[\mathrm{OffAfter}(T)\ge aN\mid \wt(U)=w]
+\;\le\;
+2^{-c_{\mathrm{off}}N}
+\end{equation}
+for all sufficiently large \(N\).
+\end{lemma}
+
+\begin{proof}
+Choose \(G\) large enough for Lemma~\ref{lem:dense-long-gap-mass} with \(b=a/4\). Then there is
+\(c_{\mathrm{gap}}>0\) such that
+\[
+\PP[Z_G(U)\ge aN/4\mid \wt(U)=w]\le 2^{-c_{\mathrm{gap}}N}.
+\]
+On the complementary event \(Z_G(U)<aN/4\), Lemma~\ref{lem:dense-short-gap-witness-packing} gives
+\[
+\PP[\mathrm{OffAfter}(T)\ge aN\ \wedge\ Z_G(U)<aN/4\mid \wt(U)=w]\le 2^{-c_{\mathrm{pack}}N}.
+\]
+Taking \(c_{\mathrm{off}}<\min\{c_{\mathrm{gap}},c_{\mathrm{pack}}\}\) and union bounding proves
+\eqref{eq:dense-linear-offtime-target}.
+\end{proof}
+
+\begin{corollary}[First-start plus OFF-budget linear tail]
+\label{cor:dense-first-start-offbudget-target}
+Assume Lemma~\ref{lem:dense-linear-offtime-target}. Fix \(\delta\in(0,1/2)\), an OFF budget \(a>0\), and
+\(w=\lfloor\eta N\rfloor\) in the linear window of that lemma. Then
+\[
+p_w(\delta)
+\;\le\;
+\sum_{t=1}^{N-w+1}
+\frac{\binom{N-t}{w-1}}{\binom{N}{w}}\,
+\PP[\Binomial(N-t-\lceil aN\rceil,\tfrac12)\le \lfloor\delta N\rfloor]
+\;+\;
+2^{-c_{\mathrm{off}}N},
+\]
+where binomial terms with \(N-t-\lceil aN\rceil<0\) are interpreted as \(1\).
+\end{corollary}
+
+\begin{proof}
+On the event \(\mathrm{OffAfter}(T)<aN\), the suffix after \(T=t\) contains at least \(N-t-\lceil aN\rceil\) ON times. Take
+the first \(N-t-\lceil aN\rceil\) post-start ON times as the predictable stopping times in
+Lemma~\ref{lem:dense-on-time-domination}. If \(\wt(Y)\le \lfloor\delta N\rfloor\), then those ON outputs contain at
+most \(\lfloor\delta N\rfloor\) ones, so the joint probability is bounded by the displayed binomial lower tail. The
+complement is controlled by Lemma~\ref{lem:dense-linear-offtime-target}.
+\end{proof}

@@ -1,0 +1,199 @@
+{
+  "schema": "expander-codes-certificate-manifest-v1",
+  "description": "Claim-to-verifier map for every finite numerical result in the manuscript.",
+  "tested_environment": {
+    "python": "3.14.4",
+    "packages": {
+      "numpy": "2.4.4",
+      "python-flint": "0.9.0",
+      "scipy": "1.18.0"
+    }
+  },
+  "trusted_source_tree": {
+    "rule": "SHA-256 of each non-test scripts/*.py file except verify_manifest.py, with sorted relative paths and length prefixes",
+    "sha256": "0619e76f98513e1949113e2df8bc5e5f4fa90e01c13189f0a4834659ff82965d"
+  },
+  "artifacts": {
+    "scripts/certificates/ea-k20-r5-d005-w50-s20.json": "4fd0ab616f5f0c178bd1606c7f440699a13495ef9dc7110ae3c4a986e93084e9",
+    "scripts/certificates/ea-k25-r5-d005-w56-s20.json": "5195c29a13d63cea698bfe1641027c496f543b503c44da0c65bdedbb562c0d05",
+    "scripts/certificates/ea-k30-r5-d005-w62-s20.json": "aa47bc0306f4aa62590a77446f34cbedb30326c7a41ac41c858a16dbf1f3ea5c",
+    "results/binary_biregular_ec_rate_half_d10_m15_gv.json": "5f283d87b7560b6b8f8e82111936c5bb6fedc20ad4fb12686f0b13629d6f4f42",
+    "results/binary_biregular_ec_rate_half_d14_m6_gv.json": "70207048b734a4a9df6b5502f62aacc38115227d3f51d75e1208d3806e50f235",
+    "results/binary_biregular_ec_rate_half_d18_m4_gv.json": "ef7aed52680fcb8e55f8bec8cb99f78473262d41c3dbdb7cb569ce59977bdb2c",
+    "results/binary_biregular_ec_rate_half_d6_m79_gv.json": "28565d01cab61f9af6650b003c3d95adfdfd344cddb6932c5dc1340192047298",
+    "results/prime_field_biregular_ea_p127_rate_half_d30_gv.json": "95ed9ddacc809b505ee3f57760928b7c4ec30df142040a891bbb8855fe09bf4e",
+    "results/prime_field_biregular_ec_p127_rate_half_d28_m3_gv.json": "5aaf61b05739b0f8b8d725a23c0a8384e83e37e6b3a11e42c5871d5208d397db",
+    "results/prime_field_biregular_ec_p127_rate_half_d26_m4_singleton_gv.json": "aa77c1b2095ba6e3f261d651047064e75e31ba83a14f0219d4fcd081e92d1cf9",
+    "results/prime_field_biregular_ec_p127_rate_half_d24_m6_singleton_gv.json": "3371f72091cad8be7bb4f27ae6982feb8e4360d7d5034bd11022fd996451ddae",
+    "results/prime_field_biregular_ec_p127_rate_half_d22_m12_region_gv.json": "d3d3ac264a3eb408eb8d8517ce151f6ae5675874236b48a79f7f985c53da96a1",
+    "results/finite_field_biregular_ec_gf128_rate_half_d26_m4.json": "6dbb32e74524b4dfb5a9e03a3ae0957d539ba603e7e3a02f42af3769b47e61ff",
+    "results/finite_field_biregular_ec_gf128_rate_half_d24_m5_40bit.json": "bd32e741cc71394d4856cf411880aca9e415e46137e1e60214c57c1e7721940c",
+    "results/finite_field_biregular_ec_gf127_rate_half_d24_m5_40bit.json": "5aac1cfe82ce1c7fb9b0b6388361a6ba5c8adda384cba6b43391ebb6c71e4272",
+    "results/finite_field_biregular_ec_gf129_rate_half_d24_m5_40bit.json": "5d19ac3acfe96951a89d0e6f3a63288585ac75600b63db691e516a2453f8f9a1",
+    "results/finite_field_biregular_ec_gf136_rate_half_d24_m5_38bit.json": "a95585cb22e8197589dd8e4444a2ab0588acb61d9628c31d9ce7b505b93f580f",
+    "results/finite_field_biregular_ec_gf128_rate_half_d24_m5_field_size_diagnostic.json": "59b38ee5189240ef2ffd6c10e7e8cfca22ca955e0da9a4833bb7c41a31531692"
+  },
+  "entries": [
+    {
+      "id": "binary-bernoulli-ea",
+      "kind": "rigorous",
+      "groups": ["binary"],
+      "claims": ["thm:ea-finite", "tab:ea-finite", "tab:intro-results (binary EA row)"],
+      "precision_bits": 192,
+      "expected_failure_bits": [20.468611, 20.351240, 20.234237],
+      "commands": [
+        {
+          "argv": ["python", "scripts/ea_certificate.py", "table", "scripts/certificates/ea-k20-r5-d005-w50-s20.json", "scripts/certificates/ea-k25-r5-d005-w56-s20.json", "scripts/certificates/ea-k30-r5-d005-w62-s20.json"],
+          "expect": ["20.468611", "20.351240", "20.234237"]
+        }
+      ]
+    },
+    {
+      "id": "binary-bernoulli-ec",
+      "kind": "rigorous",
+      "groups": ["binary"],
+      "claims": ["thm:ec-finite-comparison", "tab:ec-same-ensemble", "tab:binary-rate-half-frontier", "tab:intro-results (binary Bernoulli EC row)"],
+      "precision_bits": 192,
+      "marker_source": "selected at startup by an untrusted optimizer; Arb verifies the resulting bound",
+      "expected_failure_bits": [32.088658, 23.329405, 19.762768, 21.320038, 20.320353, 20.853424, 20.778210, 20.675516],
+      "commands": [
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--coefficient", "3", "--memory", "5"], "expect": ["2.187816"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--coefficient", "2.5", "--memory", "5"], "expect": ["9.485867"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--coefficient", "2.3", "--memory", "5"], "expect": ["1.124903"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--k-log2", "20", "--rate-denominator", "5", "--coefficient", "5", "--memory", "9", "--cutoff", "1274032"], "expect": ["21.320038"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--k-log2", "20", "--rate-denominator", "2", "--coefficient", "3.15", "--memory", "5", "--cutoff", "230741", "--dense-start", "26363"], "expect": ["20.320353"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--k-log2", "20", "--rate-denominator", "2", "--coefficient", "3", "--memory", "7", "--cutoff", "230741", "--dense-start", "26363"], "expect": ["20.853424"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--k-log2", "20", "--rate-denominator", "2", "--coefficient", "2.9", "--memory", "9", "--cutoff", "230741", "--dense-start", "27462"], "expect": ["20.778210"]},
+        {"argv": ["python", "scripts/bernoulli_ec_certificate.py", "--k-log2", "20", "--rate-denominator", "2", "--coefficient", "2.85", "--memory", "13", "--cutoff", "230741", "--dense-start", "28046"], "expect": ["20.675516"]}
+      ]
+    },
+    {
+      "id": "binary-left-regular",
+      "kind": "rigorous",
+      "groups": ["binary", "headline"],
+      "claims": ["thm:regular-binary-certificates items 1--2", "tab:binary-recursive-map-frontier (EA row)", "tab:intro-results (left-regular EA and EC rows)"],
+      "precision_bits": 192,
+      "expected_failure_bits": [20.0864, 22.2273],
+      "commands": [
+        {"argv": ["python", "scripts/regular_ea_certificate.py"], "expect": []},
+        {"argv": ["python", "scripts/regular_ec_certificate.py"], "expect": []}
+      ]
+    },
+    {
+      "id": "binary-biregular-10-5",
+      "kind": "rigorous",
+      "groups": ["binary", "headline"],
+      "claims": ["thm:regular-binary-certificates item 3", "eq:biregular-binary-ec-certificate", "tab:binary-recursive-map-frontier (10/5 row)", "tab:intro-results (10/5 row)"],
+      "precision_bits": 192,
+      "expected_upper_bound": "1.6474999655470851e-10",
+      "expected_failure_bits": 32.4990025,
+      "commands": [
+        {"argv": ["python", "scripts/check_binary_biregular_ec_certificate.py", "results/binary_biregular_ec_rate_half_d10_m15_gv.json"], "expect": ["valid certificate"]},
+        {"argv": ["python", "scripts/binary_biregular_ec_certificate.py", "verify", "results/binary_biregular_ec_rate_half_d10_m15_gv.json"], "expect": ["32.499002"]}
+      ]
+    },
+    {
+      "id": "binary-biregular-14-7-and-18-9",
+      "kind": "rigorous",
+      "groups": ["binary"],
+      "claims": ["thm:regular-binary-certificates items 4--5", "tab:binary-biregular-intermediate-certificates", "tab:binary-recursive-map-frontier (14/7 and 18/9 rows)", "tab:intro-results (14/7 and 18/9 rows)"],
+      "precision_bits": 192,
+      "expected_failure_bits": [26.0875, 21.6746],
+      "commands": [
+        {"argv": ["python", "scripts/check_binary_biregular_ec_certificate.py", "results/binary_biregular_ec_rate_half_d14_m6_gv.json"], "expect": ["valid certificate"]},
+        {"argv": ["python", "scripts/binary_biregular_ec_certificate.py", "verify", "results/binary_biregular_ec_rate_half_d14_m6_gv.json"], "expect": ["26.087"]},
+        {"argv": ["python", "scripts/check_binary_biregular_ec_certificate.py", "results/binary_biregular_ec_rate_half_d18_m4_gv.json"], "expect": ["valid certificate"]},
+        {"argv": ["python", "scripts/binary_biregular_ec_certificate.py", "verify", "results/binary_biregular_ec_rate_half_d18_m4_gv.json"], "expect": ["21.674"]}
+      ]
+    },
+    {
+      "id": "binary-biregular-6-3",
+      "kind": "rigorous",
+      "groups": ["binary", "headline", "slow"],
+      "claims": ["thm:regular-binary-certificates item 6", "eq:biregular-binary-ec-degree-six-certificate", "tab:binary-recursive-map-frontier (6/3 row)", "tab:intro-results (6/3 row)"],
+      "precision_bits": 192,
+      "expected_upper_bound": "3.5584438609e-7",
+      "expected_failure_bits": 21.42225019,
+      "commands": [
+        {"argv": ["python", "scripts/check_binary_biregular_ec_d6_certificate.py", "results/binary_biregular_ec_rate_half_d6_m79_gv.json"], "expect": ["valid degree-three certificate structure"]},
+        {"argv": ["python", "scripts/binary_biregular_ec_d6_certificate.py", "verify", "results/binary_biregular_ec_rate_half_d6_m79_gv.json"], "expect": ["21.422"]}
+      ]
+    },
+    {
+      "id": "binary-fixed-row",
+      "kind": "rigorous",
+      "groups": ["binary", "appendix"],
+      "claims": ["thm:fixed-row-certificates", "tab:fixed-row-certificates"],
+      "precision_bits": 192,
+      "expected_failure_bits": [21.521615, 21.903825, 21.769891, 20.886039, 21.162702, 24.303165],
+      "commands": [
+        {"argv": ["python", "scripts/exact_row_certificate.py", "--k-log2", "20", "--row-weight", "31", "--exact-limit", "7"], "expect": ["21.521"]},
+        {"argv": ["python", "scripts/exact_row_certificate.py", "--k-log2", "25", "--row-weight", "35", "--exact-limit", "16"], "expect": ["21.903"]},
+        {"argv": ["python", "scripts/exact_row_certificate.py", "--k-log2", "30", "--row-weight", "39", "--exact-limit", "48"], "expect": ["21.769"]},
+        {"argv": ["python", "scripts/exact_row_ec_certificate.py", "--k-log2", "20", "--row-weight", "15", "--memory", "21", "--exact-limit", "59"], "expect": ["20.886"]},
+        {"argv": ["python", "scripts/exact_row_ec_certificate.py", "--k-log2", "25", "--row-weight", "17", "--memory", "21", "--exact-limit", "240"], "expect": ["21.162"]},
+        {"argv": ["python", "scripts/exact_row_ec_certificate.py", "--k-log2", "30", "--row-weight", "20", "--memory", "21", "--exact-limit", "529"], "expect": ["24.303"]}
+      ]
+    },
+    {
+      "id": "field-ea-127",
+      "kind": "rigorous",
+      "groups": ["field", "headline"],
+      "claims": ["thm:p-ea-certificate", "eq:p-ea-certificate", "tab:intro-results (field EA row)"],
+      "precision_bits": 192,
+      "expected_upper_bound": "9.498737309527395e-10",
+      "expected_failure_bits": 29.9715452,
+      "commands": [
+        {"argv": ["python", "scripts/prime_field_biregular_ea_certificate.py", "verify", "results/prime_field_biregular_ea_p127_rate_half_d30_gv.json"], "expect": ["29.971545"]}
+      ]
+    },
+    {
+      "id": "field-ec-127-frontier",
+      "kind": "rigorous",
+      "groups": ["field", "headline"],
+      "claims": ["thm:p-ec-certificates", "tab:p-ec-frontier", "tab:intro-results (prime-field EC rows)"],
+      "precision_bits": 256,
+      "expected_failure_bits": [27.6486, 71.4724, 39.5003, 27.2951],
+      "commands": [
+        {"argv": ["python", "scripts/prime_field_biregular_ec_certificate.py", "verify", "results/prime_field_biregular_ec_p127_rate_half_d28_m3_gv.json"], "expect": ["27.648"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/prime_field_biregular_ec_p127_rate_half_d26_m4_singleton_gv.json"], "expect": ["71.472"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_d24_m6_certificate.py", "verify", "results/prime_field_biregular_ec_p127_rate_half_d24_m6_singleton_gv.json"], "expect": ["39.500"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_d22_m12_certificate.py", "verify", "results/prime_field_biregular_ec_p127_rate_half_d22_m12_region_gv.json"], "expect": ["27.295"]}
+      ]
+    },
+    {
+      "id": "field-ec-gf128",
+      "kind": "rigorous",
+      "groups": ["field", "headline"],
+      "claims": ["thm:gf128-ec-certificate", "tab:gf128-ec-certificates", "tab:intro-results (GF(2^128) EC rows)"],
+      "precision_bits": 256,
+      "expected_failure_bits": [45.0317394, 135.2018764],
+      "commands": [
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf128_rate_half_d24_m5_40bit.json"], "expect": ["45.031739"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf128_rate_half_d26_m4.json"], "expect": ["135.201876"]}
+      ]
+    },
+    {
+      "id": "field-size-profile",
+      "kind": "rigorous",
+      "groups": ["field", "headline"],
+      "claims": ["thm:field-size-ec-certificates", "tab:field-size-ec-certificates", "tab:intro-results (field-size profile row)"],
+      "precision_bits": 256,
+      "expected_failure_bits": [45.8357737, 45.0317394, 44.2357386, 38.7836609],
+      "commands": [
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf127_rate_half_d24_m5_40bit.json"], "expect": ["45.835773"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf128_rate_half_d24_m5_40bit.json"], "expect": ["45.031739"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf129_rate_half_d24_m5_40bit.json"], "expect": ["44.235738"]},
+        {"argv": ["python", "scripts/prime_field_biregular_ec_singleton_certificate.py", "verify", "results/finite_field_biregular_ec_gf136_rate_half_d24_m5_38bit.json"], "expect": ["38.783660"]}
+      ]
+    },
+    {
+      "id": "field-size-diagnostic",
+      "kind": "diagnostic",
+      "groups": ["field", "diagnostic"],
+      "claims": ["tab:field-size-diagnostic"],
+      "note": "Rows without a certified-bits value are floating-point diagnostics and are not executed as proofs.",
+      "commands": []
+    }
+  ]
+}

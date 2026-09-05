@@ -1,0 +1,41 @@
+
+
+\subsection{Block-Diagonal Weight Distribution at $t\geq 2$}\label{sec:blockApx}
+
+More generally, we observe that the phase transition occurs approximately at
+\begin{align*}
+    \log(\sigma) &= \frac{\log(k)}{t}+3/4,\quad
+    \sigma = 2^{3/4}\sqrt[t]{k}
+\end{align*}
+This implies that at $t=\log(k)$ a submatrix of size $\sigma=O(1)$ is sufficient. The resulting weight distributions are largely similar to the case of $t=2$ discussed in \sectionref{sec:ttwo}. 
+We plot the measured values of where the phase transition intersects $\log\delta_h=0$ in \figureref{fig:BTrans} for $t\in [2,5]$ along with the trend lines $\sigma=2^{3/4}\sqrt[t]{k}$. While there is some variance between the trend lines and the measured phase transition, the overall fit is extremely tight. We conjecture that this general trend continues for larger values of $t$ but leave the asymptotic analysis of the growth to future work. From a practical perspective, values beyond $t=4$ do not offer compelling improvements given that the cost of $t$ permutations dominates the cost of a block diagonal matrix multiply for such small values of $\sigma$.
+
+\begin{figure}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.75\linewidth, trim=0cm 0.9cm 0cm 1.2cm, clip]{fig/BTrans.pdf} 
+    \caption{ Plot of the values of $\sigma$ required for the phase transition points to occur at $\log_2\delta_h=0$, compared the the trend lines $\sigma=2^{3/4}\sqrt[t]{k}$, equivalently $\log_2 \sigma = \frac{\log_2 k}{t} + 3/4$.}
+    \label{fig:BTrans}
+\end{figure}
+
+If we fix $k\approx2^{10}$ and set $\sigma=2^{3/4}\sqrt[t]{k}$ we obtain the plot in \figureref{fig:trans1}. As can be see, the phase transition does occur at $\log_2 \delta_h = 0$. Interestingly, as $t$ increases and $\sigma$ decrease, we observe the the phase transition happens at smaller values of $h/n$. It is not immediately clear why this occurs but we note that increasing $\sigma$ does reduce this effect.
+
+More importantly, for larger values of $t$ the probability of getting low weight codewords does not fall as quickly as the case of $t=2$. This raises the possibility of having significantly lower minimum distance than compared to where the weight distribution crosses $\log_2 \delta_h = 0$. In particular, in \figureref{fig:trans1} the cumulative weight distribution is plotted as a dashed line where for each $h/n$ value we plot the expected number of codewords with \emph{at most} $h/n$ relative Hamming weight. This more accurately represents the minimum distance, as where this line crosses the $\log \delta_h=0$ denotes the expected minimum distance. Therefore, we would desire a formula for $\sigma$ such that the relative minimum distance remains close to $h/n=0.1$. \figureref{fig:trans2} plots the cumulative weight distribution when setting $\sigma=2\sqrt[t]{k}$ which does obtains the desired effect at $t\in \{4,5\}$. For $t\in \{2,3\}$ this parameterization overshoots and results in a cumulative phase transition below $\log \delta_h=2$. Regardless, the general trend is apparent, one can set $\sigma =c\sqrt[t]{k}$ for some constant $c$ such that the desired security margin can be obtained. We believe $t\in\{2,3\}$ are the most interesting cases for which $c=3/4$ and $c=2$ suffices in most applications, respectively.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=\linewidth, trim=0.7cm 0.9cm 1.75cm 2.3cm, clip]{fig/k10t.pdf} 
+    \caption{Weight distribution for  $t\in[2,5]$, $k\approx2^{10}$ and $\sigma=2^{3/4}\sqrt[t]{k}$. Dashed lines denote the cumulative weight distribution. }
+    \label{fig:trans1}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth, trim=0.7cm 0.9cm 2cm 2.7cm, clip]{fig/k10t2.pdf} 
+    \caption{Weight distribution for  $t\in[2,5]$, $k\approx2^{10}$ and $\sigma=2\sqrt[t]{k}$. Dashed lines denote the cumulative weight distribution.}
+    \label{fig:trans2}
+  \end{minipage}
+\end{figure}

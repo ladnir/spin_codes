@@ -1,0 +1,237 @@
+{
+  "schema": "pure-ea-sector-projection-energy-small-v1",
+  "status": "EXACT_PROJECTOR_ENERGIES_WITH_BINARY64_EIGENVALUE_BOUND",
+  "parameters": {
+    "message_bits": 5,
+    "output_bits": 10,
+    "right_degree": 3,
+    "shell_weight": 10
+  },
+  "parseval_energy": 1024,
+  "exact_variance_to_mean": 1.0391851265037406,
+  "sector_norm_variance_to_mean_upper": 2.225186139055731,
+  "loss_over_exact": 2.141279818488358,
+  "sectors": [
+    {
+      "sector": 0,
+      "maximum_covariance_eigenvalue": 0.19149715054389357,
+      "projected_coefficient_energy": "512/5"
+    },
+    {
+      "sector": 1,
+      "maximum_covariance_eigenvalue": 0.13405406046627172,
+      "projected_coefficient_energy": "4608/5"
+    },
+    {
+      "sector": 2,
+      "maximum_covariance_eigenvalue": 0.10003014698603298,
+      "projected_coefficient_energy": "0/1"
+    },
+    {
+      "sector": 3,
+      "maximum_covariance_eigenvalue": 0.06507275247333934,
+      "projected_coefficient_energy": "0/1"
+    },
+    {
+      "sector": 4,
+      "maximum_covariance_eigenvalue": 0.05292802054329654,
+      "projected_coefficient_energy": "0/1"
+    },
+    {
+      "sector": 5,
+      "maximum_covariance_eigenvalue": 0.0,
+      "projected_coefficient_energy": "0/1"
+    }
+  ],
+  "level_sector_energies": [
+    {
+      "level": 0,
+      "sector": 0,
+      "energy": "1/1"
+    },
+    {
+      "level": 1,
+      "sector": 0,
+      "energy": "32/5"
+    },
+    {
+      "level": 1,
+      "sector": 1,
+      "energy": "18/5"
+    },
+    {
+      "level": 2,
+      "sector": 0,
+      "energy": "81/5"
+    },
+    {
+      "level": 2,
+      "sector": 1,
+      "energy": "144/5"
+    },
+    {
+      "level": 2,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 3,
+      "sector": 0,
+      "energy": "96/5"
+    },
+    {
+      "level": 3,
+      "sector": 1,
+      "energy": "504/5"
+    },
+    {
+      "level": 3,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 3,
+      "sector": 3,
+      "energy": "0/1"
+    },
+    {
+      "level": 4,
+      "sector": 0,
+      "energy": "42/5"
+    },
+    {
+      "level": 4,
+      "sector": 1,
+      "energy": "1008/5"
+    },
+    {
+      "level": 4,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 4,
+      "sector": 3,
+      "energy": "0/1"
+    },
+    {
+      "level": 4,
+      "sector": 4,
+      "energy": "0/1"
+    },
+    {
+      "level": 5,
+      "sector": 0,
+      "energy": "0/1"
+    },
+    {
+      "level": 5,
+      "sector": 1,
+      "energy": "252/1"
+    },
+    {
+      "level": 5,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 5,
+      "sector": 3,
+      "energy": "0/1"
+    },
+    {
+      "level": 5,
+      "sector": 4,
+      "energy": "0/1"
+    },
+    {
+      "level": 5,
+      "sector": 5,
+      "energy": "0/1"
+    },
+    {
+      "level": 6,
+      "sector": 0,
+      "energy": "42/5"
+    },
+    {
+      "level": 6,
+      "sector": 1,
+      "energy": "1008/5"
+    },
+    {
+      "level": 6,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 6,
+      "sector": 3,
+      "energy": "0/1"
+    },
+    {
+      "level": 6,
+      "sector": 4,
+      "energy": "0/1"
+    },
+    {
+      "level": 7,
+      "sector": 0,
+      "energy": "96/5"
+    },
+    {
+      "level": 7,
+      "sector": 1,
+      "energy": "504/5"
+    },
+    {
+      "level": 7,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 7,
+      "sector": 3,
+      "energy": "0/1"
+    },
+    {
+      "level": 8,
+      "sector": 0,
+      "energy": "81/5"
+    },
+    {
+      "level": 8,
+      "sector": 1,
+      "energy": "144/5"
+    },
+    {
+      "level": 8,
+      "sector": 2,
+      "energy": "0/1"
+    },
+    {
+      "level": 9,
+      "sector": 0,
+      "energy": "32/5"
+    },
+    {
+      "level": 9,
+      "sector": 1,
+      "energy": "18/5"
+    },
+    {
+      "level": 10,
+      "sector": 0,
+      "energy": "1/1"
+    }
+  ],
+  "verified_identities": [
+    "sector energies reconstruct every row-subset level energy exactly",
+    "total sector energy equals the exact Parseval energy"
+  ],
+  "scope": [
+    "All projector coefficients and energies use exact rational arithmetic.",
+    "The covariance eigenvalue bound uses nondirected binary64 arithmetic.",
+    "The result validates only the displayed small instance."
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "pure-ea-dominant-character-likelihood-outward-v1",
+  "status": "OUTWARD_ARB_AND_BINARY64_CERTIFICATE",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "arb_precision_bits": 256
+  },
+  "ordered_pair_types": 22,
+  "elapsed_seconds": 0.00793550000526011,
+  "shells": [
+    {
+      "shell_weight": 2,
+      "mean_ratio_lower": 0.7470703124999994,
+      "mean_ratio_upper": 0.7470703125000007,
+      "positive_pair_excess_normalized_upper": 2.723623132219126,
+      "variance_to_mean_upper": 7.3800426835773605,
+      "passes_factor_512": true
+    }
+  ],
+  "claim": {
+    "all_requested_shells_pass_factor_512": true,
+    "maximum_variance_to_mean_upper": 7.3800426835773605
+  },
+  "proved_reduction": [
+    "For each ordered nonzero distinct pair, the reference row law retains one bias of maximum absolute value.",
+    "The omitted biases give a pointwise likelihood ratio at most (1+delta)^n.",
+    "The pair probability is also at most either marginal probability.",
+    "Replacing each covariance contribution by the positive part of its certified upper endpoint gives a valid variance upper bound."
+  ],
+  "scope": [
+    "Arb encloses every one-word and correlated-reference polynomial evaluation.",
+    "Binary64 endpoints are rounded outward after each basic operation; nonnegative reductions include a summation-error allowance.",
+    "The receipt covers only the requested low-side shells. Complementary shells need a separately proved symmetry statement."
+  ]
+}

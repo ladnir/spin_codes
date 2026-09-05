@@ -1,0 +1,225 @@
+%\section{Block-Accumulate Codes}\label{sec:BDA}
+
+%We explore the possibility of combining Block-Diagonal subcodes with Accumulators. Given the flexibility of our framework, combining different subcodes is straightforward. This is the construction we recommend for practical PCGs and ZK systems. We tested variants of alternating between Block-Diagonal subcodes and Accumulators as well as a single Block-Diagonal subcode followed by $t-1$ Accumulators. The latter proved to have better minimum distance and is the code we focus on in this section. I.e., we define Block-Accumulate (BA-$t$) codes with state size $\sigma$ and depth $t$ as
+%$$
+%\G := \B \pi_1\A ... \pi_{t-1} \A,
+%$$
+%where $\A\in\{0,1\}^{n\times n}$ is an Accumulator and $\B\in\{0,1\}^{k\times n}$ is sampled from the systematic Block-Diagonal distribution with state size $\sigma$. It is known that for $t=2$ the code must have sublinear minimum distance \cite{turbo}. We therefore focus on $t=3$ and find that it performs remarkably well.
+\section{Block-Accumulate Codes}\label{sec:BDA}
+
+We explore the possibility of combining Block-Diagonal subcodes with Accumulators. While Block-Diagonal codes alone do not achieve linear minimum distance, the addition of accumulator layers induces a strong contraction effect that dramatically improves distance. Given the flexibility of our framework, combining different subcodes is straightforward, and this is the construction we recommend for practical PCGs and ZK systems.
+
+The key additional ingredient is the accumulator, which is a simple \emph{recursive} convolution. Although an accumulator has free distance one and therefore can be trivially ``turned off'' by structured inputs, its recursive structure causes even moderately sized inputs, once randomized by the BD subcode and interleavers, to expand into outputs of large Hamming weight. This amplification effect is precisely why accumulators play a central role in turbo and serial codes.
+
+We tested variants that alternate between Block-Diagonal subcodes and Accumulators, as well as constructions consisting of a single Block-Diagonal subcode followed by $t-1$ Accumulators. The latter exhibits significantly better minimum distance and is the code we focus on in this section.
+Specifically, we define Block-Accumulate (BA-$t$) codes with state size $\sigma$ and depth $t$ as
+$$
+\G := \B \pi_1 \A \cdots \pi_{t-1} \A,
+$$
+where $\A\in\{0,1\}^{n\times n}$ is an Accumulator and $\B\in\{0,1\}^{k\times n}$ is sampled from the systematic Block-Diagonal distribution with state size $\sigma$.
+It is known that for $t=2$ such constructions must have sublinear minimum distance~\cite{spielman}.
+We therefore focus on $t=3$, for which we show that the resulting code achieves linear minimum distance with strong concrete parameters.
+
+
+
+\begin{figure}\vspace{-0.3cm}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=.95\linewidth, trim=0cm 1.4cm 0cm 1.2cm, clip]{fig/enum_sB16AA_sB256.512.16A512.512A512.512.txt.pdf} 
+    \caption{Depictions of the Block-Accumulate enumerator $\enum^{\dist }$ with $(t,k,n,\sigma)=(3,256,512,16)$.  See \figureref{fig:blockEnum} for details.  }
+    \label{fig:BAAEnum}\vspace{-0.4cm}
+\end{figure}
+
+\subsection{Enumeration}\label{sec:BAEnum}
+
+\figureref{fig:BAAEnum} contains the enumerator distribution for the case of $k=256$ and $\sigma=16$. With the exception of some low-weight inputs, we observe that the distribution is extremely close to that of a random code. In particular, we observe that the probability of codewords with substantially smaller weight than a random code is $\approx2^{-\sigma}$. This is more clearly illustrated in \figureref{fig:RAADist}, which plots the final weight distribution for $\sigma\in\{4,8,16,32\}$, along with Repeat-Accumulate code (RA-$3$) and a random linear code. As with Block-Diagonal codes, we again observe a phase transition where the probability of low-weight codewords decreases slowly for small values of $h$. However, this phase transition happens  below $\log \delta_h=0$, even for small values of $\sigma$. 
+
+Moreover, unlike Block-Diagonal codes, as $k$ increases there is no need to increase $\sigma$. We instead see the opposite behavior in that the distance slightly improves as $k$ increases. This can be seen in \figureref{fig:BAAk}, which plots the cumulative log weight distribution for a fixed $\sigma=16$ and $k\in\{128,256,512,1024,2048,4096\}$. We also observe that the phase transition becomes more acute and approximately occurs at $\log_2\delta_h=-12$ and $h/n=.105$. We investigate various values of $\sigma,k$ and conclude that the general trend is that the cumulative phase transition occurs at $-\frac{\sigma 3}{4}$ and relative minimum distance $0.105$.  This immediately gives a simple parameterization of setting $\sigma=4/3 \lambda$ for a guarantee that the relative minimum distance is $0.1$ except with probability $2^{-\lambda}$. 
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    % left  bottom right top
+    \includegraphics[width=\linewidth, trim=0.5cm 1.0cm 1.8cm 2.5cm, clip]{fig/BAA_k256.pdf} 
+    \caption{Depictions of the Block-Accumulate log weight distribution. The dashed lines denote the cumulative log weight distribution.  }
+    \label{fig:RAADist}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth, trim=0.7cm 0.9cm 1.8cm 2.5cm, clip]{fig/BAA_sigma16.pdf} 
+    \caption{Depictions of the Block-Accumulate cumulative log weight distribution for $\sigma=16$ and various $k$. }
+    \label{fig:BAAk}
+  \end{minipage}
+\end{figure}
+
+\iffalse
+
+
+\fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Analysis of Block-Accumulate Codes}
+\label{sec:ba_distance_full}
+
+To prove the asymptotic behavior of our construction we will follow the structure of \cite{spielman}.  
+We will fix the values of \B and will not require it to be sampled uniformly, unlike the prior enumeration sections. Instead, we will only condition on $\B$ having minimum distance of some constant $d'>4$. In the construction, this condition can be enforced via rejection sampling. More practically, one can select a subcode with good distance and repeat it across all blocks of \B. This analysis will demonstrate that the code will have linear minimum distance and we conjecture it will give concrete distance at least as good as the bounds obtained from the enumeration. The full proof is found in \appendixref{sec:BAProofApd} and below is a summary of the core argument.
+
+\paragraph{Proof Sketch (Linear Minimum Distance).}
+Let $\G=\B\pi_1\A\pi_2\A$, where $\pi_1,\pi_2$ are uniform interleavers and $\A$
+is the standard length-$n$ accumulator. We show that for a sufficiently small
+constant $\varepsilon>0$, the expected number $E_{\le \varepsilon n}$ of nonzero
+codewords of weight $\le \varepsilon n$ tends to zero, and conclude by Markov.
+
+Fix a nonzero input $\xv$ and define intermediate weights
+$u:=\hw{\xv\B}$, $h_1:=\hw{\xv\B\pi_1\A}$, and $h:=\hw{\xv\B\pi_1\A\pi_2\A}$.
+Random interleavers imply that conditioned on weight, the vector entering each
+accumulator stage is uniform over all vectors of that weight; thus each stage is
+governed by the accumulator input-output enumerator.
+The key analytic estimate is the accumulator \emph{small-output contraction}
+(\lemmaref{lem:small_eps}): for $t\le 2\varepsilon n$,
+\[
+\Pr[\hw{z\A}=t\mid \hw{z}=s]\le \Big(4e^2\cdot\tfrac{t}{n}\Big)^{s/2},
+\]
+and summing over $1\le h\le \varepsilon n$ gives
+\[
+\Pr[h\le \varepsilon n\mid h_1]\le (\varepsilon n)\,(4e^2\varepsilon)^{h_1/2}.
+\]
+Thus achieving $h\le \varepsilon n$ forces $h_1$ to be small, and is strongly
+suppressed in $h_1$.
+
+We now exploit the block structure of $\B$. Let $b=b(\xv)$ be the number of
+active $\sigma$-bit input blocks. Assumption~\eqref{eq:umin_def} implies
+$u=\hw{\xv\B}\ge d'b$, and the number of inputs with exactly $b$ active blocks is
+at most $\binom{k/\sigma}{b}(2^\sigma-1)^b$. Summing over inputs grouped by $b$,
+and using the first-accumulator contraction with $u\ge d'b$ together with the
+second-accumulator tail bound above, yields an upper bound of the form
+\[
+E_{\le \varepsilon n}
+\;\le\;
+(\varepsilon n)\,C_0
+\sum_{b=1}^{\lfloor 4\varepsilon n/d'\rfloor}
+\Big[\,K(\sigma,R,d',\varepsilon)\cdot b^{d'/2-1}\cdot n^{\,1-d'/2}\Big]^b,
+\]
+for an explicit constant $K(\sigma,R,d',\varepsilon)$.
+
+The bottleneck is the $b=1$ term:
+\[
+E_{b=1}\;\le\;(\varepsilon n)\cdot O(n^{1-d'/2}) \;=\; O(n^{2-d'/2}),
+\]
+so we require $2-d'/2<0$, i.e., $d'>4$. Under $d'>4$ and sufficiently small
+constant $\varepsilon$, the remaining terms $b\ge 2$ are $o(1)$ even after the
+outer factor $(\varepsilon n)$: for $2\le b\le \sqrt{n}$ we have
+$(b/n)^{d'/2-1}\le n^{-(d'/2-1)/2}$ so the sum contributes $O(n^{-(d'/2-1)})$,
+while for $b\ge \sqrt{n}$ the truncated tail is geometrically small in $b$ and
+hence $O(\rho^{\sqrt{n}})$ for some $\rho<1$. Therefore $E_{\le \varepsilon n}\to 0$,
+and Markov gives $\Pr[d_{\min}(\G)\ge \varepsilon n]\to 1$.
+The full proof (including constant choices and all intermediate bounds) appears
+in \appendixref{sec:BAProofApd}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Discussion}
+The \appendixref{sec:BAProofApd} proof establishes linear minimum distance with high probability under the
+mild structural condition $d'>4$ on $\B$. The goal of this discussion is to connect that
+asymptotic guarantee to the finite-$n$ enumerator computations in \sectionref{sec:BAEnum},
+and to clarify what we do and do not claim about extrapolation.
+
+\paragraph{Main Failure Mode (Single Active Block).}
+Both the proof and the numerics indicate that the dominant mechanism by which very low-weight
+codewords can arise is via inputs that activate only a \emph{single} $\sigma$-bit block of $\B$.
+In the proof, this corresponds to the $b=1$ term in the block-counting sum, and it is precisely
+this term that forces the condition $d'>4$ once one accounts for the outer $(\varepsilon n)$ factor
+coming from the second accumulator tail bound. Conceptually, $b\ge 2$ inputs are strongly suppressed:
+the accumulator contraction acts on an input weight of at least $u\ge d'b$, and the suppression is
+raised to the $b$th power, so multi-block inputs become negligible quickly. Thus, asymptotically,
+the probability of a low-weight codeword is governed by the tension between (i) how many single-block
+inputs exist and (ii) how effectively the two accumulators randomize and spread their mass.
+
+\paragraph{Why the theorem assumes $d'>4$, while the enumerator models $\B$ as systematic random.}
+The asymptotic proof fixes $\B$ and conditions only on a per-block minimum-distance lower bound $d'>4$.
+This is a conservative way to remove rare but adversarially bad local behavior in $\B$, and it cleanly
+isolates the accumulator/interleaver phenomenon that drives the asymptotic argument.
+In contrast, our enumerator computations treat $\B$ as coming from the natural systematic-random design
+described earlier in the paper, and therefore average over the (small) probability that a block outputs
+very low weight. This difference matters for proofs because union bounds can be sensitive to rare events;
+however, it appears to matter much less at the parameter sizes we care about because the dominant failure
+mode already behaves like a single-block event, and the enumerator mass in the extreme low weights is small.
+
+\paragraph{Why enforcing $d'>4$ barely changes the enumerator curves at practical sizes.}
+A potential concern is that the theorem’s $d'>4$ assumption might correspond to a qualitatively different
+ensemble than the one used in our numerics, and that enforcing $d'>4$ might cause a noticeable jump in the
+predicted distance. Empirically, we do \emph{not} see such a jump: even if we artificially ``repair'' the
+enumerator by moving the probability mass of per-block outputs of weight $1,2,\ldots,d'$ up to weight $d'+1$,
+the predicted distance threshold changes little at the sizes we plot.
+The natural interpretation is that, at these block sizes, the overall low-weight behavior is not dominated
+by the exact placement of a tiny amount of mass at weights below $d'$, but rather by the aggregate effect
+of the interleavers and the two accumulator stages on the typical single-block contribution. In other words,
+conditioning away the extremely low local weights is primarily a proof device to obtain a clean asymptotic
+bound; it does not appear to be the factor that drives the finite-$n$ distance threshold we observe.
+
+\paragraph{What we can (and cannot) claim about extrapolating the concrete bounds.}
+Our appendix theorem proves that the minimum distance is linear, but it is not optimized to deliver a tight
+asymptotic distance constant: the argument intentionally works in a ``small-$\varepsilon$'' regime and uses
+several conservative inequalities to ensure geometric decay. Consequently, the proof should not be read as
+pinning down the limiting relative distance (nor proving monotonic improvement in $n$).
+That said, the theorem does identify the \emph{correct mechanism} controlling the low-weight tail (the $b=1$
+term), and it shows that once $d'>4$ this mechanism is polynomially suppressed in $n$ while all multi-block
+terms are even more strongly suppressed. This is qualitatively consistent with what we observe numerically:
+as $n$ increases, the enumerator-based curves evolve smoothly and appear to approach a stable threshold
+(around $\delta\approx 0.11$ for our plotted parameters). While no theorem implies that the finite-$n$ threshold
+must be monotone in $n$, the combination of (i) an explicit asymptotic failure mechanism and (ii) the smooth
+finite-$n$ convergence across multiple orders of magnitude provides strong evidence that, for the practical
+range of lengths of interest (e.g., $n\ll 2^{30}$), the true typical distance will not diverge dramatically
+from the observed threshold.
+
+\paragraph{Explaining the observed ``floor'' in failure probability and its dependence on $\sigma$.}
+Our numerics also reveal a characteristic floor: even below the apparent distance threshold, the predicted
+failure probability does not drop indefinitely, but appears to stabilize (e.g., around $2^{-16}$ for block
+size $\sigma=16$ in the plotted regime). This behavior is also consistent with the proof’s perspective.
+The dominant failure mode is $b=1$, and the number of single-block inputs scales like
+$\binom{k/\sigma}{1}(2^\sigma-1)\approx (k/\sigma)\cdot 2^\sigma$, so increasing $\sigma$ increases the number
+of potentially dangerous single-block patterns exponentially. Meanwhile, the probability that a \emph{fixed}
+single-block input yields an anomalously low final weight is governed primarily by the accumulator/interleaver
+mixing, which depends on relative weights and $n$ rather than directly on $\sigma$.
+Thus, at fixed $n$ and rate, the leading-order dependence of the low-weight tail on $\sigma$ is driven by the
+multiplicity of $b=1$ candidates, which naturally produces a tight empirical relationship between $\sigma$ and
+the residual failure level. In short: the observed floor is not evidence that the code stops improving; rather,
+it reflects the fact that there is a large (and $\sigma$-dependent) family of single-block inputs, and the
+aggregate probability that \emph{one} of them produces a low-weight output can stabilize at a small level.
+
+\paragraph{Takeaway.}
+The proof and the enumerator computations are aligned: the proof explains why the low-weight tail is controlled
+by single-block inputs and why the code has linear minimum distance when $d'>4$, while the enumerator plots
+suggest that the corresponding distance threshold is substantially larger in the practical regime. We view the
+observed smooth convergence of the finite-$n$ curves, together with the mechanism identified by the proof, as
+strong evidence that the concrete distance behavior persists to larger lengths relevant in practice. %The appendix contains the full proof; the present discussion is intended to clarify how it supports (but does not by itself prove) the extrapolation suggested by our numerics.

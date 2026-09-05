@@ -1,0 +1,29 @@
+{
+  "schema": "pure-ea-sector-zero-complement-orbits-rust-outward-v1",
+  "status": "OUTWARD_BINARY64_UPPER_BOUND",
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "right_degree": 33
+  },
+  "entries": [
+    {
+      "sector": 0,
+      "level": 100,
+      "scaled_diagonal_upper": 2.45522037042555
+    }
+  ],
+  "enumerated_pair_types": 361985,
+  "covered_pair_types": 2862209,
+  "canonical_complement_swap_orbits": true,
+  "worker_threads": 20,
+  "elapsed_seconds": 14.8340123,
+  "scope": [
+    "Complement-orbit averaging is exact for odd row degree.",
+    "Exact big-integer comparisons bracket every rational bias, determinant, coefficient, and multiplicity in binary64.",
+    "Every arithmetic operation expands its result by one adjacent binary64 value.",
+    "Each thread performs upward summation; the main thread combines chunk sums upward in deterministic order.",
+    "The bound sums positive orbit upper endpoints and does not assume orbit positivity.",
+    "The receipt bounds only the listed sector-zero diagonals."
+  ]
+}

@@ -1,0 +1,15 @@
+\section{Expand-Permute-Multiply Paradigm}\label{sec:permutemultiply}
+
+\srini{what it is - we first expand using either expanding matrix or repeater, then permute, multiply and repeat, why we use it, describe architecture, see \sectionref{ssec:ceenum}}
+
+From prior work and exposition, the problem of interest becomes one of designing a code with high minimum distance with fast (potentially trivially parallelizable) encoding. As noted in \sectionref{sec:raa}, the paradigm of multiplying with an expanding matrix (in the RAA case, the repeater matrix), and then repeatedly permuting the codeword and multiplying with another matrix (in the RAA case, the accumulator matrix) can produce codes of high minimum distance. The loose intuition is that the expanding matrix helps boost the weight of low-weight messages. Following that, the permutations and convolutions allow for further mixing of codeword bits without the concern of cancellations thanks to the initial expansion. 
+
+To assist with the parallelizability of the encoding, we consider a block construction as described in \sectionref{sec:block}. In this case, all multiplications and permutations can be decomposed to be performed on blocks in parallel.
+
+\srinireply{To be honest, I'm not sure this section is even needed, or that it cannot be absorbed into another section, unless there is more that we want to write here. I feel like this has already been discussed elsewhere.}
+
+\subsection{Minimum Distance}\label{sec:mindist}
+
+\srini{Say how to compute minimum distance - keep track of the distribution as we do each multiplication. Some of it is written in \sectionref{ssec:ceenum}}
+
+\srinireply{Isn't this exactly \sectionref{ssec:ceenum}?}

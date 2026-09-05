@@ -1,0 +1,94 @@
+{
+  "schema": "ebch128x4-ba-variance-proxy-sparse-v1",
+  "status": "CONDITIONAL_BINARY64_EXACT_SHARED_CATEGORY_DIAGNOSTIC",
+  "parameters": {
+    "accumulator_stages": 3,
+    "variance_inflation_bits": 9.0,
+    "variance_hypothesis": "Var(A_w) <= 2^9.0 E[A_w] for every nonzero shell",
+    "memory_bits": 22,
+    "occupations": [
+      3,
+      3
+    ],
+    "distance_cutoff": 228590,
+    "low_upper": 78
+  },
+  "cap_event_failure_log2_upper": -42.255553375250585,
+  "bands": {
+    "low": {
+      "lower_weight": 42,
+      "upper_weight": 78,
+      "value_probability": 0.15234374792613956,
+      "log_majorant": 43.10503983965951,
+      "log2_majorant": 62.18742721399798,
+      "maximizing_weight": 78
+    },
+    "central": {
+      "lower_weight": 79,
+      "upper_weight": 433,
+      "value_probability": 0.4999990329838341,
+      "log_majorant": 178.83631432781442,
+      "log2_majorant": 258.00626381159776,
+      "maximizing_weight": 433
+    },
+    "high": {
+      "lower_weight": 434,
+      "upper_weight": 470,
+      "value_probability": 0.8476562497986934,
+      "log_majorant": 43.103809907789525,
+      "log2_majorant": 62.18565279738852,
+      "maximizing_weight": 434
+    }
+  },
+  "claim": {
+    "aggregate_log2_upper": -46.66286140113821,
+    "aggregate_margin_bits": 46.66286140113821,
+    "worst": {
+      "occupation": 3,
+      "defect_rows": 3,
+      "central_rows": 0,
+      "pointwise_log2_upper": -46.66286140113821,
+      "margin_bits": 46.66286140113821,
+      "log_surprisal": -8.25
+    }
+  },
+  "rows": [
+    {
+      "occupation": 3,
+      "defect_rows": 0,
+      "central_rows": 3,
+      "pointwise_log2_upper": -333.48079967328584,
+      "margin_bits": 333.48079967328584,
+      "log_surprisal": -6.75
+    },
+    {
+      "occupation": 3,
+      "defect_rows": 1,
+      "central_rows": 2,
+      "pointwise_log2_upper": -224.3560722988774,
+      "margin_bits": 224.3560722988774,
+      "log_surprisal": -7.0
+    },
+    {
+      "occupation": 3,
+      "defect_rows": 2,
+      "central_rows": 1,
+      "pointwise_log2_upper": -144.35197233001657,
+      "margin_bits": 144.35197233001657,
+      "log_surprisal": -7.5
+    },
+    {
+      "occupation": 3,
+      "defect_rows": 3,
+      "central_rows": 0,
+      "pointwise_log2_upper": -46.66286140113821,
+      "margin_bits": 46.66286140113821,
+      "log_surprisal": -8.25
+    }
+  ],
+  "limitations": [
+    "The shell-variance hypothesis is not proved.",
+    "Nearest binary64 arithmetic is not an outward certificate.",
+    "Only the stated sparse occupation interval is covered."
+  ]
+}

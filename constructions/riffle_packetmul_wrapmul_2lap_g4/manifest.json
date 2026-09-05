@@ -1,0 +1,40 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_packetmul_wrapmul_2lap_g4",
+  "display_name": "Riffle PacketMul-WrapMul-2Lap g=4",
+  "status": "ACTIVE_EXPLORATION",
+  "approved_date": "2026-08-21",
+  "parent_candidate_id": "riffle_packetmul_2lap_g4",
+  "packet_width_bits": 4,
+  "lap_count": 2,
+  "retains_first_lap_terminal_state": true,
+  "fresh_runtime_randomness_between_laps": false,
+  "setup_randomized_wrap_map": true,
+  "packet_multiplier": {
+    "field": "GF(2^4)",
+    "modulus_polynomial": "x^4+x+1",
+    "modulus_hex": "0x13",
+    "scalar_domain": "GF(16)^*",
+    "sampling": "independent_uniform_rejection",
+    "scope": "one scalar per input packet coordinate",
+    "application": "once_before_packet_permutation",
+    "public_schedule": true
+  },
+  "wrap_multiplier": {
+    "field": "GF(2^64)",
+    "basis": "polynomial_little_coefficient_order",
+    "modulus_polynomial": "x^64+x^4+x^3+x+1",
+    "implicit_top_reduction_hex": "0x1b",
+    "scalar_domain": "GF(2^64)^*",
+    "sampling": "uniform_nonzero_64_bit_rejection",
+    "scope": "one scalar per public setup, reused for every codeword",
+    "application": "multiply_first_lap_terminal_state_before_retained_state_injection",
+    "independent_of_inherited_setup": true,
+    "public_schedule": true,
+    "preserves_zero_state": true,
+    "acts_transitively_on_nonzero_states": true
+  },
+  "proof_status": "GOAL_01_PROVED_GOAL_02_ACTIVE",
+  "performance_status": "NOT_BENCHMARKED_AS_AN_INTEGRATED_CANDIDATE",
+  "active_goal": "GOAL_02_SUPPORT33_LIST_DECODING.md"
+}

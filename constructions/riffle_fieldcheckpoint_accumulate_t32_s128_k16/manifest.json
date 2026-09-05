@@ -1,0 +1,25 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_fieldcheckpoint_accumulate_t32_s128_k16",
+  "display_name": "Riffle FieldCheckpointAccumulate t=32 s=128 K=16",
+  "status": "PARAMETER_EXPLORATION",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_fieldcheckpoint_accumulate_t32_s64_k8",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "step_bits": 32,
+    "state_bits": 128,
+    "checkpoint_steps": 16,
+    "checkpoint_epoch_bits": 512,
+    "epochs_per_region": 16,
+    "visits_per_lane": 4
+  },
+  "regular_middle_result": {
+    "relative_distance": 0.09,
+    "active_blocks_min": 512,
+    "active_blocks_max": 4096,
+    "aggregate_margin_bits_float": 21135.650614041842
+  },
+  "claim_scope": "Modeled-spectrum, nearest-binary64 diagnostic for the regular middle range only."
+}

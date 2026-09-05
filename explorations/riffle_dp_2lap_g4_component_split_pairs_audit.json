@@ -1,0 +1,54 @@
+{
+  "schema": "riffle-dp-2lap-g4-component-split-pairs-audit-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "EXACT_DIMENSION33_ENUMERATION_WITH_DIAGNOSTIC_FULL64_PROJECTION",
+  "audit_source_sha256": "f79e290ef1c05837be2dd7f64c58c6ea3490807ba27720cd91cc65180eb6aee9",
+  "pair_source_sha256": "cb854981783ed4d4e92b43fd9b3e8dff0f4e586a522b89ceaa301e1b8d14dd89",
+  "pair_executable_sha256": "21ac4b08ae602d76f01f853f46a0221f8aca94b3fe2cd54d3a559d8a0ee70fc9",
+  "prepare_source_sha256": "3d5282a205685d44fb9a70dcc54ee9d6edb97fb17b903bbef044d268f487d307",
+  "generator_input_sha256": "ae76e24749eae238e969577b7544bd7dc5ef1f4aecbe93df74e33c34ed87b22b",
+  "pair_receipt_sha256": "191abc4e4f3afb096d8dc95e99cf47d5dc9f634647a9b8ec9aea1e7cc76a73a4",
+  "sat_probe_sha256": "ed7a796c71f7df4264b734751adebc50c1965c695dd81dda72a55507fbee406e",
+  "exact_dimension33_result": {
+    "support_mask_hex": "0x53",
+    "packet_value": 1,
+    "split_masks_hex": [
+      "0x40",
+      "0x13"
+    ],
+    "split_dimensions": [
+      20,
+      13
+    ],
+    "pair_count": 8589934591,
+    "minimum_two_sided_weight": 120,
+    "elapsed_seconds": 4.92374,
+    "pairs_per_second": 1744595488.59,
+    "witness_character_hex": "0xa685aac60e5acfb3",
+    "witness_weight": 120,
+    "result": "PASS_EXACT"
+  },
+  "generic_sat_result": {
+    "timeout_seconds_per_side": 10,
+    "weight_side": "UNKNOWN",
+    "complement_side": "UNKNOWN",
+    "result": "NO_EXACT_CONCLUSION_WITHIN_BUDGET"
+  },
+  "full64_naive_projection": {
+    "balanced_split_dimensions": [
+      32,
+      32
+    ],
+    "pair_count": 18446744073709551615,
+    "projected_seconds_at_dimension33_rate": 10573651138.246609,
+    "projected_years_at_dimension33_rate": 335.0587857836657,
+    "balanced_right_list_codeword_bytes": 206158430208,
+    "balanced_right_list_codeword_gibibytes": 192,
+    "balanced_right_list_with_64bit_index_gibibytes": 224,
+    "unbalanced_44_plus_20_right_list_mibibytes": 56,
+    "unbalanced_pair_count": 18446744073709551615,
+    "interpretation": "An unbalanced split fixes memory but not the 2^64 pair count. The timing projection is diagnostic and optimistic because the dimension-33 right list fits in cache."
+  },
+  "result": "EXACT_SPLIT_VALIDATED_BUT_NAIVE_FULL64_METHOD_INFEASIBLE",
+  "scope_limitation": "The dimension-33 minimum and enumeration count are exact. The full-64 time estimate extrapolates measured throughput and is not a certificate or hardware-independent prediction."
+}

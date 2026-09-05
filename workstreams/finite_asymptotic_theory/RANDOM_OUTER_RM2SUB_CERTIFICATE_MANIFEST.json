@@ -1,0 +1,102 @@
+{
+  "schema": "random-outer-rm2sub-asymptotic-distance-certificate-v1",
+  "claim": {
+    "rate": "1/2",
+    "relative_distance": "11/100",
+    "outer_block_schedule": "B=9*log2(N)+O(1)",
+    "inner": "fixed RM2Sub t=128, s=19",
+    "status": "proved for the declared random-outer ensemble"
+  },
+  "theorems": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/RANDOM_OUTER_RM2SUB_CERTIFICATE.md",
+      "sha256": "166998939B63EE6C97FFCB069A98C4F8E1D0CF57D89CF3D031BA4F1448A78BCD"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RANDOM_OUTER_RM2SUB_RAMP.md",
+      "sha256": "3120937387E8AC705A24CD648D81A5AD67B3D284DE5EAABB75CD1A2B310CA3AA"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RM2SUB_ONE_ACTIVE_CONTINUUM.md",
+      "sha256": "08A9B8241B782C3B443D21808B514F52B5DB56060943FC708F0B70BD2D0B5EA0"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RM2SUB_TWO_ACTIVE_CONTINUUM.md",
+      "sha256": "39954C4588525AA80E2421190376057F22808F4F3313D4F06AB1FE0D74FC0365"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RM2SUB_FIXED_OCCUPATION_CONTINUUM.md",
+      "sha256": "03A759E5E9DCEFD7EEB51DAB8234488FF1C741797734D35D1B0429EC27A40E2B"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RM2SUB_UNIFORM_FIXED_OCCUPATION.md",
+      "sha256": "490C9A399CE7C1E01B09665B60FFE24E89D0DA607EE6D736B5C7D9951D716BF3"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/RM2SUB_DENSE_OCCUPATION.md",
+      "sha256": "174F09314D2F12E8A8CCFD4B54A774A8809BB5FD9E22D582394E02B3685873B2"
+    }
+  ],
+  "verifiers": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/derive_rm2sub_one_active_continuum.py",
+      "sha256": "7873784F6C63851E59B7BB1386DEB4932EABAA49226EBB50E01A7742C4812A77"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/derive_rm2sub_two_active_continuum.py",
+      "sha256": "B1F24DF2ADEDC9B70E6E512CABD0EE9BD2AE1483C831CF6E0DD39FFD158505E1"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/analyze_rm2sub_fixed_occupation_continuum.py",
+      "sha256": "D1F16A405A1014E8DA59802357B8E49A322FEFBB7D59F17FA735908C89B7423D"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_rm2sub_uniform_fixed_occupation.py",
+      "sha256": "2A45F8FB0BB67A7E2665AF124D53157DB6A4BCF43E59701FF55D4F3CFA3DCCF0"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/analyze_rm2sub_dense_occupation.py",
+      "sha256": "DF987335117CA8234CADA1156AB75A427DD7642B943A509C156B4D88A37350FE"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_rm2sub_dense_small.py",
+      "sha256": "E2638B223BC992080BF06F0EC6360B48DB237E09D7A6F50E6E5F67449F78E627"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_rm2sub_dense_compact_interval.py",
+      "sha256": "9E4C83B3954CCCFEA9E56C5927FBC0AFCD55BA02BFF6EADD0F689A7F2CFE08B0"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_one_active_continuum.json",
+      "sha256": "FC02D7F1DA1D64DBC501AFD6D1512B308B60DF8E9BF702293B1EBE0660E4405F"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_two_active_continuum.json",
+      "sha256": "17D487B2E3537A4CD9ECD2A8D82889976042D88CE0015320E933310EC0BE0C9A"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_fixed_occupation_continuum_d11.json",
+      "sha256": "ACCCF6D80722D4916775265987DDB72DBB8290D7A50AE77664A458F57E79EBC3"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_uniform_fixed_occupation_d11.json",
+      "sha256": "E162EE3A41E2AFFE1FC6F905DD32DEF9455B965EB99B4F093EC58CBBB834113E"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_dense_small_exact_d11.json",
+      "sha256": "5D9C1CF4EB57D7D4831F6ADCCDBCF4EA16B6C0B19A1CBEB205CE04C8FE6308D6"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/rm2sub_dense_compact_interval_d11.json",
+      "sha256": "5722B53B801FFFAD5317F70D561C33287D764296C4779C0D839B75272BA9B636"
+    }
+  ],
+  "frozen_dependencies": [
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_selection.json",
+      "sha256": "E2658FEFDB787D5946C4C0A1DC4C8C530414FAE1F6EF8BCF9C40298E6E13F117"
+    }
+  ]
+}

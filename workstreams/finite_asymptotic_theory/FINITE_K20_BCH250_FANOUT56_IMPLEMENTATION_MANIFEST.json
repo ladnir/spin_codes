@@ -1,0 +1,60 @@
+{
+  "schema": "bch250-rowlocal-fanout56-implementation-manifest-v1",
+  "status": "MEASURED_WRAPPER_ONLY",
+  "date": "2026-09-02",
+  "build": {
+    "compiler": "MSVC 19.50",
+    "language": "C++20",
+    "flags": [
+      "/O2",
+      "/Oi",
+      "/Ot",
+      "/GL",
+      "/arch:AVX2",
+      "/W4",
+      "/permissive-",
+      "/LTCG"
+    ]
+  },
+  "benchmark": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "pinned_logical_cpu": 2,
+    "trials": 31,
+    "warmup_pairs": 5,
+    "batch_encodings_per_sample": 32
+  },
+  "artifacts": [
+    {
+      "path": "benchmark_bch250_rowlocal_fanout56.cpp",
+      "bytes": 20649,
+      "sha256": "05db69584748e973b56caf9b76ef5aef96a8740cae8b74b8adc2b3a266a45962"
+    },
+    {
+      "path": "benchmark_bch250_rowlocal_fanout56.exe",
+      "bytes": 308736,
+      "sha256": "6f2bada71eacdf963624f6d28487968cc76a693b757026aba69c019d178d0ea8"
+    },
+    {
+      "path": "bch250_rowlocal_fanout56_benchmark_windows_i7_13700h.json",
+      "bytes": 2539,
+      "sha256": "96875a1bb9cff642a5f22a0aa021a0a9b07ed98ab95126d026a10a710220b69e"
+    },
+    {
+      "path": "FINITE_K20_BCH250_FANOUT56_IMPLEMENTATION_BENCHMARK.md",
+      "bytes": 4699,
+      "sha256": "161247bad75e7453937351da16d2434c26774f63b3f616555df2c5f530eabde4"
+    }
+  ],
+  "scope": {
+    "implemented": "Packed action and inverse of 56 row-local ParityFanout-31x33 layers on 8576 rows of 250 bits.",
+    "zero_layer_control": "Copy of the same packed post-BCH rows.",
+    "omitted": [
+      "BCH250-124 encoding",
+      "local coordinate permutations",
+      "transpose",
+      "region permutations",
+      "RM2Sub-S19"
+    ],
+    "setup_warning": "The fixed-seed SplitMix64 schedule is a reproducible benchmark fixture, not a proof-compatible setup sampler."
+  }
+}

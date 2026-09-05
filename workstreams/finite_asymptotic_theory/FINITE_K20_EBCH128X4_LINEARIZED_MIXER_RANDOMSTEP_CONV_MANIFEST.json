@@ -1,0 +1,80 @@
+{
+  "schema": "fixed-outer-linearized-mixer-randomstepconv-manifest-v1",
+  "status": "OUTWARD_FINITE_DISTANCE_CERTIFICATE",
+  "claim": {
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "conditional_bad_probability_log2_upper": -51.64395898907337,
+    "conditional_margin_bits_lower": 51.64395898907337,
+    "shell_event_failure_upper": 1.896832534308249e-13,
+    "rank_failure_upper": 8.636168555094447e-78,
+    "constituent_event_failure_upper": 1.896832534308249e-13,
+    "constituent_event_margin_bits_lower": 42.26147292040985,
+    "unconditional_setup_or_bad_log2_upper": -42.259312990512214,
+    "unconditional_margin_bits_lower": 42.259312990512214,
+    "comparison_to_2^-40": true
+  },
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "distance_cutoff": 228590,
+    "memory_bits": 22,
+    "outer_sampler_bits": 1024,
+    "mixer_field_multiplications_per_active_row": 2
+  },
+  "artifacts": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_EBCH128X4_LINEARIZED_MIXER_RANDOMSTEP_CONV_CERTIFICATE.md",
+      "sha256": "4873838504cce445ece862ea0ab29a3c8271f2d72fe680e1bb322f183ebf0d39",
+      "size_bytes": 4350
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_fixed_outer_linearized_mixer_combined.py",
+      "sha256": "2338649b3fd5fdf2d5e7ff8b6385b40adbcbc0b9fd1195c2c1e8787d4525bfef",
+      "size_bytes": 8531
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_single_random_constituent_sparse_outward.py",
+      "sha256": "6928e2692646d58d076281e49a1423d85e2883a856630b1ef3c91b7728f5e1a0",
+      "size_bytes": 22629
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_single_random_constituent_dense_outward.py",
+      "sha256": "65dd684d68781ae25df63ab08552df2d1fc14cf9bcf954f89fea6d674c4ab20d",
+      "size_bytes": 16092
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/single_random_constituent_B512_sparse_outward_s22.json",
+      "sha256": "6e34039c98b77d98c7c3c94d1344828970099290f8d7703f8fe3f3a76e99ffcc",
+      "size_bytes": 2606
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/single_random_constituent_B512_shared_two_band_dense_cover_outward_s22.json",
+      "sha256": "939d495262fe67719519ddd9180d900eafe97c30e3504153a3348838c68658cd",
+      "size_bytes": 2020
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/fixed_outer_linearized_mixer_B512_combined_outward_s22.json",
+      "sha256": "a43a2c72580252b1fac9bfdd64c7b4769b83834388544821c412113240802de5",
+      "size_bytes": 3679
+    }
+  ],
+  "reproduction": [
+    "python workstreams/finite_asymptotic_theory/certify_single_random_constituent_sparse_outward.py",
+    "python workstreams/finite_asymptotic_theory/certify_single_random_constituent_dense_outward.py",
+    "python workstreams/finite_asymptotic_theory/certify_fixed_outer_linearized_mixer_combined.py",
+    "python workstreams/finite_asymptotic_theory/build_fixed_outer_linearized_mixer_manifest.py"
+  ],
+  "runtime": {
+    "python_flint_version": "0.9.0",
+    "arithmetic": "exact integers and rationals plus 192-bit Arb intervals"
+  },
+  "sampler": {
+    "mixer_random_bits": 1024,
+    "acceptance_test": null,
+    "distribution": "two independent uniform elements of GF(2^512)"
+  }
+}

@@ -1,0 +1,14 @@
+Exact Computation of Minimum Distance Optimizations:
+
+1. Run on 16 threads
+2. switched the h,w loops and unrolled the block enumerator to avoid recomputing a lot of same stuff over again 
+3. Precomputed the pascal triangle for n choose w before passing to each thread 
+4. precomputed the count_fraction before passing to each thread
+
+Still too expensive
+
+Approximate Computation of Minimum Distance Optimizations:
+
+Compute only a subset of points and approximate the remaining points?
+- note that unlike in normal function approximation, we do not know what the true function looks like or when it changes rapidly
+- Because of this, start just with Piecewise Linear Interpolation and evenly spaced points

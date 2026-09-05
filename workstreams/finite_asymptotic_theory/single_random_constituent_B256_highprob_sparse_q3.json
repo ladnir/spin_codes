@@ -1,0 +1,178 @@
+{
+  "schema": "single-random-constituent-highprob-sparse-bands-v1",
+  "status": "BINARY64_EXACT_REGION_DIAGNOSTIC",
+  "parameters": {
+    "outer_code": "one uniform binary [256,128] generator",
+    "minimum_occupation": 3,
+    "maximum_occupation": 3,
+    "distance_cutoff": 228590,
+    "memory_bits": 22
+  },
+  "spectrum_event": {
+    "per_shell_failure_target": 4.440892098500626e-16,
+    "spectrum_failure_upper": 1.0043559720855095e-13,
+    "rank_failure_upper": 2.938735877055719e-39,
+    "total_event_failure_upper": 1.0043559720855095e-13,
+    "total_cap_mass_log2": 128.0000000000235,
+    "true_nonzero_mass_log2": 128.0,
+    "cap_mass_excess_bits": 2.34913672375843e-11
+  },
+  "bands": [
+    {
+      "lower_weight": 15,
+      "upper_weight": 51,
+      "value_probability": 0.19921875003412323,
+      "log_majorant": 39.58097348385027,
+      "log2_majorant": 57.103274158708345,
+      "maximizing_weight": 51
+    },
+    {
+      "lower_weight": 52,
+      "upper_weight": 204,
+      "value_probability": 0.5,
+      "log_majorant": 88.99217541165591,
+      "log2_majorant": 128.38857014431673,
+      "maximizing_weight": 52
+    },
+    {
+      "lower_weight": 205,
+      "upper_weight": 241,
+      "value_probability": 0.8007812461135837,
+      "log_majorant": 39.58097348385029,
+      "log2_majorant": 57.10327415870838,
+      "maximizing_weight": 205
+    }
+  ],
+  "claim": {
+    "aggregate_log2_upper": 33.685651110914556,
+    "aggregate_margin_bits": -33.685651110914556,
+    "worst_composition": {
+      "occupation": 3,
+      "active_counts": [
+        3,
+        0,
+        0
+      ],
+      "pointwise_log2_upper": 33.685651110914556,
+      "margin_bits": -33.685651110914556,
+      "log_surprisal": -8.5
+    }
+  },
+  "rows": [
+    {
+      "occupation": 3,
+      "active_counts": [
+        0,
+        0,
+        3
+      ],
+      "pointwise_log2_upper": -1114.194637055708,
+      "margin_bits": 1114.194637055708,
+      "log_surprisal": -6.75
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        0,
+        1,
+        2
+      ],
+      "pointwise_log2_upper": -769.7379157586682,
+      "margin_bits": 769.7379157586682,
+      "log_surprisal": -6.75
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        0,
+        2,
+        1
+      ],
+      "pointwise_log2_upper": -460.42215151495975,
+      "margin_bits": 460.42215151495975,
+      "log_surprisal": -7.25
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        0,
+        3,
+        0
+      ],
+      "pointwise_log2_upper": -151.52015224022236,
+      "margin_bits": 151.52015224022236,
+      "log_surprisal": -7.5
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        1,
+        0,
+        2
+      ],
+      "pointwise_log2_upper": -742.1237143874074,
+      "margin_bits": 742.1237143874074,
+      "log_surprisal": -7.0
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        1,
+        1,
+        1
+      ],
+      "pointwise_log2_upper": -407.2013003616871,
+      "margin_bits": 407.2013003616871,
+      "log_surprisal": -7.25
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        1,
+        2,
+        0
+      ],
+      "pointwise_log2_upper": -89.0953379361103,
+      "margin_bits": 89.0953379361103,
+      "log_surprisal": -7.75
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        2,
+        0,
+        1
+      ],
+      "pointwise_log2_upper": -354.9045956783305,
+      "margin_bits": 354.9045956783305,
+      "log_surprisal": -7.5
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        2,
+        1,
+        0
+      ],
+      "pointwise_log2_upper": -22.705205809844482,
+      "margin_bits": 22.705205809844482,
+      "log_surprisal": -8.0
+    },
+    {
+      "occupation": 3,
+      "active_counts": [
+        3,
+        0,
+        0
+      ],
+      "pointwise_log2_upper": 33.685651110914556,
+      "margin_bits": -33.685651110914556,
+      "log_surprisal": -8.5
+    }
+  ],
+  "limitations": [
+    "Nearest binary64 arithmetic is not an outward certificate.",
+    "Only the stated sparse occupations are covered.",
+    "The three-band spectrum caps are pointwise upper bounds and may be loose."
+  ]
+}

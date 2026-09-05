@@ -1,0 +1,32 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_randomstepconv_2lap_g4_sigma20",
+  "display_name": "Riffle RandomStepConv-2Lap g=4 sigma=20",
+  "status": "PAUSED_LOW_COMPUTE_VALUE",
+  "parent_candidate_id": "riffle_randomstepconv_g4_sigma20",
+  "inherited": [
+    "ShiftAlpha64 systematic GF(2^64) outer code with two parity symbols",
+    "extended BCH [128,64,22] local encoder",
+    "independent uniform 128-bit permutation inside every BCH block",
+    "uniform global permutation of four-bit packets",
+    "distinct 20-bit inner state"
+  ],
+  "modified_mechanism": "run an independent random-map burn-in lap, carry its terminal state across the wrap, and retain only the output of a second independent random-map lap",
+  "inner_parameters": {
+    "packet_bits": 4,
+    "state_bits": 20,
+    "packet_positions": 524352,
+    "laps_computed": 2,
+    "laps_retained": 1,
+    "wrap_state": "carried",
+    "terminal_state": "discarded"
+  },
+  "random_maps": {
+    "burn_in": "A_i is independent and uniform in GF(2)^((g+sigma) x (g+sigma))",
+    "retained": "B_i is independent and uniform in GF(2)^((g+sigma) x (g+sigma))",
+    "cross_lap_relation": "all A_i and B_j are mutually independent"
+  },
+  "goal01_status": "PAUSED_NEGATIVE_DIAGNOSTIC",
+  "goal01_receipt": "receipts/goal01_cyclic_live_coverage.json",
+  "claim_scope": "Exact retained-lap gap identity with exhaustive small checks; floating target-size upper diagnostics and an explicit cyclic-cluster lower diagnostic. The 9% exponent at h=16384 improves by only about 10 bits over one lap. The candidate is paused because a second inner pass has low distance value relative to its compute cost. No outward-rounded or end-to-end distance claim."
+}

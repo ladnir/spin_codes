@@ -1,0 +1,31 @@
+{
+  "schema": "pure-ea-primal-schur-diagonal-outward-v1",
+  "status": "OUTWARD_BINARY64_UPPER_BOUND",
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "right_degree": 33
+  },
+  "enumerated_pair_types": 2862209,
+  "elapsed_seconds": 272.1411923999549,
+  "entries": [
+    {
+      "sector": 0,
+      "level": 80,
+      "scaled_diagonal_upper": 1.2772824659012254
+    },
+    {
+      "sector": 0,
+      "level": 84,
+      "scaled_diagonal_upper": 206.6614514748073
+    }
+  ],
+  "shells": [],
+  "proof_scope": [
+    "Every reported diagonal is an upper bound under IEEE-754 binary64 round-to-nearest arithmetic with gradual underflow.",
+    "Sector zero uses a termwise rational-log bound on the absolute locally centered contribution.",
+    "Sector one discards negative determinant contributions; sector two is nonnegative.",
+    "The exact diagonal insertion lemma reduces all higher sectors to sector two for levels at most output_bits/2.",
+    "The shell contraction uses exact accumulator run counts and an outward lower bound on the shell mean."
+  ]
+}

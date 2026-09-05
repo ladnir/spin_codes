@@ -1,0 +1,58 @@
+{
+  "schema": "two-stage-sparse-ea-dual-covariance-small-v1",
+  "status": "EXACT_RATIONAL_SMALL_MODEL",
+  "parameters": {
+    "message_bits": 2,
+    "output_bits": 3,
+    "first_degree": 1,
+    "second_degree": 1
+  },
+  "ensemble_sizes": {
+    "first_maps": 8,
+    "second_maps": 27,
+    "map_pairs": 216
+  },
+  "verified": {
+    "all_shell_laws_of_total_variance": true,
+    "all_shell_dual_covariance_formulas": true
+  },
+  "shells": [
+    {
+      "shell_weight": 0,
+      "direct_mean": "83/54",
+      "direct_variance": "1049/2916",
+      "mean_conditional_variance": "335/1458",
+      "variance_conditional_mean": "379/2916",
+      "dual_variance": "1049/2916"
+    },
+    {
+      "shell_weight": 1,
+      "direct_mean": "47/54",
+      "direct_variance": "2381/2916",
+      "mean_conditional_variance": "1145/1458",
+      "variance_conditional_mean": "91/2916",
+      "dual_variance": "2381/2916"
+    },
+    {
+      "shell_weight": 2,
+      "direct_mean": "73/54",
+      "direct_variance": "2609/2916",
+      "mean_conditional_variance": "1151/1458",
+      "variance_conditional_mean": "307/2916",
+      "dual_variance": "2609/2916"
+    },
+    {
+      "shell_weight": 3,
+      "direct_mean": "13/54",
+      "direct_variance": "749/2916",
+      "mean_conditional_variance": "365/1458",
+      "variance_conditional_mean": "19/2916",
+      "dual_variance": "749/2916"
+    }
+  ],
+  "scope": [
+    "Every map and every message in the stated small ensemble is enumerated.",
+    "All comparisons use exact rational arithmetic.",
+    "The result validates the identity but does not extrapolate its numerical bounds to length 512."
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "ebch32-parityfanout31x33-ba3-b256-bounded-setup-d10-v1",
+  "status": "COMPLETE_BOUNDED_SETUP_AND_DISTANCE_CERTIFICATE",
+  "claim": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "bad_weight_at_most": 209715,
+    "minimum_distance_if_successful_and_good": 209716,
+    "attempts_per_row": 6,
+    "probability_of_setup_abort_or_bad_distance_less_than_2^-45": true,
+    "probability_of_setup_abort_or_bad_distance_less_than_2^-40": true,
+    "combined_margin_bits_lower_display": 45.32393432829412
+  },
+  "exact_bounds": {
+    "rejected_single_draw_upper": {
+      "numerator": 5455803005000483,
+      "denominator": 4611686018427387904,
+      "display_log2_upper": -9.723287023390483,
+      "display_margin_bits": 9.723287023390483
+    },
+    "per_row_abort_upper": {
+      "numerator": 26372547550986317248032997538002750197785482879125775088937983731811536374295623281917258316569,
+      "denominator": 9619630419041620901435312524449124464130795720328478190417063819395928166869436184427311097384012607618805661696,
+      "display_log2_upper": -58.33972214034291,
+      "display_margin_bits": 58.33972214034291
+    },
+    "any_row_abort_union_upper": {
+      "numerator": 26372547550986317248032997538002750197785482879125775088937983731811536374295623281917258316569,
+      "denominator": 1174271291386916613944740298394668513687841274454159935353645485766104512557304221731849499192384351515967488,
+      "display_log2_upper": -45.33972214034291,
+      "display_margin_bits": 45.33972214034291
+    },
+    "conditional_bad_distance_upper": {
+      "numerator": 188342135173135641974238565912994391881054627334935612720631485770160337945280711323668642672023813209108887026201585965334529,
+      "denominator": 762145642166990290864647761179972242614403843424065222377723867096038022172794340849684107193235344521442121855812163792833978437326241529856,
+      "display_log2_upper": -51.84563234887174,
+      "display_margin_bits": 51.84563234887174
+    },
+    "abort_or_bad_distance_upper": {
+      "numerator": 17305104110241462756093576138299877522055187652691843617737917535322499575010348754362857639871468890656218698135380993670905857,
+      "denominator": 762145642166990290864647761179972242614403843424065222377723867096038022172794340849684107193235344521442121855812163792833978437326241529856,
+      "display_log2_upper": -45.32393432829412,
+      "display_margin_bits": 45.32393432829412
+    }
+  },
+  "setup_algorithm": {
+    "row_count": 8192,
+    "attempts_per_row": 6,
+    "draw_law": "For each row and attempt, independently sample ParityFanout-31x33 and two uniform accumulator interleavers.",
+    "exact_acceptance_test": "Enumerate all 2^128 messages of the candidate linear row code; accept exactly when every nonzero output has weight in [24,232].",
+    "selection": "Use the first accepted draw for each row.",
+    "failure": "Return setup failure as soon as a row has no accepted draw in six attempts."
+  },
+  "reasoning": [
+    "Markov's inequality bounds rejection of one unconditioned row draw by the certified expected number of forbidden nonzero words.",
+    "Six independent rejected draws are required for one row to abort.",
+    "A union bound over 8192 rows gives the displayed setup-abort bound.",
+    "Conditioned on no abort, first-success selection gives independent rows with exactly the conditional law used by the distance certificate.",
+    "The unconditional probability of setup abort or a bad accepted code is at most the sum of the abort bound and the conditional distance bound."
+  ],
+  "complexity_scope": {
+    "online_encoding": "O(N) bit operations for the fixed finite construction.",
+    "setup": "Finite and exact but impractical: at most 6*8192*2^128 row-message evaluations. This receipt does not claim linear-time setup."
+  },
+  "dependencies": [
+    {
+      "path": "ebch32_parityfanout31x33_ba3_B256_setup_outward.json",
+      "sha256": "3faa62d0eff91fff311e8aab6673781b769470820ef038f6d450e3e554cb193b"
+    },
+    {
+      "path": "ebch32_parityfanout31x33_ba3_B256_combined_outward_d10.json",
+      "sha256": "345e7b5867f6fe9f16bde4ea496cf891b1124d8d0b286e70520746ef661ee18a"
+    },
+    {
+      "path": "certify_ebch32_parityfanout_ba_bounded_setup_d10.py",
+      "sha256": "f0a50d537c58d0ffd4b34c0992a0f7345a7d185706cb6237ccacedc6959c960a"
+    }
+  ]
+}

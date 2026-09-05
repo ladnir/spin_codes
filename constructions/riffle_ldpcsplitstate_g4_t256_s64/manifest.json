@@ -1,0 +1,33 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_ldpcsplitstate_g4_t256_s64",
+  "display_name": "Riffle LDPCSplitState g=4 t=256 s=64",
+  "status": "PAUSED_PACKET_BRANCH",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_bchperm_transpose_bitshuffle_structuredstepconv",
+  "outer": "fixed binary [256,128] code with a supplied spectrum; independent output-coordinate permutation per outer block",
+  "permutation": "four-block packets followed by packet-position shuffling in each transposed region",
+  "inner": "paired maps A:F2^64->F2^256 and B:F2^256->F2^64 with BA=0; a zero-cost parity-lane wiring gives packet-support distance four; output Y=X+A(Q), pre-state U=Q+B(Y), and next state alpha_i U for nonzero alpha_i in GF(2^64)",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "packet_bits": 4,
+    "step_bits": 256,
+    "state_bits": 64,
+    "epochs": 8192
+  },
+  "proof_status": {
+    "epoch_algebra": "exact invertible two-shear identity",
+    "two_state_transition_shape": "derived; affine im(A) moment is maximized by the zero coset",
+    "constituent_selection": "preferred fixed pair uses degree-7 P with the degree-6 baseline compressor; it has no output-coordinate dependency of size at most three and packet-support distance four; the degree-7 ensemble separately gives an expurgated distance-40 existence bound",
+    "zero_state_activation": "exact split-weight table; fixed B has coordinate distance four and packet-support distance four",
+    "sparse_prefix": "modeled weight-38 late-start margins are positive through four active outer blocks",
+    "one_active_distance": "79.671 modeled aggregate bits at 9% from a deterministic full-support secant moment and d(im(A)) >= 40",
+    "occupation_ladder": "under distinct four-block packet groups, the regular outer spectrum and common three-moment two-state recurrence have positive 9% margin at every tested occupation from 1 through 128; occupation 128 has 9929.636 bits",
+    "shared_packet_groups": "all profiles are positive through occupation 16; all 15 occupation-128 profiles with at least 30 quad groups are positive; pathwise packing fails, while complete one-region packing domination holds in every exact scan but remains unproved",
+    "termination_phase": "the optimized all-quad tilted path measure has expected termination count 123.234 and variance 2.130, so termination is not a uniformly rare perturbation",
+    "end_to_end_distance": "open",
+    "pause_decision": "paused on 2026-08-29; the measured packet route saves about 1 ms gross, while the shared-group proof remains materially harder than the bit-transpose path"
+  },
+  "claim_scope": "The preferred sampled pair has exact BA=0, three-wise independent output coordinates, and packet-support distance four, but its global distance 40 is not certified. The degree-7 ensemble separately proves distance-40 existence. The occupation ladder is conditional on combining those properties and excludes the all-one word. Shared packet groups are exact only through occupation 16; larger packed and mixed profiles are diagnostics rather than a complete profile bound."
+}

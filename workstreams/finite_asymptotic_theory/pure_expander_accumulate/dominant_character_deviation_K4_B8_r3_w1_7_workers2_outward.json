@@ -1,0 +1,91 @@
+{
+  "schema": "pure-ea-dominant-character-deviation-outward-v1",
+  "status": "OUTWARD_ARB_AND_BINARY64_CERTIFICATE",
+  "parameters": {
+    "message_bits": 4,
+    "output_bits": 8,
+    "right_degree": 3,
+    "arb_precision_bits": 512,
+    "shell_workers": 2,
+    "flint_threads_per_worker": 1
+  },
+  "ordered_pair_types": 22,
+  "elapsed_seconds": 0.33407959999749437,
+  "worker_elapsed_seconds": [
+    0.004249399993568659,
+    0.002742899989243597
+  ],
+  "shells": [
+    {
+      "shell_weight": 1,
+      "mean_ratio_lower": 1.2729492187499991,
+      "mean_ratio_upper": 1.272949218750001,
+      "positive_pair_excess_normalized_upper": 11.733398437500021,
+      "variance_to_mean_upper": 5.608745684695067,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 2,
+      "mean_ratio_lower": 0.7470703124999994,
+      "mean_ratio_upper": 0.7470703125000007,
+      "positive_pair_excess_normalized_upper": 2.946189413265312,
+      "variance_to_mean_upper": 7.901400560224113,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 3,
+      "mean_ratio_lower": 0.7569056919642851,
+      "mean_ratio_upper": 0.7569056919642865,
+      "positive_pair_excess_normalized_upper": 2.0674625318877604,
+      "variance_to_mean_upper": 10.560132706663019,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 4,
+      "mean_ratio_lower": 1.1662946428571421,
+      "mean_ratio_upper": 1.166294642857144,
+      "positive_pair_excess_normalized_upper": 1.735338010204086,
+      "variance_to_mean_upper": 7.509593301435432,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 5,
+      "mean_ratio_lower": 0.8569335937499993,
+      "mean_ratio_upper": 0.8569335937500009,
+      "positive_pair_excess_normalized_upper": 2.1710180165816384,
+      "variance_to_mean_upper": 9.867155067155103,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 6,
+      "mean_ratio_lower": 0.7194475446428567,
+      "mean_ratio_upper": 0.7194475446428579,
+      "positive_pair_excess_normalized_upper": 3.473294005102048,
+      "variance_to_mean_upper": 9.448516579406661,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 7,
+      "mean_ratio_lower": 0.9301757812499993,
+      "mean_ratio_upper": 0.9301757812500009,
+      "positive_pair_excess_normalized_upper": 10.204101562500021,
+      "variance_to_mean_upper": 6.485039370078759,
+      "passes_factor_512": true
+    }
+  ],
+  "claim": {
+    "all_requested_shells_pass_factor_512": true,
+    "maximum_variance_to_mean_upper": 10.560132706663019
+  },
+  "proved_reduction": [
+    "For each ordered nonzero distinct pair, retain one row-character bias of maximum absolute value.",
+    "Arb encloses each one-word and correlated-reference ratio and its absolute deviation from one.",
+    "The pair excess over independent marginals is bounded by a sum of nonnegative deviation and likelihood terms; no near-one subtraction occurs in binary64.",
+    "Pairs with a deterministic all-ones marginal have zero covariance. Complement pairs use their exact two-atom support and a likelihood factor 1+abs(beta(x))."
+  ],
+  "scope": [
+    "Arb encloses every reference polynomial evaluation and deviation.",
+    "Binary64 combines only nonnegative upper endpoints and advances each basic operation outward.",
+    "The receipt covers exactly the requested shells and assumes no realized-spectrum complement symmetry."
+  ]
+}

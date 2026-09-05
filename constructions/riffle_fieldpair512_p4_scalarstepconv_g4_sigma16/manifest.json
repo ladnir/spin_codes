@@ -1,0 +1,34 @@
+{
+  "schema": "riffle-construction-model-manifest-v1",
+  "model_id": "riffle_fieldpair512_p4_scalarstepconv_g4_sigma16",
+  "display_name": "Riffle FieldPair512-P4-ScalarStepConv g=4 sigma=16",
+  "status": "ACTIVE_ENTROPY_OPTIMIZATION",
+  "is_construction": false,
+  "parent_candidate_id": "riffle_fieldpair512_p2_scalarstepconv_g4_sigma18",
+  "fixed_parameters": {
+    "data_groups": 4096,
+    "data_map": "(a_i*m_i,b_i*m_i) over GF(2^256), independent by group",
+    "field_parity_symbols": 4,
+    "parity_symbol_code": "extended BCH [128,64,22]",
+    "packet_bits": 4,
+    "packet_positions": 524416,
+    "inner_map": "c_j*(x_j,s_j) over GF(2^20), independent by step",
+    "inner_laps": 1,
+    "state_bits": 16
+  },
+  "setup_entropy_bits": {
+    "outer_maps": 2097152,
+    "inner_maps": 10488320,
+    "global_packet_permutation": 9207527.150867065,
+    "parity_local_permutations": 2864.646888334488,
+    "total": 21795863.7977554
+  },
+  "receipts": [
+    "../riffle_fieldpair512_p2_scalarstepconv_g4_sigma18/receipts/global_pointwise_p4_sigma16.json",
+    "../riffle_fieldpair512_p2_scalarstepconv_g4_sigma18/receipts/global_exact_saddle_p4_sigma16.json",
+    "../riffle_fieldpair512_p2_scalarstepconv_g4_sigma18/receipts/global_pointwise_p5_sigma15.json",
+    "../riffle_fieldpair512_p2_scalarstepconv_g4_sigma18/receipts/global_pointwise_p6_sigma15.json"
+  ],
+  "diagnostic_result": "P4 sigma 16 has central-interval exponent -44.905837. P5 sigma 15 and P6 sigma 15 have positive sampled maxima +87.981540 and +79.371762.",
+  "claim_scope": "The P4 result is diagnostic pending tail and rounding certification. The P5/P6 results identify a robust one-active-block obstruction to sigma 15 in those models."
+}

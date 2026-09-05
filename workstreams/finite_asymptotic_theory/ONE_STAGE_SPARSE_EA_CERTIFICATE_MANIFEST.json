@@ -1,0 +1,103 @@
+{
+  "schema": "one-stage-sparse-ea-certificate-manifest-v1",
+  "status": "COMPLETE_CERTIFICATE_CHAIN_AUDIT",
+  "claim": {
+    "sector_zero_levels": [
+      1,
+      159
+    ],
+    "sector_one_levels": [
+      1,
+      159
+    ],
+    "sector_two_levels": [
+      2,
+      159
+    ],
+    "defect_shells": [
+      [
+        42,
+        79
+      ],
+      [
+        433,
+        470
+      ]
+    ],
+    "central_shells": [
+      80,
+      432
+    ],
+    "cap_support": [
+      42,
+      470
+    ],
+    "bounded_rank_test_attempts": 16,
+    "distance_cutoff": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "overall_margin_bits_lower": 41.3621359294963
+  },
+  "checks": [
+    "complete outward sector-zero level range",
+    "complete outward controlling sector-one and sector-two ranges",
+    "independent sector-two receipt equality",
+    "complete low, central, and high shell ranges",
+    "factor-512 defect-shell gates",
+    "exact small-model likelihood and covariance audit",
+    "exact serial-versus-parallel shell and claim equality, tied to the current local receipt by a semantic hash",
+    "cap-source hashes and frozen-band domination",
+    "transfer-source hashes and end-to-end 40-bit gate"
+  ],
+  "artifacts": [
+    {
+      "role": "sector_zero",
+      "file": "pure_expander_accumulate\\sector_zero_complement_orbits_K256_B512_r33_p1_159_rust20_outward.json",
+      "sha256": "86ead792038c018a8db2b03453408d1043a5be29fcbfadc52bf14ba8253703c9"
+    },
+    {
+      "role": "sectors_one_two",
+      "file": "pure_expander_accumulate\\primal_schur_sectors1_2_K256_B512_r33_p1_159_rust20_outward.json",
+      "sha256": "481f170d213ee8c6b2e641a1da39a761bbfc422bad15886118711a3be834a675"
+    },
+    {
+      "role": "sector_two_mass",
+      "file": "pure_expander_accumulate\\primal_schur_sector2_K256_B512_r33_p2_159_mass_rust20_outward.json",
+      "sha256": "581e5b7310ad83989e5621165b59b08222bd4784ebf039859304c79e96b3ee6c"
+    },
+    {
+      "role": "defect_low",
+      "file": "pure_expander_accumulate\\dominant_character_likelihood_K256_B512_r33_w42_79_outward.json",
+      "sha256": "32660ce2632909cc6a53bcea6fafd096b32aec55c71cb08270ae2a1c0b8d4a33"
+    },
+    {
+      "role": "central",
+      "file": "pure_expander_accumulate\\dominant_character_deviation_K256_B512_r33_w80_432_outward.json",
+      "sha256": "1c664de6a49f328a48267a07d4ec297c07abf65b84b4dccb1be0d16dd7b79baa"
+    },
+    {
+      "role": "defect_high",
+      "file": "pure_expander_accumulate\\dominant_character_likelihood_K256_B512_r33_w433_470_outward.json",
+      "sha256": "3f85caea3a9cbafdd56ea1f500b2c1484a660c7628bbdc2777fa0a08e7cbab09"
+    },
+    {
+      "role": "small_exact",
+      "file": "pure_expander_accumulate\\dominant_character_deviation_K4_B8_r3_all_shells_exact.json",
+      "sha256": "d3837941c07e60bb70f99173b90b244d50d64ee78547120d0ee5821910e7a126"
+    },
+    {
+      "role": "parallel_validation",
+      "file": "pure_expander_accumulate\\dominant_character_deviation_peach_workers8_validation.json",
+      "sha256": "1dccf365c1d3e0a8b30d2b7a85deda3a5b95ab170b8d67afaaf0647750acbc93"
+    },
+    {
+      "role": "caps",
+      "file": "one_stage_sparse_ea_K256_B512_r33_spectrum_caps_outward.json",
+      "sha256": "cc665bd4cb6e6c7b5aa88d32ee373a918399035b851d6b6d8d8bffbd1492d78a"
+    },
+    {
+      "role": "transfer",
+      "file": "one_stage_sparse_ea_K256_B512_r33_randomstepconv_M22_d109_outward.json",
+      "sha256": "6abc12787c9a40a5675346bd98f1a9d7b8a46d68600f0943f2ccabb63df14c6a"
+    }
+  ]
+}

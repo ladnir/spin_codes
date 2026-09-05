@@ -1,0 +1,109 @@
+\section{Experimental Evaluation}\label{sec:eval}
+
+We present concrete experimental results from our implementation. \sectionref{sec:eval_code} reports general code performance, \sectionref{sec:eval_pcg} evaluates its use in PCGs, and \sectionref{sec:eval_zk} covers its use in zero-knowledge protocols.
+
+\paragraph{Implementation.}
+We implement our framework on both CPU and GPU. Its modular design enables easy integration of various code architectures (e.g., BDA-$t$, RA-$t$, Expand-Accumulate codes~\cite{EA}, etc.). Our implementation is incorporated into the \texttt{libOTe} C++ library~\cite{libOTe} as well as a fork of Rust libray \texttt{Plonkish} \cite{plonkish}. On the GPU, we use custom CUDA kernels alongside the Thrust C++ parallel algorithms library. For the permutation step, we rely on Thrust's \texttt{shuffle()}, which employs a Feistel-based bijection. For the Block-Diagonal code, we provide a dedicated CUDA kernel that assigns each block column to a separate thread.
+Since our initial goal was to use these codes for improved PCGs, we compress by $\mathbf{G}$ (from $n$ to $k$) rather than expand by it (from $k$ to $n$). Although $\mathbf{G}$ operates in $\mathbb{F}_2$, for PCG purposes we compress a vector of 128-bit elements by $\mathbf{G}$. %We implement this vector using \texttt{ulonglong2}, a native 128-bit CUDA vector type comprising two 64-bit unsigned integers. 
+For the PCG interactive setup, we use the GPU-optimized AES implementation described in \cite{aesgpu}.
+\stan{Peter, add something about blaze here. I also changed above 'Since our initial goal was to improve PCGs', to explain why we compress rather than expand in 10.1 even though we now do ZK.}\peter{compression vs expansion is an implementation detail. The exact same number of operations is performed in both case (transpose principle).}
+The code will be open-sourced.
+
+\paragraph{Experimental Setting.}
+We conduct our experiments on a commodity laptop, equipped with an upper mid-range 13th~Gen Intel Core i7-13700H CPU running at 2.40\,GHz, and with 32\,GB of RAM. The laptop features a consumer-grade NVIDIA GeForce RTX~4060 GPU with 3072\,CUDA cores and 8\,GB of GDDR6.% We anticipate improved performance on higher-end GPUs, due to the high parallelism of our codes.
+
+\paragraph{Codes and Parameters.} We present our recommended code parameters in \figureref{fig:times} along with their running times and compare them with the state of the art. As discussed before, our most promising code is the Block-Accumulate-$t$ code with $t=3$ iterations, i.e. \textbf{BA-$3$}. We also present our Block-Diagonal code with $t=2$ and $t=3$ iterations (\textbf{BD-}$t$). We compare them to Expand-Accumulate (\textbf{EA}) \cite{EA} and Expand-Convolute (\textbf{EC}) \cite{EC}. These codes have distance bounds that are either via a Markov chain analysis (no enumerator is given) or by conjecture. It is believed that the analytically bounds are not extremely tight and therefore these works \cite{EA,EC} conjecture plausibly tight parameters.
+ We do not implement \textbf{BD} codes on the CPU, as their computational cost makes them unlikely to be competitive on this platform. We also do not implement $\E\C$ codes on the GPU due to the need to implement iterative kernels that perform a two-pass convolution.  See below for discussion.
+
+\figureref{fig:times} includes the bounds on the minimum distance that the respective analysis gives. Due to the probabilistic nature of these bounds, we report the relative minimum distance, i.e. $d\in [0,1]$, such that the minimum distance is $dn$, and the bit security of obtaining this bound, i.e. $\lambda$, such that with probability at least $1-2^{-\lambda}$ the code achieves minimum distance $dn$. A good code will have high minimum distance with probability close to 1. We note that the LPN and Syndrome Decoding do not immediately become insecure if lower than expected minimum distance is obtained. Instead, the attacker must be able to find these low-weight codewords and potentially in large numbers. It is therefore common not to use a large security parameter when bounding the minimum distance. Our recommendation is to set these bounds to a small value. For our aggressive parameters, we choose $\lambda=4$ with $\sigma=8$, while our conservative parameters use $\lambda=20$ with  $\sigma=32$ which gives full distance of $0.11$. However, for $\sigma=32$ if we decrease the required distance to $0.03$ we obtain approximately $\lambda=28$ bits of security. This is a one time failure event when the code is sampled, not a per use failure and therefore lower bit security levels are commonly used. 
+In addition, prior works~\cite{EA,EC} have chosen to be far more aggressive and chosen parameters that give no bounds on the minimum distance. In \figureref{fig:times}, we mark the $\E\C$ code with these parameters with a *. %Therefore, one could consider even our aggressive parameters as conservative by previous standards. 
+
+
+%we provide two sets of parameters. Codes marked with * have aggressively chosen parameter such that they might have small minimum distance with noticeable probability but that these low weight codewords are conjectured to be hard to find. We note that \cite{EC} partially showed that some of these aggressive parameters of \cite{EA} were vulnerable and therefore we generally consider the use of such heuristics undesirable if avoidable. The second set of parameters we consider is that the
+
+\subsection{Code Performance} \label{sec:eval_code}
+
+We present the results of our experiments in \figureref{fig:times}. We show that on both the CPU and GPU, our \textbf{BA-$3$} code achieves the best performance. On the CPU, \textbf{BA-$3$} improves over state-of-the-art \textbf{EC} \cite{EC} $\approx8\times$ (or $\approx3\times$ when \textbf{EC} and our code use aggressive parameters). On the GPU, \textbf{BA-$3$} improves over \textbf{EA} $\approx50\times$ ($\approx20\times$ with more conservative parameters). 
+
+\if\submission
+We chose not to implement \textbf{EC} on the GPU, because it requires the development of a complex iterative prefix sum kernel to implement the convolution properly. Conceptually, the convolution of \textbf{EC} can be implemented using the same prefix sum algorithm as the accumulator \textbf{EA}. For the accumulator we use the GPU-optimized implementation provided with CUDA. However, this implementation cannot support the more complex convolution operation of \textbf{EC} and therefore would have required a custom implementation. However, even just the expander of the \textbf{EC} code is slower than our code and therefore not competitive. 
+\fi
+
+
+
+%On a CPU with AES acceleration, approximately 10GBps can be generated, which far outpaces the time required to multiply. Similarly, on a GPU, PRGs such as ChaCha12~\cite{bernstein2008chacha} can be used to generate the vectors with extremely large throughput, e.g. 300GBps. We therefore conclude in both settings that the multiplication remains the primary bottleneck for high throughput. 
+
+\begin{figure*}[!h]\small
+	\vspace{-0.2cm}
+
+    \centering
+
+\hspace*{-0.04\textwidth} % Shift left slightly
+    
+%    \begin{tabular}{|l|rr|r|r|rr|rr|}
+%    \hline
+%    \diagbox[width=4cm]{$\textbf{Mode}$}{\textbf{Protocol}} &\multicolumn{2}{c|}{\textbf{BA-3}} & \textbf{BB-2} & \textbf{BB-3} & \multicolumn{2}{c|}{\textbf{EA} \cite{EA}}&\multicolumn{2}{c|}{\textbf{EC} \cite{EC}}\\
+%   % \hline
+%    & $\sigma=8$ &  $\sigma=32$ & $\sigma=2048$ & $\sigma=256$ & $w=36$ & $w=78$ & $m=24,w=7$ & $m=24,w=33$\\
+%    \hline \hline
+%    CPU Runtime (ms) & \textbf{21.4} &  30.2 & --~ & --~ & --~ & --~ & 67.1 & 235.6\\
+%    GPU Runtime (ms)  & \textbf{3.2} &  3.3 & 40.0 & 14.3 & 73.0 & 156.0 & --~ & --~\\ \hline
+%  
+%    \end{tabular}
+\begin{tabular}{|l|l||r|r|r|r|}
+\hline
+\textbf{Code} &&Min. Dist. & Bit Sec. & \textbf{CPU (ms)} & \textbf{GPU (ms)} \\
+\hline
+\textbf{[This] BA-3}& $\sigma=8$ & 0.10 & 4 & \textbf{21.4} & \textbf{3.2} \\
+\textbf{[This] BA-3}& $\sigma=32$ &0.10&20& 30.2 & 3.3 \\
+\textbf{[This] BD-3}& $\sigma=256$ &0.05&10& -- & 14.3 \\
+\textbf{[This] BD-2}& $\sigma=2048$&0.05&10& -- & 40.0 \\
+\textbf{\cite{EA} EA$^*$}& $w=36$&0.05& 10& 598.0 & 73.0 \\
+\textbf{\cite{EA} EA}& $w=78$ &0.05&20& 1,211.0 & 156.0 \\
+\textbf{\cite{EC} EC$^*$}& $w=7,m=25$ &--&--& 67.1 & -- \\
+\textbf{\cite{EC} EC}& $w=33,m=25$ &0.05&20& 235.6 & -- \\
+\hline
+\end{tabular}
+    
+    \caption{Comparison of our codes, constructed via various concatenations of Block-Diagonal codes and Accumulators, with state-of-the-art Expand-Accumulate ($\E\A$) \cite{EA} and Expand-Convolute ($\E\C$) \cite{EC} codes on both CPU and GPU, for dimension $k = 2^{20}$. Some uncompetitive configurations are omitted and marked with --. The Block-Diagonal code $\B$ is parameterized by state size $\sigma$, the Expander $\E$ is parameterized by column Hamming weight $w$, and the Convolution $\C$ is parameterized by memory $m$. For each of \textbf{BA-$3$}, $\E\A$, and $\E\C$, we present two parameter sets in the table, where ones with conjectured distance labled with a *.}
+    \label{fig:times}
+	\vspace{-0.2cm}
+    
+\end{figure*}
+
+\subsection{Pseudorandom Correlation Generators} \label{sec:eval_pcg}
+
+As described in \appendixref{sec:application}, a complete PCG protocol consists of (1) an interactive setup phase that yields the initial correlation, and (2) a local encoding by $\mathbf{G}$. Both steps incur nontrivial cost, though the encoding by $\mathbf{G}$ is typically the dominant factor. This is particularly true when applying the recent Stationary Syndrome Decoding optimization of~\cite{structuredlpn}, where the setup is performed once and subsequent vectors are derived via local PRG calls.
+Our implementation shows that the one-time cost of generating the GGM tree is approximately 10 ms (amortized across many invocations), with each subsequent expand costing about 2 ms on the GPU (8 ms on the CPU), consisting of $n$ calls to AES. In the GPU-optimized interactive setup, over 97\% of runtime is spent in GPU-accelerated AES evaluations~\cite{aesgpu}. While~\cite{aesgpu} reports throughput of 100 GB/s, our laptop achieved only about 6 GB/s, suggesting that the 2 ms expand cost could be reduced significantly on higher-end hardware. In our benchmarks, encoding remains the main bottleneck, taking roughly 3 ms compared to 2 ms for AES (versus 21ms and 8ms on the CPU).
+Overall, this translates to a sustained throughput of about 200 million OTs or binary Beaver triples per second on the GPU, excluding the one-time 10 ms GGM seed expansion.
+
+\subsection{Integration: BA vs. RAA in Blaze}  \label{sec:eval_zk}
+
+To evaluate the impact of our new codes, we integrated BA-3 into the binary zero knowledge  Blaze system \cite{blaze}.
+We modified the \texttt{plonkish\_basefold} repository \cite{plonkish} to replace the RAA encoder with our BA-3 code.
+For an overview of the Blaze system, see \appendixref{sec:application}. We compared our BA-3 (rate 1/2) construction against the baseline RAA (rate 1/4) implementation for a polynomial of size $k=2^{20}$.
+The results demonstrate significant improvements in both time and memory. Notably, because BA-3 provides a better native rate, we achieve a 2x speedup in the encoding phase and a halving of total memory usage. We note that \cite{blaze} suggests using puncturing to reduce the rate to 1/2, however, this does not speed up or reduce the memory of the encoding/checking procedure, only compresses the codeword after encoding.
+
+
+\begin{table}[h]\vspace{-0.3cm}
+\centering
+\begin{tabular}{|l|rrc|}
+\hline
+\textbf{Metric} & \textbf{RAA} & \textbf{BA-3} &\  \textbf{Improvement} \\
+\hline
+Encode      & 2,572 & 1,329 & $\sim$1.93$\times$ \\
+Merkelize   & 599  & 319  & $\sim$1.87$\times$ \\
+Batch Open  &\ \  39,828 &\ \  12,022 & $\sim$3.31$\times$ \\
+Verify      & 164     & 102     & $\sim$1.60$\times$ \\
+Proof Size  & 1.2     & 1.6     & $\sim$0.75$\times$ \\
+\hline
+\end{tabular}
+\caption{
+Performance comparison of RAA (rate $1/4$, 400 queries) and BA-3 (rate $1/2$, 800 queries).
+All times are in milliseconds (ms). Proof size is in megabytes (MB).
+}\vspace{-0.4cm}
+\end{table}
+
+While the total proof size is slightly larger (due to the increased query count of 800 in the BA-3 test to maintain the same security margins), the internal steps of the prover show dramatic gains. The Commit/Encoding time, which is the foundational cost of the commitment phase, is reduced by approximately 2x.
+
+In our current benchmarks, ``Open/Batch Open" is the largest cost ($\approx12$ s vs $\approx1.3$ s for encoding). However, this ratio is deceptive for future systems. If we apply PipFri-style optimizations to the opening phase, we can expect the opening time to drop significantly (potentially by 10x). In that future scenario, the 1.3s encoding time of BA-3 versus the 2.5s encoding time of RAA becomes a critical differentiator, representing a much larger percentage of the total proof generation latency. BA-3 provides these benefits natively, making it a more robust and efficient choice for scaling SNARKs to billions of constraints.

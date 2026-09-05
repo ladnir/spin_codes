@@ -1,0 +1,639 @@
+{
+  "schema": "rm2sub-fixed-occupation-rm-holder-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "construction": "one fixed RM(4,9) constituent repeated in every row, uniform routing, and one fixed audited RM2Sub A/B pair",
+  "probability_space": {
+    "outer": "one fixed authenticated RM(4,9) constituent",
+    "routing": "independent uniform row-coordinate and region permutations",
+    "inner": "independent nonzero field scalar in every RM2Sub epoch"
+  },
+  "parameters": {
+    "message_exponent": 16,
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "outer_rows": 256,
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "bad_weight": 13107,
+    "distance_numerator": 100,
+    "distance_denominator": 1000,
+    "step_bits": 64,
+    "state_bits": 14,
+    "persistence_exponent": 20,
+    "epochs_per_region": 4,
+    "occupations": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "log_surprisals": [
+      -8.0,
+      -7.9,
+      -7.8,
+      -7.7,
+      -7.6,
+      -7.5,
+      -7.4,
+      -7.3,
+      -7.2,
+      -7.1,
+      -7.0,
+      -6.9,
+      -6.8,
+      -6.7,
+      -6.6,
+      -6.5,
+      -6.4,
+      -6.3,
+      -6.2,
+      -6.1,
+      -6.0,
+      -5.9,
+      -5.8,
+      -5.7,
+      -5.6,
+      -5.5,
+      -5.4,
+      -5.3,
+      -5.2,
+      -5.1,
+      -5.0,
+      -4.9,
+      -4.8,
+      -4.7,
+      -4.6,
+      -4.5,
+      -4.4,
+      -4.3,
+      -4.2,
+      -4.1,
+      -4.0,
+      -3.9,
+      -3.8,
+      -3.7,
+      -3.6,
+      -3.5,
+      -3.4,
+      -3.3,
+      -3.2,
+      -3.1,
+      -3.0,
+      -2.9,
+      -2.8,
+      -2.7,
+      -2.6,
+      -2.5,
+      -2.4,
+      -2.3,
+      -2.2,
+      -2.1,
+      -2.0,
+      -1.9,
+      -1.8,
+      -1.7,
+      -1.6,
+      -1.5,
+      -1.4,
+      -1.3,
+      -1.2,
+      -1.1,
+      -1.0,
+      -0.9,
+      -0.8,
+      -0.7,
+      -0.6,
+      -0.5,
+      -0.4,
+      -0.3,
+      -0.2,
+      -0.1,
+      0.0
+    ],
+    "candidate_probabilities": [
+      0.5
+    ],
+    "a_minimum_distance": 24,
+    "kernel_minimum_distance": 6,
+    "kernel_weight_four": 0
+  },
+  "comparison_outer_envelopes_not_used_by_holder_bound": [
+    {
+      "candidate_probability": 0.5,
+      "log2_mass": 368.7487413146182,
+      "maximizing_weight": 480
+    }
+  ],
+  "holder_change_of_measure": {
+    "reference": "uniform measure on F_2^512 for each regular row",
+    "density": "exact nonzero, non-all-one RM(4,9) counting measure after a uniform coordinate permutation",
+    "order_grid_size": 1281,
+    "order_grid_minimum": 1.0000009536743164,
+    "order_grid_maximum": 1048577.0,
+    "maximum_log2_density": 368.7487413146182,
+    "maximum_density_weight": 480
+  },
+  "proof_reduction": [
+    "Separate the unique all-one codeword from the other nonzero RM codewords.",
+    "Express each routed non-all-one RM counting measure by its exact density relative to the uniform product measure.",
+    "For fixed Q, sum exactly over the number of rows carrying the all-one codeword.",
+    "A positive two-colour hypergeometric recurrence places ordinary candidate rows and forced all-one rows without overlap in every transposed region.",
+    "Apply Holder across the independent regular-row density factors and the uniform-reference bad event.",
+    "Optimize the Chernoff and Holder witnesses separately for every mixture term before summing positive terms."
+  ],
+  "occupation_rows": [
+    {
+      "occupation": 3,
+      "log2_upper_diagnostic": -82.41355248355406,
+      "margin_bits_diagnostic": 82.41355248355406,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 3,
+      "mixture_rows": [
+        {
+          "regular_rows": 3,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 21.398075622909793,
+          "inner_plus_change_of_measure_log2_upper": -103.81162810646384,
+          "pointwise_log2_upper": -82.41355248355406,
+          "pointwise_margin_bits": 82.41355248355406,
+          "log_surprisal": -4.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 22.983038123631026,
+          "inner_plus_change_of_measure_log2_upper": -3582.181182735527,
+          "pointwise_log2_upper": -3559.1981446118957,
+          "pointwise_margin_bits": 3559.1981446118957,
+          "log_surprisal": -2.5,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 22.983038123631026,
+          "inner_plus_change_of_measure_log2_upper": -4490.755103936678,
+          "pointwise_log2_upper": -4467.772065813047,
+          "pointwise_margin_bits": 4467.772065813047,
+          "log_surprisal": -2.4,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 21.398075622909793,
+          "inner_plus_change_of_measure_log2_upper": -5394.623424160674,
+          "pointwise_log2_upper": -5373.225348537764,
+          "pointwise_margin_bits": 5373.225348537764,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    },
+    {
+      "occupation": 4,
+      "log2_upper_diagnostic": -110.16800888239896,
+      "margin_bits_diagnostic": 110.16800888239896,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 4,
+      "mixture_rows": [
+        {
+          "regular_rows": 4,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 27.381069197604386,
+          "inner_plus_change_of_measure_log2_upper": -137.54907808000334,
+          "pointwise_log2_upper": -110.16800888239896,
+          "pointwise_margin_bits": 110.16800888239896,
+          "log_surprisal": -3.8,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 3,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 29.38106919760423,
+          "inner_plus_change_of_measure_log2_upper": -3505.373150004971,
+          "pointwise_log2_upper": -3475.992080807367,
+          "pointwise_margin_bits": 3475.992080807367,
+          "log_surprisal": -2.5,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 29.966031698325544,
+          "inner_plus_change_of_measure_log2_upper": -4409.612305476211,
+          "pointwise_log2_upper": -4379.646273777885,
+          "pointwise_margin_bits": 4379.646273777885,
+          "log_surprisal": -2.4,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 29.38106919760423,
+          "inner_plus_change_of_measure_log2_upper": -5309.943823517215,
+          "pointwise_log2_upper": -5280.5627543196115,
+          "pointwise_margin_bits": 5280.5627543196115,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 4,
+          "outer_log2_row_choices": 27.381069197604386,
+          "inner_plus_change_of_measure_log2_upper": -6204.710137062647,
+          "pointwise_log2_upper": -6177.329067865042,
+          "pointwise_margin_bits": 6177.329067865042,
+          "log_surprisal": -2.2,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    },
+    {
+      "occupation": 5,
+      "log2_upper_diagnostic": -135.42305019908252,
+      "margin_bits_diagnostic": 135.42305019908252,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 5,
+      "mixture_rows": [
+        {
+          "regular_rows": 5,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 33.03642102621685,
+          "inner_plus_change_of_measure_log2_upper": -168.45947122529938,
+          "pointwise_log2_upper": -135.42305019908252,
+          "pointwise_margin_bits": 135.42305019908252,
+          "log_surprisal": -3.6,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 4,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 35.35834912110444,
+          "inner_plus_change_of_measure_log2_upper": -3422.419927392074,
+          "pointwise_log2_upper": -3387.0615782709697,
+          "pointwise_margin_bits": 3387.0615782709697,
+          "log_surprisal": -2.4,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 3,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 36.35834912110436,
+          "inner_plus_change_of_measure_log2_upper": -4330.025528664731,
+          "pointwise_log2_upper": -4293.667179543627,
+          "pointwise_margin_bits": 4293.667179543627,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 36.35834912110436,
+          "inner_plus_change_of_measure_log2_upper": -5232.29133284563,
+          "pointwise_log2_upper": -5195.932983724526,
+          "pointwise_margin_bits": 5195.932983724526,
+          "log_surprisal": -2.2,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 4,
+          "outer_log2_row_choices": 35.35834912110444,
+          "inner_plus_change_of_measure_log2_upper": -6127.558621485592,
+          "pointwise_log2_upper": -6092.200272364488,
+          "pointwise_margin_bits": 6092.200272364488,
+          "log_surprisal": -2.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 5,
+          "outer_log2_row_choices": 33.03642102621685,
+          "inner_plus_change_of_measure_log2_upper": -7014.1959339541845,
+          "pointwise_log2_upper": -6981.159512927967,
+          "pointwise_margin_bits": 6981.159512927967,
+          "log_surprisal": -2.0,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    },
+    {
+      "occupation": 6,
+      "log2_upper_diagnostic": -166.8472861780172,
+      "margin_bits_diagnostic": 166.8472861780172,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 6,
+      "mixture_rows": [
+        {
+          "regular_rows": 6,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 38.42300207944617,
+          "inner_plus_change_of_measure_log2_upper": -205.2702882574634,
+          "pointwise_log2_upper": -166.8472861780172,
+          "pointwise_margin_bits": 166.8472861780172,
+          "log_surprisal": -3.4,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 5,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 41.00796458016733,
+          "inner_plus_change_of_measure_log2_upper": -3343.6250305416,
+          "pointwise_log2_upper": -3302.617065961432,
+          "pointwise_margin_bits": 3302.617065961432,
+          "log_surprisal": -2.4,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 4,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 42.329892675055,
+          "inner_plus_change_of_measure_log2_upper": -4248.4480219467,
+          "pointwise_log2_upper": -4206.118129271645,
+          "pointwise_margin_bits": 4206.118129271645,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 3,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 42.744930174333604,
+          "inner_plus_change_of_measure_log2_upper": -5148.285316007247,
+          "pointwise_log2_upper": -5105.540385832914,
+          "pointwise_margin_bits": 5105.540385832914,
+          "log_surprisal": -2.2,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 4,
+          "outer_log2_row_choices": 42.329892675055,
+          "inner_plus_change_of_measure_log2_upper": -6040.542674625903,
+          "pointwise_log2_upper": -5998.212781950847,
+          "pointwise_margin_bits": 5998.212781950847,
+          "log_surprisal": -2.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 5,
+          "outer_log2_row_choices": 41.00796458016733,
+          "inner_plus_change_of_measure_log2_upper": -6920.4637422713895,
+          "pointwise_log2_upper": -6879.4557776912225,
+          "pointwise_margin_bits": 6879.4557776912225,
+          "log_surprisal": -2.0,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 6,
+          "outer_log2_row_choices": 38.42300207944617,
+          "inner_plus_change_of_measure_log2_upper": -7770.82445335818,
+          "pointwise_log2_upper": -7732.4014512787335,
+          "pointwise_margin_bits": 7732.4014512787335,
+          "log_surprisal": -1.9,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    },
+    {
+      "occupation": 7,
+      "log2_upper_diagnostic": -174.88425059558648,
+      "margin_bits_diagnostic": 174.88425059558648,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 7,
+      "mixture_rows": [
+        {
+          "regular_rows": 7,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 43.5814314420508,
+          "inner_plus_change_of_measure_log2_upper": -218.4656820376373,
+          "pointwise_log2_upper": -174.88425059558648,
+          "pointwise_margin_bits": 174.88425059558648,
+          "log_surprisal": -3.2,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 6,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 46.38878636410821,
+          "inner_plus_change_of_measure_log2_upper": -3262.7036982645914,
+          "pointwise_log2_upper": -3216.3149119004834,
+          "pointwise_margin_bits": 3216.3149119004834,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 5,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 47.973748864829446,
+          "inner_plus_change_of_measure_log2_upper": -4168.584181154012,
+          "pointwise_log2_upper": -4120.610432289183,
+          "pointwise_margin_bits": 4120.610432289183,
+          "log_surprisal": -2.2,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 4,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 48.7107144589958,
+          "inner_plus_change_of_measure_log2_upper": -5067.568050645102,
+          "pointwise_log2_upper": -5018.857336186105,
+          "pointwise_margin_bits": 5018.857336186105,
+          "log_surprisal": -2.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 3,
+          "all_one_rows": 4,
+          "outer_log2_row_choices": 48.7107144589958,
+          "inner_plus_change_of_measure_log2_upper": -5956.618103675405,
+          "pointwise_log2_upper": -5907.907389216409,
+          "pointwise_margin_bits": 5907.907389216409,
+          "log_surprisal": -2.0,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 5,
+          "outer_log2_row_choices": 47.973748864829446,
+          "inner_plus_change_of_measure_log2_upper": -6830.120267364634,
+          "pointwise_log2_upper": -6782.146518499804,
+          "pointwise_margin_bits": 6782.146518499804,
+          "log_surprisal": -1.9,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 6,
+          "outer_log2_row_choices": 46.38878636410821,
+          "inner_plus_change_of_measure_log2_upper": -7680.593330031773,
+          "pointwise_log2_upper": -7634.204543667664,
+          "pointwise_margin_bits": 7634.204543667664,
+          "log_surprisal": -1.8,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 7,
+          "outer_log2_row_choices": 43.5814314420508,
+          "inner_plus_change_of_measure_log2_upper": -8562.487556312115,
+          "pointwise_log2_upper": -8518.906124870065,
+          "pointwise_margin_bits": 8518.906124870065,
+          "log_surprisal": -1.7,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    },
+    {
+      "occupation": 8,
+      "log2_upper_diagnostic": -217.45823898583632,
+      "margin_bits_diagnostic": 217.45823898583632,
+      "dominant_all_one_rows": 0,
+      "dominant_regular_rows": 8,
+      "mixture_rows": [
+        {
+          "regular_rows": 8,
+          "all_one_rows": 0,
+          "outer_log2_row_choices": 48.54143337411903,
+          "inner_plus_change_of_measure_log2_upper": -265.99967235995535,
+          "pointwise_log2_upper": -217.45823898583632,
+          "pointwise_margin_bits": 217.45823898583632,
+          "log_surprisal": -3.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 7,
+          "all_one_rows": 1,
+          "outer_log2_row_choices": 51.54143337411912,
+          "inner_plus_change_of_measure_log2_upper": -3183.86347919453,
+          "pointwise_log2_upper": -3132.322045820411,
+          "pointwise_margin_bits": 3132.322045820411,
+          "log_surprisal": -2.3,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 6,
+          "all_one_rows": 2,
+          "outer_log2_row_choices": 53.348788296176615,
+          "inner_plus_change_of_measure_log2_upper": -4088.137397027003,
+          "pointwise_log2_upper": -4034.788608730826,
+          "pointwise_margin_bits": 4034.788608730826,
+          "log_surprisal": -2.2,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 5,
+          "all_one_rows": 3,
+          "outer_log2_row_choices": 54.34878829617654,
+          "inner_plus_change_of_measure_log2_upper": -4985.267000101297,
+          "pointwise_log2_upper": -4930.918211805119,
+          "pointwise_margin_bits": 4930.918211805119,
+          "log_surprisal": -2.1,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 4,
+          "all_one_rows": 4,
+          "outer_log2_row_choices": 54.67071639106429,
+          "inner_plus_change_of_measure_log2_upper": -5871.750474500552,
+          "pointwise_log2_upper": -5817.079758109488,
+          "pointwise_margin_bits": 5817.079758109488,
+          "log_surprisal": -2.0,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 3,
+          "all_one_rows": 5,
+          "outer_log2_row_choices": 54.34878829617654,
+          "inner_plus_change_of_measure_log2_upper": -6743.164730168098,
+          "pointwise_log2_upper": -6688.815941871922,
+          "pointwise_margin_bits": 6688.815941871922,
+          "log_surprisal": -1.9,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 2,
+          "all_one_rows": 6,
+          "outer_log2_row_choices": 53.348788296176615,
+          "inner_plus_change_of_measure_log2_upper": -7598.953646607027,
+          "pointwise_log2_upper": -7545.6048583108495,
+          "pointwise_margin_bits": 7545.6048583108495,
+          "log_surprisal": -1.8,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 1,
+          "all_one_rows": 7,
+          "outer_log2_row_choices": 51.54143337411912,
+          "inner_plus_change_of_measure_log2_upper": -8466.532102489184,
+          "pointwise_log2_upper": -8414.990669115065,
+          "pointwise_margin_bits": 8414.990669115065,
+          "log_surprisal": -1.7,
+          "candidate_probability": 0.5,
+          "holder_order": "infinity"
+        },
+        {
+          "regular_rows": 0,
+          "all_one_rows": 8,
+          "outer_log2_row_choices": 48.54143337411903,
+          "inner_plus_change_of_measure_log2_upper": -9277.083543975208,
+          "pointwise_log2_upper": -9228.54211060109,
+          "pointwise_margin_bits": 9228.54211060109,
+          "log_surprisal": -1.6,
+          "candidate_probability": 0.5,
+          "holder_order": 1.0
+        }
+      ]
+    }
+  ],
+  "partial_log2_upper": -82.41355247718242,
+  "partial_margin_bits": 82.41355247718242,
+  "limitations": [
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "The finite tilt and Bernoulli grids are not asserted optimal.",
+    "The finite Holder-order grid is not asserted optimal.",
+    "Only the displayed occupations are covered."
+  ]
+}

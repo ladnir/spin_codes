@@ -1,0 +1,31 @@
+{
+  "schema": "one-stage-sparse-ea-vs-bch-build-v1",
+  "status": "EXACT_CIRCUITS_VERIFIED_BY_GENERATORS",
+  "sparse": {
+    "rows_sha256": "42508e8b7d1d74f52ef3b4b9d884655d113fec81408bc095e0908da995ae2fac",
+    "circuit_sha256": "929e57413cf86e25534aa1a817315f4278253567ef906190f32bbddd32bbf62e",
+    "optimizer_seed": 4,
+    "forward_xors": 8966,
+    "transpose_xors_before_accumulator": 9222,
+    "transpose_xors_with_accumulator": 9733,
+    "schedule_seed": 14,
+    "schedule_peak_live": 1305,
+    "schedule_live_area": 1993956
+  },
+  "bch": {
+    "rows_sha256": "ff5f6eae3ab0e9b974e38f20334f25dc50e412018439bcbead0d53e9985dcb3d",
+    "optimizer_seed": 114,
+    "forward_xors": 2806,
+    "transpose_xors_per_constituent": 2934,
+    "transpose_xors_per_512_to_256_capacity": 5868,
+    "schedule_seed": 4,
+    "schedule_peak_live": 448,
+    "schedule_live_area": 313310
+  },
+  "benchmark": {
+    "input_blocks": 2097152,
+    "output_blocks": 1048576,
+    "packing": "two independent constituent calls per AVX2 vector",
+    "generated_source": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\pure_expander_accumulate\\one_stage_sparse_ea_vs_bch_bench.cpp"
+  }
+}

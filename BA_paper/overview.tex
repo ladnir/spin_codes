@@ -1,0 +1,53 @@
+\section{Technical Overview}\label{sec:overview}
+
+We now provide a high-level overview of our key techniques and improvements. In \sectionref{sec:turbo}, we formally introduce our \emph{enumeration framework}, which enables flexible analysis of the minimum distance of various turbo-like codes and their concatenations. This framework makes it easy to evaluate new code constructions and identify suitable candidates for PCGs. We believe the codes we propose are only a starting point and that further improvements are likely.
+In \sectionref{sec:block} - \ref{sec:banded}, we observe that existing state-of-the-art codes for PCGs are neither constant depth nor amenable to parallel implementations, which limits their ability to exploit modern GPU architectures. Guided by our enumeration framework, we introduce and analyze a novel \emph{Block-Diagonal code} (\sectionref{sec:block}) that is constant depth, highly parallelizable, and therefore well suited for efficient GPU execution.
+In \sectionref{sec:BDA}, we then combine Block-Diagonal codes with Accumulators, again using our framework, to obtain our final construction, which outperforms previous schemes on both CPUs and GPUs. In \sectionref{sec:banded}, we discuss a potential alternative to the Block-Diagonal code, called the Banded-Diagonal code, which offers several potential advantages. Finally, in \sectionref{sec:eval}, we experimentally evaluate the performance of our newly proposed codes.
+
+\medskip
+
+\noindent More specifically:
+
+\begin{itemize}
+    \item \textbf{Turbo-like Codes.} Our work considers turbo-like codes~\cite{turbo,spielman}. Turbo codes can take many forms in general, but we focus on the serial concatenation of subcodes $\G_1, \ldots, \G_t$, where the input $x$ is first multiplied by the matrix $\G_1$, then permuted by a random permutation $\pi_1$, and subsequently multiplied by the next subcode $\G_2$, and so on.
+    I.e., our overall code can be expressed as 
+    $$
+    \G := \G_1 \cdot \pi_1 \cdot \G_2 \cdot... \cdot\pi_{t-1} \cdot\G_t.
+    $$
+    This genre of code is called a serially-concatenated turbo code of depth $t$.
+    Conditioned on each $\G_i$ satisfying certain properties, we next present a generic method for proving the expected minimum distance. Our approach can be viewed as a generalization of \cite{spielman}.
+
+    \item \textbf{Enumeration Framework.} To prove that our codes have linear minimum distance, we present a flexible enumeration framework. We generalize the idea of an \emph{enumerator}  \cite{kahale1998minimum,spielman}, a technique that has been used to prove the distance of various codes. In particular, we introduce new combinatorial techniques to compute the expected minimum distance for families of structured random codes. 
+
+    \medskip
+
+    Essentially, for each step of our code, i.e. for each multiplication by $\G_i$, we track the current expected distribution of $\{\xv \G_1\pi_1\G_2...\pi_{i-1}\G_i \mid  \xv\in \Fbb^k\}$ with respect to some property. Typically, this will be the expected number of codewords with each Hamming weight. However, at times we consider other properties as well. We believe this paradigm is likely to be useful for proving tighter bounds on minimum distance for other codes as well, such as the prior Expand-Accumulate~\cite{EA} and Expand-Convolute codes~\cite{EC}.
+
+
+    \item \textbf{Enumerator Implementation.} Unlike the prior work of \cite{spielman}, we do not use approximations to bound the minimum distance. Instead, we implement that actual enumerator for each component of our codes and directly compute the expected minimum distance. More generally, we compute the whole weight distribution of the codewords in a fine-grained manner, not just the expected minimum distance. This in turn allows us to more accurately compute the security level of LPN in the linear test framework. However, this fine-grained process can be computationally intensive, which required implementing low-level optimizations and a new formulation for how to compose the enumerators from each step.
+
+    \item \textbf{Block-Diagonal Codes.} We give concrete instantiations for the $\G_i$ matrices. The first is referred to as the Block-Diagonal code and is presented in \sectionref{sec:block}. Each $\G_i$ is sampled with $q$ uniformly random submatrices along the diagonal, each having  $\sigma:=O(n/q)$ rows and columns. I.e.,
+    $$
+        \G_i = \left(\begin{matrix}\mathbf{G}_{i,1} & \mathbf{O} &\ldots&\mathbf{O}\\\mathbf{O} &\mathbf{G}_{i,2} & \ldots&\mathbf{O}\\\vdots & \vdots &\ddots&\vdots\\\mathbf{O} & \mathbf{O} &\ldots&\mathbf{G}_{i,q}\end{matrix}\right),
+    $$
+    where $\G_{i,j}\in\Fbb^{O(\sigma)\times O(\sigma)}$. We show that this construction achieves linear minimum distance with good constants with sublinear $\sigma$ and small $t$. Moreover, our construction differs from most turbo codes in that it is based on a ``stateless'' non-recursive convolution. For our purposes, this essentially means that the Block-Diagonal construction is easily implemented on a GPU in a highly parallel manner.
+
+    For constant $t$ we show that this code achieves linear minimum distance using bounding techniques. Via our enumeration techniques we observe that $t$ iterations and a memory size of $\sigma=\sqrt[t]{n}$ is sufficient for full GV distance. For the asymptotic case of $n\rightarrow \infty$ and constant $t$ we show linear minimum distance. We conjecture  $\sigma=\sqrt[t]{n}$ is a general trend for non-constant $t$ given that the distance of $G_i$ does not collapse to 0. However, this case remains open.
+    
+    \item \textbf{Banded-Diagonal Codes.} We give a second code referred to as the Banded-Diagonal construction, where $\G_i$ consists of a band of random values along the diagonal, i.e. no square submatrices. We believe that this construction could offer certain advantages compared to the Block-Diagonal construction and also achieves linear minimum distance. We present this construction at a high level in \sectionref{sec:banded} (and its enumerator in \appendixref{sec:bandedApx}).
+
+    \item \textbf{Block-Accumulate Codes.} Our most promising code can be viewed as a hybrid code between our new Block-Diagonal code and the well-known Repeat-Accumulate code \cite{turbo}. We refer to this code as Block-Accumulate and it achieves both extremely good performance on a CPU and GPU as well as very high minimum distance, essentially the same as a random linear code. This code can be described as
+    $$
+        \G =\G_1 \pi_1 \A  ...\pi_{t-1} \A
+    $$
+    where $\G_1$ is a Block-Diagonal subcode and $\A$ is an accumulator that performs a prefix sum of the input.
+
+    \cite{spielman} proved that when each $\G_i$ has ``constant recursive memory'' such as the accumulator, then a turbo code with a single permutation ($t=2$) must have sublinear minimum distance. On the other hand, two permutations ($t=3$) are sufficient. They focused on the RAA code with rate 1/4. However, our Block-Accumulate codes can achieve full GV minimum distance at rate 1/2 while still being linear time. We demonstrate for concrete parameters we achieve the GV bound while asymptotically we show linear minimum distance assuming $\G_1$ is instantiated with at least constant distance of 5. 
+
+    \item \textbf{Code Implementation.} We implement several variants of our codes in CUDA and our Block-Accumulate Codes on the CPU. We observe significant speedups over prior art in both settings. We perform benchmarking on a laptop equipped with a cost-effective NVIDIA GeForce RTX 4060 GPU. For $k = 2^{20}$, our method compresses data in $\approx3$ms on a GPU and $\approx21$ms on a CPU, achieving a $\approx47\times$ speedup over the state-of-the-art Expand-Accumulate code \cite{EA} on the GPU and $\approx7.8\times$ speedup over the state-of-the-art Expand-Convolute code \cite{EC} on the CPU.
+
+\end{itemize}
+
+
+\paragraph{A note on generalization.}
+Over $\mathbb{F}_p$, our enumerator generalizes essentially ``for free'' for the same reason it works in the binary case: once each stage is sufficiently randomized, weight propagation depends only on whether symbols are zero or nonzero, not on their specific values. Concretely, we replace binary mixing with $\mathbb{F}_p$-linear mixing using uniformly random coefficients (and, where structured components appear, most notably accumulators, we insert inexpensive random \emph{weighters}, i.e., random diagonal scalings in $\mathbb{F}_p^*$, before/after the accumulator, see Rosnes et al. \cite{rosnes2011analysis}). This standard symmetrization prevents value-dependent cancellations and ensures that, conditioned on the input support, nonzero symbols are close to uniformly distributed in $\mathbb{F}_p^*$. With this in place, the analysis carries over by the same composition rules as in the binary setting, with the only quantitative change being the replacement of ``$1/2$'' effects by the corresponding $\mathbb{F}_p$ constants (e.g., uniformity gives $\Pr[\text{symbol}=0]=1/p$ and $\Pr[\text{symbol}\neq 0]=1-1/p$). However, we do not analyze this setting in detail nor prove its linear distance. We leave it to future work.

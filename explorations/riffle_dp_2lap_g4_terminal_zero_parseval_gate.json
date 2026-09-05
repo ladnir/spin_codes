@@ -1,0 +1,619 @@
+{
+  "schema": "riffle-dp-2lap-g4-terminal-zero-parseval-gate-v1",
+  "candidate": "Riffle DP-2Lap g=4",
+  "evidence_label": "DIAGNOSTIC_CONDITIONAL_GATE",
+  "outer_receipt_sha256": "592bc077e577d6f565142f49d5af7004a6ad29b2ffea9cb509dceaaaf9d2c400",
+  "full_character_bias_probe_sha256": "6852b242d4ddd3ba932cd986061a7d722f19a8e8bf6c523bf80f42694a1f54cf",
+  "packet_positions": 524352,
+  "packet_support": 33,
+  "exact_distinctness_probability_numerator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+  "exact_distinctness_probability_denominator": "34608680103696515617857435394947922922475373234733884684182133325626783781225066411118409759751687307289554574839331920390002744555726539497105260096038876209727143936",
+  "exact_contribution_injectivity": true,
+  "collision_rows": [
+    {
+      "packet_value": 1,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 2,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 3,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 4,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 5,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 6,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 7,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 8,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 9,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 10,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 11,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 12,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 13,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 14,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    },
+    {
+      "packet_value": 15,
+      "distinct_contribution_states": 524352,
+      "collision_sum": 524352,
+      "maximum_multiplicity": 1
+    }
+  ],
+  "conditional_theorem": "Suppose B_v is a proved upper bound on every nontrivial full-state character sum for packet value v. Analyze independent uniform packet cells by Fourier inversion and Parseval. Then divide the resulting point-probability bound by the exact probability that all 33 cells are distinct. The displayed rows instantiate B_v with the maxima found by the diagnostic hill search.",
+  "parseval_identity": "Injectivity gives sum_chi |W_v(chi)/M|^2 = 2^64/M. Two copies of the anchor value pay this exact sum; every other factor pays its assumed full-character maximum.",
+  "profile_rows": [
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        0,
+        6,
+        6,
+        3,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t013fb79e0c15f9e9",
+        "terminal-w3-s33-one-i4-t013fb79e0c15f9e9",
+        "terminal-w3-s33-one-i0-t13fb79e0c15f9e90"
+      ],
+      "parseval_anchor_value": 6,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "1721302583005985680392192",
+      "iid_terminal_zero_bound_numerator": "14102632062856271055604932607",
+      "iid_terminal_zero_bound_denominator": "260147644423883314932775312343539161761102954496",
+      "conditioned_terminal_zero_bound_numerator": "26424511377500357957901401730515972081256776569871339149164093123893526478683032779985954170183523649612964291813353166369113956633047441103388672",
+      "conditioned_terminal_zero_bound_denominator": "486955598116673795101777501399941123191591621982542310931002376284975422188401327869694627684706666036397684988886360153733373024150549380959503624714991053001953125",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547237857",
+        "-63.998547237856"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        3,
+        3,
+        3,
+        6,
+        12,
+        3,
+        0,
+        0,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t56e790b14459bed0"
+      ],
+      "parseval_anchor_value": 9,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "83010348331692982272",
+      "iid_terminal_zero_bound_numerator": "680104072111936755458047",
+      "iid_terminal_zero_bound_denominator": "12545700444824619740199426714098146304065536",
+      "conditioned_terminal_zero_bound_numerator": "81571352299088838054268011813187347818064033494340189925774876943957373472324919549689252522917084486611243039360247023318355860484144894327128064",
+      "conditioned_terminal_zero_bound_denominator": "1503210759403645193575052286930253032461000224380891481569616031140576303277238881684709502852790142981923288443953546561524760204986478523831511189337581076658203125",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998546626467",
+        "-63.998546626466"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        9,
+        0,
+        3,
+        6,
+        3,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t014b26c75925b3f7",
+        "terminal-w3-s33-one-i4-t014b26c75925b3f7",
+        "terminal-w3-s33-one-i0-t14b26c75925b3f70"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "5",
+      "nonanchor_bias_product_denominator": "15937986879685052596224",
+      "iid_terminal_zero_bound_numerator": "130579927946411516679380987",
+      "iid_terminal_zero_bound_denominator": "2408774485406326990118289929106844090380582912",
+      "conditioned_terminal_zero_bound_numerator": "31798988618140626556196153156468122084388495547275724319334467558999276154821881988943477313327977009264563630166618385563925783263257326155464704",
+      "conditioned_terminal_zero_bound_denominator": "585997414682776939868240722023657961806830595945093289425443537563275508057228716588954551959562259128546366681541213066357109910418457729629233175504480758697265625",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547221964",
+        "-63.998547221963"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        3,
+        0,
+        6,
+        3,
+        3,
+        0,
+        0,
+        6,
+        3,
+        3,
+        0,
+        6,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i4-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i8-t0013fa47fb3512a5",
+        "terminal-w3-s33-one-i0-t013fa47fb3512a50",
+        "terminal-w3-s33-one-i4-t013fa47fb3512a50",
+        "terminal-w3-s33-one-i0-t13fa47fb3512a500"
+      ],
+      "parseval_anchor_value": 6,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "7968993439842526298112",
+      "iid_terminal_zero_bound_numerator": "65289963540860194112135167",
+      "iid_terminal_zero_bound_denominator": "1204387242703163495059144964553422045190291456",
+      "conditioned_terminal_zero_bound_numerator": "1876140316046627239942322909459346104633949822320060943929737512445180892652207901856298514750402906119142152537176123302474018588276516729915441152",
+      "conditioned_terminal_zero_bound_denominator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547231518",
+        "-63.998547231517"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        0,
+        6,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        6,
+        3,
+        9,
+        3,
+        0,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t15aad8f5346444f7"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "5",
+      "nonanchor_bias_product_denominator": "840479776858391445504",
+      "iid_terminal_zero_bound_numerator": "6886052252952681871532027",
+      "iid_terminal_zero_bound_denominator": "127025217003849274869519195480243731328663552",
+      "conditioned_terminal_zero_bound_numerator": "1876140700413495579996209547623745912689485203959964870139072824552040887820128118416357980432934140603494704592630811983570218296729575695618932736",
+      "conditioned_terminal_zero_bound_denominator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998546935951",
+        "-63.998546935950"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        3,
+        3,
+        0,
+        0,
+        3,
+        3,
+        6,
+        0,
+        0,
+        9,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tadfb2f65b715f54a"
+      ],
+      "parseval_anchor_value": 9,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "83010348331692982272",
+      "iid_terminal_zero_bound_numerator": "680104072111936755458047",
+      "iid_terminal_zero_bound_denominator": "12545700444824619740199426714098146304065536",
+      "conditioned_terminal_zero_bound_numerator": "81571352299088838054268011813187347818064033494340189925774876943957373472324919549689252522917084486611243039360247023318355860484144894327128064",
+      "conditioned_terminal_zero_bound_denominator": "1503210759403645193575052286930253032461000224380891481569616031140576303277238881684709502852790142981923288443953546561524760204986478523831511189337581076658203125",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998546626467",
+        "-63.998546626466"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        3,
+        3,
+        0,
+        0,
+        3,
+        3,
+        9,
+        0,
+        0,
+        6,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t5c222cbcb161bd00"
+      ],
+      "parseval_anchor_value": 9,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "83010348331692982272",
+      "iid_terminal_zero_bound_numerator": "680104072111936755458047",
+      "iid_terminal_zero_bound_denominator": "12545700444824619740199426714098146304065536",
+      "conditioned_terminal_zero_bound_numerator": "81571352299088838054268011813187347818064033494340189925774876943957373472324919549689252522917084486611243039360247023318355860484144894327128064",
+      "conditioned_terminal_zero_bound_denominator": "1503210759403645193575052286930253032461000224380891481569616031140576303277238881684709502852790142981923288443953546561524760204986478523831511189337581076658203125",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998546626467",
+        "-63.998546626466"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        0,
+        3,
+        3,
+        0,
+        9,
+        0,
+        0,
+        3,
+        0,
+        6,
+        3,
+        0,
+        0,
+        3,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tacf2ca0f00000000"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "5",
+      "nonanchor_bias_product_denominator": "15937986879685052596224",
+      "iid_terminal_zero_bound_numerator": "130579927946411516679380987",
+      "iid_terminal_zero_bound_denominator": "2408774485406326990118289929106844090380582912",
+      "conditioned_terminal_zero_bound_numerator": "31798988618140626556196153156468122084388495547275724319334467558999276154821881988943477313327977009264563630166618385563925783263257326155464704",
+      "conditioned_terminal_zero_bound_denominator": "585997414682776939868240722023657961806830595945093289425443537563275508057228716588954551959562259128546366681541213066357109910418457729629233175504480758697265625",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547221964",
+        "-63.998547221963"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6,
+        0,
+        9,
+        0,
+        3,
+        3,
+        9
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t5739d03a129b5831",
+        "terminal-w3-s33-one-i0-t83f66eb300000000"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "1537734375",
+      "nonanchor_bias_product_denominator": "2417851639229258349412352",
+      "iid_terminal_zero_bound_numerator": "6750893412510989473972555187",
+      "iid_terminal_zero_bound_denominator": "121806670274374263599068093205205350545665032192",
+      "conditioned_terminal_zero_bound_numerator": "1918117538238775169884374295304665511249683767428432886231723346348580535218873648379891600387475641408968224716947051704404321260363104818037456896",
+      "conditioned_terminal_zero_bound_denominator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.966623833788",
+        "-63.966623833787"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        0,
+        9,
+        0,
+        3,
+        0,
+        0,
+        9,
+        3,
+        3,
+        0,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t6b16d09000000000"
+      ],
+      "parseval_anchor_value": 1,
+      "nonanchor_bias_product_numerator": "3",
+      "nonanchor_bias_product_denominator": "37778931862957161709568",
+      "iid_terminal_zero_bound_numerator": "103174263205966384780533759",
+      "iid_terminal_zero_bound_denominator": "1903229223037097868735438956331333602276016128",
+      "conditioned_terminal_zero_bound_numerator": "268020044715059488769258365072840488443083861147246266414949990277747946850116525140115388716880814223053824040128765391460211492268656944211820544",
+      "conditioned_terminal_zero_bound_denominator": "4939121066611977064603743228485117106657572165822929153728738388033322139339499182678331223659167612654890804887275938702152783530669858006874965336394909251876953125",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547233856",
+        "-63.998547233855"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        3,
+        3,
+        0,
+        3,
+        0,
+        0,
+        9,
+        3,
+        3,
+        3,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tfaecebffc51f71e0"
+      ],
+      "parseval_anchor_value": 1,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "5312662293228350865408",
+      "iid_terminal_zero_bound_numerator": "43526642456650254791991295",
+      "iid_terminal_zero_bound_denominator": "802924828468775663372763309702281363460194304",
+      "conditioned_terminal_zero_bound_numerator": "375228064037570096446681257010020760816454725461959308180013907391421271895927122737350812732477097052326237283612182090214643892605681046866886656",
+      "conditioned_terminal_zero_bound_denominator": "6914769493256767890445240519879163949320601032152100815220233743246650995075298855749663713122834657716847126842186314183013896942937801209624951470952872952627734375",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547228333",
+        "-63.998547228332"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        0,
+        3,
+        6,
+        0,
+        3,
+        0,
+        0,
+        6,
+        3,
+        3,
+        3,
+        3,
+        0
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-tfbfc4e34c1f4398c"
+      ],
+      "parseval_anchor_value": 1,
+      "nonanchor_bias_product_numerator": "1",
+      "nonanchor_bias_product_denominator": "42501298345826806923264",
+      "iid_terminal_zero_bound_numerator": "348213137635589405274005503",
+      "iid_terminal_zero_bound_denominator": "6423398627750205306982106477618250907681554432",
+      "conditioned_terminal_zero_bound_numerator": "64694493424728947283424566349116029070014608248680710305274068021148345139918547245924422336842455690089568016577184282275873005751886134835675136",
+      "conditioned_terminal_zero_bound_denominator": "1192201636768408256973317331013648956779413971060707037106936852283905343978499802715459260883247354778766746007273502445347223610851345036142233012233253957349609375",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998547236692",
+        "-63.998547236691"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3,
+        6,
+        0,
+        3,
+        9,
+        3,
+        0,
+        3
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t32444f38b60d0000"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "3645",
+      "nonanchor_bias_product_denominator": "4722366482869645213696",
+      "iid_terminal_zero_bound_numerator": "12897133064624025398418241",
+      "iid_terminal_zero_bound_denominator": "237903652879637233591929869541416700284502016",
+      "conditioned_terminal_zero_bound_numerator": "2982815981836016716981649052194283953236424038861982081704845001692261028075731244007540840257756019620743653712158112367360696227601168554000384",
+      "conditioned_terminal_zero_bound_denominator": "54966371170562542849326236247052177657556446996439593125757024986062408545908575959854242552645744496954269688729620939451620802408090629647257165905825699146484375",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998508063403",
+        "-63.998508063402"
+      ]
+    },
+    {
+      "packet_value_counts_1_through_15": [
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        6,
+        6,
+        0,
+        0,
+        3,
+        0,
+        0,
+        3,
+        9
+      ],
+      "family_ids": [
+        "terminal-w3-s33-one-i0-t013f5f6d7a607131",
+        "terminal-w3-s33-one-i4-t013f5f6d7a607131",
+        "terminal-w3-s33-one-i0-t13f5f6d7a6071310"
+      ],
+      "parseval_anchor_value": 15,
+      "nonanchor_bias_product_numerator": "2109375",
+      "nonanchor_bias_product_denominator": "302231454903657293676544",
+      "iid_terminal_zero_bound_numerator": "825596765325119735589938539",
+      "iid_terminal_zero_bound_denominator": "15225833784296782949883511650650668818208129024",
+      "conditioned_terminal_zero_bound_numerator": "1876600963242639953324756631660841238582431228034283501827127234427390321973720337401801728953445022386425309905080518856569210302932853466997456896",
+      "conditioned_terminal_zero_bound_denominator": "34573847466283839452226202599395819746603005160760504076101168716233254975376494278748318565614173288584235634210931570915069484714689006048124757354764364763138671875",
+      "conditioned_terminal_zero_log2_interval": [
+        "-63.998193051264",
+        "-63.998193051263"
+      ]
+    }
+  ],
+  "conditional_aggregate_over_26_words": {
+    "numerator": "68534415573506148733873679575206928213477751811340299900036036369183371031315396257020586235368191871813166009706724382709635077482695812795203584",
+    "denominator": "48490669658182103018550073771943646208419362076802951018374710681954074299265770376926112995251294934900751240127533760049185813064079952381661651268954228279296875",
+    "log2_interval": [
+      "-59.295584244770",
+      "-59.295584244769"
+    ],
+    "below_2^-40": true
+  },
+  "coarse_certificate_target": {
+    "assumed_full_character_caps": {
+      "1": "1/2",
+      "2": "1/2",
+      "3": "1/2",
+      "4": "1/2",
+      "5": "1/2",
+      "6": "1/2",
+      "7": "1/2",
+      "8": "1/2",
+      "9": "1/2",
+      "10": "1/2",
+      "11": "1/2",
+      "12": "1/2",
+      "13": "1/2",
+      "14": "1/2",
+      "15": "5/8"
+    },
+    "aggregate_numerator": "109566352614718294132615051164361380555385665626422964075998376191025664017575910869102880731638418396934534556449395866683518725662003785273421617692672",
+    "aggregate_denominator": "2659526728175679957863554046107370749738692704673884928930859132017942690413576482980639889662628714506479664170071659301159191131899154311394212104212643443318359375",
+    "aggregate_log2_interval": [
+      "-44.464429949134",
+      "-44.464429949133"
+    ],
+    "below_2^-40": true,
+    "interpretation": "It is unnecessary to certify every diagnostic maximum. The coarse caps 5/8 for value 15 and 1/2 for every other nonzero nibble already close the support-33 terminal-zero row."
+  },
+  "scope_limitation": "The contribution-state injectivity, Parseval calculation, and conditioning reduction are exact. The full-character maxima are diagnostic lower bounds on the required caps, not certificates. Therefore the displayed terminal-zero values are proof targets, not rigorous upper bounds."
+}

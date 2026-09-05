@@ -1,0 +1,41 @@
+{
+  "schema": "rm49-exact-q1-randomstepconv-outward-v1",
+  "status": "OUTWARD_Q1_CERTIFICATE",
+  "parameters": {
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "outer": "one fixed RM(4,9) [512,256,32] constituent repeated 4096 times",
+    "outer_rows": 4096,
+    "distance_cutoff": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "inner_memory_bits": 22
+  },
+  "probability_space": {
+    "outer": "fixed deterministic RM(4,9); no outer setup event",
+    "routing": "independent uniform 512-coordinate permutation per row and uniform 4096-position permutation per transposed region",
+    "inner": "independent uniform binary 23-by-23 linear map at each of 2^21 RandomStepConv positions"
+  },
+  "claim": {
+    "occupation": 1,
+    "q1_log2_upper": -26.56089440324074,
+    "q1_margin_bits_lower": 26.56089440324074,
+    "dominant_weight": 32,
+    "dominant_pointwise_log2_upper": -26.560894426538486,
+    "closes_40_bits": false
+  },
+  "sources": [
+    {
+      "file": "scripts/rm512_256_spectrum.csv",
+      "sha256": "995aab561da18f22074b5c6f5413882f492084510aa1cd19b848355f1fcd4ed7"
+    },
+    {
+      "file": "rm49_q1_randomstepconv_M22_d109_diagnostic.json",
+      "sha256": "c56d67a7e1561a55168588fa5b90b057cff59992a47cbb286221ff6110494f25"
+    }
+  ],
+  "scope": [
+    "The bound sums every nonzero RM(4,9) weight shell with outward arithmetic.",
+    "The diagnostic supplies only tilt witnesses; the certificate does not require them to be optimal.",
+    "Only occupation one is certified. No full minimum-distance claim follows from this receipt alone."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "riffle-construction-model-manifest-v1",
+  "model_id": "riffle_outer256model_randomstepconv_g4_sigma20",
+  "display_name": "Riffle Outer256Model-RandomStepConv g=4 sigma=20",
+  "status": "ACTIVE_MODEL_EXPLORATION",
+  "is_construction": false,
+  "parent_candidate_id": "riffle_randomstepconv_g4_sigma20",
+  "fixed_parameters": {
+    "local_input_bits": 128,
+    "local_output_bits": 256,
+    "modeled_minimum_distance": 38,
+    "data_pairs": 8192,
+    "parity_pairs": 1,
+    "packet_bits": 4,
+    "packet_positions": 524352,
+    "inner_laps": 1,
+    "state_bits": 20
+  },
+  "modeled_assumption": "complement-symmetric random-like even spectrum on weights 38 through 218, plus zero and all-one words",
+  "receipts": [
+    "receipts/fixed_rate_outer256_model.json",
+    "receipts/fixed_rate_outer256_distance_sweep.json",
+    "receipts/outer_multiplicity_audit.json"
+  ],
+  "diagnostic_result": "At 9% relative output weight, the baseline modeled first-moment exponent is +4710.17. Increasing only the modeled minimum distance from 38 through 68 has negligible effect.",
+  "claim_scope": "Model only. No explicit [256,128,38] code or certified spectrum is claimed. Numerical first-moment results are floating diagnostics."
+}

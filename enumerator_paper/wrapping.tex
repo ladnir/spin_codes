@@ -1,0 +1,337 @@
+
+
+\section{Wrapping Convolution}
+
+The prior work on Expand-Convolute codes \cite{EC} identified a weakness of random convolutions that makes them \emph{worse} than a simple accumulator for some parameters. Consider a relatively small state size $\sigma$, for example 2, and let us convolute the input
+$
+\xv:=\texttt{10}...\texttt{0}.
+$
+The accumulator maps such an input to $\yv=\texttt{1}...\texttt{1}$. However, due to the random nature of a random convolution, after an expected $2^\sigma$ steps, $\yv$ will transition to a run of zeros and stay in that state. We therefore have $\mathbb{E}_{\C}[\xv\C]\leq 2^\sigma$. More generally, for low weight $\xv$ and small $\sigma$, we would expect there to be a good probability for small weight codewords. Such low weight inputs are also commonly believed to be the primary contributors to the low minimum distance, which will be confirmed by our enumeration based techniques.
+
+The probability of such low-weight codewords can be reduced by adding additional structure to the convolution \cite{EC}. Recall that at each step of the convolution, the next output is computed as
+$$
+\yv_i=\cv_i\cdot \yv_{i-[\sigma]} + \xv_i
+$$
+Consider the convolution in the critical step when $\yv_{i-[\sigma]}=(\texttt{10}...\texttt{0})$ and if the next output is not $\yv_i=1$, then the convolution will terminate. If we focus on the case of low weight $\xv$, then with high probability $\xv_i=0$. Conceptually, our goal is to prevent the convolution from terminating, and therefore it is in our interest to have
+$$
+\yv_i = \yv_{i-\sigma} +\xv.
+$$
+This can be achieved by setting $\cv_{i,1}=1$ for all $i$. For low weight $\xv$, it is less likely to terminate as there is a $\hw{\xv}/k \ll 1$ probability of $\xv_i=1$, which is neccecary to terminate the current run.
+
+The shortcoming of this additional structure is that the enumeration becomes more complex. We must now capture the effect of fixing $\cv_{i,1}=1$ on the pattern and count the resulting number of input-output pairs. Consider the following example with $\sigma = 4$:
+\begin{align*}
+  \xv=&\texttt{ 0\textcolor{blue}{1}\red{0101000}\green{0}\red{101}\textcolor{blue}{1}00\textcolor{blue}{1}\red{00100100101}}\\
+  \yv=&\texttt{ 0\olive{1001}\green{1000}\textcolor{blue}{10000}00\olive{11001110}\textcolor{violet}{1000}}\\
+  \text{ on?}=&\texttt{ 0111111111111000111111111111}%\\
+  %v=&\texttt{ 000000001000000000000000}\\
+  %t_0=&\texttt{ 001100000000000000110001}
+\end{align*}
+
+Compared to the prior section, we define the zones of the pattern differently:
+\begin{itemize}
+
+  \item \textbf{Deadzones:} As before, deadzones are runs of zeros and occur at the very beginning or after terminations. Deadzones are aligned in $\xv$ and $\yv$ and indicate when the convolution is off. Deadzones may be empty.
+
+  \item \textbf{Terminations:} This is the sequence $10^{\sigma}$ in $\yv$ and must have a \blue{1} in $\xv$ that is aligned with the last \blue{0} in $\yv$. For example, $\sigma=4$ we have
+    \begin{align*}
+      \xv=& \texttt{?????\blue{1}?}\\
+      \yv=&\texttt{?\blue{10000}?}
+    \end{align*}
+    After this, the convolution transitions into a deadzone consisting of $\texttt{0}^*$.
+
+  \item \textbf{Near-terminations:} This is the sequence of $\green{10}^{\sigma-1}$ in $\yv$ with the constraint that it must be followed by a $\texttt{1}$ and this training \texttt{1} in $\yv$ must be aligned with a $\green{0}$ in $\xv$. For example, if $\sigma=4$ we must have
+    \begin{align*}
+      \xv=& \texttt{?????\green{0}?}\\
+      \yv=&\texttt{?\green{1000}1?}
+    \end{align*}
+    We do not count the trailing \texttt{1} in $\yv$ as part of the termination pattern but a constraint on what follows.
+
+  \item \textbf{Input Freezones:} These are sequences of \texttt{\red{0}}s and \texttt{\red{1}}s in $\xv$ when the convolution is on. In $x$, freezones start after the first  \texttt{\textcolor{blue}{1}} and end in \texttt{\textcolor{blue}{1}}.
+
+  \item \textbf{Output Freezones:} In $y$, freezones can contain up to $\sigma-2$ consecutive \texttt{\olive{0}}s as they would otherwise turn into either a termination or a near-termination.
+
+  \item \textbf{Trailzone:} This is the sequence $\violet{10}^{\sigma-1}$ at the very end of $\yv$. It is similar to a near termination but since it is at the end, it does not result in the corresponding requirement of having a \green{0} in $\xv$. As a result, we must make it a special case.
+\end{itemize}
+
+\subsection{Peter's Wrapping}
+
+\paragraph{Additonal Constraints.}
+We will add the following constraints to the pattern:
+\begin{itemize}
+  \item There are exactly $r$ run transitions, where the convolution turns on or off. I.e., $r:=\left|\{i\in [n] \mid \qv_{i}\neq \qv_{i-1} \}\right|$ and $\qv_0:=1,\qv_i:=1$ if $\yv_{i-[\sigma]}\neq0^\sigma$ and 0 otherwise.
+  \item There are exactly $t_0$ output freezone zeros. I.e. $t_0:=\left|\{i \in [n] \mid \yv_i=0,\qv_{i+[\sigma]}=1^\sigma,\}\right|$
+  \item There are exactly $v$ near-termination zones. I.e. $v:=|\{ i \mid \yv_{i+[\sigma+1] = \texttt{\green{10}}^{\sigma}\texttt{\green{1}}}\}|$
+  \item There are exactly $d\in\{0,1\}$ trailzones. Note $r$ being odd implies $d=0$.
+\end{itemize}
+
+Given the values of the constraints, we will then enumerate all $(\xv,\yv,\C)$ that are compatible.
+
+\paragraph{Useful quantities.}
+Let us first define useful quantities that are implied by our constraints.
+\begin{itemize}
+  \item $r_0:=\lfloor r/2\rfloor$ terminations $\blue{10}^\sigma$ in $\yv$. Equivalently, there are $r_0$ runs of deadzones not counting the first one.
+  \item $r_1:=\lceil r/2\rceil$ non-zero runs.
+  \item $z:=n-h-(v+d)(\sigma -1)-r_0\sigma -t_0$  deadzones \texttt{0}s. There are $n-h$ zeros in general, $(v+d)(\sigma -1)$ of them are used for near termiations and trailing zones, $r_0\sigma$ used for terminations, and $t_0$ are used in the output freezone.
+  \item $f_0:=n-w-z-v$ input freezone \red{0}s . There are $n-w$ in general, $z$ used in deadzones and $v$ used in near terminations.
+  \item $f_1:=w-r$ input freezone \red{1}s. There are $w$ ones in general and each of the $r$ run transitions must occure at a \blue{1} in $\xv$.
+  \item $t_1:=h-v-r_0-d$ output freezone $\olive{1}$s. $h$ in general, $v$ are used by near terminations, $r_0$ are used for terminations, and $d$ are used for the trailing zone.
+\end{itemize}
+
+\paragraph{Baseline.}
+
+Let us first count place the $t_1$  output freezone $\olive{1}$s  and the $d$ trailzones $\violet{10}^{\sigma-1}$. There is exactly one way to do this. Our example above with $t_1=7,d=1$ would look like
+\begin{align*}
+  x&=\texttt{?\blue{1}???????????????}\\
+  y&=\texttt{?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Near terminations.} Near-terminations can occur before any of the $t_1$ output freezone \texttt{\olive{1}}s or one of the two special cases at the end: (1) before the $d \in \{0,1\}$ trailzones when we finish in an on state, or (2) before the last termination when we finish in a deadzone, i.e. if $1-r_1+r_0=1$. For 2, we only count the position before the last termination as it is not equivalent to being before an output freezone \olive{1}, unlike the other terminations. Each of these configurations results in a different $y$. There are
+$$
+E_1=\mathcal{B}(v,t_1+d+(1-r_1+r_0))
+$$
+different ways of ordering the \olive{1}s, \textcolor{violet}{1000}s and near-terminations. In our example we have
+\begin{align*}
+  x&=\texttt{?\blue{1}???????\green{0}???????????????}\\
+  y&=\texttt{?\olive{1}?\olive{1}?\green{1000}??\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+Note that a zero cannot follow a near termination in $\yv$.
+
+\paragraph{Terminations.} There are exactly $r_0$ terminations in general. However, if the convolution ends in the off state, then clearly the last termination must come right before the last deadzone. Therefore, there are $r_1-1$ terminations that are free to be placed, one for each of the $r_1$ times the convolution is on minus the last (because the last run either does not terminate or the last termination is fixed).
+A termination may come before each of the $t_1$ output freezone \olive{1}s or $v$ near terminations $\green{10}^{\sigma-1}$, or at the very end if (1) there is a trailzone, i.e. $d=1$, or (2) the convolution is in the off state at the end, i.e. $1-r_1+r_0=1$. Therefore, there are
+$$
+E_2=\ballsBins(r_1-1, t_1+v+d+(1-r_1+r_0))
+$$
+such different ways of ordering the terminations for each ordering of the \texttt{\olive{1}}s and near-terminations. In our example, we have
+\begin{align*}
+  x&=\texttt{?\blue{1}???????\green{0}???\blue{1}?\blue{1}?????????????}\\
+  y&=\texttt{?\olive{1}?\olive{1}?\green{1000}\blue{10000}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+All \texttt{1}s in the output are now placed and therefore in our example we can eliminate the \texttt{?} after the near termination, as we know a zero can not follow it. Additionally, the start of each non-zero run in $\xv$ is now known and is depicted above with a \blue{1}.
+
+\paragraph{Deadzones.}
+The $r_0+1$ deadzones can only occur at the beginning or after terminations and each way results in a different $y$. There are $z$ zeros in the deadzones. Therefore, there are
+$$
+E_3=\mathcal{B}(z,r_0+1)
+$$
+such different ways of ordering the \texttt{0}s in the deadzones for each ordering of the \texttt{\olive{1}}s, near-terminations, and terminations. In our example we have
+\begin{align*}
+  x&=\texttt{0\blue{1}???????\green{0}???\blue{1}00\blue{1}?????????????}\\
+  y&=\texttt{0\olive{1}?\olive{1}?\green{1000}\blue{10000}00\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Freezone output zeros.}
+The $t_0$ output freezone {\olive{0}}s can only come after the $t_1$ output freezone {\olive{1}}s and there can be up to $\sigma-2$ consecutive \olive{0}s at a time. Therefore, there are
+$$
+E_4=N(t_0,t_1,\sigma-2)
+$$ such different ways of ordering the \texttt{\olive{0}}s in the freezones for each ordering of the \texttt{\olive{1}}s, near-terminations, terminations, and \texttt{0}s. In our example we have
+\begin{align*}
+  x&=\texttt{0\blue{1}???????\green{0}???\blue{1}00\blue{1}???????????}\\
+  y&=\texttt{0\olive{1001}\green{1000}\blue{10000}00\olive{11001110}\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Freezone inputs.}
+What remains in the ordering of the $f_0+f_1$ input freezone \texttt{\red{0}}s and \texttt{\red{1}}s. Each ordering results in a different $x$. Therefore, there are
+$$
+E_5=\binom{f_0+f_1}{f_0}
+$$
+such different ways of ordering the \texttt{\red{0}}s of $x$ for each. At this stage, we have also completely determined $x$. In our example we have our final input output string
+\begin{align*}
+  x&=\texttt{0\textcolor{blue}{1}\red{010100}\green{0}\red{0101}\textcolor{blue}{1}00\textcolor{blue}{1}\red{00100100101}}\\
+  y&=\texttt{0\olive{1001}\green{1000}\blue{10000}00\olive{11001110}\textcolor{violet}{1000}}\\
+  G&=\texttt{0011111101111000011111111111}
+\end{align*}
+
+\paragraph{Putting it together.}
+Thus, for fixed values of $n,w,h,r,d,v,t_0$, the number of possible consistent $x$ and $y$ is
+\begin{align*}
+  \enum_{w,h,r,d,v,t_0} &= 2^{-g}E_1E_2E_3E_4E_5 P_{w,h,r,d, v, t_0}
+  %&=2^{-g}\binom{v}{t_1+1} \binom{r'-b}{h-v-r'+b} \binom{z}{r'+1} \binom{f_0+f_1}{f_0} \\
+  %&\quad \left(\sum_{i=0}^{t_1+v}(-1)^{i}\binom{t_1+v}{i}\binom{t_0+t_1+v-i(\sigma-1)-1}{t_1+v-1}\right)
+\end{align*}
+where $g:=f_1+f_0$ is the number of times we assumed the result of the convolution times the non-zero state is equal to some value, i.e. the positions where $G_i=1$ in the example above. $P$ is the bounds check predicate which is defined as
+$$
+P_{w,h,r,d, v, t_0} :=
+\begin{cases}
+  0 & \text{if } z<0 \vee f_0 <0 \vee f_1 <0 \vee t1 < 0 \vee h-r_0-d < 0 \vee\\
+  &\quad  k - r - v - f_0 - f_1 < 0 \vee r_1-r_0 -d < 0\\
+  1 & \text{otherwise }
+\end{cases}
+$$
+Unlike the other enumerator, the bounds check is infact required due to prevent intermidiate counts from going negative. A reparameterization may be possible to avoid this issue.
+
+To obtain the enumerator for fixed values of $n,w,h$, we thus need to sum over all possible values of $r,d,v,t_0$.
+Thus, for fixed values of $n,w,h$, the number of possible consistent $x$ and $y$ is
+$$
+\enum_{w,h} = \sum_{r\geq 0}\sum_{d\in \{0, 1\}}\sum_{v\geq 0}\sum_{t_0\geq 0}\mathbb{E}_{n,w,h,r,d,v,t_0}
+$$
+
+\subsection{Srini's Wrapping}
+
+\noindent Let us first describe what $y$ looks like in general:
+\begin{itemize}
+  \item $y$ may begin with a deadzone.
+  \item $y$ may then contain a mixture of freezones, near-terminations, terminations, and deadzones, subject to the following restrictions:
+    \begin{itemize}
+      \item Deadzones only follow terminations.
+      \item Freezones cannot follow freezones. Also, freezones following a termination or a deadzone must begin with a \texttt{\red{1}}.
+    \end{itemize}
+  \item $y$ may end with a trailzone.
+\end{itemize}
+Based on $y$, $x$ then contains:
+\begin{itemize}
+  \item deadzones corresponding to deadzones in $y$
+  \item freezones corresponding to terminations, near-terminations, freezones and a trailzone in $y$, subject to the following restrictions:
+    \begin{itemize}
+      \item freezones corresponding to terminations in $y$ end in \texttt{\textcolor{blue}{1}}
+      \item freezones corresponding to near-terminations in $y$ end in \texttt{\green{0}}
+      \item freezones corresponding to any sequence following a termination or a deadzone in $y$ begin with \texttt{\textcolor{blue}{1}}
+    \end{itemize}
+\end{itemize}
+
+\noindent We will have the independent variables $n,w,h,r,b,d,v$ which represent:
+\begin{itemize}
+  \item the lengths of $x$ and $y$, $n=28$
+  \item the weight of the input $x$, $w=11$
+  \item the weight of the output $y$, $h=10$
+  \item the number of times the convolution turns on, $r=2$
+  \item the indicator of whether the convolution turned off at the end, $b=0$
+  \item the indicator of whether the convolution ends in a trailzone, $d=1$
+  \item the number of near-terminations, $v=1$
+  \item the number of \texttt{\red{0}}s in freezones in $y$, $t_0=5$
+\end{itemize}
+Using these independent parameters, we can define several others as below:
+\begin{itemize}
+  \item the number of terminations, $r'=r+b-1=1$
+  \item the number of \texttt{0}s in deadzones, $z=n-h-(v+d)(\sigma-1)-r'\sigma-t_0=3$
+  \item the number of \texttt{\red{0}}s in freezones in $x$, $f_0=n-w-z-v=13$
+  \item the number of \texttt{\red{1}}s in freezones in $x$, $f_1=w-r-r'=8$
+  \item the number of \texttt{\red{1}}s in freezones in $y$, $t_1=h-2v-r'-d=6$
+\end{itemize}
+All of the above can be argued and summarized using the table below:
+\begin{center}
+  \begin{tabular}{|c|c|c|}\hline
+    \textbf{Property} & \textbf{Input $x$} & \textbf{Output $y$}  \\\hline
+    \texttt{\red{0}}s & $f_0$ & $t_0$ \\\hline
+    \texttt{\textcolor{blue}{0}}s & $-$ & $r'\sigma$ \\\hline
+    \texttt{\green{0}}s & $v$ & $v(\sigma-1)$ \\\hline
+    \texttt{\textcolor{violet}{0}}s & $-$ & $d(\sigma-1)$ \\\hline
+    \texttt{0}s & $z$ & $z$ \\\hline\hline
+    \texttt{\red{1}}s & $f_1$ & $t_1$ \\\hline
+    \texttt{\textcolor{blue}{1}}s & $r+r'$ & $r'$ \\\hline
+    \texttt{\green{1}}s & $-$ & $2v$ \\\hline
+    \texttt{\textcolor{violet}{1}}s & $-$ & $d$ \\\hline
+    \texttt{1}s & $-$ & $-$ \\\hline
+  \end{tabular}
+\end{center}
+
+\noindent Suppose we fix the values of $n,w,h,r,b,d,v,t_0$. We will now describe how to enumerate over all possible $y$ and $x$ consistent with these values. Firstly, if $d=1$, we place a trailzone at the end of $y$. Conceptually, we will build up the pattern and count the number of options. At this stage, we have placed all \texttt{\textcolor{violet}{0}}s and \texttt{\textcolor{violet}{1}}s of the tailzone in $y$ for which there is exactly one way to do it. With respect to our exmaple, at this point we have
+\begin{align*}
+  x&=\texttt{?????}\\
+  y&=\texttt{?\textcolor{violet}{1000}}
+\end{align*}
+where \texttt{?} denodes an undertermined string.
+
+\paragraph{Freezone output ones.}
+Next, we consider the freezone \texttt{\olive{1}}s in $y$. Given the current containts, these will all appear before the tailzone and there is one way to place them, e.g.
+\begin{align*}
+  x&=\texttt{?\blue{1}???????????????}\\
+  y&=\texttt{?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Near terminations.} Near-terminations can occur arbitrarily with respect to the \texttt{\olive{1}}s and each way results in a different $y$. There are
+$$
+E_1=\mathcal{B}(v,t_1+1)
+$$
+such different ways of ordering the \texttt{\olive{1}}s and near-terminations. At this stage, we have also placed all output freezone \texttt{\olive{1}}s, near termination \texttt{\green{0}}s and \texttt{\green{1}}s and trailzone \texttt{\textcolor{violet}{0}}s and \texttt{\textcolor{violet}{1}}s in $y$. In our example we have
+\begin{align*}
+  x&=\texttt{?\blue{1}?????\green{0}???????????????}\\
+  y&=\texttt{?\olive{1}?\green{10001}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Output terminations.}
+Next, consider any fixed ordering of the \texttt{\olive{1}}s and near-terminations in $y$. Terminations can occur \emph{almost} arbitrarily with respect to the \texttt{\olive{1}}s and near-terminations and each way results in a different $y$. The only restriction has to do with $b$. By definition, $b=1$ if and only if there is a termination after the last \texttt{\olive{1}} or near-termination and $d = 0$. Therefore, there are
+$$
+E_2=\mathcal{B}(r'-b,t_1+v+b+d)=\mathcal{B}(r'-b,h-v-r'+b)
+$$
+such different ways of ordering the terminations for each ordering of the \texttt{\olive{1}}s and near-terminations.
+At this stage, we have also placed all \texttt{\textcolor{blue}{0}}s and \texttt{\textcolor{blue}{1}}s in $y$. In out example we have
+\begin{align*}
+  x&=\texttt{?\blue{1}?????\green{0}?????\blue{1}?\blue{1}?????????????}\\
+  y&=\texttt{?\red{1}?\green{10001}?\blue{10000}?\red{1}?\red{1}?\red{1}?\red{1}?\red{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Deadzones.}
+Next, consider any fixed ordering of the \texttt{\red{1}}s, near-terminations, and terminations in $y$. Deadzones can only occur at the beginning or after terminations and each way results in a different $y$. Therefore, there are
+$$
+E_3=\mathcal{B}(z,r'+1)
+$$
+such different ways of ordering the \texttt{0}s in the deadzones for each ordering of the \texttt{\red{1}}s, near-terminations, and terminations. At this stage, we have also placed all \texttt{0}s in $y$. In our example we have
+\begin{align*}
+  x&=\texttt{0\blue{1}?????\green{0}?????\blue{1}00??????????????}\\
+  y&=\texttt{0\red{1}?\green{10001}?\blue{10000}00\red{1}?\red{1}?\red{1}?\red{1}?\red{1}?\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Freezone output zeros.}
+Next, consider any fixed ordering of the \texttt{\red{1}}s, near-terminations, terminations, and \texttt{0}s in $y$. The \texttt{\red{0}}s can only come after \texttt{\red{1}}s or near-terminations and there can be up to $\sigma-2$ of them consecutively and each way results in a different $y$. Therefore, there are$$E_4=N(t_0,t_1+v,\sigma-2)$$such different ways of ordering the \texttt{\red{0}}s in the freezones for each ordering of the \texttt{\red{1}}s, near-terminations, terminations, and \texttt{0}s. At this stage, we have also placed all \texttt{\red{0}}s in $y$ and hence completely determined it. In our example we have
+\begin{align*}
+  x&=\texttt{0\blue{1}??????\green{0}????\blue{1}00????????????}\\
+  y&=\texttt{0\red{100}\green{10001}\blue{10000}00\red{11001110}\textcolor{violet}{1000}}
+\end{align*}
+
+\paragraph{Freezone inputs.}
+Next, consider any fixed $y$. Corresponding to $y$, we can place all the \texttt{\green{0}}s, \texttt{0}s, and \texttt{\textcolor{blue}{1}}s in $x$. The remaining spots can be filled in arbitrarily with \texttt{\red{0}}s and \texttt{\red{1}}s and each way results in a different $x$. Therefore, there are
+$$
+E_5=\binom{f_0+f_1}{f_0}
+$$
+such different ways of ordering the \texttt{\red{0}}s of $x$ for each $y$. At this stage, we have also completely determined $x$. In our example we have our final input output string
+\begin{align*}
+  x&=\texttt{0\textcolor{blue}{1}\red{010100}\green{0}\red{0101}\textcolor{blue}{1}00\textcolor{blue}{1}\red{00100100101}}\\
+  y&=\texttt{0\red{100}\green{10001}\blue{10000}00\red{11001110}\textcolor{violet}{1000}}\\
+  G&=\texttt{0011111101111000011111111111}
+\end{align*}
+
+\paragraph{Putting it together.}
+Thus, for fixed values of $n,w,h,r,b,d,v,t_0$, the number of possible consistent $x$ and $y$ is
+\begin{align*}
+  \mathbb{E}_{w,h,r,b,d,v,t_0} &= 2^{-g}E_1E_2E_3E_4E_5\\
+  &=2^{-g}\binom{v}{t_1+1} \binom{r'-b}{h-v-r'+b} \binom{z}{r'+1} \binom{f_0+f_1}{f_0} \\
+  &\quad \left(\sum_{i=0}^{t_1+v}(-1)^{i}\binom{t_1+v}{i}\binom{t_0+t_1+v-i(\sigma-1)-1}{t_1+v-1}\right)
+\end{align*}
+where $g:=n-z-v-2r-1+b$ is the number of times we assumed the result of the convolution times the non-zero state is equal to some value, i.e. the positions where $G_i=1$ in the example above.
+To obtain the enumerator for fixed values of $n,w,h$, we thus need to sum over all possible values of $r,b,d,v,t_0$. Note that:
+\begin{itemize}
+  \item $r$ can take values from $0$ through $\min\{w,h,\frac{n-h}{\sigma}+1\}$.
+  \item By definition, $b=1\implies d=0$, therefore, $(b, d) \in \{(0,0), (0,1), (1,0)\}$.
+  \item $v$ can take values from $0$ through $\min\{n-w,\frac{h}{2},\frac{n-h}{\sigma-1}\}$.
+  \item $t_0$ can take values from $0$ through $n-h$.
+\end{itemize}
+Thus, for fixed values of $n,w,h$, the number of possible consistent $x$ and $y$ is$$\mathbb{E}_{w,h} = \sum_{r=0}^{\min\{w,h,\frac{n-h}{\sigma}+1\}}\sum_{b, d\in \{0, 1\}:bd\ne 1}\sum_{v=0}^{\min\{n-w,\frac{h}{2},\frac{n-h}{\sigma-1}\}}\sum_{t_0=0}^{n-h}\mathbb{E}_{n,w,h,r,b,d,v,t_0}$$
+
+\subsection{Extended Convolution}\label{sec:extendedconv}
+
+Let $\mathbf{x} \in \{0,1\}^k$ be an input vector, and let $\mathbf{C}$ be a fixed convolution matrix, inducing the linear map $\mathbf{y} = \mathbf{x}\mathbf{C}$.
+We observe a structural issue when $\mathbf{x}$ is low-weight and only non-zero near its tail.
+
+Consider the extreme example $\mathbf{x} = 000\ldots0001$.
+Because the convolution operator receives only a single nonzero input located at the final coordinate, the output $\mathbf{y} = \mathbf{x}\mathbf{C}$ has nonzero support only near the end of the vector.  A subsequent permutation of $\mathbf{y}$ may, with non-negligible probability, place this nonzero entry again among the final coordinates.  In such a case, the composition of convolution and permutation fails to achieve meaningful diffusion, leaving us effectively where we started.
+
+More generally, the same issue arises when only the last $O(1)$ positions of $\mathbf{x}$ are nonzero, e.g., $\mathbf{x} = 000\ldots01111$.
+Then $\mathbf{y} = \mathbf{x}\mathbf{C}$ still exhibits support concentrated near the final coordinates $\mathbf{y} = 000\ldots01???$, and after permutation the support may again lie in the last few positions.
+This degeneracy does not occur when the nonzero entries of $\mathbf{x}$ reside in the middle or beginning of the vector, in which case the convolution naturally spreads support over a larger portion of the output.
+
+\medskip
+\noindent\textbf{Mitigating the issue.}
+We remedy this vulnerability by introducing a so-called \emph{extended convolution}.
+In extended convolution, we increase the convolution horizon beyond the nominal length $k$ by producing $\kappa$ additional output positions.
+This forces the nonzero tail of $\mathbf{x}$ to mix into a region subsequently permuted into substantially different coordinates.
+
+
+Consider the input that has trailing zeros (consider the extension part of the input x)
+
+\paragraph{Baseline.}
+
+Let us first count place the $t_1$  output freezone $\olive{1}$s  and the $d$ trailzones $\violet{10}^{\sigma-1}$. There is exactly one way to do this. Our example above with $t_1=7,d=1$ would look like
+\begin{align*}
+  x&=\texttt{?\blue{1}???????????????000}\\
+  y&=\texttt{?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\olive{1}?\textcolor{violet}{1000}}
+\end{align*}

@@ -1,0 +1,60 @@
+{
+  "schema": "rm2sub-rm49-q30-low-outward-certificate-v1",
+  "status": "OUTWARD_REPRESENTATIVE_COMPOSITION_CERTIFICATE",
+  "claim": {
+    "event": "some message with exactly 30 low-band active rows and no central/high rows encodes to weight at most 13107",
+    "failure_probability_upper_interval": "[1.390330960717271266536928302866126638034012034475339892089512526335470332e-370 +/- 6.78e-443]",
+    "log2_failure_probability_interval": "[-1228.637966758791963569018639592815337463152449972615058655317644995879198551 +/- 4.63e-73]",
+    "margin_bits_lower": 1228.6379667587917
+  },
+  "composition": {
+    "occupation": 30,
+    "low_rows": 30,
+    "central_rows": 0,
+    "high_rows": 0,
+    "row_location_count": "1136256386961591164073024908354848325760"
+  },
+  "change_of_measure": {
+    "low_band": [
+      1,
+      95
+    ],
+    "reference_probability": "1/4",
+    "density_envelope_exact": "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137216/138397436655402013508240408874239671479272730152553831156623828171515257810172871494822791504462830704687683444306656485008537207745704517147202287574217408283209109844541804864876575851706574697379248948694077754100560930795594085338201679080354570022110984016377458803045",
+    "density_envelope_log2_interval": "[119.9667409684632880396646810165629498341127917142278046250707006601785670390 +/- 1.82e-74]",
+    "maximizing_weight": 32
+  },
+  "witness": {
+    "log_surprisal_exact": "-26/10",
+    "binary64_log2_upper": -1228.637966758796,
+    "absolute_log2_delta": 4.320099833421409e-12
+  },
+  "arithmetic": {
+    "library": "python-flint Arb",
+    "precision_bits": 256,
+    "all_certificate_operations": "positive Arb interval arithmetic after exact rational input parsing"
+  },
+  "inputs": {
+    "manifest": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\small_k_replay\\RM2SUB_RM49_Q30_LOW_INPUT_MANIFEST.json",
+    "manifest_sha256": "bb37532000cafc47cae0ac20c7bdeddafe576281935ebcabc4030dc7e5f1b40e",
+    "checker_sha256": "001193c3d558cefdd4632861afeb76f09bed7b343f75ebb7c0421ecc53f0d4df",
+    "files": [
+      {
+        "role": "q1_input_manifest",
+        "path": "RM2SUB_RM49_Q1_INPUT_MANIFEST.json",
+        "sha256": "a06c1f5ecf0e33d17753cb1924a81f78e7238e183e1eec7941ba2d268a4801e5"
+      },
+      {
+        "role": "shared_outward_helpers",
+        "path": "certify_rm2sub_rm49_q1_outward.py",
+        "sha256": "e71d757394cb453209db4875f803f04daabd9d4382ea6de7d988272d9b5da4cd"
+      },
+      {
+        "role": "binary64_composition_witness",
+        "path": "rm2sub_refined_q30_witness_d100.json",
+        "sha256": "48d42f6ea61a5a69b8154c613573f29e7521beb83366ca12069047d8f14e5cda"
+      }
+    ]
+  },
+  "scope": "This receipt validates the refined-band transfer for one dominant composition. It is not an occupation-30 union or an end-to-end certificate."
+}

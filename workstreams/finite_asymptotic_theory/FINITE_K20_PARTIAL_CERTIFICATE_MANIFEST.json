@@ -1,0 +1,170 @@
+{
+  "schema": "spin-finite-k20-partial-certificate-manifest-v1",
+  "status": "PARTIAL_CERTIFICATE_OPEN_Q65_8832",
+  "construction": {
+    "outer": "independent conditioned Golay--BA-3 rows",
+    "outer_bits": 240,
+    "outer_rows": 8832,
+    "message_bits_after_shortening": 1048576,
+    "parent_output_bits": 2119680,
+    "bad_weight_at_most": 233164,
+    "permitted_outer_weights": [
+      23,
+      217
+    ]
+  },
+  "proved_components": [
+    {
+      "occupations": [
+        1,
+        1
+      ],
+      "expected_bad_word_count_upper_hex": "0x1.6f3c66666f370p-47",
+      "integer_margin_bits": 46
+    },
+    {
+      "occupations": [
+        2,
+        64
+      ],
+      "expected_bad_word_count_upper_scaled": {
+        "mantissa_binary64_hex": "0x1.4dc4b8b530941p-1",
+        "binary_exponent": -84
+      },
+      "integer_margin_bits": 84
+    }
+  ],
+  "not_proved": [
+    "occupations 65 through 8832",
+    "efficient exact G_240^23 conditioning",
+    "RM2Sub implementation equivalence and complete source audit",
+    "the final 2^-40 setup-failure theorem",
+    "ordinary encoding and conditioned-setup performance"
+  ],
+  "external_performance_receipt": {
+    "sha256": "4b612e86c267a914b6cb5f6b231579f2ceb8dcfd7aa5981ee0b5807ce4fa01ee",
+    "scope": "transposed online comparison only"
+  },
+  "files": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_INDEPENDENT_SETUP.md",
+      "bytes": 5093,
+      "sha256": "8827a0b76e08899b8e24dd752f9626979ab794af517a7c46f284121c671e8e1f"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_COMPARISON.md",
+      "bytes": 9345,
+      "sha256": "d1f7ab44787093dd716cba7d8d6da0406b030ddd402ddcb7eff3af32688e7c88"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_PROOF_OBLIGATIONS.md",
+      "bytes": 11089,
+      "sha256": "cb7c16054a5059932cf4e2cbde3fd45227511c43e0c4da5fb614ee78ae28b4d8"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_DENSE_TRANSFER_TARGET.md",
+      "bytes": 4854,
+      "sha256": "2394bd337bfe523a880216d73f1c70e4d7f2f54864b481ade3703cd9385e71c5"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_CONDITIONING_WINDOW.md",
+      "bytes": 4309,
+      "sha256": "9fc95056a88d971c3c14daad29cfa4acbed342694ee0e7575a5c53d37239a380"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_TWO_TRACK_DENSE_PLAN.md",
+      "bytes": 7350,
+      "sha256": "8fc84839b1a0c5dc4bd92d1182bbbfd0a1f4b994fc498542c65865322de3a314"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_golay_ba_rm2sub_finite_one_active.py",
+      "bytes": 17370,
+      "sha256": "fed2f68982fd87dca5e5485aa14fb8c2ddd49bb6df9f557c133ce23452f2bdd5"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_q1_outward_w23_217_k20_d11.json",
+      "bytes": 67084,
+      "sha256": "be2fff5d9e9e23922e1c6bac8ef2b64dbf36466edd82c1fc5f46a34aa8629bf8"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_golay_ba_rm2sub_finite_q2_64.py",
+      "bytes": 17548,
+      "sha256": "c7903dbc90706e806774915d9600245930d57f35199352501e8ee504b4a77e8f"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_q2_64_outward_w23_217_k20_d11.json",
+      "bytes": 49822,
+      "sha256": "4ff904d162d8628e92bebeb6bf0192e17399187e60ff7dd6d2614b67797e644b"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/diagnose_finite_k20_conditioning_window.py",
+      "bytes": 4771,
+      "sha256": "ccbe8d730f3ab9735a9e43a657e60f0267d82195816a96ca303afc3888eda24f"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_conditioning_window_diagnostic.json",
+      "bytes": 4323,
+      "sha256": "7dce41f5980f9b5a5eb6e639c4d66d513d9df12943146d203af12e9b83629743"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/diagnose_finite_k20_band_pure.py",
+      "bytes": 6676,
+      "sha256": "0eb268b789aa0b116bcc9e0e46b3dbea1ab96e8d8dcfa295eedd94cb78df7c59"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_band_pure_w23_217_d109_qL_diagnostic.json",
+      "bytes": 6477,
+      "sha256": "ec35ac97fa61b745ae9c0fe2af9de7535950dd1438ec8eeaa1f53804b55ca737"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/diagnose_finite_k20_band_compositions_qL.py",
+      "bytes": 8621,
+      "sha256": "ec8fed180b441c2440f26fb87adbe9bf177c4fe6c45fa9f9ef3f68f36280b43e"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_band_compositions_qL_d109_diagnostic.json",
+      "bytes": 89968,
+      "sha256": "a6481b54c3140cf91aad6bb8854f273e65cad3e237b911fa02cbd027075087be"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/diagnose_finite_k20_qL_column_holder.py",
+      "bytes": 5921,
+      "sha256": "6923f452969afeefa75850c7f27f611f02961e514a457e27d215975f01fbe848"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_qL_column_holder_d11.json",
+      "bytes": 2425,
+      "sha256": "56edf16c11fee6a130a17a4fc9592573e24da8235d42e50de24c25dbd4a428bc"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/diagnose_finite_k20_band_simplex_cover_qL.py",
+      "bytes": 7455,
+      "sha256": "d2a7f51a1a2a774a0fd8b538dc18f18450dbbe3834fde9c730832229fe10202f"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_k20_d11.json",
+      "bytes": 103217,
+      "sha256": "918177cf5fb6f7fa1d2b8749ecc4eebe78f1453d5d2026e64526e6a297f8b85e"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/golay_ba3_rm2sub_finite_B240_bulk_q2_64_k20_d11.json",
+      "bytes": 32172,
+      "sha256": "42238c98552d63d40563adb499a1df2c95fcb1f34860b2fd21a5762cbb91afc8"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_b_kernel_spectrum.json",
+      "bytes": 33046,
+      "sha256": "bf322cfdb00410ff3aee381389ac899fa0060234edb22106f1d033888c60ea3f"
+    },
+    {
+      "path": "constructions/riffle_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s20/receipts/min_state/s19_rm2sub_a_spectrum_audit.json",
+      "bytes": 1441,
+      "sha256": "75b8d8adb7532d373ad1b5fb895159b18c800107f4ecd9b480d1b59808cb2eb5"
+    }
+  ],
+  "reproduce": [
+    "$env:SPIN_LOWER_WEIGHT='23'; $env:SPIN_UPPER_WEIGHT='217'; $env:SPIN_Q1_OUTPUT='golay_ba3_rm2sub_finite_B240_q1_outward_w23_217_k20_d11.json'; python workstreams/finite_asymptotic_theory/certify_golay_ba_rm2sub_finite_one_active.py",
+    "$env:SPIN_LOWER_WEIGHT='23'; $env:SPIN_UPPER_WEIGHT='217'; $env:SPIN_Q2_64_OUTPUT='golay_ba3_rm2sub_finite_B240_q2_64_outward_w23_217_k20_d11.json'; python workstreams/finite_asymptotic_theory/certify_golay_ba_rm2sub_finite_q2_64.py",
+    "python workstreams/finite_asymptotic_theory/build_finite_k20_partial_manifest.py"
+  ]
+}

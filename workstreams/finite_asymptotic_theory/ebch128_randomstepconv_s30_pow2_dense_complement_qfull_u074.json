@@ -1,0 +1,33 @@
+{
+  "schema": "ebch128-randomstepconv-dense-complement-diagnostic-v1",
+  "status": "BINARY64_DIAGNOSTIC_WITH_ANALYTIC_TAIL_CAP",
+  "parameters": {
+    "outer_rows": 16384,
+    "active_message_rows": 16384,
+    "output_bits": 2097152,
+    "distance_cutoff": 230687,
+    "memory_bits": 30,
+    "maximum_inactive_rows": 0,
+    "maximum_exact_region_zeros": 4096,
+    "log_surprisal": 0.74
+  },
+  "method": {
+    "region_transfer": "exact normalized coefficient indexed by the number of noncandidate positions",
+    "pivot_average": "one positive coefficient fugacity after the exact region transfer",
+    "tail": "entrywise row-sum cap for pivot loads beyond the exact complement table",
+    "outer_spectrum": "existing worst-shell uniform-even pointwise majorant"
+  },
+  "occupation_rows": [
+    {
+      "active_outer_rows": 16384,
+      "inactive_outer_rows": 0,
+      "pointwise_log2_upper": 944.8563904368771,
+      "log_pivot_fugacity": 4.84375
+    }
+  ],
+  "limitations": [
+    "Nearest binary64 arithmetic is not an outward certificate.",
+    "The Chernoff witness is fixed across the reported occupations.",
+    "The outer spectrum still uses the pointwise body majorant."
+  ]
+}

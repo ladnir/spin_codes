@@ -1,0 +1,159 @@
+\section{Additional binary expander ensembles}
+\label{app:additional-ensembles}
+
+The main text uses independent entries and region-stratified regular rows.
+This appendix records two intermediate choices.  They are useful for comparing
+the effect of fixing a row or column weight while keeping the rest of the
+sampling rule unchanged.
+
+\subsection{Fixed column degree}
+
+In the fixed-column ensemble, each of the $n$ columns is sampled independently
+and uniformly from the binary vectors of length $k$ and weight $d$.  Fix a
+message whose support has size $r$, and define
+\begin{align}
+ O_{r,d}&:=\sum_{b\geq0}\binom{r}{2b+1}\binom{k-r}{d-2b-1},&
+ Z_{r,d}&:=\sum_{b\geq0}\binom{r}{2b}\binom{k-r}{d-2b}.
+ \label{eq:fixed-column-counts}
+\end{align}
+The first quantity counts columns that meet the message support an odd number
+of times; the second counts those that meet it an even number of times.  Thus
+$O_{r,d}+Z_{r,d}=\binom{k}{d}$.
+
+\begin{lemma}[Fixed-column enumerator]
+\label{lem:fixed-column-enumerator}
+For $0\leq u\leq n$, the expected number of weight-$r$ messages whose
+expanded word has weight $u$ is
+\begin{equation}
+ \binom{k}{r}\binom{n}{u}
+ \left(\frac{O_{r,d}}{\binom{k}{d}}\right)^u
+ \left(\frac{Z_{r,d}}{\binom{k}{d}}\right)^{n-u}.
+ \label{eq:fixed-column-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For a fixed message, one output coordinate is nonzero exactly when the sampled
+column has odd intersection with the message support.  This happens with
+probability $O_{r,d}/\binom{k}{d}$.  The output coordinates are independent,
+so their weight is binomially distributed.  The factor $\binom{k}{r}$ counts
+the messages of the stated weight.
+\end{proof}
+
+The denominators in \eqref{eq:fixed-column-enumerator} are essential: without
+them the expression counts matrices instead of averaging over the ensemble.
+
+\subsection{Fixed row weight}
+
+In the fixed-row ensemble, the $k$ rows are independent and uniform among the
+binary vectors of length $n$ and weight $d$.  Define
+\begin{equation}
+ K_a^{(n)}(j):=\sum_{t\in\mathbb Z}(-1)^t
+   \binom jt\binom{n-j}{a-t}.
+ \label{eq:krawtchouk-definition}
+\end{equation}
+This polynomial is the signed difference between the number of weight-$a$
+vectors that have even and odd intersection with a fixed $j$-coordinate set.
+It is often called a binary Krawtchouk polynomial.
+
+\begin{lemma}[Fixed-row enumerator]
+\label{lem:fixed-row-enumerator}
+For $0\leq u\leq n$, the expected number of weight-$r$ messages whose
+expanded word has weight $u$ is
+\begin{equation}
+ \binom{k}{r}\frac{\binom{n}{u}}{2^n\binom{n}{d}^{r}}
+ \sum_{j=0}^{n}K_d^{(n)}(j)^rK_j^{(n)}(u).
+ \label{eq:fixed-row-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For a fixed message, the expanded word is the binary sum of $r$ independent
+uniform weight-$d$ rows.  The parity character indexed by a weight-$j$ vector
+has expected value $K_d^{(n)}(j)/\binom nd$ on one row.  Fourier inversion on
+the binary vector space gives the probability of each weight-$u$ output.
+Multiplying by the $\binom nu$ outputs and $\binom kr$ messages gives
+\eqref{eq:fixed-row-enumerator}.
+\end{proof}
+
+The alternating sum in \eqref{eq:fixed-row-enumerator} is exact but poorly
+conditioned for numerical work.  The following recurrence uses only
+nonnegative values.  Let $\rho_{0,0}=1$ and $\rho_{0,u}=0$ for $u>0$.  If the
+current sum has weight $u$, adding a uniform weight-$d$ row gives weight
+$v=u+d-2j$, where $j$ is the size of the intersection.  Therefore set
+\begin{align}
+ P_d(u,v)&:=\frac{\binom uj\binom{n-u}{d-j}}{\binom nd},
+ &j&:=\frac{u+d-v}{2},
+ \label{eq:fixed-row-transition}\\
+ \rho_{r+1,v}&:=\sum_{u=0}^{n}\rho_{r,u}P_d(u,v).
+ \label{eq:fixed-row-recurrence}
+\end{align}
+The transition is zero unless $j$ is an integer in the feasible intersection
+range.  Then $\rho_{r,u}$ is the probability that a fixed weight-$r$ message
+expands to weight $u$, and its expected shell count is
+$\binom kr\rho_{r,u}$.
+
+For larger message weights, one may instead compare a weight-$d$ row with an
+independent-entry row of density $d/n$.  Conditioning the latter to have
+weight $d$ costs
+\begin{equation}
+ \vartheta_{n,d}^{-r},\qquad
+ \vartheta_{n,d}:=\binom nd(d/n)^d(1-d/n)^{n-d},
+ \label{eq:fixed-row-conditioning}
+\end{equation}
+for $r$ selected rows.  Dense weights admit a separate Fourier bound.  The
+needed fact is that a hypergeometric intersection count can be represented as
+a sum of independent Bernoulli variables~\cite{HuiPark2014}; Parseval's
+identity and Cauchy--Schwarz then compare the expanded word with a uniform
+word.  This separation avoids paying the conditioning cost through the dense
+range.
+
+\subsection{Certified fixed-row examples}
+
+The positive recurrence, the conditioned comparison, and the dense Fourier
+bound give the following rate-$1/5$ certificates.  Here $k=2^s$, $n=5k$, and
+$L=n/20$.
+
+\begin{theorem}[Fixed-row binary certificates]
+\label{thm:fixed-row-certificates}
+For each EA row of Table~\ref{tab:fixed-row-certificates}, independently
+sample every expander row as a uniform weight-$d$ vector and apply the fixed
+accumulator.  For each EC row, sample the same expander and independently
+sample a wrapped convolution of memory $21$.  The corresponding probability
+of $\Bad_L$ is at most the displayed value $U$.
+\end{theorem}
+
+\begin{table}[tbp]
+\centering
+\caption{Certified fixed-row binary ensembles at relative distance $0.05$.}
+\label{tab:fixed-row-certificates}
+\begin{tabular}{@{}crrrr@{}}
+\toprule
+scheme & $s$ & row weight $d$ & failure bound $U$ & $-\log_2U$\\
+\midrule
+EA & $20$ & $31$ & $3.321605945\cdot10^{-7}$ & $21.521615$\\
+EA & $25$ & $35$ & $2.548539646\cdot10^{-7}$ & $21.903825$\\
+EA & $30$ & $39$ & $2.796467641\cdot10^{-7}$ & $21.769891$\\
+EC, $m=21$ & $20$ & $15$ & $5.160307473\cdot10^{-7}$ & $20.886039$\\
+EC, $m=21$ & $25$ & $17$ & $4.259825504\cdot10^{-7}$ & $21.162702$\\
+EC, $m=21$ & $30$ & $20$ & $4.830790936\cdot10^{-8}$ & $24.303165$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{proof}
+For EA, the verifier evaluates the nonnegative recurrence
+\eqref{eq:fixed-row-recurrence} at small supports.  It applies the conditioning
+factor \eqref{eq:fixed-row-conditioning} at intermediate supports and the
+dense Fourier bound described above at large supports.  For EC, the verifier
+composes the same regional shell calculation with the exact wrapped transfer
+\eqref{eq:ec-exact-enumerator}.  A conditioned Bernoulli comparison and an
+invertibility bound cover the remaining supports.  In every row, the checked
+intervals partition $[1,k]$, and outward-rounded arithmetic gives the
+displayed upper endpoint.  Lemma~\ref{lem:certified-support-partition} and
+Proposition~\ref{prop:certificate-soundness} complete the proof.
+\end{proof}
+
+These values show that fixing the total row weight already removes much of
+the sparse-message loss.  Region stratification improves further by forcing
+each row to spread across the entire word.

@@ -1,0 +1,2300 @@
+{
+  "arithmetic": {
+    "backend": "python-flint Arb",
+    "layered_transition": "Arb matrix exponentiation",
+    "precision_bits": 384,
+    "shell_optimization": "Arb upper evaluation of a valid LP dual threshold. Nearest floats propose thresholds but prove no ordering.",
+    "transition_entries": "exact fmpq"
+  },
+  "claim": {
+    "all_central_output_vectors_covered": true,
+    "central_weight_interval": [
+      13,
+      237
+    ],
+    "fanout_layers": 56,
+    "per_vector_interpretation_requires_uniform_local_coordinate_permutation": true,
+    "pointwise_density_excess_bits_strictly_below": "389/1250",
+    "source_size": 31,
+    "tail_comparison_accepted": true,
+    "tail_expected_count_log2_upper_display": -45.238916408915486,
+    "tail_expected_count_strictly_below_2^-bits": 45,
+    "tail_union_rows": 8576,
+    "target_size": 33
+  },
+  "dominant_shell": {
+    "below_density_target": true,
+    "density_ratio_upper_display": 1.2406957568458759,
+    "dual_marginal_source_weight": 70,
+    "in_central_weight_interval": true,
+    "log2_density_ratio_upper_display": 0.31114938146145804,
+    "multiplicity_upper_binary64_hex": "0x1.d4bc9e152d669p-56",
+    "output_weight": 13
+  },
+  "limitations": [
+    "This receipt certifies the expected spectrum of one independently sampled row-local wrapper.",
+    "An independent uniform local coordinate permutation turns each shell bound into the stated per-vector bound.",
+    "It does not prove concentration for one wrapper reused across rows.",
+    "Implementation equivalence is outside this receipt."
+  ],
+  "parameters": {
+    "exact_nonzero_code_mass": 21267647932558653966460912964485513215,
+    "outer_bits": 250,
+    "outer_dimension": 124,
+    "source_caps": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\shortened_bch250_124_subcode_constant_weight_envelope.json"
+  },
+  "schema": "bch250-124-rowlocal-fanout-spectrum-arb-v1",
+  "shells": [
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 173279228.8469788,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 27.368523486675812,
+      "multiplicity_upper_binary64_hex": "0x1.42c1f99d77d4bp-91",
+      "output_weight": 1
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 15005720.1563022,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 23.83900922280081,
+      "multiplicity_upper_binary64_hex": "0x1.b2fa1f43e39fdp-88",
+      "output_weight": 2
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 15150.998947497821,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 13.887125297280004,
+      "multiplicity_upper_binary64_hex": "0x1.22732a047d2e5p-91",
+      "output_weight": 3
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 3943.7316265331497,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 11.945345663395306,
+      "multiplicity_upper_binary64_hex": "0x1.23c7758a0b1ebp-87",
+      "output_weight": 4
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 797.6865873965389,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 9.63967820987627,
+      "multiplicity_upper_binary64_hex": "0x1.6af4cd48953bap-84",
+      "output_weight": 5
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 24.921579087291722,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 4.639323578547403,
+      "multiplicity_upper_binary64_hex": "0x1.cf0891c9d0186p-84",
+      "output_weight": 6
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 15.141870419092122,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 3.920471521986259,
+      "multiplicity_upper_binary64_hex": "0x1.3272efadd79fcp-79",
+      "output_weight": 7
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 2.5859691132977454,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 1.370705043764454,
+      "multiplicity_upper_binary64_hex": "0x1.8d6d85e12cb50p-77",
+      "output_weight": 8
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 2.441125289518335,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 1.2875463426111315,
+      "multiplicity_upper_binary64_hex": "0x1.3b3ea8f032925p-72",
+      "output_weight": 9
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.4493789555518934,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.5354348521872349,
+      "multiplicity_upper_binary64_hex": "0x1.19ed5676d98e1p-68",
+      "output_weight": 10
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.4487227737390596,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.5347815485064797,
+      "multiplicity_upper_binary64_hex": "0x1.8045a173b8727p-64",
+      "output_weight": 11
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.248062307610472,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.31968996035141733,
+      "multiplicity_upper_binary64_hex": "0x1.9c15a87f3e603p-60",
+      "output_weight": 12
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.2406957568458759,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.31114938146145804,
+      "multiplicity_upper_binary64_hex": "0x1.d4bc9e152d669p-56",
+      "output_weight": 13
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1787773292272525,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.23729121928516161,
+      "multiplicity_upper_binary64_hex": "0x1.d730942899eecp-52",
+      "output_weight": 14
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1640389339034818,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.21913931323769453,
+      "multiplicity_upper_binary64_hex": "0x1.c98b1f2f547dbp-48",
+      "output_weight": 15
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1436311089290165,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.19362176964897482,
+      "multiplicity_upper_binary64_hex": "0x1.9ca5a18f483b7p-44",
+      "output_weight": 16
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1249939933932198,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.16991729857569163,
+      "multiplicity_upper_binary64_hex": "0x1.5d366be2a279ap-40",
+      "output_weight": 17
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1208214027474033,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.16455641025924592,
+      "multiplicity_upper_binary64_hex": "0x1.19798cf3222f5p-36",
+      "output_weight": 18
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1010042203548667,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1388199990324974,
+      "multiplicity_upper_binary64_hex": "0x1.a605fb31e2a02p-33",
+      "output_weight": 19
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.103627432906009,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1422532233710262,
+      "multiplicity_upper_binary64_hex": "0x1.315fbbcfaa6fcp-29",
+      "output_weight": 20
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0845823015247933,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.11713953341270589,
+      "multiplicity_upper_binary64_hex": "0x1.9adb5d8617009p-26",
+      "output_weight": 21
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0896066848632182,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.12380745959095311,
+      "multiplicity_upper_binary64_hex": "0x1.0c875648b8b57p-22",
+      "output_weight": 22
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0726199390472742,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.10113897713651668,
+      "multiplicity_upper_binary64_hex": "0x1.478dfde26e70cp-19",
+      "output_weight": 23
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0777970246421495,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.10808550915339725,
+      "multiplicity_upper_binary64_hex": "0x1.852261d4ec15cp-16",
+      "output_weight": 24
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.06358029480325,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.08892895341297503,
+      "multiplicity_upper_binary64_hex": "0x1.b1ebedacca5a6p-13",
+      "output_weight": 25
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.067786139819542,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.09462272762752788,
+      "multiplicity_upper_binary64_hex": "0x1.d73e140068153p-10",
+      "output_weight": 26
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0565874054669278,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07941211816522915,
+      "multiplicity_upper_binary64_hex": "0x1.e39210e2c19f5p-7",
+      "output_weight": 27
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0593555675568858,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.08318690420514015,
+      "multiplicity_upper_binary64_hex": "0x1.e2ac4b8a613acp-4",
+      "output_weight": 28
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0510845657226702,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07187874697915396,
+      "multiplicity_upper_binary64_hex": "0x1.ca4317ed7bb5ep-1",
+      "output_weight": 29
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0523405041414888,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07360159070654045,
+      "multiplicity_upper_binary64_hex": "0x1.a67cbb0504b32p+2",
+      "output_weight": 30
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0466905007540421,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.06583491023794232,
+      "multiplicity_upper_binary64_hex": "0x1.74c65b4b7ed69p+5",
+      "output_weight": 31
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0465802138330564,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.06568288939035723,
+      "multiplicity_upper_binary64_hex": "0x1.3edd1600d2886p+8",
+      "output_weight": 32
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.04313171991406,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.06092134354158256,
+      "multiplicity_upper_binary64_hex": "0x1.066fbbad6f2cep+11",
+      "output_weight": 33
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0419071599027518,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05922673067290919,
+      "multiplicity_upper_binary64_hex": "0x1.a23fbb69e008ep+13",
+      "output_weight": 34
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0402067874314465,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05687035677655354,
+      "multiplicity_upper_binary64_hex": "0x1.421f650842084p+16",
+      "output_weight": 35
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.038151206562807,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05401658730961863,
+      "multiplicity_upper_binary64_hex": "0x1.dfff1fbb0ca4fp+18",
+      "output_weight": 36
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0377595008083345,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05347214004205049,
+      "multiplicity_upper_binary64_hex": "0x1.5ae4c412503fcp+21",
+      "output_weight": 37
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.038709329142163,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05479198910765538,
+      "multiplicity_upper_binary64_hex": "0x1.e68d6b7b1a847p+23",
+      "output_weight": 38
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0356598046761367,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05055018187876051,
+      "multiplicity_upper_binary64_hex": "0x1.49a2b0f9f5ac2p+26",
+      "output_weight": 39
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0350636662117072,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04971950985309679,
+      "multiplicity_upper_binary64_hex": "0x1.b274e466a2dddp+28",
+      "output_weight": 40
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0337991552414239,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.047955928513402434,
+      "multiplicity_upper_binary64_hex": "0x1.15d18122cbc82p+31",
+      "output_weight": 41
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0323652675039412,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04595350988941957,
+      "multiplicity_upper_binary64_hex": "0x1.5923d15c49f51p+33",
+      "output_weight": 42
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.032097231591057,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04557889026359423,
+      "multiplicity_upper_binary64_hex": "0x1.a145278c0d1c5p+35",
+      "output_weight": 43
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0303030390079957,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0430687340811253,
+      "multiplicity_upper_binary64_hex": "0x1.e9e9d6ba699a3p+37",
+      "output_weight": 44
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.030508257441112,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04335606520867181,
+      "multiplicity_upper_binary64_hex": "0x1.18652b4bde166p+40",
+      "output_weight": 45
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0286744667379364,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.040786500670455125,
+      "multiplicity_upper_binary64_hex": "0x1.37d745a6bd159p+42",
+      "output_weight": 46
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0290181277373418,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04126839774830827,
+      "multiplicity_upper_binary64_hex": "0x1.527e5ce295c76p+44",
+      "output_weight": 47
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0273432624962517,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.038918304692423404,
+      "multiplicity_upper_binary64_hex": "0x1.654dd046967d5p+46",
+      "output_weight": 48
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.027632509659895,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03932443644053391,
+      "multiplicity_upper_binary64_hex": "0x1.7058739452f58p+48",
+      "output_weight": 49
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0262159872795993,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03733440636729583,
+      "multiplicity_upper_binary64_hex": "0x1.71ad4d713be6bp+50",
+      "output_weight": 50
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.026362196978385,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.037539939105919365,
+      "multiplicity_upper_binary64_hex": "0x1.6a7ae35e398f9p+52",
+      "output_weight": 51
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0252281042074525,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0359449323618912,
+      "multiplicity_upper_binary64_hex": "0x1.5a69a059d68bep+54",
+      "output_weight": 52
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.025212112631985,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.035922428934155155,
+      "multiplicity_upper_binary64_hex": "0x1.43880029e93f7p+56",
+      "output_weight": 53
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0243350562949687,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.034687692867171,
+      "multiplicity_upper_binary64_hex": "0x1.26d1ef0fc3815p+58",
+      "output_weight": 54
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0241767947834155,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03446477680425871,
+      "multiplicity_upper_binary64_hex": "0x1.069e0667c9020p+60",
+      "output_weight": 55
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0235062473381513,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03351990839577662,
+      "multiplicity_upper_binary64_hex": "0x1.c8efa3b1248a8p+61",
+      "output_weight": 56
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0232415209285908,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.033146711965501764,
+      "multiplicity_upper_binary64_hex": "0x1.84b228fe49f16p+63",
+      "output_weight": 57
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0227208431081238,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03241240781708795,
+      "multiplicity_upper_binary64_hex": "0x1.4330b59926680p+65",
+      "output_weight": 58
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.022386389591383,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.031940535803145036,
+      "multiplicity_upper_binary64_hex": "0x1.06d93576de65fp+67",
+      "output_weight": 59
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0219647952991897,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03134549909151551,
+      "multiplicity_upper_binary64_hex": "0x1.a231d36ae125ep+68",
+      "output_weight": 60
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0215907410758056,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03081735471812224,
+      "multiplicity_upper_binary64_hex": "0x1.4586300ffb4d1p+70",
+      "output_weight": 61
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0212287261912383,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.030306025065620447,
+      "multiplicity_upper_binary64_hex": "0x1.effc6bc1d309ap+71",
+      "output_weight": 62
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0208363511034817,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.029751608258305744,
+      "multiplicity_upper_binary64_hex": "0x1.71e10fc4dbb23p+73",
+      "output_weight": 63
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0205064339897782,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.029285278162778306,
+      "multiplicity_upper_binary64_hex": "0x1.0e190bf62caa4p+75",
+      "output_weight": 64
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.020108964093097,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02872326353068713,
+      "multiplicity_upper_binary64_hex": "0x1.824c12d2a0ca0p+76",
+      "output_weight": 65
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0197938485848568,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.028277540742487478,
+      "multiplicity_upper_binary64_hex": "0x1.0e9df67e99023p+78",
+      "output_weight": 66
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0193984651223078,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.027718086134913156,
+      "multiplicity_upper_binary64_hex": "0x1.737311291252fp+79",
+      "output_weight": 67
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0190883123423196,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.027279078253178133,
+      "multiplicity_upper_binary64_hex": "0x1.f3aa7dbc2f0a8p+80",
+      "output_weight": 68
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.01869825427757,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.026726778172528373,
+      "multiplicity_upper_binary64_hex": "0x1.495d203ce142ap+82",
+      "output_weight": 69
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0183579874057962,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.026244806862156668,
+      "multiplicity_upper_binary64_hex": "0x1.a9ad963cd3f4fp+83",
+      "output_weight": 70
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0180043348354622,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02574370466735037,
+      "multiplicity_upper_binary64_hex": "0x1.0db3c7d9406a5p+85",
+      "output_weight": 71
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0176578486584014,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.025252587920905227,
+      "multiplicity_upper_binary64_hex": "0x1.4f240b35dace0p+86",
+      "output_weight": 72
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0173144447195637,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02476567498759596,
+      "multiplicity_upper_binary64_hex": "0x1.98755bef4ad3dp+87",
+      "output_weight": 73
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0169702184619864,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.024277431106610972,
+      "multiplicity_upper_binary64_hex": "0x1.e85433f3141c6p+88",
+      "output_weight": 74
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0166273792907976,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.023790990350259687,
+      "multiplicity_upper_binary64_hex": "0x1.1e63c499a4fa3p+90",
+      "output_weight": 75
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0162845849083406,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.023304449103996087,
+      "multiplicity_upper_binary64_hex": "0x1.499d23af11becp+91",
+      "output_weight": 76
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0159425296306053,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.022818793289222143,
+      "multiplicity_upper_binary64_hex": "0x1.744ba3d83d0bbp+92",
+      "output_weight": 77
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0156008082214292,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.022333448204184692,
+      "multiplicity_upper_binary64_hex": "0x1.9cba2d8ea9235p+93",
+      "output_weight": 78
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.01525959918528,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.021848667874433028,
+      "multiplicity_upper_binary64_hex": "0x1.c125a6e263fcbp+94",
+      "output_weight": 79
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0149188020248672,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.021364310068634713,
+      "multiplicity_upper_binary64_hex": "0x1.dfdd63f7c25ddp+95",
+      "output_weight": 80
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0145784448073603,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02088041517772241,
+      "multiplicity_upper_binary64_hex": "0x1.f7649932200dbp+96",
+      "output_weight": 81
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0142385106608938,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.020396959722952343,
+      "multiplicity_upper_binary64_hex": "0x1.0348833e7238ep+98",
+      "output_weight": 82
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.013898994468149,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01991393691911264,
+      "multiplicity_upper_binary64_hex": "0x1.0651be11c6055p+99",
+      "output_weight": 83
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.013559895993291,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01943134691946941,
+      "multiplicity_upper_binary64_hex": "0x1.04abb121dafe0p+100",
+      "output_weight": 84
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0132212076710794,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.018949179440676187,
+      "multiplicity_upper_binary64_hex": "0x1.fce78542394f0p+100",
+      "output_weight": 85
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.012882929869797,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.018467435485027404,
+      "multiplicity_upper_binary64_hex": "0x1.e807b8ba83a04p+101",
+      "output_weight": 86
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0125450576213804,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01798610845214677,
+      "multiplicity_upper_binary64_hex": "0x1.cbd43a3960863p+102",
+      "output_weight": 87
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0122075898846532,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01750519732915696,
+      "multiplicity_upper_binary64_hex": "0x1.a9b8f1883d00bp+103",
+      "output_weight": 88
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0118705236210261,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.017024698253319762,
+      "multiplicity_upper_binary64_hex": "0x1.835383a0eb3f5p+104",
+      "output_weight": 89
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.011533857024129,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.016544609113546507,
+      "multiplicity_upper_binary64_hex": "0x1.5a5397253cb2dp+105",
+      "output_weight": 90
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0111975879319255,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.016064927287859358,
+      "multiplicity_upper_binary64_hex": "0x1.305c961568efcp+106",
+      "output_weight": 91
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0108617143653877,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.015585650411344926,
+      "multiplicity_upper_binary64_hex": "0x1.06ebbac65b3b2p+107",
+      "output_weight": 92
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.01052623447576,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.015106776301300652,
+      "multiplicity_upper_binary64_hex": "0x1.be88d0f3d0bb5p+107",
+      "output_weight": 93
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0101911463547586,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.014628302686487647,
+      "multiplicity_upper_binary64_hex": "0x1.74c7b50197b0dp+108",
+      "output_weight": 94
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0098564482597268,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.014150227528651272,
+      "multiplicity_upper_binary64_hex": "0x1.31f87e62ca460p+109",
+      "output_weight": 95
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.009522138400806,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.013672548718766433,
+      "multiplicity_upper_binary64_hex": "0x1.edda037e25cd9p+109",
+      "output_weight": 96
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0091882150897635,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01319526428968638,
+      "multiplicity_upper_binary64_hex": "0x1.87e59929ab5c3p+110",
+      "output_weight": 97
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0088546766374786,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.012718372269787963,
+      "multiplicity_upper_binary64_hex": "0x1.31d181d35c58fp+111",
+      "output_weight": 98
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0085215214053662,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.012241870756534524,
+      "multiplicity_upper_binary64_hex": "0x1.d5626088d4295p+111",
+      "output_weight": 99
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0081887477795235,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0117657578796033,
+      "multiplicity_upper_binary64_hex": "0x1.6244a8e282080p+112",
+      "output_weight": 100
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0078563541728143,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.011290031803928312,
+      "multiplicity_upper_binary64_hex": "0x1.06fbd4b3783ebp+113",
+      "output_weight": 101
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0075243390288078,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.010814690735407445,
+      "multiplicity_upper_binary64_hex": "0x1.800932c81acfep+113",
+      "output_weight": 102
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.007192700810729,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.010339732905149888,
+      "multiplicity_upper_binary64_hex": "0x1.13d188a08625ep+114",
+      "output_weight": 103
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0068614380096534,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.009865156581265869,
+      "multiplicity_upper_binary64_hex": "0x1.85bb08f111999p+114",
+      "output_weight": 104
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0065305491355154,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.009390960056048727,
+      "multiplicity_upper_binary64_hex": "0x1.0eddd4267072cp+115",
+      "output_weight": 105
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.006200032721487,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.008917141652298783,
+      "multiplicity_upper_binary64_hex": "0x1.72673da5b89eap+115",
+      "output_weight": 106
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0058698873198235,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.008443699717420997,
+      "multiplicity_upper_binary64_hex": "0x1.f252b6f3bf0dfp+115",
+      "output_weight": 107
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0055401115024272,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007970632624283006,
+      "multiplicity_upper_binary64_hex": "0x1.49ccd947dacf9p+116",
+      "output_weight": 108
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.005210703859876,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007497938769868123,
+      "multiplicity_upper_binary64_hex": "0x1.ad81d82f48462p+116",
+      "output_weight": 109
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.00488166300019,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007025616573549743,
+      "multiplicity_upper_binary64_hex": "0x1.132f59de9780cp+117",
+      "output_weight": 110
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0045529875490158,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0065536644774017785,
+      "multiplicity_upper_binary64_hex": "0x1.5af773fc70283p+117",
+      "output_weight": 111
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.004224676148156,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.006082080944126574,
+      "multiplicity_upper_binary64_hex": "0x1.ae7838d59d3a2p+117",
+      "output_weight": 112
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0038967274557522,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.00561086445736038,
+      "multiplicity_upper_binary64_hex": "0x1.06c46d141c331p+118",
+      "output_weight": 113
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.003569140145235,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.005140013520201969,
+      "multiplicity_upper_binary64_hex": "0x1.3badbf2690ae2p+118",
+      "output_weight": 114
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.003241912905159,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.004669526655015989,
+      "multiplicity_upper_binary64_hex": "0x1.7533e098a9c4bp+118",
+      "output_weight": 115
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0029150444386237,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.004199402402633595,
+      "multiplicity_upper_binary64_hex": "0x1.b2306c78edcacp+118",
+      "output_weight": 116
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.002588533462839,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.00372963932176686,
+      "multiplicity_upper_binary64_hex": "0x1.f11d54b8cf4a7p+118",
+      "output_weight": 117
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0022623787088272,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.003260235988611646,
+      "multiplicity_upper_binary64_hex": "0x1.180ffa6a8d6c5p+119",
+      "output_weight": 118
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0019365789209074,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0027911909961415384,
+      "multiplicity_upper_binary64_hex": "0x1.368e75ca63d3ap+119",
+      "output_weight": 119
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0016111328564854,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.002322502953837683,
+      "multiplicity_upper_binary64_hex": "0x1.52e9fea4a9832p+119",
+      "output_weight": 120
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0012860392855953,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0018541704870589993,
+      "multiplicity_upper_binary64_hex": "0x1.6c011c79e8963p+119",
+      "output_weight": 121
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0009612969906703,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0013861922367446992,
+      "multiplicity_upper_binary64_hex": "0x1.80c3d7731e56cp+119",
+      "output_weight": 122
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0006369047661872,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0009185668589328768,
+      "multiplicity_upper_binary64_hex": "0x1.9046ae403b363p+119",
+      "output_weight": 123
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0003128614183974,
+      "dual_marginal_source_weight": 70,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0004512930243999838,
+      "multiplicity_upper_binary64_hex": "0x1.99d3d2ca26031p+119",
+      "output_weight": 124
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.000000216230643,
+      "dual_marginal_source_weight": 124,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 3.119548425764719e-07,
+      "multiplicity_upper_binary64_hex": "0x1.9cfa18b35983cp+119",
+      "output_weight": 125
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0003128614183974,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0004512930243999841,
+      "multiplicity_upper_binary64_hex": "0x1.99d3d2ca26031p+119",
+      "output_weight": 126
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0006369047661872,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0009185668589328765,
+      "multiplicity_upper_binary64_hex": "0x1.9046ae403b363p+119",
+      "output_weight": 127
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0009612969906703,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0013861922367446988,
+      "multiplicity_upper_binary64_hex": "0x1.80c3d7731e56cp+119",
+      "output_weight": 128
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0012860392855953,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0018541704870589989,
+      "multiplicity_upper_binary64_hex": "0x1.6c011c79e8963p+119",
+      "output_weight": 129
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0016111328564854,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0023225029538376826,
+      "multiplicity_upper_binary64_hex": "0x1.52e9fea4a9832p+119",
+      "output_weight": 130
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0019365789209074,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.002791190996141538,
+      "multiplicity_upper_binary64_hex": "0x1.368e75ca63d3ap+119",
+      "output_weight": 131
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0022623787088272,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0032602359886116485,
+      "multiplicity_upper_binary64_hex": "0x1.180ffa6a8d6c5p+119",
+      "output_weight": 132
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.002588533462839,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0037296393217668596,
+      "multiplicity_upper_binary64_hex": "0x1.f11d54b8cf4a7p+118",
+      "output_weight": 133
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0029150444386237,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.004199402402633599,
+      "multiplicity_upper_binary64_hex": "0x1.b2306c78edcacp+118",
+      "output_weight": 134
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.003241912905159,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.004669526655015988,
+      "multiplicity_upper_binary64_hex": "0x1.7533e098a9c4bp+118",
+      "output_weight": 135
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.003569140145235,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.005140013520201968,
+      "multiplicity_upper_binary64_hex": "0x1.3badbf2690ae2p+118",
+      "output_weight": 136
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0038967274557522,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.005610864457360384,
+      "multiplicity_upper_binary64_hex": "0x1.06c46d141c331p+118",
+      "output_weight": 137
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.004224676148156,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.006082080944126578,
+      "multiplicity_upper_binary64_hex": "0x1.ae7838d59d3a2p+117",
+      "output_weight": 138
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0045529875490158,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.006553664477401778,
+      "multiplicity_upper_binary64_hex": "0x1.5af773fc70283p+117",
+      "output_weight": 139
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.00488166300019,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007025616573549742,
+      "multiplicity_upper_binary64_hex": "0x1.132f59de9780cp+117",
+      "output_weight": 140
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.005210703859876,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007497938769868129,
+      "multiplicity_upper_binary64_hex": "0x1.ad81d82f48462p+116",
+      "output_weight": 141
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0055401115024272,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.007970632624283004,
+      "multiplicity_upper_binary64_hex": "0x1.49ccd947dacf9p+116",
+      "output_weight": 142
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0058698873198235,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.008443699717420997,
+      "multiplicity_upper_binary64_hex": "0x1.f252b6f3bf0dfp+115",
+      "output_weight": 143
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.006200032721487,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.008917141652298777,
+      "multiplicity_upper_binary64_hex": "0x1.72673da5b89eap+115",
+      "output_weight": 144
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0065305491355154,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.009390960056048725,
+      "multiplicity_upper_binary64_hex": "0x1.0eddd4267072cp+115",
+      "output_weight": 145
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0068614380096534,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.009865156581265867,
+      "multiplicity_upper_binary64_hex": "0x1.85bb08f111999p+114",
+      "output_weight": 146
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.007192700810729,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.010339732905149886,
+      "multiplicity_upper_binary64_hex": "0x1.13d188a08625ep+114",
+      "output_weight": 147
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0075243390288078,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.010814690735407443,
+      "multiplicity_upper_binary64_hex": "0x1.800932c81acfep+113",
+      "output_weight": 148
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0078563541728143,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01129003180392831,
+      "multiplicity_upper_binary64_hex": "0x1.06fbd4b3783ebp+113",
+      "output_weight": 149
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0081887477795235,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.011765757879603296,
+      "multiplicity_upper_binary64_hex": "0x1.6244a8e282080p+112",
+      "output_weight": 150
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0085215214053662,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.012241870756534533,
+      "multiplicity_upper_binary64_hex": "0x1.d5626088d4295p+111",
+      "output_weight": 151
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0088546766374789,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.012718372269787974,
+      "multiplicity_upper_binary64_hex": "0x1.31d181d35c58fp+111",
+      "output_weight": 152
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0091882150897635,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.013195264289686377,
+      "multiplicity_upper_binary64_hex": "0x1.87e59929ab5c3p+110",
+      "output_weight": 153
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.009522138400806,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.013672548718766444,
+      "multiplicity_upper_binary64_hex": "0x1.edda037e25cd9p+109",
+      "output_weight": 154
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0098564482597268,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.014150227528651282,
+      "multiplicity_upper_binary64_hex": "0x1.31f87e62ca460p+109",
+      "output_weight": 155
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0101911463547586,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.014628302686487642,
+      "multiplicity_upper_binary64_hex": "0x1.74c7b50197b0dp+108",
+      "output_weight": 156
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.01052623447576,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01510677630130065,
+      "multiplicity_upper_binary64_hex": "0x1.be88d0f3d0bb5p+107",
+      "output_weight": 157
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0108617143653877,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.015585650411344939,
+      "multiplicity_upper_binary64_hex": "0x1.06ebbac65b3b2p+107",
+      "output_weight": 158
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0111975879319255,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.016064927287859354,
+      "multiplicity_upper_binary64_hex": "0x1.305c961568efcp+106",
+      "output_weight": 159
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.011533857024129,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.016544609113546504,
+      "multiplicity_upper_binary64_hex": "0x1.5a5397253cb2dp+105",
+      "output_weight": 160
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0118705236210261,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.01702469825331976,
+      "multiplicity_upper_binary64_hex": "0x1.835383a0eb3f5p+104",
+      "output_weight": 161
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0122075898846532,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.017505197329156976,
+      "multiplicity_upper_binary64_hex": "0x1.a9b8f1883d00bp+103",
+      "output_weight": 162
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0125450576213804,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.017986108452146765,
+      "multiplicity_upper_binary64_hex": "0x1.cbd43a3960863p+102",
+      "output_weight": 163
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.012882929869797,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0184674354850274,
+      "multiplicity_upper_binary64_hex": "0x1.e807b8ba83a04p+101",
+      "output_weight": 164
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0132212076710794,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.018949179440676183,
+      "multiplicity_upper_binary64_hex": "0x1.fce78542394f0p+100",
+      "output_weight": 165
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.013559895993291,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.019431346919469426,
+      "multiplicity_upper_binary64_hex": "0x1.04abb121dafe0p+100",
+      "output_weight": 166
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.013898994468149,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.019913936919112637,
+      "multiplicity_upper_binary64_hex": "0x1.0651be11c6055p+99",
+      "output_weight": 167
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0142385106608938,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02039695972295236,
+      "multiplicity_upper_binary64_hex": "0x1.0348833e7238ep+98",
+      "output_weight": 168
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0145784448073603,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.020880415177722406,
+      "multiplicity_upper_binary64_hex": "0x1.f7649932200dbp+96",
+      "output_weight": 169
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0149188020248672,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.021364310068634724,
+      "multiplicity_upper_binary64_hex": "0x1.dfdd63f7c25ddp+95",
+      "output_weight": 170
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0152595991852797,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.021848667874433014,
+      "multiplicity_upper_binary64_hex": "0x1.c125a6e263fcbp+94",
+      "output_weight": 171
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0156008082214294,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02233344820418471,
+      "multiplicity_upper_binary64_hex": "0x1.9cba2d8ea9235p+93",
+      "output_weight": 172
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0159425296306053,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02281879328922214,
+      "multiplicity_upper_binary64_hex": "0x1.744ba3d83d0bbp+92",
+      "output_weight": 173
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0162845849083406,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.023304449103996087,
+      "multiplicity_upper_binary64_hex": "0x1.499d23af11becp+91",
+      "output_weight": 174
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0166273792907976,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.023790990350259687,
+      "multiplicity_upper_binary64_hex": "0x1.1e63c499a4fa3p+90",
+      "output_weight": 175
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0169702184619864,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02427743110661097,
+      "multiplicity_upper_binary64_hex": "0x1.e85433f3141c6p+88",
+      "output_weight": 176
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0173144447195637,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.024765674987595982,
+      "multiplicity_upper_binary64_hex": "0x1.98755bef4ad3dp+87",
+      "output_weight": 177
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0176578486584014,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02525258792090521,
+      "multiplicity_upper_binary64_hex": "0x1.4f240b35dace0p+86",
+      "output_weight": 178
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0180043348354622,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.025743704667350382,
+      "multiplicity_upper_binary64_hex": "0x1.0db3c7d9406a5p+85",
+      "output_weight": 179
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0183579874057962,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.026244806862156675,
+      "multiplicity_upper_binary64_hex": "0x1.a9ad963cd3f4fp+83",
+      "output_weight": 180
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.01869825427757,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.026726778172528342,
+      "multiplicity_upper_binary64_hex": "0x1.495d203ce142ap+82",
+      "output_weight": 181
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0190883123423196,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.027279078253178185,
+      "multiplicity_upper_binary64_hex": "0x1.f3aa7dbc2f0a8p+80",
+      "output_weight": 182
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.019398465122308,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.027718086134913337,
+      "multiplicity_upper_binary64_hex": "0x1.7373112912530p+79",
+      "output_weight": 183
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.019793848584857,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.02827754074248785,
+      "multiplicity_upper_binary64_hex": "0x1.0e9df67e99024p+78",
+      "output_weight": 184
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0201089640930974,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.028723263530687663,
+      "multiplicity_upper_binary64_hex": "0x1.824c12d2a0ca2p+76",
+      "output_weight": 185
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0205064339897785,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.029285278162778688,
+      "multiplicity_upper_binary64_hex": "0x1.0e190bf62caa6p+75",
+      "output_weight": 186
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0208363511034817,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.029751608258305945,
+      "multiplicity_upper_binary64_hex": "0x1.71e10fc4dbb24p+73",
+      "output_weight": 187
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0212287261912363,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.030306025065617803,
+      "multiplicity_upper_binary64_hex": "0x1.effc6bc1d308ap+71",
+      "output_weight": 188
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.021590741075802,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03081735471811713,
+      "multiplicity_upper_binary64_hex": "0x1.4586300ffb4bdp+70",
+      "output_weight": 189
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0219647952991802,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.031345499091502,
+      "multiplicity_upper_binary64_hex": "0x1.a231d36ae1219p+68",
+      "output_weight": 190
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0223863895913685,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.031940535803124684,
+      "multiplicity_upper_binary64_hex": "0x1.06d93576de61ep+67",
+      "output_weight": 191
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0227208431081125,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03241240781707194,
+      "multiplicity_upper_binary64_hex": "0x1.4330b59926641p+65",
+      "output_weight": 192
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0232415209285932,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03314671196550518,
+      "multiplicity_upper_binary64_hex": "0x1.84b228fe49f26p+63",
+      "output_weight": 193
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.02350624733825,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03351990839591536,
+      "multiplicity_upper_binary64_hex": "0x1.c8efa3b124badp+61",
+      "output_weight": 194
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.024176794783715,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03446477680468068,
+      "multiplicity_upper_binary64_hex": "0x1.069e0667c9567p+60",
+      "output_weight": 195
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0243350562956848,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.034687692868179444,
+      "multiplicity_upper_binary64_hex": "0x1.26d1ef0fc463ep+58",
+      "output_weight": 196
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0252121126336007,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03592242893642878,
+      "multiplicity_upper_binary64_hex": "0x1.43880029eb700p+56",
+      "output_weight": 197
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0252281042097655,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.035944932365146114,
+      "multiplicity_upper_binary64_hex": "0x1.5a69a059d9e73p+54",
+      "output_weight": 198
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0263621969811267,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0375399391097733,
+      "multiplicity_upper_binary64_hex": "0x1.6a7ae35e3db84p+52",
+      "output_weight": 199
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0262159872790184,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03733440636647903,
+      "multiplicity_upper_binary64_hex": "0x1.71ad4d713b009p+50",
+      "output_weight": 200
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0276325096358128,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.039324436406724554,
+      "multiplicity_upper_binary64_hex": "0x1.705873942de26p+48",
+      "output_weight": 201
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0273432624309837,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.03891830460076764,
+      "multiplicity_upper_binary64_hex": "0x1.654dd04634fe9p+46",
+      "output_weight": 202
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0290181274660553,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04126839736796164,
+      "multiplicity_upper_binary64_hex": "0x1.527e5ce1167fep+44",
+      "output_weight": 203
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0286744661726503,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04078649987765283,
+      "multiplicity_upper_binary64_hex": "0x1.37d745a3dd133p+42",
+      "output_weight": 204
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.030508255750157,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.043356062841362,
+      "multiplicity_upper_binary64_hex": "0x1.18652b4425fa6p+40",
+      "output_weight": 205
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0303030354945983,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04306872916144584,
+      "multiplicity_upper_binary64_hex": "0x1.e9e9d69e62477p+37",
+      "output_weight": 206
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0320972234184582,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04557887883970156,
+      "multiplicity_upper_binary64_hex": "0x1.a14527549dfd1p+35",
+      "output_weight": 207
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0323652488865973,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04595348387231999,
+      "multiplicity_upper_binary64_hex": "0x1.5923d0f3dd782p+33",
+      "output_weight": 208
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0337991214955,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.047955881420040425,
+      "multiplicity_upper_binary64_hex": "0x1.15d1808aa5ea3p+31",
+      "output_weight": 209
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0350635768381184,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.04971938528217124,
+      "multiplicity_upper_binary64_hex": "0x1.b274e1f143417p+28",
+      "output_weight": 210
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0356596795922768,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05055000763440478,
+      "multiplicity_upper_binary64_hex": "0x1.49a2ae5e04ccbp+26",
+      "output_weight": 211
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0387089280021582,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05479143195197071,
+      "multiplicity_upper_binary64_hex": "0x1.e68d5f2aa13dap+23",
+      "output_weight": 212
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0377590712176266,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.05347154282418686,
+      "multiplicity_upper_binary64_hex": "0x1.5ae4baa91ae75p+21",
+      "output_weight": 213
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0438030410667944,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.061849510295434555,
+      "multiplicity_upper_binary64_hex": "0x1.e29c182a005c7p+18",
+      "output_weight": 214
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0402053913952438,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.056868420569366404,
+      "multiplicity_upper_binary64_hex": "0x1.421f48b340115p+16",
+      "output_weight": 215
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0512104159588298,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07205147584299203,
+      "multiplicity_upper_binary64_hex": "0x1.a5fbc84fd155ap+13",
+      "output_weight": 216
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0431273708464812,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.06091532858566823,
+      "multiplicity_upper_binary64_hex": "0x1.066f73f8761c5p+11",
+      "output_weight": 217
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.062539555448634,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0875165498502052,
+      "multiplicity_upper_binary64_hex": "0x1.43b9d9dae7694p+8",
+      "output_weight": 218
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.046677409670835,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.06581686616577613,
+      "multiplicity_upper_binary64_hex": "0x1.74c529be6bbe8p+5",
+      "output_weight": 219
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0523200700878934,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07357357658573715,
+      "multiplicity_upper_binary64_hex": "0x1.a67aa1611ea54p+2",
+      "output_weight": 220
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0510462875935878,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.0718262063231614,
+      "multiplicity_upper_binary64_hex": "0x1.ca3ed234aea13p-1",
+      "output_weight": 221
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0592922888285559,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.08310072479848958,
+      "multiplicity_upper_binary64_hex": "0x1.e2a4ea0817740p-4",
+      "output_weight": 222
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0564782322362398,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.07926304217266085,
+      "multiplicity_upper_binary64_hex": "0x1.e385465814c4dp-7",
+      "output_weight": 223
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0675997952452094,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.09437093389829695,
+      "multiplicity_upper_binary64_hex": "0x1.d7290665cf462p-10",
+      "output_weight": 224
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0632755897477688,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.08851557657942721,
+      "multiplicity_upper_binary64_hex": "0x1.b1cc1a9f12d08p-13",
+      "output_weight": 225
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.077273549055243,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.10738463591302455,
+      "multiplicity_upper_binary64_hex": "0x1.84f1ff9bc8603p-16",
+      "output_weight": 226
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0717855824920328,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1000163143628649,
+      "multiplicity_upper_binary64_hex": "0x1.474cc3b0900cbp-19",
+      "output_weight": 227
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0881998894875566,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1219435869971114,
+      "multiplicity_upper_binary64_hex": "0x1.0c2e950f08d99p-22",
+      "output_weight": 228
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0823362498084803,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1141487714099862,
+      "multiplicity_upper_binary64_hex": "0x1.9a018ce23fd8dp-26",
+      "output_weight": 229
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1000004785494664,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.13750415138701833,
+      "multiplicity_upper_binary64_hex": "0x1.305ed140878aap-29",
+      "output_weight": 230
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.0950493526129523,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.13099589189537003,
+      "multiplicity_upper_binary64_hex": "0x1.a3bda63a68386p-33",
+      "output_weight": 231
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1118208795813416,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1529243807280313,
+      "multiplicity_upper_binary64_hex": "0x1.1736e84c1eb21p-36",
+      "output_weight": 232
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.109405549211715,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1497868469092357,
+      "multiplicity_upper_binary64_hex": "0x1.585faccc0f534p-40",
+      "output_weight": 233
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1220175257619938,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.16609521082410877,
+      "multiplicity_upper_binary64_hex": "0x1.94d92d26c31f4p-44",
+      "output_weight": 234
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1234747950809405,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.16796775832322433,
+      "multiplicity_upper_binary64_hex": "0x1.b9995d9bce5c0p-48",
+      "output_weight": 235
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.127919680069856,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.1736643360960583,
+      "multiplicity_upper_binary64_hex": "0x1.c2dc4d83e7fe7p-52",
+      "output_weight": 236
+    },
+    {
+      "below_density_target": true,
+      "density_ratio_upper_display": 1.1332449025129658,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": true,
+      "log2_density_ratio_upper_display": 0.18045967180337752,
+      "multiplicity_upper_binary64_hex": "0x1.ac24459d0bc46p-56",
+      "output_weight": 237
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.126354877605597,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.17166144509055653,
+      "multiplicity_upper_binary64_hex": "0x1.73e638b1ef0a3p-60",
+      "output_weight": 238
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.1339123439451915,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.18130911837236022,
+      "multiplicity_upper_binary64_hex": "0x1.2cc4d6c7756d0p-64",
+      "output_weight": 239
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.115967852397115,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.15829546815699921,
+      "multiplicity_upper_binary64_hex": "0x1.b225915b88bdfp-69",
+      "output_weight": 240
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.1248109469526517,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.16968254027473234,
+      "multiplicity_upper_binary64_hex": "0x1.2283a1ae637fap-73",
+      "output_weight": 241
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.100064790404902,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.13758849651644955,
+      "multiplicity_upper_binary64_hex": "0x1.52212db8e44cbp-78",
+      "output_weight": 242
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.1117169024965805,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.15278945410266026,
+      "multiplicity_upper_binary64_hex": "0x1.67fdf2bc1620dp-83",
+      "output_weight": 243
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.084618730340688,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.11718798966113071,
+      "multiplicity_upper_binary64_hex": "0x1.426dca1efd1afp-88",
+      "output_weight": 244
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.0999557393034436,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.13744547286618655,
+      "multiplicity_upper_binary64_hex": "0x1.00407f6d5ff4ep-93",
+      "output_weight": 245
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.0727815384516535,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.1013563151613058,
+      "multiplicity_upper_binary64_hex": "0x1.4519d21f4f4b6p-99",
+      "output_weight": 246
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.0912789131380995,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.12601987817394805,
+      "multiplicity_upper_binary64_hex": "0x1.56c1a525e5993p-105",
+      "output_weight": 247
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.0645918539488737,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.09030043219462984,
+      "multiplicity_upper_binary64_hex": "0x1.02ded7c8d6e8cp-111",
+      "output_weight": 248
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.0864037388322332,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.11956034970397138,
+      "multiplicity_upper_binary64_hex": "0x1.0f99d6db66245p-118",
+      "output_weight": 249
+    },
+    {
+      "below_density_target": null,
+      "density_ratio_upper_display": 1.059304415934162,
+      "dual_marginal_source_weight": 180,
+      "in_central_weight_interval": false,
+      "log2_density_ratio_upper_display": 0.08311724112278954,
+      "multiplicity_upper_binary64_hex": "0x1.0f2e92fef2136p-126",
+      "output_weight": 250
+    }
+  ],
+  "status": "OUTWARD_SPECTRUM_CERTIFICATE"
+}

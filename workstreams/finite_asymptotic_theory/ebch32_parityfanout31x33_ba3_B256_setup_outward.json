@@ -1,0 +1,261 @@
+{
+  "schema": "ebch32-parityfanout31x33-ba3-b256-setup-outward-v1",
+  "status": "OUTWARD_CERTIFICATE",
+  "claim": {
+    "permitted_final_nonzero_weights": [
+      24,
+      232
+    ],
+    "expected_rejected_word_count_upper_hex": "0x1.362062013db23p-10",
+    "good_event_probability_lower_hex": "0x1.ff64efceff611p-1",
+    "expected_rejection_trials_per_row_upper_hex": "0x1.004d9f9ac6153p+0",
+    "display_expected_rejected_word_count_upper": 0.0011830386941348934,
+    "display_good_event_probability_lower": 0.998816961305865,
+    "display_expected_trials_upper": 1.0011844399324061
+  },
+  "parameters": {
+    "row_length": 256,
+    "row_dimension": 128,
+    "constituent_count": 8,
+    "constituent": {
+      "parameters": [
+        32,
+        16,
+        8
+      ],
+      "weight_spectrum": {
+        "0": 1,
+        "8": 620,
+        "12": 13888,
+        "16": 36518,
+        "20": 13888,
+        "24": 620,
+        "32": 1
+      }
+    },
+    "parity_fanout": {
+      "source_size": 31,
+      "target_size": 33,
+      "sampling": "S uniform; T uniform in the complement of S"
+    },
+    "accumulator_count": 2,
+    "independent_uniform_accumulator_interleavers": 2
+  },
+  "exact_identity_audits": {
+    "direct_sum_total_words": "340282366920938463463374607431768211456",
+    "direct_sum_total_words_expected": "340282366920938463463374607431768211456",
+    "direct_sum_all_ones_multiplicity": 1,
+    "all_ones_source_overlap": 31,
+    "all_ones_target_overlap": 33,
+    "all_ones_fanout_output_weight": 223,
+    "source_and_target_vandermonde_checks": "passed for every nonzero input-weight coefficient"
+  },
+  "arithmetic": {
+    "format": "IEEE-754 binary64",
+    "proof_rule": "Every nonnegative proof-path addition, multiplication, and division is rounded one ULP toward +infinity; exact positive integer denominators are rounded toward -infinity.",
+    "transcendental_operations_in_proof_path": 0,
+    "python": "3.14.4",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "tail_weight_rows": [
+    {
+      "weight": 1,
+      "expected_multiplicity_upper_hex": "0x1.d064c9fb07861p-97"
+    },
+    {
+      "weight": 2,
+      "expected_multiplicity_upper_hex": "0x1.af34086a8fb48p-23"
+    },
+    {
+      "weight": 3,
+      "expected_multiplicity_upper_hex": "0x1.07ea97e63bf8dp-21"
+    },
+    {
+      "weight": 4,
+      "expected_multiplicity_upper_hex": "0x1.dd5dc4e87791cp-21"
+    },
+    {
+      "weight": 5,
+      "expected_multiplicity_upper_hex": "0x1.7b56c705bc36bp-20"
+    },
+    {
+      "weight": 6,
+      "expected_multiplicity_upper_hex": "0x1.180bed559df16p-19"
+    },
+    {
+      "weight": 7,
+      "expected_multiplicity_upper_hex": "0x1.8a1aa352b0660p-19"
+    },
+    {
+      "weight": 8,
+      "expected_multiplicity_upper_hex": "0x1.0c127e0b779c5p-18"
+    },
+    {
+      "weight": 9,
+      "expected_multiplicity_upper_hex": "0x1.63a72fa4eff64p-18"
+    },
+    {
+      "weight": 10,
+      "expected_multiplicity_upper_hex": "0x1.cee49f29c41e6p-18"
+    },
+    {
+      "weight": 11,
+      "expected_multiplicity_upper_hex": "0x1.28c9b62845bedp-17"
+    },
+    {
+      "weight": 12,
+      "expected_multiplicity_upper_hex": "0x1.7832a3ad38856p-17"
+    },
+    {
+      "weight": 13,
+      "expected_multiplicity_upper_hex": "0x1.d8a5e8e2cc349p-17"
+    },
+    {
+      "weight": 14,
+      "expected_multiplicity_upper_hex": "0x1.27008ce14899ap-16"
+    },
+    {
+      "weight": 15,
+      "expected_multiplicity_upper_hex": "0x1.6ebd1eb0c9d40p-16"
+    },
+    {
+      "weight": 16,
+      "expected_multiplicity_upper_hex": "0x1.c7386c5948b54p-16"
+    },
+    {
+      "weight": 17,
+      "expected_multiplicity_upper_hex": "0x1.1b023ba5eb84ap-15"
+    },
+    {
+      "weight": 18,
+      "expected_multiplicity_upper_hex": "0x1.62293e9ae8329p-15"
+    },
+    {
+      "weight": 19,
+      "expected_multiplicity_upper_hex": "0x1.c19172cf61f48p-15"
+    },
+    {
+      "weight": 20,
+      "expected_multiplicity_upper_hex": "0x1.25a4027852302p-14"
+    },
+    {
+      "weight": 21,
+      "expected_multiplicity_upper_hex": "0x1.95fd9e776edd7p-14"
+    },
+    {
+      "weight": 22,
+      "expected_multiplicity_upper_hex": "0x1.3932dc862957dp-13"
+    },
+    {
+      "weight": 23,
+      "expected_multiplicity_upper_hex": "0x1.24a5bceb7e4b5p-12"
+    },
+    {
+      "weight": 233,
+      "expected_multiplicity_upper_hex": "0x1.1b40b8c559361p-13"
+    },
+    {
+      "weight": 234,
+      "expected_multiplicity_upper_hex": "0x1.059f2a57b3827p-14"
+    },
+    {
+      "weight": 235,
+      "expected_multiplicity_upper_hex": "0x1.311b330aa7d9bp-15"
+    },
+    {
+      "weight": 236,
+      "expected_multiplicity_upper_hex": "0x1.9b9e58ca7b59ap-16"
+    },
+    {
+      "weight": 237,
+      "expected_multiplicity_upper_hex": "0x1.2bf11619047e0p-16"
+    },
+    {
+      "weight": 238,
+      "expected_multiplicity_upper_hex": "0x1.c63332934c032p-17"
+    },
+    {
+      "weight": 239,
+      "expected_multiplicity_upper_hex": "0x1.5e39f9b0730f2p-17"
+    },
+    {
+      "weight": 240,
+      "expected_multiplicity_upper_hex": "0x1.101c4e178af3fp-17"
+    },
+    {
+      "weight": 241,
+      "expected_multiplicity_upper_hex": "0x1.a767886d11eecp-18"
+    },
+    {
+      "weight": 242,
+      "expected_multiplicity_upper_hex": "0x1.4877575736cb1p-18"
+    },
+    {
+      "weight": 243,
+      "expected_multiplicity_upper_hex": "0x1.fa7bf6604f3f7p-19"
+    },
+    {
+      "weight": 244,
+      "expected_multiplicity_upper_hex": "0x1.82e4a6436a27bp-19"
+    },
+    {
+      "weight": 245,
+      "expected_multiplicity_upper_hex": "0x1.23e190b020a91p-19"
+    },
+    {
+      "weight": 246,
+      "expected_multiplicity_upper_hex": "0x1.b159a082088c3p-20"
+    },
+    {
+      "weight": 247,
+      "expected_multiplicity_upper_hex": "0x1.3b180d50fdbb8p-20"
+    },
+    {
+      "weight": 248,
+      "expected_multiplicity_upper_hex": "0x1.be1b8fe9616ebp-21"
+    },
+    {
+      "weight": 249,
+      "expected_multiplicity_upper_hex": "0x1.30dadf81e6afbp-21"
+    },
+    {
+      "weight": 250,
+      "expected_multiplicity_upper_hex": "0x1.8d2864670eda0p-22"
+    },
+    {
+      "weight": 251,
+      "expected_multiplicity_upper_hex": "0x1.e33c31853e62ap-23"
+    },
+    {
+      "weight": 252,
+      "expected_multiplicity_upper_hex": "0x1.08b75ea96c106p-23"
+    },
+    {
+      "weight": 253,
+      "expected_multiplicity_upper_hex": "0x1.e3899eafd20fap-25"
+    },
+    {
+      "weight": 254,
+      "expected_multiplicity_upper_hex": "0x1.26799a6ed8f8cp-26"
+    },
+    {
+      "weight": 255,
+      "expected_multiplicity_upper_hex": "0x1.c413b386ad201p-97"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_ebch32_parityfanout_ba_setup.py",
+      "sha256": "39d1f26f31dbea18aa020f7318910e2bf84240cd92363fdaa2ce0e3848f23d95"
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch32_16_delta8_spectrum.csv",
+      "sha256": "81aa68186b3f4ca0256893e7142914a4661236c1c52ac45a4b807c458a34a519"
+    }
+  ],
+  "limitations": [
+    "This receipt certifies the expected row spectrum tail and the Markov setup bound only.",
+    "It does not certify any RM2Sub distance contribution.",
+    "An efficient exact or one-sided-safe decision procedure for the accepted-row event remains open."
+  ]
+}

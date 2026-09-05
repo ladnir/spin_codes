@@ -1,0 +1,99 @@
+{
+  "schema": "ebch128-pow2-randomstepconv-d109-manifest-v1",
+  "status": "OUTWARD_DISTANCE_CERTIFICATE",
+  "claim": {
+    "minimum_distance_at_least": 228590,
+    "relative_distance_lower": 0.10900020599365234,
+    "bad_probability_log2_upper": -7.584360841183562,
+    "margin_bits_lower": 7.584360841183562,
+    "certified_margin_bits": 5,
+    "meets_certified_margin": true,
+    "dominant_active_outer_rows": 1,
+    "dominant_pointwise_log2_upper": -7.585225198814789
+  },
+  "parameters": {
+    "outer_rows": 16384,
+    "active_outer_rows": 16384,
+    "message_bits": 1048576,
+    "output_bits": 2097152,
+    "distance_cutoff": 228590,
+    "memory_bits": 20,
+    "outer_code": "extended BCH [128,64,22]",
+    "outer_bits": 128,
+    "outer_dimension": 64,
+    "shortened_outer_rows": 0,
+    "sparse_exact_max_occupation": 99
+  },
+  "artifacts": [
+    {
+      "path": "scripts/ebch128x64_forward_paar_circuit.json",
+      "sha256": "3d3451b81f4e8f3de2c5a1b042fd642629d4d5c8a8e9b08ba96422bb8136d1fa",
+      "size_bytes": 19310
+    },
+    {
+      "path": "scripts/EBCH128_64.wd",
+      "sha256": "f633eb9a2f76c64c1d74313b066c2613adba642162e04b67466714f3c30c4b8a",
+      "size_bytes": 1194
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_EBCH128_OUTER_DEFINITION.md",
+      "sha256": "87991befa739963db0f7733e5900d26e350c6ea3f825f6d59b6ea2538c92944d",
+      "size_bytes": 5880
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/FINITE_K20_EBCH128_POW2_RANDOMSTEP_CONV_D109_CERTIFICATE.md",
+      "sha256": "900e844f14a9368939c19532ab88d4ee993e1d88370f5f55ddaebb1a145e126a",
+      "size_bytes": 5912
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_g1.py",
+      "sha256": "0e63c66088cef00c3bbfb54dba4f4793e21f10ae584ea999aa3e9c9248b92e1f",
+      "size_bytes": 14518
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_parity_pivot.py",
+      "sha256": "ea52f6666879bcbb5bacb00d51835f7306109f54a83c705f59c6768415c08358",
+      "size_bytes": 13510
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_q1_exact.py",
+      "sha256": "96cab8ad7cee8a4e2a31aaaf853429ecc8b4361b3cdf83db6dbe6422f2da93b9",
+      "size_bytes": 5799
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_dense_complement.py",
+      "sha256": "e612bceaf12fc5218c218ef4bf43d408e5ee83a38bf87f163e438b1534ce9960",
+      "size_bytes": 6444
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/certify_ebch128_randomstepconv_parity_pivot_outward.py",
+      "sha256": "35df4382149a1cff0d0408e6d06a99c7b9d1ef89f7d18c7ce2b4b492ad3ad607",
+      "size_bytes": 27174
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s20_pow2_parity_pivot_d109_diagnostic.json",
+      "sha256": "d92157d720b4ca4c6a8b202e9a99bf4e093e7eed15e20a9323523f81e6366f79",
+      "size_bytes": 5539811
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch128_randomstepconv_s20_pow2_dense_complement_r64_d109_u074.json",
+      "sha256": "d4e13b0d465dd7cbe0703ba20c49bd99d62d2d65aac9d1b56b87fef2489512b9",
+      "size_bytes": 18651
+    },
+    {
+      "path": "workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s20_pow2_outward_d109.json",
+      "sha256": "8ed794d7519970de7a674a9dbed21b3128f7b4a76388a5dd449335cb1c11c6c9",
+      "size_bytes": 4176521
+    }
+  ],
+  "reproduction": [
+    "python workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_parity_pivot.py --outer-rows 16384 --memory-bits 20 --distance-numerator 109 --distance-denominator 1000 --grid-min -10 --grid-max 1 --grid-step 0.25 --output workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s20_pow2_parity_pivot_d109_diagnostic.json",
+    "python workstreams/finite_asymptotic_theory/evaluate_ebch128_randomstepconv_dense_complement.py --memory-bits 20 --distance-numerator 109 --distance-denominator 1000 --maximum-inactive-rows 64 --maximum-region-zeros 4096 --log-surprisal 0.74 --log-r-min 3 --log-r-max 7 --log-r-step 0.0625 --output workstreams/finite_asymptotic_theory/ebch128_randomstepconv_s20_pow2_dense_complement_r64_d109_u074.json",
+    "python workstreams/finite_asymptotic_theory/certify_ebch128_randomstepconv_parity_pivot_outward.py --diagnostic workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s20_pow2_parity_pivot_d109_diagnostic.json --complement-diagnostic workstreams/finite_asymptotic_theory/ebch128_randomstepconv_s20_pow2_dense_complement_r64_d109_u074.json --outer-rows 16384 --memory-bits 20 --distance-numerator 109 --distance-denominator 1000 --certified-margin-bits 5 --output workstreams/finite_asymptotic_theory/ebch128_randomstepconv_g1_s20_pow2_outward_d109.json"
+  ],
+  "runtime": {
+    "python_flint_version": "0.9.0",
+    "arithmetic": "Arb plus directed positive binary64 recurrences"
+  },
+  "imported_premise": "scripts/EBCH128_64.wd is the exact spectrum of the concrete generator fixed in FINITE_K20_EBCH128_OUTER_DEFINITION.md"
+}

@@ -1,0 +1,235 @@
+# Goal 03: boundary-shift reduction
+
+## Result
+
+The wrapped-state term is exactly a boundary translate of the ordinary
+zero-state convolution. More strongly, it is the image of a universal
+two-node first-lap turnoff. For every drive \(y\) and state \(z\),
+
+\[
+F(F(y))\mathbin\oplus J(z)=F(F(y\mathbin\oplus v_z)),
+\]
+
+where \(v_z\) occupies only the first two nodes and returns the first-lap
+state to zero. Thus WrapMul does not introduce a new dynamical object. It
+selects a linear shift of the old zero-state two-lap problem.
+
+This identity validates the proposed orbit intuition. It does not by itself
+transfer the old random-permutation probability bound, because
+\(y\mathbin\oplus v_z\) is not distributed as a permutation of the original
+packets.
+
+## One-lap recurrence
+
+Let \(A=\operatorname{Acc}\), and let \(P\) be the systematic BCH parity map.
+For input \(x_t\in\mathbb F_2^{64}\) and stored state
+\(s_t\in\mathbb F_2^{64}\), one node computes
+
+\[
+o_t=A(s_t+x_t),
+\qquad
+s_{t+1}=P(o_t).
+\]
+
+Both \(A\) and \(P\) are invertible. The autonomous stored-state map is
+
+\[
+T=P\circ A.
+\]
+
+Let \(F(x)\) denote the output sequence from initial state zero, let \(L(x)\)
+denote its terminal state, and let \(J(z)\) denote the output sequence from
+initial state \(z\) with zero drive.
+
+## Boundary-impulse lemma
+
+Let \(e_0z=(z,0,\ldots,0)\). Then
+
+\[
+J(z)=F(e_0z).
+\]
+
+To see this, compare the two executions at node zero. The execution defining
+\(J(z)\) starts in state \(z\) and reads zero. The execution defining
+\(F(e_0z)\) starts in state zero and reads \(z\). Both emit \(A(z)\), and both
+store \(P(A(z))\). Their states and their remaining zero drives are then
+identical.
+
+Linearity now gives the first form of the reduction:
+
+\[
+F(F(y))\mathbin\oplus J(z)
+=F(F(y))\mathbin\oplus F(e_0z)
+=F(F(y)\mathbin\oplus e_0z).
+\tag{1}
+\]
+
+This equation says that the entering state is exactly a modification of the
+first input node in an otherwise zero-state second lap.
+
+## Two-node turnoff lemma
+
+Define
+
+\[
+v_z:=\bigl(A^{-1}z,\;P(z),\;0,\ldots,0\bigr).
+\]
+
+The zero-state execution on \(v_z\) emits \(z\) at node zero and stores
+\(P(z)\). At node one, its input equals its stored state, so it emits zero and
+stores zero. It remains zero thereafter. Consequently,
+
+\[
+F(v_z)=e_0z,
+\qquad
+L(v_z)=0.
+\tag{2}
+\]
+
+Substituting (2) into (1) proves
+
+\[
+F(F(y))\mathbin\oplus J(z)=F(F(y\mathbin\oplus v_z)).
+\tag{3}
+\]
+
+The map \(z\mapsto v_z\) is an injective linear map from 64-bit states to a
+64-dimensional subspace of the first two 64-bit nodes. Conditional on a
+nonzero first-lap terminal state, WrapMul samples \(z\) uniformly over the
+nonzero members of this subspace.
+
+## Exact return-to-zero states
+
+Fix the second-lap drive \(F(y)\). Let \(p_t\) be the stored state before node
+\(t\) in the zero-state execution on that drive. Starting instead from state
+\(z\) translates this trajectory to
+
+\[
+p_t+T^t z.
+\]
+
+Since \(T\) is invertible, for each time \(t\in\{1,\ldots,N\}\), there is
+exactly one state
+
+\[
+z_t=T^{-t}p_t
+\]
+
+that makes the stored state at time \(t\) zero. The union of all exact
+state-return events therefore contains at most \(N=32{,}772\) wrapped states.
+For one fixed outer word, uniform WrapMul charges this union by at most
+
+\[
+\frac{32{,}772}{2^{64}-1}.
+\]
+
+Across the 26 authenticated support-33 words, a union bound gives
+
+\[
+\log_2\left(\frac{26\cdot32{,}772}{2^{64}-1}\right)
+=-44.299384182372\ldots.
+\]
+
+This would fit the remaining support-33 budget if every bad output had an
+exact state return. That implication has not been proved.
+
+## What transfers and what does not
+
+The algebraic mechanism transfers exactly. A wrapped cancellation is a
+linear shift by a two-node first-lap turnoff, and an exact state return has at
+most one wrapped state per return time.
+
+The old placement law does not transfer. The word \(v_z\) may occupy as many
+as 32 four-bit packet cells in the first two nodes. Its two node values are
+correlated by \(P\), and adding it can create or cancel packets of \(y\).
+Therefore \(y\mathbin\oplus v_z\) is not a uniformly permuted support-33 word,
+and an old probability bound stated only for that packet orbit cannot be
+applied to it.
+
+There is a second distinction. Low output weight does not formally imply an
+exact visit to the zero state. A driven affine trajectory can have small
+output symbols without hitting zero. The existing response-code list bound
+controls this larger event; the \(N\)-state return bound controls only its
+exact-turnoff subset.
+
+## Relation to the old low-output-return lemma
+
+The old low-output-return certificate concerns the autonomous 64-bit output
+recurrence
+
+\[
+o_{t+1}=(A\circ P)(o_t).
+\]
+
+The boundary-shift identity reuses this recurrence exactly before the first
+occupied node of \(y\). Indeed, \(v_z\) has already returned the first-lap
+state to zero after node one. Until \(y\) supplies a genuine packet, the
+second-lap output is the autonomous response generated by \(z\). This is the
+existing late-start argument in boundary-shift coordinates.
+
+After the first genuine packet, the system is no longer a 64-bit autonomous
+orbit. To state the correct object, run the two zero-state laps in parallel on
+
+\[
+w:=y\mathbin\oplus v_z.
+\]
+
+Let \(a_t\) be the first-lap stored state and \(b_t\) the second-lap stored
+state before node \(t\). At a node where \(w_t=0\), the pair follows the
+invertible 128-bit recurrence
+
+\[
+\begin{pmatrix}a_{t+1}\\ b_{t+1}\end{pmatrix}
+=
+\begin{pmatrix}
+T&0\\
+TA&T
+\end{pmatrix}
+\begin{pmatrix}a_t\\ b_t\end{pmatrix},
+\qquad
+q_t=A^2a_t+Ab_t,
+\tag{4}
+\]
+
+where \(q_t\) is the retained output and \(T=P\circ A\). Before the first
+genuine packet, \(a_t=0\), so (4) reduces to the old 64-bit autonomous
+recurrence. After that packet, \(a_t\) is generally nonzero and forces
+\(b_t\). This lifted orbit is the part unique to two laps.
+
+Consequently, the earlier turnoff and low-output-return certificates do not
+close the early-start event as written. They do identify a better target than
+the unrestricted response-code spectrum: analyze the zero-input gaps between
+the at most 33 occupied packet cells through the lifted recurrence (4), while
+using the global permutation to control the gap pattern.
+
+## New proof interface
+
+The useful next lemma is narrower than the previous full response-spectrum
+target:
+
+> For every reachable authenticated support-33 drive \(y\), every wrapped
+> state \(z\ne0\) for which
+> \(\operatorname{wt}(F(F(y))+J(z))\le188{,}765\) causes the second-lap
+> state trajectory to visit zero.
+
+If this statement is true, the exact return count above closes the nonzero-
+terminal support-33 row with margin. If it is false, a counterexample gives a
+bad low-weight trajectory that never returns to zero and identifies precisely
+what the old turnoff analysis misses.
+
+The assertion is false for unrestricted dense drives. For example, prescribe
+a nonzero output of weight one at every node. Its total weight is 32,772, and
+it never returns the stored state to zero after a node. Since \(F^2\) is
+invertible, some dense drive realizes that output for every fixed wrapped
+state. Any proof must therefore use the authenticated sparse drive and the
+global permutation; linear dynamics alone cannot prove the assertion.
+
+The executable audit is
+`scripts/audit_riffle_packetmul_wrapmul_2lap_g4_boundary_shift.py`. It checks
+all 64 state basis vectors over the complete 32,772-node lap and independently
+checks the mixed state `0xd6e8feb86659fd93`.
+
+## Scope
+
+This note proves the boundary-shift identities. It does not prove the new
+proof-interface lemma, close the support-33 row, or prove the construction.

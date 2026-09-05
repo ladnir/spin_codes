@@ -1,0 +1,19 @@
+\section{Accumulator warmup notes}
+\label{sec:exploration-accumulator-warmup-notes}
+
+The accumulator warmup is kept in the main paper only through its exact enumerator and low-output contraction interface.
+The optional sharpenings below are preserved here rather than compiled into the current theorem spine.
+
+\begin{enumerate}
+\item Derive a symmetric upper-tail analogue for \(\Pr[\wt(\Acc_n(U))\ge (1-\delta)n]\) and combine the two tails in a
+single bound.
+\item Optimize the \((4e\delta)^k\) constant by tightening the ratio
+\(\binom{n}{w-k}/\binom{n}{w}\) and using a sharper bound on
+\(\sum_{h\le \delta n}\binom{h-1}{k-1}\).
+\item If needed for a particular region of the outer spectrum, extend the contraction bound to all \(w\le \mu n\) for any
+fixed \(\mu<1\) by tracking
+\[
+\prod_{i=0}^{k-1}\frac{w-i}{n-w+i+1}
+\]
+as \((w/(n-w))^k\) instead of \((2w/n)^k\).
+\end{enumerate}

@@ -1,0 +1,98 @@
+{
+  "schema": "riffle-parityfanout31x33-rm2sub-s19-integrated-performance-receipt-v1",
+  "date": "2026-08-31",
+  "machine": {
+    "host": "peach48.devcore4.com",
+    "cpu": "AMD Ryzen 9 7950X",
+    "pinned_cpu": 15,
+    "load_average_before_run": [0.57, 0.27, 0.10]
+  },
+  "construction": {
+    "name": "Riffle ParityFanout31x33 BCHPerm BitShuffle RM2Sub-S19",
+    "message_blocks": 1048576,
+    "code_blocks": 2097152,
+    "block_bits": 128,
+    "fanout_source_size": 31,
+    "fanout_target_size": 33,
+    "fanout_transpose_xors_per_outer_block": 63,
+    "fanout_transpose_xors_per_call": 516096,
+    "inner_step_blocks": 128,
+    "inner_state_blocks": 19,
+    "inner_epochs": 16384,
+    "field": "GF(2^19) modulo x^19+x^5+x^2+x+1"
+  },
+  "compiler": {
+    "name": "g++",
+    "version": "15.2.0",
+    "flags": "-O3 -std=c++20 -march=znver4 -mavx2 -mvpclmulqdq -mpclmul -pthread"
+  },
+  "correctness": {
+    "status": "PASS",
+    "inner_oracle": "Five-epoch optimized transpose agrees block-for-block with an independent dense A, B, and GF(2^19) matrix implementation.",
+    "complete_oracle": "The fused encoder agrees block-for-block with a materialized inner transpose, independent route, independent ParityFanout-31x33 transpose, and BCH transpose.",
+    "checksum": "0x95c9d722a9539fef"
+  },
+  "benchmark": {
+    "trials": 21,
+    "integrated_full_median_ms": 10.823872,
+    "integrated_full_samples_ms": [
+      13.303482,
+      10.629218,
+      10.873634,
+      10.703486,
+      10.761785,
+      10.816128,
+      10.835103,
+      10.802992,
+      10.934668,
+      10.935721,
+      10.823872,
+      10.830604,
+      10.797483,
+      10.730076,
+      10.890405,
+      10.764861,
+      10.816719,
+      10.880187,
+      10.956870,
+      10.735737,
+      10.852585
+    ],
+    "materialized_reverse_inner_median_ms": 3.006784,
+    "materialized_reverse_inner_samples_ms": [
+      3.079791,
+      3.061377,
+      3.038253,
+      3.014349,
+      2.992648,
+      2.992398,
+      2.996546,
+      2.990083,
+      3.008919,
+      3.039085,
+      3.010001,
+      2.997818,
+      3.094118,
+      2.990845,
+      2.994752,
+      3.005102,
+      2.984533,
+      3.013468,
+      3.019759,
+      3.006784,
+      3.006424
+    ]
+  },
+  "comparison": {
+    "prior_s16_integrated_median_ms": 10.821225,
+    "median_difference_ms": 0.002647,
+    "interpretation": "Different-session comparison; observed end-to-end cost is effectively unchanged."
+  },
+  "source_sha256": {
+    "RiffleRm2SubS19.h": "c7e4e51ff4e6726dba827cf879a9e520250c6a7786d1a39eb2fd17c5b7f2fb6b",
+    "RiffleExactPermFieldCheckpoint.h": "fedcd272ea284e865e625b92aebd5117ab04590193e0fd311b6ccca56f85180e",
+    "RiffleFieldCheckpoint_Bench.cpp": "2bb2546e53a57d310b4263970b101feddc62bc14c8026664de4ef1866b5467a9",
+    "RiffleParityFanout31x33PairIlpS19_Bench": "cb2d6eb483d171adb245c6310ec154a3ad5d2e55bc864b8bded9617f7a56c71b"
+  },
+  "remote_workspace": "/tmp/riffle_parityfanout31x33_s19_v1"
+}

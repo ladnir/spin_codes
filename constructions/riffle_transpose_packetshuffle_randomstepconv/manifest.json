@@ -1,0 +1,24 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_transpose_packetshuffle_randomstepconv",
+  "display_name": "Riffle TransposePacketShuffle-RandomStepConv g",
+  "status": "CERTIFIED_RANDOM_ENSEMBLE_DISTANCE",
+  "parent_candidate_id": "riffle_striped_randomstepconv_g4",
+  "outer": "independent uniform random rate-half linear injections of B/2 bits into B bits",
+  "packet_bits": "parameter g",
+  "permutation": "transpose the outer-block matrix, retain fixed groups of g outer blocks as packets, and independently permute the L/g packets in every one of the B rows",
+  "inner": "one-lap RandomStepConv with independent unrestricted (g+sigma)-square binary matrices and discarded terminal state",
+  "observed_positive_cells": [
+    {"outer_bits": 1024, "packet_bits": 4, "sigma": 15, "distance": 188743, "lambda_bits_lower": 195.283900426038},
+    {"outer_bits": 1024, "packet_bits": 4, "sigma": 13, "distance": 188743, "lambda_bits_lower": 83.087891407589},
+    {"outer_bits": 512, "packet_bits": 4, "sigma": 15, "distance": 188743, "lambda_bits_lower": 57.641932041422},
+    {"outer_bits": 256, "packet_bits": 4, "sigma": 18, "distance": 188743, "lambda_bits_lower": 45.400358851794},
+    {"outer_bits": 1024, "packet_bits": 8, "sigma": 102, "distance": 188743, "lambda_bits_lower": 140.289349191542},
+    {"outer_bits": 2048, "packet_bits": 8, "sigma": 54, "distance": 188743, "lambda_bits_lower": 601.228272652283},
+    {"outer_bits": 4096, "packet_bits": 8, "sigma": 30, "distance": 188743, "lambda_bits_lower": 1011.906471547732},
+    {"outer_bits": 8192, "packet_bits": 8, "sigma": 17, "distance": 188743, "lambda_bits_lower": 2238.062870150003},
+    {"outer_bits": 16384, "packet_bits": 8, "sigma": 11, "distance": 188743, "lambda_bits_lower": 3626.465383813988},
+    {"outer_bits": 32768, "packet_bits": 8, "sigma": 8, "distance": 188743, "lambda_bits_lower": 5191.959819043644}
+  ],
+  "claim_scope": "Complete outward-rounded first-moment certificates for the random ensemble at n=2^20, distance threshold 188743, and the displayed g/B/sigma cells. The result does not certify a particular setup seed or a structured replacement for the random outer injections."
+}

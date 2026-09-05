@@ -1,0 +1,87 @@
+\section{Preliminaries}\label{sec:prelim}
+
+\subsection{Notation}\label{ssec:not}
+
+Let $\Zbb:=\{0,1,2,...\}$ and $\Nbb:=\{1,2,3,...\}$.
+For any $n \in \Zbb$, $[n] := \{1, 2, \ldots, n\}$ denotes the set of natural numbers $1, \ldots, n$ (both inclusive). $[0]$ is defined to be the empty set $\emptyset$. For any $a \le b \in \Zbb$, $[a,b]$ denotes the set of integers $a, \ldots, b$ (both inclusive). For any $a > b \in \Zbb$, $[a,b]$ is defined to be the empty set $\emptyset$. 
+
+For any vector $\xv \in \{0,1\}^k$, where $k \in \Nbb\cup\{0\}$, let $x_i\in\{0,1\}$ denote the $i$th element of $\xv$ for $i \in [k]$, and let $|\xv| := k$ denote its length. For any $S\subseteq \Nbb$, let $\xv_{S} = \{x_i:i\in S\cap[k]\}$ denote the subvector of $\xv$ indexed by the indices that belong to $S$. 
+For any vector $\xv$, we define $\hw{\xv} := |\{i:x_i\neq 0\}|$ as the number of nonzero elements of $\xv$.
+
+\subsection{Combinatorial Functions.}\label{ssec:bb}
+
+\paragraph{Balls in bins.} There are
+\begin{align*}
+\ballsBins(n,k)&={n+k-1\choose k-1}
+= \left|\left\{ \xv\in \Nbb^k \mid \sum_i \xv_i = n \right\}\right|
+\end{align*}
+ways to assign $n \in \Nbb$ identical balls into $k \in \Nbb$ labeled bins. This can be easily seen from the following argument. Consider a binary vector $\bv\in\{0,1\}^{n+k-1}$ where each position represents a ``slot.'' Suppose we designate \(k - 1\) of them as ``demarcators'' with value 1, partitioning the remaining \(n\) slots into \(k\) groups, where each group is a sequence of zeros. The size of each group represents the number of balls (out of \(n\)) allocated to each of the \(k\) bins.
+ Each choice of demarcators results in a unique way of assigning the $n$ identical balls into $k$ labeled bins. Since there are ${n+k-1\choose k-1}$ ways to choose the demarcators, i.e. a binary string $\bv$ with weight $k-1$, the claim follows. The very same argument also shows that the number of $\xv$ s.t. $\sum_{i\in[k]}\xv_i = n$ is $
+\ballsBins(n,k)={n+k-1\choose k-1}
+$.\\  
+
+\paragraph{Balls in bins w/ capacity.} There are
+\begin{align*}
+    \ballsBinsCap(n,k,c) &= \sum_{i=0}^k (-1)^i {k \choose i} {n+k -i (c+1)-1 \choose k-1}\\
+    &=\left|\left\{ \xv\in \Nbb^k \mid \sum_i \xv_i = n \wedge \xv_i \leq c \right\}\right|
+\end{align*}
+ways to assign $n$ identical balls into $k$ labeled bins each having a maximum capacity of $c$. A proof of this result can be found in \cite{bro19}.
+
+%  01000 | 01101 | ... | 00010
+\paragraph{Balls in slotted bins.} There are
+\begin{align*}
+    \ballsBinsSlots(n,k,c) &= \sum_{i=0}^k (-1)^i {k \choose i} {c(k-i) \choose n}\\
+    &=\left|\left\{ \xv\in \{0,1\}^{k\times c} \mid \forall i\in [k], 0< \sum_j \xv_{i,j} \leq c \wedge \sum_{i,j}\xv_{i,j} = n \right\}\right|
+\end{align*}
+ways to assign $n$ identical balls into $k\times c$ labeled slots such that each set of $c$ consecutive slots (i.e. each $\xv_i$, called a ``slotted bin'' of size $c$) has at least one ball. This can be proven using an inclusion-exclusion style counting argument. See \appendixref{sec:bbs}.
+
+
+
+ \subsection{Coding Theory}\label{ssec:codingtheory}
+
+\paragraph{Generator Matrix.}
+Let $k < n$, where $n,k\in\Nbb$, and let $\G\in\Fbb^{k\times n}$ be a matrix over the field $\Fbb$. The matrix $\G$ is called the generator matrix of the linear code $\mathcal{C}$, which is defined as
+\(
+C \coloneqq \{ \cv = \xv\G \mid \xv \in \Fbb^k \}.
+\)
+Here, $\xv$ represents an arbitrary message vector of length $k$, and $\cv$ is the corresponding codeword in $\mathcal{C}$.
+
+\paragraph{Systematic Form.}
+A common representation for the generator matrix is its \emph{systematic form}, expressed as
+\(
+\G = \begin{bmatrix} \I_k || \mathbf{P} \end{bmatrix},
+\)
+where $\I_k$ is the $k\times k$ identity matrix and $\mathbf{P}$ is a $k \times (n-k)$ matrix. When $\G$ is in systematic form, the code $\mathcal{C}$ is said to be \emph{systematic} since the original message appears directly in the first $k$ positions of the codeword
+\(
+\cv = \xv\G = \begin{bmatrix} \xv || \mathbf{p} \end{bmatrix},
+\)
+with $\mathbf{p}\in\Fbb^{n-k}$ representing the parity information. Any generator matrix $\G'$ can be transformed into systematic form by performing elementary row operations and, if necessary, column permutations. This preserves the structural properties of the code, such as the minimum distance.
+
+\paragraph{Parity Check Matrix.}
+A matrix $\mathbf{H}\in\Fbb^{(n-k)\times n}$ is called a parity check matrix of $\mathcal{C}$ if it represents a linear function 
+\(
+\varphi: \mathbb{F}^n \to \mathbb{F}^{n-k}
+\)
+whose kernel is exactly $\mathcal{C}$. Equivalently, we have
+\(
+C = \{ \cv \in \Fbb^n \mid \mathbf{H}\cv^T = \mathbf{0} \}.
+\)
+It follows that $\mathbf{H}$ has dimensions $(n-k)\times n$. The code defined by $\mathbf{H}$ is known as the \emph{dual code} of $\mathcal{C}$.
+
+\paragraph{Minimum Distance.}
+The minimum distance $d$ of a linear code $\mathcal{C}$ is defined as the smallest number of positions in which any two distinct codewords differ. Equivalently, since $\mathcal{C}$ is a linear code, $d$ is equal to the minimum weight (i.e., the number of nonzero entries) of any nonzero codeword in $\mathcal{C}$. Another equivalent definition is that $d$ is the minimum number of linearly dependent columns of the parity check matrix $\mathbf{H}$. It is known that computing the minimum distance for an arbitrary linear code is an NP-complete problem.
+
+\paragraph{Relationship Between Generator and Parity Check Matrices.}
+There is a direct connection between the generator matrix and the parity check matrix. In particular, if the generator matrix is in systematic form, 
+\(
+\G = \begin{bmatrix} \I_k || \mathbf{P} \end{bmatrix},
+\)
+then a corresponding parity check matrix for $\mathcal{C}$ can be constructed as
+\(
+\mathbf{H} = \begin{bmatrix} -\mathbf{P}^T || \I_{n-k} \end{bmatrix},
+\)
+where $\mathbf{P}^T$ denotes the transpose of $\mathbf{P}$, and $\I_{n-k}$ is the $(n-k)\times (n-k)$ identity matrix.
+
+
+
+%\subsection{Syndrome Decoding and Learning Parity with Noise}\label{sec:sd}

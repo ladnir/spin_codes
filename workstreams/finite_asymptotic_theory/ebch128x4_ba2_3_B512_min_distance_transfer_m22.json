@@ -1,0 +1,56 @@
+{
+  "schema": "ebch128x4-ba-min-distance-randomstepconv-v1",
+  "status": "BINARY64_MINIMUM_DISTANCE_WRAPPER_DIAGNOSTIC",
+  "parameters": {
+    "outer": "four EBCH [128,64,22] blocks followed by the stated number of uniform-interleaved accumulators",
+    "outer_block_bits": 512,
+    "outer_dimension": 256,
+    "outer_rows": 4096,
+    "output_bits": 2097152,
+    "distance_cutoff": 228590,
+    "memory_bits": 22,
+    "event_failure_target_bits": 43.0
+  },
+  "rows": [
+    {
+      "accumulators": 2,
+      "minimum_distance_event": 24,
+      "event_failure_log2_upper": -43.14135086035365,
+      "conditional_distance_log2_upper": 858169.2574234504,
+      "conditional_distance_margin_bits": -858169.2574234504,
+      "combined_log2_upper": 858169.2574234504,
+      "combined_margin_bits": -858169.2574234504,
+      "dominant_occupation": 4096,
+      "dominant_pointwise_log2_upper": 858169.2574234504,
+      "dominant_witness": {
+        "candidate_probability": 0.15,
+        "log_surprisal": -1.0
+      }
+    },
+    {
+      "accumulators": 3,
+      "minimum_distance_event": 44,
+      "event_failure_log2_upper": -46.25012974080069,
+      "conditional_distance_log2_upper": 750696.5583911329,
+      "conditional_distance_margin_bits": -750696.5583911329,
+      "combined_log2_upper": 750696.5583911329,
+      "combined_margin_bits": -750696.5583911329,
+      "dominant_occupation": 4096,
+      "dominant_pointwise_log2_upper": 750696.5583911329,
+      "dominant_witness": {
+        "candidate_probability": 0.15,
+        "log_surprisal": -1.0
+      }
+    }
+  ],
+  "proof_model": {
+    "event": "the sampled BA constituent has no nonzero word below the displayed minimum distance",
+    "event_bound": "Markov applied to the expected cumulative BA spectrum",
+    "conditional_transfer": "delete every nonzero row to a uniform minimum-weight subset, then use a Bernoulli change of measure and the exact structured region permutation"
+  },
+  "limitations": [
+    "Nearest binary64 arithmetic makes all distance-transfer values diagnostic.",
+    "The event probability uses the binary64 expected BA spectrum and must be outward-certified if this wrapper closes.",
+    "A failure here rejects only the minimum-distance-only wrapper; it does not reject the BA constituent."
+  ]
+}

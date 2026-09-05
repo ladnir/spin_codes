@@ -1,0 +1,382 @@
+{
+  "assertions": {
+    "fixed_Q_1_2_schedule_decay_positive": true,
+    "fixed_Q_ge_3_schedule_decay_positive": true,
+    "growing_sparse_support_margin_positive": true,
+    "majorant_likelihood_excess_below_1281_over_100000": true,
+    "structured_small_decay_positive": true
+  },
+  "claim": "With B=(39/4) log2(N)+O(1), the weight-coupled receipt covers every fixed Q>=3.  The BA likelihood excess below 0.01281 transfers the Q=1,2 and growing-sparse RM2Sub bounds.",
+  "exact_bounds": {
+    "fixed_Q_1_2_gap_bits_per_active_row": {
+      "decimal": "0.259296854303990132",
+      "denominator": "19492788375459913607136000",
+      "numerator": "5054418707370141608018659"
+    },
+    "fixed_Q_1_2_schedule_decay": {
+      "decimal": "1.52814432946390366",
+      "denominator": "25990384500613218142848000",
+      "numerator": "39717058695198622761394567"
+    },
+    "fixed_Q_ge_3_weight_coupled_schedule_decay_natural": 0.0008689160550218037,
+    "growing_sparse_support_margin_natural": {
+      "decimal": "0.0325484227322525438",
+      "denominator": "32494800000",
+      "numerator": "1057654487"
+    },
+    "random_fixed_gap_bits_per_active_row": {
+      "decimal": "0.116043812735052751",
+      "denominator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000",
+      "numerator": "46675063257346095514236977944488204254455253813296043316310063284898597313842490611450422657541733671"
+    },
+    "random_small_decay_natural": {
+      "decimal": "0.117153294527124335",
+      "denominator": "6665600",
+      "numerator": "780897"
+    },
+    "structured_fixed_gap_bits_per_active_row": {
+      "decimal": "0.0975628892612650928",
+      "denominator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000",
+      "numerator": "39241678815190047402268915083527738617207064866581051933397530061498597313842490611450422657541733671"
+    },
+    "structured_small_decay_natural": {
+      "decimal": "0.104343294527124333",
+      "denominator": "833200000",
+      "numerator": "86938833"
+    }
+  },
+  "likelihood_excess": {
+    "claimed_upper": {
+      "decimal": "0.0128100000000000002",
+      "denominator": "100000",
+      "numerator": "1281"
+    },
+    "convexity_rule": "On each affine majorant segment, majorant(x)-h(x)+ln(2)/2 is convex, so its maximum occurs at an endpoint.",
+    "endpoint_checks": [
+      {
+        "likelihood_excess_upper_natural": 0.012809574834076062,
+        "segment": 0,
+        "weight": "13/125"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00037502955404198414,
+        "segment": 0,
+        "weight": "18296026121/120000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00037502955404198414,
+        "segment": 1,
+        "weight": "18296026121/120000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00018206697414301456,
+        "segment": 1,
+        "weight": "791599208623/5000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00018206697414301456,
+        "segment": 2,
+        "weight": "791599208623/5000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0001533091109029358,
+        "segment": 2,
+        "weight": "1609032935677/10000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0001533091109029358,
+        "segment": 3,
+        "weight": "1609032935677/10000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00012435069767508547,
+        "segment": 3,
+        "weight": "2469788513329/15000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00012435069767508547,
+        "segment": 4,
+        "weight": "2469788513329/15000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00011406085236284277,
+        "segment": 4,
+        "weight": "4271577070219/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00011406085236284277,
+        "segment": 5,
+        "weight": "4271577070219/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0004636674419664865,
+        "segment": 5,
+        "weight": "13956016256281/75000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0004636674419664865,
+        "segment": 6,
+        "weight": "13956016256281/75000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0008626964994337532,
+        "segment": 6,
+        "weight": "428613422794653/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0008626964994337532,
+        "segment": 7,
+        "weight": "428613422794653/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0009553309383289269,
+        "segment": 7,
+        "weight": "499776708257287/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0009553309383289269,
+        "segment": 8,
+        "weight": "499776708257287/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0010462327596067313,
+        "segment": 8,
+        "weight": "144603079418107/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0010462327596067313,
+        "segment": 9,
+        "weight": "144603079418107/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001128163539755631,
+        "segment": 9,
+        "weight": "663870278625033/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001128163539755631,
+        "segment": 10,
+        "weight": "663870278625033/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0011940143027370195,
+        "segment": 10,
+        "weight": "755265762055919/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0011940143027370195,
+        "segment": 11,
+        "weight": "755265762055919/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001241305341821278,
+        "segment": 11,
+        "weight": "10640568152347/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001241305341821278,
+        "segment": 12,
+        "weight": "10640568152347/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00032972819871170036,
+        "segment": 12,
+        "weight": "46255924070167/100000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00032972819871170036,
+        "segment": 13,
+        "weight": "46255924070167/100000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 9.680626298051263e-05,
+        "segment": 13,
+        "weight": "12032207560909/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 9.680626298051263e-05,
+        "segment": 14,
+        "weight": "12032207560909/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 8.816710178601756e-05,
+        "segment": 14,
+        "weight": "246680276543717/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 8.816710178601756e-05,
+        "segment": 15,
+        "weight": "246680276543717/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 8.816710178601756e-05,
+        "segment": 15,
+        "weight": "253319723456283/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 8.816710178601756e-05,
+        "segment": 16,
+        "weight": "253319723456283/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 9.680626298051263e-05,
+        "segment": 16,
+        "weight": "12967792439091/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 9.680626298051263e-05,
+        "segment": 17,
+        "weight": "12967792439091/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00032972819871170036,
+        "segment": 17,
+        "weight": "53744075929833/100000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00032972819871170036,
+        "segment": 18,
+        "weight": "53744075929833/100000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001241305341821278,
+        "segment": 18,
+        "weight": "14359431847653/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001241305341821278,
+        "segment": 19,
+        "weight": "14359431847653/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0011940143027370195,
+        "segment": 19,
+        "weight": "1244734237944081/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0011940143027370195,
+        "segment": 20,
+        "weight": "1244734237944081/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001128163539755631,
+        "segment": 20,
+        "weight": "1336129721374967/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.001128163539755631,
+        "segment": 21,
+        "weight": "1336129721374967/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0010462327596067313,
+        "segment": 21,
+        "weight": "355396920581893/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0010462327596067313,
+        "segment": 22,
+        "weight": "355396920581893/500000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0009553309383289269,
+        "segment": 22,
+        "weight": "1500223291742713/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0009553309383289269,
+        "segment": 23,
+        "weight": "1500223291742713/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0008626964994337532,
+        "segment": 23,
+        "weight": "1571386577205347/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0008626964994337532,
+        "segment": 24,
+        "weight": "1571386577205347/2000000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0004636674419664865,
+        "segment": 24,
+        "weight": "61043983743719/75000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0004636674419664865,
+        "segment": 25,
+        "weight": "61043983743719/75000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00011406085236284277,
+        "segment": 25,
+        "weight": "20728422929781/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00011406085236284277,
+        "segment": 26,
+        "weight": "20728422929781/25000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00012435069767508547,
+        "segment": 26,
+        "weight": "12530211486671/15000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00012435069767508547,
+        "segment": 27,
+        "weight": "12530211486671/15000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0001533091109029358,
+        "segment": 27,
+        "weight": "8390967064323/10000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.0001533091109029358,
+        "segment": 28,
+        "weight": "8390967064323/10000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00018206697414301456,
+        "segment": 28,
+        "weight": "4208400791377/5000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00018206697414301456,
+        "segment": 29,
+        "weight": "4208400791377/5000000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00037502955404198414,
+        "segment": 29,
+        "weight": "101703973879/120000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.00037502955404198414,
+        "segment": 30,
+        "weight": "101703973879/120000000000"
+      },
+      {
+        "likelihood_excess_upper_natural": 0.012809574834076062,
+        "segment": 30,
+        "weight": "112/125"
+      }
+    ],
+    "largest_outward_claim_margin_upper": -4.251659239382183e-07,
+    "largest_outward_endpoint_upper": 0.012809574834076062
+  },
+  "schema": "golay-ba3-rm2sub-sparse-transfer-v2",
+  "scope": {
+    "fixed_occupations": "every fixed Q>=1",
+    "growing_sparse_occupations": "Q->infinity and Q/L<=10^-4",
+    "outer_selection_factor": "The B^2 factor per active row is exp(o(QB)) for growing Q and is absorbed into o_Q(B) for each fixed Q."
+  },
+  "selected_block_constant": {
+    "decimal": "9.75",
+    "denominator": "4",
+    "numerator": "39"
+  },
+  "status": "proved"
+}

@@ -1,0 +1,84 @@
+{
+  "assertions": {
+    "block_constant_exceeds_threshold": true,
+    "gap_is_positive": true,
+    "log_two_bracket_is_strict": true,
+    "perron_square_root_is_upper": true,
+    "schedule_decay_is_positive": true
+  },
+  "exact_bounds": {
+    "g_three_upper": {
+      "decimal_display": "0.0231625235299414249",
+      "denominator": "701171333923686901404422436777095245649580",
+      "numerator": "16240897520527812700714805496883231029641"
+    },
+    "gap_bits_per_active_row_lower": {
+      "decimal_display": "0.116043812735052751",
+      "denominator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000",
+      "numerator": "46675063257346095514236977944488204254455253813296043316310063284898597313842490611450422657541733671"
+    },
+    "log_40_over_33_upper": {
+      "decimal_display": "0.192371892647456078",
+      "denominator": "934895111898249201872563249036126994199440",
+      "numerator": "179847542102721423028413374078205455014543"
+    },
+    "log_two_lower": {
+      "decimal_display": "0.693147180559944176",
+      "denominator": "5468195662683852030075",
+      "numerator": "3790264406339427645832"
+    },
+    "log_two_upper": {
+      "decimal_display": "0.693147180559945286",
+      "denominator": "634310696871326835488700",
+      "numerator": "439670671135374324000737"
+    },
+    "natural_objective_per_active_row_upper": {
+      "decimal_display": "0.266138148661244134",
+      "denominator": "367615015148848034476620426110552935055881349460000000000000000000000000000000000000000",
+      "numerator": "97836379551789633981173446526543957524650134174739625350620145963026785557131552197781"
+    },
+    "objective_bits_per_active_row_upper": {
+      "decimal_display": "0.383956187264947235",
+      "denominator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000",
+      "numerator": "154434595919024641550758835729546949021474280164537223272866739915101402686157509388549577342458266329"
+    },
+    "perron_upper": {
+      "decimal_display": "1.00097608670967175",
+      "denominator": "10485740000000000000000000000000000000000000000",
+      "numerator": "10495974991455074559777793996256783756755050939"
+    },
+    "schedule_decay_exponent_per_active_row_lower": {
+      "decimal_display": "0.0443943146154747101",
+      "denominator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000",
+      "numerator": "17856250963373385498141174152323531738238216363997856668436963164087375824582415503053803917875603039"
+    },
+    "sqrt_radicand_upper": {
+      "decimal_display": "0.00195312709547910968",
+      "denominator": "10000000000000000000000000000000000000000",
+      "numerator": "19531270954791096818715696282348707397"
+    },
+    "strict_log2_block_threshold_upper": {
+      "decimal_display": "8.61743488455662643",
+      "denominator": "46675063257346095514236977944488204254455253813296043316310063284898597313842490611450422657541733671",
+      "numerator": "402219318352741474129991627348070306551859067955666533178353606400000000000000000000000000000000000000"
+    }
+  },
+  "interpretation": "For each fixed Q>=3, B=9 log2(N)+O(1) gives Pr[Z_{floor(0.11N),Q}>0] <= N^{-epsilon Q+o_Q(1)}, where epsilon exceeds the certified schedule-decay lower bound.",
+  "limitations": [
+    "The continuum approximation is proved separately for each fixed Q.",
+    "This certificate does not allow Q to grow with L or N.",
+    "Occupations Q=1 and Q=2 use their sharper existing certificates.",
+    "The structured-outer transfer still requires a proved uniform spectrum comparison."
+  ],
+  "schema": "rm2sub-uniform-fixed-occupation-v1",
+  "scope": {
+    "delta": "11/100",
+    "minimum_occupation": 3,
+    "occupation_quantifier": "every fixed integer Q >= 3",
+    "selected_block_constant": 9,
+    "selected_tau": "11/10",
+    "selected_y": "1/2",
+    "state_bits": 19
+  },
+  "status": "EXACT_RATIONAL_CERTIFICATE"
+}

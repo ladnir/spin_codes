@@ -1,0 +1,1473 @@
+{
+  "schema": "riffle-dp-g4-counterexample-ledger-v1",
+  "candidate": "Riffle DP g=4@g0-v1",
+  "evidence_label": "EXACT",
+  "receipt_count": 26,
+  "aggregate_first_moment_contribution": {
+    "numerator": "35706104818985535904878648866557605214498332563680201868092877773796394963593274101380227232097507057",
+    "denominator": "45135941472043053826524478143865264872618421533074071690614738889613430853327241992731097298898881645089718083633875756478932837091725",
+    "log2_interval": [
+      "-109.961733072749",
+      "-109.961733072748"
+    ],
+    "exceeds_2^-40": false
+  },
+  "receipts": [
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t0013fa47fb3512a5",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x0013fa47fb3512a5; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i4-t0013fa47fb3512a5",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_4=0x0013fa47fb3512a5; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_4; p_1=x^4m_4"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i8-t0013fa47fb3512a5",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_8=0x0013fa47fb3512a5; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_8; p_1=x^8m_8"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x0013fa47fb3512a5",
+          "codeword_hex": "0x000e0500ca000700065000b000ae0003",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fa47fb3512a500",
+          "codeword_hex": "0x0e0500ca000700065000b000ae000300",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t013f5f6d7a607131",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x013f5f6d7a607131; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013f5f6d7a607131",
+          "codeword_hex": "0x00e000001f00087080200f0000b0070f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013f5f6d7a607131",
+          "codeword_hex": "0x00e000001f00087080200f0000b0070f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013f5f6d7a607131",
+          "codeword_hex": "0x00e000001f00087080200f0000b0070f",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i4-t013f5f6d7a607131",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_4=0x013f5f6d7a607131; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_4; p_1=x^4m_4"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013f5f6d7a607131",
+          "codeword_hex": "0x00e000001f00087080200f0000b0070f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013f5f6d7a607131",
+          "codeword_hex": "0x00e000001f00087080200f0000b0070f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13f5f6d7a6071310",
+          "codeword_hex": "0x0e000001f00087080200f0000b0070f0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t013fa47fb3512a50",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x013fa47fb3512a50; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i4-t013fa47fb3512a50",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_4=0x013fa47fb3512a50; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_4; p_1=x^4m_4"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fa47fb3512a50",
+          "codeword_hex": "0x00e0500ca000700065000b000ae00030",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fa47fb3512a500",
+          "codeword_hex": "0x0e0500ca000700065000b000ae000300",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t013fb79e0c15f9e9",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x013fb79e0c15f9e9; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013fb79e0c15f9e9",
+          "codeword_hex": "0x00e05e0000500e000700000704000647",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fb79e0c15f9e9",
+          "codeword_hex": "0x00e05e0000500e000700000704000647",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fb79e0c15f9e9",
+          "codeword_hex": "0x00e05e0000500e000700000704000647",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i4-t013fb79e0c15f9e9",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_4=0x013fb79e0c15f9e9; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_4; p_1=x^4m_4"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x013fb79e0c15f9e9",
+          "codeword_hex": "0x00e05e0000500e000700000704000647",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x013fb79e0c15f9e9",
+          "codeword_hex": "0x00e05e0000500e000700000704000647",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fb79e0c15f9e90",
+          "codeword_hex": "0x0e05e0000500e0007000007040006470",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t014b26c75925b3f7",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x014b26c75925b3f7; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x014b26c75925b3f7",
+          "codeword_hex": "0x00cf000003a000aa7000e00006000d0d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x014b26c75925b3f7",
+          "codeword_hex": "0x00cf000003a000aa7000e00006000d0d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x014b26c75925b3f7",
+          "codeword_hex": "0x00cf000003a000aa7000e00006000d0d",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i4-t014b26c75925b3f7",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_4=0x014b26c75925b3f7; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_4; p_1=x^4m_4"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x014b26c75925b3f7",
+          "codeword_hex": "0x00cf000003a000aa7000e00006000d0d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x014b26c75925b3f7",
+          "codeword_hex": "0x00cf000003a000aa7000e00006000d0d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x14b26c75925b3f70",
+          "codeword_hex": "0x0cf000003a000aa7000e00006000d0d0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t13f5f6d7a6071310",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x13f5f6d7a6071310; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x13f5f6d7a6071310",
+          "codeword_hex": "0x0e000001f00087080200f0000b0070f0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13f5f6d7a6071310",
+          "codeword_hex": "0x0e000001f00087080200f0000b0070f0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13f5f6d7a6071310",
+          "codeword_hex": "0x0e000001f00087080200f0000b0070f0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t13fa47fb3512a500",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x13fa47fb3512a500; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x13fa47fb3512a500",
+          "codeword_hex": "0x0e0500ca000700065000b000ae000300",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fa47fb3512a500",
+          "codeword_hex": "0x0e0500ca000700065000b000ae000300",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fa47fb3512a500",
+          "codeword_hex": "0x0e0500ca000700065000b000ae000300",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t13fb79e0c15f9e90",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x13fb79e0c15f9e90; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x13fb79e0c15f9e90",
+          "codeword_hex": "0x0e05e0000500e0007000007040006470",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fb79e0c15f9e90",
+          "codeword_hex": "0x0e05e0000500e0007000007040006470",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x13fb79e0c15f9e90",
+          "codeword_hex": "0x0e05e0000500e0007000007040006470",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t14b26c75925b3f70",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x14b26c75925b3f70; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x14b26c75925b3f70",
+          "codeword_hex": "0x0cf000003a000aa7000e00006000d0d0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x14b26c75925b3f70",
+          "codeword_hex": "0x0cf000003a000aa7000e00006000d0d0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x14b26c75925b3f70",
+          "codeword_hex": "0x0cf000003a000aa7000e00006000d0d0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t15aad8f5346444f7",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x15aad8f5346444f7; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x15aad8f5346444f7",
+          "codeword_hex": "0x0c0c00000b0a03fca00000000063000d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x15aad8f5346444f7",
+          "codeword_hex": "0x0c0c00000b0a03fca00000000063000d",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x15aad8f5346444f7",
+          "codeword_hex": "0x0c0c00000b0a03fca00000000063000d",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t32444f38b60d0000",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x32444f38b60d0000; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x32444f38b60d0000",
+          "codeword_hex": "0x900f0c00008d00000cc10300009b0000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x32444f38b60d0000",
+          "codeword_hex": "0x900f0c00008d00000cc10300009b0000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x32444f38b60d0000",
+          "codeword_hex": "0x900f0c00008d00000cc10300009b0000",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t56e790b14459bed0",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x56e790b14459bed0; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x56e790b14459bed0",
+          "codeword_hex": "0xb00900a00b0008000000a0070c0b03b0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x56e790b14459bed0",
+          "codeword_hex": "0xb00900a00b0008000000a0070c0b03b0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x56e790b14459bed0",
+          "codeword_hex": "0xb00900a00b0008000000a0070c0b03b0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t5739d03a129b5831",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x5739d03a129b5831; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x5739d03a129b5831",
+          "codeword_hex": "0xb0b00de900000f0f00009b100000000f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x5739d03a129b5831",
+          "codeword_hex": "0xb0b00de900000f0f00009b100000000f",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x5739d03a129b5831",
+          "codeword_hex": "0xb0b00de900000f0f00009b100000000f",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t5c222cbcb161bd00",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x5c222cbcb161bd00; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x5c222cbcb161bd00",
+          "codeword_hex": "0xb60000e0350e0920000b00000a000b00",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x5c222cbcb161bd00",
+          "codeword_hex": "0xb60000e0350e0920000b00000a000b00",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x5c222cbcb161bd00",
+          "codeword_hex": "0xb60000e0350e0920000b00000a000b00",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t6b16d09000000000",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x6b16d09000000000; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x6b16d09000000000",
+          "codeword_hex": "0xa5050ab00a500000000c1e7000000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x6b16d09000000000",
+          "codeword_hex": "0xa5050ab00a500000000c1e7000000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x6b16d09000000000",
+          "codeword_hex": "0xa5050ab00a500000000c1e7000000000",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-t83f66eb300000000",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0x83f66eb300000000; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0x83f66eb300000000",
+          "codeword_hex": "0xfb0b00de900000f0f00009b100000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x83f66eb300000000",
+          "codeword_hex": "0xfb0b00de900000f0f00009b100000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0x83f66eb300000000",
+          "codeword_hex": "0xfb0b00de900000f0f00009b100000000",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-tacf2ca0f00000000",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0xacf2ca0f00000000; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0xacf2ca0f00000000",
+          "codeword_hex": "0xe0f380000000025050ab00a500000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xacf2ca0f00000000",
+          "codeword_hex": "0xe0f380000000025050ab00a500000000",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xacf2ca0f00000000",
+          "codeword_hex": "0xe0f380000000025050ab00a500000000",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-tadfb2f65b715f54a",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0xadfb2f65b715f54a; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0xadfb2f65b715f54a",
+          "codeword_hex": "0xe0000e0350e0920000b00000a000b006",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xadfb2f65b715f54a",
+          "codeword_hex": "0xe0000e0350e0920000b00000a000b006",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xadfb2f65b715f54a",
+          "codeword_hex": "0xe0000e0350e0920000b00000a000b006",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-tfaecebffc51f71e0",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0xfaecebffc51f71e0; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0xfaecebffc51f71e0",
+          "codeword_hex": "0xd0ab00a500000000c1e70000000004a0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xfaecebffc51f71e0",
+          "codeword_hex": "0xd0ab00a500000000c1e70000000004a0",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xfaecebffc51f71e0",
+          "codeword_hex": "0xd0ab00a500000000c1e70000000004a0",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    },
+    {
+      "schema": "riffle-dp-g4-counterexample-receipt-v1",
+      "candidate": "Riffle DP g=4@g0-v1",
+      "manifest_sha256": "3f4cef7669f4a5d913f6b2b8513cadd095538c22636b16116c709779cf0a60ef",
+      "evidence_label": "EXACT",
+      "family_id": "terminal-w3-s33-one-i0-tfbfc4e34c1f4398c",
+      "outer_family": {
+        "block_weight": 3,
+        "category": "one data symbol and both parity symbols",
+        "parameterization": "m_0=0xfbfc4e34c1f4398c; all other data symbols are zero",
+        "coefficient_relation": "p_0=m_0; p_1=x^0m_0"
+      },
+      "local_words": [
+        {
+          "message_hex": "0xfbfc4e34c1f4398c",
+          "codeword_hex": "0xd050ab00a500000000c1e70000000004",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xfbfc4e34c1f4398c",
+          "codeword_hex": "0xd050ab00a500000000c1e70000000004",
+          "nibble_support": 11
+        },
+        {
+          "message_hex": "0xfbfc4e34c1f4398c",
+          "codeword_hex": "0xd050ab00a500000000c1e70000000004",
+          "nibble_support": 11
+        }
+      ],
+      "inner_event": {
+        "description": "All 33 nonzero outer nibbles occupy the final 47184 logical packet positions.",
+        "output_weight_upper": 188736
+      },
+      "population": "1",
+      "event_probability": {
+        "numerator": "2746623447614271992682972989735200401115256351052323220622529059522799612584098007798479017853654389",
+        "denominator": "90271882944086107653048956287730529745236843066148143381229477779226861706654483985462194597797763290179436167267751512957865674183450"
+      },
+      "first_moment_contribution": {
+        "exact_expression": "C(47184,33)/C(524352,33)",
+        "log2_interval": [
+          -114.66217279089,
+          -114.662172790889
+        ],
+        "exceeds_2^-40": false
+      },
+      "authentication": {
+        "command": "python scripts/riffle_dp_g4_weighted_triples.py refutation --low-message-file bch_g4_le13.bin",
+        "source_sha256": "e693070965de4620369a4e2b2303d28f3325d05b986d313026e26cf9fc3c172c",
+        "independent_checks": [
+          "Every local message was re-encoded from the BCH generator rows.",
+          "Every local word has exactly 11 nonzero nibbles.",
+          "The field ratio equals one declared coefficient x^i."
+        ]
+      }
+    }
+  ]
+}

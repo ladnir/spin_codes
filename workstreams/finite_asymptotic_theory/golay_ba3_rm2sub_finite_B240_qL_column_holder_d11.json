@@ -1,0 +1,65 @@
+{
+  "schema": "golay-ba3-rm2sub-finite-b240-qL-column-holder-d11-v1",
+  "status": "BINARY64_DIAGNOSTIC",
+  "parameters": {
+    "outer_bits": 240,
+    "outer_rows": 8832,
+    "occupation": 8832,
+    "distance": 233164,
+    "outer_nonzero_words_per_row": 1329227995784915872903807060280344575,
+    "one_coordinate_probability_for_uniform_nonzero_outer_word": 0.5
+  },
+  "method": {
+    "region_transfer": "exact finite uniform-shell 2x2 envelope",
+    "region_product": "common positive weighted norm",
+    "column_dependence": "Holder with exponent B across B regions",
+    "shell_mixture": "summed implicitly from exact one-coordinate balance"
+  },
+  "best": {
+    "z_binary64_hex_exact": "0x1.1eb851eb851ecp-3",
+    "positive_norm_ratio_v1_over_v0": 1.021298871133256,
+    "log2_upper": 1712377.9815859946,
+    "margin_bits": -1712377.9815859946,
+    "optimizer_success": true,
+    "region_matrix_entries_nonnegative": true,
+    "region_matrix_maximum": 1.0,
+    "region_matrix_minimum_positive": 5e-323
+  },
+  "rows": [
+    {
+      "z_binary64_hex_exact": "0x1.c28f5c28f5c29p-4",
+      "positive_norm_ratio_v1_over_v0": 1.0225456468307352,
+      "log2_upper": 1793501.170704687,
+      "margin_bits": -1793501.170704687,
+      "optimizer_success": true,
+      "region_matrix_entries_nonnegative": true,
+      "region_matrix_maximum": 1.0,
+      "region_matrix_minimum_positive": 5e-324
+    },
+    {
+      "z_binary64_hex_exact": "0x1.fa3ec02f2f987p-4",
+      "positive_norm_ratio_v1_over_v0": 1.0219254806016442,
+      "log2_upper": 1754302.3718913167,
+      "margin_bits": -1754302.3718913167,
+      "optimizer_success": true,
+      "region_matrix_entries_nonnegative": true,
+      "region_matrix_maximum": 1.0,
+      "region_matrix_minimum_positive": 5.4e-323
+    },
+    {
+      "z_binary64_hex_exact": "0x1.1eb851eb851ecp-3",
+      "positive_norm_ratio_v1_over_v0": 1.021298871133256,
+      "log2_upper": 1712377.9815859946,
+      "margin_bits": -1712377.9815859946,
+      "optimizer_success": true,
+      "region_matrix_entries_nonnegative": true,
+      "region_matrix_maximum": 1.0,
+      "region_matrix_minimum_positive": 5e-323
+    }
+  ],
+  "limitations": [
+    "The calculation uses nearest binary64 and is not an outward certificate.",
+    "The column-H\u00f6lder reduction requires a written proof audit.",
+    "This receipt covers Q=L only."
+  ]
+}

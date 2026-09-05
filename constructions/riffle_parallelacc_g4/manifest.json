@@ -1,0 +1,22 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_parallelacc_g4",
+  "display_name": "Riffle ParallelAcc g=4",
+  "status": "DIAGNOSTIC_EXPLORATION",
+  "parent_candidate_id": "riffle_dp_g4",
+  "inherited": [
+    "outer stage",
+    "four-bit packet layout",
+    "uniform global packet permutation"
+  ],
+  "replaced_mechanism": "complete Riffle DP g=4 inner map",
+  "constituent": {
+    "packet_alphabet": "F_2^4",
+    "initial_state": 0,
+    "state_update": "s_t = s_{t-1} XOR x_t",
+    "output": "y_t = s_t",
+    "termination": "none",
+    "lap_count": 1
+  },
+  "claim_scope": "diagnostic only; no full-size distance or performance claim"
+}

@@ -1,0 +1,48 @@
+main_permConv.aux
+main_permConv.log
+main_permConv.pdf
+
+# New SPIN paper build products.
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.pdf
+paper/*.bbl
+paper/*.blg
+
+# Python bytecode and caches.
+__pycache__/
+*.py[cod]
+
+# Ad hoc script outputs. Promoted result artifacts can still be force-added
+# explicitly when they become part of a proof ledger or paper result.
+scripts/*.csv
+scripts/*.png
+
+# Local build products and caches.
+target/
+out/
+output/
+.pytest_cache/
+*.o
+*.obj
+*.exe
+*.dll
+*.pdb
+
+# Bulk experiment products. Keep small, named proof artifacts only when they
+# are deliberately force-added and pass scripts/check_repository_hygiene.py.
+receipts/
+old/
+previous_draft/
+related_work/
+*.bin
+*.npy
+*.npz
+*.parquet
+*.prof
+*.trace
+*.stdout.txt
+*.stderr.txt
+dist_*.txt

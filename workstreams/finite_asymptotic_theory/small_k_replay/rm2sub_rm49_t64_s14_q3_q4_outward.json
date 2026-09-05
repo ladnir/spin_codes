@@ -1,0 +1,152 @@
+{
+  "schema": "rm2sub-rm49-q3-q4-outward-certificate-v1",
+  "status": "OUTWARD_OCCUPATION_CERTIFICATE",
+  "claim": {
+    "event": "some occupation-three or occupation-four message encodes to output weight at most 13107",
+    "failure_probability_upper_interval": "[9.63271686505850033394648749625744009523619272933472930242178891792810050e-26 +/- 3.63e-98]",
+    "log2_failure_probability_interval": "[-83.102187705872811032659125186495237665606691046958759569670996927023615768 +/- 4.33e-73]",
+    "margin_bits_lower": 83.1021877058728,
+    "clears_40_bits": true
+  },
+  "reduction": "Separate the unique all-one RM word. Dominate every other routed RM word pointwise by the uniform Bernoulli-half reference. Sum every regular/all-one mixture with the exact positive support-averaged RM2Sub transfer.",
+  "regular_density": {
+    "reference_probability": "1/2",
+    "envelope_log2_interval": "[368.7487413146182551374593741115148740388237074066187136438319748399057163803 +/- 1.28e-74]",
+    "maximizing_weights": [
+      32,
+      480
+    ]
+  },
+  "occupation_rows": [
+    {
+      "occupation": 3,
+      "log2_failure_probability_interval": "[-83.102187710714080766232254810815631293926600554658994210221385864752581874 +/- 4.19e-73]",
+      "margin_bits_lower": 83.10218771071406,
+      "prior_binary64_margin_bits": 82.41355248355406,
+      "improvement_from_tighter_epoch_transfer_bits": 0.688635227160006
+    },
+    {
+      "occupation": 4,
+      "log2_failure_probability_interval": "[-111.252921458367817909433967170720954545348627120341286477486007196456788179 +/- 3.72e-73]",
+      "margin_bits_lower": 111.25292145836781,
+      "prior_binary64_margin_bits": 110.16800888239896,
+      "improvement_from_tighter_epoch_transfer_bits": 1.0849125759688434
+    }
+  ],
+  "mixture_rows": [
+    {
+      "occupation": 3,
+      "regular_rows": 3,
+      "all_one_rows": 0,
+      "log_surprisal_exact": "-41/10",
+      "log2_upper_interval": "[-83.102187710714080766232254810815631293926600554658994210221385864752581874 +/- 4.19e-73]",
+      "log2_upper": -83.10218771071406,
+      "margin_bits_lower": 83.10218771071406
+    },
+    {
+      "occupation": 3,
+      "regular_rows": 2,
+      "all_one_rows": 1,
+      "log_surprisal_exact": "-25/10",
+      "log2_upper_interval": "[-3809.269814789437750694751513136145786508633369951511755526801142606987233253 +/- 7.62e-73]",
+      "log2_upper": -3809.269814789437,
+      "margin_bits_lower": 3809.269814789437
+    },
+    {
+      "occupation": 3,
+      "regular_rows": 1,
+      "all_one_rows": 2,
+      "log_surprisal_exact": "-24/10",
+      "log2_upper_interval": "[-4766.35579092336870579731042786222745417916444594369251962301449818841981234 +/- 5.51e-72]",
+      "log2_upper": -4766.355790923368,
+      "margin_bits_lower": 4766.355790923368
+    },
+    {
+      "occupation": 3,
+      "regular_rows": 0,
+      "all_one_rows": 3,
+      "log_surprisal_exact": "-23/10",
+      "log2_upper_interval": "[-5728.066244210681786582467417454755851514829778837109792306959492647713167196 +/- 8.79e-73]",
+      "log2_upper": -5728.06624421068,
+      "margin_bits_lower": 5728.06624421068
+    },
+    {
+      "occupation": 4,
+      "regular_rows": 4,
+      "all_one_rows": 0,
+      "log_surprisal_exact": "-38/10",
+      "log2_upper_interval": "[-111.252921458367817909433967170720954545348627120341286477486007196456788179 +/- 3.72e-73]",
+      "log2_upper": -111.25292145836781,
+      "margin_bits_lower": 111.25292145836781
+    },
+    {
+      "occupation": 4,
+      "regular_rows": 3,
+      "all_one_rows": 1,
+      "log_surprisal_exact": "-25/10",
+      "log2_upper_interval": "[-3723.46277488632030217268731547820785411655734364304398563766143433933734198 +/- 5.01e-72]",
+      "log2_upper": -3723.46277488632,
+      "margin_bits_lower": 3723.46277488632
+    },
+    {
+      "occupation": 4,
+      "regular_rows": 2,
+      "all_one_rows": 2,
+      "log_surprisal_exact": "-24/10",
+      "log2_upper_interval": "[-4675.06606852816684364133320114207965910144187536858757448342188950214638444 +/- 5.30e-72]",
+      "log2_upper": -4675.0660685281655,
+      "margin_bits_lower": 4675.0660685281655
+    },
+    {
+      "occupation": 4,
+      "regular_rows": 1,
+      "all_one_rows": 3,
+      "log_surprisal_exact": "-23/10",
+      "log2_upper_interval": "[-5632.53502293716345854411233386018837899891604244247478056752571650303261049 +/- 5.76e-72]",
+      "log2_upper": -5632.5350229371625,
+      "margin_bits_lower": 5632.5350229371625
+    },
+    {
+      "occupation": 4,
+      "regular_rows": 0,
+      "all_one_rows": 4,
+      "log_surprisal_exact": "-22/10",
+      "log2_upper_interval": "[-6595.86918361816473132683440086259661874039403742129446760999776507349880221 +/- 1.37e-72]",
+      "log2_upper": -6595.869183618164,
+      "margin_bits_lower": 6595.869183618164
+    }
+  ],
+  "arithmetic": {
+    "library": "python-flint Arb",
+    "precision_bits": 256,
+    "proof_change_from_discovery": "exact A-spectrum support average and exact zero-state destination split replace the older factorial-moment relaxation"
+  },
+  "inputs": {
+    "manifest": "C:\\Users\\peter\\.codex\\worktrees\\3061\\permute_conv\\workstreams\\finite_asymptotic_theory\\small_k_replay\\RM2SUB_RM49_Q3_Q4_INPUT_MANIFEST.json",
+    "manifest_sha256": "cc0ac6d489084501af87a629cde1dd60b63cac47639fda40186f5c02b436b559",
+    "checker_sha256": "a9b956b54fdbc899dbf51e13304eb3950f54e0ea2613453d7d2fc7cac9ae9352",
+    "files": [
+      {
+        "role": "q1_input_manifest",
+        "path": "RM2SUB_RM49_Q1_INPUT_MANIFEST.json",
+        "sha256": "a06c1f5ecf0e33d17753cb1924a81f78e7238e183e1eec7941ba2d268a4801e5"
+      },
+      {
+        "role": "shared_q1_outward_helpers",
+        "path": "certify_rm2sub_rm49_q1_outward.py",
+        "sha256": "e71d757394cb453209db4875f803f04daabd9d4382ea6de7d988272d9b5da4cd"
+      },
+      {
+        "role": "shared_region_outward_helpers",
+        "path": "certify_rm2sub_rm49_q30_low_outward.py",
+        "sha256": "001193c3d558cefdd4632861afeb76f09bed7b343f75ebb7c0421ecc53f0d4df"
+      },
+      {
+        "role": "binary64_two_colour_witnesses",
+        "path": "rm2sub_q_ladder_rm49_t64_s14_d100.json",
+        "sha256": "5589a2e2d73115630dbb12f87e93fb7dfae1ece8c0c17e9bf5df05694e99f876"
+      }
+    ]
+  },
+  "scope": "This certificate covers occupations three and four only."
+}

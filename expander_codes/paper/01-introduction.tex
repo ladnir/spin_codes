@@ -1,0 +1,221 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Sparse linear codes appear inside several pseudorandom correlation generators
+(PCGs) and silent cryptographic protocols.  These applications do not begin with a
+received word and ask a decoder to correct errors.  They instead need a
+sampled linear map to send every nonzero message to an output with many
+nonzero coordinates.  In coding terminology, the generator must have large
+minimum distance.
+
+Expand--Accumulate (EA) and Expand--Convolute (EC) are two such families
+introduced for cryptographic applications~\cite{EA,EC}.  Both first apply a
+sparse random matrix.  EA follows that matrix by a running sum.  EC follows it
+by a randomized recursive convolution.  The sparse first stage keeps encoding
+cheap, while the recursive second stage spreads each nonzero contribution
+through the output.
+
+The published distance proofs do not analyze the recursive output law
+exactly.  They compare or bound a state process and then apply concentration.
+This choice obscures two different regimes.  A message with linearly many
+nonzero symbols makes the expander output nearly uniform; its distance is
+governed by the same entropy calculation as a random linear code.  A message
+with only a few nonzero symbols instead tests whether the sparse first stage
+creates enough opportunities for the recursive map to become active.  The
+earlier bounds lose substantially in both regimes.
+
+This paper keeps the exact input--output weight enumerator of the recursive
+map.  An enumerator is a generating function that records how many inputs of
+each weight produce outputs of each weight.  Transfer matrices compute this
+function while retaining only the information about the current state that
+can affect future output weight.  The accumulator needs two states.  A
+convolution of memory $m$ needs only $m+1$ states, rather than all $p^m$
+possible field-valued states.
+
+\paragraph{Two cases.}
+We first study binary codes.  This case models bit-valued choices, as in
+Silent OT, and the Hamming support determines every message value.  We then
+study codes over a finite field $\F_p$ whose order is close to $2^{128}$.
+This case models field-valued correlations, as in Silent VOLE.  Here equal
+supports can cancel differently, so the construction and the proof must mix
+field values.  The two cases share the enumerator method but have different
+sparse-message bottlenecks.
+
+\paragraph{Binary analysis of the original ensembles.}
+Our first results change only the analysis.  For the binary Bernoulli EA
+ensemble, write the entry probability as $C\ln(n)/n$, so an expander row has
+expected weight $C\ln n$.  The exact transfer bound lowers the required
+constant at relative distance $0.05$---meaning output weight $0.05n$---from
+$C>4.938$ to $C>1.773$.  At rate $1/5$, the
+dense-message condition improves from a distance below $0.1127$ to the binary
+Gilbert--Varshamov (GV) value $0.2430$.  For wrapped EC with memory $21$, the
+same method lowers the density requirement at distance $0.05$ from
+$C>10.4344$ to $C>1.111623$.  The permitted rate rises from below $0.1278$ to
+the GV threshold $0.7136$.
+
+The GV value is a benchmark defined by the volume of a Hamming ball.  It is
+not a finite-length upper bound.  Saying that a certificate reaches the
+floored GV cutoff means that its integer distance threshold is the floor of
+the corresponding asymptotic value at that length.
+
+\paragraph{Binary regular-expander results.}
+The exact analysis identifies low-support messages as the remaining cost.
+We therefore replace independent edge incidence by a region-stratified
+left-regular expander.  Each input coordinate has exactly one edge in each
+output region.  This change is part of the construction, not merely a proof
+improvement.  At rate one half, the regular binary EA certificate uses degree
+$64$ instead of Bernoulli expected degree $75$.  The regular binary EC
+certificate uses degree $28$ instead of Bernoulli expected degree $42.2127$,
+with convolution memory $9$.  Fixing both expander degrees improves EC much
+further.  A binary two-sided regular EC ensemble uses left/right degrees
+$10/5$ and convolution memory $15$.  Its cutoff reaches $99.993\%$ of the
+rate-one-half GV distance, with sampling failure below $2^{-32.4990}$.
+Two intermediate profiles use degrees $14/7$ with memory $6$ and degrees
+$18/9$ with memory $4$.  Their sampling failures are below $2^{-26.0875}$
+and $2^{-21.6746}$, respectively.
+A lower-degree profile uses degrees $6/3$ and memory $79$ at the same cutoff.
+Its sampling failure is below $2^{-21.4222}$.
+
+Scalar extension does preserve the minimum distance of a binary generator,
+but it does not add field mixing.  In a basis of $\F_{2^{128}}$ over $\F_2$,
+the resulting map is 128 independent copies of the binary map.  This is the
+right structure for binary-choice Silent OT, but not the field-valued mixing
+needed by Silent VOLE over $\F_{2^{128}}$.
+
+\paragraph{Fields near 128 bits.}
+Let $p$ be a prime power.  Over the finite field $\F_p$, cancellations depend
+on message values as well as their support.
+We attach an independent nonzero field label to each expander edge.  The label
+symmetry makes the distribution of a fixed message depend only on its support.
+Because nonzero scalar multiples have the same zero coordinates after every
+linear map, we count each equivalence class of scalar-multiple messages once.
+These classes are the one-dimensional message subspaces.
+Constraint traces then group the resulting projective union before it becomes
+too large.
+
+For finite-field EC, we also sample each feedback vector from the full field.
+This distribution preserves an exact reduced state based only on the number
+of trailing zero outputs.  At rate one half over $\F_{2^{127}-1}$, we certify
+the floored $p$-ary GV cutoff at length $2{,}097{,}150$.  The expander has
+left degree $22$ and right degree $11$, and the convolution has memory $12$.
+The probability of sampling a generator below the claimed distance is less
+than $2^{-27.2951}$.
+
+For the field-valued Silent VOLE setting, we separately instantiate the same
+construction over $\F_{2^{128}}$.  Degrees $24/12$ with memory $5$ reach
+$98.415\%$ of the rate-one-half GV distance.  The certified sampling-failure
+probability is below $2^{-45.03}$.  Degrees $26/13$ with memory $4$ reach the
+same distance with sampling failure below $2^{-135.20}$.  Both proved
+ensembles use nonzero field labels on expander edges and full-field
+coefficients in the convolution.
+
+Keeping degrees $24/12$ and memory $5$ fixed gives a local field-size
+profile.  At the corresponding field-relative cutoffs, the certified failure
+exponents are $45.84$, $45.03$, $44.24$, and $38.78$ for field orders
+$2^{127}$, $2^{128}$, $2^{129}$, and $2^{136}$.  The decline comes from the
+increasing distance target rather than weaker field mixing at a fixed target.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Representative finite certificates.  The probability is over the
+random choices used to sample the generator.  The final column reports the
+distance, failure bound, or comparison relevant to each row.}
+\label{tab:intro-results}
+\begin{tabular}{@{}lcccll@{}}
+\toprule
+ensemble & field & rate & expander & recursive map & conclusion \\
+\midrule
+\multicolumn{6}{@{}l}{\emph{Binary case}} \\
+EA & $\F_2$ & $1/5$ & Bernoulli, mean $50$ & accumulator
+  & $U<2^{-20.46}$ at $\delta=0.05$ \\
+wrapped EC & $\F_2$ & $1/5$ & Bernoulli, mean $46.42$ & memory $5$
+  & $U<2^{-32.08}$; $10.01$-bit gain \\
+regular EA & $\F_2$ & $1/2$ & left degree $64$ & accumulator
+  & $99.988\%$ of GV; $14.67\%$ fewer edges \\
+regular EC & $\F_2$ & $1/2$ & left degree $28$ & memory $9$
+  & $99.994\%$ of GV; $33.67\%$ fewer edges \\
+two-sided EC & $\F_2$ & $1/2$ & degrees $18/9$ & memory $4$
+  & $99.993\%$ of GV; $U<2^{-21.674}$ \\
+two-sided EC & $\F_2$ & $1/2$ & degrees $14/7$ & memory $6$
+  & $99.993\%$ of GV; $U<2^{-26.087}$ \\
+two-sided EC & $\F_2$ & $1/2$ & degrees $10/5$ & memory $15$
+  & $99.993\%$ of GV; $U<2^{-32.499}$ \\
+two-sided EC & $\F_2$ & $1/2$ & degrees $6/3$ & memory $79$
+  & $99.993\%$ of GV; $U<2^{-21.422}$ \\
+\addlinespace
+\multicolumn{6}{@{}l}{\emph{Fields near 128 bits}} \\
+two-sided EC & $\F_{2^{127}-1}$ & $1/2$ & labeled degrees $22/11$ & memory $12$
+  & floored $p$-ary GV; $U<2^{-27.295}$ \\
+two-sided EC & $\F_{2^{128}}$ & $1/2$ & labeled degrees $24/12$ & memory $5$
+  & $98.415\%$ of GV; $U<2^{-45.03}$ \\
+two-sided EC & $\F_{2^{128}}$ & $1/2$ & labeled degrees $26/13$ & memory $4$
+  & $98.415\%$ of GV; $U<2^{-135.20}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Contributions.}
+The paper makes five contributions.
+
+\begin{enumerate}
+  \item We give a common exact-enumerator framework for sparse random maps
+  followed by recursive rate-one maps.
+  \item We sharpen the distance proofs for the original binary EA and wrapped
+  EC ensembles, including direct comparisons with the published bounds.
+  \item We analyze left-regular and two-sided regular expanders.  Binary EC
+  gives four near-GV degree--memory points.
+  \item We extend the construction and analysis to fields near 128 bits using
+  edge labels, projective counting, and constraint traces.  A certified local
+  profile separates field-size effects from changes in the distance target.
+  \item We give reproducible finite certificates checked with outward-rounded
+  ball arithmetic.  The certificates cover every nonzero message support.
+\end{enumerate}
+
+\paragraph{Scope.}
+Our probability bounds concern the sampling of a generator.  They do not
+analyze a decoder, a noise distribution, or a complete cryptographic
+protocol.  Each large-field headline result fixes one field and one finite
+length.  Increasing the field order also changes the field-relative GV
+cutoff, so the displayed margins are not uniform in the field order.  The
+finite claims are separate from our asymptotic theorem for each fixed field.
+
+\paragraph{Related work.}
+Exact input--output weight enumerators and decompositions by message weight
+also appear in analyses of turbo-like codes~\cite{BazziMahdianSpielman2003}.
+Block--Accumulate codes apply this method to a block-diagonal outer map
+followed by recursive stages~\cite{BlockAccumulate2026}.  That work computes
+finite expected weight spectra and uses them to select concrete parameters.
+Its main code family changes the outer map.  We instead retain the original
+EA and EC ensembles, replace their recursive-stage relaxations by exact
+transfers, and then measure the effect of regular expander incidence.
+
+Recent large-field analyses of repeat--accumulate--accumulate (RAA) codes
+address a second source of slack: the union over many field assignments with
+the same set of nonzero message coordinates.  Akhiani and Zhang group these
+assignments before the union bound and prove constant relative distance over
+sufficiently large fields~\cite{AkhianiZhang2026}.  Khabbazian sharpens the
+analysis for randomly scaled RAA codes.  The proof fixes the support geometry,
+identifies scalar multiples, and charges only the cancellation equations that
+exceed the remaining message degrees of freedom~\cite{Khabbazian2026}.
+
+Our support grouping in \eqref{eq:support-grouping} uses the same accounting
+principle.  The EA and EC ensembles require different structural counts.
+Expander collisions determine the rank of the accumulator constraints.  For
+EC, the convolution state also determines which constraints are independent.
+Our transfer matrices therefore count output weight and independent equations
+together.  The large-field RAA results study an asymptotic regime in which the
+field grows with the block length.  Our near-128-bit headline results instead
+fix the field and length, then certify the complete finite union bound.
+
+\paragraph{Organization.}
+Section~\ref{sec:constructions} defines the sampled maps and the distance
+event.  Section~\ref{sec:enumerator-method} develops the common enumerator
+method.  Sections~\ref{sec:binary-ea} and~\ref{sec:binary-ec} treat the
+original binary ensembles.  Section~\ref{sec:regular} introduces regular
+expanders and gives the binary rate-one-half frontier.
+Section~\ref{sec:prime-fields} gives the finite-field extension and separates
+fixed-field asymptotics from cryptographic-size finite bounds.
+Section~\ref{sec:certificates} describes the certified evaluation, and
+Section~\ref{sec:discussion} records limitations and open questions.

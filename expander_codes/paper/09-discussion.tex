@@ -1,0 +1,212 @@
+\section{Discussion and open questions}
+\label{sec:discussion}
+
+The exact enumerators change the interpretation of EA and EC parameters.
+There is no single mixing bottleneck.  Dense messages already behave like the
+input to a random invertible map and attain the GV exponent.  Sparse messages
+determine how many expander edges or convolution steps are needed before that
+regime becomes available.
+
+\paragraph{What convolution buys.}
+The wrapped convolution improves the sparse endpoint from
+$I_\delta=1-2\sqrt{\delta(1-\delta)}$ for the accumulator to
+$I^{\mathrm w}_{m,\delta}$ in \eqref{eq:ec-sparse-rate}.  The latter tends to
+$1-2\delta$ as memory grows.  It does not improve the dense exponent beyond
+the random-linear-code value.  This explains the finite frontier: a few
+memory words can replace several expander edges, but large memory eventually
+has diminishing returns.
+
+\paragraph{What regularity buys.}
+Left regularity forces every message coordinate to contribute once per
+region.  It reduces the variance in edge placement that dominates low-support
+terms.  Two-sided regularity also eliminates empty right coordinates at full
+support.  This property is essential to the large-field certificates.  Over
+the binary field, odd right degree also prevents the all-one message from
+entering the expander kernel.  Two-sided regularity substantially improves
+the binary EC profile, but it does not improve the weight-two EA bottleneck.
+
+The certified frontier is not exhaustive.  Remaining odd right degrees may
+yield additional tradeoffs.  Measured encoding costs should eventually
+replace the proxy $d_L+m$.  Near-regular right degrees are another possible
+way to avoid the binary parity obstruction, but they require a new point-mass
+bound.
+
+\paragraph{Binary choices versus field values.}
+The binary profiles target Silent OT, whose choices are bits.  If the same
+matrix is viewed over $\F_{2^{128}}$, Lemma~\ref{lem:binary-scalar-extension}
+still preserves its Hamming distance, but the map splits into 128 independent
+binary maps.  Silent VOLE instead needs mixing between these components.  Our
+field-valued profile supplies that mixing through ambient-field edge labels
+and full-field convolution coefficients.
+
+\paragraph{Field size.}
+Random nonzero edge labels are not cosmetic.  They make the output law depend
+only on message support and enable the projective trace bounds.  They also add
+one multiplication per edge.  Finite-field EC additionally needs full-field
+feedback coefficients for the reduced-state argument.  A more restricted tap
+distribution may be faster, but it requires a state description that retains
+more than the zero pattern.
+
+The finite failure exponents can decrease with the field order when the target
+is a fixed fraction of the field-relative GV distance.  Consider field order
+$p=2^s$, where $s$ is the bit length of the field order.  At rate one half,
+\[
+ \delta_{2^s,\mathrm{GV}}(1/2)=\frac12-\frac1s+O(s^{-2}).
+\]
+Near $s=128$, increasing $s$ by one raises the GV-relative cutoff by about
+$126$ output coordinates at our length.  The low-equation
+structural branch receives no compensating field factor after its projective
+cap saturates.  At a fixed absolute cutoff, increasing $s$ does not weaken
+this branch; the field-suppressed branch only becomes smaller.
+
+Table~\ref{tab:field-size-diagnostic} illustrates the distinction for the
+degree-$24/12$, memory-$5$ certificate.  It freezes the $\F_{2^{128}}$ support
+partition and positive markers.  It then uses either the field-relative
+cutoff from Theorem~\ref{thm:field-size-ec-certificates} or the fixed
+$\F_{2^{128}}$ cutoff.  The frozen exponent is the negative base-two
+logarithm of this floating-point bound.  The certified column reports
+outward-rounded interval bounds where available.  The smallest stored field
+marker is $2^{-127}$, so every reused marker remains valid for the displayed
+orders.
+
+\begin{table}[ht]
+\centering
+\caption{Field-size profile around 128-bit fields for degrees $24/12$ and
+memory $5$.  A dash denotes a frozen-marker diagnostic without a separate
+interval certificate.  The last column keeps the $\F_{2^{128}}$ cutoff
+fixed.}
+\label{tab:field-size-diagnostic}
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+$s$ & GV-relative cutoff & frozen bits & certified bits & fixed-cutoff bits \\
+\midrule
+$127$ & $1{,}015{,}699$ & $45.84$ & $45.84$ & $45.03$ \\
+$128$ & $1{,}015{,}826$ & $45.03$ & $45.03$ & $45.03$ \\
+$129$ & $1{,}015{,}950$ & $44.24$ & $44.24$ & $45.03$ \\
+$130$ & $1{,}016{,}073$ & $43.44$ & --- & $45.03$ \\
+$132$ & $1{,}016{,}314$ & $41.84$ & --- & $45.03$ \\
+$136$ & $1{,}016{,}774$ & $38.69$ & $38.78$ & $45.03$ \\
+$140$ & $1{,}017{,}207$ & $35.63$ & --- & $45.03$ \\
+$144$ & $1{,}017{,}616$ & $32.67$ & --- & $45.03$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The certificates at $s=127,128,129$ confirm a local loss of about $0.80$
+failure bits per additional field bit.  At $s=136$, local retuning improves
+the frozen exponent from $38.6903$ to $38.7836$ bits.  The gain is only
+$0.0933$ bits.
+
+The structural branch controls this regime.  At $s=136$, the largest exact
+band covers message supports $129$ through $160$.  Its frozen structural and
+field-suppressed exponents are $-41.3863$ and $-162.9032$, respectively.
+Thus additional field suppression cannot compensate for the larger cutoff.
+At the fixed $\F_{2^{128}}$ cutoff $L=1{,}015{,}826$, every displayed field
+order rounds to the same $45.03$-bit diagnostic exponent.  The decline comes
+from moving the GV-relative target, not from weaker mixing at the original
+distance.
+
+This comparison does not include the certified $\F_{2^{127}-1}$ profile.
+That profile uses different degree--memory parameters and the full floored
+GV cutoff.
+
+Finding a faster feedback distribution with an exact small state space
+remains open.  A useful candidate must retain enough symmetry for a rigorous
+trace bound and use fewer field operations than full-field random taps.
+
+\paragraph{Implementation boundary.}
+The proved finite-field ensemble assigns an independent nonzero label to every
+expander edge.  These labels act before the incident edges are summed.  They
+therefore control cancellations at an expander coordinate.
+
+Our reference implementation follows this structure.  It materializes an
+independent balanced assignment for each region and gives every edge an
+independent nonzero label.  It also samples every convolution tap from the
+full field.  A public seed expands all three sources of randomness.
+
+The binary implementation materializes the two-sided regular expander and
+the wrapped convolution analyzed in Section~\ref{sec:regular}.  It is the
+Silent OT profile, not the Silent VOLE profile.
+
+Our streaming implementation studies a different construction.  Over
+odd-characteristic fields it uses a signed structured expander.  Over
+characteristic two it uses compact full-index permutations.  Both paths
+regenerate full-field convolution coefficients from a public seed and use
+field multiplications in the recurrence.  These multiplications provide the
+component mixing needed by field-valued VOLE.  The expander labels are not
+independent nonzero field elements, so we treat the streaming construction as
+heuristic rather than as a sample from the proved ensemble.
+
+Our experiments also include unit edge coefficients as an ablation.  They do
+not provide evidence of a defect at the tested sizes, but this observation is
+not a distance proof.  Proving useful distance for structured or unit edge
+coefficients remains a separate problem.
+
+\paragraph{Cryptographic interpretation.}
+A distance certificate bounds the probability that code generation produces
+a low-weight nonzero codeword.  It does not by itself establish the security
+of a PCG or a silent protocol.  Such an application must connect its attack
+model and noise distribution to the certified distance event.  It must also
+account for any public structure not sampled by our ensemble.
+
+For Silent VOLE over $\F_{2^{128}}$, the finite-field certificate supplies a
+distance premise for the independently labeled reference ensemble.  A
+complete protocol theorem must still connect that premise to the chosen noise
+distribution and attack model.  It must separately justify the structured
+streaming heuristic used by the implementation.
+
+The following composition rule records exactly how the sampling term enters a
+protocol theorem.
+
+\begin{proposition}[Adding code-sampling failure]
+\label{prop:application-composition}
+Let $\G$ be a sampled generator, define the set
+$\mathcal G_{\mathrm{good}}:=\{G:d_{\min}(G)>L\}$, and suppose
+$\Pr[\G\notin\mathcal G_{\mathrm{good}}]\leq U$.  Let $\mathsf{Fail}$ be an event defined on
+the joint randomness of code generation and a protocol.  If
+\begin{equation}
+ \Pr[\mathsf{Fail}\mid\G=G]\leq\varepsilon
+ \qquad\text{for every }G\in\mathcal G_{\mathrm{good}},
+\end{equation}
+then $\Pr[\mathsf{Fail}]\leq\varepsilon+U$.
+\end{proposition}
+
+\begin{proof}
+Condition on whether $\G\in\mathcal G_{\mathrm{good}}$.  The good branch
+contributes at most $\varepsilon$, and the bad branch contributes at most
+$U$.
+\end{proof}
+
+The same additive term applies to a distinguishing advantage by replacing
+the bad-code branch with the trivial upper bound one.  A Silent OT or Silent
+VOLE analysis must still prove the conditional bound $\varepsilon$ for its
+noise distribution and attack model.  This paper supplies only $U$.
+
+\paragraph{Decoding and explicit constructions.}
+The proofs are ensemble-existence and sampling statements.  They do not give
+an efficient decoding algorithm.  They also do not produce a deterministic
+family with the same distance.  Both questions are orthogonal to the present
+first-moment method.
+
+\paragraph{Certificate maintenance.}
+The current artifacts use several specialized verifiers.  A shared library
+for interval partitions, Arb matrices, and positive-marker bounds would make
+the trusted implementation smaller.  An independent verifier in a second
+language would further reduce implementation risk.
+
+The checked-in manifest maps each claimed numerical result to its verifier,
+inputs, SHA-256 digests, arithmetic precision, and expected failure exponent.
+The manifest driver checks these records and can execute all rigorous entries
+serially.  The specialized verifiers remain part of the trusted base.  A
+second implementation would reduce that trust further.
+
+\paragraph{Conclusion.}
+Exact input--output enumerators give substantially stronger guarantees for
+the original EA and EC ensembles.  In the binary case, region-stratified
+regularity controls sparse messages and gives a concrete rate-one-half
+degree--memory frontier near the GV cutoff.  In fields near 128 bits, random
+edge labels, projective grouping, and two-sided regularity control the
+additional union over message values.  The finite-field analysis gives a
+separately certified field-mixing profile over $\F_{2^{127}-1}$.  It also
+gives one fixed degree--memory profile over field orders $2^{127}$ through
+$2^{136}$ at a concrete cryptographic-scale length.

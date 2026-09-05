@@ -1,0 +1,31 @@
+{
+  "schema": "riffle-construction-manifest-v1",
+  "candidate_id": "riffle_fieldcheckpoint_accumulate_t32_s64_k8",
+  "display_name": "Riffle FieldCheckpointAccumulate t=32 s=64 K=8",
+  "status": "ACTIVE_PROOF_EXPLORATION",
+  "is_construction": true,
+  "parent_candidate_id": "riffle_fieldcheckpoint_accumulate_t32_s64_k32",
+  "modification": "refresh the 64-bit state every 256 bits instead of every 1024 bits",
+  "parameters": {
+    "message_bits": 1048576,
+    "outer_bits": 256,
+    "step_bits": 32,
+    "state_bits": 64,
+    "checkpoint_steps": 8,
+    "checkpoint_epoch_bits": 256,
+    "epochs_per_region": 32
+  },
+  "proof_status": {
+    "regular_occupations_all_counts_at_relative_distance_0.09": "complete floating-point density-envelope diagnostic",
+    "all_one_occupations_below_dense_threshold": "open",
+    "explicit_outer_spectrum": "open",
+    "outward_rounded_certificate": "open"
+  },
+  "regular_results": {
+    "relative_distance": 0.09,
+    "minimum_aggregate_margin_bits_float": 55.9506625823938,
+    "dominant_regular_active_blocks": 1,
+    "dense_volume_start": 7242
+  },
+  "claim_scope": "Conditional modeled-spectrum calculation. All regular occupations close numerically at 9%, but all-one occupations, an explicit outer spectrum, and outward rounding remain open."
+}

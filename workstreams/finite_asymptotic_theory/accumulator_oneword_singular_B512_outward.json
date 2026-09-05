@@ -1,0 +1,24 @@
+{
+  "schema": "accumulator-oneword-hilbert-schmidt-outward-v1",
+  "status": "OUTWARD_SINGULAR_VALUE_CERTIFICATE",
+  "claim": {
+    "length": 512,
+    "second_singular_value_strictly_below": "11/100",
+    "centered_squared_hilbert_schmidt_upper": "[0.01189211549523413676150413244906468306170211884770529937983506550396578056295 +/- 4.94e-78]",
+    "requested_square_lower": "[0.01210000000000000000000000000000000000000000000000000000000000000000000000000 +/- 6.00e-79]"
+  },
+  "operator": {
+    "state_space": "nonzero Hamming weights 1 through B",
+    "stationary_measure": "binomial(B,h)/(2^B-1)",
+    "stage": "uniform coordinate permutation followed by the zero-state prefix accumulator",
+    "centering": "subtract the stationary constant singular direction from the squared Hilbert--Schmidt norm"
+  },
+  "parameters": {
+    "precision_bits": 256,
+    "arithmetic": "exact integer counts and 256-bit Arb interval summation"
+  },
+  "limitations": [
+    "This certificate concerns the one-word weight operator only.",
+    "The ordered-pair interaction-sector bound remains separate."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "rm2sub-fixed-rm-dense-pure-band-probe-v1",
+  "status": "BINARY64_PARTIAL_DIAGNOSTIC",
+  "parameters": {
+    "message_bits": 65536,
+    "output_bits": 131072,
+    "outer_rows": 256,
+    "outer_bits": 512,
+    "step_bits": 64,
+    "state_bits": 14,
+    "bad_weight": 13107,
+    "occupations": [
+      64,
+      128,
+      256
+    ]
+  },
+  "bands": [
+    {
+      "lower": 1,
+      "upper": 47,
+      "bit_probability": 0.06249999989283405,
+      "envelope_log2": 29.44125542252923,
+      "maximizing_weight": 32
+    },
+    {
+      "lower": 48,
+      "upper": 63,
+      "bit_probability": 0.11718750191769492,
+      "envelope_log2": 53.80380355831667,
+      "maximizing_weight": 60
+    }
+  ],
+  "rows": [
+    {
+      "occupation": 64,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.23268322265818464,
+      "selected_band_envelope_log2": 107.473471938911,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.2894009548935951,
+      "surprisal": 0.14710850731699956,
+      "margin_bits_diagnostic": 386.47663166255853,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 64,
+      "band_lower": 48,
+      "band_upper": 63,
+      "minimum_envelope_bit_probability": 0.11718750191769492,
+      "minimum_envelope_log2": 53.80380355831667,
+      "selected_band_bit_probability": 0.307785582496906,
+      "selected_band_envelope_log2": 141.82204102580872,
+      "selected_band_envelope_maximizing_weight": 48,
+      "mark_probability": 0.30381577641338786,
+      "surprisal": 0.211572053903251,
+      "margin_bits_diagnostic": 1665.0934848655716,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 128,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.212373168721913,
+      "selected_band_envelope_log2": 93.59879339721547,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.543438299153229,
+      "surprisal": 0.2695166498825745,
+      "margin_bits_diagnostic": 2654.6071148466613,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 128,
+      "band_lower": 48,
+      "band_upper": 63,
+      "minimum_envelope_bit_probability": 0.11718750191769492,
+      "minimum_envelope_log2": 53.80380355831667,
+      "selected_band_bit_probability": 0.2721354446937906,
+      "selected_band_envelope_log2": 116.72960463163537,
+      "selected_band_envelope_maximizing_weight": 48,
+      "mark_probability": 0.5545816794990828,
+      "surprisal": 0.3723401420335103,
+      "margin_bits_diagnostic": 4774.968716121058,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 256,
+      "band_lower": 1,
+      "band_upper": 47,
+      "minimum_envelope_bit_probability": 0.06249999989283405,
+      "minimum_envelope_log2": 29.44125542252923,
+      "selected_band_bit_probability": 0.1815021485580942,
+      "selected_band_envelope_log2": 74.22661162972501,
+      "selected_band_envelope_maximizing_weight": 32,
+      "mark_probability": 0.9999999999,
+      "surprisal": 0.47090334812117807,
+      "margin_bits_diagnostic": 8975.248108652828,
+      "optimizer_success": true
+    },
+    {
+      "occupation": 256,
+      "band_lower": 48,
+      "band_upper": 63,
+      "minimum_envelope_bit_probability": 0.11718750191769492,
+      "minimum_envelope_log2": 53.80380355831667,
+      "selected_band_bit_probability": 0.2597700183602693,
+      "selected_band_envelope_log2": 108.67307057778922,
+      "selected_band_envelope_maximizing_weight": 48,
+      "mark_probability": 0.9999999999,
+      "surprisal": 0.7763596921845926,
+      "margin_bits_diagnostic": 12270.636921017925,
+      "optimizer_success": true
+    }
+  ],
+  "limitations": [
+    "Only pure band faces are evaluated; mixed band compositions remain open.",
+    "Nearest binary64 arithmetic is not outward rounded.",
+    "Continuous optimizers are diagnostic and not globally certified."
+  ]
+}

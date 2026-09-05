@@ -1,0 +1,649 @@
+% Auto-extracted during the research cleanup pass. Original source is preserved unchanged.
+% Source: integration.tex, lines 2213--end. Preserved block-outer/RM history and BCH spectra exploration; not included in the main spine.
+
+Thus a local code with a published or certified spectrum drops into exactly the same first-moment interface
+\(\sum_h A_h^{\mathrm{out}}p_h^{\mathrm{in}}(\delta)\).  The asymptotic theorem still uses the random banded outer; the
+block code is best viewed as a finite-\(n\) implementation variant whose proof burden is shifted to a short local
+spectrum certificate.
+
+As a first citable test case we used the fourth-order binary Reed--Muller code
+\[
+RM(4,9):\qquad [512,256,32].
+\]
+Its exact weight distribution was tabulated by Markov and Borissov in 2025.  Equivalently, because \(RM(4,9)\) is a
+Type-II self-dual binary code, its homogeneous weight enumerator has the Gleason form
+\[
+W_{RM}(x,y)
+=
+\sum_{j=0}^{21} c_j\,
+\Phi(x,y)^{64-3j}\Psi(x,y)^j,
+\]
+where
+\[
+\Phi=x^8+14x^4y^4+y^8,
+\qquad
+\Psi=x^4y^4(x^4-y^4)^4.
+\]
+The integer coefficient vector \((c_0,\ldots,c_{21})\) is
+\[
+\begin{gathered}
+1,\ -896,\ 366400,\ -90591488,\ 15125312416,\ -1804090983680,\\
+158633285104000,\ -10462864561216000,\ 521844917396785920,\\
+-19703740374727094272,\ 560488125281758654464,\ -11885355149550800420864,\\
+184790978198497210204160,\ -2057511108351137030602752,\\
+15886111690015316194099200,\ -81428598375642719259197440,\\
+261053953183414744116101120,\ -481398485705822986116792320,\\
+451352262788439851856297984,\ -176727086611150405833326592,\\
+20139935110366512638066688,\ -279475807551445268430848 .
+\end{gathered}
+\]
+For the first-moment evaluator, \(W_{\mathrm{loc}}(z)=W_{RM}(1,z)\).  Using this spectrum with \(k=2^{20}\),
+\(M=4096\), \(N=2^{21}\), fixed-tap inner memory \(\sigma=32\), and the same global episode-cover inner bound, gives
+the following low-weight diagnostics:
+\[
+\begin{array}{c|rrrr}
+\delta & .106 & .104 & .092 & .090\\
+\hline
+-\log_2 \mu_{\le220}^{RM(4,9)} & 32.686 & 33.603 & 39.474 & 40.521\\
+h_* & 32 & 32 & 32 & 32
+\end{array}
+\]
+The peak is the minimum-weight local block term.  Thus \(RM(4,9)\) does not by itself give a \(40\)-bit margin at
+\(\delta=.106\), but it does give a clean, fully spectrum-based checkpoint around \(\delta\approx .09\) at
+\(\sigma=32\).  The important finite-\(k\) headline is
+\[
+k=2^{20},\qquad N=2^{21},\qquad \sigma=32,\qquad
+\Pr[d_{\min}\le188743]\le2^{-40.5},
+\]
+or equivalently \(d_{\min}\ge188744\) with probability at least \(1-2^{-40.5}\).  In relative terms this certifies
+\[
+\frac{d_{\min}}{N}\ge\frac{188744}{2097152}>0.09000015
+\]
+except with probability at most \(2^{-40.5}\).  The nearby \(\delta=.092,.104,.106\) entries in the table are prefix
+diagnostics, not full manifest certificates.  This is already much better structured than rejection sampling away the
+first few random-banded outer weights: the entire finite outer spectrum is explicit.
+
+At \(\delta=.09\) we also extended the same computation to \(h\le500\).  The total remained
+\[
+\log_2\mu_{\le500}^{RM(4,9)}\le -40.520728,
+\]
+again with peak \(h=32\).  On the computed tail window \(300\le h\le500\), the worst adjacent log-ratio was
+\(-0.990724\).  More importantly, the analytic bounded-\(r\) low-slot ratio below gives a weaker but still sufficient
+post-prefix geometric residual below \(2^{-500.579}\).  The remaining certificate task for the RM finite-\(n\)
+checkpoint is therefore quite focused: keep the product RM spectrum in the residual ledger and use the same
+post-prefix domination split developed above for the random-banded outer.
+
+The first residual constants are already favorable.  Using the RM product generating bound at \(z=.4\),
+\[
+\log_2(W_{\mathrm{out}}(.4)-1)=33.494442,
+\]
+the bounded-\(r\) low-slot ratio at the handoff \(H=500\), \(R=12\), and \(\theta=.35\) is
+\[
+\log_2 q_{\mathrm{low}}\le -0.119386.
+\]
+The corresponding high-slot exponent is \(0.062159\), while the large-\(r\) low-slot ledger is maximized at
+\((h,r,c)=(500,13,26)\) and equals \(-271.720148\), or \(-186.135185\) after the coarse \(3N^4\) union factor.  The
+linear-window handoff from \(H/N\) to \(\eta_{\mathrm{crit}}\) still has a worst gap below \(-0.00290\).  Thus the
+RM checkpoint appears to have a full finite-certificate path, not merely a plotted finite prefix.
+
+\begin{theorem}[Finite RM-block checkpoint at relative distance \(0.09\)]
+\label{thm:finite-rm-block-checkpoint-009}
+Let the outer code be the direct sum of \(4096\) copies of \(RM(4,9)\), viewed as a binary
+\([512,256,32]\) block code.  Thus the outer message length is \(k=4096\cdot256=2^{20}\) and the
+outer output length is
+\[
+N=4096\cdot512=2^{21}.
+\]
+Concatenate this outer code through a uniform interleaver with the fixed-tap dense recursive inner ensemble with
+memory \(m=32\), and set
+\[
+d=\lfloor .09\,N\rfloor=188743.
+\]
+The finite checkpoint certificate gives
+\[
+\Pr[d_{\min}(\Csc)\le d]
+\le
+\mu_{\mathrm{cert}}^{RM}
+\le
+2^{-40.5}.
+\]
+Equivalently, with probability at least \(1-2^{-40.5}\) over the interleaver and inner ensemble,
+\[
+d_{\min}(\Csc)\ge188744,
+\]
+so the relative minimum distance is larger than \(0.09\).
+\end{theorem}
+
+\begin{proof}
+Apply Lemma~\ref{lem:block-outer-first-moment-interface} with \(C_{\mathrm{loc}}=RM(4,9)\).  Let
+\[
+W_{RM}(z)=\sum_j A_j^{RM}z^j
+\]
+be the exact weight enumerator of \(RM(4,9)\).  The Markov--Borissov table gives this local spectrum, and the committed
+copy is checked to sum to \(2^{256}\), have maximum weight \(512\), and have minimum nonzero weight \(32\).  Therefore
+the direct-sum outer has generating function \(W_{RM}(z)^{4096}\), with the all-zero word removed.
+
+The finite prefix \(h\le500\) uses the exact local RM spectrum, the product generating-function outer bound, and the
+global episode-cover inner bound with exact final-survivor accounting through the computed prefix.  The checkpoint
+artifact gives
+\[
+\log_2 \sum_{1\le h\le500} A_h^{\mathrm{out}}p_h^{\mathrm{in}}(.09)
+\le
+-40.520728.
+\]
+For the residual after \(H=500\), apply Lemma~\ref{lem:finite-block-certificate-template} with \(R=12\) and
+\(\theta=.35\).  The bounded-\(r\) low-slot, high-slot, large-\(r\) low-slot, and linear-window handoff reductions are
+the same as in Lemma~\ref{lem:checkpoint-residual-split-0106}, but with the fixed-tap banded outer generating function
+replaced by \(W_{RM}(z)^{4096}-1\) at \(z=.4\).  The residual verifier checks the displayed constants:
+\[
+\log_2 q_{\mathrm{low}}\le -0.119386,\qquad
+E_{\mathrm{hi}}\ge0.062159,
+\]
+large-\(r\) low-slot union below \(2^{-186.135185}\), and linear handoff gap below \(-0.00290\).  The finite geometric
+tail certificate records the observed post-prefix residual below \(2^{-504.095}\), while the weaker analytic
+low-slot ratio already gives a post-prefix residual below \(2^{-500.579}\).  Combining the finite prefix and all residual
+pieces keeps the certified first moment below \(2^{-40.5}\).  Markov's inequality gives the stated failure-probability
+bound.
+\end{proof}
+
+This also explains what a stronger BCH-like block would need to provide.  A distance-only certificate is not enough:
+the pessimistic bound \(W_{\mathrm{loc}}(z)\le 1+(2^b-1)z^{d_0}\) is far too loose for \(b=256\).  What is needed is a
+published or certified local spectrum envelope.  Primitive binary BCH arithmetic gives a natural candidate near
+length \(511\): the narrow-sense code with designed distance \(61\) has dimension \(259\) by the cyclotomic-coset
+degree count, so a \(256\)-dimensional subcode with distance at least \(61\) is plausible.  Such a subcode would use
+\[
+4096\text{ blocks},\qquad k=2^{20},\qquad N=4096\cdot511=2093056.
+\]
+The random-like local-spectrum diagnostic for a \([511,256,61]\)-shaped block, at \(\sigma=32\) and \(\delta=.106\),
+gives
+\[
+-\log_2\mu_{\le220}^{\mathrm{randlike}}\ge 96.675835,
+\qquad h_*=89,
+\]
+with \(d=\lfloor .106N\rfloor=221863\).  This is not a certificate, but it says the BCH direction has enough apparent
+headroom.  A uniform multiplicative loss of about \(2^{56.75}\) on the nonzero random-like local spectrum would still
+leave a \(40\)-bit margin in this prefix diagnostic.  The remaining missing object is therefore quite specific: an
+upper spectrum envelope for the
+\([511,259,\ge61]\) BCH parent, or directly for a certified \([511,256,\ge61]\) subcode.  The parent spectrum would
+already upper-bound any subcode spectrum, losing at most the three-dimensional overcount at the total-codeword level.
+The known asymptotic BCH-spectrum theorems are useful orientation, but not yet a finite certificate at this length:
+plugging the explicit error factor from the Krasikov--Litsyn BCH spectrum bound into the native \(n=511\),
+designed-distance-\(61\) candidate gives error allowances of roughly \(2^{2258}\) at \(h=61\) and \(2^{2969}\) at
+\(h=220\) when the denominator parameter is matched to the generator degree.  Thus the current BCH task is not to cite
+an asymptotic random-like spectrum theorem verbatim; it is to obtain a short finite envelope for the relevant
+low-weight parent spectrum, or to choose a nearby local code whose finite spectrum is already tabulated.
+The first natural adaptation of the Sidelnikov/Krasikov--Litsyn proof is a dual-window MacWilliams bound: if the
+nonzero dual weights lie in a central window \(W\), then
+\[
+A_h(C)\le 2^{-r}\binom{511}{h}+\max_{j\in W}|K_h(j)|.
+\]
+This support-only version is much too weak in our regime.  The Carlitz--Uchiyama half-width for \(t\approx30\) already
+covers the entire length, and even the unrealistic window \(W=\{256\}\) would spend about \(116.18\) bits of spectrum
+slack at \(h=61\) and \(80.78\) bits at \(h=89\), exceeding the \(56.75\)-bit budget for the
+\([511,259,\ge61]\) target.  Thus the adaptable part of the old BCH spectra proof is not merely dual concentration; it
+must be the moment/cancellation step that uses the BCH zero set to make the nonzero dual contribution cancel across
+weights.
+
+The finite target can be stated cleanly in MacWilliams form.  Let \(C\) be the \([511,259]\) BCH parent, let
+\(r=252\), and write
+\[
+A_h(C)=2^{-r}\left(\binom{511}{h}+S_h\right),
+\qquad
+S_h=\sum_{j>0} A_j(C^\perp)K_h(j),
+\]
+where \(K_h\) is the binary Krawtchouk polynomial.  Since the actual implementation target is a
+\([511,256]\) subcode, using the parent spectrum already spends three local bits.  The \(56.75\)-bit random-like slack
+budget is therefore met by the parent if, for all local weights used by the prefix certificate,
+\[
+\log_2\left(1+\frac{S_h}{\binom{511}{h}}\right)\le 53.75,
+\]
+or more pessimistically if
+\[
+\log_2\left(1+\frac{|S_h|}{\binom{511}{h}}\right)\le 53.75.
+\]
+This is the concrete cancellation theorem we need from the BCH zero set.  The lower-rate native neighbor has no
+three-bit parent/subcode tax, so the analogous target for the \([511,250,63]\) code is \(62.71\) bits.
+
+There is an equivalent subset-count formulation which may be the more useful proof object.  Let \(q=512\), identify the
+\(511\) cyclic positions with \(\F_q^\times\), and let \(B(\Delta)\) be the primitive narrow-sense BCH code whose zero
+set contains \(\alpha,\alpha^2,\ldots,\alpha^{\Delta-1}\).  Then
+\[
+A_h(B(\Delta))
+=
+\#\left\{
+T\subseteq \F_q^\times:\ |T|=h,\quad
+\sum_{x\in T}x^i=0\ \text{for every }1\le i<\Delta
+\right\}.
+\]
+Indeed, the binary word with support \(T\) has codeword polynomial \(c(z)=\sum_{x=\alpha^\ell\in T}z^\ell\), and the
+BCH zero conditions are exactly \(c(\alpha^i)=\sum_{x\in T}x^i=0\).  Thus the missing BCH theorem can also be stated as
+a finite equidistribution bound for \(h\)-subsets of \(\F_{512}^\times\) under the first \(\Delta-1\) power sums.  For
+\(\Delta=61\), the target is that this constrained subset count is at most \(2^{53.75}\) times the random-like
+\([511,259]\) count, uniformly over the local prefix weights used by the block certificate.  This is the same content
+as the MacWilliams correction bound, but it exposes the algebraic equations that a direct finite proof would need to
+exploit.
+In characteristic two the even constraints are Frobenius consequences of the odd ones:
+\[
+\left(\sum_{x\in T}x^i\right)^2=\sum_{x\in T}x^{2i}.
+\]
+For the \(\Delta=61\) parent, the cyclotomic-coset representatives below \(61\) are
+\[
+1,3,5,\ldots,31,\quad 35,37,39,41,43,45,47,\quad 51,53,55,57,59,
+\]
+twenty-eight size-\(9\) cosets, giving redundancy \(252\).  The \(\Delta=63\), \(k=250\) neighbor adds the coset of
+\(61\), giving redundancy \(261\).  Thus a finite proof only has to control the joint distribution of these
+\(28\) or \(29\) trace/power-sum constraints, not sixty unrelated equations.
+
+The additive-character version is the bridge back to MacWilliams.  For a set \(E\) of coset representatives, let
+\[
+P_{\mathbf a}(x)=\sum_{e\in E}a_e x^e,\qquad a_e\in\F_{512},
+\]
+and let \(\psi(u)=(-1)^{\mathrm{Tr}_{\F_{512}/\F_2}(u)}\).  Orthogonality gives
+\[
+A_h(B(\Delta))
+=2^{-9|E|}
+\sum_{\mathbf a\in\F_{512}^{E}}
+[z^h]\prod_{x\in\F_{512}^\times}\left(1+z\,\psi(P_{\mathbf a}(x))\right).
+\]
+The zero choice of \(\mathbf a\) is the random-like main term.  For \(\mathbf a\ne0\), if
+\[
+w(\mathbf a)=\#\{x\in\F_{512}^\times:\ \mathrm{Tr}(P_{\mathbf a}(x))=1\},
+\]
+then the coefficient is
+\[
+[z^h](1+z)^{511-w(\mathbf a)}(1-z)^{w(\mathbf a)}=K_h(w(\mathbf a)).
+\]
+Thus the missing cancellation theorem can be attacked either as a statement about the weight distribution of the dual
+trace-code family \(\mathrm{Tr}(P_{\mathbf a}(x))\), or directly as a high-degree elementary-symmetric cancellation
+over the signs \(\psi(P_{\mathbf a}(x))\).
+
+There is also special structure at the minimum-weight edge.  If \(T\subseteq\F_{512}^\times\) has size \(h\) and
+\(\sum_{x\in T}x^i=0\) for \(1\le i<h\), then Newton's identities imply, in characteristic two, that all odd elementary
+symmetric functions below degree \(h\) vanish.  For odd \(h\), the monic polynomial with roots \(T\) therefore has the
+form
+\[
+f_T(X)=X^h+e_2X^{h-2}+e_4X^{h-4}+\cdots+e_{h-1}X+e_h.
+\]
+Moreover \(f_T(X)=X f_T'(X)+e_h\).  Since the roots are nonzero, every root satisfies \(x f_T'(x)=e_h\).  This does
+not yet count the minimum-weight words, but it is a sharper algebraic object than a generic subset of size \(h\): the
+\(h=61\) and \(h=63\) boundary slices are constrained root sets of this special polynomial family.
+For the \(\Delta=61\) parent, the first free power sum at the boundary is \(p_{61}\).  Newton gives
+\(p_{61}=e_{61}\), so it is nonzero for a weight-\(61\) support in \(\F_{512}^\times\).  Since \(\gcd(61,511)=1\),
+scaling \(T\mapsto \beta T\) lets one normalize \(p_{61}=1\).  This is the same locator-polynomial reduction used in
+the Augot--Charpin--Sendrier minimum-distance approach to BCH codes.  For the \(\Delta=63\), \(k=250\) neighbor, the
+first free boundary power sum is \(p_{63}\), but \(\gcd(63,511)=7\), so scaling leaves seven nonzero classes rather
+than a single normalized case.
+In the normalized \(h=61\) case, writing
+\[
+g(Y)=Y^{30}+e_2Y^{29}+e_4Y^{28}+\cdots+e_{60},
+\]
+the locator polynomial is
+\[
+f_T(X)=Xg(X^2)+1.
+\]
+Thus the boundary supports are exactly the \(61\)-element subsets of \(\F_{512}^\times\) on which
+\[
+xg(x^2)=1
+\]
+for some monic degree-\(30\) polynomial \(g\).  Since \(x\mapsto x^2\) is a permutation of \(\F_{512}^\times\), any
+\(31\) proposed support points determine \(g\) by interpolation; the remaining \(30\) points must then be additional
+roots of the same degree-\(61\) polynomial \(Xg(X^2)+1\).  A finite boundary certificate could therefore be built by
+counting, or upper-bounding, the monic degree-\(30\) polynomials \(g\) for which \(Xg(X^2)+1\) splits completely over
+\(\F_{512}^\times\).  The naive \(2^{270}\) count of all such \(g\)'s is far too loose, so the splitting condition is
+the essential extra structure.  Including the \(511\)-element scaling orbit, this naive boundary count is about
+\(2^{278.997}\), whereas the \([511,259]\)-parent certificate would allow only about \(2^{67.131}\) weight-\(61\)
+words.  Thus the splitting condition must save roughly \(212\) bits at the boundary.  The analogous naive count for
+the \([511,250,63]\) neighbor is about \(215\) bits above its allowance.
+The random-polynomial heuristic says this amount of saving is plausible.  A random monic degree-\(61\) polynomial over
+\(\F_{512}\) splits into \(61\) distinct nonzero roots with probability
+\[
+\binom{511}{61}/512^{61}\approx 2^{-283.62}.
+\]
+Multiplying by the \(2^{270}\) normalized locator family and the \(511\)-element scaling orbit gives an expected
+boundary codeword count around \(2^{-4.62}\), about \(71.75\) bits below the certificate allowance.  The analogous
+\(h=63\) heuristic has about \(80.71\) bits of room.  This is only heuristic, but it suggests the boundary slice is
+probably not structurally fatal; the proof needs a finite splitting-count upper bound for this special family.
+Equivalently, after the change of variable \(Y=X^2\), the normalized \(h=61\) boundary words are monic degree-\(30\)
+polynomials \(g(Y)\) agreeing with the word \(Y^{255}\) on \(61\) points of \(\F_{512}^\times\).  The generic
+interpolation/list-size bound gives
+\[
+\#\{g\}\le \binom{511}{30}/\binom{61}{30},
+\]
+so the total boundary codeword count is at most \(2^{112.260}\) after restoring the scaling orbit.  This is rigorous
+but still about \(45.13\) bits above the certificate allowance, so generic Reed--Solomon list-decoding bounds are not
+yet enough.  The special received word has extra structure:
+\[
+Y\,(Y^{255})^2=1\quad \text{on }\F_{512}^\times.
+\]
+Thus the boundary problem is equivalently to count monic degree-\(30\) polynomials \(g\) for which
+\[
+Yg(Y)^2+1
+\]
+has \(61\) distinct nonzero roots.  This lacunary splitting formulation is the next finite theorem target.
+One way to see the remaining gap is to use more than the \(30\) interpolation points needed to determine \(g\).  If a
+valid boundary word has support size \(61\), then for any \(s\ge30\) it is counted \(\binom{61}{s}\) times by its
+\(s\)-subsets.  The raw bound
+\[
+\binom{511}{s}/\binom{61}{s}
+\]
+gets worse as \(s\) grows, but an \(s\)-set is consistent with a monic degree-\(30\) interpolant only if roughly
+\(s-30\) algebraic conditions over \(\F_{512}\) hold.  If those conditions behaved independently, the \(s=45\) ledger
+would save \(15\cdot9=135\) bits, enough to beat the certificate allowance by about \(25\) bits.  Thus the concrete
+finite problem is not to improve generic interpolation by a little; it is to prove a rank/equidistribution statement
+for these overdetermined interpolation conditions.
+Small exact toy cases support the random-splitting intuition.  For the analogous family \(Yg(Y)^2+1\) over
+\(\F_{32}\) with \(h=5\), exact enumeration gives \(6\) completely split \(g\)'s, compared with random expectation
+\(2^{2.37}\).  Over \(\F_{64}\) with \(h=7\), exact enumeration gives \(85\), compared with random expectation
+\(2^{5.04}\).  These small cases are not evidence for a theorem at \(q=512\), but they do not show the kind of
+large oversplitting bias that would make the boundary target implausible.
+A direct \(q=512\) sampler gives the same first-order signal for overdetermined interpolation.  For random \(31\)-sets
+of points in \(\F_{512}^\times\), the observed consistency rate was \(13/5000\), on the \(1/512\) scale predicted by
+one independent \(\F_{512}\)-condition.  For random \(32\)-sets, \(0/5000\) successes were observed, consistent with
+the much smaller \(512^{-2}\) prediction.  This is again only diagnostic, but it supports the idea that the missing
+finite theorem is a rank/equidistribution statement rather than a fight against an obvious algebraic bias.
+The first overdetermined condition has an explicit symmetric form.  For a \(31\)-set \(S\subset\F_{512}^\times\), the
+top coefficient of the degree-\(30\) interpolation polynomial for \(Y^{255}\) on \(S\) is the divided difference
+\((Y^{255})[S]\), which equals the complete homogeneous symmetric polynomial \(h_{225}(S)\).  Therefore \(S\) is
+consistent with a monic degree-\(30\) \(g\) iff
+\[
+h_{225}(S)=1.
+\]
+A direct checker verifies this identity against interpolation, and a \(q=512\) sample gave \(3/1000\) successes for
+this equation, again on the \(1/512\) scale.  For larger \(s\), the corresponding rank problem is that all \(31\)-subsets
+of the \(s\)-set have the same divided-difference value \(1\), with only \(s-30\) independent conditions expected.
+The follow-up rank-audit tool makes this interpolation formulation reproducible without enumerating the full
+locator-coefficient family.  Exact \(h\)-set enumeration in the small \(m=5\) cases gives the same normalized boundary
+counts as the locator enumerator:
+\[
+\begin{array}{c|c|c|c}
+m & h & \text{consistent }h\text{-sets} & A_h\\
+\hline
+5 & 5 & 6 & 186\\
+5 & 7 & 5 & 155 .
+\end{array}
+\]
+For the \(m=6,\ h=13\) exact-spectrum checkpoint, randomized interpolation from \(d=6\) points recovered all
+\(28\) normalized split polynomials in a \(200000\)-sample run, restoring the exact boundary count
+\(28\cdot63=1764\).  This is not a deterministic proof of the \(m=6\) boundary slice, but it validates that the
+rank/interpolation representation is seeing the same objects as the full BCH spectrum.  The same script samples the
+first \(q=512\) overdetermined condition; a \(2000\)-sample run found \(3\) successes against the random-rank prediction
+\(2000/512\).  On the next half-rate rung, \(m=7,\ h=21\), the first rank sample found \(29/5000\) successes, again on
+the \(1/128\) scale.
+
+As a check on the whole BCH-spectrum program, we started a small exact ladder.  The primitive narrow-sense spectra are
+computed directly from the binary power-sum parity checks by enumerating the nullspace.  The first exact data points
+are:
+\[
+\begin{array}{c|c|c|c|c|c}
+m & n & \Delta & k_{\mathrm{BCH}} & d_{\min} & \max_{0<h<n}\log_2(A_h/A_h^{\mathrm{rand}})\\
+\hline
+5 & 31 & 5 & 21 & 5 & 0.165\\
+5 & 31 & 7 & 16 & 7 & 1.011\\
+6 & 63 & 13 & 30 & 13 & 0.591\\
+6 & 63 & 15 & 24 & 15 & 1.551
+\end{array}
+\]
+Here \(A_h^{\mathrm{rand}}=2^{k-n}\binom{n}{h}\).  These are small codes, but they are useful calibration: the exact
+low-weight BCH spectra are close to random-like rather than exhibiting the kind of large inflation that would doom the
+block-outer upgrade.  They also validate the power-sum/nullspace construction used by the larger \(n=511\) target.
+
+There is also a slightly lower-rate native neighbor.  The Canteaut--Chabaud length-\(511\) table identifies the
+narrow-sense BCH code with dimension \(250\) and designed distance \(63\) as having true minimum distance \(63\).  A
+random-like diagnostic for a \([511,250,63]\)-shaped block gives
+\[
+-\log_2\mu_{\le220}^{\mathrm{randlike}}\ge102.653059,
+\qquad h_*=89,
+\]
+at the same \(\sigma=32\), \(\delta=.106\) checkpoint, with \(4195\) local blocks and
+\(N=2143645\).  Its uniform random-like slack budget before the \(40\)-bit margin disappears is about \(62.71\) bits.
+This neighbor is therefore not worse from the first-moment point of view.  The tradeoff is conceptual rather than
+numerical: it gives up six local message bits per block but starts from a better-documented minimum-distance line.
+
+\paragraph{Research proposal: affine-coset spectra ladder.}
+The most plausible route to accurate finite BCH spectra is to scale the method used for the exact length-\(128\) and
+length-\(256\) extended primitive BCH weight distributions, rather than to enumerate primitive codewords directly.
+The extended code is invariant under the affine group of \(\F_{2^m}\), while the primitive code only exposes the cyclic
+subgroup.  The proposed ladder is:
+\[
+\begin{array}{ll}
+1. & \text{Reproduce the published }[128,64]\text{ extended BCH spectrum and derive }[127,64]\text{ by puncturing.}\\
+2. & \text{Implement affine-orbit/coset representatives on the }m=7\text{ extended code and validate against the table.}\\
+3. & \text{Move to }m=8\text{, where published length-}256\text{ extended BCH spectra provide a harder validation rung.}\\
+4. & \text{For }m=9\text{, compute a low-weight prefix envelope rather than the full distribution, using nested subcodes.}
+\end{array}
+\]
+The computational kernel should follow the local-weight-distribution viewpoint of Yasunaga--Fujiwara: view the code as
+cosets of a subcode, partition those cosets under the automorphism group, and compute the weight distribution for one
+representative per orbit.  The boundary interpolation-rank tool remains useful for the minimum-weight slice, while a
+dual trace/MacWilliams sampler remains useful as a prefix diagnostic; the affine-coset ladder is the primary candidate
+for a reproducible spectrum table at message dimension around \(128\).
+The first table-audit rung confirms the extension relation exactly on the public Desaki tables:
+\([128,64,22]\) derives the published \([127,64,21]\) primitive spectrum with no mismatches.  On the \(m=8\) rung, the
+public Okayama table currently links extended length-\(256\) spectra up to dimension \(63\) and from dimension \(207\)
+upward, with the central dimensions \(71,\ldots,199\) listed but not linked.  The available \([256,63]\) table likewise
+derives the published \([255,63]\) primitive table with no mismatches.  Thus the public database is enough to validate
+the import and extension algebra, but not enough by itself for a \(k\approx128\) block; the affine-coset computation is
+still needed for the central dimension.
+As a direct block-outer trial, we also imported the Okayama/Desaki exact weight distribution
+\(\texttt{EBCH128\_64.wd}\).  The table sums to \(2^{64}\), has length \(128\), and has \(d_{\min}=22\).  Plugging this
+exact \([128,64,22]\) local spectrum into the same \(k=2^{20}\), \(N=2^{21}\), \(\sigma=32\) block-outer first-moment
+prefix gives
+\[
+\begin{array}{c|c|c|c}
+\delta & d=\lfloor \delta N\rfloor & -\log_2 \mu_{\le220} & h_*\\
+\hline
+.106 & 222298 & 12.382683 & 25\\
+.09 & 188743 & 18.592737 & 24
+\end{array}
+\]
+Thus this specific exact EBCH table is a useful import/sanity rung, but it is not competitive with the RM checkpoint:
+its local floor \(22\) leaves the small-block-weight contribution too large for the current finite-\(n\) target.
+The first affine-orbit sanity check works on exact-enumerable \(m=5\) BCH codes.  The important bookkeeping point is
+that affine orbits live in the extended code: an extended weight \(W\) slice combines primitive weights \(W-1\) and
+\(W\).  With this convention, the \([31,21,5]\) code has one affine orbit of \(992\) extended weight-\(6\) words, and
+the \([31,16,7]\) code has five affine orbits of \(124\) extended weight-\(8\) words.
+
+The reproducibility entry points are the block-outer probe, BCH-parameter script, and the RM Gleason/checkpoint/residual
+verifiers in \(\texttt{scripts/}\).  The RM checkpoint constants are also collected in the certificate manifest
+\[
+\texttt{scripts/certificates/rm512\_256\_sig32\_delta009.json},
+\]
+which is audited by
+\[
+\texttt{python scripts/verify\_block\_certificate\_manifest.py}.
+\]
+For a new spectrum-csv block candidate, the corresponding manifest is generated from the prefix and tail artifacts by
+\[
+\texttt{python scripts/create\_block\_certificate\_manifest.py}.
+\]
+The BCH asymptotic-bound diagnostic above is recorded by
+\[
+\texttt{python scripts/check\_bch\_kl\_spectrum\_bound.py}.
+\]
+The corresponding random-like slack budget is recorded by
+\[
+\texttt{python scripts/check\_bch\_spectrum\_slack\_budget.py}.
+\]
+The dual-window MacWilliams audit is recorded by
+\[
+\texttt{python scripts/check\_bch\_dual\_window\_envelope.py}.
+\]
+The parent/subcode correction target is recorded by
+\[
+\texttt{python scripts/check\_bch\_macwilliams\_target.py}.
+\]
+The Newton boundary normalization ledger is recorded by
+\[
+\texttt{python scripts/check\_bch\_newton\_boundary.py}.
+\]
+The corresponding trivial boundary-count gap is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_trivial\_bounds.py}.
+\]
+The random-splitting boundary heuristic is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_split\_heuristic.py}.
+\]
+The finite interpolation bound is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_interpolation\_bound.py}.
+\]
+The higher-interpolation rank budget is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_higher\_interp\_budget.py}.
+\]
+Small-field exact splitting sanity checks are recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_smallfield.py}.
+\]
+The \(q=512\) interpolation-consistency sampler is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_interp\_sampling.py}.
+\]
+The divided-difference form of the first consistency condition is recorded by
+\[
+\texttt{python scripts/check\_bch\_boundary\_divdiff.py}.
+\]
+The overdetermined interpolation-rank audit is recorded by
+\[
+\texttt{python scripts/bch\_boundary\_rank\_audit.py}.
+\]
+For example, the \(m=6,\ h=13\) recovery check above is reproduced by
+\[
+\texttt{python scripts/bch\_boundary\_rank\_audit.py --m 6 --h 13 --compare-spectrum scripts/bch63\_30\_delta13\_spectrum.csv recover-polys --trials 200000 --seed 23}.
+\]
+The published-table import and extended-to-primitive validation rung is recorded by
+\[
+\texttt{python scripts/bch\_wd\_table\_tools.py}.
+\]
+Single \(\texttt{.wd}\) files in the public Okayama format are converted to block-probe CSV spectra by
+\[
+\begin{array}{l}
+\texttt{python scripts/import\_wd\_spectrum.py scripts/EBCH128\_64.wd}\\
+\texttt{\quad scripts/ebch128\_64\_spectrum.csv --expect-dim 64 --expect-length 128}.
+\end{array}
+\]
+For example, the public \(m=8\) availability audit is
+\[
+\texttt{python scripts/bch\_wd\_table\_tools.py --insecure-url --index-url https://isec.ec.okayama-u.ac.jp/home/kusaka/wd/ --section "Extended Binary Primitive BCH Codes" --length 256}.
+\]
+The first affine support-orbit sanity checks are recorded by
+\[
+\texttt{python scripts/bch\_affine\_orbit\_sanity.py}.
+\]
+The small exact BCH spectra are generated by
+\[
+\texttt{python scripts/exact\_bch\_spectrum\_small.py}.
+\]
+Their compact random-like-loss summaries are generated by
+\[
+\texttt{python scripts/summarize\_exact\_bch\_spectrum.py}.
+\]
+The first specialized enumerator is the boundary locator count.  For the two \(m=5\) exact spectra it reproduces the
+minimum-weight counts without enumerating the full code:
+\[
+\begin{array}{c|c|c|c|c}
+n & \Delta & k & \text{normalized locator hits} & A_\Delta\\
+\hline
+31 & 5 & 21 & 6 & 186\\
+31 & 7 & 16 & 5 & 155
+\end{array}
+\]
+where \(A_\Delta\) is obtained by restoring the \(31\)-element scaling orbit.  This validates the Newton/locator
+boundary reduction against exact spectra.  The naive Python root-testing implementation is not yet fast enough for the
+\(m=6\), \(\Delta=13\) boundary family, so the next tooling step is a vectorized or bitset version of the same
+enumerator.
+The boundary locator enumerator is
+\[
+\texttt{python scripts/enumerate\_bch\_boundary\_locator.py}.
+\]
+
+\paragraph{What the exact isolated statistics buy us.}
+Corollary~\ref{cor:isolated-order-late} gives a rigorous next rung above the late-placement base: on the isolated
+slice one can count exactly the event that the \(r\)-th isolated start lies inside the final \(L\) positions. This is
+the clean theorem object behind statements like ``there is at most one genuinely early isolated impulse.'' Current
+numerics show that the \(r=2\) version is still too weak by itself to certify the observed small-weight regime, but it
+is now a precise proved object rather than a heuristic guess.
+
+Corollary~\ref{cor:isolated-early-count} sharpens that viewpoint further: on the isolated slice one can count exactly
+how many isolated starts fall before the final \(L\) positions. Empirically, a model of the form
+\[
+\sum_{j=0}^h
+\PP[J_L(U)=j\mid \wt(U)=h,\ R(U)=h]\tau^j
+\]
+with a single \(\tau\) already tracks the exact isolated slices within about a bit on the current overlap tables.
+That is encouraging because it isolates the remaining analytic burden into a per-early-episode penalty.
+At the same time, a uniform safe \(\tau\) is still too loose when inserted into the large-\(k\) first moment, so the
+next useful theorem likely needs a position-sensitive or \(j\)-sensitive refinement rather than a single global
+constant.
+
+The natural position-sensitive version is to assign each early isolated start position \(y\le N-L\) its own
+penalty \(\tau_y(\delta)\), and then average the product of those penalties over the exact isolated-start
+configuration. On the isolated slice this would take the form
+\[
+\frac{1}{\binom{N-h+1}{h}}
+\sum_{j=0}^h
+\binom{L-h+1}{h-j}\,
+e_j\!\bigl(\tau_1(\delta),\dots,\tau_{N-L}(\delta)\bigr),
+\]
+where \(e_j\) is the \(j\)-th elementary symmetric polynomial. The uniform-\(\tau\) model is exactly the special case
+\(\tau_y\equiv \tau\), so the current overlap evidence can be read as saying that the right theorem probably lives one
+level above the constant-\(\tau\) simplification, not in a completely different combinatorial regime.
+
+The most natural first choice is to take \(\tau_y(\delta)\) from the one-run bound with remaining suffix length
+\(N-y+1\), namely
+\[
+\tau_y(\delta)
+\approx
+(N-y+1)2^{-m}
+\;+\;
+\Pr[\Binomial(N-y+1,\tfrac12)\le \delta N].
+\]
+That position-sensitive one-run model does explain the isolated slice better than a global constant at the very
+smallest weights, but it still undershoots once \(h\) reaches the \(5\text{--}7\) window driving the current
+large-\(k\) transition. So the next theorem is still not just ``plug in the one-run law per early start''; it needs
+an additional multi-episode interaction term on top of that exact early-count decomposition.
+
+\paragraph{The current best residual law.}
+One especially clean candidate is suggested by Corollary~\ref{cor:isolated-early-pair-mean}: after factoring out the
+position-sensitive one-run model, the remaining overlap gap is well tracked by an affine function of the exact
+expected number of early-start pairs
+\[
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right]
+=
+\binom{h}{2}\frac{\binom{N-L}{2}}{\binom{N-h+1}{2}}.
+\]
+On the current overlap tables the residual coefficients are well fit by
+\[
+a(q_1,m)\approx -1.1434 + 6.1146\,q_1 - \frac{15.4212}{m},
+\]
+\[
+b(q_1,m)\approx 0.4950 - 1.0649\,q_1 - \frac{0.7693}{m},
+\]
+so the residual takes the working form
+\[
+\text{gap bits}
+\approx
+a(q_1,m)
++
+b(q_1,m)\,
+\EE\!\left[\binom{J_L(U)}{2}\,\middle|\, \wt(U)=h,\ R(U)=h\right].
+\]
+This does not yet prove the right theorem, but it is a much sharper target than a free global fit: it says the next
+correction likely lives on the early-start hypergeometric law itself, not on the full run count.
+
+The new one-episode lemma confirms that \(\mathrm{Corr}_{N,h}(\delta)\) cannot be controlled by looking only at the
+first early ON-episode: that route is structurally valid but numerically much too loose. The current multi-episode
+span certificate is the first pessimistic correction that has the right summability shape. It is probably not sharp,
+but it turns an explicit placement statistic into the proof object instead of fitting a free residual curve.
+
+\paragraph{What must be improved next.}
+The outer small-weight formula \eqref{eq:dense-dense-working-outer-small} has now largely been replaced, for
+finite-\(n\) estimation purposes, by the exact low-weight systematic banded law suggested by the enumerator.
+The remaining conceptual gap is therefore mostly on the inner side of the finite prefix: the current bridge residual
+is summable, but the small/intermediate-weight certificate still needs the sharpest safe version of the
+fixed-tap-dense recursive law.  The current best proof-oriented subproblem is to upgrade
+Corollary~\ref{cor:fixedtap-weight-slice-multiepisode} by charging not only the fixed-tap terminations needed to cover
+the early span, but also the fair-output cost of dense clusters of input ones that are swallowed by a live episode.
+Once that is in place, the remaining task is to strengthen the exact finite-prefix computation and residual split from
+the present break-even certificate to a certificate with a prescribed larger negative margin.

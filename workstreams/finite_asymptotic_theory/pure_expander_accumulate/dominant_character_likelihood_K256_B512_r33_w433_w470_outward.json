@@ -1,0 +1,45 @@
+{
+  "schema": "pure-ea-dominant-character-likelihood-outward-v1",
+  "status": "OUTWARD_ARB_AND_BINARY64_CERTIFICATE",
+  "parameters": {
+    "message_bits": 256,
+    "output_bits": 512,
+    "right_degree": 33,
+    "arb_precision_bits": 1536
+  },
+  "ordered_pair_types": 2861440,
+  "elapsed_seconds": 8.480891399958637,
+  "shells": [
+    {
+      "shell_weight": 433,
+      "mean_ratio_lower": 0.9999999999999842,
+      "mean_ratio_upper": 1.0000000000000226,
+      "positive_pair_excess_normalized_upper": 7.826672464014256e-16,
+      "variance_to_mean_upper": 143.0154185580856,
+      "passes_factor_512": true
+    },
+    {
+      "shell_weight": 470,
+      "mean_ratio_lower": 9.411756038814964,
+      "mean_ratio_upper": 9.411756038815883,
+      "positive_pair_excess_normalized_upper": 3.1955682013619804e+18,
+      "variance_to_mean_upper": 229.01247519951,
+      "passes_factor_512": true
+    }
+  ],
+  "claim": {
+    "all_requested_shells_pass_factor_512": true,
+    "maximum_variance_to_mean_upper": 229.01247519951
+  },
+  "proved_reduction": [
+    "For each ordered nonzero distinct pair, the reference row law retains one bias of maximum absolute value.",
+    "The omitted biases give a pointwise likelihood ratio at most (1+delta)^n.",
+    "The pair probability is also at most either marginal probability.",
+    "Replacing each covariance contribution by the positive part of its certified upper endpoint gives a valid variance upper bound."
+  ],
+  "scope": [
+    "Arb encloses every one-word and correlated-reference polynomial evaluation.",
+    "Binary64 endpoints are rounded outward after each basic operation; nonnegative reductions include a summation-error allowance.",
+    "The receipt covers only the requested low-side shells. Complementary shells need a separately proved symmetry statement."
+  ]
+}
