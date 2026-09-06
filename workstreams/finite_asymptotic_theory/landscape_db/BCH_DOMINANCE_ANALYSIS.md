@@ -176,6 +176,55 @@ each witness; they are not resampled constituents.
 
 ## Search and evidence discipline
 
+### Activation density for the larger-t follow-up
+
+The t128 follow-up uses additional information about the state created by
+J(u). Here J is the transpose of the recorded generator of A. Let K_j(w)
+be the coefficient of x^j in (1-x)^w(1+x)^(t-w). Character inversion gives
+the following upper bound on the probability of any particular syndrome
+when u is uniform among the weight-j inputs:
+
+    pmax_j = [choose(t,j) + sum_(w>0) a_w |K_j(w)|]
+             / [2^s choose(t,j)].
+
+The signed sum without absolute values recovers the exact zero-syndrome
+probability beta_j. The implementation checks this identity against
+every recorded kernel coefficient using integer arithmetic.
+
+For nonzero syndromes, cap pmax_j by 1-beta_j. With M=2^s-1, define
+
+    W_j = max(1-beta_j, (M-1) min(pmax_j,1-beta_j)).
+
+The nonzero syndrome measure has total mass at most W_j and every point
+has mass at most W_j/(M-1). It can therefore be dominated by W_j times
+a distribution in class L: add the missing mass while respecting that
+pointwise cap. This gives the alternative zero-state transitions
+
+    Z -> Z : beta_j z^j,
+    Z -> L : W_j z^j.
+
+All live-state transitions remain as above. The current policy uses this
+alternative when W_j <= 4(1-beta_j), and retains class D otherwise.
+The factor four is a choice in the bound, not an encoder parameter.
+`syndrome_density_v1.py` implements the alternative. Exhaustive small
+examples check every syndrome probability, future-state potential, and
+three-epoch path. This extension changes no previously recorded bound.
+
+The t128 search also separates the all-one outer word into its own band
+and optimizes the other band probabilities jointly with the tilt and
+type proposal. Smoothed costs guide that search; every retained bound
+uses the original unsmoothed costs and direct transfer evaluation.
+
+Three individual types selected from weak BCH-128 t128/s20 boxes improve
+from approximately -65,000 margin bits to 20,822.75, 47,773.90, and
+234,369.67 bits under direct witness refinement. These are selected
+binary64 point diagnostics. They demonstrate search slack at those
+types, not closure of their surrounding boxes or the full interval.
+The active refinement isolates zero-count faces and uses relative count
+uncertainty to choose subdivisions. Every split is checked as an exact
+disjoint integer partition. The t128 complete-tail conclusion remains
+pending.
+
 `occupation_refresh_v1.py` is a separate evaluator. Historical producer
 sources and their receipts remain unchanged. Exhaustive GF(4) checks cover
 every epoch occupation, extreme distributions in all four classes, and

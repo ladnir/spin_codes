@@ -10,6 +10,25 @@ four-state evaluator retains zero syndromes explicitly. A wider sparse
 counting search and complete dense type covers are being evaluated;
 partial coverage must remain labeled. BCH-256 is excluded from this goal.
 
+The active larger-t calculation is BCH-128, K=2^20, t128/s20. The
+`close_bch_dense_v10.py` producer retains a complete Q257..16384 cover
+in `landscape_db/bch_dense_v10_b128_t128_s20_e20_q257/`; its bound is
+still being tightened. It separates the all-one outer word, optimizes
+counting probabilities jointly, uses the new character-based activation
+density bound, and isolates zero-count faces when subdividing types.
+Do not restart while its process is live. Earlier v5..v9 refinement jobs
+were explicitly stopped after retaining their checkpoints.
+
+Read the activation-density subsection in `BCH_DOMINANCE_ANALYSIS.md`.
+Seven exhaustive checks validate that transfer, two validate the new
+integer subdivisions, and joint-gradient/direct-witness checks pass.
+Three selected individual types from weak boxes have direct-refined
+positive margins, demonstrating search slack at those types. This is
+not a complete t128 result. `verify_bch_full_reference_v3.py` is prepared
+for the new transfer but has not run. After the dense job, compute the
+t128/s20 Q5..256 interval with `close_bch_sparse_tail_v2.py`, then replay
+the full reference. Preserve the existing source-bound checkpoints.
+
 Both BCH blocks now have complete audited references at K=2^20, t64/s20:
 BCH-64 has 10.305616126 full margin bits (0.081331731 bits lost to higher
 occupations); BCH-128 has 32.769596142 (0.000001995 bits lost).
