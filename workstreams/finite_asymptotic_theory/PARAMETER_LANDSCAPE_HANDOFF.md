@@ -2,6 +2,22 @@
 
 Date: 2026-09-06.
 
+Latest engineering study: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
+extends the uniform-refresh Q1 analysis to RM and random constituents.
+It adds K/s interaction slices, family comparisons, and a long-region
+model with the actual cancellation probability 1/(2^s-1). Exact RM stops
+at length 512; random references stop at 512 for this focused study.
+Random ensemble averages and conditional spectrum caps are distinct.
+The next question is whether selected higher occupations follow these
+Q1 trends. BCH-256 work remains with its owning thread.
+The completed study contains 1,292 family rows over 387 geometries. All
+85 tests pass, including the new kernel and model checks. A 90-digit replay
+checks 1,155 coefficients. At K=2^20, the long-region model predicts the
+44 selected family/state cases within 0.105 bits without fitted parameters.
+This is measured agreement, not an outward error guarantee.
+
+The following update records the preceding BCH-only stage.
+
 Current research update: `landscape_db/BCH_GROWTH_ANALYSIS.md` supersedes
 the earlier four-size BCH fit and implementation-first priorities below.
 A new four-state Q1 transfer removes repeated density loss after exact

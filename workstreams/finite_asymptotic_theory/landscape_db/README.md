@@ -10,7 +10,14 @@ describes the recorded studies; it does not itself supply their result files.
 Run `python check_source_only_git.py` before pushing to check both the tip
 and every new object reachable from the branch.
 
-The current BCH-focused analysis is in
+The current engineering comparison is in
+[`CONSTITUENT_ENGINEERING_SURFACES.md`](CONSTITUENT_ENGINEERING_SURFACES.md).
+It treats exact BCH and RM, then the random ensemble, with the same
+four-state Q1 transfer and measured K/s interaction slices. It explains
+the different block-size trends and tests a long-region model with explicit
+state cancellation. Its tables and figures remain local and ignored.
+
+The preceding BCH-focused analysis is in
 [`BCH_GROWTH_ANALYSIS.md`](BCH_GROWTH_ANALYSIS.md). It separates message-length
 counting from state-size effects, explains the exact BCH-64/128 Q1 plateaus,
 and documents a tighter four-state transfer. Its 212-row study and figures

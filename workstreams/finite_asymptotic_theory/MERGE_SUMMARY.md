@@ -1,6 +1,33 @@
 # Merge summary: finite and asymptotic theory
 
-Current BCH addition: `landscape_db/BCH_GROWTH_ANALYSIS.md` explains the
+Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
+compares exact BCH, exact RM, and the random ensemble under the corrected
+Q1 transfer. It adds measured K/s interactions and separates state-size
+knees from outer-spectrum plateaus. The long-region model uses the actual
+cancellation probability and uniform-live output rate; it does not fit a
+curve through constituent sizes. Random spectrum caps remain separately
+labeled, including their setup-event charge.
+
+The completed study evaluates 387 geometries and 1,292 family rows. All 85
+tests pass. The independent 90-digit replay checks 1,155 coefficients with
+maximum log error 8.868e-12 and authenticates 77 dependencies. The 130 shared
+BCH/RM anchor pairs agree exactly; all 212 prior BCH points reproduce within
+0.000138 bits. The long-region model is checked on 44 family/state cases
+at each of three K values, with worst margin discrepancies 0.652,0.105,0.020
+bits at K=2^16,2^20,2^24. These are measured model errors, not certified
+error bounds. Six figures show growth, state-size tradeoffs, and K/s slices.
+
+New sources are the four-state native kernel, wrapper, and build script;
+`study_engineering_surfaces.py`, `report_engineering_surfaces.py`, and
+`verify_engineering_surfaces.py`; `continuous_state_model.py` and
+`check_continuous_state_model.py`; and their independent tests.
+Only this workstream changes. Frozen producers, the full-occupation ledger,
+and other workstreams remain unchanged. Generated data and figures are
+local and ignored. The next smallest useful task is to refine selected
+higher occupations near the observed state-size knees. No implementation
+runtime ranking or new full-distance certificate is proposed.
+
+Earlier BCH addition: `landscape_db/BCH_GROWTH_ANALYSIS.md` explains the
 continuous growth trends from 212 new Q1 tuples. New sources are
 `activation_q1_refresh.py`, `bch_growth_model.py`, `study_bch_growth.py`,
 `verify_bch_refresh.py`, `plot_bch_growth.py`, and `test_bch_growth.py`.

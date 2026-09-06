@@ -1,5 +1,17 @@
 # Next work after the complete finite grid
 
+The engineering-surface comparison now extends the corrected Q1 treatment
+to exact RM through length 512 and random references through length 512.
+Read `CONSTITUENT_ENGINEERING_SURFACES.md` and its reproduction commands.
+The comparison separates the K row-count cost, state-size knees, and outer
+spectrum contribution. A long-region cancellation model supplies a common
+explanation across families. The random ensemble curve and the conditional
+spectrum-cap curve remain separate evidence classes. Next, test selected
+higher occupations near the measured knees before treating the Q1 surface
+as a model of the complete failure margin.
+
+The priorities below record the earlier BCH-focused stage and full grid.
+
 Current priority: targeted BCH growth analysis, following the user's
 direction to understand continuous trends before choosing certificate
 thresholds or implementation candidates. Read `BCH_GROWTH_ANALYSIS.md`.
