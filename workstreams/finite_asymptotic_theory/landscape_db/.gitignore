@@ -1,0 +1,37 @@
+native_build/
+activation_grid_v1/run.lock
+activation_grid_v1/**/*.pending.csv
+activation_grid_v1/**/*.pending.json
+occupation_grid.lock
+activation_occupation_*.log
+sparse_comparison_status.log
+activation_occupation_grid*/**/*.pending.csv
+activation_occupation_grid*/**/*.pending.json
+# Unauthenticated exploratory output; production receipts live in grid directories.
+*_probe.json
+balanced_probability_probe*.json
+spin_landscape.sqlite3
+landscape_export.csv
+*.gz.pending
+spin_landscape.sqlite3.pending
+landscape_export.csv.pending
+grid_validation.log
+grid_union_status.log
+frontier_status.log
+snapshot_status.log
+audit_status.log
+grid_*.log
+## Research outputs stay on disk, never in Git or release bundles.
+activation_pilot*/
+activation_grid_v1/
+activation_occupation_grid*/
+*.csv
+*.json
+!catalog.json
+*.sqlite3*
+*.gz
+*.png
+*.pdf
+*.log
+*.lock
+*.pending*

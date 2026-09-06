@@ -1,13 +1,53 @@
 # Handoff: finite Structured SPIN landscape and BCH--RM2Sub closure
 
-Date: 2026-09-05.
+Date: 2026-09-06.
+
+GitHub now carries source, documentation, and catalog configuration only.
+All generated result paths below refer to local ignored outputs. The
+existing data in this worktree is preserved. Do not push the earlier
+experiment history or create a data release. Check new Git objects with
+`landscape_db/check_source_only_git.py` before pushing.
+
+Latest grid result: every one of the 3,108 native tuples has full evaluated
+occupation coverage, comprising Q1..64 and a typed Q65..L cover, with
+additional composition bounds. Most dense bounds remain loose. Read
+`landscape_db/GRID_FINDINGS.md` for the final parameter comparisons and
+`landscape_db/complete_landscape_audit.json` for the verified snapshot.
+`landscape_db/NEXT_GRID_REFINEMENTS.md` records the next implementation
+work. Exact-region composition boxes give stronger selected RM full
+diagnostics; three random [512,256] full diagnostics are near the shared
+60-bit setup budget. No new outward certificate is claimed.
+
+The completed finite-grid scope is in `landscape_db/COMPLETE_GRID_PLAN.md`:
+four exact BCH spectra through length 128, four exact RM spectra through
+length 512, and random references through length 1024. BCH-256 and
+partial-spectrum RM(5,11) are excluded. The primary exact-family Q1
+extrapolations, holdout errors, and t/s cost comparisons remain distinct
+from full-distance claims. Schema version 4 explicitly records the setup
+event for conditional random-spectrum bounds and authenticates event
+containment when combining receipts. Numerical producers are resumable
+and must run sequentially.
+
+Historical parameter-study update: read
+`landscape_db/SMALL_STATE_AND_Q2_STUDY.md` for the smaller-state extension
+and exact-spectrum Q2 comparison. The database has 1,012 preferred Q1
+observations and 36 current Q2 screens; higher occupations for these maps
+remain open. The original tranche is described in
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md`, which records the initial
+715-observation activation-aware Q1 grid. It prioritizes exact-spectrum BCH/RM inputs and
+keeps BCH-256 as a secondary bounded-spectrum anchor. The database now
+exposes historical activation-review status and excludes the old RM receipt
+from its current-certificate view. The separate BCH task has since closed
+the t64_s20 full target below 2^-50; the partial-coverage status below is
+historical. Its full receipt remains in the owning ba80 worktree and is not
+yet imported here.
 
 This document is the current entry point for the finite-parameter lane. It
 supersedes `NEXT_CHAT_HANDOFF.md` for the grid search, parameter model, and
 BCH--RM2Sub work. The older handoff remains useful as a history of rejected
 constructions.
 
-## Executive status
+## Historical workstream context
 
 The practical target is a rate-one-half Structured SPIN code at message length
 

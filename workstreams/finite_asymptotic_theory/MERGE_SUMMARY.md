@@ -1,6 +1,61 @@
 # Merge summary: finite and asymptotic theory
 
-## Final fixed-RM finite certificate
+GitHub integration is source-only. The finite analysis code, documentation,
+and catalog configuration are integrated on the curated main history without
+the local experiment commits. Generated outputs stay unchanged on disk and
+are ignored. The results and validation counts below describe that local
+research snapshot; a fresh checkout must generate data before running its
+data-dependent reports and audits. No PR or data release is created.
+
+The completed diagnostic grid has the 3,108 native tuples described in
+`landscape_db/COMPLETE_GRID_PLAN.md`. It adds a resumable Q1 producer and
+native coefficient recurrence, a kernel-aware general occupation engine,
+simultaneous spectrum caps for one reused random outer, and explicit
+coverage reports. Q1..64 and composition-preserving Q2/Q3/Q4 now cover
+every tuple, and the typed Q65..L cover completes the occupation range.
+Exact-region composition boxes give a full RM(4,9) diagnostic
+of 42.969 bits at k=2^16, t64/s18. Balanced probabilities and variance spectrum caps
+give three full-range random length-512 diagnostics near 60 bits; the
+shared setup-event budget limits those margins. Schema version 4 keeps
+conditional setup events explicit, and the union reporter checks event
+containment before combining different receipts. The stronger Q2..64
+whole-grid sweep is complete. The typed dense cover accounts for every
+remaining occupation. Its coarse bounds and counting fallbacks
+remain explicit; they do not establish distance failure. Selected outward
+replay remains a separate task. See `landscape_db/GRID_FINDINGS.md` for
+the final t/s comparison and `landscape_db/complete_landscape_audit.json`
+for the authenticated final coverage snapshot.
+
+The final snapshot has 263,262 observations and passes 72 tests. Its
+strict completion audit verifies 13,352 dependencies and 203,739 selected
+union components; all 3,108 native tuples have full evaluated coverage,
+four have positive full diagnostics, and none is a new outward certificate.
+The repository now includes tested
+t/s operation frontiers and 473 exact-family Q1 engineering projections,
+with largest-size holdout errors and window sensitivity. The bounded
+BCH-256 result appears only in a secondary comparison. Verified gzip
+snapshots replace tracked raw SQLite/CSV convenience files; local query
+and restore commands retain the ordinary file interfaces.
+
+Historical addition: `landscape_db/SMALL_STATE_AND_Q2_STUDY.md` records 297
+smaller-state Q1 screens and 36 activation-aware Q2 screens. The changes
+add an explicit three-state native pair kernel, a Windows build script,
+exact-arithmetic tests, source-bound receipts, and Q1/Q2 comparison exports.
+The database preserves pair weights and their witnesses. The original
+tranche is committed as 88aa11a, with checkout-hash repair 9d3b7be.
+The continued work remains a diagnostic study. A full test run passed 58
+tests, followed by focused validation of the batched producer and shared
+region ladder. All 9,541 registered receipt dependencies passed the content
+and checkout-line-ending audit. No benchmark or change to another worktree
+was made.
+
+Current status: the historical RM certificate discussed below requires an
+activation-state re-audit. The current parameter work is documented in
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md` and the final section of this
+summary. Its 715 preferred observations are Q1 diagnostics, not new full
+certificates. The database exposes this distinction explicitly.
+
+## Historical fixed-RM certificate, under activation re-audit
 
 The fixed-RM small-k proof template is now a complete outward theorem. At
 message dimension (k=2^{16}) and output length (N=2^{17}), one fixed
@@ -2161,3 +2216,28 @@ Supporting material:
   `small_k_replay/probe_rm2sub_fixed_rm_dense_bands.py`, and their diagnostic
   receipts;
 - the `small_k_replay/rm2sub_q_ladder_*_d100.json` receipts.
+# Current addition: activation-aware parameter study
+
+The parameter lane now has 715 preferred Q1 observations for exact-spectrum
+BCH/RM constituents and random-outer references, across five message lengths
+and thirteen nested-map RM2Sub configurations. See
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md` for the grid, findings, commands,
+and next experiments. All changes are confined to finite_asymptotic_theory.
+
+New artifacts include the activation-aware batched Q1 evaluator, sequential
+pilot and grid-refinement drivers, exact-arithmetic tests, hashed map/CSV
+receipts, comparison reports, preliminary operation counts, and plots.
+The database schema, importer, query output, README, and historical fit status
+were updated. Existing proof receipts and frozen implementation sources were
+not changed. Database source IDs and original result IDs remain stable.
+
+The old RM(4,9) certificate entries remain indexed but are excluded from the
+current-certificate view pending activation review. BCH-256 is not a primary
+fit input. No new full certificate or benchmark is claimed. Fourteen tests
+pass, including exact support enumeration, a GF(4) first-moment comparison,
+database coverage checks, and rejection of a changed screen CSV.
+
+Next: refine smaller s within these chains, then compare activation-aware Q2
+and higher occupations before fitting the scaling frontier. The dependency
+on the separate BCH task is read-only review/import of its completed compact
+certificate; no files or running sessions in that task were changed.

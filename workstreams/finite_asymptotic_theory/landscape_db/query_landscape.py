@@ -27,9 +27,9 @@ def print_rows(columns: list[str], rows: list[tuple[object, ...]]) -> None:
 
 def summary(db: sqlite3.Connection) -> None:
     query = """
-        SELECT result_class, outer_family, coverage_kind, COUNT(*) AS rows
+        SELECT result_class, transfer_review_status, outer_family, coverage_kind, COUNT(*) AS rows
         FROM landscape
-        GROUP BY result_class, outer_family, coverage_kind
+        GROUP BY result_class, transfer_review_status, outer_family, coverage_kind
         ORDER BY result_class, outer_family, coverage_kind
     """
     cursor = db.execute(query)
@@ -45,7 +45,7 @@ def curves(db: sqlite3.Connection, family: str | None) -> None:
     query = f"""
         SELECT study,outer_label,message_exponent,step_bits,state_bits,
                ROUND(persistence_offset,3) AS persistence_offset,
-               ROUND(margin_bits,6) AS margin_bits,result_class
+               ROUND(margin_bits,6) AS margin_bits,result_class,transfer_review_status,comparison_eligible
         FROM q1_curves
         WHERE {' AND '.join(conditions)}
         ORDER BY outer_family,block_bits,outer_label,study,message_bits,state_bits

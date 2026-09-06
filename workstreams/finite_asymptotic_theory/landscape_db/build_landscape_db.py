@@ -22,7 +22,7 @@ SMALL_K = HERE.parent / "small_k_replay"
 SCHEMA = HERE / "schema.sql"
 CATALOG = HERE / "catalog.json"
 DEFAULT_DB = HERE / "spin_landscape.sqlite3"
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "4"
 
 
 def sha256(path: pathlib.Path) -> str:
@@ -73,6 +73,10 @@ def parse_outer_parameters(label: str, row: dict[str, Any]) -> tuple[int, int, i
 def outer_model_kind(label: str, row: dict[str, Any]) -> tuple[str, str]:
     family = infer_family(label)
     model = str(row.get("outer_model", "")).lower()
+    if model == 'random-simultaneous-spectrum-caps':
+        if not row.get('setup_event_id') or row.get('setup_failure_bits') in (None, ''):
+            raise ValueError('conditional random bounds require an explicit shared setup event')
+        return 'random_setup_spectrum_caps', 'one reused random constituent; conditional on simultaneous shell caps'
     if family == "random" or "ensemble" in model:
         return "random_ensemble_expectation", "one sampled constituent reused; Q1 ensemble expectation"
     return "fixed_exact_spectrum", "one fixed constituent reused in every outer row"
@@ -191,8 +195,9 @@ def insert_result(
             message_exponent,message_bits,output_bits,outer_rows,epochs_per_region,
             bad_weight,distance_target,occupation_min,occupation_max,coverage_kind,
             result_class,arithmetic,margin_bits,margin_bits_text,failure_upper_text,
-            dominant_weight,notes
-        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            dominant_weight,dominant_second_weight,dominant_log_surprisal,dominant_witness_at_grid_edge,comparison_eligible,
+            setup_event_id,setup_failure_bits,witness_shift,notes
+        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """,
         (
             result_id,
@@ -217,13 +222,20 @@ def insert_result(
             margin_bits_text,
             failure_upper_text,
             optional_int(row.get("dominant_weight")),
+            optional_int(row.get("dominant_second_weight")),
+            optional_float(row.get("dominant_log_surprisal")),
+            optional_int(row.get("dominant_witness_at_grid_edge")),
+            int(row.get("comparison_eligible", 0)),
+            row.get('setup_event_id') or None,
+            optional_int(row.get('setup_failure_bits')),
+            optional_float(row.get('witness_shift')),
             notes,
         ),
     )
 
 
 def import_csv(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
-    path = SMALL_K / spec["path"]
+    path = (HERE if spec.get("base") == "landscape_db" else SMALL_K) / spec["path"]
     source_id = register_source(
         db,
         path,
@@ -231,6 +243,16 @@ def import_csv(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
         "binary64_diagnostic",
         "Rows with inner=RandomStepConv are rejected by the catalogued filter.",
     )
+    review = spec.get("transfer_review_status", "historical_pending_review")
+    if review == "activation_aware":
+        manifest_path = HERE / spec["manifest"]
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for relative, digest in manifest["source_sha256"].items():
+            if sha256(HERE.parent.parent.parent / relative) != digest:
+                raise ValueError(f"changed screen dependency: {relative}")
+        if manifest["csv_sha256"] != sha256(path):
+            raise ValueError(f"changed screen CSV: {path}")
+    db.execute("UPDATE sources SET transfer_review_status=? WHERE source_id=?", (review, source_id))
     with path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     required = {"message_bits", "output_bits", "outer_rows", "bad_weight", "margin_bits"}
@@ -238,6 +260,10 @@ def import_csv(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
         raise ValueError(f"unexpected CSV schema: {path}")
     imported = 0
     for index, row in enumerate(rows, start=2):
+        row["comparison_eligible"] = int(
+            review == "activation_aware"
+            and int(row.get("message_exponent") or 0) not in spec.get("superseded_exponents", [])
+        )
         required_inner = spec.get("require_inner")
         if required_inner is not None and row.get("inner") != required_inner:
             continue
@@ -247,8 +273,17 @@ def import_csv(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
         if not label:
             raise ValueError(f"missing constituent label at {path}:{index}")
         occupation = int(row.get("occupation") or spec.get("occupation") or 1)
+        occupation_min = int(row.get('occupation_min') or occupation)
+        occupation_max = int(row.get('occupation_max') or occupation)
+        coverage_kind = row.get('coverage_kind') or ('single_occupation' if occupation_min==occupation_max else 'occupation_union')
+        if not 1 <= occupation_min <= occupation_max <= int(row['outer_rows']):
+            raise ValueError('invalid occupation range')
+        if (coverage_kind=='single_occupation') != (occupation_min==occupation_max):
+            raise ValueError('occupation range and coverage kind disagree')
+        if coverage_kind=='full_distance' and (occupation_min!=1 or occupation_max!=int(row['outer_rows'])):
+            raise ValueError('full distance requires every occupation')
         outer_id = register_outer(db, label, row)
-        inner_id = register_inner(db, row, spec["map_tag"])
+        inner_id = register_inner(db, row, row.get("map_tag") or spec["map_tag"])
         result_class = classify_result(label, row.get("outer_model", ""))
         insert_result(
             db,
@@ -258,12 +293,13 @@ def import_csv(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
             outer_id=outer_id,
             inner_id=inner_id,
             row=row,
-            occupation_min=occupation,
-            occupation_max=occupation,
+            occupation_min=occupation_min,
+            occupation_max=occupation_max,
             result_class=result_class,
             arithmetic="nearest_binary64_diagnostic",
-            coverage_kind="single_occupation",
+            coverage_kind=coverage_kind,
             margin_bits=float(row["margin_bits"]),
+            notes=row.get("notes", ""),
         )
         imported += 1
     if imported == 0:
@@ -338,6 +374,10 @@ def decimal_margin_bits(probability_upper: decimal.Decimal) -> float:
 def import_certificate(db: sqlite3.Connection, spec: dict[str, Any]) -> None:
     path = SMALL_K / spec["path"]
     source_id = register_source(db, path, "full_certificate_v1", "outward_certificate")
+    db.execute(
+        "UPDATE sources SET transfer_review_status='activation_under_reaudit', notes=? WHERE source_id=?",
+        ("Historical outward receipt; activation-state invariant requires re-audit. See PARAMETER_LANDSCAPE_HANDOFF.md.", source_id),
+    )
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("status") != "OUTWARD_FULL_DISTANCE_CERTIFICATE":
         raise ValueError(f"not a full outward certificate: {path}")
@@ -428,6 +468,10 @@ def build(output: pathlib.Path) -> None:
                 import_q_ladder(db, spec)
             for spec in catalog["certificate_sources"]:
                 import_certificate(db, spec)
+            # Append the new sources after every historical source, preserving
+            # source IDs and result IDs in the original 414-row snapshot.
+            for spec in catalog.get("activation_sources", []):
+                import_csv(db, spec)
             db.commit()
             violations = db.execute("PRAGMA foreign_key_check").fetchall()
             if violations:
