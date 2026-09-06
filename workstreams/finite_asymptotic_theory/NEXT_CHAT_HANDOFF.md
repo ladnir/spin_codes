@@ -1,5 +1,11 @@
 # Handoff: concrete distance certificates for Structured SPIN
 
+> **Superseded for the current finite-parameter lane.** Read
+> `PARAMETER_LANDSCAPE_HANDOFF.md` first. It records the RM2Sub landscape
+> database, parameter extrapolation, activation-state audit, the proved
+> \((t,s)=(128,15)\) first-moment obstruction, and the active
+> \((t,s)=(64,20)\) BCH closure route. The material below remains historical.
+
 Date: 2026-09-03.
 
 Superseding status: the one-stage sparse-mixer--accumulator certificate that
