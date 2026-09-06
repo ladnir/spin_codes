@@ -2,6 +2,19 @@
 
 Date: 2026-09-06.
 
+Current research update: `landscape_db/BCH_GROWTH_ANALYSIS.md` supersedes
+the earlier four-size BCH fit and implementation-first priorities below.
+A new four-state Q1 transfer removes repeated density loss after exact
+uniform refresh. Its 212-tuple study shows a nearly one-bit cost per
+doubling of k and explains the high-state BCH-64/128 plateaus with a
+first-activation model. All 77 tests pass; an independent 90-digit replay
+checks 236 coefficients at four reference points. These are Q1 diagnostics,
+not new full-distance certificates. Next, tighten selected higher
+occupations before using the size trend for full-code extrapolation.
+The BCH workstream reports its completed BCH-256 outward closure; references
+below to that closure being open are historical. Its bounded spectrum
+remains outside our primary exact-spectrum study.
+
 GitHub now carries source, documentation, and catalog configuration only.
 All generated result paths below refer to local ignored outputs. The
 existing data in this worktree is preserved. Do not push the earlier

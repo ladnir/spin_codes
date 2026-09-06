@@ -1,5 +1,24 @@
 # Merge summary: finite and asymptotic theory
 
+Current BCH addition: `landscape_db/BCH_GROWTH_ANALYSIS.md` explains the
+continuous growth trends from 212 new Q1 tuples. New sources are
+`activation_q1_refresh.py`, `bch_growth_model.py`, `study_bch_growth.py`,
+`verify_bch_refresh.py`, `plot_bch_growth.py`, and `test_bch_growth.py`.
+The transfer retains exact uniformity after zero-input epochs. Exact
+rational tests dominate an actual GF(4) encoder; a separate 90-digit replay
+agrees within 1.081e-12 log units on 236 coefficients. The full local suite
+passes 77 tests. No frozen producer or existing receipt changes.
+
+At fixed t64/s20, each doubling of k costs nearly one Q1 margin bit.
+Removing the row-count factor reveals distinct state-controlled small-BCH
+curves and BCH-64/128 plateaus explained by first-activation geometry.
+The prior four-size forecast should not be treated as reliable. The next
+small task is a higher-occupation extension that handles zero syndromes,
+followed by matched t/s comparisons. BCH-256 remains secondary bounded
+evidence. No full-distance claim or change outside this workstream is
+proposed, and higher-occupation proofs are still a dependency for parameter
+selection. The figures and all generated data remain local and ignored.
+
 GitHub integration is source-only. The finite analysis code, documentation,
 and catalog configuration are integrated on the curated main history without
 the local experiment commits. Generated outputs stay unchanged on disk and

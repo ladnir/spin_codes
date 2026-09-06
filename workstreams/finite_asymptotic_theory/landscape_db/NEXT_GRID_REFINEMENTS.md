@@ -1,5 +1,16 @@
 # Next work after the complete finite grid
 
+Current priority: targeted BCH growth analysis, following the user's
+direction to understand continuous trends before choosing certificate
+thresholds or implementation candidates. Read `BCH_GROWTH_ANALYSIS.md`.
+The new four-state Q1 study explains the message-length slope and the
+BCH-64/128 state-size plateaus. The earlier fit through all four BCH sizes
+mixes distinct mechanisms and should not be used as a reliable forecast.
+Next, extend the uniform-refresh invariant to selected higher occupations,
+handling zero syndromes explicitly, and compare matched t/s settings.
+BCH-256 remains a secondary bounded-spectrum calibration point.
+The implementation and RM priorities below are retained as earlier plans.
+
 All 3,108 native tuples now have evaluated full occupation coverage.
 Read `GRID_FINDINGS.md` and `complete_landscape_audit.json` for the final
 findings and authenticated snapshot. Full coverage includes weak bounds;

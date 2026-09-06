@@ -10,6 +10,13 @@ describes the recorded studies; it does not itself supply their result files.
 Run `python check_source_only_git.py` before pushing to check both the tip
 and every new object reachable from the branch.
 
+The current BCH-focused analysis is in
+[`BCH_GROWTH_ANALYSIS.md`](BCH_GROWTH_ANALYSIS.md). It separates message-length
+counting from state-size effects, explains the exact BCH-64/128 Q1 plateaus,
+and documents a tighter four-state transfer. Its 212-row study and figures
+are local outputs, separate from the complete-grid ledger. Follow its
+sequential reproduction commands after generating the required pilot inputs.
+
 This directory indexes the known finite results used to compare Structured
 SPIN variants. The current database contains only RM2Sub inners. A `random`
 row denotes a random outer-code reference; it never denotes RandomStepConv.
