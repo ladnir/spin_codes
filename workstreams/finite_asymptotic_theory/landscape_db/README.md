@@ -10,6 +10,30 @@ describes the recorded studies; it does not itself supply their result files.
 Run `python check_source_only_git.py` before pushing to check both the tip
 and every new object reachable from the branch.
 
+The active BCH-64/128 follow-up is in
+[`BCH_DOMINANCE_ANALYSIS.md`](BCH_DOMINANCE_ANALYSIS.md). It tests whether
+the Q1 surface describes the full bound, with explicit higher-occupation
+coverage and aggregation costs. Run `study_bch_dominance_v1.py` for the
+130-point Q2..4 pass, then `verify_bch_dominance_v1.py` and
+`report_bch_dominance_v1.py`. Q5 and higher require separate tail evidence.
+Run numerical producers sequentially.
+
+`bch_zero_state_lower_v2.py` supplies a fast lower-bound screen on all
+130 geometries. `bch_zero_state_exact_grid_v3.py` strengthens the 78
+t/s settings at K=2^20 using exact integer kernel coefficients; replay
+positive witnesses with `verify_bch_zero_state_v3.py`. The report
+`report_bch_evidence_v2.py` joins the sparse grid, verified lower bounds,
+and available full-reference replays. Its evidence labels distinguish
+full Q1 dominance, first-moment obstructions, and unresolved full tails.
+Generated CSV, JSON, and figures remain ignored.
+
+Full-reference replay uses `verify_bch_full_reference_v2.py`: BCH-128
+uses the default dense cutoff Q257; BCH-64 uses `--block 64
+--dense-minimum 1025`. The required interval receipts must exist first.
+The sparse interval producers and dense-cover refiners retain their
+own versioned checkpoints. Do not overwrite an existing seed or change
+a producer whose hash is bound by a retained receipt.
+
 The current engineering comparison is in
 [`CONSTITUENT_ENGINEERING_SURFACES.md`](CONSTITUENT_ENGINEERING_SURFACES.md).
 It treats exact BCH and RM, then the random ensemble, with the same

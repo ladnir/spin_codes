@@ -1,5 +1,20 @@
 # Next work after the complete finite grid
 
+The active goal is now the BCH-64/128 dominance audit described in
+`BCH_DOMINANCE_ANALYSIS.md`. Q1 surfaces alone do not justify a full-margin
+engineering recommendation. Update the existing geometries with sparse
+occupation ratios, then control the complete remaining tail at targeted
+extremes and around the apparent state-size knees. Keep unresolved points
+explicit; do not infer dominance from Q2..4 alone. BCH-256 stays excluded.
+
+Both t64/s20 references at K=2^20 now have verified full bounds: BCH-64
+loses 0.08133 bits from higher occupations, and BCH-128 loses 0.000002
+bits. The exact-kernel lower scan finds 46 replayed first-moment
+obstructions: for both blocks, t64/s7..8, t128/s8..16, and t256/s9..20.
+Next target t128/s17..20 and the t64 state-size knees, then vary K at
+selected boundaries. The joined engineering grid still has 82 geometries
+without a useful complete-tail conclusion from the updated analysis.
+
 The engineering-surface comparison now extends the corrected Q1 treatment
 to exact RM through length 512 and random references through length 512.
 Read `CONSTITUENT_ENGINEERING_SURFACES.md` and its reproduction commands.

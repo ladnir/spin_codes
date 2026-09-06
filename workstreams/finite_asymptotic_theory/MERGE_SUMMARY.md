@@ -1,5 +1,33 @@
 # Merge summary: finite and asymptotic theory
 
+Active follow-up: `landscape_db/BCH_DOMINANCE_ANALYSIS.md` corrects the
+scope of the engineering conclusions and starts a BCH-64/128 dominance
+audit. Its new four-state occupation transfer handles nonzero inputs
+with zero syndrome. The sparse grid will report Q2..4/Q1 ratios and
+aggregation costs; complete-tail evidence remains a separate requirement.
+No full-margin engineering recommendation follows from Q1 alone.
+
+The 130-point sparse pass and full t64/s20 references at K=2^20 are now
+verified. BCH-64 has 10.305616126 full margin bits, versus 10.386947858
+for Q1; BCH-128 has 32.769596142, versus 32.769598137 for Q1. The full
+verifier replays every selected Q2..4 composition, every higher interval,
+complete disjoint type coverage, and three 90-digit dense witnesses per
+block. Both references establish Q1 dominance for their bound. They do
+not establish an outward certificate or a result at other geometries.
+
+The exact integer kernel scan identifies 46 first-moment obstructions,
+all replayed at 90 digits: t64/s7..8, t128/s8..16, and t256/s9..20 for
+both blocks at K=2^20. These restrict the first-moment certificate method;
+no lower bound on actual failure probability is inferred. The updated
+plot shows why the nearly t-insensitive Q1 curves miss this tradeoff.
+The joined grid marks 82 other geometries as sparse-only. Next target
+t128/s17..20, the t64 knees, and selected K extremes. The goal is active.
+
+This follow-up writes only within the finite-asymptotic workstream.
+Existing receipt-bound producers and the frozen encoder remain unchanged.
+Generated evidence remains ignored and local. The paused BCH-256 estimator
+is unrelated and must not be included in this change.
+
 Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 compares exact BCH, exact RM, and the random ensemble under the corrected
 Q1 transfer. It adds measured K/s interactions and separates state-size

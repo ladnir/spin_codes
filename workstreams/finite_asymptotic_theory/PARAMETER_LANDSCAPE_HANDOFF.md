@@ -2,6 +2,30 @@
 
 Date: 2026-09-06.
 
+Active goal: update the BCH-64/128 engineering grid with higher-occupation
+evidence. Read `landscape_db/BCH_DOMINANCE_ANALYSIS.md`. The Q1 curves do
+not establish full-margin scaling or implementation state-size choices
+until the remaining occupation sum is controlled. The new multi-bit
+four-state evaluator retains zero syndromes explicitly. A wider sparse
+counting search and complete dense type covers are being evaluated;
+partial coverage must remain labeled. BCH-256 is excluded from this goal.
+
+Both BCH blocks now have complete audited references at K=2^20, t64/s20:
+BCH-64 has 10.305616126 full margin bits (0.081331731 bits lost to higher
+occupations); BCH-128 has 32.769596142 (0.000001995 bits lost).
+`verify_bch_full_reference_v2.py` replays every selected Q2..4 composition,
+all higher intervals, complete disjoint type coverage, and selected
+90-digit dense witnesses. These are binary64 diagnostics.
+
+The exact integer kernel scan has 46 positive first-moment lower bounds,
+all replayed at 90 digits. For both blocks at K=2^20, it obstructs t64/s7..8,
+t128/s8..16, and t256/s9..20. The updated 130-row engineering report has
+two full Q1-dominant references, 46 obstructions, and 82 sparse-only rows.
+Read `landscape_db/BCH_DOMINANCE_ANALYSIS.md` and run
+`landscape_db/report_bch_evidence_v2.py` for the joined plot and evidence.
+Next test t128/s17..20, the t64 knees, and selected K extremes. The goal
+remains active; no full-margin surface over the unresolved range is claimed.
+
 Latest engineering study: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 extends the uniform-refresh Q1 analysis to RM and random constituents.
 It adds K/s interaction slices, family comparisons, and a long-region
