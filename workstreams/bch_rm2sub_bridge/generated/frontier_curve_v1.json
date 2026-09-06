@@ -1,0 +1,81 @@
+{
+  "status": "SEPARATED_SIZE_MARGIN_FRONTIER",
+  "configuration": "t64_s20",
+  "rows": [
+    {
+      "message_exponent": 16,
+      "message_bits": 65536,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 54.15635684953418,
+      "modeled_q1_bits": 74.21681052257702,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 20,
+      "message_bits": 1048576,
+      "full_certificate_margin_bits": 50.48729827745524,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 50.48781199145992,
+      "modeled_q1_bits": 70.55441318733986,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 24,
+      "message_bits": 16777216,
+      "full_certificate_margin_bits": 46.50870389202146,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 46.5087306446751,
+      "modeled_q1_bits": 66.57571980667717,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 28,
+      "message_bits": 268435456,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 42.510041444739954,
+      "modeled_q1_bits": 62.577054532310484,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 30,
+      "message_bits": 1073741824,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": {
+        "occupancy_range": [
+          1,
+          32
+        ],
+        "margin_bits": 40.51009417524392
+      },
+      "q1_constraint_diagnostic_bits": null,
+      "modeled_q1_bits": null,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 32,
+      "message_bits": 4294967296,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 38.510123368704626,
+      "modeled_q1_bits": 58.57713795180038,
+      "modeled_full_margin_bits": null
+    }
+  ],
+  "observed_certified_bits_lost_per_doubling_20_to_24": 0.994648596358445,
+  "limitations": [
+    "Only K20 and K24 have full certificates in this table.",
+    "Modeled values are Q1 diagnostics, not a complete failure curve or confidence interval.",
+    "The two-point certified slope is descriptive, not an extrapolation theorem.",
+    "K20 full certificate uses cutoff 209716; its Q1 diagnostic uses floor(N/10)=209715."
+  ],
+  "input_sha256": {
+    "workstreams/bch_rm2sub_bridge/generated/refresh_q1_outward_v1.json": "889417722fe2d6ef33696da9297e4f61caa63d14db2d0f3b1ad60613ebbe939c",
+    "workstreams/bch_rm2sub_bridge/generated/refresh_q1_outward_v1_replay.json": "28770a9ebe1a0acb3dfbf64136215293c46745bb8e8b5548af8797565f5d9adc",
+    "workstreams/bch_rm2sub_bridge/generated/frontier_k24_full_v1.json": "0b942cdf99266943d08b256d6ec5e81eca011255494d09a87c8e013f737e0378",
+    "workstreams/bch_rm2sub_bridge/generated/dual_track_q1_v1.json": "c9be90894496516f6e8c3ceb1463398192a634c8a0bc46c3fbe4480f0971041b",
+    "workstreams/bch_rm2sub_bridge/generated/k30_partial_coverage_v1.json": "1b6995e5b50fb978c98cb05b6706d05dbaf68b331e47ca838321719b0fc923b4"
+  },
+  "source_sha256": "e9a3af4377105dbcc76e65953f92950f965da6cb9345a8409c61c9963af0966e"
+}
