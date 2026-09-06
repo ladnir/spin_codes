@@ -1,0 +1,126 @@
+{
+  "status": "SEPARATED_SIZE_MARGIN_FRONTIER",
+  "configuration": "t64_s20",
+  "rows": [
+    {
+      "message_exponent": 16,
+      "message_bits": 65536,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 54.15635684953418,
+      "modeled_q1_bits": 74.21681052257702,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 20,
+      "message_bits": 1048576,
+      "full_certificate_margin_bits": 50.48729827745524,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 50.48781199145992,
+      "modeled_q1_bits": 70.55441318733986,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 24,
+      "message_bits": 16777216,
+      "full_certificate_margin_bits": 46.50870389202146,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 46.5087306446751,
+      "modeled_q1_bits": 66.57571980667717,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 26,
+      "message_bits": 67108864,
+      "full_certificate_margin_bits": 44.50975536265787,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": null,
+      "modeled_q1_bits": 64.57679200457572,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 28,
+      "message_bits": 268435456,
+      "full_certificate_margin_bits": 42.510012787619644,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": null,
+      "modeled_q1_bits": 62.577054532310484,
+      "modeled_full_margin_bits": null,
+      "prior_uncertified_point": {
+        "message_exponent": 28,
+        "message_bits": 268435456,
+        "full_certificate_margin_bits": null,
+        "partial_certificate": null,
+        "q1_constraint_diagnostic_bits": 42.510041444739954,
+        "modeled_q1_bits": 62.577054532310484,
+        "modeled_full_margin_bits": null
+      }
+    },
+    {
+      "message_exponent": 30,
+      "message_bits": 1073741824,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": {
+        "occupancy_range": [
+          1,
+          32
+        ],
+        "margin_bits": 40.51009417524392
+      },
+      "q1_constraint_diagnostic_bits": null,
+      "modeled_q1_bits": null,
+      "modeled_full_margin_bits": null
+    },
+    {
+      "message_exponent": 32,
+      "message_bits": 4294967296,
+      "full_certificate_margin_bits": null,
+      "partial_certificate": null,
+      "q1_constraint_diagnostic_bits": 38.510123368704626,
+      "modeled_q1_bits": 58.57713795180038,
+      "modeled_full_margin_bits": null
+    }
+  ],
+  "adjacent_certified_slopes": [
+    {
+      "from_exponent": 20,
+      "to_exponent": 24,
+      "bits_lost_per_doubling": 0.994648596358445
+    },
+    {
+      "from_exponent": 24,
+      "to_exponent": 26,
+      "bits_lost_per_doubling": 0.999474264681794
+    },
+    {
+      "from_exponent": 26,
+      "to_exponent": 28,
+      "bits_lost_per_doubling": 0.9998712875191131
+    }
+  ],
+  "added_q1_model": {
+    "margin_bits": 62.577054532310484,
+    "dominant_weight": 38,
+    "status": "BINARY64_MODELED_Q1_ONLY",
+    "modeled_full_margin_bits": null
+  },
+  "limitations": [
+    "Full certificates and modeled Q1 values are different quantities.",
+    "No modeled full-margin curve or statistical confidence interval is claimed.",
+    "Finite-difference slopes are descriptive, not an extrapolation theorem.",
+    "K20 uses its original stronger cutoff; larger certificates use floor(N/10).",
+    "Rounded higher-occupancy certificates can be looser than the modeled Q1 contribution."
+  ],
+  "source_sha256": {
+    "workstreams/bch_rm2sub_bridge/generated/frontier_curve_v2.json": "35133dbcf40376206a0dcd7efa62777248e7fd8f31bcdbf0b30a1d9083758ff5",
+    "workstreams/bch_rm2sub_bridge/generated/frontier_k28_full_v1.json": "bf3ef64bfeeafd1aa4794d0a4952fca13a1afe5ab1cd36847f112207032b92d1",
+    "workstreams/bch_rm2sub_bridge/frontier_curve_upgrade.py": "31ab4cd09b8e598c190d19006c0169ff1939d066741a4023a5a22063472eb9ac",
+    "workstreams/bch_rm2sub_bridge/frontier_ledger.py": "dfc1650bb13a7b3393c51703a34d6cf2fa667c8f0cca7048c639ab33fc4c0a6e",
+    "workstreams/bch_rm2sub_bridge/frontier_curve_extend.py": "6f9cb2dc8507c64801a81c91d7036fb64bd0e20ac13cfe0ca5691d3716b77f93",
+    "workstreams/bch_rm2sub_bridge/dual_track_q1.py": "edb3521e1bf04ee6cf9521bae3b020fe2aaa6072063822257916c503911b9c74",
+    "workstreams/finite_asymptotic_theory/landscape_db/activation_q1_refresh.py": "13e1f66bc4bf246b8bbb266e91c764ac5a12896a426ff163a8e23b0472289529",
+    "workstreams/bch_rm2sub_bridge/larger_state_maps.py": "d242b523da55bd8326e32ec32e153b7e23c31f05bc94e556512b1537eada1f13",
+    "workstreams/bch_rm2sub_bridge/generated/larger_state_inputs_v1/t64_s20_selection.json": "23219aa244e3fd6b426f5e5474e3824dff2570459853ed8d3a257a53f408d0f5",
+    "workstreams/bch_rm2sub_bridge/MIGRATION_MANIFEST.json": "48d313c9325d30c4b0487ed87720e5a7680c1bee6653e60076cf91a76a12ba98"
+  }
+}
