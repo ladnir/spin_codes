@@ -2,6 +2,16 @@
 
 Date: 2026-09-05.
 
+Current parameter-study update: read
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md` for the new 715-observation
+activation-aware Q1 grid. It prioritizes exact-spectrum BCH/RM inputs and
+keeps BCH-256 as a secondary bounded-spectrum anchor. The database now
+exposes historical activation-review status and excludes the old RM receipt
+from its current-certificate view. The separate BCH task has since closed
+the t64_s20 full target below 2^-50; the partial-coverage status below is
+historical. Its full receipt remains in the owning ba80 worktree and is not
+yet imported here.
+
 This document is the current entry point for the finite-parameter lane. It
 supersedes `NEXT_CHAT_HANDOFF.md` for the grid search, parameter model, and
 BCH--RM2Sub work. The older handoff remains useful as a history of rejected

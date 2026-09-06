@@ -101,6 +101,36 @@
       "map_tag": "primary-tranche-selected"
     }
   ],
+  "activation_sources": [
+    {
+      "path": "activation_pilot_v1/q1.csv",
+      "base": "landscape_db",
+      "manifest": "activation_pilot_v1/manifest.json",
+      "study": "activation_aware_nested_q1_pilot_v1",
+      "occupation": 1,
+      "map_tag": "nested-pilot",
+      "transfer_review_status": "activation_aware"
+    },
+    {
+      "path": "activation_pilot_scaling_v1/q1.csv",
+      "base": "landscape_db",
+      "manifest": "activation_pilot_scaling_v1/manifest.json",
+      "study": "activation_aware_nested_q1_scaling_v1",
+      "occupation": 1,
+      "map_tag": "nested-pilot",
+      "transfer_review_status": "activation_aware",
+      "superseded_exponents": [24]
+    },
+    {
+      "path": "activation_pilot_e24_refined_v1/q1.csv",
+      "base": "landscape_db",
+      "manifest": "activation_pilot_e24_refined_v1/manifest.json",
+      "study": "activation_aware_nested_q1_e24_refined_v1",
+      "occupation": 1,
+      "map_tag": "nested-pilot",
+      "transfer_review_status": "activation_aware"
+    }
+  ],
   "certificate_sources": [
     {
       "path": "rm2sub_rm49_t64_s14_full_distance_outward.json",

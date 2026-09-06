@@ -1,5 +1,11 @@
 # Merge summary: finite and asymptotic theory
 
+Current status: the historical RM certificate discussed below requires an
+activation-state re-audit. The current parameter work is documented in
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md` and the final section of this
+summary. Its 715 preferred observations are Q1 diagnostics, not new full
+certificates. The database exposes this distinction explicitly.
+
 ## Final fixed-RM finite certificate
 
 The fixed-RM small-k proof template is now a complete outward theorem. At
@@ -2161,3 +2167,28 @@ Supporting material:
   `small_k_replay/probe_rm2sub_fixed_rm_dense_bands.py`, and their diagnostic
   receipts;
 - the `small_k_replay/rm2sub_q_ladder_*_d100.json` receipts.
+# Current addition: activation-aware parameter study
+
+The parameter lane now has 715 preferred Q1 observations for exact-spectrum
+BCH/RM constituents and random-outer references, across five message lengths
+and thirteen nested-map RM2Sub configurations. See
+`landscape_db/ACTIVATION_PARAMETER_STUDY.md` for the grid, findings, commands,
+and next experiments. All changes are confined to finite_asymptotic_theory.
+
+New artifacts include the activation-aware batched Q1 evaluator, sequential
+pilot and grid-refinement drivers, exact-arithmetic tests, hashed map/CSV
+receipts, comparison reports, preliminary operation counts, and plots.
+The database schema, importer, query output, README, and historical fit status
+were updated. Existing proof receipts and frozen implementation sources were
+not changed. Database source IDs and original result IDs remain stable.
+
+The old RM(4,9) certificate entries remain indexed but are excluded from the
+current-certificate view pending activation review. BCH-256 is not a primary
+fit input. No new full certificate or benchmark is claimed. Fourteen tests
+pass, including exact support enumeration, a GF(4) first-moment comparison,
+database coverage checks, and rejection of a changed screen CSV.
+
+Next: refine smaller s within these chains, then compare activation-aware Q2
+and higher occupations before fitting the scaling frontier. The dependency
+on the separate BCH task is read-only review/import of its completed compact
+certificate; no files or running sessions in that task were changed.

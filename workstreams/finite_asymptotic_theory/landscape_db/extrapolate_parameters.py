@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 
@@ -157,7 +158,7 @@ def rm2sub_schedule(message_exponent: int, offset: int) -> dict[str, int]:
 
 
 def build(db_path: Path) -> dict[str, object]:
-    with sqlite3.connect(db_path) as db:
+    with closing(sqlite3.connect(db_path)) as db:
         source_rows = db.execute(
             """
             SELECT result_id, block_bits, minimum_distance, message_exponent, margin_bits
@@ -200,7 +201,7 @@ def build(db_path: Path) -> dict[str, object]:
 
     return {
         "schema": "spin-parameter-extrapolation-v1",
-        "status": "diagnostic empirical extrapolation; not a certificate",
+        "status": "historical Q1 fit; activation-state transfer pending review; not for current parameter selection",
         "distance_target": 0.10,
         "source_database": {
             "path": db_path.name,
@@ -253,6 +254,7 @@ def build(db_path: Path) -> dict[str, object]:
             ],
         },
         "limitations": [
+            "Source Q1 screens use the historical two-state activation invariant; retain this fit only as a comparison until recomputed.",
             "The regression extrapolates occupation-one diagnostics only.",
             "The fit does not use a BCH [256,128] spectrum or RM2Sub transfer receipt.",
             "The BCH distance law is a size heuristic and is not a spectrum theorem.",

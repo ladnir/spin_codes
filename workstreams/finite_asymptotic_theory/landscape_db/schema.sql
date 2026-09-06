@@ -11,6 +11,7 @@ CREATE TABLE sources (
     sha256 TEXT NOT NULL,
     ingestor TEXT NOT NULL,
     source_status TEXT NOT NULL,
+    transfer_review_status TEXT NOT NULL DEFAULT 'historical_pending_review',
     notes TEXT NOT NULL DEFAULT ''
 );
 
@@ -73,6 +74,8 @@ CREATE TABLE results (
     margin_bits_text TEXT,
     failure_upper_text TEXT,
     dominant_weight INTEGER,
+    dominant_witness_at_grid_edge INTEGER,
+    comparison_eligible INTEGER NOT NULL DEFAULT 0 CHECK (comparison_eligible IN (0,1)),
     notes TEXT NOT NULL DEFAULT '',
     UNIQUE(source_id, source_locator)
 );
@@ -116,8 +119,11 @@ SELECT
     r.margin_bits_text,
     r.failure_upper_text,
     r.dominant_weight,
+    r.dominant_witness_at_grid_edge,
+    r.comparison_eligible,
     s.path AS source_path,
     s.sha256 AS source_sha256,
+    s.transfer_review_status,
     r.source_locator,
     r.notes
 FROM results AS r
@@ -133,4 +139,7 @@ WHERE occupation_min = 1
 
 CREATE VIEW certified_results AS
 SELECT * FROM landscape
-WHERE result_class = 'certified';
+WHERE result_class = 'certified' AND transfer_review_status = 'activation_aware';
+
+CREATE VIEW results_under_review AS
+SELECT * FROM landscape WHERE transfer_review_status <> 'activation_aware';
