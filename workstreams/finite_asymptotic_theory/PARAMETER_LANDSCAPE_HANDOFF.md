@@ -1,73 +1,81 @@
 # Handoff: finite Structured SPIN landscape and BCH--RM2Sub closure
 
+The requested 130-point BCH occupation update is complete as a finite
+engineering audit: 77 useful full bounds, seven weak complete upper bounds,
+and 46 positive first-moment obstructions. There are no uncovered geometries.
+`audit_bch_evidence_grid_v1.py` passes, authenticating 602 files and reconciling
+aggregation within 2.54e-15 bits. All twelve 90-digit model checks pass within
+5.35e-15 bits. All five v8 figures were inspected. No numerical producer is live.
+The seven weak bounds are explicit research limitations, not code failures.
+
 Date: 2026-09-06.
 
-Active goal: update the BCH-64/128 grid with complete occupation evidence
-or clearly qualified Q1-dominance evidence. BCH-256 remains excluded.
-Read `landscape_db/BCH_DOMINANCE_ANALYSIS.md` first. The 130-row v7 report
-has 32 useful full bounds (29 small losses and three larger losses),
-20 weak full bounds, 46 first-moment obstructions, and 32 sparse-only
-geometries. The goal remains active. No numerical producer is live.
+The BCH-64/128 occupation update is described in
+`landscape_db/BCH_DOMINANCE_ANALYSIS.md`. BCH-256 remains excluded. Read the
+current grid audit for counts and the precise unresolved upper bounds;
+complete evidence coverage does not mean every geometry has a useful bound.
+The model and ratios concern first moments or selected bound contributions,
+not measured code-failure probabilities. No outward certificate is claimed.
 
-Four intermediate-K references now close at t64/s20:
+Every integer exponent from 12 through 26 now has a useful complete
+reference at T=64,S=20 for both BCH blocks. S=10,12,16 slices at exponents
+16,18,20,22,24 have also been evaluated completely. The original K=2^20
+T/S sweep has either a complete bound or a positive lower obstruction at
+every recorded point. Fresh target searches were essential: fixed-witness
+transport alone gave avoidably weak bounds in several of these regimes.
 
-| BCH block | log2 K | Full margin | Full-bound Q1 loss |
-| --- | ---: | ---: | ---: |
-| 64 | 22 | 8.333885368 | 0.0588737902 |
-| 64 | 24 | 6.171264034 | 0.222935387 |
-| 128 | 22 | 30.780002354 | 2.2830211e-8 |
-| 128 | 24 | 28.782539084 | 9.1058921e-8 |
+At T=64,S=20,K=2^26, BCH-64 has 3.574424844 full margin bits and loses
+0.820138074 bits relative to Q1. BCH-128 has 26.783189456 full margin bits
+and loses only 3.63971e-7 bits. At BCH-64 S=10,K=2^22, the full margin is
+3.575407274 bits and the loss is 1.6949197 bits. Higher occupations therefore
+exceed Q1 in that selected upper bound. A uniform majority-Q1 claim would
+misrepresent the grid. The 46 zero-state first-moment obstructions provide
+a separate, stronger reason not to generalize Q1 across T.
 
-The two-term model keeps its K=2^20 calibration. Its predictions are
-conservative by 0.00610/0.00768 bits for BCH-64 and 0.01040/0.01294 bits
-for BCH-128 at exponents 22/24. At exponent 26, BCH-64's Q3-and-higher
-penalty relative to Q1+Q2 is 0.08491 bits; after the -0.01209-bit counting
-model error, the net optimism is 0.07283 bits. Ratios and corrections
-compare selected upper bounds, not actual event probabilities.
+The two-term K model keeps its exponent-20 calibration. Comparison points
+at all integer exponents 21..26 do not refit its coefficients. At exponent
+26 its error is +0.07283 bits for BCH-64 and -0.01360 for BCH-128. Separate
+columns give the error in predicting Q1+Q2 and the penalty from adding Q3+.
+These are finite engineering checks, not a uniform extrapolation theorem.
 
-The thirteen new transports cover s10/s12/s16 at exponents 22/24 for both
-blocks, plus BCH-64 t128/s17 at exponent 20. Their complete replays pass.
-The s16 dense bounds were initially weak when reusing s20 witnesses.
-`refine_bch_transported_dense_v1.py` searches each target's dense witnesses,
-retains its verified sparse intervals, and replays the full union. All
-four s16 refinements close. At K=2^24, the full margins are 5.901222091
-for BCH-64 and 28.508121661 for BCH-128. Reducing s20 to s16 costs
-0.27004 and 0.27442 bits respectively. A weaker candidate is archived
-and the stronger preceding reference is restored by the new driver.
+Current reproduction commands, after the numerical receipts exist:
 
-Use `report_bch_evidence_v7.py`. It adds the K/state interaction plot,
-`bch_full_bound_k_state_scaling_v7.png`, and compares every available
-larger-K anchor against the same calibration in `bch_k_counting_model_v3.json`.
-The CSV includes the logarithmic higher/Q1 ratio even when the ordinary
-ratio overflows. `verify_bch_counting_model_v1.py` checks all six comparisons
-by direct 90-digit binomial count scaling, with maximum error 5.4e-15 bits.
-The tiny Q3-and-higher corrections remain positive and are evaluated stably.
-The plots were rendered and visually checked. Core arithmetic is unchanged;
-the previous 121-test pass remains applicable. Full replays are additional.
+```powershell
+python report_bch_evidence_v8.py
+python verify_bch_counting_model_v2.py
+python audit_bch_evidence_grid_v1.py
+```
 
-The largest BCH-64 point remains K=2^26, t64/s20: 3.574424844 full margin
-bits, Q1 loss 0.820138074, and higher/Q1 ratio 0.765574961. Its full cover
-is Q2..4, Q5..512, and Q513..L. At K=2^20, t64 has useful full bounds for
-BCH-64 s13..20 and BCH-128 s14..20. Lower states remain weak. Every
-recorded K=2^20 t/s point now has a full bound or a positive first-moment
-lower bound; some full bounds are still uninformative.
+Run from `landscape_db`. The v8 report includes K scaling, K/state interaction,
+state scaling, coverage, and Q1-versus-zero-state figures. The CSV retains
+both upper-contribution ratios and logarithmic lower ratios at obstructed
+points. Model arithmetic uses independent 90-digit binomial scaling at
+all twelve comparison points. The complete-grid audit reconciles geometry,
+interval coverage, aggregate margins, ratios, classifications, and source
+hashes. Read its actual status before asserting validation on a fresh run.
 
-Next, fill log2 K=16 and 18 at t64/s20 for both blocks with the v3 batch,
-then transport to s10/s12/s16. If a transported s16 dense bound is weak,
-use the new target-dense refinement before interpreting it. These slices
-cover sixteen of the remaining points. The other sixteen are t64/s20 at
-exponents 13,14,15,17,19,21,23,25 for each BCH block. Then concentrate on
-the weak state knees, especially BCH-64 t64/s12 and BCH-128 t64/s13 at
-K=2^20, and the t128 boundary. Sparse bounds may also need target searches
-at s10/s12; dense-only refinement cannot repair a weak sparse interval.
+New source drivers are `transport_bch_message_size_v1.py`, its v2 weak-bound
+replacement variant, and `refine_bch_dense_frontier_v1.py`. K transport
+recomputes fixed-Q sparse partitions and creates target dense partitions;
+it assumes no K-scaling law. Dense refinement keeps useful sparse intervals
+and searches target-specific dense witnesses. The historical dense batch
+made 22 of 24 selected weak references useful; later sparse improvements
+supersede some of its canonical reference hashes. Use the current grid audit,
+not that historical batch summary, for current aggregate provenance.
 
-Retain source references used by transports. In particular, the new s20
-references at exponents 22/24 are authenticated parents of the lower-state
-receipts. Do not casually rerun a driver that overwrites those references.
-All numerical producer and verifier versions already used are frozen.
-Generated outputs and archives stay local and ignored. Write only within
-this workstream; commit source/docs only. The unrelated paused BCH-256
-estimator remains excluded. Never run two benchmarks simultaneously.
+Retain authenticated parent references, including both blocks' T64/S20
+anchors at exponents 16,18,20,22,24 and the BCH-64 T64/S10 and S12 exponent-20
+references used by K transport. Before replacing a target, check for dependent
+receipts and archive it by content hash. Used numerical producer/verifier
+versions are frozen. Generated outputs, histories, and caches stay local and
+ignored. Commit only source/docs within this workstream. The unrelated
+paused BCH-256 estimator remains excluded. No PR or data upload is authorized.
+
+Next, target the weak points listed by the audit. A cheap dense experiment
+is exact syndrome-fiber maxima at T64/S9; measure its benefit before extending
+the transfer. Weak sparse points need dominant-occupation refinement instead.
+Do not widen the grid merely to produce more weak bounds. See
+`landscape_db/NEXT_GRID_REFINEMENTS.md` for the proposed follow-up.
 
 Latest engineering study: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 extends the uniform-refresh Q1 analysis to RM and random constituents.

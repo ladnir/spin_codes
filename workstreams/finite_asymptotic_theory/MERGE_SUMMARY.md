@@ -1,39 +1,49 @@
 # Merge summary: finite and asymptotic theory
 
-The BCH-64/128 audit now has 32 useful complete bounds, 20 weak full upper
-bounds, 46 first-moment obstructions, and 32 sparse-only points in the
-130-row grid. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md`. Full-reference
-replays authenticate complete occupation coverage and selected 90-digit
-checks; no outward arithmetic certificate is asserted.
+The requested 130-point BCH occupation update is complete as a finite
+engineering audit: 77 useful full bounds, seven weak complete upper bounds,
+and 46 positive first-moment obstructions. There are no uncovered geometries.
+`audit_bch_evidence_grid_v1.py` passes, authenticating 602 files and reconciling
+aggregation within 2.54e-15 bits. All twelve 90-digit model checks pass within
+5.35e-15 bits. All five v8 figures were inspected. No numerical producer is live.
+The seven weak bounds are explicit research limitations, not code failures.
 
-The new t64/s20 message-size checks close at log2 K=22 and 24. BCH-64's
-full margins are 8.333885368 and 6.171264034 bits, with Q1 corrections
-0.058873790 and 0.222935387 bits. BCH-128's full margins are 30.780002354
-and 28.782539084 bits, with corrections below 1e-7 bits. The unchanged
-K=2^20 two-term model predicts all four within 0.014 bits. Its error is
-split into the count-model error and the Q3-and-higher aggregation penalty.
-A direct 90-digit count-scaling replay checks six comparisons, including
-K=2^26, with maximum absolute discrepancy 5.4e-15 bits.
+The BCH-64/128 update fills every message-size gap in the original 130-point
+occupation grid and separates full bounds from positive first-moment
+obstructions. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md` and the generated
+`bch_evidence_grid_audit_v1.json` for the current counts and weak geometries.
+The complete-reference replays cover every occupation and authenticate their
+sources; selected checks use 90-digit arithmetic. No outward certificate
+or uniform extrapolation theorem is asserted.
 
-Thirteen additional fixed-K transports pass complete replay. Four s16
-transports initially had weak dense bounds; fresh target-map dense
-searches close all four using the same verified sparse intervals.
-At K=2^24, reducing s20 to s16 costs 0.27004 bits for BCH-64 and
-0.27442 bits for BCH-128. The new v7 report plots this K/state interaction
-and records logarithmic higher/Q1 ratios even when ordinary ratios overflow.
-Weak s10/s12 bounds remain explicitly unresolved. Every recorded K=2^20
-t/s point now has either a full bound or a first-moment lower obstruction.
+The new engineering curves cover every integer log2 K=12..26 at T64/S20,
+and S10/S12/S16 comparisons at exponents 16,18,20,22,24. BCH-128 retains a
+tiny higher-occupation correction along its S20 curve. BCH-64's correction
+reaches 0.82014 bits at exponent 26 and appears earlier at smaller S:
+S10 at exponent 22 has a 3.57541-bit full margin and a 1.69492-bit loss.
+Thus Q1 is not the majority of that selected bound. The 46 positive
+zero-state lower witnesses independently obstruct a small first-moment
+bound at larger T or smaller S. They do not prove code-failure probabilities.
 
-The new dense-refinement driver archives preceding references, reuses
-verified sparse intervals, and retains the stronger full bound if a
-candidate fails to improve it. No core arithmetic changes were needed;
-the preceding 121-test pass remains applicable. The new full replays and
-90-digit model checks provide validation specific to this update.
-Generated data and plots remain local and ignored; Git contains source
-and explainers only. The unrelated paused BCH-256 estimator is excluded.
+The fixed-calibration K model is checked at all twelve larger-K points
+without refitting. Its error is split into coefficient/count-model error
+and the Q3+ aggregation penalty. Version 8 plots the absolute correction
+scale, identifies weak points, and records logarithmic lower higher/Q1
+ratios at obstructed geometries. A new complete-grid audit reconciles all
+130 geometries, source hashes, full intervals, aggregate values, and labels.
 
-Next, fill the log2 K=16/18 slices and the remaining s20 message sizes,
-then tighten the unresolved state knees. The active goal remains open.
+The new K-transport drivers recompute every target bound and rebuild dense
+partitions. A batch driver selects weak dense bounds with useful sparse
+unions; fresh searches made 22 of 24 such references useful. Fresh sparse
+searches then strengthened selected lower-state points. Preceding references
+are archived, parent receipts are retained, and used numerical source
+versions remain unchanged. The existing 121-test core pass still applies;
+new complete replays, model checks, and the grid audit validate this update.
+
+Generated data and figures stay local and ignored. Git contains source and
+explainers only; the unrelated paused BCH-256 estimator remains excluded.
+The next numerical work should target the explicitly weak sparse/dense
+boundaries before expanding the grid.
 
 Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 compares exact BCH, exact RM, and the random ensemble under the corrected

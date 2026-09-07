@@ -1,29 +1,45 @@
-# Next work after the complete finite grid
+# Next work after the BCH occupation grid
 
-The active goal is the BCH-64/128 dominance audit in
-`BCH_DOMINANCE_ANALYSIS.md`. The v7 grid has 32 useful full bounds,
-20 weak full bounds, 46 first-moment obstructions, and 32 sparse-only
-points. No producer is live. BCH-256 remains excluded.
+The requested 130-point BCH occupation update is complete as a finite
+engineering audit: 77 useful full bounds, seven weak complete upper bounds,
+and 46 positive first-moment obstructions. There are no uncovered geometries.
+`audit_bch_evidence_grid_v1.py` passes, authenticating 602 files and reconciling
+aggregation within 2.54e-15 bits. All twelve 90-digit model checks pass within
+5.35e-15 bits. All five v8 figures were inspected. No numerical producer is live.
+The seven weak bounds are explicit research limitations, not code failures.
 
-The log2 K=22/24 t64/s20 holdouts close and agree with the unchanged
-K=2^20 two-term model within 0.014 bits. The s16 counterparts close after
-fresh dense searches; transported high-state witnesses alone were weak.
-The K/state curves show a near-constant 0.274-bit state cost for BCH-128
-and a growing cost for BCH-64 over K=2^20..2^24. These are selected full
-bounds and finite model checks, not a uniform extrapolation theorem.
+The BCH-64/128 occupation grid and its engineering interpretation are in
+`BCH_DOMINANCE_ANALYSIS.md`. The v8 report covers the original 130 geometries;
+`bch_evidence_grid_audit_v1.json` records the current counts and exact weak
+points. All message-size gaps are filled. BCH-256 remains excluded.
 
-Next, produce t64/s20 references at log2 K=16 and 18 for both blocks,
-using `complete_bch_reference_batch_v3.py`. Transport each to s10/s12/s16.
-Use `refine_bch_transported_dense_v1.py` when sparse intervals are useful
-but the transported dense bound is weak. Those slices fill sixteen gaps.
-The other sixteen gaps are t64/s20 at log2 K=13,14,15,17,19,21,23,25 for
-each block. Preserve reference parents already used by transports.
+The next numerical priority is the remaining weak-bound boundary, rather
+than a larger grid. Distinguish the failed component at each geometry:
+a dense refinement cannot repair a weak sparse interval, and a positive
+first-moment lower obstruction cannot be repaired by any upper-bound search.
+The replayed T=64,S=20 curves already support the finite engineering story;
+no extrapolation beyond log2 K=26 is established.
 
-Then target the weak state boundaries at K=2^20: BCH-64 t64/s12,
-BCH-128 t64/s13, and the t128 boundary. Dense-only refinement cannot
-repair weak sparse intervals at s10/s12; use target-specific sparse
-searches as needed. For BCH-64 t128/s18, isolating outer weight 56
-remains a possible improvement. Weak bounds are not code counterexamples.
+One targeted dense improvement is to test exact nonzero-syndrome fiber
+maxima in place of the current absolute-character bound. Start at T=64,S=9,
+where all 512 syndromes are cheap to enumerate from the stored generator.
+Use a Walsh transform for each weight, validate against exact kernel counts,
+and compare the resulting activation bounds before extending to S=17/18.
+The benefit is unmeasured. It requires versioned transfer and verifier support;
+do not alter numerical sources already authenticated by retained receipts.
+
+For weak sparse boundaries, compare the selected per-occupation witnesses
+and refine only the dominant Q range. Retain complete occupation coverage
+and the stronger preceding full reference. Fresh probability/tilt searches
+already made BCH-64 S=10,K=2^22 useful, with a 1.6949-bit aggregation loss.
+That setting no longer supports a majority-Q1 statement about the selected
+bound. Search quality and actual parameter effects must remain separate.
+
+A later publication step can replay chosen complete references with outward
+arithmetic. The present binary64 results, including selected 90-digit checks,
+are engineering evidence. Do not call them new formal certificates. Preserve
+all parent reference files used in transport; generated data stay ignored.
+Run numerical producers sequentially and never run two benchmarks together.
 
 The engineering-surface comparison now extends the corrected Q1 treatment
 to exact RM through length 512 and random references through length 512.
