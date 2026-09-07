@@ -1,5 +1,10 @@
 # BCH growth: separate message length, state size, and outer spectrum
 
+The follow-up `BCH_DOMINANCE_ANALYSIS.md` tests whether these Q1 curves
+represent the complete occupation bound. Until that audit controls the
+remaining sum, the growth slopes and state-size knees below describe
+Q1 only and do not establish full-margin parameter recommendations.
+
 The question is how large the BCH constituent must become as the message
 length grows, and which state sizes give useful tradeoffs. A 40-bit threshold
 does not explain that relationship. We first study the continuous bound for

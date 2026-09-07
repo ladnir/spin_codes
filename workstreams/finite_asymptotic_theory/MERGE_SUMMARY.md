@@ -1,6 +1,78 @@
 # Merge summary: finite and asymptotic theory
 
-Current BCH addition: `landscape_db/BCH_GROWTH_ANALYSIS.md` explains the
+The requested 130-point BCH occupation update is complete as a finite
+engineering audit: 77 useful full bounds, seven weak complete upper bounds,
+and 46 positive first-moment obstructions. There are no uncovered geometries.
+`audit_bch_evidence_grid_v1.py` passes, authenticating 602 files and reconciling
+aggregation within 2.54e-15 bits. All twelve 90-digit model checks pass within
+5.35e-15 bits. All five v8 figures were inspected. No numerical producer is live.
+The seven weak bounds are explicit research limitations, not code failures.
+
+The BCH-64/128 update fills every message-size gap in the original 130-point
+occupation grid and separates full bounds from positive first-moment
+obstructions. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md` and the generated
+`bch_evidence_grid_audit_v1.json` for the current counts and weak geometries.
+The complete-reference replays cover every occupation and authenticate their
+sources; selected checks use 90-digit arithmetic. No outward certificate
+or uniform extrapolation theorem is asserted.
+
+The new engineering curves cover every integer log2 K=12..26 at T64/S20,
+and S10/S12/S16 comparisons at exponents 16,18,20,22,24. BCH-128 retains a
+tiny higher-occupation correction along its S20 curve. BCH-64's correction
+reaches 0.82014 bits at exponent 26 and appears earlier at smaller S:
+S10 at exponent 22 has a 3.57541-bit full margin and a 1.69492-bit loss.
+Thus Q1 is not the majority of that selected bound. The 46 positive
+zero-state lower witnesses independently obstruct a small first-moment
+bound at larger T or smaller S. They do not prove code-failure probabilities.
+
+The fixed-calibration K model is checked at all twelve larger-K points
+without refitting. Its error is split into coefficient/count-model error
+and the Q3+ aggregation penalty. Version 8 plots the absolute correction
+scale, identifies weak points, and records logarithmic lower higher/Q1
+ratios at obstructed geometries. A new complete-grid audit reconciles all
+130 geometries, source hashes, full intervals, aggregate values, and labels.
+
+The new K-transport drivers recompute every target bound and rebuild dense
+partitions. A batch driver selects weak dense bounds with useful sparse
+unions; fresh searches made 22 of 24 such references useful. Fresh sparse
+searches then strengthened selected lower-state points. Preceding references
+are archived, parent receipts are retained, and used numerical source
+versions remain unchanged. The existing 121-test core pass still applies;
+new complete replays, model checks, and the grid audit validate this update.
+
+Generated data and figures stay local and ignored. Git contains source and
+explainers only; the unrelated paused BCH-256 estimator remains excluded.
+The next numerical work should target the explicitly weak sparse/dense
+boundaries before expanding the grid.
+
+Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
+compares exact BCH, exact RM, and the random ensemble under the corrected
+Q1 transfer. It adds measured K/s interactions and separates state-size
+knees from outer-spectrum plateaus. The long-region model uses the actual
+cancellation probability and uniform-live output rate; it does not fit a
+curve through constituent sizes. Random spectrum caps remain separately
+labeled, including their setup-event charge.
+
+The completed study evaluates 387 geometries and 1,292 family rows. All 85
+tests pass. The independent 90-digit replay checks 1,155 coefficients with
+maximum log error 8.868e-12 and authenticates 77 dependencies. The 130 shared
+BCH/RM anchor pairs agree exactly; all 212 prior BCH points reproduce within
+0.000138 bits. The long-region model is checked on 44 family/state cases
+at each of three K values, with worst margin discrepancies 0.652,0.105,0.020
+bits at K=2^16,2^20,2^24. These are measured model errors, not certified
+error bounds. Six figures show growth, state-size tradeoffs, and K/s slices.
+
+New sources are the four-state native kernel, wrapper, and build script;
+`study_engineering_surfaces.py`, `report_engineering_surfaces.py`, and
+`verify_engineering_surfaces.py`; `continuous_state_model.py` and
+`check_continuous_state_model.py`; and their independent tests.
+Only this workstream changes. Frozen producers, the full-occupation ledger,
+and other workstreams remain unchanged. Generated data and figures are
+local and ignored. The next smallest useful task is to refine selected
+higher occupations near the observed state-size knees. No implementation
+runtime ranking or new full-distance certificate is proposed.
+
+Earlier BCH addition: `landscape_db/BCH_GROWTH_ANALYSIS.md` explains the
 continuous growth trends from 212 new Q1 tuples. New sources are
 `activation_q1_refresh.py`, `bch_growth_model.py`, `study_bch_growth.py`,
 `verify_bch_refresh.py`, `plot_bch_growth.py`, and `test_bch_growth.py`.
