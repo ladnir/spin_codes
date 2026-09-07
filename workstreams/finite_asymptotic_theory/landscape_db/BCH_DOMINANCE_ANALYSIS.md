@@ -5,17 +5,23 @@ The present task checks BCH lengths 64 and 128, using the exact spectra
 and nested inner maps from the engineering study. BCH-256 remains outside
 this primary analysis.
 
-Complete reference bounds are verified for both BCH sizes at K=2^20,
-t=64, s=20. Q1 dominates the bound at these two geometries. The verified
+Seven useful complete reference bounds are verified at K=2^20: both BCH
+sizes at t64/s20 and t128/s19..20, plus BCH-128 at t128/s18.
+Q1 dominates the bound at these seven geometries. The verified
 ratios compare upper-bound contributions, not actual event probabilities.
 
-| BCH block | Q1 margin | Full margin | Higher occupations / Q1 | Margin loss |
-| --- | ---: | ---: | ---: | ---: |
-| 64 | 10.386947858 | 10.305616126 | 0.0579942093 | 0.0813317312 |
-| 128 | 32.769598137 | 32.769596142 | 1.3829333e-6 | 1.9951496e-6 |
+| BCH block | t | s | Q1 margin | Full margin | Higher occupations / Q1 | Margin loss |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 64 | 64 | 20 | 10.386947858 | 10.305616126 | 0.0579942093 | 0.0813317312 |
+| 64 | 128 | 19 | 10.369172623 | 10.281995558 | 0.0622895556 | 0.0871770651 |
+| 64 | 128 | 20 | 10.380476474 | 10.298674360 | 0.0583392186 | 0.0818021138 |
+| 128 | 64 | 20 | 32.769598137 | 32.769596142 | 1.3829333e-6 | 1.9951496e-6 |
+| 128 | 128 | 18 | 32.699950881 | 32.699942698 | 5.6715649e-6 | 8.1823154e-6 |
+| 128 | 128 | 19 | 32.739116968 | 32.739113643 | 2.3051477e-6 | 3.3256213e-6 |
+| 128 | 128 | 20 | 32.759208744 | 32.759206705 | 1.4132063e-6 | 2.0388243e-6 |
 
 Margins and losses are in bits. BCH-128 has the following complete
-occupation decomposition:
+occupation decomposition at t64/s20:
 
 | Covered occupations | Contribution margin, bits |
 | --- | ---: |
@@ -38,6 +44,26 @@ products agree with the log-domain implementation. Three selected dense
 witnesses per block replay at 90 digits, with maximum log errors below
 7.11e-9. These are verified binary64 diagnostics, not outward arithmetic
 certificates. Other geometries require their own evidence.
+
+At t128/s20, the bulk-spectrum cover described below gives dense margins
+of 93.647787109 bits for BCH-64 and 94.484899898 bits for BCH-128.
+It covers Q257 through L using 37 boxes over 32,512 integer types for
+BCH-64, and 94 boxes over 134,209,152 types for BCH-128. The Q5..256
+margins are 37.920582616 and 140.929206629 bits, respectively.
+`verify_bch_full_reference_v3.py` replays these complete unions, including
+the character-based activation transfer and selected 90-digit witnesses.
+Doubling t from 64 to 128 at s20 therefore costs only 0.00694 full-margin
+bits for BCH-64 and 0.01039 bits for BCH-128 at this K. This comparison
+has complete-tail evidence; the same conclusion does not follow at
+smaller s or other K values.
+
+The t128 comparison now extends below s20. Reducing s from 20 to 19
+costs 0.01668 full-margin bits for BCH-64 and 0.02009 bits for BCH-128.
+For BCH-128, reducing s once more to 18 costs another 0.03917 bits.
+At all these tested settings the higher-occupation penalty remains small.
+The current full bound for BCH-64 at s18 remains weak, so the apparent
+one-bit difference in the available state-size boundary may be slack in
+the bound. It is not evidence of an intrinsic difference between the codes.
 
 The exact integer kernel refinement finds 46 positive zero-state
 lower-bound witnesses in the 130-point engineering grid. Every positive
@@ -63,16 +89,21 @@ obstructed through s16. Thus the next useful t128 checks start at s17;
 this is a necessary restriction from this lower bound, not a sufficient
 condition for closure. At t256 every available state setting is obstructed.
 
-`bch_engineering_evidence_v2.csv` labels all 130 engineering geometries:
-two have complete Q1-dominant bounds, 46 have first-moment obstructions,
-and 82 have only sparse evidence in this updated analysis. The companion
-figure `bch_q1_vs_dense_tradeoff_v2.png` puts the Q1 curves above the
-zero-state lower exponents. Its stars identify the two complete bounds.
+`bch_engineering_evidence_v3.csv` labels all 130 engineering geometries:
+seven have complete Q1-dominant bounds, 46 have first-moment obstructions,
+two have weak full upper bounds, and 75 have only sparse evidence in this
+updated analysis. The companion figure `bch_q1_vs_dense_tradeoff_v3.png`
+puts the Q1 curves above the
+zero-state lower exponents. Its stars identify the complete bounds.
 No full-margin surface is interpolated through the unresolved points.
+`bch_full_bound_coverage_v3.png` maps the evidence at K=2^20 and prints
+the continuous margin loss at every useful full-bound setting. White
+cells are outside the recorded grid; gray cells have only sparse evidence.
 
-Validation: all 102 workstream tests pass, including the new finite-field
+Validation: all 116 workstream tests pass, including the finite-field
 transfer, positive coefficient, exact integer kernel, lazy composition,
-and direct dense-witness checks. The complete reference replays and all
+joint witness, activation density, and integer subdivision checks.
+The complete reference replays and all
 46 positive lower-bound replays are separate from that test suite.
 
 The distinction matters when choosing the state dimension s. Q1 has one
@@ -220,10 +251,47 @@ from approximately -65,000 margin bits to 20,822.75, 47,773.90, and
 234,369.67 bits under direct witness refinement. These are selected
 binary64 point diagnostics. They demonstrate search slack at those
 types, not closure of their surrounding boxes or the full interval.
-The active refinement isolates zero-count faces and uses relative count
+The refinement isolates zero-count faces and uses relative count
 uncertainty to choose subdivisions. Every split is checked as an exact
-disjoint integer partition. The t128 complete-tail conclusion remains
-pending.
+disjoint integer partition. The five-category t128/s20 search remained
+weak after 2,500 refinements; the smaller cover below closes that geometry.
+
+The bulk dense-tail alternative replaces the nontrivial weight bands by
+one pointwise binomial majorant. For a fixed p in (0,1), set
+
+    Gamma(p) = max_(0<w<B, A_w>0)
+                 A_w / [choose(B,w) p^w (1-p)^(B-w)].
+
+The counting measure of every nonzero, non-all-one BCH row is dominated
+by Gamma(p) times the Bernoulli-p row law. The zero row is kept separate,
+as is the all-one row when the recorded spectrum contains it. Thus the
+dense type vector has two coordinates for BCH-64 and three for BCH-128.
+The recorded BCH-64 spectrum has maximum weight 56 and no all-one word;
+BCH-128 has one all-one word. This is an upper bound from the exact fixed
+spectra, not a random-code ensemble assumption. Its weaker weight
+information is offset by the smaller type cover at t128/s20 for both
+blocks, as the complete bounds above demonstrate. The producers are
+`seed_bch_dense_v3.py` and `close_bch_dense_v11.py`.
+
+The same bulk bound for BCH-128 at t128/s17 remains inconclusive:
+1,000 refinements leave a complete dense upper-bound margin near
+-12,756.48 bits. Subdivision has stalled at that value. Its exact-kernel
+zero-state lower bound is also inconclusive, near -9,512.48 log2 units.
+Neither calculation establishes an obstruction or a useful full bound
+at s17. The lower convex witness already uses adjacent regional weights
+1638 and 1640, so replacing its broad-range convex hull by a variance
+constraint alone has no evident benefit at that witness.
+
+For BCH-64 at t128/s18, the bulk cover similarly stalls near
+-10,331.20 bits. Both this geometry and BCH-128 t128/s17 have now had
+their complete unions replayed; they are weak full upper bounds, rather
+than missing tail calculations. No failure-probability conclusion follows.
+In the BCH-64 cover, the limiting types have about 11,432 active rows,
+and the bulk probability is near 0.5055. A future refinement can separate
+the exceptional weight-56 shell before increasing the type subdivision
+budget: the bulk majorant at p=1/2 pays 33.542 bits per active row,
+whereas the largest remaining shell cost is 32.211 bits. Whether that
+change closes s18 requires a complete new cover and replay.
 
 `occupation_refresh_v1.py` is a separate evaluator. Historical producer
 sources and their receipts remain unchanged. Exhaustive GF(4) checks cover

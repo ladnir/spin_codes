@@ -27,6 +27,8 @@ def main():
     parser.add_argument('--state', type=int, default=20)
     parser.add_argument('--exponent', type=int, default=20)
     parser.add_argument('--dense-minimum', type=int, default=257)
+    parser.add_argument('--sparse-cover', type=Path, action='append',
+                        help='Explicit sparse interval receipts, ordered from Q5 upward.')
     args = parser.parse_args()
     _, spectra, maps, _ = study.load_inputs()
     block, t, s, exponent = args.block, args.step, args.state, args.exponent
@@ -39,6 +41,8 @@ def main():
     if study.sha(checkpoint) != sparse_receipt['checkpoints'][checkpoint.name]:
         raise ValueError('Q2..4 checkpoint changed')
     sparse = json.loads(checkpoint.read_text())
+    if tuple(sparse['summary'][k] for k in ('block_bits', 'step_bits', 'state_bits', 'message_exponent')) != (block, t, s, exponent):
+        raise ValueError('incompatible Q2..4 geometry')
     sparse_regions = {}
     for q in (2, 3, 4):
         detail = sparse['occupations'][str(q)]
@@ -59,14 +63,17 @@ def main():
         if abs(model.aggregate(selected, length)-detail['log_upper']) > 2e-7:
             raise ArithmeticError('sparse composition aggregation failed')
     print('Q2..4: every selected composition replayed', flush=True)
-    combined = HERE/f'bch_sparse_tail_v2_b{block}_t{t}_s{s}_e{exponent}_q5_256/cover.json'
+    combined_maximum = min(256, args.dense_minimum-1)
+    combined = HERE/f'bch_sparse_tail_v2_b{block}_t{t}_s{s}_e{exponent}_q5_{combined_maximum}/cover.json'
     paths = ([combined] if combined.exists() else
              [HERE/f'bch_sparse_tail_v1_b{block}_t{t}_s{s}_e{exponent}/cover.json',
               HERE/f'bch_sparse_tail_v2_b{block}_t{t}_s{s}_e{exponent}_q65_256/cover.json'])
     if args.dense_minimum > 257:
         paths.append(HERE/f'bch_sparse_tail_v3_b{block}_t{t}_s{s}_e{exponent}_q257_{args.dense_minimum-1}/cover.json')
+    if args.sparse_cover:
+        paths = [path.resolve() for path in args.sparse_cover]
     dense_paths = [HERE/f'bch_dense_v{version}_b{block}_t{t}_s{s}_e{exponent}_q{args.dense_minimum}/cover.json'
-                   for version in range(10, 2, -1)]
+                   for version in range(11, 2, -1)]
     dense_path = next((path for path in dense_paths if path.exists()), dense_paths[0])
     paths.append(dense_path)
     payloads = [json.loads(path.read_text()) for path in paths]
@@ -85,6 +92,8 @@ def main():
         raise ValueError('incomplete or overlapping occupation cover')
     coefficient_checks = []
     for data in payloads[:-1]:
+        if sorted(w for band in data['bands'] for w in band) != sorted(counts):
+            raise ValueError('sparse bands do not partition the exact spectrum')
         if (data['arguments']['block'], data['arguments']['step'], data['arguments']['state'], data['arguments']['exponent']) != (block, t, s, exponent):
             raise ValueError('incompatible sparse geometry')
         maximum = data['occupation_max']
@@ -144,6 +153,8 @@ def main():
             coefficient_checks.append(dict(maximum_occupation=maximum, log_tilt=z, maximum_log_error=error))
         print(f'Q{data["occupation_min"]}..{maximum}: every bound replayed', flush=True)
     data = payloads[-1]
+    if sorted(w for band in data['bands'] for w in band) != sorted(counts):
+        raise ValueError('dense bands do not partition the exact spectrum')
     if tuple(data[k] for k in ('block_bits', 'step_bits', 'state_bits', 'message_exponent')) != (block, t, s, exponent):
         raise ValueError('incompatible dense geometry')
     leaves = [leaf for root in data['roots'] for leaf in root['leaves']]
@@ -201,6 +212,9 @@ def main():
             moment = mp.log(sum(result[0, j] for j in range(4)))
             costs = [mp.mpf(0)]
             for band, probability in zip(data['bands'], p[1:]):
+                if band == [block] and probability == 1:
+                    costs.append(mp.log(counts[block]))
+                    continue
                 costs.append(max(mp.log(counts[w])-mp.log(math.comb(block, w))-w*mp.log(probability)
                                  -(block-w)*mp.log1p(-probability) for w in band))
             corners = transfer.typed.vertices(leaf['lower'], leaf['upper'], length)

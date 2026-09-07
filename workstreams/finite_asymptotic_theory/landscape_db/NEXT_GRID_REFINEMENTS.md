@@ -7,13 +7,23 @@ occupation ratios, then control the complete remaining tail at targeted
 extremes and around the apparent state-size knees. Keep unresolved points
 explicit; do not infer dominance from Q2..4 alone. BCH-256 stays excluded.
 
-Both t64/s20 references at K=2^20 now have verified full bounds: BCH-64
-loses 0.08133 bits from higher occupations, and BCH-128 loses 0.000002
-bits. The exact-kernel lower scan finds 46 replayed first-moment
+Both t64/s20 and t128/s20 references at K=2^20 have verified full bounds:
+BCH-64 loses about 0.08 bits from higher occupations, and BCH-128 loses
+about 0.000002 bits. The exact-kernel lower scan finds 46 replayed first-moment
 obstructions: for both blocks, t64/s7..8, t128/s8..16, and t256/s9..20.
-Next target t128/s17..20 and the t64 state-size knees, then vary K at
-selected boundaries. The joined engineering grid still has 82 geometries
-without a useful complete-tail conclusion from the updated analysis.
+The t128/s19 full bounds close for both blocks; BCH-128 also closes at
+t128/s18. The bulk bounds at BCH-64 t128/s18 and BCH-128 t128/s17 remain
+weak after refinement, with inconclusive zero-state lower bounds. All
+four settings have complete union replays. The joined report now has
+seven useful full bounds, two weak full bounds, 46 first-moment
+obstructions, and 75 sparse-only geometries.
+
+Next test the K extremes and t64 state-size knees. Extend full replay to
+L<257 before the small-K runs; the current batch requires a dense interval.
+At the largest BCH-64 K, preserve and incorporate the refined Q2..4
+checkpoint rather than reverting to its known loose coarse search.
+For BCH-64 t128/s18, separating the exceptional weight-56 shell is a
+more targeted next experiment than more bulk-type subdivisions.
 
 The engineering-surface comparison now extends the corrected Q1 treatment
 to exact RM through length 512 and random references through length 512.

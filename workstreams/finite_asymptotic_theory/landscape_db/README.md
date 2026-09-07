@@ -22,9 +22,12 @@ Run numerical producers sequentially.
 130 geometries. `bch_zero_state_exact_grid_v3.py` strengthens the 78
 t/s settings at K=2^20 using exact integer kernel coefficients; replay
 positive witnesses with `verify_bch_zero_state_v3.py`. The report
-`report_bch_evidence_v2.py` joins the sparse grid, verified lower bounds,
+`report_bch_evidence_v3.py` joins the sparse grid, verified lower bounds,
 and available full-reference replays. Its evidence labels distinguish
-full Q1 dominance, first-moment obstructions, and unresolved full tails.
+useful full bounds, weak complete upper bounds, first-moment obstructions,
+and unresolved full tails. A coverage map displays continuous margin
+losses at every useful full-bound setting, without interpolating missing
+values. The earlier v2 report is retained for its historical snapshot.
 Generated CSV, JSON, and figures remain ignored.
 
 Full-reference replay uses `verify_bch_full_reference_v2.py`: BCH-128
@@ -33,6 +36,33 @@ uses the default dense cutoff Q257; BCH-64 uses `--block 64
 The sparse interval producers and dense-cover refiners retain their
 own versioned checkpoints. Do not overwrite an existing seed or change
 a producer whose hash is bound by a retained receipt.
+
+The t128/s20 references use a smaller type cover from the exact BCH
+spectrum. For each block in {64,128}, run these steps sequentially:
+
+```powershell
+python seed_bch_dense_v3.py --block 128 --step 128 --state 20 --minimum 257 --nodes 127
+python close_bch_dense_v11.py --block 128 --step 128 --state 20 --minimum 257 --target-bits 55 --maximum-refinements 1000
+python close_bch_sparse_tail_v2.py --block 128 --step 128 --state 20 --minimum 5 --maximum 256
+python verify_bch_full_reference_v3.py --block 128 --step 128 --state 20
+```
+
+Replace `--block 128` by `--block 64` for BCH-64. These commands require
+the original sparse grid and input maps. The seed refuses to overwrite
+an existing file; the dense producer resumes its own saved checkpoint.
+A complete dense cover may still give a weak bound. Only the full
+replay establishes the margin after all occupation intervals are added.
+The v3 replay checks the bulk cover and the character-based activation
+transfer. It remains a binary64 diagnostic, with selected high-precision
+checks, rather than an outward arithmetic certificate.
+
+`complete_bch_reference_batch_v1.py` runs the same stages strictly
+sequentially for a list such as `--geometry 64:128:19:20 --geometry
+128:128:19:20`, where entries are B:T:S:log2(K). It reuses existing
+intervals and always runs the complete verifier. This version requires
+L>=257 and complete epochs. Its refinement limit controls search effort;
+a weak complete upper bound is retained and labeled separately by the
+report. Do not run another numerical producer while the batch is live.
 
 The current engineering comparison is in
 [`CONSTITUENT_ENGINEERING_SURFACES.md`](CONSTITUENT_ENGINEERING_SURFACES.md).

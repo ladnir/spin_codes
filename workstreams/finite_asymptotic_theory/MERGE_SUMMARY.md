@@ -15,13 +15,29 @@ complete disjoint type coverage, and three 90-digit dense witnesses per
 block. Both references establish Q1 dominance for their bound. They do
 not establish an outward certificate or a result at other geometries.
 
+The full references now also cover t128/s20 for both blocks at K=2^20.
+BCH-64 has 10.298674360 full margin bits and loses 0.081802114 bits to
+higher occupations; BCH-128 has 32.759206705 and loses 0.000002039 bits.
+A pointwise majorant of the exact fixed spectrum reduces the dense cover
+to 37 boxes for BCH-64 and 94 for BCH-128. The v3 full verifier replays
+the character-based activation transfer and all occupation intervals.
+
 The exact integer kernel scan identifies 46 first-moment obstructions,
 all replayed at 90 digits: t64/s7..8, t128/s8..16, and t256/s9..20 for
 both blocks at K=2^20. These restrict the first-moment certificate method;
 no lower bound on actual failure probability is inferred. The updated
 plot shows why the nearly t-insensitive Q1 curves miss this tradeoff.
-The joined grid marks 82 other geometries as sparse-only. Next target
-t128/s17..20, the t64 knees, and selected K extremes. The goal is active.
+The t128/s19 references now also close for both blocks, as does BCH-128
+at t128/s18. The complete margins are 10.281995558, 32.739113643, and
+32.699942698 bits, respectively. Their higher-occupation losses are
+0.087177065, 0.000003326, and 0.000008182 bits.
+
+The joined 130-row grid now records seven useful Q1-dominant full bounds,
+two weak full upper bounds, 46 obstructions, and 75 sparse-only points.
+The weak settings are BCH-64 t128/s18 and BCH-128 t128/s17; both have
+complete union replays and inconclusive lower bounds. The new coverage
+map distinguishes these cases and displays margin losses continuously.
+Next target K extremes and t64 knees. The goal is active.
 
 This follow-up writes only within the finite-asymptotic workstream.
 Existing receipt-bound producers and the frozen encoder remain unchanged.
