@@ -1,10 +1,15 @@
 # How BCH, RM, and random constituents change the engineering surface
 
+Start with [Current engineering results](CURRENT_ENGINEERING_RESULTS.md) for
+the consolidated numbers, trends, evidence classes, and 40-bit candidates.
+[The numerical appendix](CURRENT_RESULTS_TABLES.md) includes all 130 BCH
+geometries and the matched family references.
+
 **Scope correction:** these are Q1 contribution surfaces. The current
 evidence does not establish that Q1 dominates the full occupation sum
 throughout this grid. In particular, the Q1 state-size knees do not yet
-justify implementation choices for the full distance bound. The active
-BCH-64/128 audit is recorded in `BCH_DOMINANCE_ANALYSIS.md`.
+justify implementation choices for the full distance bound. The completed
+BCH-64/128 finite audit is recorded in `BCH_DOMINANCE_ANALYSIS.md`.
 
 Fix relative distance at 10%. The inputs are message dimension K, outer
 block size B, epoch size t, and state dimension s. The response is the

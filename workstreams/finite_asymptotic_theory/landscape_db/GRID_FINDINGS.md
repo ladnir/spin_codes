@@ -1,5 +1,10 @@
 # Finite RM2Sub grid findings
 
+Start with [Current engineering results](CURRENT_ENGINEERING_RESULTS.md) for
+the consolidated numbers, trends, evidence classes, and 40-bit candidates.
+[The numerical appendix](CURRENT_RESULTS_TABLES.md) includes all 130 BCH
+geometries and the matched family references.
+
 The grid evaluates 3,108 native parameter tuples. Write Q for the number
 of nonzero outer rows and L for the total number of outer rows. Every
 tuple has a Q1 calculation, Q2..64 bounds, composition-preserving
@@ -66,9 +71,10 @@ The targeted s=11 composition refinement does not close the full bound
 for any of t=64,128,256. At t64, its unresolved tail starts at Q248;
 larger t also retains middle-occupation slack. The full union selects the
 best compatible old or new receipt for each range, so a weaker new bound
-does not replace a stronger existing screen. The current smallest
-observed full 40-bit RM choice remains s=18 at t64. This leaves room for
-both witness improvement and an intermediate-state search.
+does not replace a stronger existing screen. Within this broad ledger, the smallest
+observed full 40-bit RM choice is s=18 at t64. The separate outward
+RM(4,9) certificate at k=2^16, t64/s14 supplies a smaller-state reference;
+it is not imported into this ledger. See the current overview for both scopes.
 
 Use `tested_parameter_frontiers.csv` to compare thresholds of 0, 20, 40,
 and 60 bits at each message length. Its coverage column is part of the

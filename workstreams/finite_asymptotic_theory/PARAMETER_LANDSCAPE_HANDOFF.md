@@ -1,5 +1,14 @@
 # Handoff: finite Structured SPIN landscape and BCH--RM2Sub closure
 
+Current consolidated account (2026-09-07):
+[Engineering results](landscape_db/CURRENT_ENGINEERING_RESULTS.md) collects
+the BCH/RM/random trends, the three requested message sizes, T=128 status,
+and the separate fixed-RM finite certificate. BCH-256 is excluded from this
+consolidation at the user's request.
+[Numerical tables](landscape_db/CURRENT_RESULTS_TABLES.md) cover every
+original BCH geometry and matched family references. No numerical bound
+was changed by this documentation consolidation.
+
 The requested 130-point BCH occupation update is complete as a finite
 engineering audit: 77 useful full bounds, seven weak complete upper bounds,
 and 46 positive first-moment obstructions. There are no uncovered geometries.

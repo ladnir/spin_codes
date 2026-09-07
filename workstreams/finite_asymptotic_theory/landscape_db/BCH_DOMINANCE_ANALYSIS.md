@@ -1,5 +1,10 @@
 # Checking whether Q1 represents the BCH failure bound
 
+Start with [Current engineering results](CURRENT_ENGINEERING_RESULTS.md) for
+the consolidated numbers, trends, evidence classes, and 40-bit candidates.
+[The numerical appendix](CURRENT_RESULTS_TABLES.md) includes all 130 BCH
+geometries and the matched family references.
+
 The BCH-64/128 calculations support a useful Q1 approximation in part of
 the engineering surface, and expose substantial higher-occupation effects
 elsewhere. At T=64,S=20, BCH-128 has negligible aggregation loss throughout

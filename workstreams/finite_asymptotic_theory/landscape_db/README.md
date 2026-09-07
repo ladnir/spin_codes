@@ -1,5 +1,10 @@
 # Finite-SPIN landscape database
 
+Start with [Current engineering results](CURRENT_ENGINEERING_RESULTS.md) for
+the consolidated numbers, trends, evidence classes, and 40-bit candidates.
+[The numerical appendix](CURRENT_RESULTS_TABLES.md) includes all 130 BCH
+geometries and the matched family references.
+
 Git contains the analysis code, documentation, and catalog configuration.
 Generated grids, receipts, databases, exports, plots, and compressed snapshots
 are local research outputs and are ignored. No experiment history or data
@@ -283,9 +288,11 @@ authenticated CSV and name the selected scale in each database row's notes.
 The coverage and union reports check containment before reusing an older
 conditional result under a stronger spectrum event.
 
-`certified_results` excludes entries under review. It is currently empty:
-the completed BCH-256 certificate is still in the owning task's worktree.
-This database has not imported or independently replayed that certificate.
+`certified_results` excludes entries under review. The broad database ledger
+records zero imported full certificates; it does not inventory every proof
+in the repository. The separate fixed-RM T64/S14 certificate
+is linked from the current overview. This consolidation does not import
+or replay that proof.
 
 ## Build and query
 

@@ -1,5 +1,10 @@
 # Next work after the BCH occupation grid
 
+Start with [Current engineering results](CURRENT_ENGINEERING_RESULTS.md) for
+the consolidated numbers, trends, evidence classes, and 40-bit candidates.
+[The numerical appendix](CURRENT_RESULTS_TABLES.md) includes all 130 BCH
+geometries and the matched family references.
+
 The requested 130-point BCH occupation update is complete as a finite
 engineering audit: 77 useful full bounds, seven weak complete upper bounds,
 and 46 positive first-moment obstructions. There are no uncovered geometries.
