@@ -1,149 +1,123 @@
 # Checking whether Q1 represents the BCH failure bound
 
-The Q1 engineering curves do not yet establish the full failure margin.
-The present task checks BCH lengths 64 and 128, using the exact spectra
-and nested inner maps from the engineering study. BCH-256 remains outside
-this primary analysis.
+The updated analysis has twenty-four useful full bounds for BCH lengths 64
+and 128, using their exact spectra and the recorded nested inner maps.
+Twenty-three have small aggregation losses. At the largest BCH-64 message size,
+higher occupations cost 0.8201 bits: Q1 still contributes more than half
+of the complete bound, but the rest are no longer negligible. BCH-256
+remains outside this primary analysis.
 
-Seven useful complete reference bounds are verified at K=2^20: both BCH
-sizes at t64/s20 and t128/s19..20, plus BCH-128 at t128/s18.
-Q1 dominates the bound at these seven geometries. The verified
-ratios compare upper-bound contributions, not actual event probabilities.
+All twenty-four useful references now use the same Q2..4 refinement procedure.
+`refine_bch_full_anchors_v1.py` archived the eleven preceding references
+and replayed their complete unions after refinement. The two new state-size
+checks use the same refinement through the v3 batch. Eleven neighboring-state
+references reuse those covers and independently replay every target bound.
+The ratios below
+compare upper-bound contributions, not true event probabilities.
+
+Selected anchors at K=2^20 and relative distance 1/10:
 
 | BCH block | t | s | Q1 margin | Full margin | Higher occupations / Q1 | Margin loss |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 64 | 64 | 20 | 10.386947858 | 10.305616126 | 0.0579942093 | 0.0813317312 |
-| 64 | 128 | 19 | 10.369172623 | 10.281995558 | 0.0622895556 | 0.0871770651 |
-| 64 | 128 | 20 | 10.380476474 | 10.298674360 | 0.0583392186 | 0.0818021138 |
-| 128 | 64 | 20 | 32.769598137 | 32.769596142 | 1.3829333e-6 | 1.9951496e-6 |
-| 128 | 128 | 18 | 32.699950881 | 32.699942698 | 5.6715649e-6 | 8.1823154e-6 |
-| 128 | 128 | 19 | 32.739116968 | 32.739113643 | 2.3051477e-6 | 3.3256213e-6 |
-| 128 | 128 | 20 | 32.759208744 | 32.759206705 | 1.4132063e-6 | 2.0388243e-6 |
+| 64 | 64 | 13 | 9.539167386 | 9.464552721 | 0.0530797268 | 0.0746146644 |
+| 64 | 64 | 20 | 10.386947858 | 10.371924411 | 0.0104678685 | 0.0150234467 |
+| 64 | 128 | 19 | 10.369172623 | 10.353299778 | 0.0110629650 | 0.0158728454 |
+| 64 | 128 | 20 | 10.380476474 | 10.365380374 | 0.0105187561 | 0.0150960997 |
+| 128 | 64 | 14 | 31.824890700 | 31.824890671 | 2.0155080e-8 | 2.9077636e-8 |
+| 128 | 64 | 20 | 32.769598137 | 32.769598132 | 4.0024810e-9 | 5.7743582e-9 |
+| 128 | 128 | 18 | 32.699950881 | 32.699950874 | 4.7960779e-9 | 6.9192782e-9 |
+| 128 | 128 | 19 | 32.739116968 | 32.739116962 | 4.2924275e-9 | 6.1926642e-9 |
+| 128 | 128 | 20 | 32.759208744 | 32.759208738 | 4.0336251e-9 | 5.8192933e-9 |
 
-Three additional full references check message-size endpoints at t64/s20:
+The message-size endpoints use t64/s20:
 
 | BCH block | log2 K | Q1 margin | Full margin | Higher occupations / Q1 | Margin loss |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 64 | 12 | 16.639437359 | 16.638888171 | 0.0003807405 | 0.0005491879 |
-| 128 | 12 | 37.661913405 | 37.661913342 | 4.3832597e-8 | 6.3237069e-8 |
-| 128 | 26 | 26.783189820 | 26.783066006 | 8.5825291e-5 | 0.0001238144 |
+| 64 | 12 | 16.639437359 | 16.639117327 | 0.0002218537 | 0.0003200317 |
+| 64 | 26 | 4.394562919 | 3.574424844 | 0.765574961 | 0.820138074 |
+| 128 | 12 | 37.661913405 | 37.661913344 | 4.2448887e-8 | 6.1240796e-8 |
+| 128 | 26 | 26.783189820 | 26.783189456 | 2.5228518e-7 | 3.6397053e-7 |
 
-At the small endpoint, all occupations fit in the explicit calculation:
-Q5..128 for BCH-64 and Q5..64 for BCH-128. No dense interval is omitted.
-For BCH-128 at the large endpoint, the full union includes Q5..256 and
-a complete Q257..1,048,576 dense cover. Its selected 90-digit dense
-replays have maximum absolute log error 1.61e-7. The v4 verifier also
-replays the dominant Q2, Q3, and Q4 components at 90 digits for every
-new reference, and authenticates transitive source dependencies.
+Margins and losses are in bits. At the small endpoint every occupation
+fits in the explicit coefficient calculation. The largest BCH-64 union
+includes Q5..512 with 7.834040415 margin bits and Q513..2,097,152 with
+65.517619946 bits. Its refined Q2..4 interval has 4.965027813 bits.
+Thus the observed loss is backed by complete occupation coverage.
 
-The BCH-64 log2 K=26 result is still pending. Its Q513..2,097,152
-dense interval has 65.517619946 margin bits. The Q5..512 calculation
-uses lazy composition evaluation with a 25-bit search target; every Q
-must still be included and the complete union replayed. The earlier
-Q5..256 run was explicitly stopped after spending substantial effort
-on a 55-bit target. Its retained tilt cache is not a completed interval.
-The saved refined Q2..4 checkpoint is required for the eventual full
-reference. After this interval closes, use the same sparse refinement
-method at the other K anchors before interpreting their relative slopes.
+The smaller t64 state settings now have useful full evidence: reducing s
+from 20 to 13 costs about 0.9074 full-margin bits for BCH-64; reducing it
+to 14 costs about 0.9447 bits for BCH-128. At s20, doubling t to 128 costs
+only 0.00654 and 0.01039 bits, respectively. These are comparisons of
+replayed bounds at the displayed geometries, not an implementation-cost
+claim or a uniform interpolation over the missing points.
 
-Margins and losses are in bits. BCH-128 has the following complete
-occupation decomposition at t64/s20:
+At K=2^20 and t64, every integer state from 13 through 20 for BCH-64
+and 14 through 20 for BCH-128 now has a useful full bound. The eleven
+new references retain the source integer partitions, re-evaluate all
+sparse and dense witnesses at the target map, and pass the full v5
+verifier. No monotonicity in s is assumed. The full curves and their
+aggregation losses are in `bch_full_bound_state_scaling_v6.png`. BCH-128
+s20 also replays the same source cover: its older loose dense tail had
+created a 1.6e-9-bit upward artifact in the loss curve. The matched cover
+reduces that penalty from 7.40e-9 to 5.77e-9 bits. This is a bound
+refinement, not a smoothing operation or a change in the encoder.
 
-| Covered occupations | Contribution margin, bits |
-| --- | ---: |
-| Q1 | 32.769598 |
-| Q2..4 | 52.234612 |
-| Q5..64 | 140.960729 |
-| Q65..256 | 1601.386989 |
-| Q257..16384 | 62.493745 |
-| Complete union | 32.769596 |
+Eleven complete upper bounds remain weak. In addition to BCH-64 t128/s18
+and BCH-128 t128/s17, transported t64 covers are weak at s9..12 for
+BCH-64 and s9..13 for BCH-128. Their zero-state lower bounds are also
+inconclusive. These are unresolved bounds, not code counterexamples or
+first-moment obstructions. Reusing a successful partition avoids search,
+but does not establish that its witnesses remain tight at smaller s.
 
-For BCH-64, Q5..256 has 37.935720241 margin bits, Q257..1024 has
-1,528.683863309 bits, and Q1025..32768 has 44.108822637 bits. Q2..4
-accounts for essentially all the measured aggregation loss.
+The exact integer kernel scan separately finds 46 positive zero-state
+first-moment lower bounds, all replayed at 90 digits. For both BCH blocks
+at K=2^20, the detected settings are:
 
-`verify_bch_full_reference_v2.py` replays every selected Q2..4 composition,
-every bound in the higher intervals, and their aggregation. It checks
-complete disjoint dense covers of 733,273,355,136 integer types for
-BCH-128 and 5,864,955,809,280 for BCH-64. The new positive coefficient
-products agree with the log-domain implementation. Three selected dense
-witnesses per block replay at 90 digits, with maximum log errors below
-7.11e-9. These are verified binary64 diagnostics, not outward arithmetic
-certificates. Other geometries require their own evidence.
+| t | Tested states with a positive first-moment lower bound |
+| ---: | --- |
+| 64 | 7 through 8 |
+| 128 | 8 through 16 |
+| 256 | 9 through 20 |
 
-At t128/s20, the bulk-spectrum cover described below gives dense margins
-of 93.647787109 bits for BCH-64 and 94.484899898 bits for BCH-128.
-It covers Q257 through L using 37 boxes over 32,512 integer types for
-BCH-64, and 94 boxes over 134,209,152 types for BCH-128. The Q5..256
-margins are 37.920582616 and 140.929206629 bits, respectively.
-`verify_bch_full_reference_v3.py` replays these complete unions, including
-the character-based activation transfer and selected 90-digit witnesses.
-Doubling t from 64 to 128 at s20 therefore costs only 0.00694 full-margin
-bits for BCH-64 and 0.01039 bits for BCH-128 at this K. This comparison
-has complete-tail evidence; the same conclusion does not follow at
-smaller s or other K values.
+For example, the BCH-128 t256/s20 lower exponent is about 102,883.94 bits,
+while Q1 alone has a positive margin near 32.75 bits. These trajectories
+show why the Q1 surface cannot describe a small complete first-moment
+bound throughout the t/s grid. No failure-probability lower bound is inferred.
 
-The t128 comparison now extends below s20. Reducing s from 20 to 19
-costs 0.01668 full-margin bits for BCH-64 and 0.02009 bits for BCH-128.
-For BCH-128, reducing s once more to 18 costs another 0.03917 bits.
-At all these tested settings the higher-occupation penalty remains small.
-The current full bound for BCH-64 at s18 remains weak, so the apparent
-one-bit difference in the available state-size boundary may be slack in
-the bound. It is not evidence of an intrinsic difference between the codes.
+`bch_engineering_evidence_v6.csv` labels all 130 geometries: twenty-three full
+bounds with small loss, one useful full bound with a larger loss, eleven weak
+full upper bounds, 46 first-moment obstructions, and 49 sparse-only points.
+`bch_full_bound_coverage_v6.png` shows the t/s coverage and continuous losses.
+`bch_q1_vs_dense_tradeoff_v6.png` contrasts Q1 with the zero-state lower
+exponents. White cells are outside the recorded grid; gray cells have
+only sparse evidence.
 
-The exact integer kernel refinement finds 46 positive zero-state
-lower-bound witnesses in the 130-point engineering grid. Every positive
-witness replays at 90 digits, with maximum log error 1.39e-10. At K=2^20,
-the detected first-moment obstructions are:
+`bch_full_bound_k_scaling_v6.png` compares the message-size anchors with
+an explicit two-term engineering model calibrated at K=2^20. The model
+predicts the K=2^26 full margins within 0.073 bits for BCH-64 and 0.014
+bits for BCH-128. Its dashed curves are estimates; full-bound markers
+appear only at replayed geometries. The normalization and its limitations
+are explained below. The report uses each reference's selected sparse
+components and retains the older coarse penalty separately.
 
-| BCH block | t | Tested states with a positive first-moment lower bound |
-| --- | ---: | --- |
-| 64 and 128 | 64 | 7 through 8 |
-| 64 and 128 | 128 | 8 through 16 |
-| 64 and 128 | 256 | 9 through 20 |
+All 121 tests pass. The full-reference replays, selected 90-digit checks,
+and 46 positive lower-bound replays are separate from the test suite.
+The new positive composition evaluator agrees with twelve retained BCH
+witnesses within 1.1e-11 absolute log units. The v5 sparse producer saves
+every completed occupation; a replay of 252 saved occupations leaves
+both their files and the full interval byte-identical. These are audited
+binary64 diagnostics, not outward arithmetic certificates.
 
-For example, BCH-128 at t256/s20 has a bad-word first moment at least
-approximately 2^102883.94 under the exact-kernel diagnostic below. Q1 alone
-has a positive margin near 32.75 bits there. Thus these Q1 curves cannot
-describe a small complete first-moment bound throughout the tested t/s
-range. A nonpositive or unavailable lower bound does not establish that
-another setting closes. No failure-probability lower bound is claimed.
+The same-map transport checks reproduce both source sparse intervals
+within 4.6e-13 absolute log units and both dense covers within 4.7e-10.
+Every transported target then passes the independent full log-domain
+replay and selected 90-digit checks. The target receipts authenticate
+the unchanged source references and the transport implementation.
 
-The earlier two-weight shortcut found 37 of these settings. Retaining all
-kernel coefficients strengthens that screen: in particular, t128 remains
-obstructed through s16. Thus the next useful t128 checks start at s17;
-this is a necessary restriction from this lower bound, not a sufficient
-condition for closure. At t256 every available state setting is obstructed.
-
-`bch_engineering_evidence_v4.csv` labels all 130 engineering geometries:
-ten have complete Q1-dominant bounds, 46 have first-moment obstructions,
-two have weak full upper bounds, and 72 have only sparse evidence in this
-updated analysis. The companion figure `bch_q1_vs_dense_tradeoff_v4.png`
-puts the Q1 curves above the
-zero-state lower exponents. Its stars identify the complete bounds.
-No full-margin surface is interpolated through the unresolved points.
-`bch_full_bound_coverage_v4.png` maps the evidence at K=2^20 and prints
-the continuous margin loss at every useful full-bound setting. White
-cells are outside the recorded grid; gray cells have only sparse evidence.
-`bch_full_bound_k_scaling_v4.png` shows full-margin anchors against the
-Q1 grid, with their margin losses on a logarithmic scale. It draws no
-full-bound interpolation through the missing geometries. The report
-uses each full reference's selected Q2..4 components and keeps the old
-coarse sparse penalty in a separate column.
-
-Validation: all 116 workstream tests pass, including the finite-field
-transfer, positive coefficient, exact integer kernel, lazy composition,
-joint witness, activation density, and integer subdivision checks.
-The complete reference replays and all
-46 positive lower-bound replays are separate from that test suite.
-Two additional interval-ledger tests pass for v4, including rejection
-of missing, overlapping, reversed, and mismatched dense intervals.
-
-The distinction matters when choosing the state dimension s. Q1 has one
-nonzero outer row, so each region contains at most one active input bit.
-It includes cancellation of the state by that bit. Higher occupations
-also admit multiple input bits within an epoch and nonzero inputs with
-zero syndrome. These events can change the apparent state-size knee.
+Next, test log2 K=22 and 24 against the two-term model without refitting.
+Then tighten the dense covers at the unresolved state boundaries, starting
+with BCH-64 t64/s12 and BCH-128 t64/s13. The goal remains active; no
+complete surface is asserted over the unresolved points.
 
 ## What would justify using the Q1 surface?
 
@@ -193,6 +167,29 @@ exclude a contribution with Q proportional to L; that requires the
 complete-tail evidence retained separately in this audit. Comparisons
 should use similarly refined witnesses, since a changing search budget
 can otherwise look like a change in the code's scaling.
+
+The matched t64/s20 references give the following measured coefficients:
+
+| BCH block | log2(H2/H1), K=2^20 | log2(H2/H1), K=2^26 |
+| --- | ---: | ---: |
+| 64 | -20.578141 | -20.589313 |
+| 128 | -40.896370 | -40.918440 |
+
+Their changes are only 0.0112 and 0.0221 bits. Calibrating H1 and H2 at
+K=2^20 and retaining the exact row-count factors predicts Q1+Q2 margins
+of 3.647249954 and 26.769597768 bits at K=2^26. The complete bounds there
+have 3.574424844 and 26.783189456 bits. The first estimate is optimistic
+by 0.07283 bits; the second is conservative by 0.01360 bits. The comparison
+is recorded in `bch_k_counting_model_v1.json`.
+
+This supports a local engineering explanation: the per-row transfer terms
+are nearly stable over these large-K anchors, while the count of pairs
+grows quadratically. BCH-64 therefore develops a visible aggregation loss
+at the large endpoint. The normalized pair coefficient for BCH-128 is
+about twenty bits smaller, so its loss is still tiny in the studied range.
+The short-K coefficients differ substantially and should not be fit to
+the same plateau. No untested large-Q contribution is excluded by this
+model; the complete endpoint replays supply that evidence separately.
 
 ## Multi-bit transfer with uniform refresh
 
@@ -356,6 +353,24 @@ sources and their receipts remain unchanged. Exhaustive GF(4) checks cover
 every epoch occupation, extreme distributions in all four classes, and
 three successive epochs. Positive-arithmetic checks also compare region
 coefficients and serialized moments against direct products.
+
+The sparse contraction also has a positive-arithmetic implementation in
+`occupation_composition_positive_v1.py`. Its envelope is a maximum of
+positive linear forms, so scaling one matrix entry commutes with every
+envelope step. Direct positive correlations replace the temporary array
+of logarithmic summands. Very small correlation outputs are recomputed
+in log space; coefficient-scale guards, support tracking, and periodic
+normalization similarly send unsafe envelope entries to the original
+log evaluator. The retained bounds are still replayed by the original
+log implementation in the full verifier.
+
+Three tests cover ordinary and rare coefficients, deterministic support,
+folds through 512 steps, and complete composition matrices. Twelve saved
+BCH boxes agree within 1.1e-11 log units. A selected-case profile supports
+using the new kernel in subsequent searches; it is not an encoder benchmark.
+`close_bch_sparse_tail_v5.py` uses this kernel and atomically saves each
+completed occupation. `verify_bch_sparse_resume_v1.py` confirms a completed
+252-occupation run resumes without changing any saved evidence.
 
 The sparse search retains separate outer-band compositions. It explores
 a wider range of auxiliary Bernoulli probabilities than the historical

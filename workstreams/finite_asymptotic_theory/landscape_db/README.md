@@ -22,17 +22,20 @@ Run numerical producers sequentially.
 130 geometries. `bch_zero_state_exact_grid_v3.py` strengthens the 78
 t/s settings at K=2^20 using exact integer kernel coefficients; replay
 positive witnesses with `verify_bch_zero_state_v3.py`. The report
-`report_bch_evidence_v4.py` joins the sparse grid, verified lower bounds,
+`report_bch_evidence_v6.py` joins the sparse grid, verified lower bounds,
 and available full-reference replays. Its evidence labels distinguish
 useful full bounds, weak complete upper bounds, first-moment obstructions,
 and unresolved full tails. A coverage map displays continuous margin
 losses at every useful full-bound setting, without interpolating missing
-values. The earlier v2 and v3 reports are retained for their historical snapshots.
+values. A separate state-size plot shows the complete-bound curves, while
+the K plot compares verified anchors with a two-term engineering model.
+Earlier report versions are retained for their historical snapshots.
 Generated CSV, JSON, and figures remain ignored.
 
-Full-reference replay uses `verify_bch_full_reference_v2.py`: BCH-128
-uses the default dense cutoff Q257; BCH-64 uses `--block 64
---dense-minimum 1025`. The required interval receipts must exist first.
+Full-reference replay uses `verify_bch_full_reference_v5.py`, which adds
+`--dense-cover` to v4's explicit sparse interval and refined Q2..4 inputs.
+Use each reference's recorded dense cutoff; it varies across geometries.
+The required interval receipts must exist first.
 The sparse interval producers and dense-cover refiners retain their
 own versioned checkpoints. Do not overwrite an existing seed or change
 a producer whose hash is bound by a retained receipt.
@@ -89,10 +92,54 @@ python close_bch_sparse_tail_v4.py --block 64 --step 64 --state 20 --exponent 26
 python verify_bch_full_reference_v4.py --block 64 --step 64 --state 20 --exponent 26 --dense-minimum 513 --sparse-checkpoint bch_dominance_v2/b64_t64_s20_e26.json --sparse-cover bch_sparse_tail_v4_b64_t64_s20_e26_q5_512/cover.json
 ```
 
-`report_bch_evidence_v4.py` adds message-size anchor plots. At a geometry
+`report_bch_evidence_v6.py` includes message-size anchor plots. At a geometry
 with a full reference, its Q2..4 columns use that reference's actual
 components, including any refinements. It retains the original coarse
 penalty in a separate column so a change in search quality is visible.
+
+The largest BCH-64 anchor above now closes. To match the Q2..4 search
+quality across existing useful anchors, `refine_bch_full_anchors_v1.py`
+archives the preceding full references, refines their sparse components,
+and replays the complete unions. It has completed for the eleven earlier
+useful anchors. New reference production uses
+`complete_bch_reference_batch_v3.py`, which always creates that refinement
+if absent. Its sparse v5 producer uses scaled positive composition
+contractions with log fallbacks and saves each completed occupation.
+The full verifier still replays compositions with the original log evaluator.
+
+The smaller-state anchors and the neighboring-state replays are:
+
+```powershell
+python complete_bch_reference_batch_v3.py --geometry 64:64:13:20 --geometry 128:64:14:20
+python transport_bch_full_cover_v1.py --reference bch_full_reference_b64_t64_s13_e20.json --state 14 --state 15 --state 16 --state 17 --state 18 --state 19
+python transport_bch_full_cover_v1.py --reference bch_full_reference_b128_t64_s14_e20.json --state 15 --state 16 --state 17 --state 18 --state 19 --state 20
+python report_bch_evidence_v6.py
+```
+
+The same transport also checks BCH-64 states 9..12 and BCH-128 states
+9..13. Those covers remain weak and are labeled unresolved. BCH-128 s20
+uses the matched transported cover to remove an artifact from its older,
+looser dense tail. Existing target full references are archived before replay.
+
+Transport keeps B, T and K fixed. It preserves integer partitions and
+fixed witnesses, recomputes every target-map bound, refines Q2..4, and
+runs the full v5 verifier, including selected 90-digit checks. It does
+not assume monotonicity in S. An existing transported cover must match
+the original reference and current source hashes before reuse. Do not
+rewrite a source reference after creating dependent transported receipts.
+
+Additional validation commands, run sequentially, include:
+
+```powershell
+python -m unittest test_composition_positive_v1
+python verify_composition_positive_v1.py --cover bch_sparse_tail_v4_b64_t64_s20_e26_q5_512/cover.json
+python verify_bch_sparse_resume_v1.py --cover bch_sparse_tail_v5_b64_t64_s13_e20_q5_256/cover.json
+```
+
+The resume check is for an actual v5 producer directory, not a transported
+cover. Source hashes are authenticated before replay. Outputs remain
+binary64 diagnostics with selected high-precision checks, not outward
+arithmetic certificates.
 
 The current engineering comparison is in
 [`CONSTITUENT_ENGINEERING_SURFACES.md`](CONSTITUENT_ENGINEERING_SURFACES.md).

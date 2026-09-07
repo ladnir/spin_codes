@@ -1,33 +1,29 @@
 # Next work after the complete finite grid
 
-The active goal is now the BCH-64/128 dominance audit described in
-`BCH_DOMINANCE_ANALYSIS.md`. Q1 surfaces alone do not justify a full-margin
-engineering recommendation. Update the existing geometries with sparse
-occupation ratios, then control the complete remaining tail at targeted
-extremes and around the apparent state-size knees. Keep unresolved points
-explicit; do not infer dominance from Q2..4 alone. BCH-256 stays excluded.
+The active goal is the BCH-64/128 dominance audit in
+`BCH_DOMINANCE_ANALYSIS.md`. The updated grid has twenty-four useful full
+bounds, eleven weak full upper bounds, 46 first-moment obstructions, and
+49 sparse-only points. The largest BCH-64 endpoint is closed; all useful
+anchors use the same Q2..4 refinement. No producer is live.
 
-Both t64/s20 and t128/s20 references at K=2^20 have verified full bounds:
-BCH-64 loses about 0.08 bits from higher occupations, and BCH-128 loses
-about 0.000002 bits. The exact-kernel lower scan finds 46 replayed first-moment
-obstructions: for both blocks, t64/s7..8, t128/s8..16, and t256/s9..20.
-The t128/s19 full bounds close for both blocks; BCH-128 also closes at
-t128/s18. The bulk bounds at BCH-64 t128/s18 and BCH-128 t128/s17 remain
-weak after refinement, with inconclusive zero-state lower bounds. All
-four settings have complete union replays. At K=2^20 this gives seven
-useful full bounds, two weak full bounds, and 46 first-moment obstructions.
+At t64/s20, a two-term model calibrated at log2 K=20 predicts the full
+log2 K=26 margins within 0.073 bits for BCH-64 and 0.014 bits for BCH-128.
+Keep the model explicitly conditional on the observed coefficient plateau
+and separate it from the complete-tail proofs at the anchors.
 
-Three K endpoint checks now close: both blocks at log2 K=12, and BCH-128
-at log2 K=26, all with t64/s20. The v4 verifier and v2 batch support
-complete sparse-only ranges. The active largest BCH-64 run covers
-Q5..512 with `close_bch_sparse_tail_v4.py`; Q513..L already has a complete
-dense cover. Finish and replay that union using the saved refined Q2..4
-checkpoint. Then run the same sparse refinement at the other K anchors
-before comparing slopes, followed by t64 knees and intermediate K.
-The joined report currently has ten useful full bounds, two weak full
-bounds, 46 obstructions, and 72 sparse-only points.
-For BCH-64 t128/s18, separating the exceptional weight-56 shell is a
-more targeted next experiment than more bulk-type subdivisions.
+The fixed-K state transport is complete at K=2^20 and t64. BCH-64 s13..20
+and BCH-128 s14..20 have useful full bounds; smaller states s9..12 and
+s9..13 respectively have weak complete upper bounds. Every target was
+re-evaluated and passed full replay, without assuming monotonicity in s.
+The v6 report displays both the full state curves and their Q1 losses.
+
+Next test log2 K=22 and 24 against the existing model without refitting.
+The v3 batch uses the tested positive contraction kernel, per-occupation
+resume, standard sparse refinement, and full replay. Then tighten BCH-64
+t64/s12 and BCH-128 t64/s13 to investigate the unresolved state knees. For the unresolved
+BCH-64 t128/s18 point, isolate weight 56 before more generic subdivision.
+BCH-128 t128/s17 remains a second weak-bound target. Neither weak bound
+is a code counterexample. BCH-256 stays outside this goal.
 
 The engineering-surface comparison now extends the corrected Q1 treatment
 to exact RM through length 512 and random references through length 512.

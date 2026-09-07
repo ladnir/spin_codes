@@ -1,58 +1,52 @@
 # Merge summary: finite and asymptotic theory
 
-Active follow-up: `landscape_db/BCH_DOMINANCE_ANALYSIS.md` corrects the
-scope of the engineering conclusions and starts a BCH-64/128 dominance
-audit. Its new four-state occupation transfer handles nonzero inputs
-with zero syndrome. The sparse grid will report Q2..4/Q1 ratios and
-aggregation costs; complete-tail evidence remains a separate requirement.
-No full-margin engineering recommendation follows from Q1 alone.
+The BCH-64/128 dominance audit now has twenty-four useful complete bounds,
+eleven weak full upper bounds, 46 first-moment obstructions, and 49 sparse-only
+points in the 130-row grid. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md`.
+All useful references use the same Q2..4 refinement procedure and complete
+union replay. The preceding receipts are retained locally.
 
-The 130-point sparse pass and full t64/s20 references at K=2^20 are now
-verified. BCH-64 has 10.305616126 full margin bits, versus 10.386947858
-for Q1; BCH-128 has 32.769596142, versus 32.769598137 for Q1. The full
-verifier replays every selected Q2..4 composition, every higher interval,
-complete disjoint type coverage, and three 90-digit dense witnesses per
-block. Both references establish Q1 dominance for their bound. They do
-not establish an outward certificate or a result at other geometries.
+At K=2^26, t64/s20, BCH-64 closes with 3.574424844 full margin bits and
+a 0.820138074-bit loss from higher occupations. Its Q5..512 and Q513..L
+intervals are both complete. BCH-128 at the same K has 26.783189456 full
+margin bits and a 3.6397053e-7-bit loss. Q1 is therefore representative
+for BCH-128 at this endpoint; BCH-64 has a visible aggregation correction.
 
-The full references now also cover t128/s20 for both blocks at K=2^20.
-BCH-64 has 10.298674360 full margin bits and loses 0.081802114 bits to
-higher occupations; BCH-128 has 32.759206705 and loses 0.000002039 bits.
-A pointwise majorant of the exact fixed spectrum reduces the dense cover
-to 37 boxes for BCH-64 and 94 for BCH-128. The v3 full verifier replays
-the character-based activation transfer and all occupation intervals.
+The smaller-state checks at K=2^20 also close: BCH-64 t64/s13 gives
+9.464552721 full margin bits and a 0.074614664-bit loss; BCH-128 t64/s14
+gives 31.824890671 bits and a 2.9077636e-8-bit loss. The weak t128/s18
+BCH-64 and t128/s17 BCH-128 bounds remain inconclusive about the code.
+The 46 positive lower bounds obstruct a small first-moment certificate,
+not the distance property itself.
 
-The exact integer kernel scan identifies 46 first-moment obstructions,
-all replayed at 90 digits: t64/s7..8, t128/s8..16, and t256/s9..20 for
-both blocks at K=2^20. These restrict the first-moment certificate method;
-no lower bound on actual failure probability is inferred. The updated
-plot shows why the nearly t-insensitive Q1 curves miss this tradeoff.
-The t128/s19 references now also close for both blocks, as does BCH-128
-at t128/s18. The complete margins are 10.281995558, 32.739113643, and
-32.699942698 bits, respectively. Their higher-occupation losses are
-0.087177065, 0.000003326, and 0.000008182 bits.
+A count-normalized Q1+Q2 model calibrated at K=2^20 predicts the verified
+K=2^26 full margins within 0.073 bits for BCH-64 and 0.014 bits for
+BCH-128. The normalized pair coefficients change by only 0.0112 and
+0.0221 bits over these anchors. This supports a local engineering model,
+not a uniform full-tail theorem or an extrapolation beyond the tested K.
+The v6 report distinguishes model curves, replayed full bounds, and gaps.
+It also plots the complete state-size curves at K=2^20 and t64.
 
-Three endpoint checks add full t64/s20 references: BCH-64 at log2 K=12
-has 16.638888171 margin bits; BCH-128 at log2 K=12 and 26 has
-37.661913342 and 26.783066006 bits. Their aggregation losses are
-0.000549188, 0.0000000632, and 0.000123814 bits. The v4 verifier handles
-small-K ranges entirely through sparse coefficients and replays selected
-Q2..4 witnesses at 90 digits. The two new coverage-rejection tests pass.
+The new positive composition kernel replaces large log-sum temporaries
+with scaled positive contractions and log fallbacks. Three kernel tests
+and twelve retained-box comparisons pass, with maximum log discrepancy
+1.1e-11. Full interval replay still uses the original log evaluator.
+The v5 producer saves each occupation; a 252-occupation resume is
+byte-identical. All 121 tests pass. These are binary64 diagnostics,
+with selected 90-digit replays, rather than outward certificates.
 
-The joined 130-row grid now records ten useful Q1-dominant full bounds,
-two weak full upper bounds, 46 obstructions, and 72 sparse-only points.
-The weak settings are BCH-64 t128/s18 and BCH-128 t128/s17; both have
-complete union replays and inconclusive lower bounds. The new coverage
-map distinguishes these cases and displays margin losses continuously.
-The largest BCH-64 sparse tail is still running. Its dense Q513..L cover
-has 65.517619946 margin bits, but no complete endpoint bound is claimed
-until Q5..512 and the full replay finish. Next align sparse refinement
-effort at the message-size anchors, then test t64 knees. The goal is active.
+Twenty-one transported targets pass the complete v5 verifier. At K=2^20,
+t64, BCH-64 s13..20 and BCH-128 s14..20 have useful full bounds.
+The smaller transported states (BCH-64 s9..12, BCH-128 s9..13) remain
+weak and are not interpreted as failures. The transport preserves
+integer covers and recomputes every target bound without assuming
+monotonicity in s. Same-map checks agree within 4.7e-10 log units.
 
-This follow-up writes only within the finite-asymptotic workstream.
-Existing receipt-bound producers and the frozen encoder remain unchanged.
-Generated evidence remains ignored and local. The paused BCH-256 estimator
-is unrelated and must not be included in this change.
+Next, test intermediate K values against the existing model without
+refitting, then tighten the unresolved dense bounds near the state knees.
+The goal remains active. Changes stay within this workstream; Git contains
+source and explainers only. Generated evidence remains local, and the
+unrelated paused BCH-256 estimator remains excluded.
 
 Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 compares exact BCH, exact RM, and the random ensemble under the corrected
