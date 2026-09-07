@@ -10,6 +10,27 @@ four-state evaluator retains zero syndromes explicitly. A wider sparse
 counting search and complete dense type covers are being evaluated;
 partial coverage must remain labeled. BCH-256 is excluded from this goal.
 
+The message-size endpoint checks now add three useful full references at
+t64/s20: BCH-64 at log2 K=12 has 16.638888171 margin bits; BCH-128 at
+log2 K=12 and 26 has 37.661913342 and 26.783066006 bits. Their respective
+higher-occupation losses are 0.000549188, 0.0000000632, and 0.000123814
+bits. `verify_bch_full_reference_v4.py` supports complete sparse-only
+ranges, optional authenticated refined Q2..4 checkpoints, and selected
+90-digit sparse checks. Its source is now receipt-bound.
+
+The active calculation is BCH-64, t64/s20, log2 K=26. Its Q513..L dense
+cover is complete with 65.517619946 margin bits. The running command is
+`close_bch_sparse_tail_v4.py --block 64 --step 64 --state 20 --exponent 26
+--minimum 5 --maximum 512 --target-bits 25`, logging to
+`landscape_db/bch64_k26_sparse_v4.log`. Revalidate the live process before
+resuming; do not restart from an observation timeout. The earlier v2
+Q5..256 producer was explicitly stopped; its interval never completed.
+The v4 producer uses lazy composition evaluation and a lower search
+target, while retaining every occupation. Once it finishes, replay with
+v4, `--dense-minimum 513`, the saved
+`bch_dominance_v2/b64_t64_s20_e26.json` sparse refinement, and explicit
+`--sparse-cover bch_sparse_tail_v4_b64_t64_s20_e26_q5_512/cover.json`.
+
 Both BCH blocks now have full t128/s20 references at K=2^20.
 `seed_bch_dense_v3.py` and `close_bch_dense_v11.py` use a pointwise
 binomial majorant of the exact spectrum, with the zero and any all-one
@@ -49,21 +70,24 @@ full margin bits and a 0.087177065-bit loss. BCH-128 at s18 and s19 has
 32.699942698 and 32.739113643 full margin bits, with losses of 0.000008182
 and 0.000003326 bits. BCH-64 at s18 remains weak (-10,331.20 bits).
 Both weak settings have complete verified unions; they are not missing
-tail computations. The numerical batch has finished. No producer is live.
+tail computations. The t128 numerical batch has finished.
 `complete_bch_reference_batch_v1.py` reproduces selected geometries in
 strict sequence and always replays the full union.
 
 The exact integer kernel scan has 46 positive first-moment lower bounds,
 all replayed at 90 digits. For both blocks at K=2^20, it obstructs t64/s7..8,
 t128/s8..16, and t256/s9..20. The updated 130-row engineering report has
-seven useful full Q1-dominant references, two weak full bounds,
-46 obstructions, and 75 sparse-only rows.
+ten useful full Q1-dominant references, two weak full bounds,
+46 obstructions, and 72 sparse-only rows.
 Read `landscape_db/BCH_DOMINANCE_ANALYSIS.md` and run
-`landscape_db/report_bch_evidence_v3.py` for the joined plot and evidence
-coverage map. Next test the K extremes and t64 knees. For the unresolved
+`landscape_db/report_bch_evidence_v4.py` for the joined plots, message-size
+anchors, and evidence coverage map. After the largest BCH-64 replay,
+apply the same `refine_bch_sparse_v2.py` search to the other log2 K=12,20,26
+anchors and replay them, so search quality is comparable. Then test the
+t64 knees and intermediate K values. For the unresolved
 BCH-64 t128/s18 bound, try separating weight 56 before further generic
-subdivision. Small-K full replay needs a version supporting L<257; the
-current batch deliberately rejects that case. The goal
+subdivision. The v2 batch now supports small-K sparse-only replay;
+the v1 batch remains unchanged. The goal
 remains active; no full-margin surface over the unresolved range is claimed.
 
 Latest engineering study: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`

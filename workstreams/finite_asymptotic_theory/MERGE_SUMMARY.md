@@ -32,12 +32,22 @@ at t128/s18. The complete margins are 10.281995558, 32.739113643, and
 32.699942698 bits, respectively. Their higher-occupation losses are
 0.087177065, 0.000003326, and 0.000008182 bits.
 
-The joined 130-row grid now records seven useful Q1-dominant full bounds,
-two weak full upper bounds, 46 obstructions, and 75 sparse-only points.
+Three endpoint checks add full t64/s20 references: BCH-64 at log2 K=12
+has 16.638888171 margin bits; BCH-128 at log2 K=12 and 26 has
+37.661913342 and 26.783066006 bits. Their aggregation losses are
+0.000549188, 0.0000000632, and 0.000123814 bits. The v4 verifier handles
+small-K ranges entirely through sparse coefficients and replays selected
+Q2..4 witnesses at 90 digits. The two new coverage-rejection tests pass.
+
+The joined 130-row grid now records ten useful Q1-dominant full bounds,
+two weak full upper bounds, 46 obstructions, and 72 sparse-only points.
 The weak settings are BCH-64 t128/s18 and BCH-128 t128/s17; both have
 complete union replays and inconclusive lower bounds. The new coverage
 map distinguishes these cases and displays margin losses continuously.
-Next target K extremes and t64 knees. The goal is active.
+The largest BCH-64 sparse tail is still running. Its dense Q513..L cover
+has 65.517619946 margin bits, but no complete endpoint bound is claimed
+until Q5..512 and the full replay finish. Next align sparse refinement
+effort at the message-size anchors, then test t64 knees. The goal is active.
 
 This follow-up writes only within the finite-asymptotic workstream.
 Existing receipt-bound producers and the frozen encoder remain unchanged.

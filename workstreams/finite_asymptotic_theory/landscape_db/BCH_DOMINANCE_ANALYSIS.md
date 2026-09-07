@@ -20,6 +20,32 @@ ratios compare upper-bound contributions, not actual event probabilities.
 | 128 | 128 | 19 | 32.739116968 | 32.739113643 | 2.3051477e-6 | 3.3256213e-6 |
 | 128 | 128 | 20 | 32.759208744 | 32.759206705 | 1.4132063e-6 | 2.0388243e-6 |
 
+Three additional full references check message-size endpoints at t64/s20:
+
+| BCH block | log2 K | Q1 margin | Full margin | Higher occupations / Q1 | Margin loss |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 64 | 12 | 16.639437359 | 16.638888171 | 0.0003807405 | 0.0005491879 |
+| 128 | 12 | 37.661913405 | 37.661913342 | 4.3832597e-8 | 6.3237069e-8 |
+| 128 | 26 | 26.783189820 | 26.783066006 | 8.5825291e-5 | 0.0001238144 |
+
+At the small endpoint, all occupations fit in the explicit calculation:
+Q5..128 for BCH-64 and Q5..64 for BCH-128. No dense interval is omitted.
+For BCH-128 at the large endpoint, the full union includes Q5..256 and
+a complete Q257..1,048,576 dense cover. Its selected 90-digit dense
+replays have maximum absolute log error 1.61e-7. The v4 verifier also
+replays the dominant Q2, Q3, and Q4 components at 90 digits for every
+new reference, and authenticates transitive source dependencies.
+
+The BCH-64 log2 K=26 result is still pending. Its Q513..2,097,152
+dense interval has 65.517619946 margin bits. The Q5..512 calculation
+uses lazy composition evaluation with a 25-bit search target; every Q
+must still be included and the complete union replayed. The earlier
+Q5..256 run was explicitly stopped after spending substantial effort
+on a 55-bit target. Its retained tilt cache is not a completed interval.
+The saved refined Q2..4 checkpoint is required for the eventual full
+reference. After this interval closes, use the same sparse refinement
+method at the other K anchors before interpreting their relative slopes.
+
 Margins and losses are in bits. BCH-128 has the following complete
 occupation decomposition at t64/s20:
 
@@ -89,22 +115,29 @@ obstructed through s16. Thus the next useful t128 checks start at s17;
 this is a necessary restriction from this lower bound, not a sufficient
 condition for closure. At t256 every available state setting is obstructed.
 
-`bch_engineering_evidence_v3.csv` labels all 130 engineering geometries:
-seven have complete Q1-dominant bounds, 46 have first-moment obstructions,
-two have weak full upper bounds, and 75 have only sparse evidence in this
-updated analysis. The companion figure `bch_q1_vs_dense_tradeoff_v3.png`
+`bch_engineering_evidence_v4.csv` labels all 130 engineering geometries:
+ten have complete Q1-dominant bounds, 46 have first-moment obstructions,
+two have weak full upper bounds, and 72 have only sparse evidence in this
+updated analysis. The companion figure `bch_q1_vs_dense_tradeoff_v4.png`
 puts the Q1 curves above the
 zero-state lower exponents. Its stars identify the complete bounds.
 No full-margin surface is interpolated through the unresolved points.
-`bch_full_bound_coverage_v3.png` maps the evidence at K=2^20 and prints
+`bch_full_bound_coverage_v4.png` maps the evidence at K=2^20 and prints
 the continuous margin loss at every useful full-bound setting. White
 cells are outside the recorded grid; gray cells have only sparse evidence.
+`bch_full_bound_k_scaling_v4.png` shows full-margin anchors against the
+Q1 grid, with their margin losses on a logarithmic scale. It draws no
+full-bound interpolation through the missing geometries. The report
+uses each full reference's selected Q2..4 components and keeps the old
+coarse sparse penalty in a separate column.
 
 Validation: all 116 workstream tests pass, including the finite-field
 transfer, positive coefficient, exact integer kernel, lazy composition,
 joint witness, activation density, and integer subdivision checks.
 The complete reference replays and all
 46 positive lower-bound replays are separate from that test suite.
+Two additional interval-ledger tests pass for v4, including rejection
+of missing, overlapping, reversed, and mismatched dense intervals.
 
 The distinction matters when choosing the state dimension s. Q1 has one
 nonzero outer row, so each region contains at most one active input bit.
@@ -135,6 +168,31 @@ does not control Q5 and higher. A loose full upper bound neither establishes
 Q1 dominance nor refutes the distance property. Evidence at finitely many
 geometries does not establish dominance between them without an additional
 uniform argument.
+
+## Separating message-size counting from the transfer
+
+For one fixed constituent and inner map, write each chosen occupation
+bound as U_Q=choose(L,Q) H_Q(L), where L=K/(B/2). This defines H_Q(L)
+by removing the choice of active outer rows. The dependence of H_Q on L
+still includes the transfer, the distance cutoff, and the optimized
+counting witnesses. In particular,
+
+    U_2/U_1 = (L-1)/2 * H_2(L)/H_1(L),
+    U_3/U_1 = (L-1)(L-2)/6 * H_3(L)/H_1(L).
+
+These identities explain what a message-size extrapolation must check.
+If H_2/H_1 has stabilized, doubling K approximately doubles the Q2/Q1
+ratio, even when Q1's own margin follows a nearly straight line in log2 K.
+The corresponding full-margin loss grows as log2(1+U_rest/U_1), rather
+than as a fixed offset. The small-K points can have substantial transfer
+effects, so the counting factors alone do not establish their slope.
+
+This is a conditional engineering model. Similar values at selected K
+do not prove a uniform bound between them. A fixed-Q model also cannot
+exclude a contribution with Q proportional to L; that requires the
+complete-tail evidence retained separately in this audit. Comparisons
+should use similarly refined witnesses, since a changing search budget
+can otherwise look like a change in the code's scaling.
 
 ## Multi-bit transfer with uniform refresh
 

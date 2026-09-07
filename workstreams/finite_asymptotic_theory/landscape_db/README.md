@@ -22,12 +22,12 @@ Run numerical producers sequentially.
 130 geometries. `bch_zero_state_exact_grid_v3.py` strengthens the 78
 t/s settings at K=2^20 using exact integer kernel coefficients; replay
 positive witnesses with `verify_bch_zero_state_v3.py`. The report
-`report_bch_evidence_v3.py` joins the sparse grid, verified lower bounds,
+`report_bch_evidence_v4.py` joins the sparse grid, verified lower bounds,
 and available full-reference replays. Its evidence labels distinguish
 useful full bounds, weak complete upper bounds, first-moment obstructions,
 and unresolved full tails. A coverage map displays continuous margin
 losses at every useful full-bound setting, without interpolating missing
-values. The earlier v2 report is retained for its historical snapshot.
+values. The earlier v2 and v3 reports are retained for their historical snapshots.
 Generated CSV, JSON, and figures remain ignored.
 
 Full-reference replay uses `verify_bch_full_reference_v2.py`: BCH-128
@@ -63,6 +63,36 @@ intervals and always runs the complete verifier. This version requires
 L>=257 and complete epochs. Its refinement limit controls search effort;
 a weak complete upper bound is retained and labeled separately by the
 report. Do not run another numerical producer while the batch is live.
+
+For message-size anchors, `complete_bch_reference_batch_v2.py` also
+supports L<257 by covering every remaining occupation explicitly.
+It prefers an existing `bch_dominance_v2` component refinement and
+authenticates it during `verify_bch_full_reference_v4.py`. That verifier
+replays every Q2..4 component and checks the dominant component at
+90 digits for each occupation. It accepts either a full sparse cover
+or sparse intervals followed by a dense cover, and authenticates the
+transitive source dependencies in its output.
+
+The small-K commands are:
+
+```powershell
+python complete_bch_reference_batch_v2.py --geometry 64:64:20:12 --geometry 128:64:20:12
+```
+
+For the largest BCH-64 anchor, the sparse search uses lazy composition
+evaluation and a 25-bit per-occupation search target. This target limits
+search effort; it does not omit occupations or assert that every selected
+bound reaches 25 bits. With the Q513..L dense cover already generated:
+
+```powershell
+python close_bch_sparse_tail_v4.py --block 64 --step 64 --state 20 --exponent 26 --minimum 5 --maximum 512 --target-bits 25
+python verify_bch_full_reference_v4.py --block 64 --step 64 --state 20 --exponent 26 --dense-minimum 513 --sparse-checkpoint bch_dominance_v2/b64_t64_s20_e26.json --sparse-cover bch_sparse_tail_v4_b64_t64_s20_e26_q5_512/cover.json
+```
+
+`report_bch_evidence_v4.py` adds message-size anchor plots. At a geometry
+with a full reference, its Q2..4 columns use that reference's actual
+components, including any refinements. It retains the original coarse
+penalty in a separate column so a change in search quality is visible.
 
 The current engineering comparison is in
 [`CONSTITUENT_ENGINEERING_SURFACES.md`](CONSTITUENT_ENGINEERING_SURFACES.md).

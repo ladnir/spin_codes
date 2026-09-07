@@ -14,14 +14,18 @@ obstructions: for both blocks, t64/s7..8, t128/s8..16, and t256/s9..20.
 The t128/s19 full bounds close for both blocks; BCH-128 also closes at
 t128/s18. The bulk bounds at BCH-64 t128/s18 and BCH-128 t128/s17 remain
 weak after refinement, with inconclusive zero-state lower bounds. All
-four settings have complete union replays. The joined report now has
-seven useful full bounds, two weak full bounds, 46 first-moment
-obstructions, and 75 sparse-only geometries.
+four settings have complete union replays. At K=2^20 this gives seven
+useful full bounds, two weak full bounds, and 46 first-moment obstructions.
 
-Next test the K extremes and t64 state-size knees. Extend full replay to
-L<257 before the small-K runs; the current batch requires a dense interval.
-At the largest BCH-64 K, preserve and incorporate the refined Q2..4
-checkpoint rather than reverting to its known loose coarse search.
+Three K endpoint checks now close: both blocks at log2 K=12, and BCH-128
+at log2 K=26, all with t64/s20. The v4 verifier and v2 batch support
+complete sparse-only ranges. The active largest BCH-64 run covers
+Q5..512 with `close_bch_sparse_tail_v4.py`; Q513..L already has a complete
+dense cover. Finish and replay that union using the saved refined Q2..4
+checkpoint. Then run the same sparse refinement at the other K anchors
+before comparing slopes, followed by t64 knees and intermediate K.
+The joined report currently has ten useful full bounds, two weak full
+bounds, 46 obstructions, and 72 sparse-only points.
 For BCH-64 t128/s18, separating the exceptional weight-56 shell is a
 more targeted next experiment than more bulk-type subdivisions.
 
