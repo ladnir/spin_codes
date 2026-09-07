@@ -1,52 +1,39 @@
 # Merge summary: finite and asymptotic theory
 
-The BCH-64/128 dominance audit now has twenty-four useful complete bounds,
-eleven weak full upper bounds, 46 first-moment obstructions, and 49 sparse-only
-points in the 130-row grid. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md`.
-All useful references use the same Q2..4 refinement procedure and complete
-union replay. The preceding receipts are retained locally.
+The BCH-64/128 audit now has 32 useful complete bounds, 20 weak full upper
+bounds, 46 first-moment obstructions, and 32 sparse-only points in the
+130-row grid. See `landscape_db/BCH_DOMINANCE_ANALYSIS.md`. Full-reference
+replays authenticate complete occupation coverage and selected 90-digit
+checks; no outward arithmetic certificate is asserted.
 
-At K=2^26, t64/s20, BCH-64 closes with 3.574424844 full margin bits and
-a 0.820138074-bit loss from higher occupations. Its Q5..512 and Q513..L
-intervals are both complete. BCH-128 at the same K has 26.783189456 full
-margin bits and a 3.6397053e-7-bit loss. Q1 is therefore representative
-for BCH-128 at this endpoint; BCH-64 has a visible aggregation correction.
+The new t64/s20 message-size checks close at log2 K=22 and 24. BCH-64's
+full margins are 8.333885368 and 6.171264034 bits, with Q1 corrections
+0.058873790 and 0.222935387 bits. BCH-128's full margins are 30.780002354
+and 28.782539084 bits, with corrections below 1e-7 bits. The unchanged
+K=2^20 two-term model predicts all four within 0.014 bits. Its error is
+split into the count-model error and the Q3-and-higher aggregation penalty.
+A direct 90-digit count-scaling replay checks six comparisons, including
+K=2^26, with maximum absolute discrepancy 5.4e-15 bits.
 
-The smaller-state checks at K=2^20 also close: BCH-64 t64/s13 gives
-9.464552721 full margin bits and a 0.074614664-bit loss; BCH-128 t64/s14
-gives 31.824890671 bits and a 2.9077636e-8-bit loss. The weak t128/s18
-BCH-64 and t128/s17 BCH-128 bounds remain inconclusive about the code.
-The 46 positive lower bounds obstruct a small first-moment certificate,
-not the distance property itself.
+Thirteen additional fixed-K transports pass complete replay. Four s16
+transports initially had weak dense bounds; fresh target-map dense
+searches close all four using the same verified sparse intervals.
+At K=2^24, reducing s20 to s16 costs 0.27004 bits for BCH-64 and
+0.27442 bits for BCH-128. The new v7 report plots this K/state interaction
+and records logarithmic higher/Q1 ratios even when ordinary ratios overflow.
+Weak s10/s12 bounds remain explicitly unresolved. Every recorded K=2^20
+t/s point now has either a full bound or a first-moment lower obstruction.
 
-A count-normalized Q1+Q2 model calibrated at K=2^20 predicts the verified
-K=2^26 full margins within 0.073 bits for BCH-64 and 0.014 bits for
-BCH-128. The normalized pair coefficients change by only 0.0112 and
-0.0221 bits over these anchors. This supports a local engineering model,
-not a uniform full-tail theorem or an extrapolation beyond the tested K.
-The v6 report distinguishes model curves, replayed full bounds, and gaps.
-It also plots the complete state-size curves at K=2^20 and t64.
+The new dense-refinement driver archives preceding references, reuses
+verified sparse intervals, and retains the stronger full bound if a
+candidate fails to improve it. No core arithmetic changes were needed;
+the preceding 121-test pass remains applicable. The new full replays and
+90-digit model checks provide validation specific to this update.
+Generated data and plots remain local and ignored; Git contains source
+and explainers only. The unrelated paused BCH-256 estimator is excluded.
 
-The new positive composition kernel replaces large log-sum temporaries
-with scaled positive contractions and log fallbacks. Three kernel tests
-and twelve retained-box comparisons pass, with maximum log discrepancy
-1.1e-11. Full interval replay still uses the original log evaluator.
-The v5 producer saves each occupation; a 252-occupation resume is
-byte-identical. All 121 tests pass. These are binary64 diagnostics,
-with selected 90-digit replays, rather than outward certificates.
-
-Twenty-one transported targets pass the complete v5 verifier. At K=2^20,
-t64, BCH-64 s13..20 and BCH-128 s14..20 have useful full bounds.
-The smaller transported states (BCH-64 s9..12, BCH-128 s9..13) remain
-weak and are not interpreted as failures. The transport preserves
-integer covers and recomputes every target bound without assuming
-monotonicity in s. Same-map checks agree within 4.7e-10 log units.
-
-Next, test intermediate K values against the existing model without
-refitting, then tighten the unresolved dense bounds near the state knees.
-The goal remains active. Changes stay within this workstream; Git contains
-source and explainers only. Generated evidence remains local, and the
-unrelated paused BCH-256 estimator remains excluded.
+Next, fill the log2 K=16/18 slices and the remaining s20 message sizes,
+then tighten the unresolved state knees. The active goal remains open.
 
 Current engineering-surface addition: `landscape_db/CONSTITUENT_ENGINEERING_SURFACES.md`
 compares exact BCH, exact RM, and the random ensemble under the corrected

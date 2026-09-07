@@ -1,19 +1,20 @@
 # Checking whether Q1 represents the BCH failure bound
 
-The updated analysis has twenty-four useful full bounds for BCH lengths 64
+The updated analysis has thirty-two useful full bounds for BCH lengths 64
 and 128, using their exact spectra and the recorded nested inner maps.
-Twenty-three have small aggregation losses. At the largest BCH-64 message size,
+Twenty-nine have small aggregation losses. At the largest BCH-64 message size,
 higher occupations cost 0.8201 bits: Q1 still contributes more than half
 of the complete bound, but the rest are no longer negligible. BCH-256
 remains outside this primary analysis.
 
-All twenty-four useful references now use the same Q2..4 refinement procedure.
+All useful references use the same Q2..4 refinement procedure.
 `refine_bch_full_anchors_v1.py` archived the eleven preceding references
 and replayed their complete unions after refinement. The two new state-size
 checks use the same refinement through the v3 batch. Eleven neighboring-state
 references reuse those covers and independently replay every target bound.
-The ratios below
-compare upper-bound contributions, not true event probabilities.
+The intermediate message-size checks and their state comparisons extend
+these references. The ratios below compare upper-bound contributions,
+not true event probabilities.
 
 Selected anchors at K=2^20 and relative distance 1/10:
 
@@ -56,18 +57,24 @@ and 14 through 20 for BCH-128 now has a useful full bound. The eleven
 new references retain the source integer partitions, re-evaluate all
 sparse and dense witnesses at the target map, and pass the full v5
 verifier. No monotonicity in s is assumed. The full curves and their
-aggregation losses are in `bch_full_bound_state_scaling_v6.png`. BCH-128
+aggregation losses are in `bch_full_bound_state_scaling_v7.png`. BCH-128
 s20 also replays the same source cover: its older loose dense tail had
 created a 1.6e-9-bit upward artifact in the loss curve. The matched cover
 reduces that penalty from 7.40e-9 to 5.77e-9 bits. This is a bound
 refinement, not a smoothing operation or a change in the encoder.
 
-Eleven complete upper bounds remain weak. In addition to BCH-64 t128/s18
-and BCH-128 t128/s17, transported t64 covers are weak at s9..12 for
-BCH-64 and s9..13 for BCH-128. Their zero-state lower bounds are also
-inconclusive. These are unresolved bounds, not code counterexamples or
-first-moment obstructions. Reusing a successful partition avoids search,
-but does not establish that its witnesses remain tight at smaller s.
+Twenty complete upper bounds remain weak. At K=2^20 these are BCH-64
+t128/s17..18, BCH-128 t128/s17, and the t64 states s9..12 for BCH-64
+and s9..13 for BCH-128. At K=2^22 and 2^24, the transported t64/s10
+and t64/s12 bounds remain weak for both constituents. Their zero-state
+lower bounds are inconclusive. These are unresolved bounds, not code
+counterexamples or first-moment obstructions.
+
+Fixed-witness transport alone also gave weak bounds at t64/s16 for the
+four intermediate-K cases. Fresh dense witness searches close all four,
+while retaining their already useful transported sparse intervals.
+This demonstrates why a poor transported upper bound should trigger a
+target-map search before being interpreted as a parameter limitation.
 
 The exact integer kernel scan separately finds 46 positive zero-state
 first-moment lower bounds, all replayed at 90 digits. For both BCH blocks
@@ -84,15 +91,15 @@ while Q1 alone has a positive margin near 32.75 bits. These trajectories
 show why the Q1 surface cannot describe a small complete first-moment
 bound throughout the t/s grid. No failure-probability lower bound is inferred.
 
-`bch_engineering_evidence_v6.csv` labels all 130 geometries: twenty-three full
-bounds with small loss, one useful full bound with a larger loss, eleven weak
-full upper bounds, 46 first-moment obstructions, and 49 sparse-only points.
-`bch_full_bound_coverage_v6.png` shows the t/s coverage and continuous losses.
-`bch_q1_vs_dense_tradeoff_v6.png` contrasts Q1 with the zero-state lower
+`bch_engineering_evidence_v7.csv` labels all 130 geometries: twenty-nine full
+bounds with small loss, three useful full bounds with larger losses, twenty
+weak full upper bounds, 46 first-moment obstructions, and 32 sparse-only points.
+`bch_full_bound_coverage_v7.png` shows the t/s coverage and continuous losses.
+`bch_q1_vs_dense_tradeoff_v7.png` contrasts Q1 with the zero-state lower
 exponents. White cells are outside the recorded grid; gray cells have
 only sparse evidence.
 
-`bch_full_bound_k_scaling_v6.png` compares the message-size anchors with
+`bch_full_bound_k_scaling_v7.png` compares the message-size anchors with
 an explicit two-term engineering model calibrated at K=2^20. The model
 predicts the K=2^26 full margins within 0.073 bits for BCH-64 and 0.014
 bits for BCH-128. Its dashed curves are estimates; full-bound markers
@@ -114,10 +121,16 @@ Every transported target then passes the independent full log-domain
 replay and selected 90-digit checks. The target receipts authenticate
 the unchanged source references and the transport implementation.
 
-Next, test log2 K=22 and 24 against the two-term model without refitting.
-Then tighten the dense covers at the unresolved state boundaries, starting
-with BCH-64 t64/s12 and BCH-128 t64/s13. The goal remains active; no
-complete surface is asserted over the unresolved points.
+The four intermediate-K references and thirteen additional transports
+pass full replay, including selected 90-digit checks. Four fresh dense
+searches then strengthen the s16 references. The 90-digit count-scaling
+check validates all six model comparisons with maximum absolute error
+5.4e-15 bits, including tiny positive corrections from Q3 and higher.
+
+Next, fill the log2 K=16 and 18 slices at s20, then s10/s12/s16. The
+remaining s20-only gaps are exponents 13,14,15,17,19,21,23,25 for each
+block. Weak-state refinements remain a separate task. The goal stays
+active; no complete surface is asserted over unresolved points.
 
 ## What would justify using the Q1 surface?
 
@@ -180,7 +193,7 @@ K=2^20 and retaining the exact row-count factors predicts Q1+Q2 margins
 of 3.647249954 and 26.769597768 bits at K=2^26. The complete bounds there
 have 3.574424844 and 26.783189456 bits. The first estimate is optimistic
 by 0.07283 bits; the second is conservative by 0.01360 bits. The comparison
-is recorded in `bch_k_counting_model_v1.json`.
+is recorded in `bch_k_counting_model_v3.json`.
 
 This supports a local engineering explanation: the per-row transfer terms
 are nearly stable over these large-K anchors, while the count of pairs
@@ -190,6 +203,50 @@ about twenty bits smaller, so its loss is still tiny in the studied range.
 The short-K coefficients differ substantially and should not be fit to
 the same plateau. No untested large-Q contribution is excluded by this
 model; the complete endpoint replays supply that evidence separately.
+
+## Intermediate message sizes and the state interaction
+
+The model retains its K=2^20 coefficients. Complete bounds at the two
+intermediate message sizes give the following comparisons at t64/s20;
+negative error means the estimate is conservative relative to the
+selected full upper bound.
+
+| BCH block | log2 K | Two-term estimate | Full margin | Estimate minus full |
+| --- | ---: | ---: | ---: | ---: |
+| 64 | 22 | 8.327781119 | 8.333885368 | -0.006104249 |
+| 64 | 24 | 6.163579314 | 6.171264034 | -0.007684720 |
+| 128 | 22 | 30.769598114 | 30.780002354 | -0.010404240 |
+| 128 | 24 | 28.769598045 | 28.782539084 | -0.012941039 |
+
+All four discrepancies are below 0.014 bits without refitting. The report
+separates the error in predicting the Q1+Q2 sum from the penalty for adding
+Q3 and higher. At BCH-64 K=2^26, those terms are -0.01209 and 0.08491 bits,
+respectively, for a net optimistic error of 0.07283 bits. The latter
+penalty includes the slack in the selected higher-occupation bounds; it
+is not a measurement of the corresponding true event probabilities.
+Tiny BCH-128 corrections are computed with log1p rather than subtracting
+nearly equal margins. `verify_bch_counting_model_v1.py` independently
+checks the predictions by scaling U1 by L/L0 and U2 by
+choose(L,2)/choose(L0,2), using 90-digit arithmetic.
+
+The full K/state comparison uses t64 and relative distance 1/10:
+
+| BCH block | log2 K | Full margin at s16 | Full margin at s20 | Cost of using s16 |
+| --- | ---: | ---: | ---: | ---: |
+| 64 | 20 | 10.215545930 | 10.371924411 | 0.156378481 |
+| 64 | 22 | 8.151754083 | 8.333885368 | 0.182131286 |
+| 64 | 24 | 5.901222091 | 6.171264034 | 0.270041943 |
+| 128 | 20 | 32.494912065 | 32.769598132 | 0.274686066 |
+| 128 | 22 | 30.505581685 | 30.780002354 | 0.274420669 |
+| 128 | 24 | 28.508121661 | 28.782539084 | 0.274417424 |
+
+The BCH-128 state cost is nearly constant across these three K values.
+For BCH-64 it increases with K, as the higher-occupation correction grows.
+At K=2^24, the correction is 0.3456 bits at s16 versus 0.2229 bits at s20.
+This gives a quantitative state-size tradeoff supported by complete
+bounds at every displayed point. It does not extend the s16 conclusion
+to K=2^26 or to smaller unverified states. The curves are in
+`bch_full_bound_k_state_scaling_v7.png`.
 
 ## Multi-bit transfer with uniform refresh
 

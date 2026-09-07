@@ -22,7 +22,7 @@ Run numerical producers sequentially.
 130 geometries. `bch_zero_state_exact_grid_v3.py` strengthens the 78
 t/s settings at K=2^20 using exact integer kernel coefficients; replay
 positive witnesses with `verify_bch_zero_state_v3.py`. The report
-`report_bch_evidence_v6.py` joins the sparse grid, verified lower bounds,
+`report_bch_evidence_v7.py` joins the sparse grid, verified lower bounds,
 and available full-reference replays. Its evidence labels distinguish
 useful full bounds, weak complete upper bounds, first-moment obstructions,
 and unresolved full tails. A coverage map displays continuous margin
@@ -92,7 +92,7 @@ python close_bch_sparse_tail_v4.py --block 64 --step 64 --state 20 --exponent 26
 python verify_bch_full_reference_v4.py --block 64 --step 64 --state 20 --exponent 26 --dense-minimum 513 --sparse-checkpoint bch_dominance_v2/b64_t64_s20_e26.json --sparse-cover bch_sparse_tail_v4_b64_t64_s20_e26_q5_512/cover.json
 ```
 
-`report_bch_evidence_v6.py` includes message-size anchor plots. At a geometry
+`report_bch_evidence_v7.py` includes message-size anchor plots. At a geometry
 with a full reference, its Q2..4 columns use that reference's actual
 components, including any refinements. It retains the original coarse
 penalty in a separate column so a change in search quality is visible.
@@ -113,7 +113,7 @@ The smaller-state anchors and the neighboring-state replays are:
 python complete_bch_reference_batch_v3.py --geometry 64:64:13:20 --geometry 128:64:14:20
 python transport_bch_full_cover_v1.py --reference bch_full_reference_b64_t64_s13_e20.json --state 14 --state 15 --state 16 --state 17 --state 18 --state 19
 python transport_bch_full_cover_v1.py --reference bch_full_reference_b128_t64_s14_e20.json --state 15 --state 16 --state 17 --state 18 --state 19 --state 20
-python report_bch_evidence_v6.py
+python report_bch_evidence_v7.py
 ```
 
 The same transport also checks BCH-64 states 9..12 and BCH-128 states
@@ -127,6 +127,32 @@ runs the full v5 verifier, including selected 90-digit checks. It does
 not assume monotonicity in S. An existing transported cover must match
 the original reference and current source hashes before reuse. Do not
 rewrite a source reference after creating dependent transported receipts.
+
+The intermediate message-size checks use the same v3 batch, for example:
+
+```powershell
+python complete_bch_reference_batch_v3.py --geometry 64:64:20:22 --geometry 128:64:20:22 --geometry 64:64:20:24 --geometry 128:64:20:24
+python transport_bch_full_cover_v1.py --reference bch_full_reference_b64_t64_s20_e22.json --state 16 --state 12 --state 10
+python refine_bch_transported_dense_v1.py --geometry 64:64:16:22
+```
+
+Repeat the transport for the other three completed references, and refine
+their s16 dense witnesses. The refinement driver retains the existing
+sparse intervals, searches target-map dense witnesses, and runs full replay.
+It archives the preceding reference and restores it if the candidate is
+weaker. It cannot repair a weak sparse interval; those need their own search.
+
+The v7 report adds the full K/state curves and fixed-calibration comparisons
+at every verified larger-K anchor. It separates count-model error from the
+cost of Q3 and higher, using stable arithmetic for tiny corrections. Run:
+
+```powershell
+python report_bch_evidence_v7.py
+python verify_bch_counting_model_v1.py
+```
+
+The second command independently checks the model arithmetic with direct
+90-digit binomial count scaling. It does not prove the extrapolation model.
 
 Additional validation commands, run sequentially, include:
 

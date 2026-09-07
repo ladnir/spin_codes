@@ -1,29 +1,29 @@
 # Next work after the complete finite grid
 
 The active goal is the BCH-64/128 dominance audit in
-`BCH_DOMINANCE_ANALYSIS.md`. The updated grid has twenty-four useful full
-bounds, eleven weak full upper bounds, 46 first-moment obstructions, and
-49 sparse-only points. The largest BCH-64 endpoint is closed; all useful
-anchors use the same Q2..4 refinement. No producer is live.
+`BCH_DOMINANCE_ANALYSIS.md`. The v7 grid has 32 useful full bounds,
+20 weak full bounds, 46 first-moment obstructions, and 32 sparse-only
+points. No producer is live. BCH-256 remains excluded.
 
-At t64/s20, a two-term model calibrated at log2 K=20 predicts the full
-log2 K=26 margins within 0.073 bits for BCH-64 and 0.014 bits for BCH-128.
-Keep the model explicitly conditional on the observed coefficient plateau
-and separate it from the complete-tail proofs at the anchors.
+The log2 K=22/24 t64/s20 holdouts close and agree with the unchanged
+K=2^20 two-term model within 0.014 bits. The s16 counterparts close after
+fresh dense searches; transported high-state witnesses alone were weak.
+The K/state curves show a near-constant 0.274-bit state cost for BCH-128
+and a growing cost for BCH-64 over K=2^20..2^24. These are selected full
+bounds and finite model checks, not a uniform extrapolation theorem.
 
-The fixed-K state transport is complete at K=2^20 and t64. BCH-64 s13..20
-and BCH-128 s14..20 have useful full bounds; smaller states s9..12 and
-s9..13 respectively have weak complete upper bounds. Every target was
-re-evaluated and passed full replay, without assuming monotonicity in s.
-The v6 report displays both the full state curves and their Q1 losses.
+Next, produce t64/s20 references at log2 K=16 and 18 for both blocks,
+using `complete_bch_reference_batch_v3.py`. Transport each to s10/s12/s16.
+Use `refine_bch_transported_dense_v1.py` when sparse intervals are useful
+but the transported dense bound is weak. Those slices fill sixteen gaps.
+The other sixteen gaps are t64/s20 at log2 K=13,14,15,17,19,21,23,25 for
+each block. Preserve reference parents already used by transports.
 
-Next test log2 K=22 and 24 against the existing model without refitting.
-The v3 batch uses the tested positive contraction kernel, per-occupation
-resume, standard sparse refinement, and full replay. Then tighten BCH-64
-t64/s12 and BCH-128 t64/s13 to investigate the unresolved state knees. For the unresolved
-BCH-64 t128/s18 point, isolate weight 56 before more generic subdivision.
-BCH-128 t128/s17 remains a second weak-bound target. Neither weak bound
-is a code counterexample. BCH-256 stays outside this goal.
+Then target the weak state boundaries at K=2^20: BCH-64 t64/s12,
+BCH-128 t64/s13, and the t128 boundary. Dense-only refinement cannot
+repair weak sparse intervals at s10/s12; use target-specific sparse
+searches as needed. For BCH-64 t128/s18, isolating outer weight 56
+remains a possible improvement. Weak bounds are not code counterexamples.
 
 The engineering-surface comparison now extends the corrected Q1 treatment
 to exact RM through length 512 and random references through length 512.
