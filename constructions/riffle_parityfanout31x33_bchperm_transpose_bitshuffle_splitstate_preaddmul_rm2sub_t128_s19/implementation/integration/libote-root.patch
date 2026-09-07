@@ -1,0 +1,67 @@
+diff --git a/libOTe/CMakeLists.txt b/libOTe/CMakeLists.txt
+--- a/libOTe/CMakeLists.txt
++++ b/libOTe/CMakeLists.txt
+@@ -7,6 +7,7 @@ set(SRCS
+     Tools/ExConvCodeOld/ExConvCodeOld.cpp
+     Tools/LDPC/Mtx.cpp
+     Tools/LDPC/Util.cpp
++    Tools/RiffleCode/StructuredSpinB256T128S19.cpp
+     Tools/LinearCode.cpp
+     Tools/Tools.cpp
+     Tools/TungstenCode/TungstenData.cpp
+@@ -13,5 +14,12 @@ set(SRCS
+     TwoChooseOne/ConfigureCode.cpp
+     TwoChooseOne/OTExtInterface.cpp
+ )
++if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++    set_source_files_properties(Tools/RiffleCode/StructuredSpinB256T128S19.cpp
++        PROPERTIES COMPILE_OPTIONS "-mavx2;-mvpclmulqdq;-mpclmul")
++elseif(MSVC)
++    set_source_files_properties(Tools/RiffleCode/StructuredSpinB256T128S19.cpp
++        PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
++endif()
+ 
+ if(ENABLE_SIMPLESTOT)
+diff --git a/libOTe_Tests/CMakeLists.txt b/libOTe_Tests/CMakeLists.txt
+--- a/libOTe_Tests/CMakeLists.txt
++++ b/libOTe_Tests/CMakeLists.txt
+@@ -11,6 +11,7 @@ set(SRCS
+     SilentOT_Tests.cpp
+     SoftSpoken_Tests.cpp
+     TungstenCode_Tests.cpp
++    StructuredSpin_Tests.cpp
+     UnitTests.cpp
+     Vole_Tests.cpp
+     Foleage_Tests.cpp
+@@ -30,5 +31,12 @@ set(SRCS
+     Permutation_Tests.cpp
+     BlkAccCode_Tests.cpp
+ )
++if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++    set_source_files_properties(StructuredSpin_Tests.cpp
++        PROPERTIES COMPILE_OPTIONS "-mavx2;-mvpclmulqdq;-mpclmul")
++elseif(MSVC)
++    set_source_files_properties(StructuredSpin_Tests.cpp
++        PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
++endif()
+ 
+ add_library(libOTe_Tests STATIC ${SRCS})
+diff --git a/libOTe_Tests/UnitTests.cpp b/libOTe_Tests/UnitTests.cpp
+--- a/libOTe_Tests/UnitTests.cpp
++++ b/libOTe_Tests/UnitTests.cpp
+@@ -14,6 +14,7 @@
+ #include "libOTe_Tests/Vole_Tests.h"
+ #include "libOTe_Tests/ExConvCode_Tests.h"
+ #include "libOTe_Tests/EACode_Tests.h"
++#include "libOTe_Tests/StructuredSpin_Tests.h"
+ #include "libOTe/Tools/LDPC/Mtx.h"
+ #include "libOTe_Tests/Pprf_Tests.h"
+ #include "libOTe_Tests/TungstenCode_Tests.h"
+@@ -73,6 +74,7 @@ namespace tests_libOTe
+ 			tc.add("ExConvCode_encode_basic_test            ", ExConvCode_encode_basic_test);
+ 			tc.add("ExConvCode_Audit_Test                   ", ExConvCode_Audit_Test);
+ 			tc.add("ExConvCode_weight_test                  ", ExConvCode_weight_test);
++			tc.add("StructuredSpin_correctness_test          ", StructuredSpin_correctness_test);
+ 
+ 			tc.add("TungstenCode_encode_test                ", TungstenCode_encode_test);
+ 			tc.add("TungstenCode_weight_test                ", TungstenCode_weight_test);

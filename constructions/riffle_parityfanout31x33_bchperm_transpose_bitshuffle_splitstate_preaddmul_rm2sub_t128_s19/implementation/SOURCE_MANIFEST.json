@@ -1,0 +1,58 @@
+{
+  "schema": "structured-spin-b256-t128-s19-libote-source-manifest-v2",
+  "date": "2026-08-31",
+  "frozen_baseline": {
+    "construction": "Structured SPIN (B=256, t=128, s=19)",
+    "legacy_identifier": "riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19",
+    "manifest": "../frozen_source/SOURCE_MANIFEST.json",
+    "checksum": "0x95c9d722a9539fef",
+    "median_ms": 10.823872
+  },
+  "source_host": "peach48.devcore4.com",
+  "files": [
+    {"path":"CMakeLists.txt","bytes":2237,"sha256":"057e9fd7cc5f1bf044a64b643453e05517c69c192de0da4b592c65c8fff9d22f","role":"standalone-build"},
+    {"path":"benchmarks/structured_spin_benchmark.cpp","bytes":3561,"sha256":"1ea2f8f8dde8de882269657a21825e528e206cd84e4c8bbaa6d90355516c99a5","role":"benchmark"},
+    {"path":"integration/libote-root.patch","bytes":2602,"sha256":"ffe4d1540131b21312d4667609fea5257671af5e85ec46a3dab81b8a4fc38755","role":"libote-integration"},
+    {"path":"libOTe_Tests/StructuredSpin_Tests.cpp","bytes":1160,"sha256":"e03ed5372dafeda01be4fa8db70114530d3ec93c44aa30e0eb47f964e5d23ca8","role":"libote-test-adapter"},
+    {"path":"libOTe_Tests/StructuredSpin_Tests.h","bytes":142,"sha256":"41def8b1f524302a5c7cae41ff3b3bcf4abd137200db154a5722d33f06596878","role":"libote-test-adapter"},
+    {"path":"libOTe_Tests/StructuredSpin_TestSupport.h","bytes":8561,"sha256":"c1ec8c27abdd171561aefd80cd54a3c2884a0a67762e0d918fbc560343a4b3e5","role":"independent-oracle"},
+    {"path":"libOTe/Tools/RiffleCode/ExtendedBch256x128Eq3.h","bytes":15116,"sha256":"0b067f08e8a0a09509a85157af4ee494edc8e56e3b7ee06dd4ef5aad582f727b","role":"generated-outer"},
+    {"path":"libOTe/Tools/RiffleCode/ExtendedBch256x128Eq3TransposeCircuit.h","bytes":59717,"sha256":"ec6b2dec53f19d404700824a0e64594d6bfefa9617a1b1afb8ac16e1c9fe9966","role":"generated-outer"},
+    {"path":"libOTe/Tools/RiffleCode/ExtendedBch256x128Eq3TransposeCircuit2.h","bytes":107390,"sha256":"a7abbe09eeb8256faea8386405813cf9faa80c32204213010a7b63ab3b1ca7d8","role":"generated-outer"},
+    {"path":"libOTe/Tools/RiffleCode/generated/Rm2SubS19Tables.h","bytes":2092,"sha256":"9b357eb5927f7363e34562a06105724c3fc37360082b670c28f012e471d1c669","role":"generated-inner-data"},
+    {"path":"libOTe/Tools/RiffleCode/RiffleExactPermFieldCheckpoint.h","bytes":36993,"sha256":"fedcd272ea284e865e625b92aebd5117ab04590193e0fd311b6ccca56f85180e","role":"frozen-production-kernel"},
+    {"path":"libOTe/Tools/RiffleCode/RiffleRm2SubS19.h","bytes":14784,"sha256":"08a564f5c807d51a671a7299584b087a0960a78a54fa58e0d9f330f7737e88a1","role":"production-inner-kernel"},
+    {"path":"libOTe/Tools/RiffleCode/StructuredSpin_TestAccess.hpp","bytes":369,"sha256":"7601b4d7a23e57740b3f880dc58332393c7a98d6f0a961ae049491f7122e7e87","role":"test-access"},
+    {"path":"libOTe/Tools/RiffleCode/StructuredSpinB256T128S19.cpp","bytes":4237,"sha256":"2e4b630cc4158d33327fb9f18bf096b9f7537e0f7ebe1e9a21fda0be2cc8dd61","role":"compiled-interface"},
+    {"path":"libOTe/Tools/RiffleCode/StructuredSpinB256T128S19.h","bytes":2119,"sha256":"c569d03002b98efe272de5b80a1ce7e0fadbc2d7b8c72364a11bed434f69240e","role":"public-interface"},
+    {"path":"libOTe/Tools/RiffleCode/StructuredSpinB256T128S19Parameters.h","bytes":839,"sha256":"b9a6770c69986464112ba9ee0954fe4f4d5d71334d0d1da6bf9a48a642c1c357","role":"parameters"},
+    {"path":"tests/public_header_smoke.cpp","bytes":270,"sha256":"1d8ef70f23d302aeeef43600446738db3b578d7eb261ef60633302c19beca466","role":"public-header-smoke"},
+    {"path":"tests/structured_spin_correctness.cpp","bytes":1806,"sha256":"7f750b34195dc1946185e8db34e8b7c947169d7cb00695708916cc395e1ccb72","role":"standalone-test-driver"},
+    {"path":"vendor/cryptoTools/Common/Bit.h","bytes":1953,"sha256":"95216e4a0138e9f4b261077c0df538d0e7213eff335b473086ace1eb5f151398","role":"standalone-vendor"},
+    {"path":"vendor/cryptoTools/Common/block.h","bytes":31090,"sha256":"33dbfeec4a2c225ceea5f15825a87bd675220d255f1680e8417dce38c7141159","role":"standalone-vendor"},
+    {"path":"vendor/cryptoTools/Common/config.h","bytes":229,"sha256":"19374d3c897b8a5619f9575a0e22d0c979519f8bf6205a0d6e36a1d43397da28","role":"standalone-vendor"},
+    {"path":"vendor/cryptoTools/Common/Defines.h","bytes":6835,"sha256":"abacbae04f0fce8af31c7de87285e2aa30aaa3ba5c9e86ae90f54f9a77f2657e","role":"standalone-vendor"}
+  ],
+  "frozen_correspondence": {
+    "exact_kernel_byte_identical": true,
+    "exact_kernel_sha256": "fedcd272ea284e865e625b92aebd5117ab04590193e0fd311b6ccca56f85180e",
+    "rm2sub_frozen_sha256": "c7e4e51ff4e6726dba827cf879a9e520250c6a7786d1a39eb2fd17c5b7f2fb6b",
+    "rm2sub_hot_tail_byte_identical": true,
+    "rm2sub_hot_tail_sha256": "de56e7a78b64b7055250bcd797d83a17777ce8d271dc9dd9ac6fc41e3a08156e"
+  },
+  "verified_standalone_build": {
+    "remote_workspace": "/tmp/structured_spin_libote_final_20260831",
+    "compiler": "g++ 15.2.0",
+    "flags": "-O3 -std=c++20 -march=znver4 -mavx2 -mvpclmulqdq -mpclmul -pthread",
+    "correctness_binary_sha256": "7d7f32cbb1659d3256d37d3251f00dc0aaebee342dcb78a8cb9c0a0cba25ed1d",
+    "benchmark_binary_sha256": "764f97e14dcda1de6327fbcf250a8dd1cc6e781e39c0815c4e261f398b936b39",
+    "library_sha256": "89bd1b77e50c995b7335f9611620f4ea0039d9f5b7fae9a6cebc2e1ee2a0b097"
+  },
+  "verified_libote_overlay": {
+    "libote_commit": "1748265e13bb6d943b2d03227bc34bcee0752120",
+    "cryptotools_commit": "e0da07cda834a71576fc6dec47c8cecd1641e60a",
+    "implementation_object_sha256": "8b385487b511abcd6abc2cd14969d11c6ab5282598da4e85a97853a7c934a0b5",
+    "test_object_sha256": "9eb04eb3242b61796ad6c539d80a8ff9d6821a4ef1094c3919f6d4268f54346d",
+    "source_local_flags_verified": true
+  }
+}

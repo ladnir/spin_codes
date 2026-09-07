@@ -1,0 +1,61 @@
+{
+  "schema": "golay-ba3-b240-rm2sub-s19-performance-v1",
+  "date": "2026-08-31",
+  "status": "MEASURED_ONLINE_TRANSPOSE_ONLY",
+  "host": {
+    "name": "Peach",
+    "cpu": "AMD Ryzen 9 7950X",
+    "pinned_cpu": 15,
+    "compiler": "GCC 15.2.0",
+    "cmake": "3.31.6",
+    "generator": "Ninja 1.12.1",
+    "compile_flags": ["-O3", "-march=znver4", "-mavx2", "-mvpclmulqdq", "-mpclmul"]
+  },
+  "protocol": {
+    "trials": 101,
+    "statistic": "median steady-state wall-clock milliseconds",
+    "threading": "single thread",
+    "allocation_timed": false,
+    "setup_timed": false,
+    "guard": "Before each process, scan /proc/[0-9]*/exe basenames for Bench, bench, Benchmark, or benchmark; abort on any match.",
+    "active_benchmark_before_each_run": false
+  },
+  "results": {
+    "structured_spin_b256_baseline": {
+      "code_blocks": 2097152,
+      "message_blocks": 1048576,
+      "median_ms": 10.696591
+    },
+    "golay_ba3_b240_reused": {
+      "code_blocks": 2119680,
+      "message_blocks": 1048576,
+      "median_ms": 10.263112,
+      "percent_vs_baseline": -4.052497,
+      "setup_bytes": 14308328,
+      "workspace_bytes": 38154240,
+      "checksum": "0xc4108a1282911d32"
+    },
+    "golay_ba3_b240_independent": {
+      "code_blocks": 2119680,
+      "message_blocks": 1048576,
+      "median_ms": 10.407942,
+      "percent_vs_baseline": -2.698514,
+      "percent_vs_reused": 1.411170,
+      "setup_bytes": 18547208,
+      "workspace_bytes": 38154240,
+      "checksum": "0x2bd00619556f9a86"
+    }
+  },
+  "artifacts": {
+    "remote_source": "/tmp/golay_ba3_b240_final_20260831/src/golay_ba3_b240_rm2sub_s19",
+    "remote_build": "/tmp/golay_ba3_b240_final_20260831/build",
+    "correctness_binary_sha256": "926bbe5cd9bbf50c756cc221e2abb2cac8fa248bed97ed1abc51d3b96cdf0470",
+    "benchmark_binary_sha256": "3d056881ada05b733fc68add50f27365e019986740456082d19192e1d03e6cff",
+    "static_library_sha256": "91d43b3be83322c25181423a95c82e86a1b57c99600de3d9d2733074d4c61eba"
+  },
+  "scope_limitations": [
+    "The benchmark does not measure setup or the unavailable G_240 conditioning verifier.",
+    "Seed-derived schedules instantiate the online circuit but do not establish the finite note's uniform conditional probability law.",
+    "The benchmark compares transposed block encoders, not ordinary forward encoders."
+  ]
+}

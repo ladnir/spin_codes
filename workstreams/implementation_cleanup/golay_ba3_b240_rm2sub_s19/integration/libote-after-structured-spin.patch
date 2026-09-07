@@ -1,0 +1,22 @@
+diff --git a/libOTe/CMakeLists.txt b/libOTe/CMakeLists.txt
+--- a/libOTe/CMakeLists.txt
++++ b/libOTe/CMakeLists.txt
+@@ -8,6 +8,7 @@ set(SRCS
+     Tools/LDPC/Mtx.cpp
+     Tools/LDPC/Util.cpp
+     Tools/RiffleCode/StructuredSpinB256T128S19.cpp
++    Tools/RiffleCode/GolayBa3Rm2SubB240K20.cpp
+     Tools/LinearCode.cpp
+     Tools/Tools.cpp
+     Tools/TungstenCode/TungstenData.cpp
+@@ -15,9 +16,12 @@ set(SRCS
+ )
+ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+     set_source_files_properties(Tools/RiffleCode/StructuredSpinB256T128S19.cpp
++        Tools/RiffleCode/GolayBa3Rm2SubB240K20.cpp
+         PROPERTIES COMPILE_OPTIONS "-mavx2;-mvpclmulqdq;-mpclmul")
+ elseif(MSVC)
+     set_source_files_properties(Tools/RiffleCode/StructuredSpinB256T128S19.cpp
++        Tools/RiffleCode/GolayBa3Rm2SubB240K20.cpp
+         PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
+ endif()

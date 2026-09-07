@@ -2,11 +2,27 @@
 
 Status: 2026-09-07. This is the current handoff for the BCH-256 workstream.
 Historical notes retain the claims and parameter choices made at their dates.
+For manuscript integration, start with [PAPER_HANDOFF.md](PAPER_HANDOFF.md),
+which joins the completed certificates to the measured implementation.
 
 The immediate question is which inner parameters can deliver a 40-bit
 distance/setup margin at message lengths K=2^16, 2^18, and 2^20.
-The selected t64_s20 map is our proof-backed baseline. The selected
-t128_s19 map is the next performance candidate, not another certified choice.
+The selected t64_s20 map is our proof-backed baseline at K=2^20. The selected
+t128_s19 map is now fully certified at K=2^16 with a 53.9443672720-bit margin
+and at K=2^18 with a 52.3463883689-bit margin. Its K=2^20 instance is now
+fully certified with a 50.4482033129-bit margin. See the
+[K16 record](T128_S19_M16_CLOSURE.md), [K18 record](T128_S19_M18_CLOSURE.md),
+and [K20 record](T128_S19_M20_CLOSURE.md).
+
+The selected map is also fully certified at K=2^22 and K=2^24, with margins
+48.4706838718 and 46.4762221823 bits respectively. Every occupancy is covered
+at each specified size; the sparse and dense bounds were freshly computed
+and numerically replayed. Q1 dominates all three ladder unions.
+See [the ladder record](T128_S19_LADDER_TO_M24.md) and
+[the K22/K24 proof record](T128_S19_M22_M24_CLOSURE.md) for scope and receipts.
+The all-rung completion audit passed: 1,497 dense boxes were freshly checked
+at 768 bits, all exact unions were reconstructed, and the earlier certificate
+pins remained intact. The combined regression suite passed 71 tests.
 
 ## Construction and meaning of margin
 
@@ -48,7 +64,7 @@ the conditioned-binomial spectrum model. They are not outward certificates.
 | Selected map | K=2^16 | K=2^18 | K=2^20 | Current role |
 |---|---:|---:|---:|---|
 | t64_s20 | 54.156357 | 52.422103 | 50.487812 | Proof-backed baseline at K=2^20 |
-| t128_s19 | 54.010387 | 52.360418 | 50.448302 | Next performance candidate |
+| t128_s19 | 54.010387 | 52.360418 | 50.448302 | Full certificates at K=2^16, K=2^18, and K=2^20 |
 | t64_s16 | 53.698685 | 51.979239 | 50.048776 | Smaller-state exploratory option |
 | t128_s15 | 53.186269 | 51.553698 | 49.646891 | Known first-moment obstruction at K=2^20 |
 | t256_s14 | 52.343951 | 50.844814 | 48.980155 | Q1-only alternative; not shortlisted for proof |
@@ -62,13 +78,16 @@ These dimensions do not certify every map with the same t and s.
 
 The full K=2^20 certificate for t64_s20 is **50.4872982775 bits** after the
 [Q1 refresh](DUAL_TRACK_PROGRESS.md). Every one of its 8192 occupancies is covered.
-No full certificate has yet been produced here for K=2^16 or K=2^18.
+No full t64_s20 certificate has yet been produced here for K=2^16 or K=2^18.
 The K=2^20 theorem must not be silently transferred to those shorter encoders.
 
-For all three requested sizes, retain t64_s20 as the first choice to certify.
-Then test t128_s19: its Q1 margin is within 0.15 bits of t64_s20 at each size.
-It uses half as many state updates, but neither encoder speed nor a full
-distance bound has been established for this candidate.
+The selected t128_s19 map has full margins of 53.9443672720 bits at K=2^16
+and 52.3463883689 bits at K=2^18.
+Its Q1 margin remains within 0.15 bits of t64_s20 at each requested size.
+It uses half as many state updates. The
+[implementation study](../bare_bch_rm2sub/PERFORMANCE.md) measured its online
+time at 0.560, 2.322, and 11.259 ms for the three sizes, respectively.
+All three of those t128_s19 instances now have full certificates.
 
 Smaller state should not be selected by subtracting the spare Q1 margin.
 Higher occupancies impose a different constraint. In particular, the actual
@@ -163,9 +182,13 @@ for that message length or a rerun of every historical numerical calculation.
 
 Recommended next work, in order:
 
-1. Check all occupancies for the selected t64_s20 map at K=2^16 and K=2^18.
-2. Screen difficult higher occupancies for t128_s19 at the three requested sizes.
-3. Certify passing candidates, then benchmark them serially before ranking speed.
+1. Rank the now-certified t128_s19 choices at K=2^20, 2^22, and 2^24 using
+   the completed performance measurements.
+2. Reuse the two-tilt fixed-reference cover for larger dense ranges and the
+   explicit all-one-row split where useful. Do not revive the pooled-endpoint
+   search superseded by these proofs.
+3. Keep certified margins separate from heuristic spectrum/curve estimates;
+   Q1 is now the dominant bound at all three ladder points.
 4. Continue weighted low-shell bounds and reference-score calibration when a
    stronger counting fact or independent evidence offers meaningful payoff.
 
