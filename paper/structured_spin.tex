@@ -56,9 +56,9 @@ interleaver. Its global permutation is factored into simple stages. The
 within-block permutation first removes the constituent code's coordinate
 structure. A deterministic transpose then distributes the coordinates of
 each block among regions spanning the inner computation. Finally, independent
-shuffles within those regions randomize the precise locations. The transpose
-is the structured part that rules out a deliberately late start in the
-declared routing pattern. The region shuffles stop the message from
+shuffles within those regions randomize the precise locations. A row of weight
+$w$ reaches exactly $w$ distinct regions, with at most one bit per region.
+This constrains late activation without excluding it. The region shuffles stop the message from
 controlling the remaining alignment and supply the probability law needed by
 the first-moment calculation.
 
@@ -413,7 +413,7 @@ largest index satisfying $N_{m(n)}\le n$. Define
 \begin{equation}
   \widetilde E_n(x)
   :=
-  E_{m(n)}(x)\Vert 0^{,n-N_{m(n)}}.
+  E_{m(n)}(x)\Vert 0^{n-N_{m(n)}}.
   \label{eq:structured-requested-length-wrapper}
 \end{equation}
 This zero extension preserves injectivity and minimum distance. Consecutive
@@ -423,12 +423,21 @@ $1/2-o(1)$, relative distance greater than $0.11-o(1)$ with high probability,
 and $O(n)$ ordinary and transposed work. The native-length theorem remains
 the primary statement.
 
-\subsection{Finite-length specializations}
+\subsection{From asymptotic guarantees to finite parameters}
 
-At a fixed target length, Definition~\ref{def:structured-spin} permits
-hand-tuned outer and routing parameters. In particular, the base length $a$
-and base constituent $H_a$ need not match the current Golay certificate. The
-current $N=2^{21}$ evaluation target retains RM2Sub-S19, but its outer
-constituent remains under selection. Appendix~\ref{app:structured-finite-member}
-records the open certification and evaluation boundary for this
-specialization.
+The growing outer supplies the spectral control needed by the asymptotic
+theorem. At a fixed length, the objective is sharper: obtain a small explicit
+setup failure probability while minimizing encoding cost.
+Reusing a sampled constituent requires control of its realized spectrum,
+not just its ensemble mean; see \eqref{eq:shared-constituent-enumerator}.
+Concentration or selection can consume a significant part of the finite
+failure budget. Finite guarantees are also possible with randomized outers,
+as a separately certified expander--accumulate example illustrates, so this is a question of
+proof losses rather than an obstruction to that design route.
+
+A fixed algebraic constituent removes the additional outer-spectrum failure
+event. An exact spectrum is convenient, but rigorous spectrum inequalities
+can serve the same interface. The next section instantiates this approach
+with a fixed BCH constituent and an RM2Sub inner. The architecture is
+unchanged; the finite proof replaces the growing-outer argument with bounds
+tailored to the selected constituent.

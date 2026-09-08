@@ -1,46 +1,234 @@
-\section{Finite-length certificates}
+\section{Finite-length Structured SPIN}
 \label{sec:finite-certificates}
 
-The first-moment identity is finite and exact. A computer-assisted proof
-upper-bounds its class contributions and should expose a finite collection of
-rigorous bounds rather than only a floating optimization trace.
+For practical lengths, a compact fixed outer can give both a fast circuit
+and a strong finite guarantee. We first examine how the message length,
+outer length, and inner parameters affect the finite bound. We then give
+a certified BCH-256 construction.
 
-Fix a finite class map with class set $\mathcal T$. A certificate
-provides bounds $\widehat A_\tau^{\mathrm{out}}$ and
-$\widehat Q_\tau(d)$ satisfying
+\subsection{How the parameters affect the margin}
+\label{sec:finite-parameter-slices}
+
+Consider a rate-$1/2$ outer constituent of length $B$, repeated over
+$L=2K/B$ rows to encode $K$ message bits. The output length is $N=2K$.
+The RM2Sub inner processes $t$ bits per step and carries an $s$-bit state.
+Throughout the plots, the bad-word cutoff is $H=\lfloor N/10\rfloor$.
+For an upper bound $U$ on the expected number of nonzero messages with
+output weight at most $H$, call $-\log_2U$ its \emph{margin} in bits.
+A full bound includes every number $q$ of active outer rows; a $q=1$ bound
+includes only messages with one active row and does not by itself control
+distance failure.
+
+Figures~\ref{fig:finite-k-b}--\ref{fig:finite-k-s} use exact-spectrum
+BCH-64 and BCH-128 constituents. At each step size $t$, one fixed ordered
+RM2Sub basis supplies the state maps by prefix restriction. The same maps
+are used for both outer lengths and all message lengths. Thus varying $s$
+gives nested maps, while changing $t$ compares different basis chains.
+These are numerical evaluations of finite bounds, not outward-rounded
+certificates or measurements of actual failure probability. The separately
+selected BCH-256 map is treated below.
+The artifact's \href{https://github.com/ladnir/permute_conv/blob/main/paper/build_parameter_figures.py}{figure generator}
+reconstructs these plots from the retained rounded tables and checks their
+configuration coverage.
+
+\paragraph{Outer length and message length.}
+Figure~\ref{fig:finite-k-b} fixes $(t,s)=(64,20)$.
+Increasing $B$ from $64$ to $128$ raises the full margin at $K=2^{20}$
+from $10.37$ to $32.77$ bits. Beyond the small-length transient, each
+doubling of $K$ costs roughly one bit. This behavior is consistent with
+the growing number of possible active rows when $q=1$ dominates; it is
+not a universal scaling law. For BCH-64 the higher-occupancy loss grows
+from $0.015$ bits at $2^{20}$ to $0.820$ bits at $2^{26}$, whereas the
+two curves remain visually indistinguishable for BCH-128.
+
+\input{figures/parameter_k_b}
+
+\paragraph{State size and step size.}
+Figure~\ref{fig:finite-s-t} fixes $K=2^{20}$. At $t=64$, additional state
+first buys substantial margin and then gives diminishing returns.
+For BCH-128, increasing $s$ from $10$ to $16$ raises the full margin
+from $27.04$ to $32.49$ bits; increasing it to $20$ adds only $0.27$ bits.
+Increasing $t$ can reduce the number of inner steps, but it changes what
+state size suffices for a useful full bound. In these chains, $t=128$
+first gives a useful full bound at $s=19$ for BCH-64 and $s=18$ for BCH-128.
+No tested state through $s=20$ does so at $t=256$.
+The status strips distinguish a weak upper bound from a positive lower
+obstruction on the first moment. Neither status alone proves poor distance.
+
+\input{figures/parameter_s_t}
+
+\paragraph{State size at larger message lengths.}
+Figure~\ref{fig:finite-k-s} compares the state curve at
+$K\in\{2^{16},2^{20},2^{24}\}$, holding $t=64$ fixed.
+The nearly saturated part shifts downward as $K$ grows, but the loss at
+small states need not be a uniform vertical shift. For BCH-64 at
+$K=2^{24}$, the full upper bounds at $s=10$ and $s=12$ are no longer
+useful, although $s=16$ and $s=20$ still give positive margins.
+For BCH-128, higher occupancies have a much smaller effect on the plotted
+states. These slices suggest choosing state near the plateau, then checking
+the full bound at the intended message length and step size.
+
+\input{figures/parameter_k_s}
+\FloatBarrier
+
+\subsection{The selected construction}
+
+We now use a binary BCH-derived constituent $\mathcal B$ of length $256$,
+dimension $128$, and minimum distance at least $38$.
+Its exact weight spectrum is unknown. The proof instead uses deterministic
+inequalities for that spectrum, with no exceptional event for the choice
+of outer.
+
+Let $P$ and $Q$ be the parity extensions of the primitive binary BCH codes
+of length $255$ and designed distances $37$ and $39$, respectively.
+Their dimensions are $131$ and $123$. The selected constituent satisfies
+$Q\subset\mathcal B\subset P$ and has dimension $128$.
+Appendix~\ref{app:finite-bch-definition} specifies its generators and explains
+why the spectrum bounds apply to the implemented code.
+
+For $K$ message bits, choose
 \[
-  A_\tau^{\mathrm{out}}
-  \le \widehat A_\tau^{\mathrm{out}},
-  \qquad
-  Q_\tau(d)
-  \le \widehat Q_\tau(d)
+  L:=K/128,\qquad N:=256L=2K,\qquad (t,s):=(128,19).
 \]
-for every $\tau$. If an independently checkable evaluation proves
+Use $\mathcal B$ in every outer row and the structured interleaver of
+Section~\ref{sec:structured-spin}. Fix the RM2Sub maps
+$A:\F_2^{19}\to\F_2^{128}$ and $C=A^\top$ specified in
+Appendix~\ref{app:finite-inner-definition}; they satisfy $CA=0$.
+The field basis is defined there as well. Setup $\theta$ consists of
+independent uniform row permutations, independent uniform region permutations,
+and independent multipliers $\alpha_i\gets\F_{2^{19}}^\times$.
+One setup is shared by all messages.
+
+The inner processes the routed $128$-bit groups $X_i$ in order:
+\[
+  Q_0=0,\qquad Y_i=X_i+A(Q_i),\qquad
+  Q_{i+1}=\alpha_iQ_i+C(X_i).
+\]
+Output precedes the state update. The state persists across region boundaries,
+and the final state is discarded without a flush. There is no parity fanout.
+These conventions specify the same recursive architecture as the asymptotic
+construction; the finite certificate pins its own selected maps.
+
+\subsection{Finite distance guarantee}
+
+\begin{samepage}
+\begin{theorem}[Certified BCH-256 Structured SPIN]
+\label{thm:finite-bch-spin}
+For each $K\in\{2^{16},2^{18},2^{20},2^{22},2^{24}\}$, let $E_\theta$ be
+the selected encoder above and put $H:=\lfloor N/10\rfloor$.
+Every realization is a binary linear code of rate $1/2$, and
 \begin{equation}
-  \sum_{\tau\in\mathcal T}
-  \widehat A_\tau^{\mathrm{out}}
-  \widehat Q_\tau(d)
-  <1,
+  \Prob_\theta\!\left[
+    \exists x\ne0:\ \wt(E_\theta(x))\le H
+  \right]\le U_K<2^{-40}.
+  \label{eq:finite-bch-distance}
+\end{equation}
+The certified bounds $U_K$ have the margins reported in
+Table~\ref{tab:finite-bch-margins}.
+\end{theorem}
+\end{samepage}
+
+\begin{table}[tb]
+\centering
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$\log_2K$ & outer rows $L$ & cutoff $H$ & $-\log_2U_K$ (bits) \\
+\midrule
+16 & 512 & 13\,107 & 53.944367 \\
+18 & 2\,048 & 52\,428 & 52.346388 \\
+20 & 8\,192 & 209\,715 & 50.448203 \\
+22 & 32\,768 & 838\,860 & 48.470684 \\
+24 & 131\,072 & 3\,355\,443 & 46.476222 \\
+\bottomrule
+\end{tabular}
+\caption{Complete finite certificates for the selected $(128,19)$ inner.
+Margins are rounded for display; the theorem uses exact rational upper bounds.}
+\label{tab:finite-bch-margins}
+\end{table}
+
+Thus, except with probability below $2^{-40}$ over setup, every nonzero
+message has output weight greater than $N/10$.
+The margin measures a certified upper bound on distance failure, not the
+true failure probability or the security level of a complete application.
+The theorem covers the five listed lengths, rather than every length between
+them. It does not assert an asymptotic distance guarantee for fixed
+$\mathcal B$ and fixed inner parameters.
+
+\paragraph{Proof overview.}
+Let $Z_H$ count nonzero messages whose output weight is at most $H$.
+Partition messages by the number $q$ of nonzero outer rows and by their
+row-weight classes. The first-moment framework gives
+\begin{equation}
+  \Prob_\theta[Z_H>0]\le\E_\theta Z_H
+  \le\sum_{\tau\in\mathcal T}
+      \widehat A_\tau^{\mathrm{out}}\widehat Q_\tau(H)
+  =:U_K.
   \label{eq:finite-certificate}
 \end{equation}
-then Theorem~\ref{thm:class-first-moment} proves the existence of an injective
-encoder with minimum distance greater than $d$. The bound
-$\widehat Q_\tau(d)$ may certify a worst-case conditional failure probability;
-the conditional law need not be identical throughout the class.
+Here $\widehat A_\tau^{\mathrm{out}}$ bounds the class multiplicity and
+$\widehat Q_\tau(H)$ bounds its conditional failure probability.
+No independence between different codewords is required.
 
-A certificate must record:
+The $q=1$ contribution combines a positive inner transfer calculation with
+weighted BCH spectrum inequalities. Sparse occupancies use a positive
+polynomial recurrence that retains the region-weight constraint. Dense
+occupancies use a comparison with independent Bernoulli inputs, together
+with input and output tilts. The all-one outer word is counted separately:
+its exact multiplicity and deterministic support must not be inflated by an
+ordinary weight-band envelope.
 
-\begin{enumerate}
-  \item the complete encoder and setup distribution;
-  \item all finite parameters and divisibility conditions;
-  \item the interface classes and their complete range;
-  \item the source of each exact value or upper bound;
-  \item the arithmetic and outward-rounding rules;
-  \item the verifier and hashes of its inputs.
-\end{enumerate}
+For the three largest instances, the sparse recurrence covers $2\le q\le511$,
+and interval certificates cover $512\le q\le L$. The two smaller instances
+use a finite composition split for the remainder. All contributions are
+included in an exact rational union. Appendix~\ref{app:finite-bch-proof}
+gives the mathematical reductions and identifies the bound inputs and
+coverage checks.
 
-The main text reports the class partition and final bound. Detailed tables,
-optimization grids, and verifier transcripts belong in the artifact bundle or
-appendix. Appendix~\ref{app:structured-scalable-certificate} identifies the
-hash-bound bundle for the scalable Structured SPIN theorem. Future finite
-specializations should use the same manifest fields and evidence labels.
+\subsection{The certified engineering curve}
+\label{sec:finite-engineering-curve}
+
+Figure~\ref{fig:finite-bch-curve} holds the outer and selected inner fixed.
+The upper three rungs lose almost one margin bit for each doubling of $K$.
+Their full bounds are dominated by $q=1$; the other occupancies change the
+reported margin by less than $10^{-6}$ bits. A local planning approximation is
+\[
+  -\log_2U_K\approx50.45-\log_2(K/2^{20}).
+\]
+This summarizes the certified points over $2^{20}\le K\le2^{24}$; it is
+not a bound at an untested length.
+
+\begin{figure}[tb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=.82\linewidth,height=5.4cm,
+  xlabel={$\log_2 K$},ylabel={Certified margin (bits)},
+  xmin=15.6,xmax=24.4,ymin=38,ymax=56,
+  xtick={16,18,20,22,24},ytick={40,44,48,52,56},
+  grid=major,legend style={at={(.98,.98)},anchor=north east,font=\small}]
+\addplot+[blue!70!black,thick,mark=*] coordinates {
+ (16,53.9443672720) (18,52.3463883689) (20,50.4482033129)
+ (22,48.4706838718) (24,46.4762221823)};
+\addlegendentry{BCH-256, $(t,s)=(128,19)$}
+\addplot[black,dashed] coordinates {(16,40) (24,40)};
+\addlegendentry{40-bit target}
+\end{axis}
+\end{tikzpicture}
+\caption{Five complete finite bounds. Connecting segments are visual guides,
+not certificates for intermediate lengths.}
+\label{fig:finite-bch-curve}
+\end{figure}
+
+The smaller exact-spectrum studies in
+Section~\ref{sec:finite-parameter-slices} help interpret this behavior:
+once state-related losses are small, late activation by low-weight outer
+words limits further improvement. The certified curve is consistent with
+that picture, but uses its own selected inner map and is not an additional
+matched-$B$ curve in Figure~\ref{fig:finite-k-b}.
+
+These certified margins are conservative inputs to a parameter selector.
+A heuristic estimate of the unknown BCH spectrum addresses a different
+question: how much slack remains in those inputs? Backtests on smaller
+known-spectrum constituents can support such estimates, but do not bound
+their error for BCH-256. In particular, the existing spectrum-model curve
+uses a different $(64,20)$ inner and is not a matched estimate for
+Figure~\ref{fig:finite-bch-curve}.

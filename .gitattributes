@@ -4,3 +4,10 @@ workstreams/bch_rm2sub_bridge/** -text
 workstreams/bare_bch_rm2sub/** -text
 constructions/riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19/implementation/** -text
 workstreams/implementation_cleanup/golay_ba3_b240_rm2sub_s19/** -text
+# The asymptotic manifest binds LF text; make Windows checkouts reproducible.
+workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/** text eol=lf
+# JSON receipts bind their original bytes, including mixed newline conventions.
+workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/**/*.json -text
+constructions/riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19/MAIN_CODE_FREEZE.md text eol=lf
+constructions/riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19/frozen_source/SOURCE_MANIFEST.json text eol=lf
+artifact/data/asymptotic/** -text

@@ -1,27 +1,77 @@
 \section{Implementation and performance}
 \label{sec:implementation}
-% Integration handoff (2026-09-07): the BCH-256 / selected RM2Sub (128,19)
-% no-fanout milestone is now certified and measured. Before revising the
-% historical BA-3 target below, reconcile the current shared manuscript with
-% workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md. These are distinct encoders.
 
-The mathematical sections define forward encoders. The implementation uses
-transposed, batched evaluation because the target application encodes many
-binary columns in parallel. This evaluation order must preserve the same
-linear map.
+We implement the selected BCH-256/RM2Sub $(128,19)$ construction from
+Section~\ref{sec:finite-certificates}. The application evaluates the
+transposed encoder on batches: $2K$ input blocks map to $K$ output blocks,
+where each $128$-bit block carries $128$ parallel binary instances.
+The pipeline applies the transposed inner, reverses the routing factors,
+and applies the transposed BCH outer. No parity fanout is included.
 
-The current finite-length target uses a BA-3 outer, the factored Structured
-SPIN interleaver, and the RM2Sub-S19 inner. The base constituent and its length
-remain under selection. The optimized transposed pipeline applies the
-transposed inner, inverts the routing factors, and then applies the transposed
-BA-3 outer.
+\paragraph{Shared implementation and optimized kernels.}
+The configurations share setup, routing, the paired BCH transpose, and
+an RM2Sub template. Selected maps supply compile-time constants and checked
+quadratic XOR circuits. The BCH circuit uses $3029$ scalar XOR operations
+and evaluates two rows together with AVX2. Inner kernels use pruned SIMD
+zeta stages, unrolled emission, and fixed nibble tables.
+The online call has no allocation or type-erased callback dispatch;
+configuration and layout dispatch occur once per encoding.
 
-Performance measurements and distance certificates answer different
-questions. Correctness tests establish that the optimized code evaluates the
-declared linear map. Benchmarks measure that evaluation. The finite
-first-moment certificate separately establishes minimum distance.
+At $K=2^{20}$, packed $24$-bit routing indices and $2048$-row tiles reduce
+routing overhead. The smaller measured instances use $256$-row tiles.
+Grouped nibble tables improve the selected S19 kernel.
+These are measured choices for the evaluation host, not processor-independent
+optimality claims.
 
-\papertodo{Select the finite BA-3 base constituent and insert the finalized
-interface, build and test commands, operation ledger, dependency provenance,
-correctness receipt, and serialized benchmark receipt. Do not report a
-preliminary timing as a paper result before these records are fixed.}
+\paragraph{Correctness.}
+Symbolic checks verify the generated BCH matrix and its transposed circuit,
+the pruned zeta schedule, and the selected inner maps.
+Runtime tests compare the complete optimized output with dense BCH
+multiplication and a separately implemented scalar inner recurrence.
+Tests cover routing layouts, tile sizes, setup compaction, multiple setups,
+boundary impulses, zero inputs, and buffer validation.
+The tested configurations agree under GCC and MSVC.
+
+\paragraph{Measurement method.}
+Measurements use one Ryzen 9 7950X thread on Linux, pinned to CPU~15, with
+GCC~15.2.0. The release build uses \texttt{-O3 -DNDEBUG -march=znver4},
+AVX2, and carry-less multiplication instructions.
+Each reported time is the median of three independent serial run medians.
+Each run performs three warmups and $101$ timed calls, reusing its buffers
+and workspace. Setup, allocation, correctness checks, and output hashing
+are outside the online interval. These are steady-state encoder latencies,
+not cold-cache or full-application timings.
+
+\begin{table}[tb]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Inner $(t,s)$ & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
+\midrule
+$(128,19)$, selected & 0.560 & 2.322 & 11.259 \\
+$(64,20)$, reference & 0.625 & 2.577 & 12.059 \\
+\bottomrule
+\end{tabular}
+\caption{Online time in milliseconds for the batched transposed encoder.
+The selected construction has the five finite certificates in
+Table~\ref{tab:finite-bch-margins}; implementation support is currently
+limited to $16\le\log_2K\le20$.}
+\label{tab:finite-bch-performance}
+\end{table}
+
+At $K=2^{20}$, the selected construction takes $6.6\%$ less time than the
+$(64,20)$ reference. Its three run medians range from $11.105$ to $11.276$\,ms.
+The measured setup takes $43.91$\,ms and includes construction of oracle
+and alternative routing data. Those data are discarded before online timing;
+setup timing excludes this final deallocation and workspace construction.
+The retained setup occupies $13.19$\,MiB, the workspace $40$\,MiB, and
+the input/output buffers a separate $48$\,MiB.
+No performance measurement is claimed at $K=2^{22}$ or $2^{24}$.
+
+The artifact's \href{https://github.com/ladnir/permute_conv/blob/main/workstreams/bare_bch_rm2sub/README.md}{encoder guide}
+in \path{workstreams/bare_bch_rm2sub} records build
+instructions, exact memory sizes, source and binary hashes, and all final
+observations in \path{PERFORMANCE.json}. Performance and distance are separate
+checks of the same selected construction: the tests establish the implemented
+linear map, the timings measure its evaluation, and the finite certificate
+bounds the setup event in Theorem~\ref{thm:finite-bch-spin}.

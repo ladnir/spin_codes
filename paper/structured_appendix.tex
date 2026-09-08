@@ -1,4 +1,4 @@
-\section{Structured SPIN certificate and finite specialization}
+\section{Asymptotic Structured SPIN certificate}
 
 \subsection{Certificate for the scalable family}
 \label{app:structured-scalable-certificate}
@@ -769,16 +769,5 @@ artifact stores rational affine supports, box covers, Collatz vectors,
 Bernstein coefficients, and outward endpoints. The present theorem relies on
 the hash-bound Python and interval-arithmetic certificate.
 
-\subsection{Finite-length specialization}
-\label{app:structured-finite-member}
-
-The finite-length target at $N=2^{21}$ will use a BA-3 outer and the
-RM2Sub-S19 inner. Its base constituent, base length, outer-block length, and
-routing parameters remain under selection. The finite design will optimize
-measured cost subject to an exact first-moment certificate. The scalable
-theorem does not depend on this optimization.
-
-\papertodo{Insert the selected finite parameters and exact setup law. Certify
-the finite BA-3 spectrum envelope, evaluate the complete first-moment sum with
-outward-rounded arithmetic, and bind the resulting theorem inputs to the
-finalized implementation manifest before stating a finite-distance theorem.}
+The finite BCH instantiation uses the same construction interface, with a
+separate certificate developed in Appendix~\ref{app:finite-bch-proof}.

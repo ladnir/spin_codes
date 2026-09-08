@@ -25,7 +25,11 @@ supplies class multiplicities, while the interleaver--inner pair supplies
 conditional failure envelopes. Two additional families isolate the main proof
 mechanisms. At rate $1/2$, Accumulator SPIN achieves relative distance
 $0.0037$, and Random SPIN achieves relative distance $0.11002$, under explicit
-  logarithmic schedules. A finite-length specialization is under separate
-  constituent selection and certification; it is not used by the scalable
-  theorem.
+logarithmic schedules. For finite lengths, the same structured architecture
+uses a fixed BCH-derived $[256,128,\ge38]$ constituent and an RM2Sub inner
+with $128$-bit steps and $19$-bit state. Rigorous spectrum inequalities,
+rather than an assumed exact spectrum, certify relative distance greater
+than $0.10$ with setup failure below $2^{-40}$ at message lengths
+$2^{16},2^{18},2^{20},2^{22},2^{24}$. A single-thread implementation evaluates
+the batched transposed encoder at $K=2^{20}$ in $11.259$\,ms.
 \end{abstract}

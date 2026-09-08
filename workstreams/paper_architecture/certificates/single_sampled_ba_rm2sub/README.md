@@ -26,7 +26,20 @@ files and the repository-relative frozen dependencies.
 
 ## Verification
 
-Run the manifest check from the repository root:
+For a portable source-checkout check, use the reader-facing artifact command:
+
+```text
+python -B artifact/reproduce.py quick
+```
+
+This authenticates the original 31-entry manifest. It resolves the historical
+selected-map receipt from `artifact/data/asymptotic/` without changing its
+hash. The two compact manifest/interval files omitted during the GitHub
+curation have been restored, and Git attributes preserve the expected LF
+source bytes on Windows.
+
+The legacy command below additionally requires the selected-map input at its
+original ignored receipt path:
 
 ```text
 python workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/verify_imported_manifest.py
@@ -45,3 +58,6 @@ python workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/cert
 
 The sparse verifier consumes those receipts. The imported JSON files record
 the exact accepted results and remain the hash-bound publication artifacts.
+See the repository's `artifact/REPRODUCING.md` for the distinction between
+manifest authentication and a fresh end-to-end numerical replay. The latter
+still requires resolving historical producer input paths.

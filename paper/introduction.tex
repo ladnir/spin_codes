@@ -52,7 +52,7 @@ The phrase \emph{single permutation} describes the mathematical interface.
 An implementation may factor $\Pi_N$ into block shuffles, a transpose, and
 region shuffles. These factors still compose to one global interleaver.
 
-\subsection{A family of SPIN families}
+\subsection{Three SPIN constructions}
 
 We use the same interface for three construction lines.
 
@@ -87,9 +87,10 @@ A spectrum-controlled local outer, a structured global interleaver, and a
   block and region shuffles surround a deterministic transpose, and RM2Sub-S19
   supplies the inner recursion. The direct family has natural admissible
   lengths. Zero extension from the largest preceding direct member gives a
-  code at every sufficiently large requested length. A separately tuned
-  implementation at $N=2^{21}$ is a finite specialization, not the family
-  definition.
+  code at every sufficiently large requested length. For finite lengths,
+  a fixed BCH-derived constituent uses the same routing and RM2Sub architecture.
+  Its rigorous spectrum bounds yield explicit setup guarantees and support
+  an optimized implementation.
 
 Table~\ref{tab:spin-families} summarizes the three lines.
 
@@ -116,7 +117,7 @@ a distinct quantitative result.
 
 \subsection{Contributions}
 
-We make four contributions.
+We make five contributions.
 
 \begin{itemize}
   \item \textbf{A structured linear-time code with proved distance.}
@@ -127,12 +128,22 @@ We make four contributions.
   evaluation directions.
 
   \item \textbf{A modular structured construction.}
-  Structured SPIN combines one sampled BA-3 constituent reused along the outer
-  diagonal, one factored global interleaver, and the fixed RM2Sub-S19 inner.
-  The base constituent and its length are parameters exposed through a
-  certified spectrum envelope. The interleaver contains the long-range data
+  Structured SPIN combines a spectrum-controlled constituent reused along the
+  outer diagonal, one factored global interleaver, and an RM2Sub inner.
+  A growing Golay--BA-3 constituent supplies the asymptotic instantiation;
+  a fixed BCH-derived constituent supplies the finite instantiation.
+  Both expose the outer through certified spectrum bounds.
+  The interleaver contains the long-range data
   movement; the remaining outer permutations are block-local. Constituent
   replacement therefore does not change the route or inner architecture.
+
+  \item \textbf{Finite certificates and measured encoding.}
+  A fixed BCH-derived $[256,128,\ge38]$ constituent and selected $(128,19)$
+  RM2Sub inner certify relative distance greater than $0.10$ with setup failure
+  below $2^{-40}$ at five message lengths from $2^{16}$ through $2^{24}$.
+  The proof uses rigorous spectrum inequalities despite the unknown exact
+  BCH spectrum. At $K=2^{20}$, the batched transposed encoder takes
+  $11.259$\,ms on one Ryzen 9 7950X thread.
 
   \item \textbf{A first-moment framework for structured routes.}
   We index outer words by classes and bound each class's conditional failure
@@ -179,7 +190,7 @@ Expand--Accumulate combines a sparse expander with an accumulator
 ~\cite{ea22}. Expand--Convolute replaces that accumulator with a random
 time-varying convolution~\cite{RaghuramanRindalTanguy2023EC}. Random SPIN keeps
 the latter inner distribution but replaces the expander with random block
-injections. Structured SPIN instead combines a spectrum-controlled BA outer,
+injections. Structured SPIN instead combines a spectrum-controlled outer,
 one factored global interleaver, and the RM2Sub inner. Its principal distinction
 is the simultaneous proof of rate one half, relative distance $0.11$, and
 linear ordinary and transposed encoding work.
@@ -225,8 +236,18 @@ Sections~\ref{sec:accumulator-spin} and~\ref{sec:random-spin} develop the two
 random construction lines. Section~\ref{sec:structured-spin} defines the
   structured line, its parameterized constituent interface, and the currently
   certified scalable instantiation.
-Section~\ref{sec:finite-certificates} specifies finite certificate semantics.
+Section~\ref{sec:finite-certificates} presents the finite BCH construction,
+its distance certificates, and the certified engineering curve.
 Section~\ref{sec:scaling} separates finite validity, asymptotic distance, and
 encoding complexity. Section~\ref{sec:implementation} records the
-implementation and finite-evaluation boundary. The appendix records the
-scalable certificate and finite-length specialization.
+implementation and measurements. The appendices give the asymptotic and
+finite proof reductions and identify their computational evidence.
+
+\paragraph{Artifact.}
+The source repository is \url{https://github.com/ladnir/permute_conv}.
+Its \href{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{artifact guide}
+gives the reproduction entry point, and its
+\href{https://github.com/ladnir/permute_conv/blob/main/artifact/PAPER_MAP.md}{paper-to-code map}
+maps the theorems, figures, and timing table to
+their sources and checks. The guide separates reproduction of reported
+values from numerical proof replay and new performance measurements.

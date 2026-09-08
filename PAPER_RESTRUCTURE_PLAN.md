@@ -1,5 +1,9 @@
 # Paper Restructure Plan
 
+Historical plan for the pre-restart manuscript. For the current SPIN paper,
+use [paper/REVISION_PLAN.md](paper/REVISION_PLAN.md). The status and source
+paths below are preserved as historical context, not current guidance.
+
 Generated: 2026-06-12
 
 Purpose: one working source of truth for the paper cleanup. This consolidates
