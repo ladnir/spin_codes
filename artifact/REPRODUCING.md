@@ -5,6 +5,10 @@ in place of `python` if needed. The quick path uses Python 3.11+ and no
 third-party Python packages. It is intended for both Windows and Linux;
 Windows is the locally tested platform for this revision.
 
+On Windows, enable long paths for the clone because some frozen source paths
+are long: `git clone -c core.longpaths=true https://github.com/ladnir/permute_conv.git`.
+The Windows CI job enables this setting before checkout as well.
+
 ## 1. Check retained results
 
 ```sh
