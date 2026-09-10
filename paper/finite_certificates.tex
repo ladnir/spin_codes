@@ -27,7 +27,7 @@ gives nested maps, while changing $t$ compares different basis chains.
 These are numerical evaluations of finite bounds, not outward-rounded
 certificates or measurements of actual failure probability. The separately
 selected BCH-256 map is treated below.
-The artifact's \href{https://github.com/ladnir/permute_conv/blob/main/paper/build_parameter_figures.py}{figure generator}
+The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/paper/build_parameter_figures.py}{figure generator}
 reconstructs these plots from the retained rounded tables and checks their
 configuration coverage.
 
@@ -114,6 +114,7 @@ construction; the finite certificate pins its own selected maps.
 \begin{samepage}
 \begin{theorem}[Certified BCH-256 Structured SPIN]
 \label{thm:finite-bch-spin}
+\leavevmode\par
 For each $K\in\{2^{16},2^{18},2^{20},2^{22},2^{24}\}$, let $E_\theta$ be
 the selected encoder above and put $H:=\lfloor N/10\rfloor$.
 Every realization is a binary linear code of rate $1/2$, and
@@ -130,6 +131,9 @@ Table~\ref{tab:finite-bch-margins}.
 
 \begin{table}[tb]
 \centering
+\caption{Complete finite certificates for the selected $(128,19)$ inner.
+Margins are rounded for display; the theorem uses exact rational upper bounds.}
+\label{tab:finite-bch-margins}
 \begin{tabular}{@{}rrrr@{}}
 \toprule
 $\log_2K$ & outer rows $L$ & cutoff $H$ & $-\log_2U_K$ (bits) \\
@@ -141,9 +145,6 @@ $\log_2K$ & outer rows $L$ & cutoff $H$ & $-\log_2U_K$ (bits) \\
 24 & 131\,072 & 3\,355\,443 & 46.476222 \\
 \bottomrule
 \end{tabular}
-\caption{Complete finite certificates for the selected $(128,19)$ inner.
-Margins are rounded for display; the theorem uses exact rational upper bounds.}
-\label{tab:finite-bch-margins}
 \end{table}
 
 Thus, except with probability below $2^{-40}$ over setup, every nonzero

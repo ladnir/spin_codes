@@ -1,16 +1,43 @@
-\documentclass[11pt]{article}
+\documentclass{llncs}
+
+% Set \submissiontrue for anonymous review; \submissionfalse shows the authors.
+% submission.tex overrides this default without editing the manuscript.
+\newif\ifsubmission
+\submissionfalse
+\ifdefined\SubmissionVersion\submissiontrue\fi
 
 \input{preamble}
 
 \title{SPIN Codes: Single-Permutation INterleaved Codes}
-\author{}
-\date{Draft of \today}
+\titlerunning{SPIN Codes}
+\ifsubmission
+  \author{Anonymous submission}
+  \authorrunning{Anonymous submission}
+  \institute{}
+  \hypersetup{pdfauthor={}}
+\else
+  \author{Stanislav~Peceny\inst{1} \and Rahul~Rachuri\inst{2} \and
+    Srinivasan~Raghuraman\inst{2} \and Peter~Rindal\inst{3}}
+  \authorrunning{S. Peceny et al.}
+  \institute{Stealth Software Technologies, Inc. \and
+    Visa Research \and Category Labs}
+  \hypersetup{pdfauthor={Stanislav Peceny, Rahul Rachuri,
+    Srinivasan Raghuraman, Peter Rindal}}
+\fi
+\hypersetup{pdftitle={SPIN Codes: Single-Permutation INterleaved Codes}}
+\pagestyle{plain}
 
 \begin{document}
 
 \maketitle
+\thispagestyle{plain}
 \input{abstract}
-\tableofcontents
+
+\ifsubmission\else
+  \clearpage
+  \tableofcontents
+  \clearpage
+\fi
 
 \input{introduction}
 \input{preliminaries}
@@ -22,10 +49,12 @@
 \input{scaling_complexity}
 \input{implementation}
 
-\bibliographystyle{alpha}
+\bibliographystyle{splncs04}
 \bibliography{references}
 
 \appendix
+\clearpage
+\section*{Supplementary material}
 \input{structured_appendix}
 \input{finite_appendix}
 \input{proof_appendix}

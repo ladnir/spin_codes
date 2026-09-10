@@ -36,6 +36,7 @@ contains $Q$. Even parity and the BCH bound give $d(\mathcal B)\ge38$.
 The all-one word belongs to $Q$, hence to $\mathcal B$.
 
 \begin{lemma}[Common spectrum of the intermediate codes]
+\leavevmode\par
 Every dimension-$128$ code between $Q$ and $P$ has the same weight spectrum.
 If $q_w$ counts weight-$w$ words of $Q$ and $h_w$ counts them in one nonzero
 $Q$-coset in $P$, then
@@ -52,7 +53,7 @@ action, so all nonzero cosets have the same spectrum. Each intermediate
 dimension-$128$ code is a union of $Q$ and $31$ nonzero cosets.
 \end{proof}
 
-This lemma connects the implemented generators to the certificate's
+This lemma connects the implemented generators to the certificate's\linebreak
 syndrome-subspace definition of the outer. It does not identify the two
 coordinate codes. Independent row permutations make their identical
 spectra sufficient for the same first-moment bounds.
@@ -69,7 +70,7 @@ from linear constraints, rather than a model for the unknown spectrum.
 
 The constraints use the exact endpoint spectra of Fujiwara and
 Kusaka~\cite{FujiwaraKusaka2021}: the dimension-$71$ extended BCH spectrum
-and the dual spectrum of the dimension-$187$ extended BCH code.
+and the dual spectrum of the\linebreak dimension-$187$ extended BCH code.
 Generator containments and MacWilliams transforms relate these known
 spectra to $P$, $Q$, and their duals. The polynomial
 \[
@@ -252,7 +253,7 @@ Put $b_j=\binom tj$ and define
  c_j&=\max\left\{1-\beta_j,\frac{(M-1)n_j}{2^{19}b_j}\right\}.
 \end{aligned}
 \]
-Fourier inversion bounds each nonzero syndrome probability by
+Fourier inversion bounds each nonzero syndrome probability\linebreak by
 $n_j/(2^{19}b_j)$. Hence its subprobability measure is dominated by $c_j$
 times a law in $P$: its total mass is at most $c_j$ and each point mass
 is at most $c_j/(M-1)$. The certificate may replace the $ZD$ entry by
@@ -517,7 +518,7 @@ precision, authenticates the sparse $512$-bit replays, and reconstructs the
 exact unions. Positive recurrences use directed arithmetic, with exact
 dyadic conversion and summation; search scores never enter a certificate.
 
-The artifact's \href{https://github.com/ladnir/permute_conv/blob/main/artifact/REPRODUCING.md}{reproduction guide}
+The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/REPRODUCING.md}{reproduction guide}
 provides the commands and dependency inventory.
 The directory's \path{PAPER_HANDOFF.md} maps the analytic notes, selected
 inputs, closure ledgers, and numerical reproduction commands.

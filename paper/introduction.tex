@@ -64,7 +64,7 @@ architecture of Kolesnikov et al.~\cite{KolesnikovEtAl2026BA}. The BA
 construction also supplies the random-block enumerator used below.
 Chosen-block BAA instead studies the related option of reusing one certified
 constituent in every outer position
-\cite{PecenyRindal2026ChosenBlockBAA}.
+\cite{cryptoeprint:2026/1903}.
 The accumulator admits an exact input--output enumerator, making this construction
 the simplest setting in which to expose the distance mechanism.
 
@@ -96,7 +96,9 @@ Table~\ref{tab:spin-families} summarizes the three lines.
 
 \begin{table}[t]
   \centering
-  \begin{tabular}{@{}llll@{}}
+  \caption{The three principal SPIN construction lines.}
+  \label{tab:spin-families}
+\begin{tabular}{@{}llll@{}}
     \toprule
     Family & Outer & Interleaver & Inner \\
     \midrule
@@ -105,9 +107,7 @@ Table~\ref{tab:spin-families} summarizes the three lines.
     Structured SPIN & spectrum-controlled & structured & RM2Sub-S19 \\
     \bottomrule
   \end{tabular}
-  \caption{The three principal SPIN construction lines.}
-  \label{tab:spin-families}
-\end{table}
+  \end{table}
 
 The component table also defines a larger design space. For example, one may
 combine a structured interleaver with a random outer and an accumulator.
@@ -120,14 +120,14 @@ a distinct quantitative result.
 We make five contributions.
 
 \begin{itemize}
-  \item \textbf{A structured linear-time code with proved distance.}
+  \item \textbf{A structured linear-time code with proved distance.}\par
   We construct a sampled binary code family whose native members have rate
   $1/2$ and minimum distance greater than $0.11N$ with probability $1-o(1)$.
   Every realized member has $O(N)$ ordinary and transposed encoding work. The
   result therefore combines strong binary distance with linear work in both
   evaluation directions.
 
-  \item \textbf{A modular structured construction.}
+  \item \textbf{A modular structured construction.}\par
   Structured SPIN combines a spectrum-controlled constituent reused along the
   outer diagonal, one factored global interleaver, and an RM2Sub inner.
   A growing Golay--BA-3 constituent supplies the asymptotic instantiation;
@@ -137,21 +137,21 @@ We make five contributions.
   movement; the remaining outer permutations are block-local. Constituent
   replacement therefore does not change the route or inner architecture.
 
-  \item \textbf{Finite certificates and measured encoding.}
-  A fixed BCH-derived $[256,128,\ge38]$ constituent and selected $(128,19)$
+  \item \textbf{Finite certificates and measured encoding.}\par
+  A fixed BCH-derived $[256,128,\ge38]$ constituent\linebreak and selected $(128,19)$
   RM2Sub inner certify relative distance greater than $0.10$ with setup failure
   below $2^{-40}$ at five message lengths from $2^{16}$ through $2^{24}$.
   The proof uses rigorous spectrum inequalities despite the unknown exact
   BCH spectrum. At $K=2^{20}$, the batched transposed encoder takes
   $11.259$\,ms on one Ryzen 9 7950X thread.
 
-  \item \textbf{A first-moment framework for structured routes.}
+  \item \textbf{A first-moment framework for structured routes.}\par
   We index outer words by classes and bound each class's conditional failure
   probability under the interleaver--inner pair. Equal-weight words need not
   have the same inner law. The Structured SPIN proof uses occupation and
   row-weight classes.
 
-  \item \textbf{Two explanatory SPIN families.}
+  \item \textbf{Two explanatory SPIN families.}\par
   At rate $1/2$, Accumulator SPIN proves relative distance $0.0037$, while
   Random SPIN proves relative distance $0.11002$. These baselines isolate the
   block spectrum, uniform interleaving, and recursive mixing.
@@ -177,7 +177,7 @@ compute detailed expected spectra; they also provide optimized CPU and GPU
 implementations~\cite{KolesnikovEtAl2026BA}. Accumulator SPIN is their
 one-accumulator truncation. Chosen-block BAA studies the complementary choice
 of reusing one constituent in every diagonal position
-~\cite{PecenyRindal2026ChosenBlockBAA}. Structured SPIN adopts that shared-code
+~\cite{cryptoeprint:2026/1903}. Structured SPIN adopts that shared-code
 view, but adds a structured global route and a different recursive inner.
 
 \paragraph{Codes for correlation generation.}
@@ -244,10 +244,17 @@ implementation and measurements. The appendices give the asymptotic and
 finite proof reductions and identify their computational evidence.
 
 \paragraph{Artifact.}
-The source repository is \url{https://github.com/ladnir/permute_conv}.
-Its \href{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{artifact guide}
+\ifsubmission
+The source repository includes an artifact guide and a paper-to-code map.
+\else
+The source repository is
+\artifactlink{https://github.com/ladnir/permute_conv}{\texttt{ladnir/permute\_conv} on GitHub}.
+Its \artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{artifact guide}
 gives the reproduction entry point, and its
-\href{https://github.com/ladnir/permute_conv/blob/main/artifact/PAPER_MAP.md}{paper-to-code map}
-maps the theorems, figures, and timing table to
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/PAPER_MAP.md}{paper-to-code map}
+identifies the corresponding sources.
+\fi
+The guide gives the reproduction entry point, and the map links the theorems,
+figures, and timing table to
 their sources and checks. The guide separates reproduction of reported
 values from numerical proof replay and new performance measurements.

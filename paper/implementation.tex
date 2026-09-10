@@ -44,6 +44,11 @@ not cold-cache or full-application timings.
 
 \begin{table}[tb]
 \centering
+\caption{Online time in milliseconds for the batched transposed encoder.
+The selected construction has the five finite certificates in
+Table~\ref{tab:finite-bch-margins}; implementation support is currently
+limited to $16\le\log_2K\le20$.}
+\label{tab:finite-bch-performance}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 Inner $(t,s)$ & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
@@ -52,11 +57,6 @@ $(128,19)$, selected & 0.560 & 2.322 & 11.259 \\
 $(64,20)$, reference & 0.625 & 2.577 & 12.059 \\
 \bottomrule
 \end{tabular}
-\caption{Online time in milliseconds for the batched transposed encoder.
-The selected construction has the five finite certificates in
-Table~\ref{tab:finite-bch-margins}; implementation support is currently
-limited to $16\le\log_2K\le20$.}
-\label{tab:finite-bch-performance}
 \end{table}
 
 At $K=2^{20}$, the selected construction takes $6.6\%$ less time than the
@@ -68,7 +68,7 @@ The retained setup occupies $13.19$\,MiB, the workspace $40$\,MiB, and
 the input/output buffers a separate $48$\,MiB.
 No performance measurement is claimed at $K=2^{22}$ or $2^{24}$.
 
-The artifact's \href{https://github.com/ladnir/permute_conv/blob/main/workstreams/bare_bch_rm2sub/README.md}{encoder guide}
+The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/bare_bch_rm2sub/README.md}{encoder guide}
 in \path{workstreams/bare_bch_rm2sub} records build
 instructions, exact memory sizes, source and binary hashes, and all final
 observations in \path{PERFORMANCE.json}. Performance and distance are separate
