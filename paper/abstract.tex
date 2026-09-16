@@ -1,10 +1,10 @@
 \begin{abstract}
-Pseudorandom correlation generators and proof systems\linebreak need binary codes that
-combine constant rate and linear distance with fast ordinary and transposed
-encoding. They also need predictable data movement. Random linear codes provide
+Cryptographic applications need binary codes with constant rate, linear
+distance, fast ordinary and transposed encoding, and predictable data
+movement. Random linear codes provide
 strong distance but require dense computation. Fast structured encoders reduce
 this cost, but their sparse dependencies make linear distance difficult to
-prove.\linebreak We ask whether one code family can achieve all of these properties.
+prove. We ask whether one code family can achieve all of these properties.
 
 We introduce Single-Permutation INterleaved (SPIN) codes. A SPIN encoder
 composes a blockwise outer encoder, one global interleaver, and a recursive
@@ -14,22 +14,23 @@ encoders use $O(N)$ bit operations. With probability $1-o(1)$ over setup, its
   minimum distance exceeds $0.11N$. The construction reuses one sampled
   spectrum-certified BA-3 constituent along the outer diagonal, factors the
   interleaver into structured routing stages, and uses the fixed RM2Sub-S19
-  inner. The outer interface permits different base constituents and base
-  lengths. The current certificate uses extended Golay blocks and the schedule
-  $\frac{39}{4}\log_2N+O(1)$. Zero extension gives a family at every
-  sufficiently large requested length with rate $1/2-o(1)$, relative distance
-  greater than $0.11-o(1)$, and linear work.
+  inner. Zero extension supplies every sufficiently large requested length
+  with only an $o(1)$ loss in rate and relative distance.
 
 The proof uses a finite, class-indexed first-moment framework. The outer stage
 supplies class multiplicities, while the interleaver--inner pair supplies
-conditional failure envelopes. Two additional families isolate the main proof
-mechanisms. At rate $1/2$, Accumulator SPIN achieves relative distance
-$0.0037$, and Random SPIN achieves relative distance $0.11002$, under explicit
-logarithmic schedules. For finite lengths, the same structured architecture
+conditional failure envelopes. Accumulator SPIN and Random SPIN isolate
+the main proof mechanisms. For finite lengths, the same structured architecture
 uses a fixed BCH-derived $[256,128,\ge38]$ constituent and an RM2Sub inner
 with $128$-bit steps and $19$-bit state. Rigorous spectrum inequalities,
 rather than an assumed exact spectrum, certify relative distance greater
 than $0.10$ with setup failure below $2^{-40}$ at message lengths
 $2^{16},2^{18},2^{20},2^{22},2^{24}$. A single-thread implementation evaluates
-the batched transposed encoder at $K=2^{20}$ in $11.259$\,ms.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
+the batched transposed encoder at $K=2^{20}$ in $11.259$\,ms; separate
+paired measurements give similar ordinary-encoding cost.
+We instantiate Brakedown with SPIN: commitment and one opening of
+$512$\,MiB take $519.60$\,ms under a conditional 100-bit parameter target.
+Integrating this PCS into an optimized Flock implementation improves
+prover throughput by $1.38$--$1.93\times$ over its optimized Ligerito
+configuration at the measured workloads, with larger proofs.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
 \end{abstract}

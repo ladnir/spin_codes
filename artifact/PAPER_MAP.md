@@ -21,7 +21,14 @@ contain 54 serial runs. Run `python -B workstreams/transposed_comparison/report.
 to check the 18 table cells without benchmarking; this separate check is
 not currently part of `reproduce.py quick`.
 
+The ordinary-encoding, standalone PCS, and Flock tables are mapped in
+[APPLICATION_RESULTS.md](APPLICATION_RESULTS.md). Their compact source data are
+in `paper/data/application_results.json`; run
+`python -B paper/build_application_tables.py --check` to check the generated
+tables and conditional parameter budgets without running benchmarks.
+
 ## The five finite ledgers
+
 
 All paths below are within `workstreams/bch_rm2sub_bridge/generated/`.
 

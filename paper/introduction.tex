@@ -52,6 +52,12 @@ The phrase \emph{single permutation} describes the mathematical interface.
 An implementation may factor $\Pi_N$ into block shuffles, a transpose, and
 region shuffles. These factors still compose to one global interleaver.
 
+The application chain begins with a SPIN instantiation of the Brakedown
+polynomial commitment scheme and continues with its integration into Flock.
+We measure ordinary encoding, standalone commitment and opening, and
+complete constraint proving separately. This separates the code's evaluation
+cost from the benefit it delivers inside a larger system.
+
 \subsection{Three SPIN constructions}
 
 We use the same interface for three construction lines.
@@ -117,7 +123,7 @@ a distinct quantitative result.
 
 \subsection{Contributions}
 
-We make five contributions.
+We make seven contributions.
 
 \begin{itemize}
   \item \textbf{A structured linear-time code with proved distance.}\par
@@ -144,6 +150,20 @@ We make five contributions.
   The proof uses rigorous spectrum inequalities despite the unknown exact
   BCH spectrum. At $K=2^{20}$, the batched transposed encoder takes
   $11.259$\,ms on one Ryzen 9 7950X thread.
+
+  \item \textbf{A SPIN-based polynomial commitment implementation.}\par
+  We instantiate Brakedown with SPIN and organize the computation around
+  packed binary data. At $512$\,MiB input, commitment and one opening take
+  $519.60$\,ms on one core. A separate commitment-only comparison is
+  $4.16\times$ faster than the fastest measured Bolt-max configuration
+  at the same input volume. Section~\ref{sec:spin-pcs} states the
+  conditional parameter target and comparison scope.
+
+  \item \textbf{Integration into Flock.}\par
+  We adapt the PCS to Flock's witness claims and optimize the shared prover
+  implementation. With the applicable optimizations in both configurations,
+  SPIN--Brakedown improves throughput by $1.93\times$ and $1.38\times$
+  over Ligerito at the two measured workloads, with larger proofs.
 
   \item \textbf{A first-moment framework for structured routes.}\par
   We index outer words by classes and bound each class's conditional failure
@@ -202,9 +222,11 @@ cost~\cite{rr25}. Orion uses code switching to obtain a linear-time prover
 linear-time encodable code~\cite{brakedown23}. Field-agnostic SNARKs have also
 been instantiated from Expand--Accumulate codes~\cite{fieldEA24}. Blaze uses
 interleaved RAA codes and supplies improved binary distance bounds
-~\cite{blaze25}. SPIN does not instantiate a proof system in this paper. These
-works motivate the combination of high rate, strong binary distance, fast
-transposed evaluation, and regular data movement.
+~\cite{blaze25}. Bolt uses sketched codes to reduce commitment
+cost~\cite{bolt26}. We instantiate the Brakedown matrix PCS with SPIN
+and evaluate it independently before integrating it into Flock's Boolean
+constraint prover~\cite{flock26}. The latter comparison uses Ligerito
+as the alternative PCS~\cite{ligerito25}.
 
 \subsection{One distance calculation}
 
@@ -240,7 +262,9 @@ Section~\ref{sec:finite-certificates} presents the finite BCH construction,
 its distance certificates, and the certified engineering curve.
 Section~\ref{sec:scaling} separates finite validity, asymptotic distance, and
 encoding complexity. Section~\ref{sec:implementation} records the
-implementation and measurements. The appendices give the asymptotic and
+encoder implementation and measurements. Section~\ref{sec:spin-pcs}
+presents the standalone PCS, and Section~\ref{sec:spin-flock} evaluates
+its integration into Flock. The appendices give the asymptotic and
 finite proof reductions and identify their computational evidence.
 
 \paragraph{Artifact.}

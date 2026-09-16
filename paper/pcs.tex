@@ -1,0 +1,83 @@
+\section{Polynomial commitments from SPIN}
+\label{sec:spin-pcs}
+
+We use SPIN as the row encoder in a Brakedown-style polynomial commitment
+scheme~\cite{brakedown23}. This application tests whether fast ordinary
+encoding translates into fast commitment and opening. The implementation
+has two principal changes: it instantiates the code with SPIN, and it
+organizes the computation around packed binary data. At $512$\,MiB of
+input, the resulting prover commits and opens in $519.60$\,ms on one core.
+
+\paragraph{Construction.}
+Let a Boolean evaluation table define a multilinear polynomial over
+$\mathbb F:=\F_{2^{128}}$. A public index mapping arranges its $RK$ bits
+into $R$ rows of $K$ bits. The prover applies the same SPIN encoder to
+each row, obtaining $N=2K$ columns, and commits to these columns with a
+Merkle tree. An opening sends one random testing combination of the
+message rows and one combination weighted by the requested evaluation
+point. The combinations lie in $\mathbb F^K$. The verifier encodes them
+and checks consistency with authenticated columns sampled after both
+messages are fixed. The evaluation combination also supplies the claimed
+polynomial value. We retain Brakedown's matrix-testing structure and send
+the folded messages explicitly.
+
+\paragraph{Making the binary code useful.}
+Expanding every bit to an extension-field element would erase much of
+SPIN's encoding advantage. We therefore keep the matrix packed and
+encode bounded groups of rows. The internal layout follows the input
+index mapping, avoiding a full-matrix bit transpose. Batched column
+processing and table-based row combinations reduce the data movement
+and arithmetic around the encoder. Workspaces are allocated before
+repeated proving. These changes make encoding and column hashing account
+for approximately $79\%$ of the fastest standalone prover time.
+
+\paragraph{Parameters.}
+We condition once on the selected code satisfying the distance bound
+of Theorem~\ref{thm:finite-bch-spin}. Extending its binary generator to
+$\mathbb F$ preserves minimum distance. At $K=2^{16}$ and $2^{18}$,
+we use $2045$ column samples and one random testing fold. The generic-code
+proximity calculation~\cite{diamondPosen24} then gives an error below
+$2^{-100}$ for the fixed-matrix test and evaluation check. We call this
+the conditional 100-bit parameter target. It excludes the one-time setup
+event and the separate commitment-extraction and Fiat--Shamir reductions;
+the calculation does not establish a complete composed security theorem.
+The artifact records the bound and checks the parameters with exact arithmetic.
+
+\paragraph{Standalone performance.}
+Table~\ref{tab:spin-pcs-standalone} compares two matrix shapes for the same
+$2^{32}$-bit input. Both encode to $1$\,GiB. Longer rows reduce the proof
+size by $31.7\%$ for a $5.5\%$ increase in prover time. The square
+configuration spends $233.04$\,ms encoding, $178.57$\,ms hashing columns,
+and approximately $94.7$\,ms computing the two row combinations.
+
+\begin{table}[tb]
+\centering
+\caption{SPIN--Brakedown for $512$\,MiB of Boolean input. Prover time
+includes commitment and one opening at the conditional 100-bit target.}
+\label{tab:spin-pcs-standalone}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Shape $R\times K$ & Prover (ms) & Verify (ms) & Proof (MiB) \\
+\midrule
+\input{tables/pcs_standalone}
+\end{tabular}
+\end{table}
+
+Measurements use one worker on the Ryzen 9 7950X, pinned to CPU~15,
+with a requested $4.5$\,GHz frequency and boost disabled. Each entry is
+the pooled median of ten trials from two processes, each excluding one
+warmup. Setup, workspace allocation, outer serialization, and independent
+evaluation for validation are outside the prover timer. Verification
+excludes decoding and workspace allocation. Every timed proof verifies.
+
+\paragraph{Comparison with Bolt.}
+At the same $512$\,MiB input volume and on one core, the fastest measured
+Bolt-max commitment takes $1719.90$\,ms, compared with $413.47$\,ms for
+SPIN--Brakedown: a $4.16\times$ difference. Bolt~\cite{bolt26} encodes
+$2^{27}$ elements of $\F_{2^{32}}$; our input has $2^{32}$ Boolean entries.
+The comparison therefore matches input bytes, rather than polynomial
+dimension or coefficient field. It includes each implementation's code,
+layout, and commitment processing. The Bolt run measures commitment only;
+we did not run its complete opening prover. The artifact records the
+implementations, timing boundaries, and both measured Bolt-max variants.

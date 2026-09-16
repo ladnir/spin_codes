@@ -1,5 +1,12 @@
 # SPIN manuscript (LLNCS)
 
+The PCS application revision adds ordinary-encoder measurements, a standalone
+SPIN–Brakedown section, and the optimized Flock comparison. See
+[the application evidence map](../artifact/APPLICATION_RESULTS.md) for retained
+measurements, timing definitions, and the conditional security scope.
+Run `python -B paper/build_application_tables.py --check` from the repository
+root to check its tables without benchmarking.
+
 The paper uses Springer's unmodified LLNCS 2.26 class and `splncs04.bst`,
 vendored here from the [official CTAN package](https://ctan.org/pkg/llncs)
 (copyright Springer, CC BY 4.0). The

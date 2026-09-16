@@ -1,8 +1,8 @@
-\section{Implementation and performance}
+\section{Encoder implementation and performance}
 \label{sec:implementation}
 
 We implement the selected BCH-256/RM2Sub $(128,19)$ construction from
-Section~\ref{sec:finite-certificates}. The application evaluates the
+Section~\ref{sec:finite-certificates}. We first evaluate the
 transposed encoder on batches: $2K$ input blocks map to $K$ output blocks,
 where each $128$-bit block carries $128$ parallel binary instances.
 The pipeline applies the transposed inner, reverses the routing factors,
@@ -36,7 +36,7 @@ The tested configurations agree under GCC and MSVC.
 Measurements use one Ryzen 9 7950X thread on Linux, pinned to CPU~15, with
 GCC~15.2.0. The release build uses \texttt{-O3 -DNDEBUG -march=znver4},
 AVX2, and carry-less multiplication instructions.
-Each reported time is the median of three independent serial run medians.
+Each time in Table~\ref{tab:finite-bch-performance} is the median of three independent serial run medians.
 Each run performs three warmups and $101$ timed calls, reusing its buffers
 and workspace. Setup, allocation, correctness checks, and output hashing
 are outside the online interval. These are steady-state encoder latencies,
@@ -75,6 +75,51 @@ observations in \path{PERFORMANCE.json}. Performance and distance are separate
 checks of the same selected construction: the tests establish the implemented
 linear map, the timings measure its evaluation, and the finite certificate
 bounds the setup event in Theorem~\ref{thm:finite-bch-spin}.
+
+\subsection{Ordinary encoding}
+\label{sec:ordinary-encoding}
+
+Polynomial commitments require the ordinary encoder: $K$ input blocks
+expand to $2K$ output blocks. We implement this direction for the same
+selected SPIN map and measure it separately. Each block again contains
+$128$ parallel binary instances. These measurements include the outer
+encoder, routing, and inner recurrence, but no commitment or opening work.
+
+The ordinary encoder reuses the same local circuits and tiled routing
+strategy. Its first implementation made an extra pass over the inner
+input. Combining input gathering with output emission removes that pass
+and reduces memory traffic. Dense-oracle checks and the identity
+$\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$ check that the
+implementation preserves the linear map.
+
+\begin{table}[tb]
+\centering
+\caption{Ordinary and transposed SPIN encoding, in milliseconds, for
+$128$ parallel binary instances. The two directions are measured in a
+separate paired experiment; neither includes PCS work.}
+\label{tab:ordinary-encoding}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Direction & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
+\midrule
+\input{tables/ordinary_encoding}
+\end{tabular}
+\end{table}
+
+The experiment uses the same Ryzen host, CPU affinity, and GCC version
+as above, with boost disabled. Each direction has independent input and
+workspace buffers. Execution order alternates, and each timed batch of
+three calls follows a direction-specific warmup. Table~\ref{tab:ordinary-encoding}
+reports medians of $31$ trials after five initial paired warmups.
+Setup, allocation, and output checks are outside the interval.
+All runs execute serially.
+
+At the largest size, two additional processes with $51$ trials each give
+ordinary/transposed medians of $11.489/11.372$ and $11.317/11.368$\,ms.
+Thus ordinary encoding is within about $1\%$ of transposed encoding in
+these confirmation runs. The result supports similar practical cost in
+both directions; the PCS measurements below additionally include the
+cost of committing and opening the encoded data.
 
 \subsection{Comparison with other transposed encoders}
 \label{sec:transposed-comparison}

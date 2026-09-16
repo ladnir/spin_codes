@@ -4,6 +4,11 @@ Review base: `3004281944ee75b918c17a62fc1aa164c5a4839a` on `main`.
 Working branch: `codex/spin-paper-pcs-applications`.
 Date: 2026-09-15.
 
+Drafting update: the subsequent pass adds `pcs.tex`, `flock.tex`, and a separate
+ordinary-encoding subsection, with concise explanations of the changes,
+motivation, and results. `artifact/APPLICATION_RESULTS.md` records the evidence
+and remaining scope. The review and proposal below describe the starting point.
+
 This is a review and proposed revision, not a manuscript rewrite. The review
 covers the manuscript's organization, main statements, implementation section,
 and the retained application evidence. It is not a new audit of the numerical

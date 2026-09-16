@@ -1,0 +1,76 @@
+\section{Application to Flock}
+\label{sec:spin-flock}
+
+We integrate SPIN--Brakedown into Flock~\cite{flock26} to measure its
+effect inside a larger prover. Flock checks batches of Boolean constraints
+and reduces them to claims about a committed witness. Our integration
+replaces its Ligerito PCS~\cite{ligerito25} with the construction in
+Section~\ref{sec:spin-pcs}. The final comparison improves prover throughput
+by $1.93\times$ and $1.38\times$ at the two measured workloads.
+
+\paragraph{Adapting the opening interface.}
+Flock's final claims include interpolation weights on a small group of
+witness coordinates. We incorporate these weights into the PCS row
+combination, so the opening proves the functional that Flock actually
+requests. A compatible packed representation passes the witness between
+the two implementations without repacking it. The current adapter uses
+two separate openings with $2110$ column samples each and $K=2^{16}$.
+Their conditional fixed-matrix error bounds sum to less than $2^{-102}$.
+Composition with Flock's adaptive claims requires the corresponding
+extraction argument. The benchmark proves the committed batch's
+compression constraints; binding public hash inputs and outputs is a
+separate application wrapper.
+
+\paragraph{Improving the surrounding prover.}
+During integration, we found that field arithmetic, repeated witness
+passes, and temporary storage could obscure the PCS improvement. We
+optimized Flock's x86 kernels, reused workspaces, and evaluated the
+fixed linear constraints directly. The Ligerito configuration receives
+the applicable improvements as well. In particular, its existing
+column buffers can supply an intermediate zerocheck value, avoiding
+duplicate work. These changes preserve the checked protocol messages.
+The comparison below uses both PCS backends within this optimized
+implementation, rather than attributing shared improvements to SPIN.
+
+\begin{table}[tb]
+\centering
+\caption{Flock proofs of BLAKE3-compression constraints on one Ryzen
+core. Both configurations use the applicable shared optimizations.
+The Ligerito configuration is Fast100.}
+\label{tab:spin-flock}
+\small
+\begin{tabular}{@{}rlrrr@{}}
+\toprule
+Compressions & PCS & Prover (ms) & Verify (ms) & Proof (MiB) \\
+\midrule
+\input{tables/flock_comparison}
+\end{tabular}
+\end{table}
+
+\paragraph{Measurement method.}
+Both configurations run in one executable with the same deterministic
+input stream and compiler settings. They use the single-worker hardware
+environment of the standalone PCS experiment. Each workload has four processes per backend
+in a balanced serial order. Each process excludes five warmups and
+measures four trials; entries average the four process medians.
+Prover time includes witness generation, commitment, and proving. Setup,
+verification, and outer proof serialization are outside the interval.
+Serialization inside the SPIN opening remains timed because its bytes
+enter the protocol transcript. All $252$ proofs in the final experiment,
+including warmups and reference controls, verify.
+
+\paragraph{Prover costs.}
+At the larger workload, commitment takes $100.97$\,ms with SPIN--Brakedown
+and $161.00$\,ms with Ligerito. Opening takes $61.17$ and $140.35$\,ms,
+respectively. These phases account for about $139$\,ms of the $155$\,ms total
+difference. Witness generation is faster in the Ligerito configuration,
+and the remaining checking and preparation costs differ with the layouts.
+Thus the table measures the complete PCS integrations; it does not isolate
+the encoder alone.
+
+The current SPIN--Brakedown integration favors prover time at a substantial
+communication cost. At the larger workload, its proof is $12.83$\,MiB,
+compared with $0.396$\,MiB for Ligerito, which also verifies faster.
+The application result complements the standalone PCS measurements:
+SPIN's encoding performance supports a fast commitment path, and that
+advantage remains useful after integration into Flock.
