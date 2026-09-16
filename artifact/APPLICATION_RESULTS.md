@@ -294,3 +294,14 @@ The standalone Ligerito pass adds measured Fast100 and Slim100 rows to
 both PCS tables. The run-summary validation, application-table check,
 finite-integration check, and repository hygiene check pass. The changed
 PCS pages were rendered and inspected after rebuilding the draft.
+
+### Original BAA comparison in the abstract
+
+The abstract's approximately 3x encoding speedup compares SPIN's 11.104 ms
+with approximately 32 ms for original rate-1/2 BAA, not with chosen-block
+BAA. Peter confirmed on 2026-09-16 that separate measurements find comparable
+original-BAA latency on Ryzen. Those separate run logs are not archived in
+this worktree. The companion manuscript's original-BAA rerun records
+32.769 ms on Intel; that exact value is not relabeled as a Ryzen measurement.
+The archived same-host comparison remains unchanged: chosen Golay and RM
+BAA take 23.997 and 27.660 ms, or 2.16x and 2.49x the SPIN latency.

@@ -20,8 +20,8 @@ without assuming the constituent's exact weight spectrum.
 
 For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
 computes $2^{20}$ $128$-bit correlation blocks in about $11$\,ms on one
-Ryzen core. This is $2.2$--$2.5\times$ faster than our measured instantiations
-of the rate-$1/2$ BAA family introduced by Kolesnikov et al.\ (CRYPTO
+Ryzen core. This is approximately $3\times$ faster than the original
+rate-$1/2$ BAA codes of Kolesnikov et al.\ (CRYPTO
 2026)~\cite{KolesnikovEtAl2026BA}. Ordinary encoding has similar cost.
 Including roughly $8$\,ms for GGM tree expansion, we estimate an end-to-end
 cost of about $20$\,ms per batch, or $50$ million oblivious transfers per second.
