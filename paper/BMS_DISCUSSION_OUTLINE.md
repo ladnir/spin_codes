@@ -1,5 +1,11 @@
 # BMS discussion: outline and remaining formalization
 
+Update: the streaming, termination, and state-count correspondence is
+worked out in [BMS_MEMORY_ARGUMENT.md](BMS_MEMORY_ARGUMENT.md). It gives
+a positive result with explicit termination, preserving the original
+codeword as a prefix. Section 8.3 now summarizes that argument. The
+checks below are retained as the original outline; priority remains open.
+
 Working subsection: `scaling_complexity.tex`, `sec:bms-question`, under
 “Finite lengths, asymptotics, and complexity.” Do not promote a resolution
 claim to the introduction until the model correspondence below is checked.
@@ -65,6 +71,7 @@ are separate claims.
 - The paper's Accumulator SPIN, Random SPIN, and Scalable Structured SPIN
   theorems, and the structured-inner recurrence.
 
-Next step: prove the automata correspondence for Accumulator SPIN, then
-extend the discussion to the structured inner and audit priority. Keep the
-introduction and contribution bullets unchanged during this step.
+Next step: audit the original Block-Accumulate paper and subsequent
+growing-memory literature for attribution and priority. The streaming
+correspondence is now explicit in BMS_MEMORY_ARGUMENT.md and Section 8.3.
+Keep the introduction and contribution bullets unchanged until this review.
