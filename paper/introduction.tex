@@ -90,8 +90,9 @@ distance greater than $0.11002$, nearly matching the GV bound, with
 $O(N\log N)$ direct encoding work.
 
 This recursive inner has a lineage in codes for PCGs. Silver used a banded
-lower-triangular solve, but its linear-distance claim remained
-conjectural~\cite{CouteauRindalRaghuraman2021Silver}.
+lower-triangular solve, but its conjecture of linear distance
+~\cite{CouteauRindalRaghuraman2021Silver} was later refuted
+~\cite{RaghuramanRindalTanguy2023EC}.
 Expand--Convolute introduced a random recursive convolution and proved
 distance bounds through Markov-chain coupling and concentration
 \cite{RaghuramanRindalTanguy2023EC}. The proved parameters are conservative;
@@ -239,7 +240,8 @@ Linear codes compress sparse correlations in vector-OLE and pseudorandom
 correlation generators~\cite{bcgi18,bcg19pcg,bcg19tworound,ferret20,bcg20ring}. This application motivated a
 sequence of faster structured codes. Silver uses structured LDPC matrices and
 a banded triangular solve~\cite{CouteauRindalRaghuraman2021Silver}. Linear
-distance was an explicit conjecture supported by heuristic evidence.
+distance was an explicit conjecture supported by heuristic evidence and
+later refuted~\cite{RaghuramanRindalTanguy2023EC}.
 Expand--Accumulate combines a sparse expander with an accumulator
 ~\cite{ea22}. Expand--Convolute replaces that accumulator with a random
 time-varying convolution~\cite{RaghuramanRindalTanguy2023EC}. Random SPIN keeps
