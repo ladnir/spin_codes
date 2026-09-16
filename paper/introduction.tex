@@ -21,9 +21,9 @@ family that combines a quantitative distance guarantee with linear-time
 evaluation in both directions and regular data movement.
 
 We introduce Single-Permutation INterleaved (SPIN) codes. Our main result,
-Structured SPIN, meets this goal. At its native output lengths
-$N$, every realized code has rate $1/2$ and $O(N)$ ordinary and transposed
-encoding work. With probability $1-o(1)$ over setup, its minimum distance
+Structured SPIN, meets this goal. Its asymptotic family has rate $1/2$
+and $O(N)$ ordinary and transposed encoding work at its native output
+lengths $N$. With probability $1-o(1)$ over setup, its minimum distance
 exceeds $0.11N$. The construction combines a proved distance guarantee
 with an encoding structure designed for efficient implementation. We
 evaluate this combination both as an encoder for PCGs and as a component
@@ -146,48 +146,61 @@ interleaver, and inner encoder. Our analysis treats the three families above.
 We make five contributions.
 
 \begin{itemize}
-  \item \textbf{A structured linear-time code with proved distance.}\par
-  We construct a sampled binary code family whose native members have rate
-  $1/2$ and minimum distance greater than $0.11N$ with probability $1-o(1)$.
-  Every realized member has $O(N)$ ordinary and transposed encoding work. The
-  construction combines a spectrum-controlled constituent reused along the
-  outer diagonal, one factored global interleaver, and a structured recursive inner.
-  Zero extension gives every sufficiently large requested output length
-  with an $o(1)$ loss in rate and relative distance.
+  \item \textbf{An asymptotically linear-time code with proved distance.}\par
+  We construct a sampled binary code family with rate $1/2$ and minimum
+  distance greater than $0.11N$ with probability $1-o(1)$ over setup.
+  Combining a linear-time outer with our structured interleaver and
+  recursive inner gives $O(N)$ ordinary and transposed encoding work.
+  This is an asymptotic result along the family's admissible lengths.
+  Our finite-size implementations choose constituents for concrete
+  performance and distance, and need not use this asymptotic outer.
 
-  \item \textbf{A first-moment framework for structured interleavers.}\par
-  We group outer words into classes and bound each class's conditional
-  failure probability under the interleaver--inner pair. This accommodates
-  structured routing, where equal-weight words need not have the same
-  output-weight distribution. Accumulator SPIN and Random SPIN isolate the
-  roles of the outer spectrum, interleaving, and recursive mixing. At rate
-  $1/2$, they prove relative distances $0.0037$ and $0.11002$, respectively.
+  \item \textbf{First-moment analysis and improved interleaving.}\par
+  We first combine outer weight enumerators with inner weight distributions
+  under a uniform permutation to analyze Accumulator SPIN and Random SPIN.
+  We then extend this first-moment analysis to structured permutations,
+  tracking where support enters the inner as well as its weight.
+  The structure helps the distance analysis: it spreads each active outer
+  block across distinct regions, constraining harmful concentrations that
+  a uniform permutation permits. Thus interleaving is a tool for improving
+  distance guarantees as well as encoding efficiency. The benefit depends
+  on its interaction with the outer and inner, rather than on a universal
+  comparison between structured and uniform permutations.
 
-  \item \textbf{Finite certificates and measured encoding.}\par
-  We combine a fixed BCH-derived $[256,128,\ge38]$ constituent with a
-  selected $(128,19)$ RM2Sub inner. We certify relative distance greater
-  than $0.10$ with setup failure
-  below $2^{-40}$ at message lengths $2^{16},2^{18},2^{20},2^{22},2^{24}$.
-  The proof uses rigorous spectrum inequalities despite the unknown exact
-  BCH spectrum. Separate paired benchmarks of $128$ parallel instances
-  show similar ordinary and transposed encoding costs: about $11$\,ms
-  at message length $K=2^{20}$ on one Ryzen 9 7950X thread.
+  \item \textbf{Finite-size optimization and concrete certificates.}\par
+  We optimize Structured SPIN for practical lengths and explicit setup
+  failure targets. The outer can use a code selected for its finite
+  distance and encoding cost, independently of the asymptotic construction.
+  Our implementation uses a fixed BCH-derived $[256,128,\ge38]$ constituent
+  with a fast encoding circuit. With the selected recursive inner, we
+  certify relative distance greater than $0.10$ and setup failure below
+  $2^{-40}$ at message lengths $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and
+  $2^{24}$. Rigorous spectrum inequalities suffice despite the unknown
+  exact BCH spectrum. Paired benchmarks confirm similar ordinary and
+  transposed encoding costs.
 
-  \item \textbf{A SPIN-based polynomial commitment implementation.}\par
-  We instantiate Brakedown with SPIN and organize the computation around
-  packed binary data. At $512$\,MiB input, commitment and one opening take
-  $520$\,ms on one core. Standalone Ligerito measurements show the tradeoff:
-  SPIN--Brakedown proves faster, while Ligerito has smaller proofs and faster
-  verification. SPIN--Brakedown's commitment is $4.16\times$ faster than the fastest
-  measured Bolt-max configuration in a separate commitment-only experiment
-  at the same input volume. Section~\ref{sec:spin-pcs} states the
-  conditional parameter target and comparison scope.
+  \item \textbf{Faster encoding for PCGs.}\par
+  SPIN computes the encoding stage for $2^{20}$ $128$-bit correlations in
+  about $11$\,ms on one Ryzen 9 7950X thread, approximately $3\times$ faster
+  than original BAA~\cite{KolesnikovEtAl2026BA}. Adding roughly $8$\,ms
+  for tree expansion gives an estimated total of about $20$\,ms per batch,
+  or $50$ million OTs per second. This throughput is a projection from
+  component costs; Section~\ref{sec:transposed-comparison} reports the
+  measurements and the comparison with the newer companion BAA encoders.
 
-  \item \textbf{Integration into Flock.}\par
-  We adapt the PCS to Flock's witness claims and optimize the shared prover
-  implementation. With the applicable optimizations in both configurations,
-  SPIN--Brakedown improves throughput by $1.93\times$ and $1.38\times$
-  over Ligerito at the two measured workloads, with larger proofs.
+  \item \textbf{Polynomial commitments and integration into Flock.}\par
+  We instantiate Brakedown~\cite{brakedown23} with SPIN and integrate
+  the resulting PCS into Flock~\cite{flock26}. At $512$\,MiB input,
+  standalone commitment and one opening take $520$\,ms on one core.
+  In a separate experiment at the same input volume, commitment is
+  $4.16\times$ faster than the fastest measured Bolt-max
+  configuration~\cite{bolt26}. Within Flock, replacing
+  Ligerito~\cite{ligerito25} with SPIN--Brakedown improves throughput by
+  $1.93\times$ and $1.38\times$ at the two measured workloads, with the
+  applicable shared optimizations in both configurations. The speedup
+  comes with larger proofs; standalone Ligerito also verifies faster.
+  Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock} give the conditional
+  parameter targets and comparison scope.
 
 \end{itemize}
 
