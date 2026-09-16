@@ -29,10 +29,13 @@ with an encoding structure designed for efficient implementation. We
 evaluate this combination both as an encoder for PCGs and as a component
 of code-based proof systems.
 
-SPIN follows the serial-concatenation pattern. An outer encoder
-prevents messages from remaining too sparse. A recursive inner encoder spreads
-the interleaved outer word across the final codeword. The interleaver moves the
-outer support before the recursion processes it. SPIN makes this pattern
+SPIN follows the serial-concatenation pattern. An outer encoder first
+prevents nonzero messages with small support from remaining too sparse.
+The interleaver then scatters the outer support across the input to the
+inner encoder. This reduces the chance that local structure in the outer
+word causes the inner encoder to produce a low-weight output.
+Finally, the inner encoder generates the codeword by recursive convolution.
+SPIN makes this pattern
 modular: structure appears where speed and regular data movement require it,
 and setup randomness remains at the interfaces used by the distance proof.
 
