@@ -35,8 +35,10 @@ implementation, rather than attributing shared improvements to SPIN.
 \begin{table}[tb]
 \centering
 \caption{Flock proofs of BLAKE3-compression constraints on one Ryzen
-core. Both configurations use the applicable shared optimizations.
-The Ligerito configuration is Fast100.}
+core. SPIN and Ligerito (Fast100) are measured with the applicable shared
+optimizations. Bolt entries are optimistic projections assuming free claim
+conversion, shared opening work, and amortized matrix-proof cost;
+Bolt--Flock is not implemented. Dashes denote unestimated quantities.}
 \label{tab:spin-flock}
 \small
 \begin{tabular}{@{}rlrrr@{}}
@@ -48,7 +50,7 @@ Compressions & PCS & Prover (ms) & Verify (ms) & Proof (MiB) \\
 \end{table}
 
 \paragraph{Measurement method.}
-Both configurations run in one executable with the same deterministic
+The SPIN and Ligerito configurations run in one executable with the same deterministic
 input stream and compiler settings. They use the single-worker hardware
 environment of the standalone PCS experiment. Each workload has four processes per backend
 in a balanced serial order. Each process excludes five warmups and
@@ -65,11 +67,11 @@ and $161.00$\,ms with Ligerito. Opening takes $61.17$ and $140.35$\,ms,
 respectively. These phases account for about $139$\,ms of the $155$\,ms total
 difference. Witness generation is faster in the Ligerito configuration,
 and the remaining checking and preparation costs differ with the layouts.
-Thus the table measures the complete PCS integrations; it does not isolate
+These measured rows cover the complete PCS integrations; they do not isolate
 the encoder alone.
 
 \paragraph{An optimistic Bolt projection.}
-Figure~\ref{fig:flock-projection} also considers replacing the PCS with
+Table~\ref{tab:spin-flock} also considers replacing the PCS with
 Bolt, using the calibrated opening costs from Section~\ref{sec:spin-pcs}.
 We give Bolt favorable assumptions: free conversion of Flock's weighted
 claims, shared opening work across its two claims, and negligible
@@ -80,17 +82,6 @@ $244$ and $1060$\,ms, compared with the measured SPIN totals of $112$
 and $413$\,ms. Thus the projected Bolt configuration remains slower even
 with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.
-
-\begin{figure}[tb]
-\centering
-\input{figures/flock_projection}
-\caption{Measured Flock prover times and an optimistic Bolt--Flock
-projection, at $32$ and $128$\,MiB of witness data. Hatched bars combine
-measured components and work proxies; they assume free claim conversion,
-shared opening work, and the amortized limit for the matrix proof.
-Bolt--Flock is not implemented, and the projection is not a runtime bound.}
-\label{fig:flock-projection}
-\end{figure}
 
 The current SPIN--Brakedown integration favors prover time at a substantial
 communication cost. At the larger workload, its proof is $12.83$\,MiB,

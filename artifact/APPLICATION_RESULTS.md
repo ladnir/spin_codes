@@ -20,8 +20,7 @@ python -B paper/build_application_tables.py --check
 
 This checks generated table contents and both conditional parameter budgets
 with integer arithmetic. It does not run benchmarks or replay distance proofs.
-Without `--check`, it regenerates the four TeX table bodies and the Flock
-prover-time figure. With
+Without `--check`, it regenerates the four TeX table bodies. With
 `--source PATH`, it imports the selected summaries from a Hypercat checkout;
 review the resulting manifest before accepting new measurements.
 `--bolt-source PATH` separately imports the pinned Bolt opening projection
@@ -88,12 +87,12 @@ bound. A finite amortization batch must pay its share of the matrix proof
 and batching work. These runs also do not establish equal composed security
 between implementations. The paper retains the equal-input-volume scope
 and reports the measured Flock integration separately. The additional
-Bolt/Flock figure uses the explicitly hypothetical assumptions below.
+Bolt/Flock table entries use the explicitly hypothetical assumptions below.
 
 ### Optimistic Bolt--Flock projection
 
-Figure `fig:flock-projection` retains solid bars for measured SPIN and
-Ligerito totals, and uses hatched bars for Bolt. The latter is a cost
+Table `tab:spin-flock` includes measured SPIN and Ligerito rows alongside
+explicitly labeled Bolt projection rows. The latter are a cost
 substitution, not an implemented integration or a runtime bound. The pinned
 Bolt JSON now also retains the 32 and 128 MiB calibration cases.
 
@@ -123,7 +122,7 @@ O is an accounting residual of aggregated measurements, not a newly timed
 phase. The surrounding computation is held fixed by assumption; another
 integration could change it. The generator reconstructs J from component
 medians and checks both it and the total against the pinned source record.
-The figure rounds milliseconds to integers. It does not project verification
+The Bolt table entries round milliseconds to integers. It does not project verification
 time or proof size, and it does not claim a complete matched-security
 Bolt/Flock integration. The existing standalone-proxy omissions still apply.
 
@@ -208,9 +207,7 @@ or overfull boxes. No new benchmarks were run.
 The PDF is a build product under
 `output/pdf/spin_codes_draft.pdf` and is not committed.
 
-The optimistic Bolt/Flock figure pass produces a 63-page draft. Its
-discussion and figure appear on pages 38 and 39, both visually inspected.
-The generated-data checks (including shared-opening and substitution sums),
-finite-integration check, repository hygiene, and whitespace checks pass.
-The rebuilt PDF has no unresolved references or overfull boxes. This pass
-uses existing measurements only; no benchmarks were run.
+The Bolt/Flock projection now appears directly in the Flock table; the
+bar chart and its generator were removed. Verification time and proof size
+are left unestimated for Bolt. The table arithmetic and PDF layout were
+checked after this change. No benchmarks were run.
