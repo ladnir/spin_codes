@@ -134,6 +134,14 @@ benchmark process. Use Linux for the published affinity-controlled procedure.
 Do not interpret a timing difference on another machine as a failed proof.
 The artifact quick command only checks transcription and retained records.
 
+For the new same-host comparison against chosen BAA, Expand--Convolute,
+and binary RAA, follow the
+[comparison guide](../workstreams/transposed_comparison/README.md).
+Its pinned dependency build and serial runner are separate from the frozen
+SPIN benchmark. Validate its retained samples and generated paper table with
+`python -B workstreams/transposed_comparison/report.py --check`.
+This check performs no measurements and is not yet included in `quick`.
+
 ## Release preparation
 
 Before an external artifact submission:

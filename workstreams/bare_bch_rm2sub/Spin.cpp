@@ -1,6 +1,8 @@
 #include "Spin.h"
+#include "WorkspaceRouting.h"
 #include "Inner.h"
 #include "generated/BchCircuit.h"
+#include "../rate_quarter_bch/implementation/generated/QuarterCircuit.h"
 #include <algorithm>
 #include <array>
 #include <bit>
@@ -26,29 +28,36 @@ template<class T> static void shuffle(T* p,std::size_t n,u64& seed) {
 static void pack(u8* p,u32 v) { p[0]=u8(v); p[1]=u8(v>>8); p[2]=u8(v>>16); }
 static OC_FORCEINLINE u32 unpack(const u8* p) { u32 v; std::memcpy(&v,p,4); return v&0xffffff; }
 
-Spin::Spin(Configuration c,unsigned exponent,u64 routeSeed,u64 coefficientSeed,unsigned tileRows)
-    :mConfig(c),mK(0),mTileRows(tileRows) {
-    if(exponent<16 || exponent>20 || (tileRows && !std::has_single_bit(tileRows)))
-        throw std::invalid_argument("supported message exponents: 16..20; tile rows must be a power of two");
+Spin::Spin(Configuration c,unsigned exponent,u64 routeSeed,u64 coefficientSeed,unsigned tileRows,Outer outer)
+    :mConfig(c),mOuter(outer),mK(0),mTileRows(tileRows) {
+    if(exponent<16 || exponent>20 || (tileRows && (tileRows<2 || !std::has_single_bit(tileRows))))
+        throw std::invalid_argument("supported message exponents: 16..20; tile rows must be a power of two >=2");
     if(static_cast<unsigned>(c)>static_cast<unsigned>(Configuration::T256S14))
         throw std::invalid_argument("unknown configuration");
+    if(outer!=Outer::Bch256x128 && outer!=Outer::Bch128x32)
+        throw std::invalid_argument("unknown outer");
+    if(outer==Outer::Bch128x32 && c!=Configuration::T128S19)
+        throw std::invalid_argument("quarter-rate implementation selects t128_s19");
     mK=std::size_t{1}<<exponent;
-    const std::size_t n=codeBlocks(),rows=mK/128;
-    const auto selectedTile=tileRows?tileRows:(exponent<=18?256U:2048U);
+    const auto b=outerLength();
+    const std::size_t n=codeBlocks(),rows=mK/outerDimension();
+    const auto defaultTile=outer==Outer::Bch128x32?
+        (exponent<=16?256U:exponent<=18?2048U:4096U):(exponent<=18?256U:2048U);
+    const auto selectedTile=tileRows?tileRows:defaultTile;
     mTileRows=static_cast<unsigned>(std::min<std::size_t>(selectedTile,rows));
     if(rows%step()) throw std::invalid_argument("incomplete region epochs");
     std::vector<u8> regionCoordinate(n);
     std::array<u8,256> coordinateRegion;
     for(std::size_t row=0;row<rows;++row) {
-        shuffle(coordinateRegion.data(),256,routeSeed);
-        for(unsigned j=0;j<256;++j) regionCoordinate[coordinateRegion[j]*rows+row]=u8(j);
+        shuffle(coordinateRegion.data(),b,routeSeed);
+        for(unsigned j=0;j<b;++j) regionCoordinate[coordinateRegion[j]*rows+row]=u8(j);
     }
     mRoute.resize(n);
     std::vector<u32> positions(rows);
-    for(unsigned region=0;region<256;++region) {
+    for(unsigned region=0;region<b;++region) {
         shuffle(positions.data(),rows,routeSeed);
         for(std::size_t row=0;row<rows;++row)
-            mRoute[region*rows+positions[row]]=u32(row*256+regionCoordinate[region*rows+row]);
+            mRoute[region*rows+positions[row]]=u32(row*b+regionCoordinate[region*rows+row]);
     }
     mSlots24.resize(3*n+4); mOffsets24.resize(3*n+4);
     mSlots32.resize(n); mOffsets32.resize(n);
@@ -77,7 +86,12 @@ template<class Map> void Spin::setupInner(u64 seed) {
         for(unsigned j=0;j<Map::S;++j) mFieldRows[e*Map::S+j]=fieldMultiply<Map>(1U<<j,a);
     }
 }
-Spin::Workspace::Workspace(const Spin& code):buckets(code.codeBlocks()),tile(code.tileBlocks()) {}
+Spin::Workspace::Workspace(const Spin& code):buckets(code.codeBlocks()),tile(code.tileBlocks()) {
+    if(workspace_routing::eligible(code.outerLength()==128,code.messageBlocks())) {
+        workspace_routing::adviseOwned(tile.data(),tile.size()*sizeof(block));
+        workspace_routing::adviseOwned(buckets.data(),buckets.size()*sizeof(block));
+    }
+}
 std::size_t Spin::Workspace::bytes() const noexcept { return (buckets.capacity()+tile.capacity())*sizeof(block); }
 unsigned Spin::step() const noexcept {
     switch(mConfig) { case Configuration::T64S16: case Configuration::T64S20:return 64;
@@ -119,7 +133,15 @@ void Spin::compact(Layout layout) {
     std::vector<u32>().swap(mRoute);std::vector<u32>().swap(mCoefficients);
     mRetainedLayout=layout;mCompacted=true;
 }
-template<class Map,bool Packed> void Spin::run(const block* in,block* out,Workspace& w) const {
+
+void Spin::encodeInplace(block* buffer,std::size_t count,Workspace& w,Layout layout) const {
+    if(!buffer || count!=codeBlocks() || w.buckets.size()!=codeBlocks() || w.tile.size()!=tileBlocks())
+        throw std::invalid_argument("buffer or workspace geometry mismatch");
+    if(layout!=Layout::Packed24 && layout!=Layout::Indices32) throw std::invalid_argument("unknown layout");
+    if(mCompacted && layout!=mRetainedLayout) throw std::invalid_argument("routing layout was discarded");
+    encodeUnchecked(buffer,buffer,w,layout);
+}
+template<class Map,bool Packed,bool Quarter> void Spin::run(const block* in,block* out,Workspace& w) const {
     block* values=w.buckets.data();
     innerReverse<Map>(in,codeBlocks(),mFieldRows.data(),[&](std::size_t i,block v) {
         if constexpr(Packed) values[unpack(mSlots24.data()+3*i)]=v;
@@ -127,6 +149,15 @@ template<class Map,bool Packed> void Spin::run(const block* in,block* out,Worksp
     });
     block* tile=w.tile.data();
     const auto tileSize=tileBlocks(),n=codeBlocks();
+    if constexpr(requires {Map::tunedWorkspaceRouting;}) {
+        static_assert(Quarter);
+        for(std::size_t base=0;base<n;base+=tileSize) {
+            workspace_routing::scatterWrite<Packed>(values,tile,mOffsets24.data(),mOffsets32.data(),base,tileSize);
+            for(std::size_t j=0;j<tileSize;j+=256)
+                quarterTranspose2(tile+j,tile+j+128,out+base/4+j/4,out+base/4+j/4+32);
+        }
+        return;
+    }
     for(std::size_t base=0;base<n;base+=tileSize) {
         for(std::size_t j=0;j<tileSize;++j) {
             if(j+32<tileSize) {
@@ -136,12 +167,30 @@ template<class Map,bool Packed> void Spin::run(const block* in,block* out,Worksp
             const auto offset=Packed?unpack(mOffsets24.data()+3*(base+j)):mOffsets32[base+j];
             tile[offset]=values[base+j];
         }
-        for(std::size_t j=0;j<tileSize;j+=512)
-            bchTranspose2(tile+j,tile+j+256,out+base/2+j/2,out+base/2+j/2+128);
+        if constexpr(Quarter) {
+            for(std::size_t j=0;j<tileSize;j+=256)
+                quarterTranspose2(tile+j,tile+j+128,out+base/4+j/4,out+base/4+j/4+32);
+        } else {
+            for(std::size_t j=0;j<tileSize;j+=512)
+                bchTranspose2(tile+j,tile+j+256,out+base/2+j/2,out+base/2+j/2+128);
+        }
     }
 }
 void Spin::encodeUnchecked(const block* in,block* out,Workspace& w,Layout layout) const {
-#define RUN_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) run<Map,true>(in,out,w); else run<Map,false>(in,out,w); break
+    if(mOuter==Outer::Bch128x32) {
+        if constexpr(workspace_routing::compiled) {
+            if(workspace_routing::eligible(true,messageBlocks())) {
+                using Tuned=workspace_routing::TunedMap<Map128S19>;
+                if(layout==Layout::Packed24) run<Tuned,true,true>(in,out,w);
+                else run<Tuned,false,true>(in,out,w);
+                return;
+            }
+        }
+        if(layout==Layout::Packed24) run<Map128S19,true,true>(in,out,w);
+        else run<Map128S19,false,true>(in,out,w);
+        return;
+    }
+#define RUN_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) run<Map,true,false>(in,out,w); else run<Map,false,false>(in,out,w); break
     switch(mConfig) {
         RUN_CASE(T64S16,Map64S16); RUN_CASE(T64S20,Map64S20);
         RUN_CASE(T128S19,Map128S19); RUN_CASE(T256S14,Map256S14);
@@ -159,10 +208,10 @@ void Spin::validateSetup() const {
            (slot/tileBlocks())*tileBlocks()+mOffsets32[slot]!=outer)
             throw std::runtime_error("packed route mismatch");
     }
-    const auto rows=mK/128;
+    const auto rows=mK/outerDimension();
     std::vector<bool> rowRegion(codeBlocks());
     for(std::size_t i=0;i<codeBlocks();++i) {
-        const auto key=(mRoute[i]/256)*256+i/rows;
+        const auto key=(mRoute[i]/outerLength())*outerLength()+i/rows;
         if(rowRegion[key]) throw std::runtime_error("route has duplicate row/region");
         rowRegion[key]=true;
     }
@@ -176,7 +225,7 @@ template<class Map> static u32 referenceMultiply(u32 a,u32 b) {
     for(int j=2*Map::S-2;j>=int(Map::S);--j) if((product>>j)&1) product^=modulus<<(j-Map::S);
     return u32(product);
 }
-template<class Map> void Spin::oracle(const block* in,block* out) const {
+template<class Map,bool Quarter> void Spin::oracle(const block* in,block* out) const {
     const auto n=codeBlocks(),epochs=n/Map::T;
     std::vector<block> routed(n);
     std::array<block,Map::S> state{},syndrome{},next{};
@@ -197,19 +246,24 @@ template<class Map> void Spin::oracle(const block* in,block* out) const {
         }
         state=next;
     }
-    for(std::size_t r=0;r<mK/128;++r) for(unsigned j=0;j<128;++j) {
+    constexpr unsigned B=Quarter?128:256,D=Quarter?32:128;
+    for(std::size_t r=0;r<mK/D;++r) for(unsigned j=0;j<D;++j) {
         block v(0,0);
-        for(unsigned c=0;c<256;++c) if((BchRows[j][c/64]>>(c%64))&1) v^=routed[r*256+c];
-        out[r*128+j]=v;
+        for(unsigned c=0;c<B;++c) {
+            const auto word=Quarter?QuarterRows[j][c/64]:BchRows[j][c/64];
+            if((word>>(c%64))&1) v^=routed[r*B+c];
+        }
+        out[r*D+j]=v;
     }
 }
 void Spin::reference(const block* in,block* out) const {
     if(mCompacted) throw std::logic_error("oracle schedules were discarded");
+    if(mOuter==Outer::Bch128x32) {oracle<Map128S19,true>(in,out);return;}
     switch(mConfig) {
-        case Configuration::T64S16:oracle<Map64S16>(in,out);break;
-        case Configuration::T64S20:oracle<Map64S20>(in,out);break;
-        case Configuration::T128S19:oracle<Map128S19>(in,out);break;
-        case Configuration::T256S14:oracle<Map256S14>(in,out);break;
+        case Configuration::T64S16:oracle<Map64S16,false>(in,out);break;
+        case Configuration::T64S20:oracle<Map64S20,false>(in,out);break;
+        case Configuration::T128S19:oracle<Map128S19,false>(in,out);break;
+        case Configuration::T256S14:oracle<Map256S14,false>(in,out);break;
     }
 }
 }

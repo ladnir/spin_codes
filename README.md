@@ -34,6 +34,7 @@ The output is `output/pdf/spin_codes_draft.pdf`.
 | [artifact/](artifact/README.md) | Reader-facing reproduction guide, checks, and [paper-to-code map](artifact/PAPER_MAP.md). |
 | [paper/](paper/README.md) | Current LaTeX manuscript and reproducible vector figures. |
 | [workstreams/bare_bch_rm2sub/](workstreams/bare_bch_rm2sub/README.md) | Selected no-fanout BCH-256 encoder, correctness tests, and performance records. |
+| [workstreams/transposed_comparison/](workstreams/transposed_comparison/README.md) | Same-host transposed SPIN, chosen BAA, Expand--Convolute, and binary RAA comparison. |
 | [workstreams/bch_rm2sub_bridge/](workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md) | Finite BCH-256 proof sources, compact ledgers, and numerical replay notes. |
 | [workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/](workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md) | Frozen asymptotic Structured SPIN certificate snapshot. |
 | [workstreams/finite_asymptotic_theory/landscape_db/](workstreams/finite_asymptotic_theory/landscape_db/CURRENT_ENGINEERING_RESULTS.md) | Small-constituent parameter study and retained numerical tables. |

@@ -1,0 +1,75 @@
+#pragma once
+#include "Inner.h"
+namespace bare_spin {
+struct CandidateMap : Map128S19 {
+static constexpr std::array<std::uint32_t,T> columns{0x1,0x3,0x5,0x2e22f,0x11,0x315b,0x28535,0x5657,0x81,0x2a6e3,0x2338d,0x277c7,0x235d1,0xa2fb,0x283fd,0x2f6ff,0x801,0x2ce23,0x6f2d,0x4b27,0x2f819,0xf73,0x1a15,0xf57,0x2d9c9,0x2b98b,0x8ded,0x20f87,0x21c91,0x24d9b,0x2cd95,0x7eb7,0x10001,0x3d74b,0x3226d,0x3170f,0x10551,0x3e353,0x1a21d,0x1a637,0x320a9,0x35183,0x331cd,0x1a2cf,0x110b9,0x150db,0x384fd,0x126b7,0x3ff29,0x3ee43,0x1ba6d,0x3492f,0x10a71,0x12a53,0x1ca15,0x3081f,0x30ec9,0x1b9c3,0x37885,0x32da7,0x3ced1,0x14893,0x13dbd,0x159d7,0x40001,0x43543,0x4530d,0x68467,0x41159,0x41553,0x6c775,0x42157,0x6a5e1,0x436c3,0x4c5e5,0x4b4ef,0x481f9,0x62393,0x464dd,0x4249f,0x6be69,0x44d0b,0x68a4d,0x69b07,0x45f39,0x69d13,0x6ee3d,0x6ce3f,0x6cac1,0x69fc3,0x4cded,0x67ac7,0x61ed1,0x67a9b,0x69cdd,0x41abf,0x74329,0x5a123,0x5324d,0x5326f,0x75731,0x58473,0x7a375,0x7921f,0x7c6e1,0x7828b,0x7848d,0x522cf,0x5e7b9,0x5929b,0x720f5,0x5b7ff,0x70a69,0x72e43,0x51c25,0x7da27,0x5ee79,0x5fb1b,0x57d15,0x78a5f,0x55ee9,0x7dca3,0x57bad,0x51bcf,0x58fb9,0x73cbb,0x72fdd,0x77ef7};
+static constexpr auto groupedColumns=columns;
+static constexpr std::array<unsigned,S> groupOrder{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18};
+static inline void finish(const __m128i* z,__m128i* out) {
+const auto v0=z[0];
+const auto v1=z[1];
+const auto v2=z[2];
+const auto v3=z[3];
+const auto v4=z[4];
+const auto v5=z[5];
+const auto v6=z[6];
+const auto v7=z[8];
+const auto v8=z[9];
+const auto v9=z[10];
+const auto v10=z[12];
+const auto v11=z[16];
+const auto v12=z[17];
+const auto v13=z[18];
+const auto v14=z[20];
+const auto v15=z[24];
+const auto v16=z[32];
+const auto v17=z[33];
+const auto v18=z[34];
+const auto v19=z[36];
+const auto v20=z[40];
+const auto v21=z[48];
+const auto v22=z[64];
+const auto v23=z[65];
+const auto v24=z[66];
+const auto v25=z[68];
+const auto v26=z[72];
+const auto v27=z[80];
+const auto v28=z[96];
+const auto v29=vx(v18,v28);
+const auto v30=vx(v21,v26);
+const auto v31=vx(v20,v30);
+const auto v32=vx(v19,v29);
+const auto v33=vx(v23,v25);
+const auto v34=vx(v24,v27);
+const auto v35=vx(v31,v32);
+const auto v36=vx(v21,v33);
+out[0]=v0;
+out[1]=v1;
+out[2]=v2;
+out[3]=vx(vx(vx(v3, v19), vx(v25, v26)), v28);
+out[4]=v4;
+out[5]=vx(vx(v5, v32), v34);
+out[6]=vx(vx(vx(v6, v20), vx(v24, v28)), v33);
+out[7]=v7;
+out[8]=vx(vx(v8, v27), v35);
+out[9]=vx(vx(v9, v18), v30);
+out[10]=vx(vx(v10, v28), v31);
+out[11]=v11;
+out[12]=vx(vx(v12, v24), vx(v25, v35));
+out[13]=vx(vx(v13, v32), v36);
+out[14]=vx(vx(v14, v29), vx(v31, v34));
+out[15]=vx(vx(v15, v19), vx(v30, v34));
+out[16]=v16;
+out[17]=vx(vx(v17, v29), v36);
+out[18]=v22;
+}
+static void conjugate(u32* rows) {
+constexpr u32 V[19]={0x1,0x2,0x4,0x52e00,0x8,0x56000,0xb200,0x10,0x1c000,0x3c500,0x5f900,0x20,0x71a00,0x75900,0x34a00,0x600,0x40,0xf800,0x80};
+constexpr u32 inverse[19]={0x1,0x2,0x4,0x10,0x80,0x800,0x10000,0x40000,0x6160,0x28068,0x20068,0x25120,0xc620,0xb448,0x2d108,0x2f240,0x2248,0x26208,0x24728};
+u32 left[19]{},result[19]{};
+for(unsigned i=0;i<19;++i) for(unsigned j=0;j<19;++j) if((V[i]>>j)&1) left[i]^=rows[j];
+for(unsigned i=0;i<19;++i) for(unsigned j=0;j<19;++j) if((left[i]>>j)&1) result[i]^=inverse[j];
+std::memcpy(rows,result,sizeof(result));
+}
+};
+}

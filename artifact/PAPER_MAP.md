@@ -13,6 +13,14 @@ may contain historical worktree paths.
 | BCH-256, Theorem 7.1, Table 2, Figure 4 (`thm:finite-bch-spin`, `tab:finite-bch-margins`, `fig:finite-bch-curve`), Appendix B | [finite handoff](../workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md), [ledger directory](../workstreams/bch_rm2sub_bridge/generated/), [paper integration checker](../paper/check_finite_integration.py) | `reproduce.py quick` checks exact-ledger margins and the selected inner. `reproduce.py evidence` authenticates the larger retained evidence set. Neither reruns all interval calculations. |
 | Performance, Section 9, Table 3 (`tab:finite-bch-performance`) | [encoder and build guide](../workstreams/bare_bch_rm2sub/README.md), [measurements](../workstreams/bare_bch_rm2sub/PERFORMANCE.json), [methodology](../workstreams/bare_bch_rm2sub/PERFORMANCE.md) | Build and run CTest for correctness; run the benchmark separately and serially for new timings. |
 
+The additional performance comparison (`sec:transposed-comparison`,
+`tab:transposed-comparison`) is reproduced by the
+[comparison guide](../workstreams/transposed_comparison/README.md).
+Its [no-reset observations](../workstreams/transposed_comparison/results_no_reset_20260911.json)
+contain 54 serial runs. Run `python -B workstreams/transposed_comparison/report.py --check`
+to check the 18 table cells without benchmarking; this separate check is
+not currently part of `reproduce.py quick`.
+
 ## The five finite ledgers
 
 All paths below are within `workstreams/bch_rm2sub_bridge/generated/`.

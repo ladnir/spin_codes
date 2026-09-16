@@ -29,6 +29,10 @@ int main() {
             require(actual==expected,"packed implementation differs from dense oracle");
             code.encode(input.data(),input.size(),other.data(),other.size(),work,Layout::Indices32);
             require(other==expected,"32-bit route differs from dense oracle");
+            auto inplace=input;
+            code.encodeInplace(inplace.data(),inplace.size(),work);
+            require(std::equal(expected.begin(),expected.end(),inplace.begin()),"inplace differs from dense oracle");
+            require(std::equal(input.begin()+expected.size(),input.end(),inplace.begin()+expected.size()),"inplace changed suffix");
             const auto routeHash=code.routeHash();
             if(m==16) {
                 Spin alternate(static_cast<Configuration>(c),m,1,2,512);

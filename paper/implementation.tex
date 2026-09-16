@@ -75,3 +75,93 @@ observations in \path{PERFORMANCE.json}. Performance and distance are separate
 checks of the same selected construction: the tests establish the implemented
 linear map, the timings measure its evaluation, and the finite certificate
 bounds the setup event in Theorem~\ref{thm:finite-bch-spin}.
+
+\subsection{Comparison with other transposed encoders}
+\label{sec:transposed-comparison}
+
+We compare SPIN with chosen-block BAA~\cite{cryptoeprint:2026/1903},
+Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}, and binary
+repeat--accumulate--accumulate (RAA)~\cite{blaze25}. Every call evaluates a binary
+transposed encoder on $128$ parallel instances. No weighted extension-field
+RAA or forward-encoder timing is included.
+
+The BAA rows use the optimized Golay $[24,12,8]$ and RM$(2,5)$ kernels
+from the companion implementation. Expand--Convolute uses the legacy
+nonsystematic implementation with expander weight $w=33$ and memory $m=25$.
+The implementation takes $24$ random taps plus one fixed tap and applies
+one convolution pass. Its native interface modifies the input buffer and
+writes the result to a preallocated output buffer. Our binary RAA adapter
+uses two accumulator/permutation layers and a repetition transpose.
+BAA and RAA use four-round Feistel permutations, with cycle walking for
+non-power-of-two domains. SPIN retains its packed routing tables.
+The measured times include each implementation's routing costs; they do
+not establish a general ranking of the code families.
+
+\paragraph{Common timing protocol.}
+We rebuild all rows with one compiler and measure them on the same Ryzen
+host and CPU as above. Each cell uses three serial processes, each with
+three warmups and $101$ timed calls. Each process allocates and initializes
+its buffers once, then repeatedly invokes the native encoder interface.
+There is no input copy or reset between calls. Expand--Convolute operates
+on the buffer left by the previous call; the other interfaces preserve
+their input. Code setup, caller buffer allocation, and output hashing
+are outside the interval; all work inside each encoder call is timed.
+The BAA message lengths are $2^m-64$ for $m\in\{16,18,20\}$, allowing
+both constituents to tile the same input. All other rows use $K=2^m$.
+RAA processes $3K$ or $4K$ input blocks, versus $2K$ for the rate-$1/2$ rows.
+
+\begin{table}[tb]
+\centering
+\caption{Same-host transposed-encoder latency in milliseconds.
+Entries are medians of three process medians, with no input resets.
+The pair $(\delta,\lambda)$ gives the relative distance and margin
+in bits at the largest listed length, except for the RAA reference marked
+$*$ below; -- denotes an unassigned bound.
+EC uses the older, weaker distance and margin target.}
+\label{tab:transposed-comparison}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{figures/transposed_comparison}
+\par\smallskip
+\begin{minipage}{\linewidth}
+\footnotesize
+$*$RAA reference bound at $K=2^{22}$, not the timed $K=2^{20}$:
+approximately $13$ bits without setup testing~\cite[Sec.~3.1]{blaze25}.
+One-time testing of low-weight messages can improve the margin to about
+$40$ bits ($41.5$ bits at this size), with near-quadratic setup work
+\cite[Fig.~2]{blaze25}. No such test is used in our benchmark.
+\end{minipage}
+\end{table}
+
+At the largest measured length, SPIN takes $11.104$\,ms.
+Chosen Golay and RM BAA take $2.16$ and $2.49$ times as long,
+respectively. The conservative EC profile takes $181.825$\,ms.
+The repetition-$3$ permutation domain requires cycle walking; the
+repetition-$4$ domain does not. These measurements do not imply that
+lower-rate RAA is intrinsically faster.
+
+For context, the companion BAA evaluation reports $22.810$\,ms for Golay
+and $24.278$\,ms for RM at the same code parameters, using an Intel
+i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses
+our same-host rerun and does not combine cross-machine timings.
+
+\paragraph{Distance context.}
+At the largest lengths, SPIN's certified margin is $50.448$ bits at
+relative distance $0.10$. The companion BAA evaluation reports full
+first-moment margins of $46.386$ and $47.093$ bits for Golay and RM,
+respectively, at the same distance target and their measured length.
+For EC, we use the conservative profile reported in the earlier
+comparison~\cite{KolesnikovEtAl2026BA}: relative distance $0.05$ with
+a $20$-bit margin at $K=2^{20}$. These bounds concern each construction's
+stated random ensemble. For repetition-$4$ RAA, we report Blaze's
+published no-test reference bound at $K=2^{22}$ separately from our
+smaller timing sizes. Its relative distance is $0.19$, with an approximately
+$13$-bit margin; setup testing can improve this margin as noted in the table.
+We do not transfer this bound to $K=2^{20}$ or to repetition-$3$ RAA,
+nor extrapolate the BAA or EC margins to smaller lengths.
+
+The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/transposed_comparison/README.md}{comparison guide}
+records dependency revisions, correctness checks, actual lengths, all
+$5454$ timing samples, and a script that regenerates
+Table~\ref{tab:transposed-comparison}. The original SPIN measurements
+in Table~\ref{tab:finite-bch-performance} remain unchanged.

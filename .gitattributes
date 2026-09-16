@@ -11,3 +11,10 @@ workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/**/*.json -
 constructions/riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19/MAIN_CODE_FREEZE.md text eol=lf
 constructions/riffle_parityfanout31x33_bchperm_transpose_bitshuffle_splitstate_preaddmul_rm2sub_t128_s19/frozen_source/SOURCE_MANIFEST.json text eol=lf
 artifact/data/asymptotic/** -text
+# Measured comparison sources and records use LF bytes on every platform.
+workstreams/transposed_comparison/** text eol=lf
+# Retain the exact bytes of published spectrum tables bound by audit receipts.
+workstreams/rate_quarter_bch/sources/*.wd -text
+# Spectrum and fixed-inner receipts bind their producer bytes as well.
+workstreams/rate_quarter_bch/** -text
+workstreams/inner_design/** -text

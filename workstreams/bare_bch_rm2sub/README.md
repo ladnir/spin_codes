@@ -12,6 +12,10 @@ Four exact selected inner maps share one setup, routing, and BCH implementation:
 Message exponents 16 through 20 are accepted; exponents 16, 18, and 20 are tested
 and measured. The public operation maps `2K` input blocks to `K` output blocks.
 
+The optional `Outer::Bch128x32` adds a quarter-rate `4K` to `K` operation with
+the same selected t128_s19 inner. See the [quarter-rate implementation and report](../rate_quarter_bch/implementation/README.md).
+The default constructor and the historical rate-half measurements remain unchanged.
+
 ## Build and run
 
 The standalone build uses the imported cryptoTools header subset. No external
@@ -25,6 +29,28 @@ ctest --test-dir out/bare-spin --output-on-failure
 
 MSVC uses `/arch:AVX2` and ignores `SPIN_ARCH`. On other GCC hosts, supply an
 appropriate architecture such as `-DSPIN_ARCH=native`. There is no runtime ISA dispatch.
+
+### Optional workspace routing optimization
+
+On Linux, add `-DSPIN_WORKSPACE_ROUTING_OPT=ON` to opt in to large-page advice
+for owned workspace buffers and write-prefetch in the quarter-rate tile scatter.
+The option is off by default. It applies only to `Outer::Bch128x32` with
+K >= 2^18; smaller messages and half-rate instances retain the original path.
+Non-Linux builds retain the original path even when the option is enabled.
+
+Workspace construction requests `MADV_HUGEPAGE` and, when available,
+`MADV_COLLAPSE`. Failed requests are tolerated; the existing allocation remains
+usable with ordinary pages. This is a best-effort hint, not a guarantee of
+large-page backing. It changes neither system settings nor caller-owned memory.
+Page preparation can add workspace-construction latency and is excluded from
+encoding timings. Copying or replacing workspace vectors does not repeat the hints.
+
+The option does not change the linear map, public API, retained setup size, or
+workspace size. It adds no allocation or policy branch inside the coordinate
+loop. See the [deployment validation](../inner_design/routing_opt/deployment/README.md)
+for correctness, forced-fallback tests, and measurements. The experimental
+asymmetric inner remains a separate implementation; enabling this option does
+not select it.
 
 Run benchmarks only when no other benchmark is active. Linux runs pin CPU 15
 and refuse to start if another benchmark executable is found. Do not run the
@@ -57,8 +83,10 @@ std::vector<block> input(code.codeBlocks()), output(code.messageBlocks());
 code.encode(input.data(), input.size(), output.data(), output.size(), workspace);
 ```
 
-`encode` checks buffers, geometry, and overlap. `encodeUnchecked` omits checks;
-the caller must provide valid nonoverlapping buffers, a matching workspace, and
+`encode` checks buffers, geometry, and overlap. `encodeInplace` checks one `N`-block
+buffer and replaces its first `K` blocks without an input copy; the suffix is unchanged.
+`encodeUnchecked` omits checks; input/output may be disjoint or exactly equal.
+The caller must provide buffers disjoint from workspace storage, a matching workspace, and
 a retained routing layout. `compact(Indices32)` instead keeps the 32-bit layout;
 subsequent encode calls must explicitly request that layout.
 
@@ -67,7 +95,8 @@ Each active call requires its own workspace and input/output buffers. Do not
 compact while another call is using the setup. `reference` and `validateSetup`
 require un-compacted diagnostic schedules. Reinitialization means constructing
 a new object. The default tile policy uses 256 rows up to exponent 18 and 2048
-rows above it; an explicit power-of-two tile count overrides this choice.
+rows above it for the rate-half outer; an explicit power-of-two tile count of
+at least two overrides this choice. Quarter-rate defaults are documented separately.
 
 ## Generated code and provenance
 
