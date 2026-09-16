@@ -185,6 +185,16 @@ The repetition-$3$ permutation domain requires cycle walking; the
 repetition-$4$ domain does not. These measurements do not imply that
 lower-rate RAA is intrinsically faster.
 
+\paragraph{Implication for PCGs.}
+The transposed encoder computes $2^{20}$ output blocks of $128$ bits,
+matching the encoding stage for a batch of $2^{20}$ correlations.
+Combining its roughly $11$\,ms cost with an estimated $8$\,ms for GGM
+tree expansion gives a rounded budget of about $20$\,ms per OT batch.
+This projects approximately $50$ million OTs per second.
+The throughput is an end-to-end estimate using the GGM cost, not a
+measurement of an integrated OT protocol; the retained benchmarks measure
+the encoder alone.
+
 For context, the companion BAA evaluation reports $22.810$\,ms for Golay
 and $24.278$\,ms for RM at the same code parameters, using an Intel
 i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses

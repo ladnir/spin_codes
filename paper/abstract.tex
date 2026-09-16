@@ -16,9 +16,14 @@ For finite lengths, a BCH-derived outer constituent and a fixed recursive
 inner give rate $1/2$ and relative distance greater than $0.10$, with setup
 failure below $2^{-40}$. We certify this bound at message lengths
 $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum inequalities,
-without assuming the constituent's exact weight spectrum. On one Ryzen
-core, ordinary encoding of $128$ parallel $2^{20}$-bit messages takes
-about $11$\,ms, with similar transposed-encoding cost.
+without assuming the constituent's exact weight spectrum.
+
+For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
+computes $2^{20}$ $128$-bit correlation blocks in about $11$\,ms on one
+Ryzen core. This is $2.2$--$2.5\times$ faster than the measured prior
+rate-$1/2$ BAA encoders. Ordinary encoding has similar cost.
+Including roughly $8$\,ms for GGM tree expansion, we estimate an end-to-end
+cost of about $20$\,ms per batch, or $50$ million oblivious transfers per second.
 
 We apply SPIN in a Brakedown-style polynomial commitment scheme and
 integrate that scheme into Flock. With conditional 100-bit PCS parameters,
