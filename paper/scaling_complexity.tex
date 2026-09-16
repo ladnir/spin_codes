@@ -51,7 +51,7 @@ greater than $0.0037$ with probability $1-o(1)$. Thus a growing inner
 state is unnecessary for linear distance once the outer blocks grow
 logarithmically. Random SPIN increases the inner memory to
 $\Theta(\log N)$ and proves relative distance greater than $0.11002$.
-Structured SPIN then returns to constant inner state: with better
+Structured SPIN then returns to constant recursive state: with better
 constituents and structured interleaving, it proves relative distance
 greater than $0.11$ and linear-time encoding. Both of the latter distance
 guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
@@ -64,9 +64,13 @@ two elements of $\F_{2^{19}}$ as specified in
 \eqref{eq:structured-inner}. Even a direct bit implementation takes a
 constant number of operations per step, so the total inner work is
 $O(N)$. The sampled multiplier changes with the step, but neither its
-width nor the arithmetic cost grows. This is a constant-state,
-time-varying encoder; the stored multiplier schedule and interleaver
-description are setup data, not part of the recursive state.
+width nor the arithmetic cost grows. The recursive state therefore has
+constant size. If the encoder also tracks its position to select the next
+multiplier, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
+working state. If the position is supplied externally, the working state
+remains constant. This distinction does not change the linear encoding
+work. The stored multiplier schedule and interleaver description are
+setup data, separate from this working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
 
@@ -90,10 +94,6 @@ the BMS question: logarithmic outer memory and a one-bit accumulator
 suffice for an asymptotically good code. BMS mention termination but
 omit it from their displayed encoder definition~\cite[Sec.~I-A]{bms09};
 the fixed termination inputs are explicit in the realization above.
-For Structured SPIN, serializing each fixed-width inner step requires
-only constant-size data registers. If the position counter selecting
-its sampled multipliers is counted internally, the total inner memory
-is $O(\log N)$, while its recursive data state remains constant.
 The structured interleaver is still one permutation between the two
 encoders; permutations internal to the outer act only within its blocks.
 
