@@ -124,7 +124,13 @@ cost of committing and opening the encoded data.
 \subsection{Comparison with other transposed encoders}
 \label{sec:transposed-comparison}
 
-We compare SPIN with chosen-block BAA~\cite{cryptoeprint:2026/1903},
+We compare SPIN with BAA, introduced by Kolesnikov et al.\ at CRYPTO
+2026~\cite{KolesnikovEtAl2026BA}, using the newer chosen-block
+instantiations~\cite{cryptoeprint:2026/1903}. Chosen-block BAA is a companion
+work that updates BAA using ideas also developed here, including reuse of
+a spectrum-controlled outer constituent. The reported BAA timings use
+that companion implementation, rather than the original CRYPTO implementation.
+We also compare with
 Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}, and binary
 repeat--accumulate--accumulate (RAA)~\cite{blaze25}. Every call evaluates a binary
 transposed encoder on $128$ parallel instances. No weighted extension-field

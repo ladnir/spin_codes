@@ -187,10 +187,12 @@ Gilbert--Varshamov bound~\cite{kliewer08}.
 Block-Accumulate codes replace repetition with random block-diagonal maps and
 compute detailed expected spectra; they also provide optimized CPU and GPU
 implementations~\cite{KolesnikovEtAl2026BA}. Accumulator SPIN is their
-one-accumulator truncation. Chosen-block BAA studies the complementary choice
-of reusing one constituent in every diagonal position
-~\cite{cryptoeprint:2026/1903}. Structured SPIN adopts that shared-code
-view, but adds a structured global route and a different recursive inner.
+one-accumulator truncation. The newer companion work on chosen-block BAA
+updates this family by reusing one spectrum-controlled constituent in every
+diagonal position~\cite{cryptoeprint:2026/1903}. Structured SPIN combines
+this shared design idea with a structured global route and a different
+recursive inner. Our BAA performance comparisons use the newer companion
+instantiations of the original CRYPTO 2026 family.
 
 \paragraph{Codes for correlation generation.}
 Linear codes compress sparse correlations in vector-OLE and pseudorandom
