@@ -20,14 +20,17 @@ python -B paper/build_application_tables.py --check
 
 This checks generated table contents and both conditional parameter budgets
 with integer arithmetic. It does not run benchmarks or replay distance proofs.
-Without `--check`, it regenerates the three TeX table bodies. With
+Without `--check`, it regenerates the four TeX table bodies. With
 `--source PATH`, it imports the selected summaries from a Hypercat checkout;
 review the resulting manifest before accepting new measurements.
+`--bolt-source PATH` separately imports the pinned Bolt opening projection
+from the Bolt worktree; importing Hypercat data leaves that record unchanged.
 
 | Paper table | Source summary in Hypercat | Aggregation |
 | --- | --- | --- |
 | Ordinary encoding (`tab:ordinary-encoding`) | `results/spin-brakedown/peach-paired/summary.json` | Median of 31 trials for each `fused-k16/18/20` run. |
 | Standalone PCS (`tab:spin-pcs-standalone`) | `results/spin-brakedown/peach-security/summary.json` | `pooled_optimized`, ten trials from two processes per shape. |
+| Opening only (`tab:pcs-opening`) | Same SPIN summary; Bolt source described below | SPIN `open_ms` median; Bolt sum of component medians and work proxies. |
 | Flock (`tab:spin-flock`) | `results/flock-spin/native-current-comparison/summary.json` | Mean of four process medians; four measured trials after five warmups per process. |
 
 The Bolt commitment comparison comes from `results/bolt-one-thread/summary.json`.
@@ -38,6 +41,48 @@ trials after one warmup. The fastest Bolt-max run uses SHA-256; the alternative
 BLAKE3 run takes 1928.190524 ms. Both use the same one-core hardware conditions.
 The builds have different compiler revisions and different layouts; no claim of
 a controlled encoder-only replacement is made for this comparison.
+
+### Opening-only comparison
+
+The measured SPIN opening medians are 106.815013 ms (square) and
+107.0409855 ms (longer rows). Both come directly from `open_ms` in the
+conditional 100-bit runs, not from subtraction of unrelated measurements.
+Opening includes folds, transcript work, and authenticated query preparation;
+outer serialization and independent evaluation for validation are excluded.
+Independently aggregated phase medians need not add to the total median.
+
+`paper/data/bolt_opening_projection.json` retains the 512 MiB standalone
+case from Bolt worktree revision `9b45089`, including the SHA-256 of
+`tools/standalone/opening-results/projection.json`. The worktree uses upstream
+`bcc-research/bolt-rs` revision
+`3832e47b24e7b3e10525c9c5bcfc1cfe66d525f2`. Detailed scope, raw CSV files,
+source/build receipts, and the component validator are under
+`tools/standalone/`; see `CALIBRATED_PROJECTION.md` there.
+
+The amortized-limit model adds row evaluation (636.655120 ms), independent
+random column folding (372.763259 ms), two sumchecks (36.095448 ms), and
+inner proximity proxies (227.253379 ms), totaling 1272.767206 ms. The
+non-amortized model adds 455.895924 ms of leading Mulperm work calibrated
+with streaming product scans, totaling 1728.663130 ms. The paper rounds
+these projections to integer milliseconds and does not report a measured
+opening speedup factor. The generator checks the sums before rendering.
+
+Each component is a median of five trials after one warmup on Peach CPU 15,
+one worker, requested 4.5 GHz and boost disabled, using Rust 1.94.1 with native
+CPU features. Custom folds were cross-checked, sumcheck endpoints checked,
+and all 36 inner-proxy proofs verified outside the prover timer. These are
+component measurements, not a complete opening run. The kernels follow
+upstream arithmetic and are not claimed to be optimal.
+
+The inner proxies are separate complete Ligerito proximity proofs, not
+Bolt's constrained, virtual-syndrome, or batched proofs. Some work is
+omitted and other work is substituted, so neither projection is a runtime
+bound. A finite amortization batch must pay its share of the matrix proof
+and batching work. These runs also do not establish equal composed security
+between implementations. The paper retains the equal-input-volume scope
+and reports the measured Flock integration separately. It does not infer
+a Bolt/Flock runtime by substituting these standalone opening costs: the
+weighted-claim adapter and intermediate reuse require additional analysis.
 
 Ordinary encoding processes 128 parallel binary instances. The call maps K
 128-bit blocks to 2K such blocks. It excludes commitment, opening, setup,
@@ -112,6 +157,10 @@ previous transposed timing entries; it is not a full numerical proof replay.
 The author draft builds with TeX Live 2026 and has no unresolved references or
 overfull boxes. The changed front matter and application pages were rendered
 and visually inspected. Existing underfull-box and class/package warnings remain.
-The new encoding subsection begins on page 32; the PCS and Flock sections begin
-on pages 35 and 36 of this 61-page author draft. The PDF is a build product under
+After adding the opening-only comparison, the draft has 62 pages; the
+opening table is on page 36 and Flock begins on page 37. Pages 36--38 were
+rendered and inspected. The table arithmetic, finite-integration, repository
+hygiene, and whitespace checks pass; the build has no unresolved references
+or overfull boxes. No new benchmarks were run.
+The PDF is a build product under
 `output/pdf/spin_codes_draft.pdf` and is not committed.

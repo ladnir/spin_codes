@@ -81,3 +81,46 @@ dimension or coefficient field. It includes each implementation's code,
 layout, and commitment processing. The Bolt run measures commitment only;
 we did not run its complete opening prover. The artifact records the
 implementations, timing boundaries, and both measured Bolt-max variants.
+
+\paragraph{Opening cost in isolation.}
+Table~\ref{tab:pcs-opening} separates opening from commitment. The two
+SPIN configurations both open in approximately $107$\,ms, including the
+row combinations and authenticated column queries. These are measured
+opening times from the same trials as Table~\ref{tab:spin-pcs-standalone};
+they exclude outer serialization. Sending the folded messages explicitly
+keeps the prover's opening work small, at the proof sizes reported above.
+
+\begin{table}[tb]
+\centering
+\caption{One opening after commitment, at $512$\,MiB input volume on one
+core. Bolt entries are calibrated projections, not complete prover
+measurements or runtime bounds.}
+\label{tab:pcs-opening}
+\small
+\begin{tabular}{@{}llr@{}}
+\toprule
+Configuration & Evidence & Opening (ms) \\
+\midrule
+\input{tables/pcs_opening}
+\end{tabular}
+\end{table}
+
+Bolt's opening additionally uses inner Reed--Solomon proofs and a proof
+of the sparse-matrix relation~\cite{bolt26}. To estimate its cost, we
+measure row evaluation, a random column fold, and sumchecks, and use
+complete Ligerito proximity runs as proxies for the inner proofs. The
+calibrated projection is $1273$\,ms in the amortized limit, which assigns
+negligible cost per opening to the matrix-relation proof. Adding a
+calibration of that proof's leading multiplication work gives $1729$\,ms
+without amortization. The inner proxies differ from Bolt's constrained
+and batched proofs; basis preparation, some matrix-proof work, outer
+authentication, and transcript integration remain unmodeled. The
+artifact records these choices and the measured components. Consequently,
+these figures describe the projected cost of the selected implementation
+approach, rather than a lower bound on Bolt's opening time.
+
+The opening comparison motivates testing the complete application:
+commitment speed alone does not determine the cost of a PCS inside a
+proof system. Section~\ref{sec:spin-flock} measures both commitment and
+opening after integration into Flock, where the claim interface and
+available intermediate computations also affect their cost.

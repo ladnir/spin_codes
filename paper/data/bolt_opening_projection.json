@@ -1,0 +1,28 @@
+{
+  "source_repository": "bolt-rs",
+  "source_revision": "9b45089",
+  "receipt": {
+    "path": "tools/standalone/opening-results/projection.json",
+    "sha256": "7263e0bdabe10878e0bc4a397a45e8fa6eb64e09883545a596c989d61118f662"
+  },
+  "label": "Calibrated projection",
+  "scope": "Sum of dominant-work measurements and proxies; no complete Bolt opening, verification, or Flock/Bolt integration",
+  "model": "A = row evaluation + independent random column fold + 2 sumchecks + inner_message_proxy + inner_syndrome_proxy; non-amortized adds d(d-1) product scans of length 8k",
+  "amortization": "Amortized limit omits sparse-matrix proof allocation. Finite batches require adding the allocated proof cost and batching work.",
+  "omitted": "Sparse-relation/batching basis preparation; outer Merkle extraction/serialization; full Fiat-Shamir integration; Mulperm witness/setup and other work; binary-witness adaptation; composed-security retuning",
+  "proxy_scope": "Separate complete Ligerito proximity runs on extension-field tables of lengths k and k/8 include their own encoding/commitment. They are not the constrained/virtual or batched inner RS proofs in Bolt.",
+  "case": {
+    "input_mib": 512,
+    "phase_medians_ms": {
+      "row_evaluations": 636.65512,
+      "random_column_fold": 372.763259,
+      "one_sumcheck": 18.047724,
+      "inner_message_proxy": 201.990798,
+      "inner_syndrome_proxy": 25.262581,
+      "mulperm_one_product_scan": 37.991327
+    },
+    "one_opening_amortized_limit_projection_ms": 1272.767206,
+    "one_opening_non_amortized_projection_ms": 1728.66313,
+    "mulperm_leading_work_projection_ms": 455.895924
+  }
+}
