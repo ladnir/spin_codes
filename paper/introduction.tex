@@ -53,52 +53,73 @@ The phrase \emph{single permutation} describes the mathematical interface.
 An implementation may factor $\Pi_N$ into block shuffles, a transpose, and
 region shuffles. These factors still compose to one global interleaver.
 
-We also test whether these encoding properties improve a complete prover.
-We instantiate Brakedown's matrix polynomial commitment scheme (PCS)
-with SPIN, then integrate that PCS into Flock. Separate measurements
-of ordinary encoding, standalone commitment and opening, and complete
-constraint proving connect the code's cost to its application-level benefit.
-The resulting PCS favors prover speed over proof size.
+Beyond the code construction, we evaluate SPIN in two applications:
+correlation generation and code-based proof systems. For PCGs, we measure
+the encoding stage and estimate the resulting OT throughput. For proof
+systems, we instantiate the Brakedown matrix polynomial commitment scheme
+(PCS)~\cite{brakedown23} with SPIN, then integrate it into
+Flock~\cite{flock26}. Standalone commitment and opening benchmarks measure
+the PCS cost; the Flock comparison measures its effect on a complete
+constraint prover, using Ligerito~\cite{ligerito25} as the alternative PCS.
+The resulting SPIN-based PCS favors prover speed over proof size.
 
 \subsection{Three SPIN constructions}
 
-We use the same interface for three construction lines.
+The three constructions develop the same idea in stages: start with a
+simple accumulator, strengthen the inner mixing, then replace expensive
+random components with efficient structured ones.
 
 \paragraph{Accumulator SPIN.}
-The outer encoder uses random block maps along the diagonal.
-The interleaver is uniform, and the inner encoder is the binary accumulator.
-This is the depth-two, one-accumulator truncation of the Block-Accumulate
-architecture of Kolesnikov et al.~\cite{KolesnikovEtAl2026BA}. The BA
-construction also supplies the random-block enumerator used below.
-Chosen-block BAA instead studies the related option of reusing one certified
-constituent in every outer position
-\cite{cryptoeprint:2026/1903}.
-The accumulator admits an exact input--output enumerator, making this construction
-the simplest setting in which to expose the distance mechanism.
+We begin with random outer blocks, one uniform interleaver, and a binary
+accumulator. This simplifies the Block-Accumulate (BA) architecture,
+including the Block-Accumulate-Accumulate (BAA) constructions of prior
+work~\cite{KolesnikovEtAl2026BA,cryptoeprint:2026/1903}, to one
+interleaver and one accumulator. The accumulator has an exact input--output
+weight enumerator, making it a useful starting point for the analysis.
+However, a single accumulator provides limited mixing of sparse inputs.
+Our rate-$1/2$ theorem gives relative distance $0.0037$, far below the
+Gilbert--Varshamov (GV) benchmark of approximately $0.110028$.
+This weak guarantee motivates a stronger inner encoder.
 
 \paragraph{Random SPIN.}
-The outer encoder and uniform interleaver remain unchanged. A random recursive
-convolution replaces the accumulator. The stronger inner mixing yields a
-substantially larger relative distance, at the cost of a denser recursion.
-Silver codes earlier used a banded lower-triangular solve, which is
-a structured recursive encoder of convolutional form
-\cite{CouteauRindalRaghuraman2021Silver}. Expand-Convolute later isolated a
-random time-varying convolution after a sparse expander
-\cite{RaghuramanRindalTanguy2023EC}. The theorem below combines that random
-inner with independent random-block injections.
+We retain the random outer blocks and uniform interleaver, but replace
+the accumulator with a random recursive convolution of logarithmic memory.
+The larger memory lets the inner mix sparse inputs more effectively.
+With logarithmic outer block size, our rate-$1/2$ theorem proves relative
+distance greater than $0.11002$, nearly matching the GV bound, with
+$O(N\log N)$ direct encoding work.
+
+This recursive inner has a lineage in codes for PCGs. Silver used a banded
+lower-triangular solve, but its linear-distance claim remained
+conjectural~\cite{CouteauRindalRaghuraman2021Silver}.
+Expand--Convolute introduced a random recursive convolution and proved
+distance bounds through Markov-chain coupling and concentration
+\cite{RaghuramanRindalTanguy2023EC}. The proved parameters are conservative;
+its evaluation also proposed faster, aggressive parameters supported by
+empirical distance estimates beyond those guarantees. We retain its random inner but analyze the
+concatenation through weight enumerators. An exact input--output transform
+tracks the expected weight spectrum and yields the near-GV distance bound.
 
 \paragraph{Structured SPIN.}
-A spectrum-controlled local outer, a structured global interleaver, and a
-  structured recursive inner replace the random components. The scalable
-  family samples one spectrum-certified BA-3 constituent and reuses it in every
-  outer position. Its base code and base length are parameters. Independent
-  block and region shuffles surround a deterministic transpose, and RM2Sub-S19
-  supplies the inner recursion. The direct family has natural admissible
-  lengths. Zero extension from the largest preceding direct member gives a
-  code at every sufficiently large requested length. For finite lengths,
-  a fixed BCH-derived constituent uses the same routing and RM2Sub architecture.
-  Its rigorous spectrum bounds yield explicit setup guarantees and support
-  an optimized implementation.
+Random SPIN establishes that the architecture can approach the GV bound,
+but its dense random outer blocks and random convolution are expensive.
+Structured SPIN identifies the properties needed by that proof and realizes
+them with efficient constituent codes and structured interleaving. The
+outer supplies bounds on the number of codewords at each weight; the inner
+supplies bounds on how input weights propagate to output weights.
+These interfaces let us replace the random components while retaining
+strong distance guarantees. Our scalable family has rate $1/2$, relative
+distance greater than $0.11$ with high probability, and $O(N)$ encoding work.
+
+The same analysis supports concrete parameter selection using exact
+enumerators where available and rigorous spectrum bounds otherwise.
+For the implemented family, we certify relative distance greater than
+$0.10$ with setup failure below $2^{-40}$ at five message lengths from
+$2^{16}$ to $2^{24}$. Parameter selection trades encoding cost against the
+desired setup-failure bound, with each choice checked by its certificate.
+The resulting encoders are several times faster than prior implementations,
+as quantified below. This connects the asymptotic distance argument to
+finite guarantees and practical encoding speed.
 
 Table~\ref{tab:spin-families} summarizes the three lines.
 
@@ -112,7 +133,7 @@ Table~\ref{tab:spin-families} summarizes the three lines.
     \midrule
     Accumulator SPIN & random blocks & uniform & accumulator \\
     Random SPIN & random blocks & uniform & random recursive \\
-    Structured SPIN & spectrum-controlled & structured & RM2Sub-S19 \\
+    Structured SPIN & spectrum-controlled & structured & structured recursive \\
     \bottomrule
   \end{tabular}
   \end{table}
@@ -130,7 +151,7 @@ We make five contributions.
   $1/2$ and minimum distance greater than $0.11N$ with probability $1-o(1)$.
   Every realized member has $O(N)$ ordinary and transposed encoding work. The
   construction combines a spectrum-controlled constituent reused along the
-  outer diagonal, one factored global interleaver, and an RM2Sub inner.
+  outer diagonal, one factored global interleaver, and a structured recursive inner.
   Zero extension gives every sufficiently large requested output length
   with an $o(1)$ loss in rate and relative distance.
 
