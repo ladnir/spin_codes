@@ -4,6 +4,9 @@ The paper now presents the application chain in three stages: ordinary
 encoding, a standalone SPIN–Brakedown PCS, and integration into Flock.
 The application prose focuses on the changes, their purpose, and the result.
 Kernel tuning and experiment history remain in the implementation records.
+PCS and Flock tables display whole milliseconds. Their proof-size columns
+use one decimal place consistently because some entries are below 1 MiB.
+The pinned measurements and calculations retain full precision.
 
 ## Tables and reproduction
 

@@ -6,7 +6,7 @@ scheme~\cite{brakedown23}. This application tests whether fast ordinary
 encoding translates into fast commitment and opening. The implementation
 has two principal changes: it instantiates the code with SPIN, and it
 organizes the computation around packed binary data. At $512$\,MiB of
-input, the resulting prover commits and opens in $519.60$\,ms on one core.
+input, the resulting prover commits and opens in $520$\,ms on one core.
 
 \paragraph{Construction.}
 Let a Boolean evaluation table define a multilinear polynomial over
@@ -50,8 +50,8 @@ $R=K=2^{16}$ for the square shape. The longer-row shape has $R=2^{14}$
 and $K=2^{18}$. Both encode to $1$\,GiB.
 Longer rows reduce the SPIN proof
 size by $31.7\%$ for a $5.5\%$ increase in prover time. The square
-configuration spends $233.04$\,ms encoding, $178.57$\,ms hashing columns,
-and approximately $94.7$\,ms computing the two row combinations.
+configuration spends $233$\,ms encoding, $179$\,ms hashing columns,
+and approximately $95$\,ms computing the two row combinations.
 
 \begin{table}[tb]
 \centering
@@ -91,7 +91,7 @@ composed security theorem.
 
 \paragraph{Comparison with Bolt.}
 At the same $512$\,MiB input volume and on one core, the fastest measured
-Bolt-max commitment takes $1719.90$\,ms, compared with $413.47$\,ms for
+Bolt-max commitment takes $1720$\,ms, compared with $413$\,ms for
 SPIN--Brakedown: a $4.16\times$ difference. Bolt~\cite{bolt26} encodes
 $2^{27}$ elements of $\F_{2^{32}}$; our input has $2^{32}$ Boolean entries.
 The comparison therefore matches input bytes, rather than polynomial

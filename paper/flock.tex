@@ -62,8 +62,8 @@ enter the protocol transcript. All $252$ proofs in the final experiment,
 including warmups and reference controls, verify.
 
 \paragraph{Prover costs.}
-At the larger workload, commitment takes $100.97$\,ms with SPIN--Brakedown
-and $161.00$\,ms with Ligerito. Opening takes $61.17$ and $140.35$\,ms,
+At the larger workload, commitment takes $101$\,ms with SPIN--Brakedown
+and $161$\,ms with Ligerito. Opening takes $61$ and $140$\,ms,
 respectively. These phases account for about $139$\,ms of the $155$\,ms total
 difference. Witness generation is faster in the Ligerito configuration,
 and the remaining checking and preparation costs differ with the layouts.
@@ -84,8 +84,8 @@ with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.
 
 The current SPIN--Brakedown integration favors prover time at a substantial
-communication cost. At the larger workload, its proof is $12.83$\,MiB,
-compared with $0.396$\,MiB for Ligerito, which also verifies faster.
+communication cost. At the larger workload, its proof is $12.8$\,MiB,
+compared with $0.4$\,MiB for Ligerito, which also verifies faster.
 The application result complements the standalone PCS measurements:
 SPIN's encoding performance supports a fast commitment path, and that
 advantage remains useful after integration into Flock.

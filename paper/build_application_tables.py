@@ -98,21 +98,21 @@ def render(data, bolt, ligerito):
     rows = []
     for key, label in (("k16-w2", "square"), ("k18-w2", "longer rows")):
         r = data["pcs"]["rows"][key]
-        rows.append(f"SPIN--Brakedown ({label}) & {r['total_ms']:.2f} & "
-                    f"{r['verify_ms']:.2f} & {r['proof_bytes']/2**20:.3f}" + r" \\")
+        rows.append(f"SPIN--Brakedown ({label}) & {r['total_ms']:.0f} & "
+                    f"{r['verify_ms']:.0f} & {r['proof_bytes']/2**20:.1f}" + r" \\")
     for key, label in (("fast100", "Fast100"), ("slim100", "Slim100")):
         r = ligerito["rows"][key]
-        rows.append(f"Ligerito ({label}) & {r['total_ms']:.2f} & "
-                    f"{r['verify_ms']:.2f} & {r['opening_bytes']/2**20:.3f}" + r" \\")
+        rows.append(f"Ligerito ({label}) & {r['total_ms']:.0f} & "
+                    f"{r['verify_ms']:.0f} & {r['opening_bytes']/2**20:.1f}" + r" \\")
     tables["pcs_standalone"] = rows
     case = bolt["case"]
     rows = []
     for key, label in (("k16-w2", "square"), ("k18-w2", "longer rows")):
         value = data["pcs"]["rows"][key]["open_ms"]
-        rows.append(f"SPIN--Brakedown ({label}) & Measured & {value:.2f}" + r" \\")
+        rows.append(f"SPIN--Brakedown ({label}) & Measured & {value:.0f}" + r" \\")
     for key, label in (("fast100", "Fast100"), ("slim100", "Slim100")):
         value = ligerito["rows"][key]["open_ms"]
-        rows.append(f"Ligerito ({label}) & Measured & {value:.2f}" + r" \\")
+        rows.append(f"Ligerito ({label}) & Measured & {value:.0f}" + r" \\")
     for label, key in (("amortized limit", "one_opening_amortized_limit_projection_ms"),
                        ("non-amortized", "one_opening_non_amortized_projection_ms")):
         rows.append(f"Bolt-max ({label}) & Calibrated projection & {case[key]:.0f}" + r" \\")
@@ -122,8 +122,8 @@ def render(data, bolt, ligerito):
     for log in ("14", "16"):
         for backend, label in (("spin", "SPIN--Brakedown"), ("native-fast100", "Ligerito")):
             r = data["flock"][log][backend]
-            rows.append(f"${2**int(log):,}$ & {label} & {r['total_ms']:.2f} & "
-                        f"{r['verify_ms']:.2f} & {r['proof_bytes']/2**20:.3f}" + r" \\")
+            rows.append(f"${2**int(log):,}$ & {label} & {r['total_ms']:.0f} & "
+                        f"{r['verify_ms']:.0f} & {r['proof_bytes']/2**20:.1f}" + r" \\")
         case = cases[{"14": 32, "16": 128}[log]]
         rows.append(f"${2**int(log):,}$ & Bolt (projection) & "
                     f"{flock_projection(data, case):.0f} & --- & ---" + r" \\")
