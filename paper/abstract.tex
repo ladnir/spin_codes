@@ -1,36 +1,30 @@
 \begin{abstract}
-Cryptographic applications need binary codes with constant rate, linear
-distance, fast ordinary and transposed encoding, and predictable data
-movement. Random linear codes provide
-strong distance but require dense computation. Fast structured encoders reduce
-this cost, but their sparse dependencies make linear distance difficult to
-prove. We ask whether one code family can achieve all of these properties.
+Binary codes used in correlation generation and proof systems need strong
+distance, fast ordinary and transposed encoding, and regular memory access.
+We introduce Single-Permutation INterleaved (SPIN) codes, which compose
+a blockwise outer encoder, one global interleaver, and a recursive inner
+encoder.
 
-We introduce Single-Permutation INterleaved (SPIN) codes. A SPIN encoder
-composes a blockwise outer encoder, one global interleaver, and a recursive
-inner encoder. Our central result is a Structured SPIN family at native lengths
-$N$. Every realized code has rate $1/2$, and its ordinary and transposed
-encoders use $O(N)$ bit operations. With probability $1-o(1)$ over setup, its
-  minimum distance exceeds $0.11N$. The construction reuses one sampled
-  spectrum-certified BA-3 constituent along the outer diagonal, factors the
-  interleaver into structured routing stages, and uses the fixed RM2Sub-S19
-  inner. Zero extension supplies every sufficiently large requested length
-  with only an $o(1)$ loss in rate and relative distance.
+Our main result is a Structured SPIN family with rate $1/2$ and $O(N)$
+bit operations for both encoding directions at its native output lengths
+$N$. With probability $1-o(1)$ over setup, its minimum distance exceeds
+$0.11N$. A first-moment analysis groups outer words by block occupancy
+and weight, then bounds their contributions to low-weight codewords
+after structured interleaving and recursive encoding.
 
-The proof uses a finite, class-indexed first-moment framework. The outer stage
-supplies class multiplicities, while the interleaver--inner pair supplies
-conditional failure envelopes. Accumulator SPIN and Random SPIN isolate
-the main proof mechanisms. For finite lengths, the same structured architecture
-uses a fixed BCH-derived $[256,128,\ge38]$ constituent and an RM2Sub inner
-with $128$-bit steps and $19$-bit state. Rigorous spectrum inequalities,
-rather than an assumed exact spectrum, certify relative distance greater
-than $0.10$ with setup failure below $2^{-40}$ at message lengths
-$2^{16},2^{18},2^{20},2^{22},2^{24}$. A single-thread implementation evaluates
-the batched transposed encoder at $K=2^{20}$ in $11.259$\,ms; separate
-paired measurements give similar ordinary-encoding cost.
-We instantiate Brakedown with SPIN: commitment and one opening of
-$512$\,MiB take $519.60$\,ms under a conditional 100-bit parameter target.
-Integrating this PCS into an optimized Flock implementation improves
-prover throughput by $1.38$--$1.93\times$ over its optimized Ligerito
-configuration at the measured workloads, with larger proofs.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
+For finite lengths, a BCH-derived outer constituent and a fixed recursive
+inner give rate $1/2$ and relative distance greater than $0.10$, with setup
+failure below $2^{-40}$. We certify this bound at message lengths
+$2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum inequalities,
+without assuming the constituent's exact weight spectrum. On one Ryzen
+core, ordinary encoding of $128$ parallel $2^{20}$-bit messages takes
+about $11$\,ms, with similar transposed-encoding cost.
+
+We apply SPIN in a Brakedown-style polynomial commitment scheme and
+integrate that scheme into Flock. With conditional 100-bit PCS parameters,
+commitment and one opening of $512$\,MiB take $520$\,ms on one core.
+Within an optimized Flock implementation, replacing Ligerito with
+SPIN--Brakedown improves prover throughput by $1.38$--$1.93\times$ at the
+measured workloads, with larger proofs. The comparison gives both
+backends the applicable shared implementation optimizations.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
 \end{abstract}
