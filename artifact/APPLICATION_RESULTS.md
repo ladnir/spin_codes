@@ -220,7 +220,7 @@ do not certify that particular seed's distance.
 ### Blaze compatibility
 
 The PCS section now distinguishes the current explicit-fold Brakedown
-implementation from a possible SPIN instantiation of Blaze's code-switching
+implementation from the theoretical SPIN composition with Blaze's code-switching
 framework. Blaze Sections 1.2.1 and 6 give the generic interleaving interface;
 Section 8.2 explains that its inner proof avoids transmitting the full linear
 combination. The outer code must be paired with a multilinear-evaluation
@@ -228,8 +228,10 @@ IOPP, which checks proximity and the decoded message's evaluation jointly.
 Linearity and distance alone do not provide a fast concrete prover for that
 interface. The SPIN block maps, routing, and recurrence would need such a
 proof; substituting them into the RAA-specific proof is not an implemented
-change. Generic proof machinery supplies a conceptual route, with concrete
-cost still to be determined.
+change. Generic proof machinery establishes the theoretical compatibility
+and asymptotic proof-size reduction. The paper states that observation;
+it does not claim a concrete SPIN--Blaze instantiation, parameter selection,
+finite-size reduction factor, or measured performance.
 
 At the current longer-row 512 MiB shape, the two explicit folded messages
 contribute 8 MiB and the sampled columns about 4 MiB before authentication.
