@@ -55,6 +55,9 @@ The runner, raw CSV files, machine/compiler/configuration hashes, build log,
 summary validator, and timing contract are in `benchmarks/pcs-standalone/`.
 The source summary is `results-paper/summary.json` within that directory.
 The run records were committed in Flock revision `f73a91f`.
+The recorded source hashes are for the Windows-exported archive (CRLF);
+the harness, lockfile, and both m32 configurations were checked against
+that archive and against the pinned Git blobs after newline normalization.
 
 Both rows use 512 MiB of packed bits and one ordinary 32-coordinate binary
 multilinear evaluation. Ring switching receives equality weights on the
