@@ -142,166 +142,42 @@ floating feasibility tolerance, supplies the inequality consumed below.
 The published endpoint spectra remain mathematical inputs; empirical
 spectrum estimates do not.
 
-\subsection{Selected RM2Sub maps}
+\subsection{Selected IMT maps and positive transfers}
 \label{app:finite-inner-definition}
 
-Use $\F_{2^{19}}=\F_2[X]/(X^{19}+X^5+X^2+X+1)$ in the polynomial basis.
-For $0\le j<19$, the following word is $A(e_j)$, with output coordinate $i$
-stored in bit $i$. Leading zeros are immaterial.
-\begin{center}
-\small
-\begin{tabular}{@{}rl@{}}
-\toprule
-$j$ & hexadecimal generator word\\
-\midrule
-0 & \texttt{ffffffffffffffffffffffffffffffff}\\
-1 & \texttt{aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}\\
-2 & \texttt{cccccccccccccccccccccccccccccccc}\\
-3 & \texttt{f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0}\\
-4 & \texttt{ff00ff00ff00ff00ff00ff00ff00ff00}\\
-5 & \texttt{ffff0000ffff0000ffff0000ffff0000}\\
-6 & \texttt{ffffffff00000000ffffffff00000000}\\
-7 & \texttt{ffffffffffffffff0000000000000000}\\
-8 & \texttt{ca9ff6a3c56f06ac0653c590f65cca60}\\
-9 & \texttt{8e8e718e2bd4d4d4b2b24db217e8e8e8}\\
-10 & \texttt{b2b2b2b218e7e71842bdbd42e8e8e8e8}\\
-11 & \texttt{a00a05af366393c6396c633650fa0aa0}\\
-12 & \texttt{9350635fa063506c5f9c506c93509ca0}\\
-13 & \texttt{12e2747b121d7484de2e4748212eb848}\\
-14 & \texttt{4411e14b11bb4b1e2d87772287d22288}\\
-15 & \texttt{59953003cffca66a0cc0655665560cc0}\\
-16 & \texttt{7447b88b74b8b874b7847b4848848448}\\
-17 & \texttt{11ddd21e447787b42d1e112278b44488}\\
-18 & \texttt{72e48214e48deb82d8b1d7be4ed8be28}\\
-\bottomrule
-\end{tabular}
-\end{center}
-Set $C=A^\top$. Binary elimination and dot products verify
-$\operatorname{rank}(A)=19$ and $CA=0$.
-Enumerating $2^{19}$ states gives the image enumerator
-\[
- 1+5040z^{48}+110848z^{56}+292510z^{64}
-   +110848z^{72}+5040z^{80}+z^{128}.
-\]
-MacWilliams gives the exact kernel spectrum of $C$; its minimum nonzero
-weight is $6$. These are small, exact computations on the inner, not an
-enumeration of the outer.
+The half-rate construction uses exactly the maps in Table~\ref{tab:imt-maps}.
+In particular, the image of $A$ does not contain the all-one word; the
+feedback columns have weight five. No field-multiplier update or identity
+$CA=0$ is used. The seven-state fixed-weight transfers
+$T_j(z)$ in Appendix~\ref{app:imt-finite-transfers} apply without a limiting
+argument. They distinguish zero, arbitrary nonzero mass, and five uniform
+image-weight shells. Their cancellation bounds use the feedback map $C$
+separately from the expansion $A$.
 
-\subsection{Positive transfers for one step and one region}
+Write $E_j(z):=T_j(z)$. For a shuffled region of $L$ bits, form
+\[
+ \mathcal E(u,z):=\sum_{j=0}^{128}\binom{128}{j}E_j(z)u^j,\qquad
+ R_j(z):=\frac{[u^j]\mathcal E(u,z)^{L/128}}{\binom Lj}.
+\]
+Conditional on its weight, the region is a uniform slice. The binomial
+factors count its stepwise supports, proving this coefficient formula.
+Multiplication retains the inner state across steps and regions; the
+matrices need not commute. From the zero initial state, the conditional
+bad-word probability is at most
+$z^{-H}e_ZR_{j_1}\cdots R_{j_{256}}\1$, where $e_Z$ is a row vector.
+Truncation above degree $q$ cannot change any coefficient through degree $q$.
 
-Fix $0<z<1$. A transfer entry bounds output moment weighted by the indicated
-next-state class. All comparisons below are entrywise and nonnegative.
-Let $M=2^{19}-1$, $\kappa=M/(M-1)$, $d_A=48$, and let $a'_w$ count nonzero
-image words of weight $w$. For a uniform input of weight $j$ in $t=128$
-coordinates, define
-\[
- f_{w,j}(z):=\frac{\sum_v\binom wv\binom{t-w}{j-v}z^{w+j-2v}}{\binom tj},
- \quad f_j:=\max_{w:a'_w>0}f_{w,j},\quad
- \mu_j:=M^{-1}\sum_w a'_w f_{w,j}.
-\]
-These expressions average over overlap with a fixed image word.
-Let $k_j$ be the number of weight-$j$ words in $\ker C$ and
-$\beta_j=k_j/\binom tj$.
-
-We distinguish zero state $Z$, arbitrary nonzero state $D$, uniform nonzero
-state $U$, and the class $P$ of nonzero laws with point masses at most
-$1/(M-1)$. The last class includes punctured-uniform laws and their mixtures.
-For these three nonzero classes, valid moment bounds are respectively
-\[
- m_{D,j}=f_j,\qquad m_{U,j}=\mu_j,\qquad
- m_{P,j}=\min\{f_j,\kappa\mu_j\}.
-\]
-This follows by conditioning on a fixed state for $D$, averaging for $U$,
-and pointwise domination for $P$.
-
-\paragraph{Refresh and termination.}
-For fixed nonzero state and fixed input, a fresh nonzero multiplier makes
-the multiplied state uniform on the nonzero field elements.
-If $C(X_i)=0$, the next state is uniform nonzero.
-Otherwise it vanishes with probability $1/M$, and conditional on remaining
-nonzero it is uniform except at one excluded point.
-The current output does not depend on this fresh multiplier. Consequently,
-the weighted terminating mass for a nonzero class $a$ is at most
-\[
- \frac1M\min\{m_{a,j},(1-\beta_j)z^{\max(0,d_A-j)}\}.
-\]
-The weighted zero-syndrome mass is at most
-$\min\{m_{a,j},\beta_jz^{\max(0,d_A-j)}\}$.
-For $j>0$, a four-state upper matrix $E_j$ therefore has entries
-\begin{align*}
- (E_j)_{ZZ}&=\beta_jz^j,& (E_j)_{ZD}&=(1-\beta_j)z^j,\\
- (E_j)_{aZ}&=\frac{\min\{m_{a,j},(1-\beta_j)z^{\max(0,d_A-j)}\}}{M},\\
- (E_j)_{aP}&=\frac{M-1}{M}m_{a,j}
-       +\frac{\min\{m_{a,j},\beta_jz^{\max(0,d_A-j)}\}}{M}
-       &&(a\in\{D,U,P\}),
-\end{align*}
-with all unspecified entries zero.
-For zero input, refresh is exact:
-\[
- (E_0)_{ZZ}=1,\quad (E_0)_{DU}=z^{d_A},\quad
- (E_0)_{UU}=\mu_0,\quad (E_0)_{PU}=\min\{z^{d_A},\kappa\mu_0\}.
-\]
-Tracking $U$ separately avoids charging $\kappa$ at every idle step.
-
-The dense calculation further sharpens activation from zero.
-Let $\mathcal K^{(t)}_j$ denote the Krawtchouk polynomial for length $t$.
-Put $b_j=\binom tj$ and define
-\[
-\begin{aligned}
- n_j&=\min\left\{b_j+\sum_w a'_w|\mathcal K^{(t)}_j(w)|,\
-                    2^{19}(b_j-k_j)\right\},\\
- c_j&=\max\left\{1-\beta_j,\frac{(M-1)n_j}{2^{19}b_j}\right\}.
-\end{aligned}
-\]
-Fourier inversion bounds each nonzero syndrome probability\linebreak by
-$n_j/(2^{19}b_j)$. Hence its subprobability measure is dominated by $c_j$
-times a law in $P$: its total mass is at most $c_j$ and each point mass
-is at most $c_j/(M-1)$. The certificate may replace the $ZD$ entry by
-$ZP=c_jz^j$. It uses this replacement when $c_j\le4(1-\beta_j)$.
-No independence between the emitted weight and the syndrome is assumed.
-
-\paragraph{Region coefficients.}
-For any of these upper transfers, form the matrix polynomial
-\[
- \mathcal E(u,z):=\sum_{j=0}^t\binom tj E_j(z)u^j,\qquad
- R_j(z):=\frac{[u^j]\mathcal E(u,z)^{L/t}}{\binom Lj}.
-\]
-Conditional on its total weight, a shuffled region is a uniform slice.
-The binomial factors count its stepwise supports, proving this coefficient
-formula. Multiplication retains the inner state between steps and regions;
-the matrices need not commute. With initial row vector $e_Z$, Markov's
-inequality gives the moment bound $z^{-H}e_ZR_{j_1}\cdots R_{j_{256}}\1$.
-
-The sparse calculation uses a less expensive three-state envelope on
-$(Z,D,P)$. Its step matrix is
-\[
- \begin{pmatrix}
- \beta_jz^j&(1-\beta_j)z^j&0\\
- \min\{1-\beta_j,f_j\}/M&0&f_j\\
- \kappa\min\{1-\beta_j,\mu_j\}/M&0&\kappa\mu_j
- \end{pmatrix}.
-\]
-It overcounts surviving mass, which preserves an upper bound. The same
-region formula applies. Truncating the polynomial above degree $q$ cannot
-change any coefficient through degree $q$ because all degrees are nonnegative.
+For dense input laws the verifier may instead use the complete occupation
+or Fourier moment bound of Appendix~\ref{app:imt-finite-transfers}.
+Every selection bounds the same terminal moment; an entrywise minimum of
+different measure representations would not be justified.
 
 \subsection{One active outer row}
 
 A row of weight $w$ reaches a uniform $w$-subset of the $256$ regions.
 Its single position in each reached region is independently uniform.
-The specialized four-state transfer uses
-\[
- E_0=\begin{pmatrix}
- 1&0&0&0\\0&0&z^{d_A}&0\\0&0&\mu_0&0\\0&0&\kappa\mu_0&0
- \end{pmatrix},\qquad
- E_1=\begin{pmatrix}
- 0&z&0&0\\
- z^{d_A-1}/M&0&0&(M-1)z^{d_A-1}/M\\
- \mu_1/M&0&0&(M-1)\mu_1/M\\
- \kappa\mu_1/M&0&0&(M-1)\kappa\mu_1/M
- \end{pmatrix}.
-\]
-Here $k_1=0$ makes activation and termination particularly simple.
+Use the same $E_0,E_1$ above, including the exact weight-one
+cancellation data for the selected independent maps.
 Put $\ell=L/t$, $R_0=E_0^\ell$, and
 $R_1=\ell^{-1}\sum_{i=0}^{\ell-1}E_0^iE_1E_0^{\ell-1-i}$.
 The coefficient bound including the $L$ possible active row positions is
@@ -323,7 +199,7 @@ $b_w^\star$. Complement symmetry and nonnegativity imply
  \label{eq:finite-q1-domination}
 \end{equation}
 This reuses a weighted outer inequality, not a probability computed for
-another inner. All $c_w$ are evaluated for the selected RM2Sub instance.
+another inner. All $c_w$ are evaluated for the selected IMT instance.
 
 \subsection{Sparse occupancies and constant-row compositions}
 
@@ -424,7 +300,7 @@ independent Bernoulli inputs of probability
 $r=\vartheta/[x+(1-x)\vartheta]$. The product of row costs and normalizers
 is exactly $\prod_i C_{a_i}(x)B(\vartheta_a,x)^N$.
 
-For $\lambda>0$, use the four-state transfer above to define
+For $\lambda>0$, use a valid seven-state IMT transfer to define
 \[
  T(r,z):=\sum_{j=0}^t\binom tj r^j(1-r)^{t-j}E_j(z),\qquad
  \mathcal M(r,\lambda):=e^{\lambda H}e_ZT(r,e^{-\lambda})^{N/t}\1.
@@ -481,51 +357,234 @@ The original evaluations pay $(L+1)^{256}$; the refined receipts multiply
 their bounds by the exact rational factor $(D_L/(L+1))^{256}$.
 This changes only the density comparison, not any transfer or cover.
 
+\paragraph{Short-length refinements.}
+The two shortest instances need sharper bounds, not a different encoder.
+First, activation from zero can retain uniform-shell mass. For a
+weight-$j$ input, let $c_j$ bound every nonzero syndrome fiber. A valid
+complete zero row retains $E_{ZZ}=k_jz^j/\binom{128}{j}$ and sends
+$a_vc_jz^j/\binom{128}{j}$ to the shell of size $a_v$, with no arbitrary
+component. Here $k_j$ counts weight-$j$ kernel words and $a_v$ counts
+states with image weight $v$. For Bernoulli input, let $b_w$ count
+nonzero weight-$w$ words in the image of $C^\top$.
+Fourier inversion similarly bounds each
+weighted nonzero syndrome by
+\[
+ h=2^{-19}(1-r+rz)^{128}
+ \left(1+\sum_w b_w\left|1-\frac{2rz}{1-r+rz}\right|^w\right).
+\]
+Keeping the exact zero entry and sending $a_vh$ to each shell is valid.
+The verifier compares complete moment bounds, not their individual entries.
+
+Second, the factor $D_L$ can be replaced by a smaller
+composition-sensitive bound. Fix an assignment of reference probabilities
+$\xi_i$ (zero for inactive rows), with mean $\vartheta$. To compare its
+shuffled weight-$j$ probability to $\operatorname{Bin}(L,\vartheta)$, put
+$y=j/L$ and $a=y(1-\vartheta)/(\vartheta(1-y))$.
+Exponential tilting gives the exact ratio
+\[
+ \frac{\prod_i(1-\xi_i+\xi_i a)}
+      {(1-\vartheta+\vartheta a)^L}
+ \frac{\Prob[\sum_i X_i'=j]}{\Prob[\operatorname{Bin}(L,y)=j]},
+ \qquad
+ \Prob[X_i'=1]=\frac{\xi_i a}{1-\xi_i+\xi_i a}.
+\]
+For $0<j<L$, concavity bounds the product in the numerator by
+$(1-\nu+\nu a)^q$. If the tilted variance is at least $V$, Fourier
+inversion gives the point-mass bound $e^{-V}I_0(V)$: the absolute
+characteristic function is at most
+$\exp(-2V\sin^2(\phi/2))$, and integration proves the claim.
+This bound decreases with $V$.
+
+For an entire $(q,\nu)$ rectangle, minimize each tilted variance
+$\xi(1-\xi)a/(1-\xi+\xi a)^2$ over the allowed tilt interval. Its minimum
+is at an endpoint. A finite linear program then minimizes the average of
+these lower bounds subject to the allowed mean reference density.
+Multiplication by the minimum $q$ gives a uniform $V$.
+Maximizing the preceding likelihood ratio over integer $j$ gives a
+uniform routing factor for the rectangle. Endpoint weights are bounded
+directly. This calculation is also valid with a restricted set of labels.
+
+Third, fixing $x$ throughout a rectangle permits the label sum
+$S(x,\eta)^q$ in \eqref{eq:finite-dense-tilt} without the
+composition-count factor required by the varying-$x$ calculation.
+The iid probability $r$ then varies with $\vartheta$.
+To keep the moment and normalizer coupled, fix the setup-averaged
+nonnegative function $f(u)=\E_\theta[z^{\wt(I_\theta(u))}]$ on $N$-bit inputs
+and put $M(r)=\E_{U\sim\mathrm{Bern}(r)^N}f(U)$. For
+$D(\vartheta)=1-\vartheta+\vartheta/x$,
+\[
+ D(\vartheta)^N M\!\left(\frac{\vartheta}{x+(1-x)\vartheta}\right)
+ =\sum_u f(u)x^{-\wt(u)}
+          \vartheta^{\wt(u)}(1-\vartheta)^{N-\wt(u)}.
+\]
+Thus, as a function of $v=\log(\vartheta/(1-\vartheta))$,
+\[
+ F(v)=N\log D(\vartheta)+\log M(r(\vartheta))+\eta L\vartheta
+ \quad\hbox{satisfies}\quad F''(v)\ge-(N+|\eta L|)/4.
+\]
+Indeed, the logarithm of the positive exponential sum is convex,
+$(\log(1+e^v))''\le1/4$, and $|\vartheta''(v)|\le1/4$.
+The resulting secant bound is
+\[
+ F(v)\le\max(F(v_0),F(v_1))
+           +(N+|\eta L|)(v_1-v_0)^2/32.
+\]
+Outward endpoint moment bounds can replace $F(v_0),F(v_1)$.
+The verifier adds $q\log S+\log\binom Lq+\lambda H$, sums over the
+integers $q$ in the leaf, and applies its routing factor.
+
+Finally, split assignments with no high-reference label from those with
+at least one, taking a label to be high when $\xi_g>3/4$.
+The first part uses $S_{\rm low}$ and the restricted routing comparison.
+For the second part, choose $\zeta\le0$, use
+$S_{\rm low}+e^{-\zeta}S_{\rm high}$ and multiply by $e^\zeta$.
+If $h\ge1$ labels are high, $e^{\zeta h}\le e^\zeta$ proves this upper
+bound after expanding the label sum. An analogous split isolates the
+all-one label. The two subset bounds are added before comparison with an
+unsplit bound. No separately rounded normalizers are subtracted.
+The artifact's \path{SHORT_LENGTH_BOUNDS.md} derives the rectangle
+optimizations and records their exact-arithmetic tests.
+
+\subsection{The quarter-rate outer and feedback}
+\label{app:finite-quarter-definition}
+
+Over $\F_{128}$ with modulus $X^7+X+1$ and primitive element $X$, let
+$p$ and $q$ generate the primitive length-$127$ BCH codes of designed
+distances $31$ and $43$. In coefficient-bit notation,
+\[
+ p=\texttt{d5306d6bfdbc8574719e70d},\qquad
+ q=\texttt{5106dae17a61e520c606a4e29}.
+\]
+The quarter-rate constituent is the span of the parity extensions of
+$X^iq$ for $0\le i<29$ and $p,Xp,X^2p$.
+The quotient $q/p=\texttt{d5}$ is primitive of degree seven. The same
+coset-orbit argument as above proves rank $32$ and spectrum
+\[
+ W_{32}=W_{29}+\frac7{127}(W_{36}-W_{29}).
+\]
+Here $W_{29},W_{36}$ are the published extended-BCH spectra retained and
+attributed in the artifact's
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/rate_quarter_bch/SMALLER_OUTER.md}{outer-construction guide}.
+The resulting spectrum has minimum weight $32$, multiplicity $588$ at
+weight $32$, total mass $2^{32}$, and a single all-one word.
+
+Retain $A$ from Table~\ref{tab:imt-maps} and use $C$ from
+Table~\ref{tab:finite-quarter-feedback}. Its columns have weight three.
+The fixed-weight and Fourier transfers apply with this map's own dual
+spectrum, kernel counts, fiber caps, and weight-one/two cancellation sums.
+The quarter-rate calculation uses the exact outer spectrum, so no BCH-256
+spectrum inequality is transferred to it.
+
+\begin{table}[tb]
+\centering
+\caption{Quarter-rate feedback map: bit $i$ of the listed word is
+coordinate $i$ of $C^\top(e_j)$.}
+\label{tab:finite-quarter-feedback}
+\scriptsize
+\begin{tabular}{@{}rl@{}}
+\toprule
+$j$ & $C^\top(e_j)$\\
+\midrule
+0 & \texttt{808019020040c0800400032500101090}\\
+1 & \texttt{01008021009102020030601020308206}\\
+2 & \texttt{020006020e0200220400001205680121}\\
+3 & \texttt{00100002410a18010108190188020009}\\
+4 & \texttt{006040080801003c2000900080604442}\\
+5 & \texttt{e1060040101080201088844080801000}\\
+6 & \texttt{a0000010020800002064008920020c34}\\
+7 & \texttt{4010b19080200090406201800c000000}\\
+8 & \texttt{409802c8300001880104400220c40000}\\
+9 & \texttt{2808000401442400804120405408a000}\\
+10 & \texttt{044140048004110008004c0612100048}\\
+11 & \texttt{02202118200840020003264008080210}\\
+12 & \texttt{10060025440204005004808802004248}\\
+13 & \texttt{00a0aa01990002400290001042002800}\\
+14 & \texttt{0001548000c0110c020002284001d800}\\
+15 & \texttt{15000c0000240644950a000000020082}\\
+16 & \texttt{00000060001128016a000824000121a1}\\
+17 & \texttt{0843000024a008508011100001840100}\\
+18 & \texttt{1e0c00004200e0010880000011050404}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the two quarter-rate cutoffs, the verifier separately sums all outer
+weight classes for $q=1$, band compositions for $q=2$, and region bounds
+for $3\le q\le q_{\max}$. It covers the remaining integer types
+(zero, ordinary-weight bands, and all-one rows) by a disjoint dense partition.
+Here $q_{\max}=64$ for $\delta=0.165$ and $128$ for $\delta=0.19$.
+Every dense type uses a product reference law and a complete IMT moment;
+the type likelihood ratio is bounded at the vertices of its box.
+The union covers $q=1,\ldots,32768$ at each cutoff.
+For completeness, the dense comparison can be written directly in terms
+of these types. Let $n_g$ count rows of label $g$, so $\sum_g n_g=L$,
+and put $J(\boldsymbol n)=L!/\prod_g n_g!$.
+Let $\Gamma_g$ dominate the row counting measure by Bernoulli$(p_g)$
+bits, as in the sparse calculation. Include zero and all-one labels with
+$(\Gamma_0,p_0)=(1,0)$ and $(\Gamma_*,p_*)=(1,1)$.
+Choose a positive probability vector $\boldsymbol\pi$ on the labels and
+put $r=\sum_g\pi_gp_g$. Independent labels in a region have type
+$\boldsymbol n$ with probability $J(\boldsymbol n)\prod_g\pi_g^{n_g}$.
+Conditioning on this type gives the permuted reference rows exactly.
+Pay that conditioning cost in each of the $B=128$ regions and count
+the $J(\boldsymbol n)$ outer assignments once. If $\mathcal U(r,z)$
+upper-bounds the complete IMT moment, the contribution of this type is at most
+\[
+ z^{-H}\mathcal U(r,z)J(\boldsymbol n)^{1-B}
+       \prod_g(\Gamma_g\pi_g^{-B})^{n_g}.
+\]
+Its logarithm is convex in $\boldsymbol n$ for a fixed witness: the only
+nonlinear term is $(B-1)\sum_g\log\Gamma(n_g+1)$, which is convex.
+Thus vertices of a box intersected with $\sum_g n_g=L$ suffice.
+Multiply its maximum by an upper bound on the number of integer types in
+the box, then sum the disjoint boxes. This is an auxiliary input-law
+comparison, not additional randomness in the encoder setup.
+The outward producer, higher-precision replay, and exact-union checker
+are separate from the binary64 witness search.
+
 \subsection{Completion and reproducibility}
 
-For $K=2^{20},2^{22},2^{24}$, the exact union has three contributions.
-Their margins, rounded here only for display, are
+The half-rate exact unions have the following component margins, rounded
+only for display. Here $q_{\max}$ is the last sparse occupancy.
 \begin{center}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}rrrrr@{}}
 \toprule
-Contribution & $2^{20}$ & $2^{22}$ & $2^{24}$\\
+$\log_2K$ & $q_{\max}$ & $q=1$ & $2\le q\le q_{\max}$ & $q>q_{\max}$\\
 \midrule
-$q=1$ & 50.448204 & 48.470684 & 46.476222\\
-$2\le q\le511$ & 71.005647 & 71.005647 & 70.912537\\
-$512\le q\le L$ & 577.142524 & 1540.015843 & 1855.086791\\
+16 & 63 & 43.592834 & 60.988751 & 42.317109\\
+18 & 127 & 50.189181 & 63.938924 & 79.903280\\
+20 & 511 & 50.062272 & 63.000000 & 78.909867\\
+22 & 511 & 48.390495 & 67.000000 & 84.999997\\
+24 & 511 & 46.457257 & 66.000000 & 191.512160\\
 \bottomrule
 \end{tabular}
 \end{center}
-At the two smaller lengths, the ledger combines the sparse bounds with the
-constant-row composition calculation, taking the smaller eligible bound
-where coverage overlaps. In every case the covered integer set is exactly
-$\{1,\ldots,L\}$. Summing these rational bounds proves
-\eqref{eq:finite-bch-distance} by \eqref{eq:finite-certificate}.
-Injectivity follows independently by sequential inversion of the inner
+In each case the checked occupancy set is exactly $\{1,\ldots,L\}$.
+Summing the three rational bounds and applying
+\eqref{eq:finite-certificate} proves \eqref{eq:finite-bch-distance}.
+The quarter-rate unions prove Theorem~\ref{thm:finite-quarter-spin}
+by the same first-moment inequality.
+Injectivity follows independently from sequential inversion of the inner
 and injectivity of the block-diagonal outer.
 
-The finite artifacts reside in \path{workstreams/bch_rm2sub_bridge}.
-The compact full ledgers reside in its \path{generated} subdirectory:
-\begin{quote}\small
-\path{t128_s19_m16_full_split_coverage_v1.json}\\
-\path{t128_s19_m18_full_split_coverage_v1.json}\\
-\path{t128_s19_m20_ladder_full_v1.json}\\
-\path{t128_s19_m22_ladder_full_v1.json}\\
-\path{t128_s19_m24_ladder_full_v1.json}.
-\end{quote}
-The retained completion audit checks all $1497$ dense boxes at $768$-bit
-precision, authenticates the sparse $512$-bit replays, and reconstructs the
-exact unions. Positive recurrences use directed arithmetic, with exact
-dyadic conversion and summation; search scores never enter a certificate.
+The current integration ledger is
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PAPER_RESULTS.md}{finite IMT results}.
+It identifies the five half-rate verification receipts, the quarter-rate
+certificate and replay, and their exact source paths. Each receipt binds
+the selected maps, code parameters, numerical inputs, and verifier sources.
 
-The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/REPRODUCING.md}{reproduction guide}
-provides the commands and dependency inventory.
-The directory's \path{PAPER_HANDOFF.md} maps the analytic notes, selected
-inputs, closure ledgers, and numerical reproduction commands.
-The script \path{verify_paper_milestone.py} checks pinned dependencies
-and exact retained sums without rerunning interval arithmetic.
-The source repository includes the compact ledgers and audit; bulk worker
-receipts are local artifact inputs. A source-only checkout is not a
-self-contained numerical replay bundle. An external artifact release must
-include or regenerate those pinned inputs. This is a computer-assisted
-proof, not a proof-assistant formalization.
+All selected bounds have passed $512$-bit replay, followed by source
+authentication, exact coverage checks, and rational summation.
+The $K=2^{16}$ dense partition has $1096$ leaves.
+Directed arithmetic and upward dyadic conversion supply the numerical
+bounds; floating-point search scores do not enter the unions.
+Higher-precision replay shares producer formulas, so it is not an
+independent proof implementation.
+
+The \path{finite_migration} reproduction guide lists the commands.
+The timing bindings additionally check map identity, outer implementation,
+correctness receipts, and measured source and binary identities.
+A source-only checkout does not contain all generated receipts or raw
+measurements. A full replay bundle must supply or regenerate the pinned
+inputs.
+This is a computer-assisted proof, not a proof-assistant formalization.

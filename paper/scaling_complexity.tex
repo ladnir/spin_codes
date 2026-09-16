@@ -59,17 +59,17 @@ guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
 \paragraph{Why the structured inner takes linear time.}
 In the scalable family, the inner step width $t=128$ and state dimension
 $s=19$ are fixed independently of $N$. Each of the $N/t$ steps evaluates
-the fixed linear maps $A,C$, adds fixed-length vectors, and multiplies
-two elements of $\F_{2^{19}}$ as specified in
+the fixed linear maps $A,C$, adds fixed-length vectors, and applies
+a sampled transvection as specified in
 \eqref{eq:structured-inner}. Even a direct bit implementation takes a
 constant number of operations per step, so the total inner work is
-$O(N)$. The sampled multiplier changes with the step, but neither its
+$O(N)$. The sampled mixer changes with the step, but neither its
 width nor the arithmetic cost grows. The recursive state therefore has
 constant size. If the encoder also tracks its position to select the next
-multiplier, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
+mixer, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
 working state. If the position is supplied externally, the working state
 remains constant. This distinction does not change the linear encoding
-work. The stored multiplier schedule and interleaver description are
+work. The stored mixer schedule and interleaver description are
 setup data, separate from this working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
@@ -114,7 +114,7 @@ its dimensions. For $t=2^m$, an $s$-dimensional subcode of
 $\operatorname{RM}(2,m)$ requires
 \begin{equation}
   s\le 1+m+\binom m2.
-  \label{eq:rm2sub-capacity}
+  \label{eq:rm-expansion-capacity}
 \end{equation}
 This dimension constraint is an admissibility test, not a distance guarantee.
 Changing the outer or selected map requires a matching spectrum calculation
@@ -148,7 +148,7 @@ where the last term covers routing and permutation work.
 
 For any fixed base constituent with a constant-size encoding circuit, tiling,
 two permutations, and two accumulators give
-$C_{\mathrm{out}}(b)=O(b)$.\linebreak The fixed RM2Sub-S19 step has constant cost.
+$C_{\mathrm{out}}(b)=O(b)$.\linebreak The fixed $(128,19)$ IMT step has constant cost.
 Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The current
 certificate uses extended Golay as the base constituent, but the cost argument
 does not depend on its 24-bit length.

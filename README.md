@@ -17,8 +17,14 @@ python -B artifact/reproduce.py quick
 ```
 
 This checks manuscript numbers, selected inner maps and spectra, plot data,
-and the asymptotic manifest. It needs only Python's standard library and
-does not launch a search or benchmark. To build the paper, additionally
+and the historical asymptotic manifest. It needs Python's standard library,
+Git history, and the pinned local evidence; it does not launch a search or
+benchmark. The selected finite results now use IMT. Its separate 11%
+asymptotic check is `python -B paper/check_imt_integration.py` (see the
+[artifact guide](artifact/README.md) for dependencies). The broader
+parameter plots now show IMT Q1 diagnostics, with a separate matched Q1/full
+comparison at the five certified BCH-256 lengths. They do not certify the full grid.
+To build the paper, additionally
 install TeX Live with latexmk, BibTeX, PGFPlots, and placeins:
 
 ```sh
@@ -33,7 +39,9 @@ The output is `output/pdf/spin_codes_draft.pdf`.
 |---|---|
 | [artifact/](artifact/README.md) | Reader-facing reproduction guide, checks, and [paper-to-code map](artifact/PAPER_MAP.md). |
 | [paper/](paper/README.md) | Current LaTeX manuscript and reproducible vector figures. |
-| [workstreams/bare_bch_rm2sub/](workstreams/bare_bch_rm2sub/README.md) | Selected no-fanout BCH-256 encoder, correctness tests, and performance records. |
+| [Finite IMT results](workstreams/inner_design/finite_migration/PAPER_RESULTS.md) | Current selected certificates, matching timings, implementation paths, and migration status. |
+| [workstreams/bare_bch_rm2sub/](workstreams/bare_bch_rm2sub/README.md) | Shared implementation machinery and historical RM2Sub encoder. |
+| [IMT inner](workstreams/inner_design/IMT.md) | New inner: terminology, certified instances, and source-name mapping; the supported default remains RM2Sub. |
 | [workstreams/transposed_comparison/](workstreams/transposed_comparison/README.md) | Same-host transposed SPIN, chosen BAA, Expand--Convolute, and binary RAA comparison. |
 | [workstreams/bch_rm2sub_bridge/](workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md) | Finite BCH-256 proof sources, compact ledgers, and numerical replay notes. |
 | [workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/](workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md) | Frozen asymptotic Structured SPIN certificate snapshot. |

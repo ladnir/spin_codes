@@ -9,7 +9,7 @@ outer block, O(log N).
 
 Accumulator SPIN gives logarithmic outer memory and a one-bit,
 time-invariant inner. Structured SPIN has constant recursive data state;
-its position-dependent multiplier schedule requires either time-varying
+its position-dependent mixer schedule requires either time-varying
 transitions or an O(log N) internal position counter. The latter still
 gives logarithmic outer memory and sublinear inner memory.
 
@@ -66,9 +66,9 @@ Pi_ext on N+b coordinates by
     Pi_ext(0^b || z) = Pi(z) || 0^b.
 
 This specifies the coordinate permutation independently of z. Continue
-the original causal inner on the b extra zero bits. For a multiplier
-schedule, preserve every original multiplier and choose any fixed
-continuation (for example all ones). A partial final inner group can be
+the original causal inner on the b extra zero bits. For a mixer
+schedule, preserve every original mixer and choose any fixed
+continuation (for example identity maps). A partial final inner group can be
 serialized and stopped after the required output bits.
 
 Then for every message x,
@@ -98,18 +98,18 @@ state after its original N inputs. Its recursive state is still one bit.
 The native recurrence is
 
     Y_i = X_i + A Q_i,
-    Q_(i+1) = alpha_i Q_i + C X_i,
+    Q_(i+1) = M_i Q_i + C X_i,
 
 with t=128 and s=19. Hold Q_i fixed while reading the t input bits.
 On input bit x_j, emit x_j+(A Q_i)_j and accumulate x_j C(e_j) into
-an s-bit register P. After t inputs, set Q=alpha_i Q+P and clear P.
+an s-bit register P. After t inputs, set Q=M_i Q+P and clear P.
 
 This is exactly the native map, with one input and one output per
 transition, two s-bit data registers, and a constant-size within-group
 phase counter. Temporary fixed-width arithmetic registers do not change
 the O(1) state or work-per-bit bound. No growing block buffer is needed.
 
-The coefficient alpha_i depends on the group index. With an external
+The mixer M_i depends on the group index. With an external
 time-dependent schedule, the data state remains constant. With the
 position counter included in a time-invariant encoder's state, total
 memory is O(log N). Thus “19-bit recursive state” is accurate;

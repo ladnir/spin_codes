@@ -1,11 +1,20 @@
-# Independent expansion and feedback maps
+# IMT inner: independent expansion and feedback maps
 
-The selected independent-map inner now has an outward certificate for the
+**Independent-Map Transvection (IMT)** names this inner, not the complete SPIN
+configuration. The [IMT guide](../IMT.md) defines the terminology and maps it
+to the historical source and receipt names retained in this directory.
+
+The selected IMT inner now has an outward certificate for the
 quarter-rate BCH [128,32,32] instance at K=2^20, t=128, s=19. The 256-bit
 calculation and 512-bit replay certify both operating points: 40 margin bits
 at 16.5% relative distance and 30 bits at 19%. See `CERTIFICATE_RESULT.md` for
 the precise claim, verification commands, and remaining migration gates.
 The supported default remains unchanged.
+
+The half-rate BCH [256,128] instance at K=2^20 now also has a
+[full certificate and tested implementation](bch256/weight5/README.md), using
+weight-five IMT feedback. The search history below concerns weight-three
+and mixed-feedback candidates for the quarter-rate instance.
 
 The collision-aware weight-three feedback map `greedy3_2`, with its sparse
 update kernel, reduced measured in-place transpose time from 17.037 ms to
@@ -182,7 +191,9 @@ certification obligations separate in `TRANSFER_ARGUMENT.md`.
 The selected `greedy3_2_sparse` candidate has now passed outward production,
 higher-precision replay, exact union and coverage checks, and binding to its
 tested map and outer implementation. This closes the first finite-instance
-gate only. Next extend certificates to the paper's BCH-256 cells, adapt the
+gate. The BCH-256 K=2^20 instance subsequently closed with weight-five IMT
+feedback. Next integrate both certified instances as opt-ins, extend
+certificates to the remaining BCH-256 cells, adapt the
 asymptotic argument, and measure a complete forward encoder, as specified in
 `MIGRATION_PLAN.md`.
 

@@ -1,4 +1,8 @@
-# Independent-map inner: BCH-256 migration
+# IMT inner: BCH-256 migration
+
+IMT means [Independent-Map Transvection](../../IMT.md). The name refers only
+to the inner; the BCH outer and randomized bit-transpose permutation are
+separate components of SPIN.
 
 This work reuses the fixed BCH [256,128,d>=38] outer and replaces its inner
 with the quarter-rate candidate's balanced expansion A, sparse feedback B,
@@ -6,6 +10,12 @@ and one transvection per epoch. The target is 10% relative distance with
 40 margin bits at K=2^16, 2^18, and 2^20. The supported encoder is unchanged.
 
 ## Current result
+
+Follow-up: [weight-five feedback](weight5/README.md) now has a full certificate
+at K=2^20, 10% relative distance, and 50.0620882264 margin bits. Its exact
+union and all 512-bit replays pass. Its isolated optimized transpose is now
+tested and benchmarked; the two smaller sizes remain unresolved. The results below
+refer to the original weight-three feedback map.
 
 The Q=1 calculation passes at all three sizes. Q counts nonzero outer rows.
 The new producer uses 256-bit outward arithmetic. Its 512-bit replay checks

@@ -1,5 +1,8 @@
 # BCH-256 overlap audit and feedback diagnosis
 
+Follow-up: [weight-five seed 0 now has a full K=2^20 certificate](../weight5/README.md).
+The text below preserves the earlier point-only diagnosis that motivated it.
+
 The overlap audit did not close the BCH-256 migration. It identifies the
 zero-state contribution as the main obstruction at the retained difficult
 witness. Two weight-five feedback candidates pass that point. Neither has

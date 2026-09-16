@@ -1,11 +1,11 @@
-name: Paper artifact quick checks
+name: Paper artifact source checks
 
 on:
   push:
   pull_request:
 
 jobs:
-  quick:
+  source-checks:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -18,5 +18,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -B artifact/reproduce.py quick
-      - run: python -B -m unittest discover -s artifact -p "test_*.py"
+      # Generated IMT evidence is released separately, not committed to Git.
+      # These tests do not claim certificate or numerical-replay verification.
+      - name: Artifact packaging and missing-evidence rejection tests
+        run: python -B -m unittest discover -s artifact -p "test_*.py"
+      - name: Exact-union adapter tests
+        run: python -B -m unittest discover -s paper -p "test_imt_results.py"
+      - name: Manuscript terminology tests
+        run: python -B -m unittest discover -s paper -p "test_imt_narrative.py"

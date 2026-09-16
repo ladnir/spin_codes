@@ -69,10 +69,11 @@ SPIN instead amortizes that refresh over a group of coordinates. During the
 cheap part of an inner step, fixed structured maps mix one input group with a
 small persistent state and emit a group of output bits. These maps are fast
 because they operate on whole groups and reuse a compact circuit. At the
-refresh stage, multiplication by a sampled field element supplies the
-uniform-state law used by the proof for each fixed nonzero state. The analysis
-combines this refresh with certified information about the kernels and images
-of the fixed maps.
+mixing stage, a sampled binary transvection combines a lazy update with
+uniform refresh of each fixed nonzero state. We call this inner
+\emph{Independent-Map Transvection} (IMT). Its expansion and feedback maps
+are specified separately. The proof combines their certified spectra with
+the exact transvection law; it does not assume independent new state bits.
 
 The resulting encoder is neither fully random nor fully deterministic. Its
 constituent codes and batched inner operations provide speed. Its independent
@@ -132,10 +133,8 @@ $(L,b,k,t,s)$, two linear maps
   A:\F_2^s\to\F_2^t,
   \qquad
   C:\F_2^t\to\F_2^s,
-  \qquad
-  C\circ A=0,
 \]
-a basis identifying $\F_2^s$ with $\F_{2^s}$, and a joint setup law for
+a setup law for invertible state maps $M_i:\F_2^s\to\F_2^s$, and a joint setup law for
 injective constituent maps
 \[
   G_j:\F_2^k\to\F_2^b
@@ -147,8 +146,8 @@ distinction changes the expected outer enumerator.
 
 Setup samples the constituent maps from this joint law. Independently, it
 samples one uniform coordinate permutation for every outer block, one uniform
-permutation for every region, and one uniform nonzero field multiplier for
-every inner step. All routing permutations and inner multipliers are mutually
+permutation for every region, and one state map for
+every inner step. All routing permutations and state maps are mutually
 independent. After setup, every arrow in
 \eqref{eq:structured-dataflow} is fixed. A family selector $\theta_m$ is a
 sequence of these parameter choices and setup laws; we suppress $m$ until the
@@ -248,32 +247,47 @@ that output as
   \qquad
   R:=N/t=be.
 \]
-The state space $\F_2^s$ uses the fixed basis of $\F_{2^s}$. Fix linear maps
+The state space is $\F_2^s$. Fix linear maps
 \[
   A:\F_2^s\to\F_2^t,
   \qquad
-  C:\F_2^t\to\F_2^s,
-  \qquad
-  C\circ A=0.
+  C:\F_2^t\to\F_2^s.
 \]
-Setup samples $\alpha_i\gets\F_{2^s}^{\times}$ independently for
-$0\le i<R$. Starting from $Q_0:=0$, the inner computes
+Their choice need not satisfy $C=A^\top$ or $CA=0$.
+For IMT, setup samples $u_i\gets\F_2^s\setminus\{0\}$ and then
+$v_i\gets\{v:\langle u_i,v\rangle=0\}$, including zero, and sets
+$M_i:=I+u_iv_i^\top$. The pairs are independent over $0\le i<R$.
+Since $(u_iv_i^\top)^2=0$, each $M_i$ is invertible.
+Starting from $Q_0:=0$, the inner computes
 \begin{equation}
   Y_i:=X_i+A(Q_i),
   \qquad
-  Q_{i+1}:=\alpha_iQ_i+C(X_i)
+  Q_{i+1}:=M_iQ_i+C(X_i)
   \quad(0\le i<R).
   \label{eq:structured-inner}
 \end{equation}
-It outputs $I(X):=(Y_0,\ldots,Y_{R-1})$ and discards $Q_R$. Field
-multiplication refreshes a nonzero state once per $t$ output coordinates.
-The fixed maps $A$ and $C$ perform the cheaper work inside each step. The
-identity $C\circ A=0$ supports the transfer analysis and the optimized
-transpose; it is not needed for injectivity.
+It outputs $I(X):=(Y_0,\ldots,Y_{R-1})$ and discards $Q_R$ without a flush.
+State persists across region boundaries. For each fixed $q\ne0$,
+\[
+  \mathcal L(M_iq)=
+  \tfrac12\delta_q+\tfrac12\operatorname{Unif}(\F_2^s\setminus\{0\}).
+\]
+Here the right side denotes a mixture of probability measures. To see the
+identity, $u_i=q$ always fixes $q$; for every other $u_i$, the bit
+$\langle v_i,q\rangle$ is fair. Thus any distinct nonzero target has
+probability $1/(2(2^s-1))$.
+
+The transpose starts with $r_R=0$ and processes steps in reverse:
+\[
+ V_i=U_i+C^\top r_{i+1},\qquad
+ r_i=A^\top U_i+M_i^\top r_{i+1}.
+\]
+Both feedback computations consume the raw input, not the emitted output.
+The finite constructions below use this same transvection law.
 
 \begin{lemma}[Inner bijectivity]
 \label{lem:structured-inner-bijective}
-For every fixed multiplier schedule and every fixed pair of linear maps
+For every fixed state-map schedule and every fixed pair of linear maps
 $A,C$, the map $I:(\F_2^t)^R\to(\F_2^t)^R$ defined in
 \eqref{eq:structured-inner} is bijective.
 \end{lemma}
@@ -316,7 +330,7 @@ or envelope and a conditional failure envelope for the structured route
 classes used in Theorem~\ref{thm:class-first-moment}.
 
 The scalable family below lets the base constituent and $b_m$ vary while
-retaining the fixed RM2Sub step and state dimensions. Finite-length
+retaining the fixed IMT step and state dimensions. Finite-length
 instantiations may tune these choices at one target length. Both cases use
 Definition~\ref{def:structured-spin}.
 
@@ -375,16 +389,17 @@ map in all $L_m$ diagonal positions:
 \[
   G_{m,1}=\cdots=G_{m,L_m}:=\mathcal O_{24,b_m}.
 \]
-The expectation over $(\tau_1,\tau_2)$ therefore remains outside\linebreak the
+The expectation over $(\tau_1,\tau_2)$ remains outside the
 $q$th enumerator power, as in
 \eqref{eq:shared-constituent-enumerator}.
 
 After sampling this shared constituent, setup follows the generic
 construction. It samples one independent $\sigma_j\gets S_{b_m}$ for every
 outer position and one independent $\pi_r\gets S_{L_m}$ for every region.
-The inner fixes $(t,s)=(128,19)$ and the RM2Sub-S19 maps $A,C$. It samples one
-independent $\alpha_i\gets\F_{2^{19}}^\times$ per inner step. All route
-permutations and multipliers are independent of $(\tau_1,\tau_2)$.
+The inner fixes $(t,s)=(128,19)$ and the IMT maps $A,C$ in
+Table~\ref{tab:imt-maps}. Setup samples one independent transvection per
+inner step as above. All route permutations and transvections are independent
+of $(\tau_1,\tau_2)$.
 
 \begin{theorem}[Scalable Structured SPIN]
 \label{thm:structured-spin-scalable}
@@ -398,7 +413,7 @@ For the setup above,
   \label{eq:structured-spin-distance}
 \end{equation}
 The probability includes the two BA permutations, all route permutations,
-and all RM2Sub multipliers. Every realized code has rate $1/2$. Its ordinary
+and all IMT transvections. Every realized code has rate $1/2$. Its ordinary
 and transposed encoders use $O(N_m)$ bit operations.
 \end{theorem}
 
@@ -438,6 +453,7 @@ proof losses rather than an obstruction to that design route.
 A fixed algebraic constituent removes the additional outer-spectrum failure
 event. An exact spectrum is convenient, but rigorous spectrum inequalities
 can serve the same interface. The next section instantiates this approach
-with a fixed BCH constituent and an RM2Sub inner. The architecture is
-unchanged; the finite proof replaces the growing-outer argument with bounds
-tailored to the selected constituent.
+with fixed BCH constituents and the same IMT architecture. The half-rate
+construction even uses the same fixed inner maps.
+The finite proof replaces the growing-outer argument with bounds tailored
+to that selected constituent and inner.

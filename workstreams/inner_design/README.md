@@ -1,11 +1,22 @@
 # Inner-design investigation
 
+The new inner is **Independent-Map Transvection (IMT)**. See the
+[IMT guide](IMT.md) for the interface, certified instances, and mapping to
+historical code names. Describe the full construction as SPIN with a BCH
+outer, randomized bit-transpose permutation, and IMT inner.
+
+The [asymptotic investigation](imt_asymptotic/README.md) now has an 11% proof
+draft with passing numerical certificates for every occupancy regime.
+The refined outer bound closes the dense gap without changing IMT. Following
+an in-session analytic review, the manuscript now uses that asymptotic theorem.
+The finite RM2Sub results remain labeled until their IMT replacements close.
+
 This is a code-and-documentation checkpoint. New data files, including map
 JSON, numerical certificates, replay receipts, and benchmark records, remain
 local and are not included in this commit. Reported results describe those
 local runs. Receipt-dependent verification needs the data or a regenerated
 artifact; this checkout alone is not the complete verification bundle.
-The latest paused investigation is in [the BCH-256 overlap note](asymmetric/bch256/overlap/README.md).
+The latest result is the [full BCH-256 weight-five certificate at K=2^20](asymmetric/bch256/weight5/README.md).
 
 The certified quarter-rate implementation is unchanged. The two-part goal is
 recorded in [GOAL.md](GOAL.md).

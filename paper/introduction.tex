@@ -181,8 +181,9 @@ We make five contributions.
   certify relative distance greater than $0.10$ and setup failure below
   $2^{-40}$ at message lengths $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and
   $2^{24}$. Rigorous spectrum inequalities suffice despite the unknown
-  exact BCH spectrum. Paired benchmarks confirm similar ordinary and
-  transposed encoding costs.
+  exact BCH spectrum. At rate $1/4$, a BCH-derived $[128,32,32]$ outer
+  gives certified relative distance $0.165$ with setup failure below
+  $2^{-40}$ at $K=2^{20}$, or distance $0.19$ with failure below $2^{-30}$.
 
   \item \textbf{Faster encoding for PCGs.}\par
   SPIN computes the encoding stage for $2^{20}$ $128$-bit correlations in
@@ -247,7 +248,7 @@ Expand--Accumulate combines a sparse expander with an accumulator
 time-varying convolution~\cite{RaghuramanRindalTanguy2023EC}. Random SPIN keeps
 the latter inner distribution but replaces the expander with random block
 injections. Structured SPIN instead combines a spectrum-controlled outer,
-one factored global interleaver, and the RM2Sub inner. Its principal distinction
+one factored global interleaver, and the IMT inner. Its principal distinction
 is the simultaneous proof of rate one half, relative distance $0.11$, and
 linear ordinary and transposed encoding work.
 
