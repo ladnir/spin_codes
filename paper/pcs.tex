@@ -78,8 +78,9 @@ SPIN--Brakedown: a $4.16\times$ difference. Bolt~\cite{bolt26} encodes
 $2^{27}$ elements of $\F_{2^{32}}$; our input has $2^{32}$ Boolean entries.
 The comparison therefore matches input bytes, rather than polynomial
 dimension or coefficient field. It includes each implementation's code,
-layout, and commitment processing. The Bolt run measures commitment only;
-we did not run its complete opening prover. The artifact records the
+layout, and commitment processing. The authors' public Bolt implementation
+provides commitment but does not implement the complete opening prover.
+The artifact records the
 implementations, timing boundaries, and both measured Bolt-max variants.
 
 \paragraph{Opening cost in isolation.}
@@ -89,6 +90,11 @@ row combinations and authenticated column queries. These are measured
 opening times from the same trials as Table~\ref{tab:spin-pcs-standalone};
 they exclude outer serialization. Sending the folded messages explicitly
 keeps the prover's opening work small, at the proof sizes reported above.
+
+For Bolt, we implemented and measured the dominant opening computations
+to obtain a preliminary cost estimate. These estimates indicated a
+substantial gap, so we did not pursue a complete Bolt opening implementation
+for this comparison. We report a calibrated projection instead.
 
 \begin{table}[tb]
 \centering

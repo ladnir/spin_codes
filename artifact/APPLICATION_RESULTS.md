@@ -44,6 +44,12 @@ a controlled encoder-only replacement is made for this comparison.
 
 ### Opening-only comparison
 
+The authors' public Bolt implementation does not include the complete
+opening prover. We measured dominant opening computations to obtain
+preliminary estimates; the indicated gap did not motivate completing a
+Bolt opening implementation for this comparison. This is why the paper
+reports calibrated projections alongside measured SPIN openings.
+
 The measured SPIN opening medians are 106.815013 ms (square) and
 107.0409855 ms (longer rows). Both come directly from `open_ms` in the
 conditional 100-bit runs, not from subtraction of unrelated measurements.
