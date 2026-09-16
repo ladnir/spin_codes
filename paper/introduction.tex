@@ -9,10 +9,8 @@ how efficiently its transpose can be evaluated.
 Pseudorandom correlation generators apply a public generator matrix to large
 vectors to expand sparse correlations into OT and VOLE correlations
 \cite{bcgi18,bcg19pcg}. Code-based proof systems encode rows of large arrays,
-with distance supporting soundness~\cite{brakedown23,blaze25}. Transposition is
-also operational: for a linear encoder $E$ and check vector $q$, the identity
-$\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$ pulls the check back to the
-message coordinates. At these dimensions, long-range memory traffic can cost
+with distance supporting soundness~\cite{brakedown23,blaze25}.
+At these dimensions, long-range memory traffic can cost
 more than the binary arithmetic.
 
 Random linear codes provide excellent distance, but direct encoding requires
