@@ -1,0 +1,56 @@
+{
+  "source_revision": "cd4189e",
+  "input_bits": 4294967296,
+  "input_bytes": 536870912,
+  "method": "One worker on Peach CPU15, requested 4.5GHz, boost off. Ten pooled trials from two processes per profile; one excluded warmup each. Serial lock held throughout.",
+  "scope": "Binary MLE commitment plus one ordinary evaluation opening through ring switching and Ligerito. No Flock computation or cached partial evaluations. Input generation/copy, statement serialization, outer serialization/decoding, and independent claim calculation excluded. Internal allocations remain timed. Total is commit plus opening per trial.",
+  "proof_size": "Serialized opening only; commitment bytes recorded separately.",
+  "security_scope": "Shipped Fast100/Slim100 profiles and opening grinding policy. This benchmark does not prove a composed 100-bit theorem.",
+  "rows": {
+    "fast100": {
+      "commit_ms": 942.9081679999999,
+      "open_ms": 3388.976921,
+      "total_ms": 4331.1463745,
+      "verify_ms": 2.078595,
+      "opening_bytes": 508496,
+      "commitment_bytes": 4137,
+      "total_range_ms": [
+        4284.730016,
+        4371.071623
+      ],
+      "proof_hash": "165899d4d7e8055f1bb3de19923b84e6306582f054fb69d348aa5bc5bfc0e6df",
+      "trials": 10
+    },
+    "slim100": {
+      "commit_ms": 1899.6997375,
+      "open_ms": 3667.5078185,
+      "total_ms": 5567.251494,
+      "verify_ms": 1.471557,
+      "opening_bytes": 271328,
+      "commitment_bytes": 2089,
+      "total_range_ms": [
+        5501.01429,
+        5597.961249
+      ],
+      "proof_hash": "dd4eab4963f024f84a2dc56919bfe56a97d089017e4bded4ba6837cd9335dad6",
+      "trials": 10
+    }
+  },
+  "receipts": {
+    "completed.txt": "4a80a34ad1996b48c2e747ecf69d09ec05b264696dba7c4ae57b8fdaa7ca7e1d",
+    "environment.txt": "09eefb69e8e6b95627644f9326294ca7e2f643c3227f0e998f57bd9efef57fed",
+    "fast100-a.csv": "1054c4317c6afaca65a5a49049b6eeeaccac1e1de6fa29adc53dc4c296b0f17f",
+    "fast100-a.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fast100-b.csv": "da5c78114b3ba02eb74938ab675da801b0c327549e57ed6dbce2a29756ccaf7d",
+    "fast100-b.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "slim100-a.csv": "fe1bd3b1d653b34364ec60e15217033231e4ffbbbaa7e03d54d2479b2392f8b6",
+    "slim100-a.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "slim100-b.csv": "72d4e468e82e8d3513499f28aedbe96122e24c44c394fdef73f42efe051a0b15",
+    "slim100-b.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "smoke-fast100.csv": "0df2fd375726a5589a4ff374f9ba26b4ff8c5d5e632cd7eba874c60e1e4dbbb3",
+    "smoke-fast100.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "smoke-slim100.csv": "7e819b7fd81d699e51f3522cc28c6077eccfa819bc2a38bf4690ffa42f75e260",
+    "smoke-slim100.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_summary_sha256": "542d34d670401890c2b609d1130d3a732e541aa2a53b4f483737ad232a3c6570"
+}

@@ -44,32 +44,50 @@ the calculation does not establish a complete composed security theorem.
 The artifact records the bound and checks the parameters with exact arithmetic.
 
 \paragraph{Standalone performance.}
-Table~\ref{tab:spin-pcs-standalone} compares two matrix shapes for the same
-$2^{32}$-bit input. Both encode to $1$\,GiB. Longer rows reduce the proof
+Table~\ref{tab:spin-pcs-standalone} compares SPIN--Brakedown with
+Ligerito~\cite{ligerito25} on the same $2^{32}$-bit input. SPIN uses
+$R=K=2^{16}$ for the square shape. The longer-row shape has $R=2^{14}$
+and $K=2^{18}$. Both encode to $1$\,GiB.
+Longer rows reduce the SPIN proof
 size by $31.7\%$ for a $5.5\%$ increase in prover time. The square
 configuration spends $233.04$\,ms encoding, $178.57$\,ms hashing columns,
 and approximately $94.7$\,ms computing the two row combinations.
 
 \begin{table}[tb]
 \centering
-\caption{SPIN--Brakedown for $512$\,MiB of Boolean input. Prover time
-includes commitment and one opening at the conditional 100-bit target.}
+\caption{Standalone PCS for $512$\,MiB of Boolean input. Prover time
+includes commitment and one evaluation opening. SPIN uses the conditional
+100-bit target; Ligerito uses its Fast100 and Slim100 profiles.}
 \label{tab:spin-pcs-standalone}
 \small
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Shape $R\times K$ & Prover (ms) & Verify (ms) & Proof (MiB) \\
+Configuration & Prover (ms) & Verify (ms) & Proof (MiB) \\
 \midrule
 \input{tables/pcs_standalone}
 \end{tabular}
 \end{table}
 
-Measurements use one worker on the Ryzen 9 7950X, pinned to CPU~15,
-with a requested $4.5$\,GHz frequency and boost disabled. Each entry is
+All measurements use one worker on the Ryzen 9 7950X, pinned to CPU~15,
+with a requested $4.5$\,GHz frequency and boost disabled. Each SPIN entry is
 the pooled median of ten trials from two processes, each excluding one
-warmup. Setup, workspace allocation, outer serialization, and independent
+warmup. For SPIN, setup, workspace allocation, outer serialization, and independent
 evaluation for validation are outside the prover timer. Verification
 excludes decoding and workspace allocation. Every timed proof verifies.
+
+Ligerito's rows use the optimized implementation that also supplies the
+Flock baseline in Section~\ref{sec:spin-flock}. Its ring-switching layer
+opens the binary multilinear polynomial at an ordinary evaluation point;
+no Flock computation or cached partial evaluation is supplied. Fast100
+and Slim100 use initial code rates $1/2$ and $1/4$, respectively, and
+their shipped query and grinding parameters. Their timings pool ten trials
+from two processes per profile, each with one excluded warmup. Input
+preparation, statement serialization, independent evaluation, outer proof
+serialization, and decoding are excluded; internal allocations remain
+timed. These profiles give much smaller proofs and faster verification,
+at higher prover cost. The artifact records the configurations and the
+different timing boundaries; these runs do not establish a common
+composed security theorem.
 
 \paragraph{Comparison with Bolt.}
 At the same $512$\,MiB input volume and on one core, the fastest measured

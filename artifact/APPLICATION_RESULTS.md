@@ -25,12 +25,15 @@ Without `--check`, it regenerates the four TeX table bodies. With
 review the resulting manifest before accepting new measurements.
 `--bolt-source PATH` separately imports the pinned Bolt opening projection
 from the Bolt worktree; importing Hypercat data leaves that record unchanged.
+`--ligerito-source SUMMARY_JSON` imports the standalone Ligerito run summary.
+It is pinned separately in `paper/data/ligerito_standalone.json`, with its
+source-summary hash and raw-run receipts.
 
 | Paper table | Source summary in Hypercat | Aggregation |
 | --- | --- | --- |
 | Ordinary encoding (`tab:ordinary-encoding`) | `results/spin-brakedown/peach-paired/summary.json` | Median of 31 trials for each `fused-k16/18/20` run. |
-| Standalone PCS (`tab:spin-pcs-standalone`) | `results/spin-brakedown/peach-security/summary.json` | `pooled_optimized`, ten trials from two processes per shape. |
-| Opening only (`tab:pcs-opening`) | Same SPIN summary; Bolt source described below | SPIN `open_ms` median; Bolt sum of component medians and work proxies. |
+| Standalone PCS (`tab:spin-pcs-standalone`) | SPIN `results/spin-brakedown/peach-security/summary.json`; standalone Ligerito below | Ten pooled trials from two processes per configuration. |
+| Opening only (`tab:pcs-opening`) | Same SPIN and Ligerito summaries; Bolt source below | Measured `open_ms` medians; Bolt sum of component medians and work proxies. |
 | Flock (`tab:spin-flock`) | `results/flock-spin/native-current-comparison/summary.json` | Mean of four process medians; four measured trials after five warmups per process. |
 
 The Bolt commitment comparison comes from `results/bolt-one-thread/summary.json`.
@@ -41,6 +44,46 @@ trials after one warmup. The fastest Bolt-max run uses SHA-256; the alternative
 BLAKE3 run takes 1928.190524 ms. Both use the same one-core hardware conditions.
 The builds have different compiler revisions and different layouts; no claim of
 a controlled encoder-only replacement is made for this comparison.
+
+### Standalone Ligerito rows
+
+The Ligerito rows are newly measured standalone binary-MLE commitments and
+openings, not extracted Flock phase times. The implementation base is Flock
+`2d667ca`, the same optimized source used by the integrated comparison.
+Revision `cd4189e` adds `crates/flock-prover/examples/pcs_standalone.rs`.
+The runner, raw CSV files, machine/compiler/configuration hashes, build log,
+summary validator, and timing contract are in `benchmarks/pcs-standalone/`.
+The source summary is `results-paper/summary.json` within that directory.
+The run records were committed in Flock revision `f73a91f`.
+
+Both rows use 512 MiB of packed bits and one ordinary 32-coordinate binary
+multilinear evaluation. Ring switching receives equality weights on the
+first six coordinates and the remaining coordinates through the existing
+API. No precomputed partial evaluation is passed to the opener. Recursive
+Ligerito uses F256 challenges with the shipped m32 Fast100/Slim100 profiles;
+the initial rates are 1/2 and 1/4. The profile names identify parameter
+targets, not a new complete composed-security claim.
+
+| Profile | Commit (ms) | Open (ms) | Commit + open (ms) | Verify (ms) | Opening bytes |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast100 | 942.91 | 3388.98 | 4331.15 | 2.08 | 508496 |
+| Slim100 | 1899.70 | 3667.51 | 5567.25 | 1.47 | 271328 |
+
+Timings pool ten trials per profile from two processes, one warmup each,
+on Peach CPU15, one worker, requested 4.5 GHz, boost disabled. Rust 1.94.1
+uses native CPU features and the bench profile (thin LTO, one codegen unit).
+All runs hold the common serial benchmark lock. Internal allocations remain
+timed; input generation/copy for the consuming API, setup, independent claim
+evaluation, statement serialization, outer serialization, and decoding are
+excluded. Each total is the sum of commit and open for one trial before
+taking the median. Proof size excludes the serialized commitment (4137 and
+2089 bytes, respectively), which is retained separately in the summary.
+
+All 26 proofs verified (24 large proofs including warmups and two smoke
+proofs). Each of the six processes also rejected an altered claim. The
+m22 smoke runs checked the evaluation against a scalar Boolean-MLE oracle;
+large repetitions checked stable proof hashes. These standalone boundaries
+differ from Flock, which can supply partial evaluations computed earlier.
 
 ### Opening-only comparison
 
@@ -211,3 +254,8 @@ The Bolt/Flock projection now appears directly in the Flock table; the
 bar chart and its generator were removed. Verification time and proof size
 are left unestimated for Bolt. The table arithmetic and PDF layout were
 checked after this change. No benchmarks were run.
+
+The standalone Ligerito pass adds measured Fast100 and Slim100 rows to
+both PCS tables. The run-summary validation, application-table check,
+finite-integration check, and repository hygiene check pass. The changed
+PCS pages were rendered and inspected after rebuilding the draft.
