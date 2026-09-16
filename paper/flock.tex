@@ -6,7 +6,7 @@ effect inside a larger prover. Flock checks batches of Boolean constraints
 and reduces them to claims about a committed witness. Our integration
 replaces its Ligerito PCS~\cite{ligerito25} with the construction in
 Section~\ref{sec:spin-pcs}. The final comparison improves prover throughput
-by $1.93\times$ and $1.38\times$ at the two measured workloads.
+by $1.92\times$ and $1.36\times$ at the two measured workloads.
 
 \paragraph{Adapting the opening interface.}
 Flock's final claims include interpolation weights on a small group of
@@ -58,13 +58,13 @@ measures four trials; entries average the four process medians.
 Prover time includes witness generation, commitment, and proving. Setup,
 verification, and outer proof serialization are outside the interval.
 Serialization inside the SPIN opening remains timed because its bytes
-enter the protocol transcript. All $252$ proofs in the final experiment,
-including warmups and reference controls, verify.
+enter the protocol transcript. All $144$ Flock proofs in the final experiment,
+including warmups, verify.
 
 \paragraph{Prover costs.}
 At the larger workload, commitment takes $101$\,ms with SPIN--Brakedown
-and $161$\,ms with Ligerito. Opening takes $61$ and $140$\,ms,
-respectively. These phases account for about $139$\,ms of the $155$\,ms total
+and $162$\,ms with Ligerito. Opening takes $61$ and $141$\,ms,
+respectively. These phases account for about $141$\,ms of the $151$\,ms total
 difference. Witness generation is faster in the Ligerito configuration,
 and the remaining checking and preparation costs differ with the layouts.
 These measured rows cover the complete PCS integrations; they do not isolate
@@ -78,8 +78,8 @@ claims, shared opening work across its two claims, and negligible
 matrix-proof cost per opening in the amortized limit. We retain the
 surrounding prover time measured with SPIN and substitute Bolt's measured
 commitment and projected opening costs. The resulting totals are
-$244$ and $1060$\,ms, compared with the measured SPIN totals of $112$
-and $413$\,ms. Thus the projected Bolt configuration remains slower even
+$244$ and $1068$\,ms, compared with the measured SPIN totals of $113$
+and $420$\,ms. Thus the projected Bolt configuration remains slower even
 with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.
 

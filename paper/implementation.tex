@@ -19,7 +19,7 @@ In particular, $A^\top$ consumes the raw input $U_i$.
 The balanced expansion is evaluated by pruned SIMD zeta stages and fixed
 nibble tables. Sparse feedback gives unrolled XOR emission; each output
 block combines five state blocks at half rate, or three at quarter rate.
-The transvection update uses masked XORs on the state blocks.
+The transvection update uses XORs on selected state blocks.
 The BCH-256 circuit uses $3029$ scalar XOR operations and evaluates two
 rows together with AVX2. The quarter-rate constituent has its own generated
 transpose circuit. The online call has no allocation or type-erased
@@ -95,9 +95,10 @@ $128$ parallel binary instances. These measurements include the outer
 encoder, routing, and inner recurrence, but no commitment or opening work.
 
 The ordinary encoder reuses the same local circuits and tiled routing
-strategy. Its first implementation made an extra pass over the inner
-input. Combining input gathering with output emission removes that pass
-and reduces memory traffic. Dense-oracle checks and the identity
+strategy. It gathers the inner input and emits the output in one pass,
+retaining the raw input for the independent feedback map. A generated XOR
+circuit evaluates that map. Both directions use the same transvection
+updates and workspace-local page routing. Dense-oracle checks and the identity
 $\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$ check that the
 implementation preserves the linear map.
 
@@ -123,12 +124,14 @@ reports medians of $31$ trials after five initial paired warmups.
 Setup, allocation, and output checks are outside the interval.
 All runs execute serially.
 
-At the largest size, two additional processes with $51$ trials each give
-ordinary/transposed medians of $11.489/11.372$ and $11.317/11.368$\,ms.
-Thus ordinary encoding is within about $1\%$ of transposed encoding in
-these confirmation runs. The result supports similar practical cost in
-both directions; the PCS measurements below additionally include the
-cost of committing and opening the encoded data.
+At $K=2^{20}$, the two directions take $10.797$ and $10.674$\,ms.
+A fresh control using the preceding inner
+and implementation takes $11.332$ and $11.616$\,ms under the same paired
+measurement policy. The IMT implementation reduces these times by about
+$5\%$ and $8\%$. Both directions therefore retain similar practical cost.
+The steady-state transposed measurements above use a different buffer
+and repetition policy; they are not paired with these ordinary timings.
+The PCS measurements below additionally include commitment and opening.
 
 \subsection{Comparison with other transposed encoders}
 \label{sec:transposed-comparison}

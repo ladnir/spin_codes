@@ -108,6 +108,8 @@ Structured SPIN identifies the properties needed by that proof and realizes
 them with efficient constituent codes and structured interleaving. The
 outer supplies bounds on the number of codewords at each weight; the inner
 supplies bounds on how input weights propagate to output weights.
+We instantiate the recursive stage with an Independent-Map Transvection
+(IMT) inner.
 These interfaces let us replace the random components while retaining
 strong distance guarantees. Our scalable family has rate $1/2$, relative
 distance greater than $0.11$ with high probability, and $O(N)$ encoding work.
@@ -187,7 +189,7 @@ We make five contributions.
 
   \item \textbf{Faster encoding for PCGs.}\par
   SPIN computes the encoding stage for $2^{20}$ $128$-bit correlations in
-  about $11$\,ms on one Ryzen 9 7950X thread, approximately $3\times$ faster
+  about $10$\,ms on one Ryzen 9 7950X thread, approximately $3\times$ faster
   than original BAA~\cite{KolesnikovEtAl2026BA}. Adding roughly $8$\,ms
   for tree expansion gives an estimated total of about $20$\,ms per batch,
   or $50$ million OTs per second. This throughput is a projection from
@@ -197,12 +199,12 @@ We make five contributions.
   \item \textbf{Polynomial commitments and integration into Flock.}\par
   We instantiate Brakedown~\cite{brakedown23} with SPIN and integrate
   the resulting PCS into Flock~\cite{flock26}. At $512$\,MiB input,
-  standalone commitment and one opening take $520$\,ms on one core.
-  In a separate experiment at the same input volume, commitment is
-  $4.16\times$ faster than the fastest measured Bolt-max
-  configuration~\cite{bolt26}. Within Flock, replacing
+  standalone commitment and one opening take $509$\,ms on one core.
+  Commitment is $4.29\times$ faster than the fastest Bolt-max
+  configuration~\cite{bolt26}, measured separately at the same input volume.
+  Within Flock, replacing
   Ligerito~\cite{ligerito25} with SPIN--Brakedown improves throughput by
-  $1.93\times$ and $1.38\times$ at the two measured workloads, with the
+  $1.92\times$ and $1.36\times$ at the two measured workloads, with the
   applicable shared optimizations in both configurations.
   SPIN--Brakedown gives a faster prover at the expense of larger proofs
   and the associated slower verification.

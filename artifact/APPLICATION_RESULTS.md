@@ -10,10 +10,43 @@ The pinned measurements and calculations retain full precision.
 
 ## Tables and reproduction
 
-`paper/data/application_results.json` retains compact measurements extracted
-from Hypercat revision `015a4f8`. It includes the SHA-256 and relative path of
-each source summary. The Flock implementation change is at revision `2d667ca`;
-the measured executable/source receipts remain authoritative for the runs.
+`paper/data/application_results.json` retains the final IMT campaign from
+Hypercat revision `f98b02a`, with Flock at `e15d047`. It includes the SHA-256
+and relative path of the source summary and its run receipt. Earlier Bolt
+and standalone Ligerito measurements retain their original provenance.
+The measured executable/source receipts remain authoritative for the runs.
+
+### IMT refresh (2026-09-16)
+
+The paper branch merges permute_conv `ec7bce79` in `b9548db3`, preserving
+the application sections and recent editorial changes. The application
+implementation uses the certified half-rate IMT maps with t=128, s=19,
+and weight-five feedback. The quarter-rate code is not used in these PCS runs.
+
+The final records are `results/imt-20260916/final-summary.json` and `final/`
+in Hypercat, committed in `6b652bc`. The setup identifier is
+`hypercat-spin-imt-s19-weight5-v2`.
+All runs are serial on Peach CPU15 at requested 4.5 GHz, boost disabled.
+The campaign verifies 144 Flock proofs and 24 standalone PCS proofs,
+including warmups. Three encoding tests and all 14 PCS tests also pass.
+The paired harness checks dense forward and transpose oracles at K=2^16.
+
+| Measurement | Final IMT | Fresh preceding-inner control |
+| --- | ---: | ---: |
+| Ordinary encoding, K=2^20 (ms) | 10.797 | 11.332 |
+| Transposed encoding, K=2^20 (ms) | 10.674 | 11.616 |
+| Square PCS, 512 MiB commit + open (ms) | 509 | — |
+| Longer-row PCS, 512 MiB commit + open (ms) | 525 | — |
+| Flock, 16,384 compressions (ms) | 113 | Ligerito: 217 |
+| Flock, 65,536 compressions (ms) | 420 | Ligerito: 571 |
+
+Paired encoding improves by about 5% forward and 8% transposed. The
+steady-state transposed table instead uses the upstream three-process IMT
+campaign (10.110 ms); its buffer/repetition policy differs from the paired
+experiment. The Flock comparison is rerun with both backends in the same
+executable. The remaining historical sections below document earlier
+measurements and calibration choices; the final summary supersedes their
+SPIN and integrated Flock times.
 
 From the paper repository root:
 
@@ -29,20 +62,23 @@ review the resulting manifest before accepting new measurements.
 `--bolt-source PATH` separately imports the pinned Bolt opening projection
 from the Bolt worktree; importing Hypercat data leaves that record unchanged.
 `--ligerito-source SUMMARY_JSON` imports the standalone Ligerito run summary.
+`--imt-summary PATH` refreshes SPIN encoding, PCS, and integrated Flock from
+the final IMT summary while retaining the Bolt and standalone Ligerito data.
 It is pinned separately in `paper/data/ligerito_standalone.json`, with its
 source-summary hash and raw-run receipts.
 
 | Paper table | Source summary in Hypercat | Aggregation |
 | --- | --- | --- |
-| Ordinary encoding (`tab:ordinary-encoding`) | `results/spin-brakedown/peach-paired/summary.json` | Median of 31 trials for each `fused-k16/18/20` run. |
-| Standalone PCS (`tab:spin-pcs-standalone`) | SPIN `results/spin-brakedown/peach-security/summary.json`; standalone Ligerito below | Ten pooled trials from two processes per configuration. |
+| Ordinary encoding (`tab:ordinary-encoding`) | `results/imt-20260916/final-summary.json` | Median of 31 trials for each `imt-k16/18/20` run. |
+| Standalone PCS (`tab:spin-pcs-standalone`) | SPIN `results/imt-20260916/final-summary.json`; standalone Ligerito below | Ten pooled trials from two processes per configuration. |
 | Opening only (`tab:pcs-opening`) | Same SPIN and Ligerito summaries; Bolt source below | Measured `open_ms` medians; Bolt sum of component medians and work proxies. |
-| Flock (`tab:spin-flock`) | `results/flock-spin/native-current-comparison/summary.json` | Mean of four process medians; four measured trials after five warmups per process. |
+| Flock (`tab:spin-flock`) | `results/imt-20260916/final-summary.json` | Mean of four process medians; four measured trials after five warmups per process. |
 
 The Bolt commitment comparison comes from `results/bolt-one-thread/summary.json`.
-Its SPIN commitment value is 413.46894 ms from the earlier paired comparison.
-It is not obtained by subtracting independently aggregated phase medians from
-the newer 519.602439 ms complete prover result. Bolt timings are medians of five
+The current comparison uses 401.335489 ms for IMT SPIN commitment: subtract
+opening from total within each trial, then take the median. The old source
+summary's 413.46894 ms SPIN control is retained only as historical evidence.
+Bolt timings are medians of five
 trials after one warmup. The fastest Bolt-max run uses SHA-256; the alternative
 BLAKE3 run takes 1928.190524 ms. Both use the same one-core hardware conditions.
 The builds have different compiler revisions and different layouts; no claim of
@@ -297,11 +333,11 @@ PCS pages were rendered and inspected after rebuilding the draft.
 
 ### Original BAA comparison in the abstract
 
-The abstract's approximately 3x encoding speedup compares SPIN's 11.104 ms
+The abstract's approximately 3x encoding speedup compares SPIN's 10.110 ms
 with approximately 32 ms for original rate-1/2 BAA, not with chosen-block
 BAA. Peter confirmed on 2026-09-16 that separate measurements find comparable
 original-BAA latency on Ryzen. Those separate run logs are not archived in
-this worktree. The companion manuscript's original-BAA rerun records
+this worktree. The chosen-block BAA manuscript's original-BAA rerun records
 32.769 ms on Intel; that exact value is not relabeled as a Ryzen measurement.
 The archived same-host comparison remains unchanged: chosen Golay and RM
-BAA take 23.997 and 27.660 ms, or 2.16x and 2.49x the SPIN latency.
+BAA take 23.997 and 27.660 ms, or 2.37x and 2.74x the current SPIN latency.

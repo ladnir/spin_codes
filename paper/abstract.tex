@@ -19,7 +19,7 @@ $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum ine
 without assuming the constituent's exact weight spectrum.
 
 For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
-computes $2^{20}$ $128$-bit correlation blocks in about $11$\,ms on one
+computes $2^{20}$ $128$-bit correlation blocks in about $10$\,ms on one
 Ryzen core. This is approximately $3\times$ faster than the original
 rate-$1/2$ BAA codes of Kolesnikov et al.\ (CRYPTO
 2026)~\cite{KolesnikovEtAl2026BA}. Ordinary encoding has similar cost.
@@ -28,9 +28,9 @@ cost of about $20$\,ms per batch, or $50$ million oblivious transfers per second
 
 We apply SPIN in a Brakedown-style polynomial commitment scheme and
 integrate that scheme into Flock. With conditional 100-bit PCS parameters,
-commitment and one opening of $512$\,MiB take $520$\,ms on one core.
+commitment and one opening of $512$\,MiB take $509$\,ms on one core.
 Within an optimized Flock implementation, replacing Ligerito with
-SPIN--Brakedown improves prover throughput by $1.38$--$1.93\times$ at the
+SPIN--Brakedown improves prover throughput by $1.36$--$1.92\times$ at the
 measured workloads, with larger proofs. The comparison gives both
 backends the applicable shared implementation optimizations.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
 \end{abstract}

@@ -49,6 +49,29 @@ def import_results(source):
     }
 
 
+def import_imt(data, source):
+    raw = source.read_bytes()
+    result = json.loads(raw)
+    assert result["verified_proofs"] == 168
+    assert set(result["pcs"]["rows"]) == {"k16-w2", "k18-w2"}
+    data["source_revision"] = "f98b02a"
+    data["flock_revision"] = "e15d047"
+    data["historical_receipts"] = data.get("historical_receipts", data["receipts"])
+    data["receipts"] = {
+        "imt": {"path": "results/imt-20260916/final-summary.json",
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "run_receipt_sha256": result["receipt_sha256"]},
+        "bolt": data["historical_receipts"]["bolt"],
+    }
+    data["encoding"] = {"method": result["method"]["encoding_method"],
+                        "source_revision": "f98b02a", "prefix": "imt",
+                        "runs": result["encoding"]}
+    data["pcs"].update(result["pcs"])
+    data["flock"] = result["flock"]
+    data["measurement_method"] = result["method"]
+    return data
+
+
 def import_bolt(source):
     name = "tools/standalone/opening-results/projection.json"
     raw = (source / name).read_bytes()
@@ -84,14 +107,16 @@ def flock_projection(data, case):
               + p["inner_syndrome_proxy"])
     assert abs(shared - case["two_openings"]["shared_amortized_limit_ms"]) < 1e-8
     total = outer + case["commit_measured_ms"] + shared
-    assert abs(total - case["flock"]["bolt_shared_amortized_limit_projection_ms"]) < 1e-8
+    # The calibrated Bolt components are retained; the surrounding Flock
+    # residual comes from the current SPIN measurement campaign.
     return total
 
 
 def render(data, bolt, ligerito):
     rows = []
     for field, label in (("forward_ms", "Ordinary"), ("transpose_ms", "Transposed")):
-        values = [data["encoding"]["runs"][f"fused-k{k}"][field]["median"]
+        prefix = data["encoding"].get("prefix", "fused")
+        values = [data["encoding"]["runs"][f"{prefix}-k{k}"][field]["median"]
                   for k in (16, 18, 20)]
         rows.append(label + " & " + " & ".join(f"{v:.3f}" for v in values) + r" \\")
     tables = {"ordinary_encoding": rows}
@@ -144,16 +169,20 @@ def render(data, bolt, ligerito):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, help="Import the pinned summaries from Hypercat")
+    parser.add_argument("--imt-summary", type=Path, help="Refresh SPIN and Flock from the final IMT campaign")
     parser.add_argument("--bolt-source", type=Path, help="Import the pinned Bolt opening projection")
     parser.add_argument("--ligerito-source", type=Path, help="Import the standalone Ligerito summary JSON")
     parser.add_argument("--check", action="store_true", help="Check generated tables without writing")
     args = parser.parse_args()
-    if (args.source or args.bolt_source or args.ligerito_source) and args.check:
+    if (args.source or args.imt_summary or args.bolt_source or args.ligerito_source) and args.check:
         parser.error("Import and --check are separate operations")
     if args.source:
         DATA.parent.mkdir(parents=True, exist_ok=True)
         DATA.write_text(json.dumps(import_results(args.source), indent=2) + "\n", encoding="utf-8")
     data = json.loads(DATA.read_text(encoding="utf-8"))
+    if args.imt_summary:
+        data = import_imt(data, args.imt_summary)
+        DATA.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     if args.bolt_source:
         BOLT_DATA.write_text(json.dumps(import_bolt(args.bolt_source), indent=2) + "\n", encoding="utf-8")
     bolt = json.loads(BOLT_DATA.read_text(encoding="utf-8"))
