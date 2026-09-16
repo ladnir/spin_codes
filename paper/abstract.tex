@@ -13,8 +13,8 @@ $N$. Every realized code has rate $1/2$, and its ordinary and transposed
 encoders use $O(N)$ bit operations. With probability $1-o(1)$ over setup, its
   minimum distance exceeds $0.11N$. The construction reuses one sampled
   spectrum-certified BA-3 constituent along the outer diagonal, factors the
-  interleaver into structured routing stages, and uses the fixed RM2Sub-S19
-  inner. The outer interface permits different base constituents and base
+  interleaver into structured routing stages, and uses an Independent-Map
+  Transvection (IMT) inner. The outer interface permits different base constituents and base
   lengths. The current certificate uses extended Golay blocks and the schedule
   $\frac{39}{4}\log_2N+O(1)$. Zero extension gives a family at every
   sufficiently large requested length with rate $1/2-o(1)$, relative distance
@@ -26,10 +26,10 @@ conditional failure envelopes. Two additional families isolate the main proof
 mechanisms. At rate $1/2$, Accumulator SPIN achieves relative distance
 $0.0037$, and Random SPIN achieves relative distance $0.11002$, under explicit
 logarithmic schedules. For finite lengths, the same structured architecture
-uses a fixed BCH-derived $[256,128,\ge38]$ constituent and an RM2Sub inner
+uses a fixed BCH-derived $[256,128,\ge38]$ constituent and the same IMT inner
 with $128$-bit steps and $19$-bit state. Rigorous spectrum inequalities,
 rather than an assumed exact spectrum, certify relative distance greater
 than $0.10$ with setup failure below $2^{-40}$ at message lengths
 $2^{16},2^{18},2^{20},2^{22},2^{24}$. A single-thread implementation evaluates
-the batched transposed encoder at $K=2^{20}$ in $11.259$\,ms.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
+the batched transposed encoder at $K=2^{20}$ in $10.110$\,ms.\footnote{This work was created with the assistance of ChatGPT 5.6, 6.0.}
 \end{abstract}

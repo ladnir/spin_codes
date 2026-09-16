@@ -9,18 +9,34 @@ On Windows, enable long paths for the clone because some frozen source paths
 are long: `git clone -c core.longpaths=true https://github.com/ladnir/permute_conv.git`.
 The Windows CI job enables this setting before checkout as well.
 
+Automatic **Paper artifact source checks** run packaging, missing-evidence
+rejection, exact-union adapter, and terminology tests on Windows and Linux.
+They do not validate the paper's numerical certificates: those checks require
+the separately supplied pinned evidence and use the commands below. A green
+source-check job is not a certificate-replay result.
+
 ## 1. Check retained results
 
+The selected finite results now use IMT. Supply their pinned evidence before
+running these checks; a source-only checkout does not contain the bulk receipts.
+
 ```sh
+python -B artifact/imt_reproduce.py check
 python -B artifact/reproduce.py quick
 python -B -m unittest discover -s artifact -p 'test_*.py'
 ```
 
-Expected: `QUICK CHECK PASSED`, including all 130 small-BCH geometries,
-five finite certificate margins, 19 selected generators, all 524,288 inner
-states, the exact kernel spectrum, six timing entries, and 31 asymptotic
-manifest entries. This should be a short check on an ordinary desktop;
-it performs no parameter search, interval replay, or timing experiment.
+The first command reports `SELECTED_FINITE_IMT_INTEGRATION_PASSED`: seven
+certificate targets, four timing cells, 57 map words, and exact union checks.
+The historical `quick` wrapper also checks the 130 retained RM2Sub geometries
+and 31 imported asymptotic manifest entries. Its old progress labels are not
+an IMT inventory. Neither command performs parameter search, interval replay,
+or a timing experiment. The current finite check also authenticates the 130-cell
+IMT Q1 grid and checks its three figures plus five matched Q1/full anchors.
+
+Check the current asymptotic IMT theorem separately with
+`python -B paper/check_imt_integration.py`; this requires the numerical
+dependencies below and the separate local asymptotic IMT receipts.
 
 The asymptotic checker uses the original manifest and one explicit relocation:
 the historical `receipts/min_state/s19_rm2sub_selection.json` input is retained
@@ -33,23 +49,52 @@ on Windows; other frozen BCH sources keep their existing byte conventions.
 Install TeX Live with latexmk, BibTeX, PGFPlots, and placeins. Then run:
 
 ```sh
-python -B artifact/reproduce.py figures
+python -B artifact/imt_reproduce.py figures
 python -B artifact/reproduce.py paper
 ```
 
-The first command rewrites only the three generated TeX figure inputs.
+The first command rewrites only the four generated IMT TeX figure inputs.
 The second runs quick checks and builds `output/pdf/spin_codes_draft.pdf`.
 The PDF uses the build date, so its bytes need not match an earlier build.
 No plotting library is needed: the figures are native vector PGFPlots.
 
-Figures 1--3 are regenerated from the tracked rounded results table. Full
-margins retain six decimal places; Q1 overlays add the reported loss only
-where both values are present. Rebuilding them is not a fresh evaluation of
-the original grid. The table records fingerprints of the raw exports, which
-are not included in this checkout. The five BCH-256 curve points instead
-come from exact rational ledgers checked against the manuscript.
+The three parameter slices come from `PARAMETER_NO_CONSTANT_Q1_v1.json` and
+its authenticated replay receipt. The replay checked all 130 geometries and
+39 exact map pairs, including seven separate log-domain checks. Regeneration
+authenticates that evidence; it does not perform a fresh numerical evaluation.
+The five BCH-256 Q1/full pairs come from the selected full-certificate ledgers
+and use identical maps within each pair. The old `build_parameter_figures.py`
+and its rounded RM2Sub tables remain available only for historical reproduction.
 
-## 3. Inventory and authenticate BCH evidence
+## 3. Inventory and authenticate evidence
+
+For the selected finite IMT results:
+
+```sh
+python -B artifact/imt_reproduce.py inventory
+python -B artifact/imt_reproduce.py inventory --output output/artifact/imt-inventory.json
+python -B artifact/imt_reproduce.py pack --output output/artifact/imt-evidence.zip
+```
+
+Use fresh output names. Inventory fails on missing or mismatched files;
+an unreadable root receipt also marks discovery incomplete. The accepted
+local set has 753 files and 640,779,033 uncompressed bytes. The ZIP contains
+only the eight accepted root receipts, their declared source pins, and an
+inventory manifest. Packing streams the files, reopens the archive, and
+verifies its member list and every SHA-256. It never overwrites an archive.
+No production IMT archive has been created or published by this step.
+
+This scope covers the selected finite certificates and timing bindings.
+It does not include a runtime, installed dependencies, the separate asymptotic
+IMT evidence, or the diagnostic Q1 grid by default. To include the current
+parameter-figure inputs, add `--include-q1` to `inventory` or `pack`. The
+expanded local inventory has ten root receipts, 766 files, and 641,495,560
+uncompressed bytes, with no missing or mismatched files. It still does not
+certify every grid cell. File authentication is not an interval replay or an
+independent review of the proof.
+
+The commands below retain their **historical BCH/RM2Sub** scope. They are
+not substitutes for the current IMT inventory or package:
 
 ```sh
 python -B artifact/reproduce.py inventory
@@ -89,7 +134,13 @@ finite-proof environment uses Python 3.14, python-flint 0.9.0, NumPy 2.4.4,
 SciPy 1.18.0, and mpmath 1.3.0. These are recorded working-environment versions,
 not a claim that every replay command has been retested in a fresh environment.
 
-For asymptotic Structured SPIN, start with the [certificate README](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md).
+For current IMT replay, start with the
+[finite results ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
+and [asymptotic IMT guide](../workstreams/inner_design/imt_asymptotic/README.md).
+They identify the accepted inputs and separate authentication from arithmetic
+replay. The procedures in the next paragraphs describe historical RM2Sub proofs.
+
+For historical asymptotic Structured SPIN, start with the [certificate README](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md).
 It lists the outward-arithmetic producers and their order. Use new output
 paths; preserve the accepted receipts and their hashes. Some historical
 producers still resolve inputs through old repository locations. The quick
@@ -113,6 +164,12 @@ freshly reevaluates dense boxes at 768 bits, but authenticates existing sparse
 proof regeneration claim in this artifact revision.
 
 ## 5. Encoder correctness and performance
+
+The current IMT measurements and exact map bindings are listed in the
+[finite results ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
+Use `python -B paper/build_imt_comparison.py --check` to validate the current
+comparison table. The build below and the original campaign generator are
+retained historical RM2Sub procedures, not commands to reproduce IMT timings.
 
 See the [encoder README](../workstreams/bare_bch_rm2sub/README.md) for the API,
 build commands, ISA requirements, and measurement procedure. A representative
@@ -139,7 +196,7 @@ and binary RAA, follow the
 [comparison guide](../workstreams/transposed_comparison/README.md).
 Its pinned dependency build and serial runner are separate from the frozen
 SPIN benchmark. Validate its retained samples and generated paper table with
-`python -B workstreams/transposed_comparison/report.py --check`.
+`python -B paper/build_imt_comparison.py --check`.
 This check performs no measurements and is not yet included in `quick`.
 
 ## Release preparation
@@ -149,10 +206,11 @@ Before an external artifact submission:
 1. Commit and review the compact artifact, then record its immutable revision
    in the paper. The current GitHub link is a repository entry point, not a
    versioned release claim.
-2. Publish the missing BCH numerical evidence separately, with a file manifest,
+2. Publish the selected IMT numerical evidence separately, with a file manifest,
    sizes, checksums, and an archive checksum. Do not commit raw worker trees.
-3. Restore the small-BCH raw grid inputs and exports if claiming reproduction
-   of the underlying sweep, rather than reproduction of its plotted results.
+3. Include the current Q1 inputs with `--include-q1` and test their producer
+   and replay commands, not just figure regeneration. Restore the older small-BCH
+   raw exports only if also releasing the historical RM2Sub sweep.
 4. Test numerical replay in a fresh environment, resolving historical paths
    through explicit adapters instead of modifying frozen producers.
 5. Record measured runtime, peak memory, machine, dependencies, and expected

@@ -1,5 +1,33 @@
 # SPIN manuscript (LLNCS)
 
+The asymptotic construction now uses [Independent-Map Transvection (IMT)](../workstreams/inner_design/IMT.md)
+at 11% relative distance, with the same shared Golay--BA-3 outer and 39/4
+growth constant. Its reviewed argument is in `structured_appendix.tex` and
+`structured_imt_appendix.tex`; the latter includes the exact two maps.
+The selected finite results now use verified IMT certificates and matching
+timings: five half-rate lengths, plus two quarter-rate distance thresholds
+at K=2^20. See the [integration ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
+The three broader parameter-slice plots now use the authenticated 130-cell
+IMT Q1 grid. The selected BCH-256 curve compares Q1 and full certificates at
+five exactly matching configurations. The diagnostic maps differ from those
+selected maps; no full-grid certificate is claimed.
+The manuscript presents IMT without a preceding-inner comparison. Historical
+source and receipt names remain unchanged in the artifact; Reed--Muller
+expansion mathematics and the external RM-based BAA baseline remain in scope.
+No library default changes with this manuscript update.
+
+Run `python -B paper/check_imt_integration.py` from the repository root to
+check all 38 shared map words and the retained 11% evidence bindings.
+The finite checker authenticates seven selected certificate targets, four
+timing cells, and the shared and quarter-rate map tables. These checks need
+the local generated evidence; a clean source checkout does not include it.
+The asymptotic check is additional to the finite checker and is not
+included in the historical `artifact/reproduce.py quick` command.
+Use `python -B paper/build_imt_comparison.py --check` for the current
+comparison table. The preceding comparison generator remains historical.
+The [review record](../workstreams/inner_design/imt_asymptotic/d11/PAPER_REVIEW.md)
+describes the analytic review and the preserved evidence boundary.
+
 The paper uses Springer's unmodified LLNCS 2.26 class and `splncs04.bst`,
 vendored here from the [official CTAN package](https://ctan.org/pkg/llncs)
 (copyright Springer, CC BY 4.0). The
@@ -75,30 +103,23 @@ Check finite integration from the repository root:
 
 ```text
 python -B paper/check_finite_integration.py
-python -B workstreams/bch_rm2sub_bridge/verify_paper_milestone.py --require-local-evidence
 ```
 
-Reproduce or check the three parameter-slice figures from the retained
-rounded tables (no grid search or numerical proof replay):
+Reproduce or check the IMT Q1 slices and matched certificate curve from the retained
+pinned Q1 grid and full-certificate receipts (no grid search or numerical proof replay):
 
 ```text
-python -B paper/build_parameter_figures.py
-python -B paper/build_parameter_figures.py --check
+python -B paper/build_imt_parameter_figures.py
+python -B paper/build_imt_parameter_figures.py --check
 ```
 
-The generator checks all 130 BCH-64/128 geometries and their status counts,
-then writes native PGFPlots inputs under `paper/figures/`. Each input records
-the normalized SHA-256 of `CURRENT_RESULTS_TABLES.md`. Full margins are
-retained to the table's six decimals; Q1 overlays are reconstructed only
-where both the full margin and its loss are present. Missing/weak points
-are not interpolated. These plots are diagnostic, unlike the separate
-BCH-256 exact-ledger certificate curve.
-
-The first checks table and plot values, generator transcription, the exact
-inner spectra, and measured timings. The second authenticates the retained
-proof evidence and exact final sums. Neither is a fresh interval-arithmetic
-replay. See the bridge's `PAPER_HANDOFF.md` for full replay instructions and
-the external artifact packaging boundary.
+The generator authenticates the no-constant IMT Q1 grid and its replay receipt,
+checks all 130 geometries and nested map identities, then writes native PGFPlots
+inputs under `paper/figures/`. Each input records the Q1 producer's SHA-256.
+The selected BCH-256 plot compares Q1 with the full certificate for the exact
+same maps at five lengths. It does not certify the different smaller-outer
+diagnostic maps. See the [reproduction guide](../artifact/REPRODUCING.md) for
+the evidence-package boundary and separate replay instructions.
 
 The LLNCS revision was also compiled with TeX Live 2023 in WSL Ubuntu and writes its PDF to
 `../output/pdf/spin_codes_draft.pdf`. The September 7 revision adds the finite

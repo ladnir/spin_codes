@@ -46,7 +46,7 @@ its dimensions. For $t=2^m$, an $s$-dimensional subcode of
 $\operatorname{RM}(2,m)$ requires
 \begin{equation}
   s\le 1+m+\binom m2.
-  \label{eq:rm2sub-capacity}
+  \label{eq:rm-expansion-capacity}
 \end{equation}
 This dimension constraint is an admissibility test, not a distance guarantee.
 Changing the outer or selected map requires a matching spectrum calculation
@@ -80,7 +80,7 @@ where the last term covers routing and permutation work.
 
 For any fixed base constituent with a constant-size encoding circuit, tiling,
 two permutations, and two accumulators give
-$C_{\mathrm{out}}(b)=O(b)$.\linebreak The fixed RM2Sub-S19 step has constant cost.
+$C_{\mathrm{out}}(b)=O(b)$.\linebreak The fixed $(128,19)$ IMT step has constant cost.
 Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The current
 certificate uses extended Golay as the base constituent, but the cost argument
 does not depend on its 24-bit length.

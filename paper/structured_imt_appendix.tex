@@ -1,0 +1,492 @@
+\subsubsection{The selected IMT maps}
+
+The state dimension is $s=19$ and the step width is $t=128$ throughout this
+appendix. Table~\ref{tab:imt-maps} specifies both maps in
+\eqref{eq:structured-inner}. Bit $i$ of each hexadecimal word is coordinate
+$i$, starting with the least significant bit. Write $M:=2^{19}-1$.
+The nonzero image weights of $A$ and their multiplicities are
+\[
+ (d_i)_{i=1}^5=(48,56,64,72,80),\qquad
+ (c_i)_{i=1}^5=(5166,110288,293455,110128,5250).
+\]
+Every coordinate of $A$ is a nonzero linear functional. The $128$ columns
+of $C$ are distinct nonzero vectors of weight five and span $\F_2^{19}$.
+The artifact checks these properties and both spectra by exact enumeration.
+
+\begin{table}[t]
+\centering
+\caption{Fixed IMT expansion and feedback maps. The words specify
+$A(e_j)$ and $C^\top(e_j)$ for the standard state basis.}
+\label{tab:imt-maps}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}rll@{}}
+\toprule
+$j$ & $A(e_j)$ & $C^\top(e_j)$ \\
+\midrule
+0 & \texttt{55555555555555555555555555555555} & \texttt{800003d868100423210234004341a004} \\
+1 & \texttt{33333333333333333333333333333333} & \texttt{010d0102568441441a6212120884488c} \\
+2 & \texttt{0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f} & \texttt{40482008104050000312449182000a43} \\
+3 & \texttt{ff00ff00ff00ff00ff00ff00ff00ff00} & \texttt{c60682141218101b9a382140d1011330} \\
+4 & \texttt{0000ffff0000ffff0000ffff0000ffff} & \texttt{02800a0201093ca2cc121a20200c0408} \\
+5 & \texttt{ffffffff00000000ffffffff00000000} & \texttt{81212844806ef00068055044102ee101} \\
+6 & \texttt{ffffffffffffffff0000000000000000} & \texttt{1e200091046309f08018083800400061} \\
+7 & \texttt{ca9ff6a3c56f06ac0653c590f65cca60} & \texttt{91750062141381019100a60c30a810aa} \\
+8 & \texttt{8e8e718e2bd4d4d4b2b24db217e8e8e8} & \texttt{01043040c08a882804068c12246500d0} \\
+9 & \texttt{b2b2b2b218e7e71842bdbd42e8e8e8e8} & \texttt{2089148c8300089c8504044184424100} \\
+10 & \texttt{a00a05af366393c6396c633650fa0aa0} & \texttt{044340810132201506e1012001322008} \\
+11 & \texttt{9350635fa063506c5f9c506c93509ca0} & \texttt{42001d281e80022101ec18224403cc12} \\
+12 & \texttt{12e2747b121d7484de2e4748212eb848} & \texttt{2834da0440600280021100010b9a9780} \\
+13 & \texttt{4411e14b11bb4b1e2d87772287d22288} & \texttt{2118a12209240f06640041cacb0884c5} \\
+14 & \texttt{59953003cffca66a0cc0655665560cc0} & \texttt{80122401c000804c00c9821294803a04} \\
+15 & \texttt{7447b88b74b8b874b7847b4848848448} & \texttt{6880cc1f224046004080818c3814003b} \\
+16 & \texttt{11ddd21e447787b42d1e112278b44488} & \texttt{1cf284802d0ca24a000820040c904700} \\
+17 & \texttt{72e48214e48deb82d8b1d7be4ed8be28} & \texttt{7c405360a885745070a0c0a122702002} \\
+18 & \texttt{4e824e82e428e4284e824e82e428e428} & \texttt{128a40312091018038456bcd40011874} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Finite IMT transfers}
+\label{app:imt-finite-transfers}
+
+We represent a weighted state measure by seven nonnegative coordinates
+$(Z,D,S_1,\ldots,S_5)$. The $Z$ coordinate is mass at zero. The $D$
+coordinate bounds arbitrary mass on nonzero states. Coordinate $S_i$
+dominates $S_i$ times the uniform probability measure on
+$\{q:\wt(Aq)=d_i\}$. Terminal mass is bounded by the sum of coordinates.
+Rows of a transfer matrix index the entering coordinate.
+
+First fix an input weight $j$. Let $n_j:=\binom{128}{j}$, let $k_j$ be the
+number of weight-$j$ vectors in $\ker C$, and put $\nu_j:=1-k_j/n_j$.
+For $z\in(0,1)$, the emitted moment at image weight $d$ is
+\[
+ m_{d,j}(z):=\frac1{n_j}\sum_h
+ \binom dh\binom{128-d}{j-h}z^{d+j-2h}.
+\]
+Set $m_{D,j}:=\max_i m_{d_i,j}$. For $q\ne0$, define the lazy
+cancellation moment
+\[
+ L_j(q;z):=\frac1{n_j}\sum_{\substack{\wt(X)=j\\CX=q}}
+ z^{\wt(X+Aq)}.
+\]
+Choose upper bounds $\ell_{D,j}\ge\max_{q\ne0}L_j(q;z)$ and
+$\ell_{i,j}\ge c_i^{-1}\sum_{\wt(Aq)=d_i}L_j(q;z)$.
+Let $f_j$ bound the size of every nonzero weight-$j$ syndrome fiber. Valid
+choices are the minima of the following bounds:
+\begin{align*}
+ \ell_{D,j}&:=
+ \min\left\{m_{D,j},\nu_j,
+ \frac{f_j}{n_j}z^{\min_i|d_i-j|}\right\},\\
+ \ell_{i,j}&:=
+ \min\left\{m_{d_i,j},
+ \frac{\min(n_j-k_j,c_i f_j)}{c_i n_j}z^{|d_i-j|}\right\}.
+\end{align*}
+For $j=1,2$ the verifier also uses the exact cancellation sums, enumerating
+the input supports and grouping them by $CX$ and $\wt(ACX)$. No relation
+between $A$ and $C^\top$ is assumed.
+
+The integer fiber bounds require only the spectrum of $C^\top$. Let $b_w$
+count its nonzero words of weight $w$, and let $\mathcal K_j(w)$ be the
+binary Krawtchouk polynomial. Fourier inversion and Parseval give
+\[
+ k_j=2^{-19}\left(n_j+\sum_w b_w\mathcal K_j(w)\right),\qquad
+ V_j=2^{-19}\left(n_j^2+\sum_w b_w\mathcal K_j(w)^2\right),
+\]
+where $V_j$ is the sum of squares of all syndrome fiber sizes. Put
+$a_j:=n_j-k_j$. A nonzero fiber is at most each of
+\begin{gather*}
+ a_j,\qquad
+ \left\lfloor2^{-19}\left(n_j+\sum_w b_w|\mathcal K_j(w)|\right)\right\rfloor,\\
+ \left\lfloor\frac{a_j+\lceil\sqrt{(M-1)(M(V_j-k_j^2)-a_j^2)}\rceil}{M}\right\rfloor.
+\end{gather*}
+The last bound follows by minimizing the other $M-1$ squares for a fixed
+maximum fiber. There is also a constant-weight packing bound. If $d_C$ is
+the kernel distance, set $r=\lfloor(d_C-1)/2\rfloor$ and $h=\min(j,128-j)$.
+The bound is $1$ for $h<r$ and
+$\lfloor\binom{128}{h-r}/\binom hr\rfloor$ otherwise: two words in one
+fiber cannot contain the same $(h-r)$-subset after complementing when needed.
+The verifier takes the minimum of these integer upper bounds.
+
+Define the fixed-weight transfer $T_j(z)$ by the following nonzero entries:
+\begin{align*}
+ (T_j)_{ZZ}&=(1-\nu_j)z^j,& (T_j)_{ZD}&=\nu_j z^j,\\
+ (T_j)_{DZ}&=\tfrac12\ell_{D,j}+\tfrac1{2M}\min(m_{D,j},\nu_j),&
+ (T_j)_{DD}&=\tfrac12m_{D,j},\\
+ (T_j)_{DS_i}&=\tfrac{c_i}{2M}m_{D,j},&
+ (T_j)_{S_iZ}&=\tfrac12\ell_{i,j}+\tfrac1{2M}\min(m_{d_i,j},\nu_j),\\
+ (T_j)_{S_iS_h}&=\tfrac{c_h}{2M}m_{d_i,j}.&&
+\end{align*}
+Additionally put mass $m_{d_i,j}/2$ in entry $S_iD$ when $\nu_j>0$, or
+add it to entry $S_iS_i$ when $\nu_j=0$.
+
+These entries dominate the weighted state measure. The zero row is exact.
+The lazy branch pays its cancellation bound and places the remaining mass
+in $D$; if all syndromes vanish, it preserves the entering shell.
+On the refresh branch, every specified target has probability at most $1/M$.
+Termination also requires a nonzero syndrome, giving the minimum in the
+zero column. Keeping the full surviving-mass upper bounds deliberately
+overcounts cancellation; it never subtracts an unproved lower bound.
+For iid Bernoulli-$\beta$ input, the occupation transfer is
+\[
+ T_{\rm occ}(\beta,z):=\sum_{j=0}^{128}
+ \binom{128}{j}\beta^j(1-\beta)^{128-j}T_j(z).
+\]
+
+A second envelope bounds every target by Fourier inversion of a tilted
+input law. Set
+\[
+ g_0:=1-\beta+\beta z,\quad g_1:=\beta+(1-\beta)z,\quad
+ F_d:=g_0^{128-d}g_1^d,
+\]
+\[
+ r_0:=|1-2\beta z/g_0|,\qquad
+ r_1:=|1-2(1-\beta)z/g_1|,
+\]
+and define
+\[
+ H_d:=2^{-19}\left(1+\sum_w b_w
+ \max_{\max(0,d+w-128)\le h\le\min(d,w)}r_0^{w-h}r_1^h\right).
+\]
+The maximum is attained at an endpoint. Tilting by $z^{\wt(X+Aq)}$ keeps
+the input coordinates independent. Fourier inversion bounds each syndrome
+point probability by $H_d$. Thus every target, including zero, receives
+weighted mass at most $F_d(H_d/2+1/(2M))$. Define $T_{\rm F}$ by placing
+this value in column $Z$ and $c_h$ times this value in column $S_h$ for an
+entering shell $S_i$ with $d=d_i$. For an entering $D$, maximize over $d_i$.
+Its zero row is the exact binomial mixture of the zero rows of $T_j$.
+
+Finally the state-independent scalar envelope is
+\[
+ T_{\rm sc}(\beta,z):=\max_{d\in\{0,48,56,64,72,80\}}F_d.
+\]
+At $\beta=1/2$ it equals $((1+z)/2)^{128}$ exactly. For either matrix
+envelope, induction gives
+\begin{equation}
+ \E[z^{\wt(Y)}]\le e_Z^\top T(\beta,z)^{N/128}\1.
+ \label{eq:imt-moment}
+\end{equation}
+The scalar bound gives $T_{\rm sc}^{N/128}$. A witness selects one complete
+envelope; the proof never takes an entrywise minimum of representations.
+
+\subsubsection{Positive occupation}
+
+Fix $\alpha\ge10^{-4}$ and mean active-row weight $x\in\mathcal W$.
+All arrays in a fixed profile have $N\alpha x$ ones. Apply route domination
+to the moment restricted to that weight slice, then change its iid reference
+probability from $\alpha x$ to $py$. The likelihood cost is
+$\exp(ND_{\rm KL}(\alpha x\Vert py))$. The chain rule bounds its exponent by
+$D_{\rm KL}(\alpha\Vert p)+\alpha D_{\rm KL}(x\Vert y)$.
+Consequently the bad-message exponent per output bit is at most
+\begin{equation}
+ \alpha\widehat a_{\rm BA}(x)+D_{\rm KL}(\alpha\Vert p)
+ +\alpha D_{\rm KL}(x\Vert y)+\frac{\ln\lambda}{128}-0.11\ln z,
+ \label{eq:imt-dense-exponent}
+\end{equation}
+where $\lambda$ is a scalar bound or a positive Collatz bound
+$T(py,z)\boldsymbol w\le\lambda\boldsymbol w$.
+
+The verifier covers $[10^{-4},1]\times\mathcal W$ by $1{,}023$ rational
+boxes within the $39$ outer segments. It fixes a witness on each box and
+checks four vertices. The exponent is convex in $(\alpha,\alpha x)$ on
+each affine segment. All bounds pass outward arithmetic at $256$ bits and
+replay at $512$ bits, with maximum less than $-4.10335\cdot10^{-7}$.
+The witnesses use $433$ occupation transfers, $307$ Fourier transfers, and
+$283$ scalar transfers. The values $p,y$ and the positive vectors are rational;
+the weight tilt is specified by a rational $\log(-\log z)$ and enclosed
+outward. Exact rational geometry checks containment, disjoint interiors,
+and total area. No numerical eigenvalue is trusted.
+
+There are finitely many witnesses, so their moment prefactors are bounded.
+Counting and route-domination costs are $\exp(o(N))$ uniformly in this range.
+They include active-position choices, row-weight tuples, and the selected
+spectrum's polynomial factors. The summed first moment is therefore $o(1)$.
+
+\subsubsection{Uniform sparse occupation}
+
+For sparse profiles, the factor $(L+1)^b$ would be too costly. We instead
+compare the counting measure on each permuted active outer row with fair
+bits. The original, coarser $31$-segment outer majorant already proves
+\[
+ \sup_{x\in\mathcal W}\bigl(\widehat a_{\rm old}(x)-h(x)+\ln(2)/2\bigr)
+ <\ell,\qquad \ell:=0.01281.
+\]
+Hence, uniformly over all selected outers and weights, for some
+$\epsilon_b=O(\log(b)/b)$,
+\begin{equation}
+ \frac{A_{\mathcal O_b}(w)}{\binom bw}
+ \le \exp\{b(-\ln(2)/2+\ell+\epsilon_b)\}.
+ \label{eq:imt-row-likelihood}
+\end{equation}
+Relative to a fair $b$-bit row, the counting measure thus costs
+$\exp\{b(\ln(2)/2+\ell+\epsilon_b)\}$. This comparison is made after
+summing messages; it does not assert that a fixed constituent word is uniform.
+
+Fix $Q$ active positions and put $\alpha=Q/L\le10^{-4}$.
+Under the fair-row reference, each region has $Q$ uniform marked positions
+carrying independent fair bits. Sample iid marks with probability
+$p=(8/5)\alpha$ and condition their count to equal $Q$. Without that
+conditioning, all input bits are iid with $\beta=p/2=(4/5)\alpha$.
+The reference regions are independent. Since $Q$ is a mode of
+$\operatorname{Bin}(L,\alpha)$, Chebyshev's inequality gives modal mass
+at least $1/(8\sqrt Q)$. The exact binomial likelihood ratio yields
+\[
+ \Prob[\operatorname{Bin}(L,p)=Q]
+ \ge \frac{e^{-LD_{\rm KL}(\alpha\Vert p)}}{8\sqrt Q}.
+\]
+Indeed, probability at least $3/4$ lies in at most $4\sqrt Q+1\le5\sqrt Q$
+integer locations about the mean, so a mode has mass at least $3/(20\sqrt Q)$.
+
+Put $z=1-(8/5)\alpha$. An exact rational polynomial certificate proves
+\begin{equation}
+ T_{\rm occ}(\beta,z)\boldsymbol w(\alpha)
+ \le (1-96\alpha)\boldsymbol w(\alpha),
+ \qquad 0<\alpha\le10^{-4}.
+ \label{eq:imt-sparse-collatz}
+\end{equation}
+Here $w_Z=1$, and $w_i=2^{-10}(1+h_i\alpha)$ for the six live coordinates,
+with
+\begin{align*}
+ h_D&=900,& h_{S_1}&=\frac{116184452864}{2257055535},&
+ h_{S_2}&=\frac{92653723520}{3613910291},\\
+ h_{S_3}&=-\frac{26853143552}{769273207925},&
+ h_{S_4}&=-\frac{461216096896}{18043337105},&
+ h_{S_5}&=-\frac{351546952448}{6881266875}.
+\end{align*}
+The shell-weighted average of the corrections is zero. Every coordinate is
+at least $1/2048$. In the variable $x=10000\alpha$, the verifier constructs
+degree-$257$ rational polynomial upper bounds for the seven residuals.
+It certifies every maximum replacement over $[0,1]$. Each residual vanishes
+at zero. After removing that factor, its constant coefficient plus the sum
+of its positive remaining coefficients is strictly negative. This proves
+the whole interval, including arbitrarily small positive $\alpha$.
+
+Combining \eqref{eq:imt-row-likelihood}, the conditioning bound,
+\eqref{eq:imt-sparse-collatz}, and Markov's inequality gives
+\begin{align}
+ \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
+ \le{}&2048\binom LQ e^{Qb(\ln(2)/2+\ell+\epsilon_b)}(8\sqrt Q)^b
+ \nonumber\\*
+ &\cdot e^{ND_{\rm KL}(\alpha\Vert p)}
+ (1-96\alpha)^{N/128}z^{-0.11N}.
+ \label{eq:imt-uniform-sparse}
+\end{align}
+Use $\ln\binom LQ\le Q\ln L+Q$, $b\ge c\log_2N$ with $c=39/4$, and
+$\ln(1-u)\le-u$. The uniform coefficient per active-row bit is at most
+\[
+ C_*:=\frac{\ln2}{2}+\ln(5/8)
+ +\frac{3/5+0.11(8/5)}{1-0.00016}-\frac{96}{128}
+ +\ell+\frac{\ln2}{c}<-0.01340384.
+\]
+The remaining terms are
+$\epsilon_b+1/b+\ln(8\sqrt Q)/Q+\ln(2048)/(Qb)$.
+For $Q\ge4096$, the third is below $0.002$ and decreases with $Q$.
+For sufficiently large $b$, the other terms together are below $0.004$
+uniformly. Thus
+\begin{equation}
+ \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
+ \le e^{-0.006Qb},\qquad 4096\le Q\le10^{-4}L.
+ \label{eq:imt-sparse-final}
+\end{equation}
+This explicit cutoff avoids any assumption about how fast $Q$ grows.
+
+\subsubsection{Fixed occupation and the continuum limit}
+
+It remains to control finitely many $Q<4096$. We derive a limit for each
+fixed $Q$, allowing constants to depend on $Q$. Define
+\[
+ r:=1/M,\qquad p_0:=2^{18}/M,\qquad
+ P_0:=\begin{pmatrix}0&1\\r&1-r\end{pmatrix}.
+\]
+During empty epochs a live state has transition $P=(I+\Pi)/2$, where
+$\Pi$ replaces it by a uniform nonzero state. Write $f(q):=\wt(Aq)$.
+Its stationary mean is $\mu=128p_0$. For any initial live state,
+\[
+ \E[f(q_j)\mid q_i]=\mu+2^{-(j-i)}(f(q_i)-\mu),\qquad j\ge i.
+\]
+For $S_g:=\sum_{i=0}^{g-1}f(q_i)$ this implies
+\[
+ |\E S_g-\mu g|\le2t,\qquad
+ \operatorname{Var}(S_g)\le3t^2g,\qquad
+ \E|S_g-\mu g|\le t\sqrt{3g}+2t.
+\]
+The variance bound follows from
+$\operatorname{Cov}(f(q_i),f(q_j))=2^{-(j-i)}\operatorname{Var}(f(q_i))$.
+It does not require a stationary initial state.
+
+Fix $\theta>0$, and set $z_L=e^{-\theta/L}$ and $\gamma=p_0\theta$.
+Let $W_0(z_L)$ be the actual full-state weighted empty-step kernel.
+The Lipschitz bound for $e^{-x}$ and
+$P^g=2^{-g}I+(1-2^{-g})\Pi$ give, for every live $q,q'$,
+\begin{equation}
+ \left|W_0(z_L)^g(q,q')-\frac{e^{-\theta\mu g/L}}M\right|
+ \le\frac{\theta t(\sqrt{3g}+2)}L+2^{-g}.
+ \label{eq:imt-empty-limit}
+\end{equation}
+The zero state stays zero. Define the lift $J$ by $J(q,0)=\1_{q=0}$,
+$J(q,1)=\1_{q\ne0}$, and the projection $R$ by
+$R(0,q)=\1_{q=0}$, $R(1,q)=\1_{q\ne0}/M$. Thus $RJ=I_2$.
+Put $D_\gamma(u):=\operatorname{diag}(1,e^{-\gamma u})$.
+For $\lceil3\log_2L\rceil\le g\le L/t$, equation
+\eqref{eq:imt-empty-limit} approximates $W_0^g$ by
+$JD_\gamma(tg/L)R$ with entry error $O(L^{-1/2})$.
+
+Let $W_1(z_L)$ be the kernel for one input bit at a uniformly chosen local
+position. Its difference from $W_1(1)$ is $O(1/L)$ in row norm, since the
+emitted weight is at most $t$. Invertibility of the mixer and the nonzero
+columns of $C$ give the exact identity
+\[
+ RW_1(1)J=P_0.
+\]
+For a fixed $a\le Q$ uniformly placed impulses in one region, an epoch
+collision has probability $O_Q(1/L)$. A boundary or inter-impulse gap shorter
+than $\lceil3\log_2L\rceil$ has probability $O_Q(\log(L)/L)$.
+On the complement, replace each empty gap using
+\eqref{eq:imt-empty-limit} and each impulse by $W_1(1)$. The finite products
+telescope with bounded row norms. The omitted impulse durations total
+$at/L=O_Q(1/L)$. Riemann sums for the ordered uniform sites then give
+\begin{equation}
+ K_a(\theta):=a!\int_{\substack{u_i\ge0\\\sum_{i=0}^a u_i=1}}
+ D_\gamma(u_0)P_0D_\gamma(u_1)\cdots P_0D_\gamma(u_a)\,d\boldsymbol u.
+ \label{eq:imt-continuum}
+\end{equation}
+For $a=0$, $K_0=D_\gamma(1)$. The simplex integral uses $a$ independent
+coordinates. The actual region kernel $F_{a,L}(z_L)$ differs from $JK_aR$
+by $O_{Q,M,\theta}(L^{-1/2}+\log(L)/L)$ in every entry, uniformly over
+initial and final states. Bad placement events cost at most their probability
+because weighted actual kernels have row sums at most one.
+
+The additive comparison becomes multiplicative. For $a=0$, both zero/live
+cross entries vanish exactly. For $a=1$, zero-to-zero vanishes exactly.
+All other coarse entries are positive, and for $a\ge2$ every entry is
+positive. Since $Q,M,\theta$ are fixed, there exists
+$\eta_L=O_{Q,M,\theta}(L^{-1/2}+\log(L)/L)$ such that
+\begin{equation}
+ F_{a,L}(z_L)\le(1+\eta_L)JK_a(\theta)R\quad(0\le a\le Q).
+ \label{eq:imt-componentwise-limit}
+\end{equation}
+This inequality averages over the within-region placements. It is uniform
+over the choices of which active rows contribute a bit and over boundary
+states. Multiplication over $b=O(\log L)$ regions costs $\exp(o(1))$,
+also when coefficient extraction enforces the row weights.
+
+We may enlarge $P_0$ to
+$P_+:=\left(\begin{smallmatrix}0&1\\r&1\end{smallmatrix}\right)$
+in \eqref{eq:imt-continuum}; write $K_a^+$ for the resulting upper matrices.
+They are nonnegative, but not stochastic.
+
+\paragraph{One and two active rows.}
+Use \eqref{eq:imt-row-likelihood} and fair reference rows. The continuum
+region matrix is $2^{-Q}T_Q$, with
+$T_Q:=\sum_{a=0}^Q\binom Qa K_a^+$. Set $\gamma=Q\ln2$ and
+$\theta=\gamma/p_0$. With
+\[
+ a_0=e^{-\gamma},\quad f=\frac{1-a_0}{\gamma},\quad
+ g=\frac{2(\gamma-1+a_0)}{\gamma^2},\quad
+ e=\frac{2(1-(1+\gamma)a_0)}{\gamma^2},
+\]
+the matrices are
+\[
+ K_0^+=\operatorname{diag}(1,a_0),\quad
+ K_1^+=\begin{pmatrix}0&f\\rf&a_0\end{pmatrix},\quad
+ K_2^+=\begin{pmatrix}rg&e\\re&re+a_0\end{pmatrix}.
+\]
+The exponent per outer bit, including active-position choices, is
+\[
+ \ln\rho(T_Q)+0.11\theta-Q\ln(2)/2+Q\ell+Q\ln(2)/c.
+\]
+Outward checks at $256$ bits, replayed at $512$ bits, bound this expression
+divided by $Q$ by $-0.10918$ for $Q=1$ and $-0.10914$ for $Q=2$.
+Finite positive-matrix prefactors and the uniform outer remainder are
+$\exp(o_Q(b))$, so both first moments tend to zero.
+
+\paragraph{A weight-coupled bound for fixed $Q\ge3$.}
+For positive row fugacities $u_j$, define
+\[
+ T_Q(\boldsymbol u,\theta):=\sum_{\boldsymbol e\in\{0,1\}^Q}
+ \left(\prod_j u_j^{e_j}\right)K_{\sum_j e_j}^+(\theta).
+\]
+Nonnegative coefficient extraction and \eqref{eq:imt-componentwise-limit}
+bound the moment for row weights $w_j$ by
+\[
+ \left(\prod_j\binom b{w_j}^{-1}u_j^{-w_j}\right)
+ e_0^\top T_Q(\boldsymbol u,\theta)^b\1_2\,\exp(o_Q(b)).
+\]
+Set $\sigma=127/250$, $\tau=133/125$, $v_1=3/1600$, and
+$\theta=Q\tau/p_0$. Define
+\begin{align*}
+ G_Q&:=\sup_{0\le y\le1}\{-\tau y+(1+1/Q)\ln(1-y+y/\sigma)\},\\
+ m_v(u)&:=\max\{1+u\sigma v_1,ur/v_1+\sigma(1+u)\}.
+\end{align*}
+For the weighted row norm with $v=(1,v_1)^\top$,
+\begin{equation}
+ \|T_Q(\boldsymbol u,Q\tau/p_0)\|_v
+ \le e^{QG_Q}\prod_jm_v(u_j),\qquad G_Q\le G_3.
+ \label{eq:imt-product-norm}
+\end{equation}
+For completeness, insert all $Q$ potential impulse sites, using $I$ for
+an unused site and $P_+$ for a used site. If a fixed class path has $l$ live
+spacings, their total duration $Y$ has distribution
+$\operatorname{Beta}(l,Q+1-l)$, with deterministic endpoint cases. The identity
+\[
+ \E[(1-Y+Y/\sigma)^{-(Q+1)}]=\sigma^l
+\]
+follows by the substitution $u=y/[\sigma+(1-\sigma)y]$ in the beta integral.
+By the definition of $G_Q$, the path's integrated weight is at most
+$e^{QG_Q}\sigma^l$. Summing paths yields the average over orders $\pi$ of
+\[
+ D_\sigma(I+u_{\pi(1)}P_+)D_\sigma\cdots
+ (I+u_{\pi(Q)}P_+)D_\sigma,
+\]
+times $e^{QG_Q}$, where $D_\sigma=\operatorname{diag}(1,\sigma)$.
+Submultiplicativity, $\|D_\sigma\|_v\le1$, and
+$\|(I+uP_+)D_\sigma\|_v=m_v(u)$ prove \eqref{eq:imt-product-norm}.
+This reasoning requires nonnegative coefficients, not stochasticity of $P_+$.
+
+The old $31$-segment majorant suffices here. For each segment choose one
+rational $u>0$. Convexity in $x$ reduces the following inequality to its
+two endpoints:
+\[
+ \widehat a_{\rm old}(x)-h(x)-x\ln u+\ln m_v(u)
+ +G_3+0.11\tau/p_0+\ln(2)/c<-0.0008679786.
+\]
+All $62$ outward checks pass. The row-weight tuples and finite coefficient
+remainders contribute $o_Q(b)$. Therefore, for each fixed $Q\ge3$,
+\[
+ \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
+ \le\exp\{-0.0008679Qb+o_Q(b)\}.
+\]
+
+\subsubsection{Completion and certificate boundary}
+
+\begin{proof}[Theorem~\ref{thm:structured-spin-scalable}]
+Condition on any outer satisfying $\mathcal G_b$. The fixed-occupation
+arguments give a vanishing sum over the finite set $1\le Q<4096$.
+Equation~\eqref{eq:imt-sparse-final} gives a uniform geometric sum for
+$4096\le Q\le10^{-4}L$. The positive-occupation certificate bounds the
+remaining sum by $L\exp(-\eta N+o(N))$ for some $\eta>0$.
+Thus $\sum_{Q=1}^L\E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]=o(1)$.
+The explicit cutoff makes this a summable union, not merely a statement
+about each occupation sequence. Markov's inequality and
+$\Prob[\mathcal G_b^c]=o(1)$ prove the distance claim.
+
+Rate follows from injectivity. Every outer row costs $O(b)$ in either circuit
+direction: it uses fixed Golay circuits, two permutations, and two accumulators.
+The route costs $O(N)$, and the fixed-size binary IMT steps cost $O(1)$ each.
+The displayed adjoint gives the same bound for transposed encoding.
+\end{proof}
+
+The imported outer event and its coarse majorant retain the $31$-entry
+manifest in the
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md}{outer certificate snapshot}.
+The IMT evidence has separate source bindings, including the refined
+outer and dense replay.
+The \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/imt_asymptotic/README.md}{IMT reproduction guide}
+identifies the source bindings and commands. The numerical certificates check
+the finite spectra, interval covers, Collatz inequalities, exact sparse
+polynomials, and fixed-occupation constants. The analytic steps are the
+measure comparisons, transfer induction, continuum limit, and final union
+proved above. Higher-precision replay is not an independent proof of those
+steps. The finite BCH/IMT results use the same transfer interface, with
+their separate finite-length evidence in
+Appendix~\ref{app:finite-bch-proof}.

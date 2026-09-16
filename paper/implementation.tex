@@ -1,80 +1,89 @@
 \section{Implementation and performance}
 \label{sec:implementation}
 
-We implement the selected BCH-256/RM2Sub $(128,19)$ construction from
+We implement the selected BCH/IMT constructions from
 Section~\ref{sec:finite-certificates}. The application evaluates the
-transposed encoder on batches: $2K$ input blocks map to $K$ output blocks,
+transposed encoder on batches: $N$ input blocks map to $K$ output blocks,
 where each $128$-bit block carries $128$ parallel binary instances.
+Here $N=2K$ at rate $1/2$ and $N=4K$ at rate $1/4$.
 The pipeline applies the transposed inner, reverses the routing factors,
 and applies the transposed BCH outer. No parity fanout is included.
 
 \paragraph{Shared implementation and optimized kernels.}
-The configurations share setup, routing, the paired BCH transpose, and
-an RM2Sub template. Selected maps supply compile-time constants and checked
-quadratic XOR circuits. The BCH circuit uses $3029$ scalar XOR operations
-and evaluates two rows together with AVX2. Inner kernels use pruned SIMD
-zeta stages, unrolled emission, and fixed nibble tables.
-The online call has no allocation or type-erased callback dispatch;
-configuration and layout dispatch occur once per encoding.
+The configurations share the routing machinery and an IMT template.
+The transpose uses
+\[
+ V_i=U_i+C^\top r_{i+1},\qquad r_i=A^\top U_i+M_i^\top r_{i+1}.
+\]
+In particular, $A^\top$ consumes the raw input $U_i$.
+The balanced expansion is evaluated by pruned SIMD zeta stages and fixed
+nibble tables. Sparse feedback gives unrolled XOR emission; each output
+block combines five state blocks at half rate, or three at quarter rate.
+The transvection update uses masked XORs on the state blocks.
+The BCH-256 circuit uses $3029$ scalar XOR operations and evaluates two
+rows together with AVX2. The quarter-rate constituent has its own generated
+transpose circuit. The online call has no allocation or type-erased
+callback dispatch; configuration and layout dispatch occur once per encoding.
 
-At $K=2^{20}$, packed $24$-bit routing indices and $2048$-row tiles reduce
-routing overhead. The smaller measured instances use $256$-row tiles.
-Grouped nibble tables improve the selected S19 kernel.
-These are measured choices for the evaluation host, not processor-independent
-optimality claims.
+Packed $24$-bit routing indices and workspace-local page routing reduce
+data-movement costs. At $K=2^{20}$ the half-rate implementation uses
+$2048$-row tiles and the quarter-rate implementation uses $4096$-row tiles.
+The smaller half-rate measurements use $256$-row tiles.
+These are measured choices for the evaluation host, not
+processor-independent optimality claims.
 
-\paragraph{Correctness.}
-Symbolic checks verify the generated BCH matrix and its transposed circuit,
-the pruned zeta schedule, and the selected inner maps.
-Runtime tests compare the complete optimized output with dense BCH
+\paragraph{Correctness and certificate binding.}
+Symbolic checks verify the generated outer matrices and transpose circuits,
+the pruned zeta schedule, and both independent inner maps.
+Runtime tests compare the complete optimized output with dense outer
 multiplication and a separately implemented scalar inner recurrence.
-Tests cover routing layouts, tile sizes, setup compaction, multiple setups,
-boundary impulses, zero inputs, and buffer validation.
-The tested configurations agree under GCC and MSVC.
+The retained checks cover routing layouts, tile sizes, setup compaction,
+boundary inputs, and buffer validation. The half-rate campaign passed all
+$12$ correctness tests. Source and binary identities, exact map columns,
+and the outer construction bind each reported timing to its corresponding
+finite certificate. A timing alone does not establish distance.
 
 \paragraph{Measurement method.}
 Measurements use one Ryzen 9 7950X thread on Linux, pinned to CPU~15, with
 GCC~15.2.0. The release build uses \texttt{-O3 -DNDEBUG -march=znver4},
 AVX2, and carry-less multiplication instructions.
 Each reported time is the median of three independent serial run medians.
-Each run performs three warmups and $101$ timed calls, reusing its buffers
-and workspace. Setup, allocation, correctness checks, and output hashing
+Each run performs three warmups and $101$ timed calls. Buffers are initialized
+once per process, with no copy or reset between calls.
+Setup, allocation, correctness checks, and output hashing
 are outside the online interval. These are steady-state encoder latencies,
 not cold-cache or full-application timings.
 
 \begin{table}[tb]
 \centering
 \caption{Online time in milliseconds for the batched transposed encoder.
-The selected construction has the five finite certificates in
-Table~\ref{tab:finite-bch-margins}; implementation support is currently
-limited to $16\le\log_2K\le20$.}
+Both rows use IMT $(t,s)=(128,19)$ with their specified feedback maps.
+A dash means that no certificate-matched timing is reported here.}
 \label{tab:finite-bch-performance}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Inner $(t,s)$ & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
+Outer and rate & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
 \midrule
-$(128,19)$, selected & 0.560 & 2.322 & 11.259 \\
-$(64,20)$, reference & 0.625 & 2.577 & 12.059 \\
+BCH-256, $1/2$ & 0.523 & 2.154 & 10.110 \\
+BCH-128, $1/4$ & -- & -- & 15.254 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At $K=2^{20}$, the selected construction takes $6.6\%$ less time than the
-$(64,20)$ reference. Its three run medians range from $11.105$ to $11.276$\,ms.
-The measured setup takes $43.91$\,ms and includes construction of oracle
-and alternative routing data. Those data are discarded before online timing;
-setup timing excludes this final deallocation and workspace construction.
-The retained setup occupies $13.19$\,MiB, the workspace $40$\,MiB, and
-the input/output buffers a separate $48$\,MiB.
-No performance measurement is claimed at $K=2^{22}$ or $2^{24}$.
+At half rate and $K=2^{20}$, the three process medians range from
+$10.095$ to $10.172$\,ms. Retained setup occupies $12.13$\,MiB,
+workspace $40$\,MiB, and input/output buffers a separate $48$\,MiB.
+The quarter-rate setup occupies $24.25$\,MiB and workspace $72$\,MiB;
+its process medians range from $15.204$ to $15.313$\,ms.
+Setup latency is not reported. No performance measurement is claimed at
+$K=2^{22}$ or $2^{24}$.
 
-The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/bare_bch_rm2sub/README.md}{encoder guide}
-in \path{workstreams/bare_bch_rm2sub} records build
-instructions, exact memory sizes, source and binary hashes, and all final
-observations in \path{PERFORMANCE.json}. Performance and distance are separate
-checks of the same selected construction: the tests establish the implemented
-linear map, the timings measure its evaluation, and the finite certificate
-bounds the setup event in Theorem~\ref{thm:finite-bch-spin}.
+The artifact's
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PAPER_RESULTS.md}{finite IMT ledger}
+records the exact measurements, memory sizes, and proof bindings.
+Its \path{HALF_LADDER_PERFORMANCE_VERIFIED.json} authenticates the three
+half-rate cells; \path{QUARTER_DEPLOYMENT_VERIFIED.json} authenticates the
+quarter-rate implementation and both distance thresholds.
 
 \subsection{Comparison with other transposed encoders}
 \label{sec:transposed-comparison}
@@ -133,8 +142,8 @@ $40$ bits ($41.5$ bits at this size), with near-quadratic setup work
 \end{minipage}
 \end{table}
 
-At the largest measured length, SPIN takes $11.104$\,ms.
-Chosen Golay and RM BAA take $2.16$ and $2.49$ times as long,
+At the largest measured length, half-rate SPIN with IMT takes $10.110$\,ms.
+Chosen Golay and RM BAA take $2.37$ and $2.74$ times as long,
 respectively. The conservative EC profile takes $181.825$\,ms.
 The repetition-$3$ permutation domain requires cycle walking; the
 repetition-$4$ domain does not. These measurements do not imply that
@@ -146,7 +155,7 @@ i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses
 our same-host rerun and does not combine cross-machine timings.
 
 \paragraph{Distance context.}
-At the largest lengths, SPIN's certified margin is $50.448$ bits at
+At the largest lengths, half-rate SPIN's certified margin is $50.062$ bits at
 relative distance $0.10$. The companion BAA evaluation reports full
 first-moment margins of $46.386$ and $47.093$ bits for Golay and RM,
 respectively, at the same distance target and their measured length.
@@ -163,5 +172,8 @@ nor extrapolate the BAA or EC margins to smaller lengths.
 The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/transposed_comparison/README.md}{comparison guide}
 records dependency revisions, correctness checks, actual lengths, all
 $5454$ timing samples, and a script that regenerates
-Table~\ref{tab:transposed-comparison}. The original SPIN measurements
-in Table~\ref{tab:finite-bch-performance} remain unchanged.
+Table~\ref{tab:transposed-comparison}. The external rows retain that campaign. The SPIN row instead uses the
+certificate-matched IMT series from Table~\ref{tab:finite-bch-performance},
+measured separately under the same host, compiler, and timing policy.
+\path{paper/build_imt_comparison.py} authenticates both sources and
+regenerates the combined table.

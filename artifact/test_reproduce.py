@@ -55,11 +55,16 @@ class ArtifactChecks(unittest.TestCase):
                     continue
                 self.assertTrue((doc.parent / target.split('#')[0]).exists(), f'{doc}: {target}')
 
-    def test_isolated_compact_tree(self):
-        # Explicit inputs only: no Git metadata, receipt trees, or parent worktree.
+    def test_historical_compact_tree_does_not_certify_imt(self):
+        # Historical ledgers must not silently stand in for current IMT evidence.
+        # Explicit inputs only: no Git metadata or parent-worktree fallback.
         root = reproduce.ROOT
         names = {Path('artifact/reproduce.py'), Path('paper/build_parameter_figures.py'),
                  Path('paper/check_finite_integration.py'),
+                 Path('paper/imt_results.py'), Path('paper/build_imt_comparison.py'),
+                 Path('paper/build_imt_parameter_figures.py'),
+                 Path('workstreams/transposed_comparison/report.py'),
+                 Path('workstreams/transposed_comparison/run.py'),
                  reproduce.BUNDLE / 'SINGLE_SAMPLED_BA_RM2SUB_CERTIFICATE_MANIFEST.json',
                  Path('workstreams/finite_asymptotic_theory/landscape_db/CURRENT_RESULTS_TABLES.md'),
                  Path('workstreams/bare_bch_rm2sub/PERFORMANCE.json'),
@@ -81,8 +86,9 @@ class ArtifactChecks(unittest.TestCase):
                 shutil.copyfile(root / name, target)
             result = subprocess.run([sys.executable, '-B', str(destination / 'artifact/reproduce.py'), 'quick'],
                                     cwd=destination, capture_output=True, text=True)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn('QUICK CHECK PASSED', result.stdout)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Missing IMT evidence', result.stdout + result.stderr)
+            self.assertNotIn('QUICK CHECK PASSED', result.stdout)
 
 
 if __name__ == '__main__':

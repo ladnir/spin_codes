@@ -1,47 +1,65 @@
 # Paper-to-code map
 
-Section numbers refer to the current draft. LaTeX labels are included so this
-map can survive renumbering. Repository paths are authoritative; older notes
-may contain historical worktree paths.
+LaTeX labels identify results across renumbering. GitHub is authoritative;
+older notes may contain historical worktree paths.
 
-| Paper result | Source and retained evidence | Reproduction entry point |
+| Paper result | Current sources | Check or reproduction |
 |---|---|---|
-| Common first-moment framework, Section 3 | [framework.tex](../paper/framework.tex) | Analytic argument; not a numerical benchmark. |
-| Accumulator and Random SPIN, Sections 4--5 | [accumulator_spin.tex](../paper/accumulator_spin.tex), [random_spin.tex](../paper/random_spin.tex), [proof_appendix.tex](../paper/proof_appendix.tex) | Analytic proofs in the manuscript. |
-| Scalable Structured SPIN, Theorem 6.3 (`thm:structured-spin-scalable`), Appendix A | [certificate snapshot](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md), [manifest](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/SINGLE_SAMPLED_BA_RM2SUB_CERTIFICATE_MANIFEST.json) | `reproduce.py quick` checks the 31 pinned entries. The snapshot README lists interval producers; see the replay boundary below. |
-| Parameter slices, Section 7.1, Figures 1--3 (`fig:finite-k-b`, `fig:finite-s-t`, `fig:finite-k-s`) | [retained tables](../workstreams/finite_asymptotic_theory/landscape_db/CURRENT_RESULTS_TABLES.md), [interpretation](../workstreams/finite_asymptotic_theory/landscape_db/BCH_DOMINANCE_ANALYSIS.md), [figure generator](../paper/build_parameter_figures.py) | `reproduce.py figures`; 130 geometries, 77 useful full bounds, 7 weak bounds, 46 first-moment obstructions. No fresh grid evaluation. |
-| BCH-256, Theorem 7.1, Table 2, Figure 4 (`thm:finite-bch-spin`, `tab:finite-bch-margins`, `fig:finite-bch-curve`), Appendix B | [finite handoff](../workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md), [ledger directory](../workstreams/bch_rm2sub_bridge/generated/), [paper integration checker](../paper/check_finite_integration.py) | `reproduce.py quick` checks exact-ledger margins and the selected inner. `reproduce.py evidence` authenticates the larger retained evidence set. Neither reruns all interval calculations. |
-| Performance, Section 9, Table 3 (`tab:finite-bch-performance`) | [encoder and build guide](../workstreams/bare_bch_rm2sub/README.md), [measurements](../workstreams/bare_bch_rm2sub/PERFORMANCE.json), [methodology](../workstreams/bare_bch_rm2sub/PERFORMANCE.md) | Build and run CTest for correctness; run the benchmark separately and serially for new timings. |
+| Common first-moment framework | [framework.tex](../paper/framework.tex) | Analytic argument. |
+| Accumulator and Random SPIN | [accumulator_spin.tex](../paper/accumulator_spin.tex), [random_spin.tex](../paper/random_spin.tex), [proof_appendix.tex](../paper/proof_appendix.tex) | Analytic proofs. |
+| Scalable Structured SPIN, IMT at 11% (`thm:structured-spin-scalable`) | [IMT proof guide](../workstreams/inner_design/imt_asymptotic/README.md), [11% refinement](../workstreams/inner_design/imt_asymptotic/d11/PROOF_UPDATE.md) | `python -B paper/check_imt_integration.py`; guide supplies numerical replay commands. |
+| BCH-256 finite theorem and engineering curve (`thm:finite-bch-spin`, `fig:finite-bch-curve`) | [selected finite IMT results](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md), [finite appendix](../paper/finite_appendix.tex) | `python -B paper/check_finite_integration.py` authenticates accepted evidence and checks exact unions, maps, and transcription. No interval replay. |
+| Quarter-rate operating points (`thm:finite-quarter-spin`) | Same ledger; [independent-map transfer argument](../workstreams/inner_design/asymmetric/TRANSFER_ARGUMENT.md), [outer construction](../workstreams/rate_quarter_bch/SMALLER_OUTER.md) | Same checker; current margins come from IMT receipts, not the older RM2Sub outer study. |
+| Selected transpose performance (`tab:finite-bch-performance`) | [timing and proof bindings](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md) | Same checker; 3 half-rate sizes and 1 certified quarter-rate size. New benchmarks must run serially. |
+| External comparison (`tab:transposed-comparison`) | [external campaign](../workstreams/transposed_comparison/README.md), [combined generator](../paper/build_imt_comparison.py) | `python -B paper/build_imt_comparison.py --check`; IMT replaces only SPIN, retaining external measurements. |
+| IMT Q1 parameter slices (`fig:finite-k-b`, `fig:finite-s-t`, `fig:finite-k-s`) | [study and scope](../workstreams/inner_design/finite_migration/PARAMETER_SLICES.md), [generator](../paper/build_imt_parameter_figures.py) | `python -B paper/build_imt_parameter_figures.py --check` authenticates 130 Q1 cells and five selected matched Q1/full anchors. No full-grid claim. |
 
-The additional performance comparison (`sec:transposed-comparison`,
-`tab:transposed-comparison`) is reproduced by the
-[comparison guide](../workstreams/transposed_comparison/README.md).
-Its [no-reset observations](../workstreams/transposed_comparison/results_no_reset_20260911.json)
-contain 54 serial runs. Run `python -B workstreams/transposed_comparison/report.py --check`
-to check the 18 table cells without benchmarking; this separate check is
-not currently part of `reproduce.py quick`.
+## Selected finite IMT certificates
 
-## The five finite ledgers
+| Outer / rate | log2 K | Relative distance | Full margin (display only) |
+|---|---:|---:|---:|
+| BCH-256 / 1/2 | 16 | .10 | 41.818327 |
+| BCH-256 / 1/2 | 18 | .10 | 50.189076 |
+| BCH-256 / 1/2 | 20 | .10 | 50.062088 |
+| BCH-256 / 1/2 | 22 | .10 | 48.390492 |
+| BCH-256 / 1/2 | 24 | .10 | 46.457255 |
+| BCH-128 / 1/4 | 20 | .165 | 41.048168 |
+| BCH-128 / 1/4 | 20 | .19 | 30.033491 |
 
-All paths below are within `workstreams/bch_rm2sub_bridge/generated/`.
+The half-rate lengths share both IMT maps with the asymptotic construction.
+The quarter-rate code shares the expansion but uses weight-three feedback.
+Theorems use exact rational upper bounds, not rounded display values.
+The certified curve is not an estimate of the true BCH-256 spectrum.
 
-| log2 K | Ledger | Full margin (display only) |
-|---:|---|---:|
-| 16 | [t128_s19_m16_full_split_coverage_v1.json](../workstreams/bch_rm2sub_bridge/generated/t128_s19_m16_full_split_coverage_v1.json) | 53.944367 |
-| 18 | [t128_s19_m18_full_split_coverage_v1.json](../workstreams/bch_rm2sub_bridge/generated/t128_s19_m18_full_split_coverage_v1.json) | 52.346388 |
-| 20 | [t128_s19_m20_ladder_full_v1.json](../workstreams/bch_rm2sub_bridge/generated/t128_s19_m20_ladder_full_v1.json) | 50.448203 |
-| 22 | [t128_s19_m22_ladder_full_v1.json](../workstreams/bch_rm2sub_bridge/generated/t128_s19_m22_ladder_full_v1.json) | 48.470684 |
-| 24 | [t128_s19_m24_ladder_full_v1.json](../workstreams/bch_rm2sub_bridge/generated/t128_s19_m24_ladder_full_v1.json) | 46.476222 |
+## Evidence and release boundary
 
-The theorem uses rational upper bounds, not these rounded decimals. These
-five lengths share the selected (t,s)=(128,19) map. The small-BCH plots use
-different, nested calibration maps; they are not additional matched points
-on the BCH-256 curve.
+The IMT checker authenticates accepted receipt pins and their source inputs,
+checks exact sums (including outward-rounded quarter-rate ceilings), and
+compares the selected maps to the manuscript and implementation headers.
+It is not a fresh numerical replay or an independent analytic proof review.
 
-## Replay boundary
+The external comparison retains its 2026-09-11 campaign. Two shared SPIN
+source files have since changed; the combined generator authenticates their
+measured bytes from commit `aafb3f59e7c3541e19b8623520c8a407ee2219e8`.
+It does not ignore their hashes or substitute today's source. The new IMT
+series was measured separately under the same host/compiler/protocol.
 
-The asymptotic manifest preserves 31 accepted sources and receipts. A fresh
-numerical replay invokes the producers and checks their output, in addition
-to reading the analytic proof. The finite BCH source checkout retains compact
-ledgers and the completion audit, but not every worker input or receipt.
-The [reproduction guide](REPRODUCING.md) gives the separate procedures.
+Generated IMT evidence remains local and uncommitted. A source-only checkout
+must obtain or regenerate the pinned inputs before these checks can pass.
+The older `reproduce.py inventory/evidence/pack-evidence` commands cover
+the historical BCH/RM2Sub evidence set, not a complete current IMT release.
+The [reproduction guide](REPRODUCING.md) retains those historical procedures.
+
+Use `python -B artifact/imt_reproduce.py inventory` for the selected finite
+IMT evidence instead. Its 753-file inventory authenticates the eight accepted
+root receipts and their declared source pins. `pack --output <fresh.zip>`
+packages that set and verifies its archived bytes. Neither command runs
+interval arithmetic. Add `--include-q1` to include the diagnostic grid (766
+files total rather than 753). The local
+inventory is complete; no current IMT archive has been published.
+
+The broader plots now follow the agreed Q1-focused scope. Their 130-cell grid
+does not by itself establish full margins. The selected BCH-256 curve supplies
+five matched Q1/full comparisons, not endpoint certificates for the different
+diagnostic BCH-64/128 maps. Full-grid proof search is no longer a prerequisite
+for this engineering explanation.

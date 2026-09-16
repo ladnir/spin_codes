@@ -1,7 +1,7 @@
-# First independent-map certificate
+# First IMT certificate
 
 The quarter-rate BCH [128,32,32] SPIN instance now passes both requested
-operating points with the independent expansion/feedback inner. Its parameters
+operating points with the [IMT inner](../IMT.md). Its parameters
 are K=2^20 message bits, N=2^22 output bits, t=128, s=19, balanced expansion A,
 feedback map `greedy3_2`, and one sampled transvection per epoch.
 
