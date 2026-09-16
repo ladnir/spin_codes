@@ -29,6 +29,59 @@ satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)
 The requested-length wrapper gives rate $1/2-o(1)$, relative distance
 $0.11-o(1)$, and linear work.
 
+\subsection{The Bazzi--Mahdian--Spielman question}
+\label{sec:bms-question}
+
+\paragraph{When does one interleaver suffice?}
+Bazzi, Mahdian, and Spielman (BMS) show that a depth-two serial concatenation
+cannot be asymptotically good when the outer has constant memory and the
+inner has sublinear memory~\cite[Sec.~III-A]{bms09}. Their conclusion asks
+whether allowing the outer memory to grow logarithmically with block length
+permits an asymptotically good code~\cite[Sec.~IV]{bms09}.
+Here, asymptotically good means that both rate and relative minimum
+distance stay bounded away from zero. The question concerns the
+composition of an outer encoder, one interleaver, and an inner encoder.
+
+\paragraph{The SPIN progression.}
+Accumulator SPIN supplies the basic positive construction in the
+block-encoder setting. Its outer blocks have length $\Theta(\log N)$,
+and its inner accumulator carries one bit of state. At rate $1/2$,
+Theorem~\ref{thm:independent-accumulator-spin} gives relative distance
+greater than $0.0037$ with probability $1-o(1)$. Thus a growing inner
+state is unnecessary for linear distance once the outer blocks grow
+logarithmically. Random SPIN increases the inner memory to
+$\Theta(\log N)$ and proves relative distance greater than $0.11002$.
+Structured SPIN then returns to constant inner state: with better
+constituents and structured interleaving, it proves relative distance
+greater than $0.11$ and linear-time encoding. Both of the latter distance
+guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
+
+\paragraph{Why the structured inner takes linear time.}
+In the scalable family, the inner step width $t=128$ and state dimension
+$s=19$ are fixed independently of $N$. Each of the $N/t$ steps evaluates
+the fixed linear maps $A,C$, adds fixed-length vectors, and multiplies
+two elements of $\F_{2^{19}}$ as specified in
+\eqref{eq:structured-inner}. Even a direct bit implementation takes a
+constant number of operations per step, so the total inner work is
+$O(N)$. The sampled multiplier changes with the step, but neither its
+width nor the arithmetic cost grows. This is a constant-state,
+time-varying encoder; the stored multiplier schedule and interleaver
+description are setup data, not part of the recursive state.
+The full encoder also needs a linear-time outer, as accounted for in
+\eqref{eq:structured-cost} below.
+
+\paragraph{Correspondence with the automata formulation.}
+The outer block length bounds the data that must be retained to process
+one constituent, giving $O(\log N)$ working memory for a blockwise
+realization. Relating this directly to the BMS formulation requires
+specifying a bit-serial realization, including buffering, termination,
+and the treatment of time-dependent transition maps. The structured
+interleaver still composes to one permutation between the outer and inner;
+the outer's internal permutations operate only within its logarithmic-size
+blocks. The construction therefore supplies the relevant memory and
+distance regime. A formal statement answering the original question
+should make the encoder-model correspondence explicit.
+
 \subsection{Finite parameter selection}
 \label{sec:finite-parameter-extrapolation}
 
