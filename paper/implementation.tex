@@ -126,11 +126,11 @@ cost of committing and opening the encoded data.
 
 We compare SPIN with BAA, introduced by Kolesnikov et al.\ at CRYPTO
 2026~\cite{KolesnikovEtAl2026BA}, using the newer chosen-block
-instantiations~\cite{cryptoeprint:2026/1903}. Chosen-block BAA is a companion
-work that updates BAA using ideas also developed here, including reuse of
+instantiations~\cite{cryptoeprint:2026/1903}. Chosen-block BAA updates
+BAA using related design ideas, including reuse of
 a spectrum-controlled outer constituent. The BAA timings in
 Table~\ref{tab:transposed-comparison} use
-that companion implementation, rather than the original CRYPTO implementation.
+that newer implementation, rather than the original CRYPTO implementation.
 We also compare with
 Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}, and binary
 repeat--accumulate--accumulate (RAA)~\cite{blaze25}. Every call evaluates a binary
@@ -138,7 +138,7 @@ transposed encoder on $128$ parallel instances. No weighted extension-field
 RAA or forward-encoder timing is included.
 
 The BAA rows use the optimized Golay $[24,12,8]$ and RM$(2,5)$ kernels
-from the companion implementation. Expand--Convolute uses the legacy
+from the chosen-block BAA implementation. Expand--Convolute uses the legacy
 nonsystematic implementation with expander weight $w=33$ and memory $m=25$.
 The implementation takes $24$ random taps plus one fixed tap and applies
 one convolution pass. Its native interface modifies the input buffer and
@@ -189,7 +189,7 @@ At the largest measured length, SPIN takes $11.104$\,ms.
 The original rate-$1/2$ BAA implementation takes approximately $32$\,ms,
 giving the approximately $3\times$ speedup stated in the abstract.
 Separate measurements confirm comparable original-BAA latency on the
-Ryzen host. The newer companion implementations improve on that baseline:
+Ryzen host. The newer chosen-block implementations improve on that baseline:
 Chosen Golay and RM BAA take $2.16$ and $2.49$ times as long,
 respectively. The conservative EC profile takes $181.825$\,ms.
 The repetition-$3$ permutation domain requires cycle walking; the
@@ -206,14 +206,14 @@ The throughput is an end-to-end estimate using the GGM cost, not a
 measurement of an integrated OT protocol; the retained benchmarks measure
 the encoder alone.
 
-For context, the companion BAA evaluation reports $22.810$\,ms for Golay
+For context, the chosen-block BAA evaluation reports $22.810$\,ms for Golay
 and $24.278$\,ms for RM at the same code parameters, using an Intel
 i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses
 our same-host rerun and does not combine cross-machine timings.
 
 \paragraph{Distance context.}
 At the largest lengths, SPIN's certified margin is $50.448$ bits at
-relative distance $0.10$. The companion BAA evaluation reports full
+relative distance $0.10$. The chosen-block BAA evaluation reports full
 first-moment margins of $46.386$ and $47.093$ bits for Golay and RM,
 respectively, at the same distance target and their measured length.
 For EC, we use the conservative profile reported in the earlier
