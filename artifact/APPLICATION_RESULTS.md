@@ -20,7 +20,8 @@ python -B paper/build_application_tables.py --check
 
 This checks generated table contents and both conditional parameter budgets
 with integer arithmetic. It does not run benchmarks or replay distance proofs.
-Without `--check`, it regenerates the four TeX table bodies. With
+Without `--check`, it regenerates the four TeX table bodies and the Flock
+prover-time figure. With
 `--source PATH`, it imports the selected summaries from a Hypercat checkout;
 review the resulting manifest before accepting new measurements.
 `--bolt-source PATH` separately imports the pinned Bolt opening projection
@@ -86,9 +87,45 @@ omitted and other work is substituted, so neither projection is a runtime
 bound. A finite amortization batch must pay its share of the matrix proof
 and batching work. These runs also do not establish equal composed security
 between implementations. The paper retains the equal-input-volume scope
-and reports the measured Flock integration separately. It does not infer
-a Bolt/Flock runtime by substituting these standalone opening costs: the
-weighted-claim adapter and intermediate reuse require additional analysis.
+and reports the measured Flock integration separately. The additional
+Bolt/Flock figure uses the explicitly hypothetical assumptions below.
+
+### Optimistic Bolt--Flock projection
+
+Figure `fig:flock-projection` retains solid bars for measured SPIN and
+Ligerito totals, and uses hatched bars for Bolt. The latter is a cost
+substitution, not an implemented integration or a runtime bound. The pinned
+Bolt JSON now also retains the 32 and 128 MiB calibration cases.
+
+We give Bolt zero cost for converting Flock's weighted claims, assume the
+proposed joint opening applies, and use the matrix-proof amortized limit.
+The joint model retains both row evaluations but shares one independent
+random fold, the pair of sumchecks, and the two inner proximity proxies.
+It assigns no cost to additional batching preparation or claim adaptation.
+It does not assume that Flock's cached evaluations eliminate the row
+evaluations at any new challenge point. These choices follow the component
+accounting in `tools/standalone/SHARED_OPENINGS.md` and the interface audit
+in `CACHE_REUSE.md`, with free conversion as an explicit favorable assumption.
+
+For each workload let O be the SPIN/Flock total minus its commitment and
+opening phase summaries. We retain O and add measured Bolt commitment C
+and projected shared opening J:
+
+    J = 2 row evaluations + random fold + 2 sumchecks + inner proxies
+    projected total = O + C + J
+
+| Witness | Retained O (ms) | Bolt C (ms) | Shared J (ms) | Projected total (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| 32 MiB | 60.1349785 | 79.717826 | 104.021498 | 243.8743025 |
+| 128 MiB | 250.69794925 | 392.690179 | 417.035058 | 1060.42318625 |
+
+O is an accounting residual of aggregated measurements, not a newly timed
+phase. The surrounding computation is held fixed by assumption; another
+integration could change it. The generator reconstructs J from component
+medians and checks both it and the total against the pinned source record.
+The figure rounds milliseconds to integers. It does not project verification
+time or proof size, and it does not claim a complete matched-security
+Bolt/Flock integration. The existing standalone-proxy omissions still apply.
 
 Ordinary encoding processes 128 parallel binary instances. The call maps K
 128-bit blocks to 2K such blocks. It excludes commitment, opening, setup,
@@ -170,3 +207,10 @@ hygiene, and whitespace checks pass; the build has no unresolved references
 or overfull boxes. No new benchmarks were run.
 The PDF is a build product under
 `output/pdf/spin_codes_draft.pdf` and is not committed.
+
+The optimistic Bolt/Flock figure pass produces a 63-page draft. Its
+discussion and figure appear on pages 38 and 39, both visually inspected.
+The generated-data checks (including shared-opening and substitution sums),
+finite-integration check, repository hygiene, and whitespace checks pass.
+The rebuilt PDF has no unresolved references or overfull boxes. This pass
+uses existing measurements only; no benchmarks were run.

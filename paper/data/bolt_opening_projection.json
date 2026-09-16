@@ -24,5 +24,79 @@
     "one_opening_amortized_limit_projection_ms": 1272.767206,
     "one_opening_non_amortized_projection_ms": 1728.66313,
     "mulperm_leading_work_projection_ms": 455.895924
-  }
+  },
+  "flock_cases": [
+    {
+      "input_mib": 32,
+      "phase_medians_ms": {
+        "row_evaluations": 29.523784,
+        "random_column_fold": 23.33919,
+        "one_sumcheck": 1.181175,
+        "inner_message_proxy": 14.019486,
+        "inner_syndrome_proxy": 5.252904,
+        "mulperm_one_product_scan": 1.672782
+      },
+      "commit_measured_ms": 79.717826,
+      "two_openings": {
+        "scope": "Proposed batched Bolt opening; not implemented or fully security-accounted. Both claims and row-evaluation vectors fixed before a shared independent random fold. Extra batching-basis work omitted.",
+        "independent_amortized_limit_ms": 148.995428,
+        "shared_amortized_limit_ms": 104.02149800000001,
+        "independent_non_amortized_ms": 189.142196,
+        "shared_non_amortized_ms": 124.09488200000001,
+        "amortized_limit_saving_ms": 44.973929999999996,
+        "amortized_limit_saving_percent": 30.184771844140077,
+        "non_amortized_saving_ms": 65.047314,
+        "credited_row_evaluation_reuse": false
+      },
+      "flock": {
+        "spin_measured_ms": 111.993778375,
+        "ligerito_measured_ms": 216.47877212499998,
+        "unchanged_outer_ms": 60.1349785,
+        "independent_openings": 2,
+        "bolt_amortized_limit_projection_ms": 288.8482325,
+        "bolt_non_amortized_projection_ms": 328.9950005,
+        "bolt_shared_amortized_limit_projection_ms": 243.8743025,
+        "bolt_shared_non_amortized_projection_ms": 263.9476865,
+        "adapter_status": "Unspecified: Flock ring switching produces weighted inner-product claims; adapting to ordinary Bolt evaluations can add substantial work and change the opening count.",
+        "cache_reuse_credit": false,
+        "omitted_adapter_ms": null
+      }
+    },
+    {
+      "input_mib": 128,
+      "phase_medians_ms": {
+        "row_evaluations": 129.892122,
+        "random_column_fold": 93.232881,
+        "one_sumcheck": 4.532429,
+        "inner_message_proxy": 47.929246,
+        "inner_syndrome_proxy": 7.023829,
+        "mulperm_one_product_scan": 7.029751
+      },
+      "commit_measured_ms": 392.690179,
+      "two_openings": {
+        "scope": "Proposed batched Bolt opening; not implemented or fully security-accounted. Both claims and row-evaluation vectors fixed before a shared independent random fold. Extra batching-basis work omitted.",
+        "independent_amortized_limit_ms": 574.2858719999999,
+        "shared_amortized_limit_ms": 417.03505799999994,
+        "independent_non_amortized_ms": 742.9998959999999,
+        "shared_non_amortized_ms": 501.39206999999993,
+        "amortized_limit_saving_ms": 157.250814,
+        "amortized_limit_saving_percent": 27.38197501748746,
+        "non_amortized_saving_ms": 241.607826,
+        "credited_row_evaluation_reuse": false
+      },
+      "flock": {
+        "spin_measured_ms": 412.83591912500003,
+        "ligerito_measured_ms": 567.927995,
+        "unchanged_outer_ms": 250.69794925000002,
+        "independent_openings": 2,
+        "bolt_amortized_limit_projection_ms": 1217.67400025,
+        "bolt_non_amortized_projection_ms": 1386.38802425,
+        "bolt_shared_amortized_limit_projection_ms": 1060.42318625,
+        "bolt_shared_non_amortized_projection_ms": 1144.78019825,
+        "adapter_status": "Unspecified: Flock ring switching produces weighted inner-product claims; adapting to ordinary Bolt evaluations can add substantial work and change the opening count.",
+        "cache_reuse_credit": false,
+        "omitted_adapter_ms": null
+      }
+    }
+  ]
 }
