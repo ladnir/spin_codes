@@ -24,9 +24,10 @@ We introduce Single-Permutation INterleaved (SPIN) codes. Our main result,
 Structured SPIN, meets this goal. At its native output lengths
 $N$, every realized code has rate $1/2$ and $O(N)$ ordinary and transposed
 encoding work. With probability $1-o(1)$ over setup, its minimum distance
-exceeds $0.11N$. A zero-extension wrapper gives rate $1/2-o(1)$,
-  relative distance $0.11-o(1)$,
-  and linear work at every sufficiently large requested length.
+exceeds $0.11N$. The construction combines a proved distance guarantee
+with an encoding structure designed for efficient implementation. We
+evaluate this combination both as an encoder for PCGs and as a component
+of code-based proof systems.
 
 SPIN follows the serial-concatenation pattern. An outer encoder
 prevents messages from remaining too sparse. A recursive inner encoder spreads
