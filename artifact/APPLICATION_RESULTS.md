@@ -217,6 +217,33 @@ do not certify that particular seed's distance.
 
 ## Integration scope and remaining work
 
+### Blaze compatibility
+
+The PCS section now distinguishes the current explicit-fold Brakedown
+implementation from a possible SPIN instantiation of Blaze's code-switching
+framework. Blaze Sections 1.2.1 and 6 give the generic interleaving interface;
+Section 8.2 explains that its inner proof avoids transmitting the full linear
+combination. The outer code must be paired with a multilinear-evaluation
+IOPP, which checks proximity and the decoded message's evaluation jointly.
+Linearity and distance alone do not provide a fast concrete prover for that
+interface. The SPIN block maps, routing, and recurrence would need such a
+proof; substituting them into the RAA-specific proof is not an implemented
+change. Generic proof machinery supplies a conceptual route, with concrete
+cost still to be determined.
+
+At the current longer-row 512 MiB shape, the two explicit folded messages
+contribute 8 MiB and the sampled columns about 4 MiB before authentication.
+Replacing the former with an inner proof still leaves the latter. The
+additional opportunity is to use longer rows and fewer rows: sampled
+columns become shorter while the inner proof handles the longer folded
+instance. Total size must include row-evaluation messages, authenticated
+columns, Merkle paths, and the inner proof. No SPIN--Blaze proof-size or
+runtime projection is included in the benchmark tables.
+
+Source: https://eprint.iacr.org/2024/1609 (Sections 1.2.1, 6, and 8.2).
+
+### Flock integration
+
 The Flock adapter supports its two weighted witness functionals. Its verifier
 currently receives the circuit and proof, not separate public hash inputs and
 outputs. The paper therefore describes compression-constraint proofs. A complete

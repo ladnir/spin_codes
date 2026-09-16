@@ -143,6 +143,26 @@ artifact records these choices and the measured components. Consequently,
 these figures describe the projected cost of the selected implementation
 approach, rather than a lower bound on Bolt's opening time.
 
+\paragraph{Compatibility with Blaze.}
+Blaze's code-switching approach~\cite{blaze25} offers a route to smaller
+SPIN proofs. Its interleaving framework applies to a linear code equipped
+with an interactive oracle proof of proximity for multilinear evaluation.
+Such a proof checks that the queried word is close to an encoding of a
+message with the claimed evaluation. SPIN supplies a linear encoder and
+a distance bound; a concrete instantiation must additionally provide an
+efficient proof for its block maps, routing, and inner recurrence.
+The generic framework permits this substitution, but Blaze's specialized
+RAA proof does not directly implement the SPIN encoding relation.
+
+The inner proof avoids transmitting the full folded messages. This removes
+the proof-size penalty that limits row length in our current construction:
+longer rows then shorten the authenticated columns while increasing the
+inner prover's workload. This could substantially reduce communication,
+at additional opening cost. The proof sizes reported here therefore
+describe our Brakedown-style implementation, rather than an inherent
+limit of SPIN. We leave a concrete SPIN--Blaze integration and its parameter
+tradeoffs to future work.
+
 The opening comparison motivates testing the complete application:
 commitment speed alone does not determine the cost of a PCS inside a
 proof system. Section~\ref{sec:spin-flock} measures both commitment and
