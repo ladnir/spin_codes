@@ -1,24 +1,20 @@
 \begin{abstract}
 Binary codes used in correlation generation and proof systems need strong
 distance, fast ordinary and transposed encoding, and regular memory access.
-We introduce Single-Permutation INterleaved (SPIN) codes, which compose
-a blockwise outer encoder, one global interleaver, and a recursive inner
-encoder.
+We introduce Single-Permutation INterleaved (SPIN) codes to meet these requirements, combining a blockwise outer encoder, one global interleaver, and a recursive inner encoder.
 
-Our main result is a Structured SPIN family with rate $1/2$ and $O(N)$
-bit operations for both encoding directions at its native output lengths
-$N$. With probability $1-o(1)$ over setup, its minimum distance exceeds
-$0.11N$. A first-moment analysis groups outer words by block occupancy
-and weight, then bounds their contributions to low-weight codewords
-after structured interleaving and recursive encoding.
+\qquad Our main result is a Structured SPIN family with rate $1/2$ and $O(N)$
+bit operations for ordinary and transposed encoding at its native output lengths
+$N$. With probability $1-o(1)$ over the random choice of the code, its minimum distance exceeds
+$0.11N$. A first-moment analysis groups outer codewords by the number of nonzero blocks and their weights, then bounds the expected number of low-weight final codewords produced by each group after structured interleaving and inner encoding.
 
-For finite lengths, a BCH-derived outer constituent and a fixed recursive
+\qquad For finite lengths, a BCH-derived outer constituent and a fixed recursive
 inner give rate $1/2$ and relative distance greater than $0.10$, with setup
 failure below $2^{-40}$. We certify this bound at message lengths
 $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum inequalities,
 without assuming the constituent's exact weight spectrum.
 
-For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
+\qquad For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
 computes $2^{20}$ $128$-bit correlation blocks in about $10$\,ms on one
 Ryzen core. This is approximately $3\times$ faster than the original
 rate-$1/2$ BAA codes of Kolesnikov et al.\ (CRYPTO
@@ -26,7 +22,7 @@ rate-$1/2$ BAA codes of Kolesnikov et al.\ (CRYPTO
 Including roughly $8$\,ms for GGM tree expansion, we estimate an end-to-end
 cost of about $20$\,ms per batch, or $50$ million oblivious transfers per second.
 
-We apply SPIN in a Brakedown-style polynomial commitment scheme and
+\qquad We apply SPIN in a Brakedown-style polynomial commitment\linebreak scheme and
 integrate that scheme into Flock. With conditional 100-bit PCS parameters,
 commitment and one opening of $512$\,MiB take $509$\,ms on one core.
 Within an optimized Flock implementation, replacing Ligerito with
