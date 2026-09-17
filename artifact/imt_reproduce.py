@@ -24,7 +24,9 @@ def accepted_roots(include_q1=False):
         imt_results.QUARTER_PIN, imt_results.QUARTER_PROOF_PIN]
     if include_q1:
         import build_imt_parameter_figures as figures
+        import build_imt_length_figure as length
         entries += [figures.GRID_PIN, figures.REPLAY_PIN]
+        entries += [length.GRID_PIN, length.REPLAY_PIN]
     return {'workstreams/inner_design/' + name: digest for name,digest in entries}
 
 
@@ -140,7 +142,7 @@ def main():
         subprocess.run([sys.executable,'-B',str(ROOT/'paper/check_finite_integration.py')],
                        cwd=ROOT,check=True)
     elif a.command == 'figures':
-        if a.output is not None: p.error('figures writes the four fixed paper inputs')
+        if a.output is not None: p.error('figures writes the fixed paper inputs')
         subprocess.run([sys.executable,'-B',str(ROOT/'paper/build_imt_parameter_figures.py')],
                        cwd=ROOT,check=True)
     elif a.command == 'pack':

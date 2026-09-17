@@ -11,7 +11,9 @@ certified rate-$1/2$ and rate-$1/4$ BCH constructions with IMT.
 
 Consider a rate-$1/2$ outer constituent of length $B$, repeated over
 $L=2K/B$ rows to encode $K$ message bits. The output length is $N=2K$.
-The IMT inner processes $t$ bits per step and carries an $s$-bit state.
+The IMT inner processes $t$ bits per step, carries an $s$-bit state,
+and applies one transvection per update. We ask how to choose $t$ and $s$
+as $K$ changes, rather than prescribing one inner for every length.
 Throughout the plots, the bad-word cutoff is $H=\lfloor N/10\rfloor$.
 For an upper bound $U$ on the expected number of nonzero messages with
 output weight at most $H$, call $-\log_2U$ its \emph{margin} in bits.
@@ -23,35 +25,105 @@ certificates at five selected operating points in
 Section~\ref{sec:finite-engineering-curve}. Q1 alone does not control
 distance failure: messages with two or more active rows remain to be bounded.
 
-Figures~\ref{fig:finite-k-b}--\ref{fig:finite-k-s} use two exact-spectrum
-constituents: a shortened BCH-derived $[64,32,12]$ code and an extended
-BCH $[128,64,22]$ code, called BCH-64 and BCH-128 below.
-The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PARAMETER_SLICES.md}{parameter-study guide}
-identifies their retained spectra and construction inputs.
-At each step size $t$, one fixed ordered
-IMT map chain supplies the state maps by prefix restriction. The same maps
-are used for both outer lengths and all message lengths. Thus varying $s$
-gives nested maps, while changing $t$ compares different basis chains.
-Each expansion is injective and excludes the all-one word; feedback is
-chosen independently of expansion. These are binary64 evaluations of Q1
-bounds. The BCH-256 certificates below use separately selected maps; they
-do not certify the different BCH-64/128 diagnostic configurations.
-The artifact's \artifactlink{https://github.com/ladnir/permute_conv/blob/main/paper/build_imt_parameter_figures.py}{figure generator}
-authenticates the retained grid and its replay receipt, checks all $130$
-geometries, and reconstructs the plots without rerunning parameter search.
-
-\paragraph{Outer length and message length.}
-Figure~\ref{fig:finite-k-b} fixes $(t,s)=(64,20)$.
-Increasing $B$ from $64$ to $128$ raises the Q1 margin at $K=2^{20}$
-from $10.34$ to $32.63$ bits. Beyond the small-length transient, each
-doubling of $K$ costs roughly one bit. This behavior is consistent with
-the growing number of possible active rows; it is not a universal scaling
-law. From $2^{24}$ to $2^{26}$, the Q1 margins fall from $6.39$ to $4.39$
-bits for BCH-64 and from $28.77$ to $26.77$ bits for BCH-128.
+Figure~\ref{fig:finite-k-b} centers this comparison on the BCH-derived
+$[256,128]$ constituent and implemented $(t,s)=(128,19)$ maps specified in
+Section~\ref{sec:finite-selected-construction}. Two smaller exact-spectrum
+constituents provide outer-size comparisons: a shortened BCH-derived
+$[64,32,12]$ code and an extended BCH $[128,64,22]$ code, called BCH-64
+and BCH-128. Their fixed-step curves use $(t,s)=(64,20)$.
+For each fixed curve, an ideal mixing reference replaces every transvection
+by an independently sampled uniform invertible linear map. Every fixed
+nonzero state then has a uniform nonzero image; zero stays zero.
+This \emph{full refresh} keeps the outer, routing, expansion, and feedback
+fixed. Its Q1 bound is a reference, not an absolute outer-only ceiling.
 
 \input{figures/imt_parameter_k_b}
 
+\paragraph{Why the length curve turns down.}
+The Q1 sum contains $L$ possible active rows. Once the bounds on conditional
+low-weight probabilities stabilize, doubling $K$, and hence $L$, costs
+approximately one margin bit. The larger-length portions of
+Figure~\ref{fig:finite-k-b} follow this trend. At short lengths, however,
+the conditional probabilities also change: a region contains only
+$h:=L/t=2K/(Bt)$ inner steps. At $K=2^{16}$, the BCH-256 fixed-step
+configuration has $h=4$, compared with $h=64$ at $K=2^{20}$.
+Increasing $B$ at fixed $K,t$ also reduces $h$: a stronger outer can
+require a different inner calibration, not just a vertical shift of the curve.
+
+One mechanism is a short excursion away from state zero. The first input
+bit injects a nonzero state; a later bit can cancel it before much weight
+has been emitted. A transvection retains any fixed nonzero incoming state
+with mixture weight $1/2$. After $d$ empty updates, the retained component
+therefore has weight $2^{-d}$; it is not a fresh uniform state.
+Consider two adjacent regions, each containing one input bit, with zero
+state before the first. Let their input positions be independent and
+uniform, and suppose the feedback columns are distinct and nonzero.
+The probability that the state returns to zero just after the second input is
+\[
+ p_{\mathrm{cancel}}
+ =\frac{\rho_h}{t}+\frac{1-\rho_h}{2^s-1},
+ \qquad \rho_h:=\frac{2(1-2^{-h})^2}{h^2}.
+\]
+The first term comes from repeating the same feedback column while the
+state is retained. Increasing $s$ reduces the second term, not the first.
+For large $h$, the first term is approximately $2t/L^2$.
+These retained cancellations favor inputs near the shared region boundary:
+their mean separation approaches three epochs even as $h$ grows.
+They can therefore produce short output pulses, rather than benefiting
+from the typical number of mixing updates.
+This is a local cancellation probability, not a whole-code distance bound;
+the emitted weights and all activation patterns still matter.
+
+Additional mixing within each update also suppresses retention. Applying
+$r$ independent transvections before adding feedback reduces the retained
+component's weight from $1/2$ to $2^{-r}$, without changing the step or maps.
+In a separate controlled BCH-256 study with $(t,s)=(128,19)$, increasing
+$r$ from one to two raises the Q1 margin from $44.26$ to $51.21$ bits at
+$K=2^{16}$. At $K=2^{20}$, the same change gives only $50.08$ to $50.35$
+bits: the benefit diminishes once one transvection per update provides
+sufficient mixing for these Q1 bounds. The artifact's
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/MIXING_ROUNDS.md}{mixing-study guide}
+records the fixed maps and outward-bound replay. These gains concern Q1,
+not full certificates. We keep one transvection per update in the plotted
+constructions and instead vary the step, which also changes feedback
+grouping and the expansion maps.
+
+\paragraph{Reducing the step at short lengths.}
+The adaptive curves keep one transvection per update and select among
+smaller steps. At each tested $K$, we take the largest $t$ within $0.1$
+bits of the best tested Q1 margin. This tolerance avoids selecting a
+smaller step for a negligible bound improvement; it is not a runtime optimum.
+For BCH-256, the selected pairs are $(16,10)$ at $K=2^{14}$, $(32,15)$
+at $K=2^{16},2^{18}$, and the implemented $(128,19)$ pair at the three
+larger tested lengths. At $K=2^{16}$, the smaller step improves Q1 from
+$44.36$ to $49.04$ bits. For BCH-128 at $K=2^{12}$, it improves Q1 from
+$19.18$ to $24.27$ bits. The short-length loss shrinks but does not disappear.
+
+Shrinking $t$ has a competing cost in this map family. With $t=2^m$,
+the nonconstant degree-at-most-two generators span only $m+\binom m2$
+dimensions. Our $t=32,16,8$ candidates consequently use $s=15,10,6$.
+Smaller state spaces increase fresh-state cancellation probabilities, and
+different expansion maps change the emitted-weight distribution.
+Indeed, $t=8$ wins at none of the tested lengths. There is no evidence here
+for a universal rule based only on $K/t$.
+
+The artifact's
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/ADAPTIVE_LENGTH.md}{length-study guide}
+specifies all maps, derives the local cancellation formula, and records
+the $110$-cell independent log-domain replay. Figure~\ref{fig:finite-k-b}
+tracks the expansion-weight shell at activation, sharpening the earlier
+diagnostic calculation. At the shortest BCH-128 point this alone improves
+the bound by $2.90$ bits; that gain is separate from changing $t$.
+The selected BCH-256 certificates below do not certify the different BCH-64/128 diagnostic configurations
+or the smaller-step BCH-256 alternatives.
+
 \paragraph{State size and step size.}
+Figures~\ref{fig:finite-s-t} and \ref{fig:finite-k-s} retain the broader
+BCH-64/128 state study. At each $t$, fixed ordered map chains give nested
+state maps; the same maps serve both outer lengths and all $K$.
+These slices use the earlier activation envelope. The
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PARAMETER_SLICES.md}{state-study guide}
+records their $130$ geometries and replay.
 Figure~\ref{fig:finite-s-t} fixes $K=2^{20}$. At $t=64$, additional state
 first buys substantial margin and then gives diminishing returns.
 For BCH-128, increasing $s$ from $10$ to $16$ raises the Q1 margin
@@ -70,14 +142,19 @@ $K\in\{2^{16},2^{20},2^{24}\}$, holding $t=64$ fixed.
 The nearly saturated part shifts downward as $K$ grows, but the loss need
 not be a uniform vertical shift. For BCH-128 at $K=2^{24}$, raising $s$
 from $10$ to $16$ improves Q1 from $23.04$ to $28.50$ bits; raising it to
-$20$ adds only $0.27$ bits. These slices suggest choosing state near the
-plateau, then checking the full bound at the intended message length and
-step size.
+$20$ adds only $0.27$ bits.
 
 \input{figures/imt_parameter_k_s}
+
+Together, the slices suggest calibrating $t$ at the intended $K$, then
+checking which compatible state maps approach the available Q1 margin.
+The choice $s=19$ below is a demonstrated operating point, not a proved
+minimum or optimum. The final tests are the full bound over all occupancies
+and the cost of the resulting encoder; neither follows from Q1 alone.
 \FloatBarrier
 
 \subsection{The selected construction}
+\label{sec:finite-selected-construction}
 
 We now use a binary BCH-derived constituent $\mathcal B$ of length $256$,
 dimension $128$, and minimum distance at least $38$.
@@ -215,9 +292,9 @@ tightness of either bound against the true failure probability.
 
 \input{figures/imt_certified_curve}
 
-The smaller exact-spectrum studies in
-Section~\ref{sec:finite-parameter-slices} help interpret this behavior:
-late activation by low-weight outer words can limit further improvement.
+Section~\ref{sec:finite-parameter-slices} investigates smaller steps as
+an alternative at short lengths. All certificates here and the measured
+implementations retain $(t,s)=(128,19)$ and one transvection per update.
 
 These certified margins are conservative inputs to a parameter selector.
 A heuristic estimate of the unknown BCH spectrum addresses a different

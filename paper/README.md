@@ -14,14 +14,24 @@ growth constant. Its reviewed argument is in `structured_appendix.tex` and
 The selected finite results now use verified IMT certificates and matching
 timings: five half-rate lengths, plus two quarter-rate distance thresholds
 at K=2^20. See the [integration ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
-The three broader parameter-slice plots now use the authenticated 130-cell
-IMT Q1 grid. The selected BCH-256 curve compares Q1 and full certificates at
+Figure 1 uses the authenticated 110-cell one-round IMT length study, with
+BCH-256 central and smaller steps at short lengths. The two state-size plots
+retain the earlier 130-cell Q1 grid. The selected BCH-256 curve compares Q1 and full certificates at
 five exactly matching configurations. The diagnostic maps differ from those
 selected maps; no full-grid certificate is claimed.
 The manuscript presents IMT without a preceding-inner comparison. Historical
 source and receipt names remain unchanged in the artifact; Reed--Muller
 expansion mathematics and the external RM-based BAA baseline remain in scope.
 No library default changes with this manuscript update.
+
+The engineering explainer keeps one transvection per update. Figure 1 compares
+fixed steps, length-dependent steps, and fixed-map full-refresh references.
+The [length study](../workstreams/inner_design/finite_migration/ADAPTIVE_LENGTH.md)
+derives a local cancellation probability, separates proof slack from encoder
+changes, and gives numerical replay commands. Reproduce its plot with
+`python -B paper/build_imt_length_figure.py`; add `--check` to authenticate it.
+The earlier multi-round study is retained as supporting research, not an
+active figure or an additional construction parameter in this section.
 
 Run `python -B paper/check_imt_integration.py` from the repository root to
 check all 38 shared map words and the retained 11% evidence bindings.
@@ -120,8 +130,9 @@ python -B paper/build_imt_parameter_figures.py
 python -B paper/build_imt_parameter_figures.py --check
 ```
 
-The generator authenticates the no-constant IMT Q1 grid and its replay receipt,
-checks all 130 geometries and nested map identities, then writes native PGFPlots
+The generator authenticates both the no-constant state grid (130 geometries)
+and the adaptive-length grid (110 cells), with their replay receipts and maps,
+then writes native PGFPlots
 inputs under `paper/figures/`. Each input records the Q1 producer's SHA-256.
 The selected BCH-256 plot compares Q1 with the full certificate for the exact
 same maps at five lengths. It does not certify the different smaller-outer

@@ -9,6 +9,7 @@ from collections import Counter
 import imt_results as evidence
 import build_imt_comparison
 import build_imt_parameter_figures
+import build_imt_length_figure
 
 ROOT, require = evidence.ROOT, evidence.require
 PAPER = ROOT / 'paper'
@@ -113,8 +114,10 @@ def check():
     require('Historical parameter study' not in finite and
             r'\input{figures/parameter_' not in finite, 'Historical figures remain active')
     parameter_check = build_imt_parameter_figures.check(data)
+    length_check = build_imt_length_figure.check(data)
     for name in ('imt_parameter_k_b', 'imt_parameter_s_t', 'imt_parameter_k_s', 'imt_certified_curve'):
         require(r'\input{figures/' + name + '}' in finite, 'Current IMT figure not included')
+    require(r'\input{figures/imt_mixing_rounds}' not in finite, 'Retired mixing-round figure remains')
     require(read('figures/transposed_comparison.tex') == build_imt_comparison.table(data),
             'Stale external comparison table')
     main = read('main.tex')
@@ -123,7 +126,8 @@ def check():
     return dict(status='SELECTED_FINITE_IMT_INTEGRATION_PASSED', selected_certificates=7,
                 matched_timing_cells=4, map_words_checked=57,
                 authenticated_files=data['authenticated_files'], full_interval_replay=False,
-                parameter_plot_migration_complete=True, parameter_study=parameter_check)
+                parameter_plot_migration_complete=True, parameter_study=parameter_check,
+                adaptive_length_study=length_check)
 
 
 if __name__ == '__main__':

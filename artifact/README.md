@@ -19,8 +19,8 @@ for the different diagnostic maps.
 | Command, from the repository root | What it does | Requirements |
 |---|---|---|
 | `python -B artifact/imt_reproduce.py check` | Checks the selected finite IMT certificate, map, and timing bindings. | Python 3.11+, Git, pinned local evidence. |
-| `python -B artifact/imt_reproduce.py figures` | Regenerates three IMT Q1 slices and the matched Q1/full curve. | Same, including the Q1 grid and replay receipt. |
-| `python -B artifact/imt_reproduce.py inventory --include-q1` | Includes the Q1 inputs in the selected finite evidence inventory; also supported by `pack`. | Complete matching local evidence. |
+| `python -B artifact/imt_reproduce.py figures` | Regenerates the adaptive-step length comparison, two state-size slices, and the matched Q1/full curve. | Same, including both Q1 studies and their replay receipts. |
+| `python -B artifact/imt_reproduce.py inventory --include-q1` | Includes the state-grid and adaptive-length Q1 inputs in the selected finite evidence inventory; also supported by `pack`. | Complete matching local evidence. |
 | `python -B artifact/imt_reproduce.py inventory` | Authenticates the selected finite IMT dependencies and reports missing files. Fails on absent or mismatched evidence. | Python and Git for tracked-file status. |
 | `python -B artifact/imt_reproduce.py pack --output output/artifact/imt-evidence.zip` | Packages only those IMT pins and verifies every archived hash. Requires a new output path. | Complete matching local evidence. |
 | `python -B artifact/reproduce.py quick` | Checks selected finite IMT values and bindings, historical parameter figures, and 31 imported asymptotic entries. | Python 3.11+, Git, pinned local evidence. |

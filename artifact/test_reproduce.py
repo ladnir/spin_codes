@@ -63,6 +63,7 @@ class ArtifactChecks(unittest.TestCase):
                  Path('paper/check_finite_integration.py'),
                  Path('paper/imt_results.py'), Path('paper/build_imt_comparison.py'),
                  Path('paper/build_imt_parameter_figures.py'),
+                 Path('paper/build_imt_length_figure.py'),
                  Path('workstreams/transposed_comparison/report.py'),
                  Path('workstreams/transposed_comparison/run.py'),
                  reproduce.BUNDLE / 'SINGLE_SAMPLED_BA_RM2SUB_CERTIFICATE_MANIFEST.json',

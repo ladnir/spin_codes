@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 
 import imt_results as evidence
+import build_imt_length_figure as length_figure
 
 ROOT = evidence.ROOT
 OUT = ROOT / 'paper/figures'
@@ -93,21 +94,7 @@ def figure(body, caption, label, placement='tb'):
 
 
 def figures(rows, data):
-    outputs = {}
-    body = ''
-    for b, color in zip((64, 128), COLORS):
-        body += plot([(m, rows[b, 64, 20, m]) for m in range(12, 27)],
-                     color + ',thick,mark=*,mark size=1.5pt')
-        body += f'\\addlegendentry{{$B={b}$}}\n'
-    outputs['imt_parameter_k_b.tex'] = figure(panel(
-        r'width=.92\linewidth,height=5.5cm,xlabel={$\log_2 K$},'
-        r'ylabel={Q1 margin (bits)},xmin=11.7,xmax=26.3,ymin=0,ymax=40,'
-        r'xtick={12,14,16,18,20,22,24,26},legend pos=south west,', body, r'\linewidth'),
-        r'IMT one-active-row bounds versus message length, with $(t,s)=(64,20)$.'
-        '\nThe two outers share the same maps. These binary64 Q1 evaluations do not'
-        '\ninclude higher occupancies. Markers are evaluated configurations;'
-        '\nconnecting segments are visual guides in all three parameter-slice figures.',
-        'fig:finite-k-b', '!hbp')
+    outputs = {'imt_parameter_k_b.tex': length_figure.render(length_figure.load(data))}
     panels = []
     for b in (64, 128):
         body = ''
@@ -164,7 +151,7 @@ def check(data=None):
     outputs = figures(load_grid(), evidence.load() if data is None else data)
     for name, contents in outputs.items():
         require((OUT / name).read_text(encoding='utf-8') == contents, f'Stale IMT figure: {name}')
-    return dict(q1_geometries=130, matched_full_anchors=5, figures=4,
+    return dict(q1_geometries=130, adaptive_length_cells=110, matched_full_anchors=5, figures=4,
                 full_grid_certified=False, numerical_replay=False)
 
 
@@ -177,7 +164,7 @@ def main():
     else:
         for name, contents in figures(load_grid(), evidence.load()).items():
             (OUT / name).write_text(contents, encoding='utf-8', newline='\n')
-        print('Generated three Q1 slices and five matched Q1/full anchors; no new proof replay.')
+        print('Generated adaptive-length and state Q1 slices plus five Q1/full anchors; no new proof replay.')
 
 
 if __name__ == '__main__':
