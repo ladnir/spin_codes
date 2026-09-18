@@ -1,11 +1,11 @@
-\section{Random SPIN}
+\subsection{Random SPIN}
 \label{sec:random-spin}
 
 Random SPIN replaces the accumulator with a random recursive convolution.
 Its outer uses the independent random-block injections from
-Section~\ref{sec:accumulator-spin}.
+Appendix~\ref{sec:accumulator-spin}.
 
-\subsection{Relation to Silver and Expand-Convolute}
+\subsubsection{Relation to Silver and Expand-Convolute}
 
 Silver codes predate Expand-Convolute and use a banded lower-triangular solve
 for linear-time encoding~\cite{CouteauRindalRaghuraman2021Silver}. The solve
@@ -19,7 +19,7 @@ coefficients are independent uniform bits
 inner distribution and replaces the expander with independent random-block
 injections followed by one uniform interleaver.
 
-\subsection{Random recursive inner}
+\subsubsection{Random recursive inner}
 
 Fix a memory $m\ge1$. For every $t\in[N]$, setup samples
 \[
@@ -40,7 +40,7 @@ Write $I_{N,m}^{\mathrm{rnd}}(u):=y$. Once setup fixes
 $(\alpha_t)_{t=1}^N$, this map is linear and invertible because $y_t$ contains
 $u_t$ with coefficient one.
 
-\subsection{Exact convolution transfer}
+\subsubsection{Exact convolution transfer}
 
 The random inner admits an exact finite-state transform. Let $X$ mark input
 weight and let $S$ mark output weight. Index the matrix rows and columns by
@@ -111,7 +111,7 @@ For $\delta\in(0,1/2)$, define
   \label{eq:random-inner-slice-tail}
 \end{equation}
 
-\subsection{Asymptotic theorem}
+\subsubsection{Asymptotic theorem}
 
 For an even block length $B$ dividing $N$, set $M:=N/B$. Independently
 sample uniform linear injections
@@ -185,3 +185,12 @@ The admissible lengths have relative gaps $o(1)$. For a requested length, zero
 extend the largest preceding native member. This preserves injectivity and
 absolute minimum distance while changing rate and relative distance by only
 $o(1)$.
+
+\subsubsection{Random-family encoding costs}
+
+Under either proved schedule, the outer encoder processes \(N/B\) blocks of
+length \(B=\Theta(\log N)\). Direct dense block multiplication therefore
+costs \(\Theta(N\log N)\) bit operations. The accumulator costs \(O(N)\).
+The Random SPIN recurrence evaluates \(m=\Theta(\log N)\) taps per output
+coordinate and hence costs \(\Theta(N\log N)\). These bounds concern direct
+encoders; preprocessing or word-level batching may reduce practical constants.

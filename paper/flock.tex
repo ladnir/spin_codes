@@ -1,5 +1,5 @@
-\section{Application to Flock}
-\label{sec:spin-flock}
+\subsection{Flock integration and full results}
+\label{app:flock-details}
 
 We integrate SPIN--Brakedown into Flock~\cite{flock26} to measure its
 effect inside a larger prover. Flock checks batches of Boolean constraints
@@ -72,13 +72,13 @@ the encoder alone.
 
 \paragraph{An optimistic Bolt projection.}
 Table~\ref{tab:spin-flock} also considers replacing the PCS with
-Bolt, using the calibrated opening costs from Section~\ref{sec:spin-pcs}.
+Bolt, using the calibrated opening costs from Appendix~\ref{app:pcs-details}.
 We give Bolt favorable assumptions: free conversion of Flock's weighted
 claims, shared opening work across its two claims, and negligible
 matrix-proof cost per opening in the amortized limit. We retain the
 surrounding prover time measured with SPIN and substitute Bolt's measured
 commitment and projected opening costs. The resulting totals are
-$244$ and $1068$\,ms, compared with the measured SPIN totals of $113$
+$228$ and $983$\,ms, compared with the measured SPIN totals of $113$
 and $420$\,ms. Thus the projected Bolt configuration remains slower even
 with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.

@@ -1,0 +1,66 @@
+\subsubsection{The weight-indexed calculation}
+
+All three lines use the same first-moment idea. Fix a target distance $d$,
+and count nonzero messages whose encoded words have weight at most $d$.
+If the expected count is below one, then some sampled encoder is injective and
+has minimum distance greater than $d$.
+
+For a uniform interleaver, the outer Hamming weight is often a sufficient
+interface. The expected bad-word count then has the form
+\begin{equation}
+  \sum_w A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d),
+  \label{eq:intro-weight-first-moment}
+\end{equation}
+where $A_w^{\mathrm{out}}$ is the expected outer spectrum and
+$p_w^{\mathrm{in}}(d)$ is an inner slice-to-tail probability.
+
+A structured interleaver need not produce a uniform Hamming slice. We
+therefore allow a class to record block occupation or another routing profile.
+The interleaver--inner analysis supplies a uniform failure envelope for each
+class. The weight-indexed sum in~\eqref{eq:intro-weight-first-moment} is the
+special case in which the conditional law depends only on weight.
+
+\subsubsection{Uniform-interleaver specialization}
+
+Suppose $\Pi$ is uniform over all permutations of $[N]$. If $u$ has
+weight $w$, then $\Pi(u)$ is uniform over the Hamming slice
+\[
+  \mathcal H_{N,w}:=\{v\in\F_2^N:\wt(v)=w\}.
+\]
+Indeed, every vector in $\mathcal H_{N,w}$ has exactly
+$w!(N-w)!$ preimages among the permutations of $u$.
+
+Let $U_w$ be uniform over $\mathcal H_{N,w}$, independent of the inner
+setup, and define
+\begin{equation}
+  p_w^{\mathrm{in}}(d)
+  :=
+  \Prob_{U_w,I}[\wt(I(U_w))\le d].
+  \label{eq:inner-slice-tail}
+\end{equation}
+Also define
+\[
+  A_w^{\mathrm{out}}
+  :=
+  \E_O\bigl[
+    |\{x\ne0:\wt(O(x))=w\}|
+  \bigr].
+\]
+
+\begin{corollary}[Weight-indexed first moment]
+\label{cor:weight-first-moment}
+Under a uniform interleaver independent of $O$ and $I$,
+\[
+  \E[Z_d]
+  =
+  \sum_{w=0}^N
+  A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d).
+\]
+\end{corollary}
+
+Accumulator SPIN and Random SPIN use
+Corollary~\ref{cor:weight-first-moment}. Structured SPIN uses
+Theorem~\ref{thm:class-first-moment} with occupation and row-weight classes.
+The structured-route analysis supplies a uniform failure envelope for every
+such class; it does not require the conditional probability to be identical
+for all words in the class.

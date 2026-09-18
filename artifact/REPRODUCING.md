@@ -1,5 +1,9 @@
 # Reproducing the paper
 
+Historical author-side instructions, not artifact requirements. The artifact
+now covers only the [core implementation](README.md). Commands below may
+require unpublished local research inputs; no complete replay bundle is promised.
+
 Run commands from the repository root unless stated otherwise. Use `python3`
 in place of `python` if needed. The quick path uses Python 3.11+ and no
 third-party Python packages. It is intended for both Windows and Linux;

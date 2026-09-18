@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      # Generated IMT evidence is released separately, not committed to Git.
+      # Generated IMT evidence is author-side data, outside the core-code artifact.
       # These tests do not claim certificate or numerical-replay verification.
       - name: Artifact packaging and missing-evidence rejection tests
         run: python -B -m unittest discover -s artifact -p "test_*.py"

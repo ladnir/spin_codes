@@ -1,9 +1,4 @@
-\section{Proof details and artifact interfaces}
-
-This appendix records proof details that are not needed to understand the
-construction progression.
-
-\subsection{Random SPIN exponent closure}
+\subsubsection{Random SPIN exponent closure}
 \label{app:random-spin-exponents}
 
 This subsection proves the two estimates used by
@@ -218,9 +213,9 @@ Finally, outward arithmetic gives
 Thus the last expression tends to zero.
 \end{proof}
 
-The hash-bound artifact named in
-Appendix~\ref{app:structured-scalable-certificate} contains the complete
-structured-route and IMT transfer derivations, verifier sources, receipts,
-and arithmetic semantics. The theorem uses the probability space and
-inequalities stated in the main text and appendices; the artifact supplies the
-independently checkable arithmetic witnesses.
+Appendix~\ref{app:structured-scalable-certificate} gives the structured-route
+and IMT transfer derivations and arithmetic semantics.
+The theorem uses the probability space and inequalities stated in the main
+text and appendices. Our author-side verification records retain the verifier
+sources and hash-bound arithmetic witnesses; these are outside the core
+encoder artifact.

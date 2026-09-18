@@ -1,0 +1,220 @@
+\section{Encoder implementation and benchmark details}
+\label{app:implementation}
+
+This appendix supports Section~\ref{sec:implementation}.
+It retains the full implementation description, memory accounting,
+measurement protocols, and ordinary-encoding comparison.
+
+
+We implement the selected BCH/IMT constructions from
+Section~\ref{sec:finite-certificates}. The application evaluates the
+transposed encoder on batches: $N$ input blocks map to $K$ output blocks,
+where each $128$-bit block carries $128$ parallel binary instances.
+Here $N=2K$ at rate $1/2$ and $N=4K$ at rate $1/4$.
+The pipeline applies the transposed inner, reverses the routing factors,
+and applies the transposed BCH outer. No parity fanout is included.
+
+\paragraph{Shared implementation and optimized kernels.}
+The configurations share the routing machinery and an IMT template.
+The transpose uses
+\[
+ V_i=U_i+C^\top r_{i+1},\qquad r_i=A^\top U_i+M_i^\top r_{i+1}.
+\]
+In particular, $A^\top$ consumes the raw input $U_i$.
+The balanced expansion is evaluated by pruned SIMD zeta stages and fixed
+nibble tables. Sparse feedback gives unrolled XOR emission; each output
+block combines five state blocks at half rate, or three at quarter rate.
+The transvection update uses XORs on selected state blocks.
+The BCH-256 circuit uses $3029$ scalar XOR operations and evaluates two
+rows together with AVX2. The quarter-rate constituent has its own generated
+transpose circuit. The online call has no allocation or type-erased
+callback dispatch; configuration and layout dispatch occur once per encoding.
+
+Packed $24$-bit routing indices and workspace-local page routing reduce
+data-movement costs. At $K=2^{20}$ the half-rate implementation uses
+$2048$-row tiles and the quarter-rate implementation uses $4096$-row tiles.
+The smaller half-rate measurements use $256$-row tiles.
+These are measured choices for the evaluation host, not
+processor-independent optimality claims.
+
+\paragraph{Correctness and certificate binding.}
+Symbolic checks verify the generated outer matrices and transpose circuits,
+the pruned zeta schedule, and both independent inner maps.
+Runtime tests compare the complete optimized output with dense outer
+multiplication and a separately implemented scalar inner recurrence.
+The retained checks cover routing layouts, tile sizes, setup compaction,
+boundary inputs, and buffer validation. The half-rate campaign passed all
+$12$ correctness tests. Source and binary identities, exact map columns,
+and the outer construction bind each reported timing to its corresponding
+finite certificate. A timing alone does not establish distance.
+
+\paragraph{Measurement method.}
+Measurements use one Ryzen 9 7950X thread on Linux, pinned to CPU~15, with
+GCC~15.2.0. The release build uses \texttt{-O3 -DNDEBUG -march=znver4},
+AVX2, and carry-less multiplication instructions.
+Each reported time is the median of three independent serial run medians.
+Each run performs three warmups and $101$ timed calls. Buffers are initialized
+once per process, with no copy or reset between calls.
+Setup, allocation, correctness checks, and output hashing
+are outside the online interval. These are steady-state encoder latencies,
+not cold-cache or full-application timings.
+
+\begin{table}[tb]
+\centering
+\caption{Online time in milliseconds for the batched transposed encoder.
+Both rows use IMT $(t,s)=(128,19)$ with their specified feedback maps.
+A dash means that no certificate-matched timing is reported here.}
+\label{tab:finite-bch-performance}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Outer and rate & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
+\midrule
+BCH-256, $1/2$ & 0.523 & 2.154 & 10.110 \\
+BCH-128, $1/4$ & -- & -- & 15.254 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At half rate and $K=2^{20}$, the three process medians range from
+$10.095$ to $10.172$\,ms. Retained setup occupies $12.13$\,MiB,
+workspace $40$\,MiB, and input/output buffers a separate $48$\,MiB.
+The quarter-rate setup occupies $24.25$\,MiB and workspace $72$\,MiB;
+its process medians range from $15.204$ to $15.313$\,ms.
+Setup latency is not reported. No performance measurement is claimed at
+$K=2^{22}$ or $2^{24}$.
+
+Our author-side
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PAPER_RESULTS.md}{finite IMT ledger}
+records the exact measurements, memory sizes, and proof bindings.
+Its \path{HALF_LADDER_PERFORMANCE_VERIFIED.json} authenticates the three
+half-rate cells; \path{QUARTER_DEPLOYMENT_VERIFIED.json} authenticates the
+quarter-rate implementation and both distance thresholds.
+
+\subsection{Ordinary encoding}
+\label{sec:ordinary-encoding}
+
+Polynomial commitments require the ordinary encoder: $K$ input blocks
+expand to $2K$ output blocks. We implement this direction for the same
+selected SPIN map and measure it separately. Each block again contains
+$128$ parallel binary instances. These measurements include the outer
+encoder, routing, and inner recurrence, but no commitment or opening work.
+
+The ordinary encoder reuses the same local circuits and tiled routing
+strategy. It gathers the inner input and emits the output in one pass,
+retaining the raw input for the independent feedback map. A generated XOR
+circuit evaluates that map. Both directions use the same transvection
+updates and workspace-local page routing. Dense-oracle checks and the identity
+$\langle E(x),q\rangle=\langle x,E^\top(q)\rangle$ check that the
+implementation preserves the linear map.
+
+\begin{table}[tb]
+\centering
+\caption{Ordinary and transposed SPIN encoding, in milliseconds, for
+$128$ parallel binary instances. The two directions are measured in a
+separate paired experiment; neither includes PCS work.}
+\label{tab:ordinary-encoding}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Direction & $K=2^{16}$ & $K=2^{18}$ & $K=2^{20}$ \\
+\midrule
+\input{tables/ordinary_encoding}
+\end{tabular}
+\end{table}
+
+The experiment uses the same Ryzen host, CPU affinity, and GCC version
+as above, with boost disabled. Each direction has independent input and
+workspace buffers. Execution order alternates, and each timed batch of
+three calls follows a direction-specific warmup. Table~\ref{tab:ordinary-encoding}
+reports medians of $31$ trials after five initial paired warmups.
+Setup, allocation, and output checks are outside the interval.
+All runs execute serially.
+
+At $K=2^{20}$, the two directions take $10.797$ and $10.674$\,ms.
+A fresh control using the preceding inner
+and implementation takes $11.332$ and $11.616$\,ms under the same paired
+measurement policy. The IMT implementation reduces these times by about
+$5\%$ and $8\%$. Both directions therefore retain similar practical cost.
+The steady-state transposed measurements above use a different buffer
+and repetition policy; they are not paired with these ordinary timings.
+The PCS measurements in Section~\ref{sec:spin-pcs} additionally include commitment and opening.
+
+\subsection{Comparison with other transposed encoders}
+\label{app:transposed-comparison-details}
+
+We compare SPIN with BAA, introduced by Kolesnikov et al.\ at CRYPTO
+2026~\cite{KolesnikovEtAl2026BA}, using the newer chosen-block
+instantiations~\cite{cryptoeprint:2026/1903}. Chosen-block BAA updates
+BAA using related design ideas, including reuse of
+a spectrum-controlled outer constituent. The BAA timings in
+Table~\ref{tab:transposed-comparison} use
+that newer implementation, rather than the original CRYPTO implementation.
+We also compare with
+Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}, and binary
+repeat--accumulate--accumulate (RAA)~\cite{blaze25}. Every call evaluates a binary
+transposed encoder on $128$ parallel instances. No weighted extension-field
+RAA or forward-encoder timing is included.
+
+The BAA rows use the optimized Golay $[24,12,8]$ and RM$(2,5)$ kernels
+from the chosen-block BAA implementation. Expand--Convolute uses the legacy
+nonsystematic implementation with expander weight $w=33$ and memory $m=25$.
+The implementation takes $24$ random taps plus one fixed tap and applies
+one convolution pass. Its native interface modifies the input buffer and
+writes the result to a preallocated output buffer. Our binary RAA adapter
+uses two accumulator/permutation layers and a repetition transpose.
+BAA and RAA use four-round Feistel permutations, with cycle walking for
+non-power-of-two domains. SPIN retains its packed routing tables.
+The measured times include each implementation's routing costs; they do
+not establish a general ranking of the code families.
+
+\paragraph{Common timing protocol.}
+We rebuild all rows with one compiler and measure them on the same Ryzen
+host and CPU as above. Each cell uses three serial processes, each with
+three warmups and $101$ timed calls. Each process allocates and initializes
+its buffers once, then repeatedly invokes the native encoder interface.
+There is no input copy or reset between calls. Expand--Convolute operates
+on the buffer left by the previous call; the other interfaces preserve
+their input. Code setup, caller buffer allocation, and output hashing
+are outside the interval; all work inside each encoder call is timed.
+The BAA message lengths are $2^m-64$ for $m\in\{16,18,20\}$, allowing
+both constituents to tile the same input. All other rows use $K=2^m$.
+RAA processes $3K$ or $4K$ input blocks, versus $2K$ for the rate-$1/2$ rows.
+
+The combined results appear in the main comparison,
+Table~\ref{tab:transposed-comparison}. Its RAA footnote states the different
+reference length and the optional setup-testing guarantee.
+
+At the largest measured length, half-rate SPIN with IMT takes $10.110$\,ms.
+The original rate-$1/2$ BAA implementation takes approximately $32$\,ms,
+giving the approximately $3\times$ speedup stated in the abstract.
+Separate measurements confirm comparable original-BAA latency on the
+Ryzen host. The newer chosen-block implementations improve on that baseline:
+Chosen Golay and RM BAA take $2.37$ and $2.74$ times as long,
+respectively. The conservative EC profile takes $181.825$\,ms.
+The repetition-$3$ permutation domain requires cycle walking; the
+repetition-$4$ domain does not. These measurements do not imply that
+lower-rate RAA is intrinsically faster.
+
+\paragraph{Distance context.}
+At the largest lengths, half-rate SPIN's certified margin is $50.062$ bits at
+relative distance $0.10$. The chosen-block BAA evaluation reports full
+first-moment margins of $46.386$ and $47.093$ bits for Golay and RM,
+respectively, at the same distance target and their measured length.
+For EC, we use the conservative profile reported in the earlier
+comparison~\cite{KolesnikovEtAl2026BA}: relative distance $0.05$ with
+a $20$-bit margin at $K=2^{20}$. These bounds concern each construction's
+stated random ensemble. For repetition-$4$ RAA, we report Blaze's
+published no-test reference bound at $K=2^{22}$ separately from our
+smaller timing sizes. Its relative distance is $0.19$, with an approximately
+$13$-bit margin; setup testing can improve this margin as noted in the table.
+We do not transfer this bound to $K=2^{20}$ or to repetition-$3$ RAA,
+nor extrapolate the BAA or EC margins to smaller lengths.
+
+Our author-side \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/transposed_comparison/README.md}{comparison guide}
+records dependency revisions, correctness checks, actual lengths, all
+$5454$ timing samples, and a script that regenerates
+Table~\ref{tab:transposed-comparison}. The external rows retain that campaign. The SPIN row instead uses the
+certificate-matched IMT series from Table~\ref{tab:finite-bch-performance},
+measured separately under the same host, compiler, and timing policy.
+\path{paper/build_imt_comparison.py} authenticates both sources and
+regenerates the combined table.
+\FloatBarrier

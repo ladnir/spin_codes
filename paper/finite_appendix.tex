@@ -96,7 +96,7 @@ For example, the displayed intersection and MacWilliams identity imply
 coefficientwise. This is a set-difference argument, not subtraction of
 unrelated upper bounds. Signed Fourier transforms of
 $(-1)^{\wt(c)/2}$ on the even codes give further linear inequalities through
-their hulls. The artifact derives these constraints and checks the requisite
+their hulls. Our verification code derives these constraints and checks the requisite
 binary ranks and intersections.
 
 Second, a finite Fourier case cover proves $d(Q^\perp)\ge30$.
@@ -154,7 +154,8 @@ argument. They distinguish zero, arbitrary nonzero mass, and five uniform
 image-weight shells. Their cancellation bounds use the feedback map $C$
 separately from the expansion $A$.
 
-Write $E_j(z):=T_j(z)$. For a shuffled region of $L$ bits, form
+Fix an output tilt $z\in(0,1)$ and write $E_j(z):=T_j(z)$.
+For a shuffled region of $L$ bits, form
 \[
  \mathcal E(u,z):=\sum_{j=0}^{128}\binom{128}{j}E_j(z)u^j,\qquad
  R_j(z):=\frac{[u^j]\mathcal E(u,z)^{L/128}}{\binom Lj}.
@@ -223,7 +224,8 @@ Indeed, at a support of weight $w$ its mass is $A_w/\binom{256}{w}$.
 The comparison makes different regions independent before their inner states
 are propagated. Split $\Gamma_g$ into $256$ equal factors, one per region.
 
-For fixed occupancy $q$, start with $V_j^{(0)}=R_j$ for $0\le j\le q$ and set
+For fixed occupancy $q$, start with $V_j^{(0)}=R_j$ for $0\le j\le q$.
+For $0\le r<q$ and $0\le j<q-r$, set
 \[
  V_j^{(r+1)}=
  \max_g \rho_g\bigl((1-p_g)V_j^{(r)}+p_gV_{j+1}^{(r)}\bigr).
@@ -241,7 +243,8 @@ make those adaptive choices.
 
 For the smaller instances, a sharper composition split keeps $h$ all-one
 rows exact and applies the recurrence only to $d$ ordinary rows.
-Initialize $V_j^{(0)}=R_{h+j}$ and maximize over the twelve ordinary bands.
+Initialize $V_j^{(0)}=R_{h+j}$ for $0\le j\le d$ and apply $d$ recurrence
+steps, maximizing over the twelve ordinary bands.
 The composition contribution is bounded by
 \[
  U_{d,h}=\binom Ld\binom{L-d}{h}\,12^d
@@ -310,7 +313,8 @@ $D_L^{256}\prod_iC_{a_i}(x)B(\vartheta_a,x)^N\mathcal M(r,\lambda)$.
 For an auxiliary real slope $\eta$, put
 $S(x,\eta)=\sum_g C_g(x)e^{-\eta\xi_g}$, including the all-one label.
 Expanding $S^q$ sums all ordered assignments. Therefore, for a density
-interval $I$,
+interval $I$, let $U_{q,I}$ be the contribution to $\E Z_H$ from
+assignments with $q$ active rows and $\nu_a\in I$. Then
 \begin{equation}
  \begin{split}
  U_{q,I}\le{}&\binom Lq D_L^{256} S(x,\eta)^q\\
@@ -378,7 +382,8 @@ The verifier compares complete moment bounds, not their individual entries.
 Second, the factor $D_L$ can be replaced by a smaller
 composition-sensitive bound. Fix an assignment of reference probabilities
 $\xi_i$ (zero for inactive rows), with mean $\vartheta$. To compare its
-shuffled weight-$j$ probability to $\operatorname{Bin}(L,\vartheta)$, put
+shuffled weight-$j$ probability to $\operatorname{Bin}(L,\vartheta)$,
+assume $0<\vartheta<1$ and $0<j<L$, and put
 $y=j/L$ and $a=y(1-\vartheta)/(\vartheta(1-y))$.
 Exponential tilting gives the exact ratio
 \[
@@ -388,9 +393,12 @@ Exponential tilting gives the exact ratio
  \qquad
  \Prob[X_i'=1]=\frac{\xi_i a}{1-\xi_i+\xi_i a}.
 \]
-For $0<j<L$, concavity bounds the product in the numerator by
+Here the $X_i'$ are independent Bernoulli variables.
+Concavity bounds the product in the numerator by
 $(1-\nu+\nu a)^q$. If the tilted variance is at least $V$, Fourier
-inversion gives the point-mass bound $e^{-V}I_0(V)$: the absolute
+inversion gives the point-mass bound $e^{-V}I_0(V)$, where
+$I_0(V):=\pi^{-1}\int_0^\pi e^{V\cos\phi}\,d\phi$.
+Indeed, the absolute
 characteristic function is at most
 $\exp(-2V\sin^2(\phi/2))$, and integration proves the claim.
 This bound decreases with $V$.
@@ -442,7 +450,7 @@ If $h\ge1$ labels are high, $e^{\zeta h}\le e^\zeta$ proves this upper
 bound after expanding the label sum. An analogous split isolates the
 all-one label. The two subset bounds are added before comparison with an
 unsplit bound. No separately rounded normalizers are subtracted.
-The artifact's \path{SHORT_LENGTH_BOUNDS.md} derives the rectangle
+Our derivation note \path{SHORT_LENGTH_BOUNDS.md} derives the rectangle
 optimizations and records their exact-arithmetic tests.
 
 \subsection{The quarter-rate outer and feedback}
@@ -463,7 +471,7 @@ coset-orbit argument as above proves rank $32$ and spectrum
  W_{32}=W_{29}+\frac7{127}(W_{36}-W_{29}).
 \]
 Here $W_{29},W_{36}$ are the published extended-BCH spectra retained and
-attributed in the artifact's
+attributed in our author-side
 \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/rate_quarter_bch/SMALLER_OUTER.md}{outer-construction guide}.
 The resulting spectrum has minimum weight $32$, multiplicity $588$ at
 weight $32$, total mass $2^{32}$, and a single all-one word.
@@ -542,7 +550,49 @@ comparison, not additional randomness in the encoder setup.
 The outward producer, higher-precision replay, and exact-union checker
 are separate from the binary64 witness search.
 
-\subsection{Completion and reproducibility}
+\subsection{Complete finite margins}
+\label{app:finite-margin-tables}
+
+Tables~\ref{tab:finite-bch-margins} and~\ref{tab:finite-quarter-margins}
+give the complete numerical results for the two finite theorems in
+Section~\ref{sec:finite-certificates}. Their margins are certified bounds
+on setup failure, not full application-security levels.
+
+\begin{table}[!htbp]
+\centering
+\caption{Complete finite certificates for the selected $(128,19)$ IMT inner.
+Margins are rounded for display; the theorem uses exact rational upper bounds.}
+\label{tab:finite-bch-margins}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$\log_2K$ & outer rows $L$ & cutoff $H$ & $-\log_2U_K$ (bits) \\
+\midrule
+16 & 512 & 13\,107 & 41.818327 \\
+18 & 2\,048 & 52\,428 & 50.189076 \\
+20 & 8\,192 & 209\,715 & 50.062088 \\
+22 & 32\,768 & 838\,860 & 48.390492 \\
+24 & 131\,072 & 3\,355\,443 & 46.457255 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Two distance thresholds for the same quarter-rate encoder at
+$K=2^{20}$. The exact unions, not the rounded margins, establish the targets.}
+\label{tab:finite-quarter-margins}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$\delta$ & cutoff $\lfloor\delta N\rfloor$ & target $\lambda$ & margin (bits) \\
+\midrule
+0.165 & 692\,060 & 40 & 41.048168 \\
+0.190 & 796\,917 & 30 & 30.033491 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\subsection{Certificate completion}
 
 The half-rate exact unions have the following component margins, rounded
 only for display. Here $q_{\max}$ is the last sparse occupancy.
@@ -567,7 +617,7 @@ by the same first-moment inequality.
 Injectivity follows independently from sequential inversion of the inner
 and injectivity of the block-diagonal outer.
 
-The current integration ledger is
+Our author-side integration ledger is
 \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/finite_migration/PAPER_RESULTS.md}{finite IMT results}.
 It identifies the five half-rate verification receipts, the quarter-rate
 certificate and replay, and their exact source paths. Each receipt binds
@@ -581,10 +631,8 @@ bounds; floating-point search scores do not enter the unions.
 Higher-precision replay shares producer formulas, so it is not an
 independent proof implementation.
 
-The \path{finite_migration} reproduction guide lists the commands.
 The timing bindings additionally check map identity, outer implementation,
 correctness receipts, and measured source and binary identities.
-A source-only checkout does not contain all generated receipts or raw
-measurements. A full replay bundle must supply or regenerate the pinned
-inputs.
+These verification records are separate from the core encoder artifact;
+the artifact does not distribute the generated receipts or raw measurements.
 This is a computer-assisted proof, not a proof-assistant formalization.

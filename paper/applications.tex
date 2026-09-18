@@ -1,0 +1,132 @@
+\section{Applications}
+\label{sec:applications}
+
+We evaluate SPIN as a component of existing protocols, not as a new PCG,
+PCS, or proof system. The three applications use different parts of the
+encoder interface. We distinguish measured computation costs from
+projected costs and conditional security calculations.
+
+\subsection{Pseudorandom correlation generation}
+\label{sec:spin-pcg}
+
+PCGs use the transposed encoder to compress pseudorandom tree outputs
+into correlation blocks. At rate $1/2$, SPIN maps $2^{21}$ input blocks
+to $2^{20}$ output blocks of $128$ bits in about $10$\,ms.
+We also integrate SPIN into libOTe's semi-honest Silent OT path
+\cite{bcg19tworound}. Starting with base correlations installed, expansion
+and SPIN take $19.531$\,ms for the sender and $20.625$\,ms for the receiver.
+Including output hashing gives $22.099$ and $21.841$\,ms, respectively.
+These are measured per-party computations for $2^{20}$ outputs, excluding
+base OT, setup, buffer allocation, and network latency. They correspond to
+about $47$ million hashed OTs per second of computation on one core.
+The endpoints run serially with separate timers, not as a timed network session.
+Appendix~\ref{app:pcg-details} gives the noise parameters, output modes,
+timing contract, and correctness checks.
+
+\subsection{Polynomial commitments}
+\label{sec:spin-pcs}
+
+We use SPIN as the row encoder in a Brakedown-style PCS
+\cite{brakedown23}. Arrange a Boolean evaluation table in $R$ rows of
+$K$ bits, encode each row to $N=2K$ bits, and Merkle-commit to the columns.
+In the interactive protocol, the commitment and evaluation claim precede
+the verifier's uniform testing coefficients in $\F_{2^{128}}^R$.
+The prover returns the testing combination and an evaluation-weighted
+combination of the message rows. Only then does the verifier sample
+columns and check both encoded combinations against authenticated openings.
+The measured implementation derives these challenges from a Fiat--Shamir
+transcript; Appendix~\ref{app:pcs-details} specifies the order.
+Keeping the input packed, batching columns, and using table-based row
+combinations avoid expanding the full Boolean matrix into field elements.
+
+We condition once on the code satisfying
+Theorem~\ref{thm:finite-bch-spin}; extending its binary generator to
+$\F_{2^{128}}$ preserves minimum distance.
+For $K=2^{16}$ or $2^{18}$, one testing fold and $2045$ column samples give
+fixed-matrix testing and evaluation error below $2^{-100}$
+\cite{diamondPosen24}. This conditional target excludes the one-time
+code-setup event and the commitment-extraction and Fiat--Shamir reductions.
+It is not a complete composed security theorem. Such an argument would
+have to account for setup failure, the interactive testing error, and the
+missing cryptographic reductions; the $100$-bit target bounds only the
+testing term conditional on a good code.
+
+\begin{table}[!htbp]
+\centering
+\caption{Standalone PCS at $512$\,MiB input volume. Prover time includes
+commitment and one evaluation opening. SPIN uses the conditional 100-bit
+fixed-matrix testing target; Ligerito uses its Fast100 and Slim100 profiles. Bolt uses its
+nominal 100-bit parameters.}
+\label{tab:spin-pcs-standalone}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Configuration & Prover (ms) & Verify (ms) & Proof (MiB) \\
+\midrule
+\input{tables/pcs_standalone}
+\end{tabular}
+\par\smallskip
+\begin{minipage}{\linewidth}\footnotesize
+$^{*}$Estimated: measured commitment plus a calibrated opening projection;
+proof size uses a communication proxy. Both assign negligible per-opening
+cost to the shared matrix proof (amortized limit). Bolt uses
+$\F_{2^{32}}$ inputs; the other rows use packed Boolean inputs.
+Verification was not measured. See Appendix~\ref{app:bolt-estimate}.
+\end{minipage}
+\end{table}
+
+Table~\ref{tab:spin-pcs-standalone} matches input bytes, not coefficient
+fields or polynomial dimensions. It compares the measured implementations:
+SPIN reuses a preallocated workspace, whereas Ligerito's internal
+allocations remain timed. It does not isolate an encoder-only substitution.
+The square SPIN shape has $R=K=2^{16}$; longer rows use
+$(R,K)=(2^{14},2^{18})$. Both encode to $1$\,GiB.
+SPIN commits and opens in $509$\,ms for the square shape.
+Longer rows reduce proof size by $31.6\%$ at a $3.1\%$ prover-time cost.
+Ligerito~\cite{ligerito25} provides substantially smaller proofs and
+faster verification, at higher prover cost.
+
+These runs use one worker on the same Ryzen host, with boost disabled
+and a requested $4.5$\,GHz frequency. Each measured SPIN or Ligerito entry pools ten trials from
+two processes, each excluding one warmup. Setup and input preparation
+are excluded; Appendix~\ref{app:pcs-details} states the implementation-specific
+allocation and serialization boundaries and the Fast100/Slim100 parameters.
+The comparison does not establish a common composed security theorem.
+
+The large SPIN proofs reflect this PCS's explicit folded messages.
+Blaze's generic code-switching framework~\cite{blaze25} permits a theoretical
+composition with asymptotically smaller proofs; we do not instantiate or
+benchmark it here. Bolt-max~\cite{bolt26} provides a comparison at a
+similar proof size: its estimated $11.1$\,MiB is close to the longer-row
+SPIN configuration's measured $12.4$\,MiB. Its prover entry is a calibrated
+projection, not a complete prover measurement or runtime bound.
+Appendix~\ref{app:bolt-estimate} gives the accounting.
+
+\subsection{Flock}
+\label{sec:spin-flock}
+
+We replace Ligerito with SPIN--Brakedown inside Flock~\cite{flock26},
+which reduces batches of Boolean constraints to claims about a committed
+witness. The adapter incorporates Flock's interpolation weights into the
+row combinations and passes a packed witness without repacking.
+It uses two openings with $2110$ column samples each and $K=2^{16}$.
+Their conditional fixed-matrix error bounds sum to less than $2^{-102}$;
+composition with adaptive Flock claims still requires the extraction argument.
+
+For $16{,}384$ and $65{,}536$ BLAKE3-compression constraints, SPIN's measured
+prover times are $113$ and $420$\,ms, versus $217$ and $571$\,ms for Ligerito.
+These are $1.92\times$ and $1.36\times$ throughput improvements.
+At the larger workload, SPIN's proof is $12.8$\,MiB and verification takes
+$46$\,ms, versus $0.4$\,MiB and $28$\,ms for Ligerito.
+The gain therefore trades communication and verification for prover speed.
+
+Both backends receive the applicable optimizations to arithmetic,
+workspace reuse, and witness processing. Prover time includes witness generation,
+commitment, and proving, but excludes setup, verification, and outer
+serialization. All $144$ proofs, including warmups, verify.
+The checked relation is the committed batch's compression constraints;
+binding public hash inputs and outputs needs a separate wrapper.
+Appendix~\ref{app:flock-details} gives the full measured table, balanced
+serial timing protocol, phase breakdowns, and separately labeled Bolt
+projections. No Bolt--Flock implementation was benchmarked.
+\FloatBarrier

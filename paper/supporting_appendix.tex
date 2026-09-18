@@ -1,0 +1,33 @@
+\section{Supporting constructions and their proofs}
+\label{app:supporting-constructions}
+
+This appendix gives the complete analysis of the constructions used for
+intuition in Section~\ref{sec:spin-intuition}. We first give the shared
+uniform-interleaver calculation and random-block enumerators, then analyze
+the accumulator and random recursive inner. The final subsection gives the
+terminated-encoder interpretation of the BMS connection.
+
+\begin{table}[!htbp]
+  \centering
+  \caption{From minimal recursion to structured encoding.}
+  \label{tab:spin-families}
+\begin{tabular}{@{}llll@{}}
+    \toprule
+    Family & Outer & Interleaver & Inner \\
+    \midrule
+    Accumulator SPIN & random blocks & uniform & accumulator \\
+    Random SPIN & random blocks & uniform & random recursive \\
+    Structured SPIN & spectrum-controlled & structured & structured recursive \\
+    \bottomrule
+  \end{tabular}
+  \end{table}
+
+\subsection{Uniform interleaving and random-block outers}
+\label{app:supporting-framework}
+\input{supporting_framework}
+\input{supporting_outer}
+
+\input{accumulator_spin}
+\input{random_spin}
+\input{proof_appendix}
+\input{supporting_bms}

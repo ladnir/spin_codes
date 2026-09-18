@@ -34,8 +34,9 @@ def check_inner_terminology(source):
 def check():
     data = evidence.load()
     finite, appendix, implementation = map(read, (
-        'finite_certificates.tex', 'finite_appendix.tex', 'implementation.tex'))
-    rows = re.findall(r'^(16|18|20|22|24) & (.*?) & (.*?) & ([0-9.]+) \\\\', finite, re.M)
+        'finite_certificates.tex', 'finite_appendix.tex', 'implementation_appendix.tex'))
+    engineering = read('engineering_appendix.tex')
+    rows = re.findall(r'^(16|18|20|22|24) & (.*?) & (.*?) & ([0-9.]+) \\\\', appendix, re.M)
     require(len(rows) == 5, 'Expected five selected margins')
     for m_text, l_text, h_text, display in rows:
         m = int(m_text)
@@ -78,7 +79,7 @@ def check():
     for row, display in zip(data['quarter_proof']['results'], ('0.165', '0.190'), strict=True):
         cutoff = f"{row['bad_weight']:,}".replace(',', r'\,')
         expected = f"{display} & {cutoff} & {row['target_bits']} & {row['margin_bits_diagnostic']:.6f}"
-        require(expected in finite, 'Wrong quarter threshold row')
+        require(expected in appendix, 'Wrong quarter threshold row')
     for key in ('parent_generator_hex', 'subcode_generator_hex'):
         require(data['quarter_proof']['outer'][key][2:] in appendix, 'Wrong quarter polynomial')
 
@@ -98,31 +99,39 @@ def check():
         require('11.259' not in read(name), 'Historical headline presented as current')
     require(r'Q_{i+1}=M_iQ_i+C(X_i)' in finite, 'Wrong finite state update')
     require(r'\alpha_i' not in finite and 'four-state' not in appendix, 'Old refresh proof remains')
-    require('Q1 alone does not control' in finite and
-            'do not certify the different BCH-64/128 diagnostic configurations' in finite,
+    require('Q1 alone does not control' in engineering and
+            'do not certify the different BCH-64/128 diagnostic configurations' in engineering,
             'Missing Q1 scope distinction')
     for name in ('[64,32,12]', '[128,64,22]'):
-        require(name in finite, 'Missing diagnostic outer identity')
+        require(name in engineering, 'Missing diagnostic outer identity')
     short = data['half'][16]
     q1_short = short['component_margin_bits'][0]
-    require(f'${q1_short:.3f}$ bits' in finite and
-            f"${q1_short-short['margin_bits']:.3f}$ bits" in finite,
+    require(f'${q1_short:.3f}$ bits' in engineering and
+            f"${q1_short-short['margin_bits']:.3f}$ bits" in engineering,
             'Wrong short-length Q1 margin or higher-occupancy loss')
-    require('existing spectrum-model curve' not in finite, 'Unshown historical curve referenced')
+    require('existing spectrum-model curve' not in engineering, 'Unshown historical curve referenced')
     for source in PAPER.glob('*.tex'):
         check_inner_terminology(source.read_text(encoding='utf-8'))
-    require('Historical parameter study' not in finite and
-            r'\input{figures/parameter_' not in finite, 'Historical figures remain active')
+    require('Historical parameter study' not in engineering and
+            r'\input{figures/parameter_' not in engineering, 'Historical figures remain active')
     parameter_check = build_imt_parameter_figures.check(data)
     length_check = build_imt_length_figure.check(data)
     for name in ('imt_parameter_k_b', 'imt_parameter_s_t', 'imt_parameter_k_s', 'imt_certified_curve'):
-        require(r'\input{figures/' + name + '}' in finite, 'Current IMT figure not included')
-    require(r'\input{figures/imt_mixing_rounds}' not in finite, 'Retired mixing-round figure remains')
+        require(r'\input{figures/' + name + '}' in engineering, 'Current IMT figure not included')
+    require(r'\input{figures/imt_mixing_rounds}' not in engineering, 'Retired mixing-round figure remains')
     require(read('figures/transposed_comparison.tex') == build_imt_comparison.table(data),
             'Stale external comparison table')
     main = read('main.tex')
-    require(main.index(r'\input{structured_spin}') < main.index(r'\input{finite_certificates}')
-            < main.index(r'\input{scaling_complexity}'), 'Wrong section order')
+    require(main.index(r'\input{structured_spin}') < main.index(r'\input{structured_proof}')
+            < main.index(r'\input{finite_certificates}') < main.index(r'\input{implementation}')
+            < main.index(r'\input{applications}') < main.index(r'\appendix'),
+            'Wrong main section order')
+    for name in ('finite_appendix', 'engineering_appendix', 'implementation_appendix',
+                 'applications_appendix'):
+        require(r'\input{' + name + '}' in main.split(r'\appendix', 1)[1],
+                'Moved evidence is not included in the supplement')
+    require(r'\input{scaling_complexity}' in engineering, 'Missing parameter-selection discussion')
+    require(r'\ref{app:engineering}' in finite, 'Missing main-text parameter-study pointer')
     return dict(status='SELECTED_FINITE_IMT_INTEGRATION_PASSED', selected_certificates=7,
                 matched_timing_cells=4, map_words_checked=57,
                 authenticated_files=data['authenticated_files'], full_interval_replay=False,

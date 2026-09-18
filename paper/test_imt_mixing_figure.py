@@ -24,8 +24,8 @@ def fixture():
 
 class MixingFigureTests(unittest.TestCase):
     def test_round_plot_is_retired_from_parameter_explainer(self):
-        text = Path(__file__).with_name('finite_certificates.tex').read_text()
-        explainer, remainder = text.split(r'\subsection{The selected construction}', 1)
+        text = Path(__file__).with_name('engineering_appendix.tex').read_text()
+        explainer, remainder = text.split(r'\subsection{The certified engineering curve}', 1)
         figures = [r'\input{figures/' + name + '}' for name in
                    ('imt_parameter_k_b',
                     'imt_parameter_s_t', 'imt_parameter_k_s')]

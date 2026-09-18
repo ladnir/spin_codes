@@ -1,5 +1,5 @@
-\section{Polynomial commitments from SPIN}
-\label{sec:spin-pcs}
+\subsection{Polynomial commitment details}
+\label{app:pcs-details}
 
 We use SPIN as the row encoder in a Brakedown-style polynomial commitment
 scheme~\cite{brakedown23}. This application tests whether fast ordinary
@@ -9,17 +9,46 @@ organizes the computation around packed binary data. At $512$\,MiB of
 input, the resulting prover commits and opens in $509$\,ms on one core.
 
 \paragraph{Construction.}
-Let a Boolean evaluation table define a multilinear polynomial over
+Let a Boolean evaluation table define a multilinear polynomial $f$ over
 $\mathbb F:=\F_{2^{128}}$. A public index mapping arranges its $RK$ bits
-into $R$ rows of $K$ bits. The prover applies the same SPIN encoder to
-each row, obtaining $N=2K$ columns, and commits to these columns with a
-Merkle tree. An opening sends one random testing combination of the
-message rows and one combination weighted by the requested evaluation
-point. The combinations lie in $\mathbb F^K$. The verifier encodes them
-and checks consistency with authenticated columns sampled after both
-messages are fixed. The evaluation combination also supplies the claimed
-polynomial value. We retain Brakedown's matrix-testing structure and send
-the folded messages explicitly.
+into a matrix $M\in\F_2^{R\times K}$. The prover applies the same SPIN
+encoder $\operatorname{Enc}$ to each row $M_i$, obtaining
+$U\in\F_2^{R\times N}$ with $N=2K$, and Merkle-commits to its columns.
+We also write $\operatorname{Enc}$ for the extension of its binary generator
+to $\mathbb F$.
+For a requested evaluation point $z$, let $\beta\in\mathbb F^R$ and
+$\gamma\in\mathbb F^K$ be the Boolean Lagrange weights for the row and
+column variables under this mapping. Thus
+$f(z)=\sum_{i,j}\beta_i\gamma_jM_{ij}$.
+
+In the interactive protocol, the commitment, $z$, and claimed value $v$
+are fixed before the verifier samples $\alpha\gets\mathbb F^R$ and sends
+it to the prover. The honest prover returns the explicit folded messages
+\[
+  m_T:=\sum_{i=1}^R\alpha_i M_i,
+  \qquad
+  m_E:=\sum_{i=1}^R\beta_i M_i
+  \qquad\text{in }\mathbb F^K.
+\]
+After receiving both messages, the verifier draws $q$ independent uniform
+column indices from $[N]$ with replacement and requests openings at the distinct
+sampled indices. The prover returns those columns and their Merkle
+authentication. The verifier rejects malformed messages or invalid
+authentication. It also checks $\sum_j\gamma_j(m_E)_j=v$ and, for every
+sampled column $j$,
+\[
+  \operatorname{Enc}(m_T)_j=\sum_i\alpha_iU_{ij},
+  \qquad
+  \operatorname{Enc}(m_E)_j=\sum_i\beta_iU_{ij}.
+\]
+It accepts only if all checks pass. Both folds share the query set;
+deduplication does not change the event of missing all inconsistent columns.
+
+The measured implementation uses domain-separated BLAKE3 transcript
+challenges in place of verifier randomness. It absorbs the parameter
+identifier, commitment root, point, and claimed value before deriving
+$\alpha$. It then absorbs $m_T$ followed by $m_E$ before deriving the
+column indices. The verifier reproduces this order.
 
 \paragraph{Making the binary code useful.}
 Expanding every bit to an extension-field element would erase much of
@@ -35,13 +64,14 @@ for approximately $79\%$ of the fastest standalone prover time.
 We condition once on the selected code satisfying the distance bound
 of Theorem~\ref{thm:finite-bch-spin}. Extending its binary generator to
 $\mathbb F$ preserves minimum distance. At $K=2^{16}$ and $2^{18}$,
-we use $2045$ column samples and one random testing fold. The generic-code
-proximity calculation~\cite{diamondPosen24} then gives an error below
-$2^{-100}$ for the fixed-matrix test and evaluation check. We call this
-the conditional 100-bit parameter target. It excludes the one-time setup
+we use $2045$ column samples and one random testing fold. For a complete
+matrix fixed before the testing challenge, the generic-code proximity
+calculation~\cite{diamondPosen24} gives an error below $2^{-100}$ for the
+interactive matrix test and evaluation check. We call this
+the conditional 100-bit fixed-matrix testing target. It excludes the one-time setup
 event and the separate commitment-extraction and Fiat--Shamir reductions;
 the calculation does not establish a complete composed security theorem.
-The artifact records the bound and checks the parameters with exact arithmetic.
+Our verification code checks this bound and its parameters with exact arithmetic.
 
 \paragraph{Standalone performance.}
 Table~\ref{tab:spin-pcs-standalone} compares SPIN--Brakedown with
@@ -53,20 +83,7 @@ size by $31.6\%$ for a $3.1\%$ increase in prover time. The square
 configuration spends $221$\,ms encoding, $180$\,ms hashing columns,
 and approximately $96$\,ms computing the two row combinations.
 
-\begin{table}[tb]
-\centering
-\caption{Standalone PCS for $512$\,MiB of Boolean input. Prover time
-includes commitment and one evaluation opening. SPIN uses the conditional
-100-bit target; Ligerito uses its Fast100 and Slim100 profiles.}
-\label{tab:spin-pcs-standalone}
-\small
-\begin{tabular}{@{}lrrr@{}}
-\toprule
-Configuration & Prover (ms) & Verify (ms) & Proof (MiB) \\
-\midrule
-\input{tables/pcs_standalone}
-\end{tabular}
-\end{table}
+The headline comparison appears in Table~\ref{tab:spin-pcs-standalone}.
 
 All measurements use one worker on the Ryzen 9 7950X, pinned to CPU~15,
 with a requested $4.5$\,GHz frequency and boost disabled. Each SPIN entry is
@@ -85,22 +102,30 @@ from two processes per profile, each with one excluded warmup. Input
 preparation, statement serialization, independent evaluation, outer proof
 serialization, and decoding are excluded; internal allocations remain
 timed. These profiles give much smaller proofs and faster verification,
-at higher prover cost. The artifact records the configurations and the
+at higher prover cost. Our author-side records retain the configurations and the
 different timing boundaries; these runs do not establish a common
 composed security theorem.
 
 \paragraph{Comparison with Bolt.}
+\label{app:bolt-estimate}
 At the same $512$\,MiB input volume and on one core, the fastest measured
-Bolt-max commitment takes $1720$\,ms, compared with $401$\,ms for
-SPIN--Brakedown: a $4.29\times$ difference. These measurements come from
+Bolt-max commitment takes $1342$\,ms, compared with $401$\,ms for
+SPIN--Brakedown: a $3.34\times$ difference. These measurements come from
 separate campaigns on the same host. Bolt~\cite{bolt26} encodes
 $2^{27}$ elements of $\F_{2^{32}}$; our input has $2^{32}$ Boolean entries.
 The comparison therefore matches input bytes, rather than polynomial
 dimension or coefficient field. It includes each implementation's code,
 layout, and commitment processing. The authors' public Bolt implementation
 provides commitment but does not implement the complete opening prover.
-The artifact records the
-implementations, timing boundaries, and both measured Bolt-max variants.
+We optimized Bolt's x86 expander by specializing its $128$-symbol columns
+and replacing each heap accumulator with a fixed-size array.
+The compiler keeps the accumulator in SIMD registers; no handwritten
+assembly is used. In a fresh baseline comparison, expander time falls
+from $733$ to $331$\,ms and commitment time from $1757$ to $1342$\,ms.
+The graph, parameters, Reed--Solomon kernel, and hashing are unchanged;
+baseline and optimized commitment roots match. Timings are medians of
+six measured trials per binary, across two processes with one excluded
+warmup each. Our author-side records retain the source hashes and timing boundaries.
 
 \paragraph{Opening cost in isolation.}
 Table~\ref{tab:pcs-opening} separates opening from commitment. The two
@@ -140,9 +165,42 @@ calibration of that proof's leading multiplication work gives $1729$\,ms
 without amortization. The inner proxies differ from Bolt's constrained
 and batched proofs; basis preparation, some matrix-proof work, outer
 authentication, and transcript integration remain unmodeled. The
-artifact records these choices and the measured components. Consequently,
+author-side records retain these choices and the measured components. Consequently,
 these figures describe the projected cost of the selected implementation
 approach, rather than a lower bound on Bolt's opening time.
+
+\paragraph{Estimated Bolt communication.}
+The Bolt-max row in Table~\ref{tab:spin-pcs-standalone} uses the same
+amortized-limit model for time and communication. Adding the measured
+commitment to the projected opening gives $2614$\,ms, using unrounded inputs.
+For communication, we use the paper's nominal 100-bit query formulas,
+with parity-check distance $\gamma=0.013$ and rate-$1/2$ Reed--Solomon
+encoding. They give $15{,}962$ message queries and $241$ syndrome queries
+\cite[Section 7.3]{bolt26}. This is not a new composed-security analysis.
+
+The measured commitment has $2^{20}$ message columns and $2^{18}$
+syndrome columns, each containing $128$ four-byte symbols.
+Uniform distinct queries within each part transmit $7.912$\,MiB of
+column data and an expected $2.600$\,MiB of batched Merkle authentication.
+The authentication calculation includes the two dummy sibling hashes in
+the implementation's non-power-of-two tree.
+We add $451{,}184$ and $177{,}200$ bytes from the two verified inner-proof
+proxies used for timing, $2048$ bytes of row evaluations, $1920$ bytes for
+two sumcheck transcripts, and $128$ bytes of scalar-message allowance.
+The resulting communication estimate is $11.115$\,MiB, rounded to $11.1$.
+
+The inner proxies are complete Ligerito proximity proofs, not Bolt's
+constrained proofs. They include their own commitments and do not exploit
+Bolt's virtual syndrome oracle or batching. The estimate assigns zero
+per-opening communication to the shared matrix proof in the amortized
+limit; finite batches must pay their share. It excludes container framing
+and the original commitment root. These substitutions make the total a
+communication model, not a generated Bolt proof or a bound.
+As a secondary comparison, retaining the unresolved overhead in Bolt's
+published $4$\,GiB proof gives $10.9$--$11.5$\,MiB at $512$\,MiB,
+depending on the interpretation of its MB units. That agreement does not
+independently validate the inner-proof model. Our author-side checks use a calculator, source receipts, and
+small-tree enumeration tests.
 
 \paragraph{Compatibility with Blaze.}
 SPIN is also compatible with Blaze's generic code-switching

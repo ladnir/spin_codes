@@ -1,0 +1,49 @@
+\subsection{The Bazzi--Mahdian--Spielman question}
+\label{sec:bms-question}
+
+\paragraph{When does one interleaver suffice?}
+Bazzi, Mahdian, and Spielman (BMS) show that a depth-two serial concatenation
+cannot be asymptotically good when the outer has constant memory and the
+inner has sublinear memory~\cite[Sec.~III-A]{bms09}. Their conclusion asks
+whether allowing the outer memory to grow logarithmically with block length
+permits an asymptotically good code~\cite[Sec.~IV]{bms09}.
+Here, asymptotically good means that both rate and relative minimum
+distance stay bounded away from zero. The question concerns the
+composition of an outer encoder, one interleaver, and an inner encoder.
+
+\paragraph{The SPIN progression.}
+Accumulator SPIN supplies the basic positive construction in the
+block-encoder setting. Its outer blocks have length $\Theta(\log N)$,
+and its inner accumulator carries one bit of state. At rate $1/2$,
+Theorem~\ref{thm:independent-accumulator-spin} gives relative distance
+greater than $0.0037$ with probability $1-o(1)$. Thus a growing inner
+state is unnecessary for linear distance once the outer blocks grow
+logarithmically. Random SPIN increases the inner memory to
+$\Theta(\log N)$ and proves relative distance greater than $0.11002$.
+Structured SPIN then returns to constant recursive state: with better
+constituents and structured interleaving, it proves relative distance
+greater than $0.11$ and linear-time encoding. Both of the latter distance
+guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
+
+\paragraph{Logarithmic outer memory suffices.}
+The block description admits a streaming realization with logarithmic
+memory and a short termination. For a rate-$1/2$ outer with block length
+$b$, buffer one block while emitting the preceding block, at two output
+bits per input bit. Initially the output buffer contains $b$ zeros.
+After the message, $b/2$ fixed zero input bits flush the last block.
+This produces $0^b\Vert O(x)$ using $O(b+\log N)$ memory, including
+buffers and a position counter. Extend the interleaver to send these
+startup zeros to the end and apply the original permutation to $O(x)$.
+The inner therefore receives $\Pi(O(x))\Vert0^b$. Since each inner is
+causal, the first $N$ output bits are exactly the original SPIN codeword.
+The added outputs cannot reduce absolute minimum distance. For
+$b=\Theta(\log N)$, the rate becomes $1/2-o(1)$ and the relative-distance
+guarantee changes by only $o(1)$.
+
+This gives a positive answer in the terminated-encoder interpretation of
+the BMS question: logarithmic outer memory and a one-bit accumulator
+suffice for an asymptotically good code. BMS mention termination but
+omit it from their displayed encoder definition~\cite[Sec.~I-A]{bms09};
+the fixed termination inputs are explicit in the realization above.
+The structured interleaver is still one permutation between the two
+encoders; permutations internal to the outer act only within its blocks.

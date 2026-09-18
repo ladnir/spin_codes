@@ -1,80 +1,56 @@
-# SPIN paper artifact
+# SPIN core implementation artifact
 
-This is the reader-facing entry point for the paper's code and numerical
-evidence. Use the [paper-to-code map](PAPER_MAP.md) to locate a specific result,
-or the [reproduction guide](REPRODUCING.md) to run the checks.
-The [validation record](VALIDATION.md) lists tests performed and the local
-evidence archive's checksum.
+The artifact covers the core SPIN encoder implementation, its build instructions,
+and correctness tests. It does not package the numerical proof searches,
+certificate receipts, parameter sweeps, application integrations, comparison
+benchmarks, or raw measurements used during the research.
 
-## Reproduction levels
+The repository is a broader author workspace. Historical reproduction scripts
+and research notes remain available, but they are not artifact deliverables.
+Their commands may require local inputs that are not distributed.
 
-The selected finite results now use IMT. Their current entry point is
-`python -B paper/check_finite_integration.py`: seven certificate targets,
-four timing cells, and exact map transcription. It needs the pinned local
-evidence plus Python and Git. See the [current results ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
-The three parameter plots now use IMT Q1 diagnostics. Five matched BCH-256
-Q1/full comparisons provide certified operating points, not certificates
-for the different diagnostic maps.
+## Core source
 
-| Command, from the repository root | What it does | Requirements |
-|---|---|---|
-| `python -B artifact/imt_reproduce.py check` | Checks the selected finite IMT certificate, map, and timing bindings. | Python 3.11+, Git, pinned local evidence. |
-| `python -B artifact/imt_reproduce.py figures` | Regenerates the adaptive-step length comparison, two state-size slices, and the matched Q1/full curve. | Same, including both Q1 studies and their replay receipts. |
-| `python -B artifact/imt_reproduce.py inventory --include-q1` | Includes the state-grid and adaptive-length Q1 inputs in the selected finite evidence inventory; also supported by `pack`. | Complete matching local evidence. |
-| `python -B artifact/imt_reproduce.py inventory` | Authenticates the selected finite IMT dependencies and reports missing files. Fails on absent or mismatched evidence. | Python and Git for tracked-file status. |
-| `python -B artifact/imt_reproduce.py pack --output output/artifact/imt-evidence.zip` | Packages only those IMT pins and verifies every archived hash. Requires a new output path. | Complete matching local evidence. |
-| `python -B artifact/reproduce.py quick` | Checks selected finite IMT values and bindings, historical parameter figures, and 31 imported asymptotic entries. | Python 3.11+, Git, pinned local evidence. |
-| `python -B artifact/reproduce.py figures` | Regenerates historical RM2Sub figures, no longer used by the manuscript. | Same. |
-| `python -B artifact/reproduce.py paper` | Runs quick checks and builds the PDF. | Same, plus TeX Live/latexmk. |
-| `python -B artifact/reproduce.py inventory` | Lists historical BCH/RM2Sub audit dependencies, not a full IMT inventory. | Python and Git. |
-| `python -B artifact/reproduce.py evidence` | Requires every retained BCH audit dependency locally and authenticates exact retained sums. | Complete local evidence plus Git; no numerical replay. |
-| `python -B artifact/reproduce.py pack-evidence --output output/artifact/bch-evidence.zip` | Packages the matching BCH evidence and rechecks every archived SHA-256. Refuses to overwrite an existing ZIP. | Complete local evidence plus Git. |
+The selected half-rate encoder uses the BCH [256,128] outer, randomized bit
+transpose permutation, and IMT inner with (t,s) = (128,19), weight-five feedback.
 
-The `evidence` and `pack-evidence` commands also retain their historical
-BCH/RM2Sub scope; they do not package the current IMT proofs.
-Use `python -B paper/build_imt_comparison.py --check` for the current
-external comparison, whose SPIN row comes from the new IMT series.
-These commands stop on failure. A hash check establishes that the retained
-file matches its manifest, not that every mathematical reduction is correct.
+- [Selected encoder and inner](../workstreams/inner_design/asymmetric/bch256/weight5/implementation/):
+  `Weight5Spin.cpp`, `Weight5Inner.h`, and `AsymmetricMap.h`.
+- [Shared interface and routing](../workstreams/bare_bch_rm2sub/):
+  shared support code and the generated BCH circuit. The directory name is historical.
+- [Generated quarter-rate outer circuits](../workstreams/rate_quarter_bch/implementation/generated/):
+  an existing build dependency.
+- [Selected finite configurations](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md):
+  author-side source mapping for the half-rate and quarter-rate variants.
 
-The manuscript's new **IMT asymptotic theorem at 11%** has an additional check:
-`python -B paper/check_imt_integration.py`. It checks the exact map table and
-new evidence bindings and needs the local IMT records plus NumPy, SciPy,
-mpmath, and python-flint. The historical `quick` command above does not cover
-this addition. The [IMT guide](../workstreams/inner_design/imt_asymptotic/README.md)
-gives the separate interval and exact-polynomial replay commands. Those local
-records are not yet part of the external artifact release.
+These paths are retained to avoid duplicating or relocating kernels and their
+dependencies. Do not substitute a historical baseline merely because its path
+has a shorter name.
 
-## Artifact layout
+## Build and test the half-rate encoder
 
-```text
-artifact/
-  README.md              start here
-  PAPER_MAP.md           paper claim -> source, data, checker
-  REPRODUCING.md         setup, commands, scope, and release gaps
-  reproduce.py           small command-line entry point
-  imt_reproduce.py       selected finite IMT check, inventory, and packaging
-  test_reproduce.py      regression tests for artifact checks
-  data/asymptotic/       compact relocated frozen dependency
+From the repository root on Linux with CMake 3.20+ and a C++20 GCC-compatible
+compiler supporting `-march=znver4`:
+
+```sh
+cmake -S workstreams/inner_design/asymmetric/bch256/weight5/implementation -B out/spin-core -DCMAKE_BUILD_TYPE=Release
+cmake --build out/spin-core --target sparse_pages sparse_pages_test -j 3
+ctest --test-dir out/spin-core -R '^sparse_pages_test$' --output-on-failure
 ```
 
-Manuscript sources, numerical producers, and encoder kernels remain in their
-documented directories. The file under `data/asymptotic/` preserves the bytes
-of a small selected-map input whose historical path was inside an ignored
-receipt tree. The original manifest still supplies its hash.
+The current build targets Zen 4 and requires compatible x86 SIMD instructions;
+it is not a portable-binary configuration. The `sparse_pages` target selects
+the optimized weight-five encoder. Its correctness test demonstrates setup,
+workspace use, and encoding through the shared interface. No numerical receipt
+or benchmark log is required to build this target.
 
-## What is ready, and what remains
+A clean standalone package and matching quarter-rate build entry point can be
+prepared from these sources; this guide does not claim that such a release has
+already been assembled. Never run two benchmarks concurrently.
 
-The sources support checking current selected IMT values when the pinned
-local receipts are present. They do not bundle those receipts. The three
-historical small-BCH plots still regenerate from tracked rounded RM2Sub
-tables, not from the new IMT grid. These are separate evidence sources.
+## Author-side material
 
-A selected finite IMT inventory now authenticates 753 files (640,779,033
-uncompressed bytes), with no missing or mismatched files locally. This is
-not an inventory of the asymptotic IMT proof or unfinished parameter study.
-A complete current release still needs separately supplied numerical receipts,
-a fresh-environment replay test, and the finished full-occupancy parameter
-figures. Publication must pin the final source revision and
-record the external evidence archive checksum. No data files are added to
-the source commit. See [release preparation](REPRODUCING.md#release-preparation).
+[PAPER_MAP.md](PAPER_MAP.md), [REPRODUCING.md](REPRODUCING.md), and the application
+measurement notes describe the broader research workspace. They are retained
+for provenance and maintenance, not as promises to reproduce all paper results.
+Missing experiment data is not a blocker for the core-code artifact.

@@ -3,7 +3,9 @@
 \subsection{Certificate for the scalable family}
 \label{app:structured-scalable-certificate}
 
-This subsection proves Theorem~\ref{thm:structured-spin-scalable}. The proof
+This appendix supplies the detailed estimates for the proof of
+Theorem~\ref{thm:structured-spin-scalable} in
+Section~\ref{sec:structured-distance}. The argument
 first selects one Golay--BA-3 constituent whose realized spectrum obeys a
 certified envelope. It then reduces the structured route to occupation and
 mean row weight. The final first-moment bound separates four regimes:
@@ -70,53 +72,9 @@ $P_b(c,w)$. Summing over the $G_b(a)$ input words proves
 \eqref{eq:structured-exact-ba-spectrum}.
 \end{proof}
 
-The exact formula supplies both the tail bound and the spectrum envelope.
-Let
-\[
-  \mathcal W:=[0.104,0.896].
-\]
-The outer certificate proves
-\begin{equation}
-  \sum_{w/b\notin\mathcal W}\overline A_b(w)=o(1).
-  \label{eq:structured-ba-tail}
-\end{equation}
-
-\begin{lemma}[One-sample selection]
-\label{lem:structured-one-sample-selection}
-There is an event $\mathcal G_b$, determined by the two BA permutations, such
-that
-\begin{equation}
-  \Prob[\mathcal G_b]=1-o(1).
-  \label{eq:ba-good-event}
-\end{equation}
-On $\mathcal G_b$, every nonzero constituent word has relative weight in
-$\mathcal W$, and
-\begin{equation}
-  A_{\mathcal O_b}(w)
-  \le b^2\overline A_b(w)
-  \qquad(0\le w\le b).
-  \label{eq:ba-selected-spectrum}
-\end{equation}
-\end{lemma}
-
-\begin{proof}
-The expected number of nonzero tail words equals the left side of
-\eqref{eq:structured-ba-tail}. Markov's inequality shows that no such word
-exists with probability $1-o(1)$. For each remaining weight $w$, another
-application of Markov's inequality gives
-\[
-  \Prob[A_{\mathcal O_b}(w)>b^2\overline A_b(w)]\le b^{-2}.
-\]
-A union bound over at most $b+1$ weights costs $O(1/b)$. Intersecting the two
-events proves the lemma.
-\end{proof}
-
-The event in Lemma~\ref{lem:structured-one-sample-selection} is paid once.
-After setup samples $\mathcal O_b$, the construction reuses that realization
-at every outer position.
-
-We next state the asymptotic envelope verified from
-\eqref{eq:structured-exact-ba-spectrum}. Let
+We use this formula to bound both tails and the central spectrum.
+The tails require a separate estimate for messages supported on few Golay
+blocks; a limiting exponent alone does not control those messages. Let
 \[
   h(x):=-x\ln x-(1-x)\ln(1-x)
 \]
@@ -151,6 +109,136 @@ Uniform coefficient and Stirling bounds in
   \label{eq:structured-ba-asymptotic}
 \end{equation}
 
+\begin{lemma}[BA outer tails]
+\label{lem:structured-ba-tails}
+As $b\to\infty$ through multiples of $24$,
+\[
+  \sum_{w/b\notin[0.104,0.896]}\overline A_b(w)=o(1).
+\]
+The expectation is over the two independent BA permutations.
+\end{lemma}
+
+\begin{proof}
+Put $\delta_o:=13/125$ and $\eta:=1/1000$. We split nonzero messages
+by the number $j$ of active Golay blocks. There are at most
+\[
+  N_j:=\binom{b/24}{j}4095^j
+  \le\left(\frac{4095eb}{24j}\right)^j
+\]
+such messages. Their input weight to the first accumulator is even,
+say $a=2\ell$, with $4j\le\ell\le12j$.
+
+First consider $j\le\eta b$. For a uniform weight-$v$ input $V$,
+the transition formula \eqref{eq:structured-acc-transition} bounds the
+lower-tail probability by
+\begin{equation}
+  p_v:=\sum_{0\le h\le\delta_o b}P_b(v,h)
+  \le c_o^{\lfloor v/2\rfloor},
+  \qquad c_o:=\frac{4\delta_o}{1-\delta_o}=\frac{13}{28}.
+  \label{eq:structured-ba-one-acc-tail}
+\end{equation}
+Indeed, for $v=2\ell$ and $D:=\lfloor\delta_o b\rfloor$, summing
+$\binom{h-1}{\ell-1}$ over $h\le D$ gives
+\[
+  p_{2\ell}
+  \le\frac{\binom b\ell\binom D\ell}{\binom b{2\ell}}
+  =\binom{2\ell}{\ell}\frac{\binom D\ell}{\binom{b-\ell}\ell}
+  \le c_o^\ell.
+\]
+If $\ell>D$, the probability is zero. The odd case has an additional
+factor at most $2\delta_o/(1-\delta_o)<1$. The bound also holds for $v=0$.
+
+Set $\zeta:=\sqrt{c_o}$ and $\kappa:=4\zeta/(1-\zeta)$.
+Let $H_1,H_2$ be the weights after the first and second accumulators.
+Conditional on $H_1$, the second permutation makes its input uniform;
+thus \eqref{eq:structured-ba-one-acc-tail} bounds the lower-tail
+probability by $\zeta^{-1}\E[\zeta^{H_1}]$.
+For a fixed first input of weight $2\ell$,
+\begin{equation}
+\begin{split}
+  \E[\zeta^{H_1}]
+  &\le\frac{\binom b\ell}{\binom b{2\ell}}
+      \sum_{h\ge\ell}\binom{h-1}{\ell-1}\zeta^h\\
+  &=\frac{\binom b\ell}{\binom b{2\ell}}
+      \left(\frac{\zeta}{1-\zeta}\right)^\ell
+  \le\left(\frac{\kappa\ell}{b-2\ell+1}\right)^\ell.
+\end{split}
+\label{eq:structured-ba-sparse-moment}
+\end{equation}
+For $\ell/b\le12\eta$, the last expression decreases with $\ell$.
+To check this, its logarithmic derivative is at most
+$\ln(\kappa x/(1-2x))+1+2x/(1-2x)$ at $x=12\eta$,
+which is below $-1.22$.
+Consequently, every message with $j\le\eta b$ satisfies
+\[
+  \E[\zeta^{H_1}]
+  \le\left(\frac{4\kappa j}{b(1-8\eta)}\right)^{4j}.
+\]
+Summing over these messages gives
+\begin{equation}
+  S_b:=\sum_{1\le j\le\eta b}
+    \left[C_*\left(\frac jb\right)^3\right]^j,
+  \qquad
+  C_*:=\frac{4095e}{24}
+       \left(\frac{4\kappa}{1-8\eta}\right)^4.
+  \label{eq:structured-ba-sparse-sum}
+\end{equation}
+The expected number of sparse lower-tail words is at most
+$\zeta^{-1}S_b$. Outward interval arithmetic gives
+$C_*\eta^3<0.657$. For $j\le\sqrt b$, the summands are bounded by
+a geometric series with base $C_*b^{-3/2}$; the remaining summands
+are at most $0.657^j$. Hence $S_b=O(b^{-3/2})$.
+
+The sparse upper tail needs an explicit bound as well. Let
+$e_1=(1,0,\ldots,0)$. Since
+$\operatorname{Acc}(V)+\mathbf1=\operatorname{Acc}(V+e_1)$,
+conditioning on the first bit of a uniform weight-$v$ input gives
+\[
+ \Prob[\operatorname{wt}(\operatorname{Acc}(V))\ge(1-\delta_o)b]
+ \le \frac{v}{b-v+1}p_{v-1}
+      +\frac{b-v}{v+1}p_{v+1}.
+\]
+At $v=b$ the second term is absent. Each prefactor is at most $b$.
+Using \eqref{eq:structured-ba-one-acc-tail}, the right side is at most
+$b(\zeta^{-2}+1)\zeta^v$ for $v\ge1$.
+Apply this bound with $v=H_1$, which is nonzero for a nonzero input.
+Equation~\eqref{eq:structured-ba-sparse-sum} bounds the expected number
+of sparse upper-tail words by $b(\zeta^{-2}+1)S_b=O(b^{-1/2})=o(1)$.
+
+It remains to bound messages with $j>\eta b$. Write
+$\alpha:=a/b$, $\beta:=H_1/b$, and $x:=H_2/b$.
+Then $\alpha\ge8\eta=0.008$. Accumulator support constraints imply
+$x\ge\alpha/4\ge0.002$. For the lower tail, the interval verifier proves
+\begin{equation}
+  g(\alpha)+\pi(\alpha,\beta)+\pi(\beta,x)
+  <-7.68\cdot10^{-8}
+  \label{eq:structured-ba-dense-tail}
+\end{equation}
+at every feasible point with
+$\alpha\in[0.008,1]$, $\beta\in[0,1]$, and $x\in[0.002,0.104]$.
+The branch-and-bound check processes $6{,}747$ boxes and leaves no
+unresolved boxes. Uniform coefficient and Stirling bounds apply to
+each summand of \eqref{eq:structured-exact-ba-spectrum}; the polynomial
+number of weights and the $O(\ln b)$ remainder preserve exponential decay.
+This argument restricts the initial weight before taking a supremum:
+the unrestricted exponent $a_{\rm BA}$ also includes sparse paths.
+
+For the dense upper tail, reflect $x$ to $1-x$ and use
+$\pi(\beta,x)=\pi(\beta,1-x)$.
+The finite support constraints can differ from the limiting feasibility
+region by $O(1/b)$ because of parity. The entropy terms are uniformly
+continuous, so these shifts contribute $o(1)$ to the normalized exponent.
+The strict negative gap in \eqref{eq:structured-ba-dense-tail} therefore
+also gives exponential decay for the dense upper tail.
+Combining the sparse and dense estimates proves the lemma.
+\end{proof}
+
+Our verification code checks the monotonicity and geometric constants,
+and uses interval arithmetic to check \eqref{eq:structured-ba-dense-tail}.
+The author-side paper-to-code map gives the sources and replay commands.
+Lemma~\ref{lem:structured-one-sample-selection} now selects the shared
+outer. We next bound its spectrum on $\mathcal W=[0.104,0.896]$.
+
 The certificate represents a concave majorant $\widehat a_{\rm BA}$ as the
 lower envelope of rational affine supports. It proves
 \begin{equation}
@@ -173,96 +261,14 @@ rounding of the exact code-size bound $(\ln2)/2$. Taking the lower envelope
 preserves concavity.
 Equations~\eqref{eq:structured-ba-asymptotic} and
 \eqref{eq:ba-spectrum-majorant} give the outer exponent used below. The
-artifact retains all affine supports and box witnesses.
+verification records retain all affine supports and box witnesses.
 
-\subsubsection{What the structured route preserves}
+\subsubsection{Routing and the inner estimates}
 
-View an outer word as an $L$-tuple of rows in $\F_2^b$. For the framework in
-Section~\ref{sec:framework}, take its class to be the ordered row-weight
-profile
-\[
-  c(u):=(\wt(u_1),\ldots,\wt(u_L)).
-\]
-This finite class records the information preserved by the independent block
-shuffles. The analysis below constructs a uniform route--inner failure
-envelope for every such profile. It then aggregates profiles by occupation and
-mean row weight where those coarser parameters suffice.
-
-Fix $Q$ active outer positions. Let their realized output weights be
-$w_1,\ldots,w_Q$, and set
-\[
-  x_j:=\frac{w_j}{b},
-  \qquad
-  \alpha:=\frac QL,
-  \qquad
-  x:=\frac1Q\sum_{j=1}^Qx_j,
-  \qquad
-  q:=\alpha x.
-\]
-The next lemma justifies the reduction from the complete weight tuple to
-$(\alpha,x)$ when $\alpha$ has a positive lower bound.
-
-\begin{lemma}[Route domination]
-\label{lem:structured-route-domination}
-Let $F$ be any nonnegative function of the routed $L$-by-$b$ binary array.
-Conditioned on the row weights $w_1,\ldots,w_Q$, the structured route
-satisfies
-\begin{equation}
-  \E_{\rm route}[F]
-  \le
-  (b+1)^Q(L+1)^b
-  \E_{\operatorname{Ber}(q)^{Lb}}[F].
-  \label{eq:structured-route-domination}
-\end{equation}
-If $\alpha$ is bounded below by a positive constant, the multiplicative
-factor in \eqref{eq:structured-route-domination} is $\exp(o(N))$.
-\end{lemma}
-
-\begin{proof}
-For row $j$, begin with $b$ independent Bernoulli-$x_j$ variables and
-condition their sum to equal $w_j$. The value $w_j$ is a mode of the
-binomial distribution. Hence the inverse conditioning probability is at
-most $b+1$. Applying this reduction to all active rows costs at most
-$(b+1)^Q$.
-
-Before the region shuffle, one fixed region contains independent Bernoulli
-variables whose average success probability is $q$. Let $S$ be their sum.
-For every $0\le k\le L$, the Chernoff bound for a Poisson-binomial sum gives
-\[
-  \Prob[S=k]
-  \le
-  \exp\{-L D_{\rm KL}(k/L\Vert q)\}.
-\]
-The method-of-types lower bound gives
-\[
-  \Prob[\operatorname{Bin}(L,q)=k]
-  \ge
-  \frac1{L+1}
-  \exp\{-L D_{\rm KL}(k/L\Vert q)\}.
-\]
-After a uniform region shuffle, both laws are uniform on every weight-$k$
-slice. The routed region law is therefore pointwise at most $L+1$ times the
-iid Bernoulli-$q$ law. Multiplying over the $b$ independent region shuffles
-proves \eqref{eq:structured-route-domination}.
-
-Finally,
-\[
-  \ln((b+1)^Q(L+1)^b)
-  =Q\ln(b+1)+b\ln(L+1)=o(Lb)
-\]
-when $Q/L$ is bounded below by a positive constant and $b,L\to\infty$.
-\end{proof}
-
-Concavity of $\widehat a_{\rm BA}$ now reduces the selected outer spectrum
-to the mean row weight:
-\begin{equation}
-  \frac1Q\sum_{j=1}^Q\widehat a_{\rm BA}(x_j)
-  \le
-  \widehat a_{\rm BA}(x).
-  \label{eq:structured-ba-jensen}
-\end{equation}
-The region shuffles are essential for Lemma~\ref{lem:structured-route-domination}.
-The deterministic transpose alone spreads each row, but it does not erase
-the row's coordinate pattern.
+Lemma~\ref{lem:structured-route-domination} and its proof are in
+Section~\ref{sec:structured-distance}. The estimates below use its notation:
+$Q$ active rows, $\alpha=Q/L$, mean relative row weight $x$, and
+$q=\alpha x$. The concavity bound
+\eqref{eq:structured-ba-jensen} reduces the selected spectrum to that mean.
 
 \input{structured_imt_appendix}

@@ -6,7 +6,7 @@
 For an integer $n\ge0$, let $[n]:=\{1,\ldots,n\}$, with $[0]:=\varnothing$.
 In the coding sections, all vector spaces are over $\F_2$.
 The applications explicitly introduce an extension field.
-We write vectors as rows. For
+Unless stated otherwise, we write vectors as rows. For
 $u\in\F_2^n$, let $\wt(u)$ be its Hamming weight and let
 $\supp(u):=\{i\in[n]:u_i\ne0\}$ be its support. Let $S_n$ denote the symmetric
 group on $[n]$; a permutation acts on vectors by permuting their coordinates.
@@ -17,24 +17,15 @@ $\mathcal D$. Separate sampling statements use independent randomness unless
 a joint distribution is declared.
 
 For $q\in[0,1]$, define the binary entropy function
-\[
-  H_2(q):=-q\log_2q-(1-q)\log_2(1-q),
-\]
-where $0\log_20:=0$. For integers $a,b$, we set $\binom{a}{b}:=0$ unless
+$H_2(q):=-q\log_2q-(1-q)\log_2(1-q)$, where $0\log_20:=0$. For integers $a,b$, we set $\binom{a}{b}:=0$ unless
 $0\le b\le a$. These conventions shorten the enumerator formulas below.
 
 \subsection{Linear encoders and codes}
 
 Fix integers $1\le K\le N$. A binary linear encoder is a map
-\[
-  E:\F_2^K\longrightarrow\F_2^N.
-\]
-Under the row-vector convention, there is a unique generator matrix
+$E:\F_2^K\longrightarrow\F_2^N$. Under the row-vector convention, there is a unique generator matrix
 $G_E\in\F_2^{K\times N}$ satisfying $E(x)=xG_E$. The associated linear code is
-the image
-\[
-  \mathcal C(E):=E(\F_2^K)\subseteq\F_2^N.
-\]
+the image $\mathcal C(E):=E(\F_2^K)\subseteq\F_2^N$.
 Its rate is $\dim(\mathcal C(E))/N$. In particular, an injective encoder has
 rate $K/N$.
 

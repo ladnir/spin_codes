@@ -1,5 +1,15 @@
 # Ordinary encoding, SPIN–Brakedown, and Flock
 
+The 2026-09-17 OT integration replaces the former 8 ms tree / 50M OT/s projection
+with existing measured libOTe results: 19.531/20.625 ms per sender/receiver
+without hashing, and 22.099/21.841 ms with hashing, at K=2^20. See
+[OT performance](OT_PERFORMANCE.md) for the timing contract, source and log
+pins, and reproduction commands. No new benchmark was run.
+The PCS 100-bit target is an interactive fixed-matrix testing
+bound, not a complete extraction/Fiat--Shamir/composition theorem. See
+[`EUROCRYPT_2027_READINESS_AUDIT.md`](../paper/EUROCRYPT_2027_READINESS_AUDIT.md)
+for the fresh-reader review, implemented corrections and remaining obligations.
+
 The paper now presents the application chain in three stages: ordinary
 encoding, a standalone SPIN–Brakedown PCS, and integration into Flock.
 The application prose focuses on the changes, their purpose, and the result.
@@ -9,6 +19,15 @@ use one decimal place consistently because some entries are below 1 MiB.
 The pinned measurements and calculations retain full precision.
 
 ## Tables and reproduction
+
+The 2026-09-17 Bolt refresh is pinned separately in
+`paper/data/bolt_x86_commitment.json`. It uses our optimized x86 XOR expander
+with unchanged graph, parameters, RS, and hashing. Single-core SHA-256 commitment
+times are 63.002, 307.788, and 1341.630 ms at 32, 128, and 512 MiB.
+The table generator uses these measurements for standalone PCS and Flock
+projections; historical commitment receipts and all opening estimates remain
+unchanged. See [the Bolt accounting](BOLT_PCS_ESTIMATE.md) for timing boundaries,
+baseline comparisons, hashes, and the resulting 2614 ms headline estimate.
 
 `paper/data/application_results.json` retains the final IMT campaign from
 Hypercat revision `f98b02a`, with Flock at `e15d047`. It includes the SHA-256
@@ -223,6 +242,43 @@ The existing transposed tables remain separate experiments. In particular,
 11.259, 11.104, and 11.352 ms are measurements from different experiments, not
 three summaries of the same samples.
 
+## PCS challenge chronology
+
+The 2026-09-17 manuscript audit checked the selected packed PCS against
+Hypercat's implementation. The main text now identifies the interactive
+verifier as the source of the testing challenge. The appendix specifies
+both folded messages, the checks, and the measured Fiat--Shamir schedule:
+
+1. Bind the parameter identifier, commitment root, evaluation point, and
+   claimed value.
+2. Derive the full vector of GF(2^128) testing coefficients. Compute and
+   absorb the testing message.
+3. Compute and absorb the evaluation message.
+4. Derive the column samples; sort and deduplicate them for authentication.
+
+In the interactive analysis, step 2 uses a fresh uniform vector, independent
+of the fixed matrix. Step 4 uses independent uniform column samples with
+replacement, after both messages are fixed. Both folds share those samples.
+The implementation uses labeled BLAKE3 transcript squeezes in the same order.
+Each coefficient consumes 128 bits without rejection; column indices use a
+mask because the encoded length is a power of two. Deduplication preserves
+the query-miss event; 2,045 samples do not mean 2,045 distinct columns.
+
+The inspected Hypercat sources match the SHA-256 entries in
+`results/imt-20260916/final/receipt.json` byte for byte:
+
+| Hypercat source | Checked behavior |
+|---|---|
+| `hypercat/src/pcs/brakedown.rs` | Statement binding, prover message order, query sampling and deduplication. |
+| `hypercat/src/pcs/brakedown/packed.rs` | Full coefficient vector sampling, verifier transcript order, authentication, fold and evaluation checks. |
+| `hypercat/src/pcs/brakedown/packed/natural.rs` | Public variable mapping and delegation to the same protocol. |
+| `hypercat/src/crypto/transcript.rs` | Domain-separated, length-bound BLAKE3 transcript operations. |
+
+The receipt itself is pinned by `paper/data/application_results.json`.
+This was a source-level chronology check, not a new benchmark or a complete
+Fiat--Shamir/extraction analysis. Neither protocol code nor reported
+parameters changed.
+
 ## Parameter calculation behind the concise paper paragraph
 
 Condition once on the selected SPIN code having the stated distance. Reuse
@@ -230,6 +286,15 @@ that code across rows and proofs. Extending its binary generator to GF(2^128)
 preserves distance: each nonzero extension-field codeword has a nonzero binary
 basis component whose support is contained in its support. Binary codewords
 also embed in the extension, giving equality of minimum distances.
+
+For the selected IMT inner, the certified setup margins are 41.8183267960
+bits at K=65536 and 50.1890763816 bits at K=262144. These are minus log2 of
+exact rational upper bounds on setup failure, not PCS soundness levels.
+The receipts and component budgets are recorded in
+[`PAPER_RESULTS.md`](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
+and authenticated by `paper/imt_results.py`. The earlier 53.9443672720-bit
+K=65536 setup margin belongs to the previous inner, not the measured IMT code.
+Setup failure is charged once for a shared code, not once per row or proof.
 
 For a complete matrix fixed before the challenge, let d be the code distance,
 N its block length, e=floor((d-1)/3), and a=e+1. One uniform random testing

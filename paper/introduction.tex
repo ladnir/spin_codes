@@ -1,324 +1,153 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Binary encoding is a major computation in correlation generators and
-code-based proof systems. These applications need constant rate and linear
-distance, but their cost also depends on how the encoder moves data and
-how efficiently its transpose can be evaluated.
+Binary encoding is a major cost in correlation generators and code-based
+proof systems. Pseudorandom correlation generators (PCGs) apply public
+generator matrices to expand sparse correlations into OT and VOLE
+correlations~\cite{bcgi18,bcg19pcg}. Code-based proof systems encode rows
+of large arrays, with distance supporting soundness~\cite{brakedown23,blaze25}.
+These applications need constant rate and linear distance, but also fast
+encoding, efficient transposed encoding, and regular memory access.
 
-Pseudorandom correlation generators apply a public generator matrix to large
-vectors to expand sparse correlations into OT and VOLE correlations
-\cite{bcgi18,bcg19pcg}. Code-based proof systems encode rows of large arrays,
-with distance supporting soundness~\cite{brakedown23,blaze25}.
-At these dimensions, long-range memory traffic can cost
-more than the binary arithmetic.
-
-Random linear codes provide excellent distance, but direct encoding requires
-dense computation. Structured encoders can reduce both arithmetic and memory
-traffic. Proving strong distance for such an encoder requires controlling
-the dependencies introduced by its structure. Our goal is a binary code
-family that combines a quantitative distance guarantee with linear-time
-evaluation in both directions and regular data movement.
-
-We introduce Single-Permutation INterleaved (SPIN) codes. Our main result,
-Structured SPIN, meets this goal. Its asymptotic family has rate $1/2$
-and $O(N)$ ordinary and transposed encoding work at its native output
-lengths $N$. With probability $1-o(1)$ over setup, its minimum distance
-exceeds $0.11N$. The construction combines a proved distance guarantee
-with an encoding structure designed for efficient implementation. We
-evaluate this combination both as an encoder for PCGs and as a component
-of code-based proof systems.
-
-SPIN follows the serial-concatenation pattern. An outer encoder first
-prevents nonzero messages with small support from remaining too sparse.
-The interleaver then scatters the outer support across the input to the
-inner encoder. This reduces the chance that local structure in the outer
-word causes the inner encoder to produce a low-weight output.
-Finally, the inner encoder generates the codeword by recursive convolution.
-SPIN makes this pattern
-modular: structure appears where speed and regular data movement require it,
-and setup randomness remains at the interfaces used by the distance proof.
+Random linear codes provide strong distance but require dense computation
+under direct encoding. Structure can reduce arithmetic and data movement;
+it also introduces dependencies that complicate distance proofs.
+We introduce \emph{Single-Permutation INterleaved} (SPIN) codes to combine
+quantitative distance guarantees with efficient evaluation in both directions.
 
 For an admissible output length $N$, a SPIN encoder has the form
 \begin{equation}
   E_N := I_N\circ\Pi_N\circ O_N.
   \label{eq:intro-spin-composition}
 \end{equation}
-The outer encoder $O_N$ maps the message into $N$ intermediate bits.
-The interleaver $\Pi_N$ is one permutation of those $N$ coordinates.
-The inner encoder $I_N$ is a length-preserving recursive linear map.
-Setup may sample any of these objects from a declared distribution.
+The outer $O_N$ maps the message to $N$ intermediate bits, $\Pi_N$ permutes
+these coordinates, and the recursive linear inner $I_N$ preserves length.
+The outer prevents sparse messages from remaining too sparse; the interleaver
+spreads their support before recursive encoding. Setup samples the specified
+components once. The phrase \emph{single permutation} describes this
+interface: block shuffles, a transpose, and region shuffles may implement
+$\Pi_N$, but their composition is one global interleaver.
 
-The phrase \emph{single permutation} describes the mathematical interface.
-An implementation may factor $\Pi_N$ into block shuffles, a transpose, and
-region shuffles. These factors still compose to one global interleaver.
+\subsection{Results and approach}
 
-Beyond the code construction, we evaluate SPIN in two applications:
-correlation generation and code-based proof systems. For PCGs, we measure
-the encoding stage and estimate the resulting OT throughput. For proof
-systems, we instantiate the Brakedown matrix polynomial commitment scheme
-(PCS)~\cite{brakedown23} with SPIN, then integrate it into
-Flock~\cite{flock26}. Standalone commitment and opening benchmarks measure
-the PCS cost; the Flock comparison measures its effect on a complete
-constraint prover, using Ligerito~\cite{ligerito25} as the alternative PCS.
-The resulting SPIN-based PCS favors prover speed over proof size.
+\paragraph{Distance and encoding work.}
+Our main construction, Structured SPIN, has rate $1/2$ and minimum distance
+greater than $0.11N$ with probability $1-o(1)$ over setup.
+Ordinary and transposed encoding require $O(N)$ bit operations at its native
+lengths. For finite lengths, we choose constituents for concrete performance
+rather than require the asymptotic outer. A fixed BCH-derived
+$[256,128,\ge38]$ constituent gives relative distance greater than $0.10$
+with setup failure below $2^{-40}$ at message lengths
+$2^{16},2^{18},2^{20},2^{22},2^{24}$.
+The certificate uses rigorous spectrum inequalities, not an assumed exact
+BCH spectrum. Section~\ref{sec:finite-quarter} also gives two certified
+quarter-rate operating points.
 
-\subsection{Three SPIN constructions}
+\paragraph{Analysis and structure.}
+The proof bounds the expected number of nonzero messages with low-weight
+outputs. It combines an outer spectrum bound with an interleaver--inner
+failure bound for each class of outer words. A uniform interleaver permits
+weight classes; structured routing also requires block occupation and
+row-weight information. Our route sends each active outer row into distinct
+regions, restricting concentrations that a uniform permutation permits.
+This improves the distance analysis as well as data movement, without
+claiming that structured permutations are universally better.
+The recursive stage uses an Independent-Map Transvection (IMT) inner.
+The contribution is the route--inner design and its analysis, rather than
+serial concatenation itself: accumulation, convolution, and the chosen-block
+outer are existing ingredients. Relative to the Random SPIN example below,
+Structured SPIN retains an $11\%$ distance guarantee while reducing the
+direct encoding work from $\Theta(N\log N)$ to $O(N)$.
 
-The three constructions develop the same idea in stages: start with a
-simple accumulator, strengthen the inner mixing, then replace expensive
-random components with efficient structured ones.
+Section~\ref{sec:spin-intuition} develops the idea through two simpler
+instances: Accumulator SPIN makes the counting transparent, and Random SPIN
+isolates the benefit of randomized recursive mixing. They motivate the
+structured construction; their complete proofs are in
+Appendix~\ref{app:supporting-constructions}.
+The minimal accumulator instance also answers the logarithmic-outer-memory
+question of Bazzi, Mahdian, and Spielman~\cite{bms09} in the
+terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 
-\paragraph{Accumulator SPIN.}
-We begin with random outer blocks, one uniform interleaver, and a binary
-accumulator. This simplifies the Block-Accumulate (BA) architecture,
-including the Block-Accumulate-Accumulate (BAA) constructions of prior
-work~\cite{KolesnikovEtAl2026BA,cryptoeprint:2026/1903}, to one
-interleaver and one accumulator. The accumulator has an exact input--output
-weight enumerator, making it a useful starting point for the analysis.
-However, a single accumulator provides limited mixing of sparse inputs.
-Our rate-$1/2$ theorem gives relative distance $0.0037$, far below the
-Gilbert--Varshamov (GV) benchmark of approximately $0.110028$.
-This weak guarantee motivates a stronger inner encoder.
+\paragraph{Implementation and applications.}
+On one Ryzen 9 7950X thread, SPIN's transposed encoder computes
+$2^{20}$ $128$-bit correlation blocks in about $10$\,ms, approximately
+$3\times$ faster than original BAA~\cite{KolesnikovEtAl2026BA}.
+Ordinary encoding has similar cost.
+Our same-host encoder comparison also includes newer chosen-block BAA,
+whose fastest measured configuration takes about $24$\,ms.
+In a libOTe Silent OT integration, expansion and SPIN take about $20$\,ms
+per party for $2^{20}$ correlations; output hashing brings the cost to
+about $22$\,ms. These measured computations exclude base OT, setup, and
+network latency. Section~\ref{sec:spin-pcg} gives the per-party results.
 
-\paragraph{Random SPIN.}
-We retain the random outer blocks and uniform interleaver, but replace
-the accumulator with a random recursive convolution of logarithmic memory.
-The larger memory lets the inner mix sparse inputs more effectively.
-With logarithmic outer block size, our rate-$1/2$ theorem proves relative
-distance greater than $0.11002$, nearly matching the GV bound, with
-$O(N\log N)$ direct encoding work.
-
-This recursive inner has a lineage in codes for PCGs. Silver used a banded
-lower-triangular solve, but its conjecture of linear distance
-~\cite{CouteauRindalRaghuraman2021Silver} was later refuted
-~\cite{RaghuramanRindalTanguy2023EC}.
-Expand--Convolute introduced a random recursive convolution and proved
-distance bounds through Markov-chain coupling and concentration
-\cite{RaghuramanRindalTanguy2023EC}. The proved parameters are conservative;
-its evaluation also proposed faster, aggressive parameters supported by
-empirical distance estimates beyond those guarantees. We retain its random inner but analyze the
-concatenation through weight enumerators. An exact input--output transform
-tracks the expected weight spectrum and yields the near-GV distance bound.
-
-\paragraph{Structured SPIN.}
-Random SPIN establishes that the architecture can approach the GV bound,
-but its dense random outer blocks and random convolution are expensive.
-Structured SPIN identifies the properties needed by that proof and realizes
-them with efficient constituent codes and structured interleaving. The
-outer supplies bounds on the number of codewords at each weight; the inner
-supplies bounds on how input weights propagate to output weights.
-We instantiate the recursive stage with an Independent-Map Transvection
-(IMT) inner.
-These interfaces let us replace the random components while retaining
-strong distance guarantees. Our scalable family has rate $1/2$, relative
-distance greater than $0.11$ with high probability, and $O(N)$ encoding work.
-
-The same analysis supports concrete parameter selection using exact
-enumerators where available and rigorous spectrum bounds otherwise.
-For the implemented family, we certify relative distance greater than
-$0.10$ with setup failure below $2^{-40}$ at five message lengths from
-$2^{16}$ to $2^{24}$. Parameter selection trades encoding cost against the
-desired setup-failure bound, with each choice checked by its certificate.
-The resulting encoders are several times faster than prior implementations,
-as quantified below. This connects the asymptotic distance argument to
-finite guarantees and practical encoding speed.
-
-Table~\ref{tab:spin-families} summarizes the three lines.
-
-\begin{table}[t]
-  \centering
-  \caption{The three principal SPIN construction lines.}
-  \label{tab:spin-families}
-\begin{tabular}{@{}llll@{}}
-    \toprule
-    Family & Outer & Interleaver & Inner \\
-    \midrule
-    Accumulator SPIN & random blocks & uniform & accumulator \\
-    Random SPIN & random blocks & uniform & random recursive \\
-    Structured SPIN & spectrum-controlled & structured & structured recursive \\
-    \bottomrule
-  \end{tabular}
-  \end{table}
-
-The interface also permits other combinations of outer encoder,
-interleaver, and inner encoder. Our analysis treats the three families above.
-
-\subsection{Contributions}
-
-We make five contributions.
-
-\begin{itemize}
-  \item \textbf{An asymptotically linear-time code with proved distance.}\par
-  We construct a sampled binary code family with rate $1/2$ and minimum
-  distance greater than $0.11N$ with probability $1-o(1)$ over setup.
-  Combining a linear-time outer with our structured interleaver and
-  recursive inner gives $O(N)$ ordinary and transposed encoding work.
-  This is an asymptotic result along the family's admissible lengths.
-  Our finite-size implementations choose constituents for concrete
-  performance and distance, and need not use this asymptotic outer.
-  SPIN affirmatively answers the question of Bazzi, Mahdian, and
-  Spielman~\cite{bms09} of whether logarithmic outer memory and a single
-  interleaver can achieve positive rate and linear minimum distance.
-  Section~\ref{sec:bms-question} explains the connection, including termination.
-
-  \item \textbf{First-moment analysis and improved interleaving.}\par
-  We first combine outer weight enumerators with inner weight distributions
-  under a uniform permutation to analyze Accumulator SPIN and Random SPIN.
-  We then extend this first-moment analysis to structured permutations,
-  tracking where support enters the inner as well as its weight.
-  The structure helps the distance analysis: it spreads each active outer
-  block across distinct regions, constraining harmful concentrations that
-  a uniform permutation permits. Thus interleaving is a tool for improving
-  distance guarantees as well as encoding efficiency. The benefit depends
-  on its interaction with the outer and inner, rather than on a universal
-  comparison between structured and uniform permutations.
-
-  \item \textbf{Finite-size optimization and concrete certificates.}\par
-  We optimize Structured SPIN for practical lengths and explicit setup
-  failure targets. The outer can use a code selected for its finite
-  distance and encoding cost, independently of the asymptotic construction.
-  Our implementation uses a fixed BCH-derived $[256,128,\ge38]$ constituent
-  with a fast encoding circuit. With the selected recursive inner, we
-  certify relative distance greater than $0.10$ and setup failure below
-  $2^{-40}$ at message lengths $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and
-  $2^{24}$. Rigorous spectrum inequalities suffice despite the unknown
-  exact BCH spectrum. At rate $1/4$, a BCH-derived $[128,32,32]$ outer
-  gives certified relative distance $0.165$ with setup failure below
-  $2^{-40}$ at $K=2^{20}$, or distance $0.19$ with failure below $2^{-30}$.
-
-  \item \textbf{Faster encoding for PCGs.}\par
-  SPIN computes the encoding stage for $2^{20}$ $128$-bit correlations in
-  about $10$\,ms on one Ryzen 9 7950X thread, approximately $3\times$ faster
-  than original BAA~\cite{KolesnikovEtAl2026BA}. Adding roughly $8$\,ms
-  for tree expansion gives an estimated total of about $20$\,ms per batch,
-  or $50$ million OTs per second. This throughput is a projection from
-  component costs; Section~\ref{sec:transposed-comparison} reports the
-  measurements and the comparison with the newer chosen-block BAA encoders.
-
-  \item \textbf{Polynomial commitments and integration into Flock.}\par
-  We instantiate Brakedown~\cite{brakedown23} with SPIN and integrate
-  the resulting PCS into Flock~\cite{flock26}. At $512$\,MiB input,
-  standalone commitment and one opening take $509$\,ms on one core.
-  Commitment is $4.29\times$ faster than the fastest Bolt-max
-  configuration~\cite{bolt26}, measured separately at the same input volume.
-  Within Flock, replacing
-  Ligerito~\cite{ligerito25} with SPIN--Brakedown improves throughput by
-  $1.92\times$ and $1.36\times$ at the two measured workloads, with the
-  applicable shared optimizations in both configurations.
-  SPIN--Brakedown gives a faster prover at the expense of larger proofs
-  and the associated slower verification.
-  Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock} give the conditional
-  parameter targets and comparison scope.
-
-\end{itemize}
+As application evidence, we substitute SPIN into a Brakedown-style
+PCS~\cite{brakedown23} and integrate it into Flock~\cite{flock26}.
+Standalone commitment and one opening of $512$\,MiB take $509$\,ms on one
+core. Replacing Ligerito~\cite{ligerito25} within Flock improves throughput
+by $1.36$--$1.92\times$ at the measured workloads, with larger proofs and
+slower verification. Both backends receive the applicable shared
+optimizations. Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock}
+state the conditional parameter targets and comparison scope.
 
 \subsection{Related work}
 
-\paragraph{Serially concatenated codes.}
-Turbo codes introduced randomized interleaving as a way to combine simple
-constituent encoders~\cite{berrou93}. Benedetto et al. developed the
-uniform-interleaver analysis of serial concatenations~\cite{benedetto98}.
-Divsalar, Jin, and McEliece introduced repeat--accumulate codes and their
-weight-enumerator analysis~\cite{divsalar98}, while Kahale and Urbanke studied
-minimum distance in random parallel and serial concatenations
-~\cite{kahale98}. Bazzi, Mahdian, and Spielman proved limitations for
-depth-two constant-memory serial concatenations and positive results with two
-accumulators~\cite{bms09}. Later work established coding theorems for
-repeat-multiple-accumulate ensembles approaching the binary
-Gilbert--Varshamov bound~\cite{kliewer08}.
+\paragraph{Serial concatenation.}
+Turbo codes use randomized interleaving~\cite{berrou93}.
+Benedetto et al.\ analyzed serial concatenation with a uniform
+interleaver~\cite{benedetto98}. Repeat--accumulate codes and their
+enumerators~\cite{divsalar98}, distance analyses of parallel and serial
+concatenations~\cite{kahale98}, and near-GV repeat-multiple-accumulate
+ensembles~\cite{kliewer08} form the coding-theoretic background.
+Bazzi, Mahdian, and Spielman give limitations for depth-two constant-memory
+concatenations and positive results with two accumulators~\cite{bms09}.
+Block-Accumulate codes use random block-diagonal maps, detailed expected
+spectra, and optimized CPU/GPU encoders~\cite{KolesnikovEtAl2026BA}.
+Accumulator SPIN is their one-accumulator truncation. Chosen-block BAA
+reuses a spectrum-controlled constituent~\cite{cryptoeprint:2026/1903};
+Structured SPIN combines that shared design idea with a structured route
+and a different recursive inner. Our benchmark compares chosen-block BAA,
+whereas the abstract's speedup is relative to original BAA.
 
-Block-Accumulate codes replace repetition with random block-diagonal maps and
-compute detailed expected spectra; they also provide optimized CPU and GPU
-implementations~\cite{KolesnikovEtAl2026BA}. Accumulator SPIN is their
-one-accumulator truncation. The newer work on chosen-block BAA
-updates this family by reusing one spectrum-controlled constituent in every
-diagonal position~\cite{cryptoeprint:2026/1903}. Structured SPIN combines
-this shared design idea with a structured global route and a different
-recursive inner. Our benchmark table compares these newer chosen-block
-instantiations; the abstract's speedup is relative to original BAA.
+\paragraph{Correlation generation.}
+PCGs and vector-OLE use linear codes
+\cite{bcgi18,bcg19pcg,bcg19tworound,ferret20,bcg20ring}.
+Silver uses structured LDPC matrices and a banded triangular
+solve~\cite{CouteauRindalRaghuraman2021Silver}; its heuristic
+linear-distance conjecture was later refuted~\cite{RaghuramanRindalTanguy2023EC}.
+Expand--Accumulate combines a sparse expander and accumulator~\cite{ea22}.
+Expand--Convolute uses random time-varying convolution and proves distance
+through coupling and concentration~\cite{RaghuramanRindalTanguy2023EC};
+its faster empirical parameter choices go beyond those guarantees.
+Random SPIN retains that inner but replaces the expander with independent
+random-block injections and uses an exact weight-enumerator transform.
+Structured SPIN instead combines a spectrum-controlled outer, structured
+interleaving, and IMT to prove strong distance with linear encoding work.
 
-\paragraph{Codes for correlation generation.}
-Linear codes compress sparse correlations in vector-OLE and pseudorandom
-correlation generators~\cite{bcgi18,bcg19pcg,bcg19tworound,ferret20,bcg20ring}. This application motivated a
-sequence of faster structured codes. Silver uses structured LDPC matrices and
-a banded triangular solve~\cite{CouteauRindalRaghuraman2021Silver}. Linear
-distance was an explicit conjecture supported by heuristic evidence and
-later refuted~\cite{RaghuramanRindalTanguy2023EC}.
-Expand--Accumulate combines a sparse expander with an accumulator
-~\cite{ea22}. Expand--Convolute replaces that accumulator with a random
-time-varying convolution~\cite{RaghuramanRindalTanguy2023EC}. Random SPIN keeps
-the latter inner distribution but replaces the expander with random block
-injections. Structured SPIN instead combines a spectrum-controlled outer,
-one factored global interleaver, and the IMT inner. Its principal distinction
-is the simultaneous proof of rate one half, relative distance $0.11$, and
-linear ordinary and transposed encoding work.
+\paragraph{Proof systems.}
+Linear encoding is a first-order cost in constant-overhead arguments
+\cite{rr25}. Orion uses code switching~\cite{orion22}; Brakedown gives
+a field-agnostic SNARK from linear-time encodable codes~\cite{brakedown23}.
+Other constructions use Expand--Accumulate~\cite{fieldEA24} or
+interleaved RAA with improved binary distance bounds~\cite{blaze25}.
+Blaze's generic code-switching framework also accommodates SPIN in theory
+with smaller asymptotic proofs than our measured Brakedown-style PCS.
+Bolt uses sketched codes to reduce commitment cost~\cite{bolt26}.
+We evaluate the Brakedown substitution and its integration into Flock,
+using Ligerito as the alternative PCS.
 
-\paragraph{Linear-time proving systems.}
-Constant-overhead arguments make linear-time encoding a first-order prover
-cost~\cite{rr25}. Orion uses code switching to obtain a linear-time prover
-~\cite{orion22}, and Brakedown builds a field-agnostic SNARK from a
-linear-time encodable code~\cite{brakedown23}. Field-agnostic SNARKs have also
-been instantiated from Expand--Accumulate codes~\cite{fieldEA24}. Blaze uses
-interleaved RAA codes and supplies improved binary distance bounds
-~\cite{blaze25}. Its generic code-switching framework also accommodates
-SPIN in theory, with asymptotically smaller proofs than our measured
-Brakedown-style construction. Bolt uses sketched codes to reduce commitment
-cost~\cite{bolt26}. We instantiate the Brakedown matrix PCS with SPIN
-and evaluate it independently before integrating it into Flock's Boolean
-constraint prover~\cite{flock26}. The latter comparison uses Ligerito
-as the alternative PCS~\cite{ligerito25}.
-
-\subsection{One distance calculation}
-
-All three lines use the same first-moment idea. Fix a target distance $d$,
-and count nonzero messages whose encoded words have weight at most $d$.
-If the expected count is below one, then some sampled encoder is injective and
-has minimum distance greater than $d$.
-
-For a uniform interleaver, the outer Hamming weight is often a sufficient
-interface. The expected bad-word count then has the form
-\begin{equation}
-  \sum_w A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d),
-  \label{eq:intro-weight-first-moment}
-\end{equation}
-where $A_w^{\mathrm{out}}$ is the expected outer spectrum and
-$p_w^{\mathrm{in}}(d)$ is an inner slice-to-tail probability.
-
-A structured interleaver need not produce a uniform Hamming slice. We
-therefore allow a class to record block occupation or another routing profile.
-The interleaver--inner analysis supplies a uniform failure envelope for each
-class. The weight-indexed sum in~\eqref{eq:intro-weight-first-moment} is the
-special case in which the conditional law depends only on weight.
-
-\subsection{Organization}
-
-Section~\ref{sec:preliminaries} fixes notation. Section~\ref{sec:framework}
-states the exact finite first-moment framework.
-Sections~\ref{sec:accumulator-spin} and~\ref{sec:random-spin} develop the two
-random construction lines. Section~\ref{sec:structured-spin} defines the
-  structured line, its parameterized constituent interface, and the currently
-  certified scalable instantiation.
-Section~\ref{sec:finite-certificates} presents the finite BCH construction,
-its distance certificates, and the certified engineering curve.
-Section~\ref{sec:scaling} separates finite validity, asymptotic distance, and
-encoding complexity. Section~\ref{sec:implementation} records the
-encoder implementation and measurements. Section~\ref{sec:spin-pcs}
-presents the standalone PCS, and Section~\ref{sec:spin-flock} evaluates
-its integration into Flock. The appendices give the asymptotic and
-finite proof reductions and identify their computational evidence.
-
-\paragraph{Artifact.}
+\paragraph{Organization and artifact.}
+Sections~\ref{sec:preliminaries}--\ref{sec:framework} give the common framework;
+Section~\ref{sec:spin-intuition} builds intuition before the structured
+construction, asymptotic proof, and finite certificates in
+Sections~\ref{sec:structured-spin}--\ref{sec:finite-certificates}.
+Sections~\ref{sec:implementation} and~\ref{sec:applications} evaluate the encoder
+and applications. The appendices retain the complete supporting proofs,
+parameter studies, and detailed experiments.
 \ifsubmission
-The source repository includes an artifact guide and a paper-to-code map.
+The artifact provides the core SPIN encoder implementation and build instructions.
 \else
-The source repository is
-\artifactlink{https://github.com/ladnir/permute_conv}{\texttt{ladnir/permute\_conv} on GitHub}.
-Its \artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{artifact guide}
-gives the reproduction entry point, and its
-\artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/PAPER_MAP.md}{paper-to-code map}
-identifies the corresponding sources.
+The \artifactlink{https://github.com/ladnir/permute_conv}{source repository}
+includes the core SPIN encoder implementation and
+\artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{build instructions}.
 \fi
-The map links the theorems, figures, and timing tables to their sources
-and checks. The guide separates reproduction of reported values from
-numerical proof replay and new performance measurements.
+The artifact does not include the numerical-search or comparison-experiment archives.

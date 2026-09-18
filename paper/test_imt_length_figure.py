@@ -60,11 +60,17 @@ class LengthFigureTests(unittest.TestCase):
         with self.assertRaises(ValueError): figure.validate(grid,replay,selected)
 
     def test_plot_remains_in_parameter_explainer(self):
-        text = Path(__file__).with_name('finite_certificates.tex').read_text()
-        prefix = text.split(r'\subsection{The selected construction}')[0]
+        paper = Path(__file__).parent
+        text = (paper / 'engineering_appendix.tex').read_text()
+        prefix = text.split(r'\subsection{The certified engineering curve}')[0]
         self.assertIn(r'\input{figures/imt_parameter_k_b}',prefix)
         self.assertIn(r'p_{\mathrm{cancel}}',prefix)
         self.assertNotIn(r'\input{figures/imt_mixing_rounds}',text)
+        main = (paper / 'main.tex').read_text()
+        self.assertIn(r'\input{engineering_appendix}', main.split(r'\appendix', 1)[1])
+        finite = (paper / 'finite_certificates.tex').read_text()
+        self.assertIn(r'\ref{app:engineering}', finite)
+        self.assertNotIn(r'\input{figures/imt_parameter_k_b}', finite)
 
 
 if __name__ == '__main__': unittest.main()

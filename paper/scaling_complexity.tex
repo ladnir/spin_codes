@@ -1,10 +1,10 @@
-\section{Finite lengths, asymptotics, and complexity}
+\subsection{Length, work, and parameter selection}
 \label{sec:scaling}
 
 Finite validity, asymptotic distance, and encoding complexity are separate
 properties. We state them separately for each SPIN family.
 
-\subsection{Native and requested lengths}
+\subsubsection{Native and requested lengths}
 
 The direct constructions apply at native lengths for which their block
 dimensions are integral. Their logarithmic schedules permit admissible lengths
@@ -14,7 +14,7 @@ below any sufficiently large requested length into that output length. This wrap
 injectivity and absolute minimum distance. It changes rate and relative
 distance by only $o(1)$ and preserves linear work.
 
-\subsection{Asymptotic statements}
+\subsubsection{Asymptotic statements}
 
 Theorems~\ref{thm:independent-accumulator-spin}
 and~\ref{thm:independent-random-spin} give positive relative distance with
@@ -29,32 +29,7 @@ satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)
 The requested-length wrapper gives rate $1/2-o(1)$, relative distance
 $0.11-o(1)$, and linear work.
 
-\subsection{The Bazzi--Mahdian--Spielman question}
-\label{sec:bms-question}
-
-\paragraph{When does one interleaver suffice?}
-Bazzi, Mahdian, and Spielman (BMS) show that a depth-two serial concatenation
-cannot be asymptotically good when the outer has constant memory and the
-inner has sublinear memory~\cite[Sec.~III-A]{bms09}. Their conclusion asks
-whether allowing the outer memory to grow logarithmically with block length
-permits an asymptotically good code~\cite[Sec.~IV]{bms09}.
-Here, asymptotically good means that both rate and relative minimum
-distance stay bounded away from zero. The question concerns the
-composition of an outer encoder, one interleaver, and an inner encoder.
-
-\paragraph{The SPIN progression.}
-Accumulator SPIN supplies the basic positive construction in the
-block-encoder setting. Its outer blocks have length $\Theta(\log N)$,
-and its inner accumulator carries one bit of state. At rate $1/2$,
-Theorem~\ref{thm:independent-accumulator-spin} gives relative distance
-greater than $0.0037$ with probability $1-o(1)$. Thus a growing inner
-state is unnecessary for linear distance once the outer blocks grow
-logarithmically. Random SPIN increases the inner memory to
-$\Theta(\log N)$ and proves relative distance greater than $0.11002$.
-Structured SPIN then returns to constant recursive state: with better
-constituents and structured interleaving, it proves relative distance
-greater than $0.11$ and linear-time encoding. Both of the latter distance
-guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
+\subsubsection{Linear work and working state}
 
 \paragraph{Why the structured inner takes linear time.}
 In the scalable family, the inner step width $t=128$ and state dimension
@@ -74,30 +49,7 @@ setup data, separate from this working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
 
-\paragraph{Logarithmic outer memory suffices.}
-The block description admits a streaming realization with logarithmic
-memory and a short termination. For a rate-$1/2$ outer with block length
-$b$, buffer one block while emitting the preceding block, at two output
-bits per input bit. Initially the output buffer contains $b$ zeros.
-After the message, $b/2$ fixed zero input bits flush the last block.
-This produces $0^b\Vert O(x)$ using $O(b+\log N)$ memory, including
-buffers and a position counter. Extend the interleaver to send these
-startup zeros to the end and apply the original permutation to $O(x)$.
-The inner therefore receives $\Pi(O(x))\Vert0^b$. Since each inner is
-causal, the first $N$ output bits are exactly the original SPIN codeword.
-The added outputs cannot reduce absolute minimum distance. For
-$b=\Theta(\log N)$, the rate becomes $1/2-o(1)$ and the relative-distance
-guarantee changes by only $o(1)$.
-
-This gives a positive answer in the terminated-encoder interpretation of
-the BMS question: logarithmic outer memory and a one-bit accumulator
-suffice for an asymptotically good code. BMS mention termination but
-omit it from their displayed encoder definition~\cite[Sec.~I-A]{bms09};
-the fixed termination inputs are explicit in the realization above.
-The structured interleaver is still one permutation between the two
-encoders; permutations internal to the outer act only within its blocks.
-
-\subsection{Finite parameter selection}
+\subsubsection{Finite parameter selection}
 \label{sec:finite-parameter-extrapolation}
 
 The finite theorem and Figure~\ref{fig:finite-bch-curve} provide certified
@@ -121,16 +73,7 @@ Changing the outer or selected map requires a matching spectrum calculation
 and inner analysis. The fixed $(128,19)$ ladder shows that useful finite
 coverage need not require retuning at every message length.
 
-\subsection{Random-family encoding costs}
-
-Under either proved schedule, the outer encoder processes \(N/B\) blocks of
-length \(B=\Theta(\log N)\). Direct dense block multiplication therefore
-costs \(\Theta(N\log N)\) bit operations. The accumulator costs \(O(N)\).
-The Random SPIN recurrence evaluates \(m=\Theta(\log N)\) taps per output
-coordinate and hence costs \(\Theta(N\log N)\). These bounds concern direct
-encoders; preprocessing or word-level batching may reduce practical constants.
-
-\subsection{Cost model}
+\subsubsection{Cost model}
 
 Let $C_{\mathrm{out}}(b)$ be the work to encode one outer block, and let
 $C_{\mathrm{in}}(t,s)$ be the work for one structured inner step. A

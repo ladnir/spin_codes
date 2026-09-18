@@ -1,0 +1,77 @@
+\section{Building intuition: accumulation and random mixing}
+\label{sec:spin-intuition}
+
+Two simple instances explain the roles of the outer, interleaver, and inner.
+Both use independent uniform linear injections
+$C_i:\F_2^{B/2}\to\F_2^B$, where $B$ is even and $N=MB$ for $M$ blocks.
+The outer concatenates their outputs, and a uniform permutation interleaves
+the resulting $N$ bits. Setup is sampled once and fixed for every message.
+For each fixed nonzero input to an outer block, its image is uniform over
+the nonzero $B$-bit vectors. After interleaving, a word of weight $w$ has
+uniform support among the $N$ positions. Thus the remaining question is
+how the inner transforms such a support.
+
+\paragraph{The minimal inner: an accumulator.}
+For interleaved input $u$, set $y_0:=0$ and compute
+\[
+  y_i:=y_{i-1}+u_i,\qquad i=1,\ldots,N.
+\]
+Write $\Acc_N(u):=y$. This is the one-stage Block-Accumulate
+architecture~\cite{KolesnikovEtAl2026BA}.
+The inner has one bit of state. Each input one flips the output, so output
+ones occupy the intervals between alternating flips. Counting these
+intervals gives an exact input--output weight enumerator.
+
+Let $U_w$ be uniform among $N$-bit vectors of weight $w$.
+For $0<\delta<1/2$, the enumerator implies
+\[
+ \Pr[\wt(\Acc_N(U_w))\le\lfloor\delta N\rfloor]
+ \le \bigl(2\sqrt{\delta(1-\delta)}\bigr)^w.
+\]
+The outer spectrum counts how many messages can supply each weight;
+this bound controls their chance of producing a low-weight output.
+Multiplying and summing gives the first moment from
+Section~\ref{sec:framework}. Logarithmically growing outer blocks suffice
+to make that sum vanish at a positive relative distance.
+
+Theorem~\ref{thm:independent-accumulator-spin} makes this concrete:
+with its block schedule $B\ge3\log_2N$, the rate-$1/2$ family has relative
+distance greater than $0.0037$ with probability $1-o(1)$ over setup.
+This modest guarantee already shows that a one-bit inner can suffice.
+Together with a terminated streaming realization of the outer, it gives
+a positive answer to the logarithmic-outer-memory question of
+Bazzi, Mahdian, and Spielman~\cite{bms09}; Appendix~\ref{sec:bms-question}
+states the precise interpretation. The minimal construction is useful
+independently of the stronger mixing considered next.
+
+\paragraph{A stronger inner: random recursive convolution.}
+Keep the same outer and interleaver, but use the recursive inner from
+Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}. For memory $m$, sample
+independent $\alpha_i\gets\F_2^m$ at setup, independently of the outer and
+interleaver, and set $y_j:=0$ for $j\le0$. Compute
+\[
+ y_i:=u_i+\langle\alpha_i,(y_{i-1},\ldots,y_{i-m})\rangle.
+\]
+For a fixed input, condition on the preceding outputs. If the state is
+nonzero, the fresh coefficient vector makes the next output bit uniform.
+If the state is zero, the next output equals the input bit. Tracking the
+number of trailing output zeros, clipped at $m$, therefore gives an exact
+finite-state calculation of the expected weight enumerator. The zero-state
+case matters: the outputs are not an independent uniform string.
+
+Theorem~\ref{thm:independent-random-spin} combines this calculation with
+logarithmic outer block size and memory. At rate $1/2$, it proves relative
+distance greater than $0.11002$ with probability $1-o(1)$, close to the
+Gilbert--Varshamov value of approximately $0.110028$. The full transfer and
+the bounds for sparse and linear weights appear together in
+Appendix~\ref{sec:random-spin}.
+
+\paragraph{Toward efficient encoding.}
+Both direct encoders require $\Theta(N\log N)$ work under their proved
+schedules: the outer blocks are dense, and the random convolution evaluates
+logarithmically many taps per coordinate. The next section replaces these
+costly components with spectrum-controlled constituents, structured routing,
+and batched inner operations. The proof must then account for the remaining
+coordinate structure and the inner's actual state law. Random SPIN motivates
+that design; its distance theorem does not by itself establish the
+structured construction's guarantee.

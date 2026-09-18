@@ -4,40 +4,31 @@ Research code and artifacts for **SPIN Codes: Single-Permutation INterleaved
 Codes**. GitHub is the authoritative workspace; Overleaf is an optional
 paper-only mirror.
 
-Start with the [artifact guide](artifact/README.md). It gives reproduction
-commands, expected results, and the boundary between the compact repository
-and the larger numerical evidence bundle.
+Start with the [core implementation guide](artifact/README.md). The artifact
+covers encoder code, build instructions, and correctness tests, not the
+research experiments or numerical proof archives.
 
 ## Quick start
 
-From the repository root, with Python 3.11 or newer:
+Follow the [core build and test instructions](artifact/README.md#build-and-test-the-half-rate-encoder)
+for the selected BCH/IMT implementation.
+
+To build the paper, install TeX Live with latexmk, BibTeX, PGFPlots, and placeins,
+then run from the repository root:
 
 ```sh
-python -B artifact/reproduce.py quick
+cd paper
+latexmk -pdf -outdir=../output/pdf -jobname=spin_codes_draft main.tex
 ```
 
-This checks manuscript numbers, selected inner maps and spectra, plot data,
-and the historical asymptotic manifest. It needs Python's standard library,
-Git history, and the pinned local evidence; it does not launch a search or
-benchmark. The selected finite results now use IMT. Its separate 11%
-asymptotic check is `python -B paper/check_imt_integration.py` (see the
-[artifact guide](artifact/README.md) for dependencies). The broader
-parameter plots now show IMT Q1 diagnostics, with a separate matched Q1/full
-comparison at the five certified BCH-256 lengths. They do not certify the full grid.
-To build the paper, additionally
-install TeX Live with latexmk, BibTeX, PGFPlots, and placeins:
-
-```sh
-python -B artifact/reproduce.py paper
-```
-
-The output is `output/pdf/spin_codes_draft.pdf`.
+The output is `output/pdf/spin_codes_draft.pdf`. Compiling the committed
+manuscript does not require regenerating its tables or replaying numerical proofs.
 
 ## Where to look
 
 | Directory | Purpose |
 |---|---|
-| [artifact/](artifact/README.md) | Reader-facing reproduction guide, checks, and [paper-to-code map](artifact/PAPER_MAP.md). |
+| [artifact/](artifact/README.md) | Core implementation guide; also retains historical author-side scripts and notes. |
 | [paper/](paper/README.md) | Current LaTeX manuscript and reproducible vector figures. |
 | [Finite IMT results](workstreams/inner_design/finite_migration/PAPER_RESULTS.md) | Current selected certificates, matching timings, implementation paths, and migration status. |
 | [workstreams/bare_bch_rm2sub/](workstreams/bare_bch_rm2sub/README.md) | Shared implementation machinery and historical RM2Sub encoder. |
@@ -64,6 +55,6 @@ benchmarking. Run benchmarks serially, never concurrently.
 
 See [the publication policy](GITHUB_PUBLISH_POLICY.md) before adding data.
 Commit source, compact selected results, and manifests, not experiment trees.
-Before submission, publish a reviewed evidence archive and record an immutable
-Git revision in the paper; no release archive has yet been published by this
-artifact pass.
+The artifact is limited to the core implementation. A complete experimental
+or numerical-evidence archive is not a release requirement for that artifact.
+Historical reproduction commands above remain author-side tools.

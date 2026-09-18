@@ -8,10 +8,7 @@ nonzero messages.
 Fix lengths $K,N\ge1$. The construction samples an outer encoder
 $O:\F_2^K\to\F_2^N$ and a pair $(\Pi,I)$, where $\Pi$ is a permutation of
 $[N]$ and $I:\F_2^N\to\F_2^N$ is linear. Assume that $O$ is independent
-of $(\Pi,I)$. The realized SPIN encoder is
-\[
-  E:=I\circ\Pi\circ O.
-\]
+of $(\Pi,I)$. The realized SPIN encoder is $E:=I\circ\Pi\circ O$.
 
 Fix a finite class set $\mathcal T$ and a class map
 $c:\F_2^N\to\mathcal T$. The class map records the information about an
@@ -104,47 +101,9 @@ remains independent of the conditioned outer encoder. This observation lets a
 proof first select an outer spectrum event and then certify route envelopes on
 that event.
 
-\subsection{Uniform-interleaver specialization}
-
-Suppose $\Pi$ is uniform over all permutations of $[N]$. If $u$ has
-weight $w$, then $\Pi(u)$ is uniform over the Hamming slice
-\[
-  \mathcal H_{N,w}:=\{v\in\F_2^N:\wt(v)=w\}.
-\]
-Indeed, every vector in $\mathcal H_{N,w}$ has exactly
-$w!(N-w)!$ preimages among the permutations of $u$.
-
-Let $U_w$ be uniform over $\mathcal H_{N,w}$, independent of the inner
-setup, and define
-\begin{equation}
-  p_w^{\mathrm{in}}(d)
-  :=
-  \Prob_{U_w,I}[\wt(I(U_w))\le d].
-  \label{eq:inner-slice-tail}
-\end{equation}
-Also define
-\[
-  A_w^{\mathrm{out}}
-  :=
-  \E_O\bigl[
-    |\{x\ne0:\wt(O(x))=w\}|
-  \bigr].
-\]
-
-\begin{corollary}[Weight-indexed first moment]
-\label{cor:weight-first-moment}
-Under a uniform interleaver independent of $O$ and $I$,
-\[
-  \E[Z_d]
-  =
-  \sum_{w=0}^N
-  A_w^{\mathrm{out}}p_w^{\mathrm{in}}(d).
-\]
-\end{corollary}
-
-Accumulator SPIN and Random SPIN use
-Corollary~\ref{cor:weight-first-moment}. Structured SPIN uses
-Theorem~\ref{thm:class-first-moment} with occupation and row-weight classes.
-The structured-route analysis supplies a uniform failure envelope for every
-such class; it does not require the conditional probability to be identical
-for all words in the class.
+For a uniform interleaver independent of the inner setup, the conditional
+law depends only on the outer word's weight. Section~\ref{sec:spin-intuition}
+uses this specialization to explain the two supporting constructions;
+Appendix~\ref{app:supporting-framework} gives its full statement.
+Structured SPIN instead uses occupation and row-weight classes, with a
+uniform failure envelope for every word in each class.

@@ -1,0 +1,70 @@
+\section{Application details and additional comparisons}
+\label{app:applications}
+
+This appendix supports Section~\ref{sec:applications}.
+It preserves the full PCS and Flock methodology, additional comparisons,
+and the distinction between measurements and projected costs.
+
+\subsection{Silent OT integration}
+\label{app:pcg-details}
+We replace the linear map in libOTe's semi-honest Silent OT path with the
+half-rate BCH--IMT encoder at $K=2^{20}$, $(t,s)=(128,19)$ and weight-five
+feedback. Table~\ref{tab:spin-ot} reports protocol computation, not an
+encoder-based projection.
+
+\begin{table}[!htbp]
+\centering
+\caption{Measured time per party for $2^{20}$ outputs in the Silent OT
+integration. Base OT, setup, buffer allocation and network latency are excluded.}
+\label{tab:spin-ot}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Timed work & Sender (ms) & Receiver (ms) \\
+\midrule
+Expansion + SPIN & 19.531 & 20.625 \\
+Expansion + SPIN + hashing & 22.099 & 21.841 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The regular binary noise has $400$ partitions of $5242$ coordinates each;
+the remaining $352$ coordinates of the $2^{21}$-coordinate input are zero.
+The configuration subtracts those unused coordinates from the distance
+input to libOTe's noise-weight calculation. This benchmark specifies the
+implementation and its costs; it does not supply a new hardness claim for
+the resulting structured LPN instance.
+
+The harness installs synthetic matching base correlations, constructs the
+public SPIN setup, and allocates and touches both endpoints' buffers before
+timing. It runs the sender and receiver serially on the same core, using
+the sender's actual buffered transcript for the receiver. Each endpoint
+has its own timer and workspace. The measured calls perform expansion
+and the in-place linear map; the receiver also packs its choice bits.
+Transcript handoff, network latency, output checks and object destruction
+are excluded. Online communication is $179{,}624$ bytes, excluding base
+correlations.
+
+Without hashing, the receiver stores its choices in the low bits of its
+blocks; the correlated-OT relation holds in the remaining $127$ bits.
+With hashing, the harness checks each selected OT message against the
+corresponding sender output. All $2^{20}$ outputs pass in every trial,
+including warmups, in both modes. Independent dense-oracle encoder tests
+also pass at $K=2^{16},2^{18},2^{20}$.
+
+The runs use one Ryzen 9 7950X core, pinned to CPU~15 at a requested
+$4.5$\,GHz with boost disabled, and GCC~15.2.0 with
+\texttt{-O3 -march=znver4}. Each entry is the median of nine calls after
+one warmup. Hash-enabled totals are medians of per-call sums of protocol
+and hashing time, not sums of independently computed medians.
+The no-hash sender times range from $19.474$ to $19.911$\,ms and receiver
+times from $20.532$ to $20.754$\,ms. Our benchmark records pin the source revision and log hashes. No integrated baseline speedup is claimed.
+
+For context, the chosen-block BAA evaluation reports $22.810$\,ms for Golay
+and $24.278$\,ms for RM at the same code parameters, using an Intel
+i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses
+our same-host rerun and does not combine cross-machine timings.
+
+
+\input{pcs}
+\input{flock}
+\FloatBarrier

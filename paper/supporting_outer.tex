@@ -1,0 +1,98 @@
+\subsubsection{Relation to Block-Accumulate codes}
+
+Block-Accumulate (BA) codes concatenate a random block-diagonal outer with
+one or more stages, each consisting of a uniform interleaver and an accumulator
+\cite{KolesnikovEtAl2026BA}. Accumulator SPIN retains the first such stage and
+therefore may be viewed as a truncated BA code. We retain the SPIN name to
+place this construction in the common outer--interleaver--inner interface, but
+the block-accumulate architecture and the random-block enumerator below are
+due to Kolesnikov et al.
+
+Accumulator SPIN follows the BA ensemble at this level: setup samples the
+local maps independently. The theorem below conditions each local map to be
+injective. This condition makes every realized outer encoder injective.
+
+Chosen-block BAA studies the related fixed-constituent choice
+\cite{cryptoeprint:2026/1903}. It fixes a short constituent code and
+uses the same code in every outer position. Its concrete binary constituents
+include Golay, Reed--Muller, and a BCH subcode. That reuse option is not the
+ensemble analyzed here.
+
+\subsubsection{Random-block outer lineage}
+
+The following local input--output enumerator is the random-block calculation
+used for BA codes. We state it in the present notation because it is also the
+local input to the Accumulator SPIN analysis.
+
+\begin{lemma}[Uniform random-block enumerator]
+\label{lem:uniform-random-block-enumerator}
+Suppose that $G_B$ is uniform over $\F_2^{K_B\times B}$. Let
+$E^{\mathrm{blk}}_{a,b}(G_B)$ be the number of inputs of weight $a$ whose
+images have weight $b$. Then
+\begin{equation}
+  \E_{G_B}[E^{\mathrm{blk}}_{a,b}(G_B)]
+  =
+  \begin{cases}
+    1, & a=0 \text{ and } b=0,\\
+    0, & a=0 \text{ and } b>0,\\
+    \displaystyle
+    \binom{K_B}{a}\binom{B}{b}2^{-B}, & a>0.
+  \end{cases}
+  \label{eq:uniform-random-block-enumerator}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The zero input maps to the zero output. Fix a nonzero input $u$. Each column
+of $G_B$ is uniform and independent, so the coordinates of $uG_B$ are
+independent uniform bits. Thus $uG_B$ is uniform over $\F_2^B$. There are
+$\binom{K_B}{a}$ inputs of weight $a$ and $\binom{B}{b}$ outputs of weight
+$b$. Summing the probability $2^{-B}$ over these pairs gives
+\eqref{eq:uniform-random-block-enumerator}.
+\end{proof}
+
+The BA independent-block ensemble has a closed global input--output
+enumerator. Let $E^{\mathrm{BA}}_{a,b}$ count total input weight
+$a$ and total outer-output weight $b$ across $M$ blocks. Specializing the BA
+formula~\cite{KolesnikovEtAl2026BA} to local dimensions
+$K_B\times B$ gives
+\begin{equation}
+  \E[E^{\mathrm{BA}}_{a,b}]
+  =
+  \sum_{q=0}^{M}
+  2^{-Bq}\binom{M}{q}\binom{Bq}{b}
+  \sum_{j=0}^{q}(-1)^j\binom{q}{j}
+  \binom{K_B(q-j)}{a}.
+  \label{eq:ba-independent-block-enumerator}
+\end{equation}
+Here $q$ is the number of nonzero input blocks. The inner alternating sum
+counts weight-$a$ inputs for which exactly those $q$ blocks are nonzero. For a
+fixed such input, the $q$ independently sampled local matrices produce a
+uniform word on the corresponding $Bq$ output coordinates. This yields the
+factor $2^{-Bq}\binom{Bq}{b}$.
+
+The following exact generating function uses the same independence pattern,
+but samples uniform injections rather than unconditioned matrices.
+
+\subsubsection{Uniform injections}
+Fix a rational rate $R\in(0,1)$ and a block length $B$ with $RB$ integral.
+For $M$ block positions, let $N:=MB$ and sample independent uniform linear
+injections $C_i:\F_2^{RB}\to\F_2^B$. Let $A_{N,w}^{\mathrm{out}}$ count
+nonzero messages whose blockwise image has weight $w$.
+
+For one local injection, define
+\begin{equation}
+  G_{B,R}(z)
+  :=
+  (2^{RB}-1)\frac{(1+z)^B-1}{2^B-1}.
+  \label{eq:injection-local-mass}
+\end{equation}
+Every nonzero input has a uniform nonzero image, so independence across block
+positions gives
+\begin{equation}
+  \E\!\left[
+    1+\sum_{w=1}^{N}A_{N,w}^{\mathrm{out}}z^w
+  \right]
+  =(1+G_{B,R}(z))^M.
+  \label{eq:injection-global-mass}
+\end{equation}
