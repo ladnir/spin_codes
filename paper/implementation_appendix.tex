@@ -1,4 +1,4 @@
-\section{Encoder implementation and benchmark details}
+\section{Encoder Implementation and Benchmark Details}
 \label{app:implementation}
 
 This appendix supports Section~\ref{sec:implementation}.
@@ -14,7 +14,7 @@ Here $N=2K$ at rate $1/2$ and $N=4K$ at rate $1/4$.
 The pipeline applies the transposed inner, reverses the routing factors,
 and applies the transposed BCH outer. No parity fanout is included.
 
-\paragraph{Shared implementation and optimized kernels.}
+\paragraph{Shared Implementation and Optimized Kernels.}
 The configurations share the routing machinery and an IMT template.
 The transpose uses
 \[
@@ -37,7 +37,7 @@ The smaller half-rate measurements use $256$-row tiles.
 These are measured choices for the evaluation host, not
 processor-independent optimality claims.
 
-\paragraph{Correctness and certificate binding.}
+\paragraph{Correctness and Certificate Binding.}
 Symbolic checks verify the generated outer matrices and transpose circuits,
 the pruned zeta schedule, and both independent inner maps.
 Runtime tests compare the complete optimized output with dense outer
@@ -48,7 +48,7 @@ $12$ correctness tests. Source and binary identities, exact map columns,
 and the outer construction bind each reported timing to its corresponding
 finite certificate. A timing alone does not establish distance.
 
-\paragraph{Measurement method.}
+\paragraph{Measurement Method.}
 Measurements use one Ryzen 9 7950X thread on Linux, pinned to CPU~15, with
 GCC~15.2.0. The release build uses \texttt{-O3 -DNDEBUG -march=znver4},
 AVX2, and carry-less multiplication instructions.
@@ -90,7 +90,7 @@ Its \path{HALF_LADDER_PERFORMANCE_VERIFIED.json} authenticates the three
 half-rate cells; \path{QUARTER_DEPLOYMENT_VERIFIED.json} authenticates the
 quarter-rate implementation and both distance thresholds.
 
-\subsection{Ordinary encoding}
+\subsection{Ordinary Encoding}
 \label{sec:ordinary-encoding}
 
 Polynomial commitments require the ordinary encoder: $K$ input blocks
@@ -138,36 +138,36 @@ The steady-state transposed measurements above use a different buffer
 and repetition policy; they are not paired with these ordinary timings.
 The PCS measurements in Section~\ref{sec:spin-pcs} additionally include commitment and opening.
 
-\subsection{Comparison with other transposed encoders}
+\subsection{Comparison with Other Transposed Encoders}
 \label{app:transposed-comparison-details}
 
 We compare SPIN with BAA, introduced by Kolesnikov et al.\ at CRYPTO
-2026~\cite{KolesnikovEtAl2026BA}, using the newer chosen-block
+2026~\cite{KolesnikovEtAl2026BA}, and the newer chosen-block
 instantiations~\cite{cryptoeprint:2026/1903}. Chosen-block BAA updates
 BAA using related design ideas, including reuse of
-a spectrum-controlled outer constituent. The BAA timings in
-Table~\ref{tab:transposed-comparison} use
-that newer implementation, rather than the original CRYPTO implementation.
+a spectrum-controlled outer constituent. Table~\ref{tab:transposed-comparison}
+includes both, with the separately measured original-BAA reference marked.
 We also compare with
 Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}, and binary
 repeat--accumulate--accumulate (RAA)~\cite{blaze25}. Every call evaluates a binary
 transposed encoder on $128$ parallel instances. No weighted extension-field
 RAA or forward-encoder timing is included.
 
-The BAA rows use the optimized Golay $[24,12,8]$ and RM$(2,5)$ kernels
+The chosen-block BAA rows use the optimized Golay $[24,12,8]$ and RM$(2,5)$ kernels
 from the chosen-block BAA implementation. Expand--Convolute uses the legacy
 nonsystematic implementation with expander weight $w=33$ and memory $m=25$.
 The implementation takes $24$ random taps plus one fixed tap and applies
 one convolution pass. Its native interface modifies the input buffer and
 writes the result to a preallocated output buffer. Our binary RAA adapter
 uses two accumulator/permutation layers and a repetition transpose.
-BAA and RAA use four-round Feistel permutations, with cycle walking for
+Chosen-block BAA and RAA use four-round Feistel permutations, with cycle walking for
 non-power-of-two domains. SPIN retains its packed routing tables.
 The measured times include each implementation's routing costs; they do
 not establish a general ranking of the code families.
 
-\paragraph{Common timing protocol.}
-We rebuild all rows with one compiler and measure them on the same Ryzen
+\paragraph{Common Timing Protocol.}
+Except for the separate original-BAA reference, we rebuild all rows with
+one compiler and measure them on the same Ryzen
 host and CPU as above. Each cell uses three serial processes, each with
 three warmups and $101$ timed calls. Each process allocates and initializes
 its buffers once, then repeatedly invokes the native encoder interface.
@@ -175,7 +175,7 @@ There is no input copy or reset between calls. Expand--Convolute operates
 on the buffer left by the previous call; the other interfaces preserve
 their input. Code setup, caller buffer allocation, and output hashing
 are outside the interval; all work inside each encoder call is timed.
-The BAA message lengths are $2^m-64$ for $m\in\{16,18,20\}$, allowing
+The chosen-block BAA message lengths are $2^m-64$ for $m\in\{16,18,20\}$, allowing
 both constituents to tile the same input. All other rows use $K=2^m$.
 RAA processes $3K$ or $4K$ input blocks, versus $2K$ for the rate-$1/2$ rows.
 
@@ -187,14 +187,15 @@ At the largest measured length, half-rate SPIN with IMT takes $10.110$\,ms.
 The original rate-$1/2$ BAA implementation takes approximately $32$\,ms,
 giving the approximately $3\times$ speedup stated in the abstract.
 Separate measurements confirm comparable original-BAA latency on the
-Ryzen host. The newer chosen-block implementations improve on that baseline:
+Ryzen host; their raw logs are not retained in our comparison archive.
+The newer chosen-block implementations improve on that baseline:
 Chosen Golay and RM BAA take $2.37$ and $2.74$ times as long,
 respectively. The conservative EC profile takes $181.825$\,ms.
 The repetition-$3$ permutation domain requires cycle walking; the
 repetition-$4$ domain does not. These measurements do not imply that
 lower-rate RAA is intrinsically faster.
 
-\paragraph{Distance context.}
+\paragraph{Distance Context.}
 At the largest lengths, half-rate SPIN's certified margin is $50.062$ bits at
 relative distance $0.10$. The chosen-block BAA evaluation reports full
 first-moment margins of $46.386$ and $47.093$ bits for Golay and RM,
@@ -212,7 +213,8 @@ nor extrapolate the BAA or EC margins to smaller lengths.
 Our author-side \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/transposed_comparison/README.md}{comparison guide}
 records dependency revisions, correctness checks, actual lengths, all
 $5454$ timing samples, and a script that regenerates
-Table~\ref{tab:transposed-comparison}. The external rows retain that campaign. The SPIN row instead uses the
+Table~\ref{tab:transposed-comparison}. The external rows other than the
+separate original-BAA reference retain that campaign. The SPIN row instead uses the
 certificate-matched IMT series from Table~\ref{tab:finite-bch-performance},
 measured separately under the same host, compiler, and timing policy.
 \path{paper/build_imt_comparison.py} authenticates both sources and

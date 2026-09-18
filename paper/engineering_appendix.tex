@@ -1,4 +1,4 @@
-\section{Parameter selection and engineering curves}
+\section{Parameter Selection and Engineering Curves}
 \label{app:engineering}
 
 This appendix supports the finite constructions in
@@ -6,7 +6,7 @@ Section~\ref{sec:finite-certificates}. It is intended for choosing and
 implementing other parameter sets: the plots separate diagnostic bounds
 from the complete certificates at the selected operating points.
 
-\subsection{How the parameters affect the margin}
+\subsection{How the Parameters Affect the Margin}
 \label{sec:finite-parameter-slices}
 
 Consider a rate-$1/2$ outer constituent of length $B$, repeated over
@@ -39,7 +39,7 @@ fixed. Its Q1 bound is a reference, not an absolute outer-only ceiling.
 
 \input{figures/imt_parameter_k_b}
 
-\paragraph{Why the length curve turns down.}
+\paragraph{Why the Length Curve Turns Down.}
 The Q1 sum contains $L$ possible active rows. Once the bounds on conditional
 low-weight probabilities stabilize, doubling $K$, and hence $L$, costs
 approximately one margin bit. The larger-length portions of
@@ -88,7 +88,7 @@ not full certificates. We keep one transvection per update in the plotted
 constructions and instead vary the step, which also changes feedback
 grouping and the expansion maps.
 
-\paragraph{Reducing the step at short lengths.}
+\paragraph{Reducing the Step at Short Lengths.}
 The adaptive curves keep one transvection per update and select among
 smaller steps. At each tested $K$, we take the largest $t$ within $0.1$
 bits of the best tested Q1 margin. This tolerance avoids selecting a
@@ -117,7 +117,7 @@ the bound by $2.90$ bits; that gain is separate from changing $t$.
 The selected BCH-256 certificates do not certify the different BCH-64/128 diagnostic configurations
 or the smaller-step BCH-256 alternatives.
 
-\paragraph{State size and step size.}
+\paragraph{State Size and Step Size.}
 Figures~\ref{fig:finite-s-t} and \ref{fig:finite-k-s} retain the broader
 BCH-64/128 state study. At each $t$, fixed ordered map chains give nested
 state maps; the same maps serve both outer lengths and all $K$.
@@ -136,7 +136,7 @@ also change the multi-row activation and cancellation bounds.
 
 \input{figures/imt_parameter_s_t}
 
-\paragraph{State size at larger message lengths.}
+\paragraph{State Size at Larger Message Lengths.}
 Figure~\ref{fig:finite-k-s} compares the state curve at
 $K\in\{2^{16},2^{20},2^{24}\}$, holding $t=64$ fixed.
 The nearly saturated part shifts downward as $K$ grows, but the loss need
@@ -153,7 +153,7 @@ minimum or optimum. The final tests are the full bound over all occupancies
 and the cost of the resulting encoder; neither follows from Q1 alone.
 \FloatBarrier
 
-\subsection{The certified engineering curve}
+\subsection{The Certified Engineering Curve}
 \label{sec:finite-engineering-curve}
 
 Figure~\ref{fig:finite-bch-curve} holds the outer and selected inner fixed

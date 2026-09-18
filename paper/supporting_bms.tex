@@ -1,7 +1,7 @@
-\subsection{The Bazzi--Mahdian--Spielman question}
+\subsection{The Bazzi--Mahdian--Spielman Question}
 \label{sec:bms-question}
 
-\paragraph{When does one interleaver suffice?}
+\paragraph{When Does One Interleaver Suffice?}
 Bazzi, Mahdian, and Spielman (BMS) show that a depth-two serial concatenation
 cannot be asymptotically good when the outer has constant memory and the
 inner has sublinear memory~\cite[Sec.~III-A]{bms09}. Their conclusion asks
@@ -11,7 +11,7 @@ Here, asymptotically good means that both rate and relative minimum
 distance stay bounded away from zero. The question concerns the
 composition of an outer encoder, one interleaver, and an inner encoder.
 
-\paragraph{The SPIN progression.}
+\paragraph{The SPIN Progression.}
 Accumulator SPIN supplies the basic positive construction in the
 block-encoder setting. Its outer blocks have length $\Theta(\log N)$,
 and its inner accumulator carries one bit of state. At rate $1/2$,
@@ -25,7 +25,7 @@ constituents and structured interleaving, it proves relative distance
 greater than $0.11$ and linear-time encoding. Both of the latter distance
 guarantees are close to the rate-$1/2$ GV value of approximately $0.110028$.
 
-\paragraph{Logarithmic outer memory suffices.}
+\paragraph{Logarithmic Outer Memory Suffices.}
 The block description admits a streaming realization with logarithmic
 memory and a short termination. For a rate-$1/2$ outer with block length
 $b$, buffer one block while emitting the preceding block, at two output

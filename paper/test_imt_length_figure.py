@@ -62,7 +62,7 @@ class LengthFigureTests(unittest.TestCase):
     def test_plot_remains_in_parameter_explainer(self):
         paper = Path(__file__).parent
         text = (paper / 'engineering_appendix.tex').read_text()
-        prefix = text.split(r'\subsection{The certified engineering curve}')[0]
+        prefix = text.split(r'\subsection{The Certified Engineering Curve}')[0]
         self.assertIn(r'\input{figures/imt_parameter_k_b}',prefix)
         self.assertIn(r'p_{\mathrm{cancel}}',prefix)
         self.assertNotIn(r'\input{figures/imt_mixing_rounds}',text)

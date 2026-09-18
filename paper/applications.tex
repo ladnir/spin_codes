@@ -6,7 +6,7 @@ PCS, or proof system. The three applications use different parts of the
 encoder interface. We distinguish measured computation costs from
 projected costs and conditional security calculations.
 
-\subsection{Pseudorandom correlation generation}
+\subsection{Pseudorandom Correlation Generation}
 \label{sec:spin-pcg}
 
 PCGs use the transposed encoder to compress pseudorandom tree outputs
@@ -23,7 +23,7 @@ The endpoints run serially with separate timers, not as a timed network session.
 Appendix~\ref{app:pcg-details} gives the noise parameters, output modes,
 timing contract, and correctness checks.
 
-\subsection{Polynomial commitments}
+\subsection{Polynomial Commitments}
 \label{sec:spin-pcs}
 
 We use SPIN as the row encoder in a Brakedown-style PCS
@@ -123,8 +123,7 @@ The gain therefore trades communication and verification for prover speed.
 Both backends receive the applicable optimizations to arithmetic,
 workspace reuse, and witness processing. Prover time includes witness generation,
 commitment, and proving, but excludes setup, verification, and outer
-serialization. All $144$ proofs generated in the experiment, including
-those from warmup runs, passed verification.
+serialization.
 The checked relation is the committed batch's compression constraints;
 binding public hash inputs and outputs needs a separate wrapper.
 Appendix~\ref{app:flock-details} gives the full measured table, balanced

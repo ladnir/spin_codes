@@ -1,4 +1,4 @@
-\section{Asymptotic distance and linear work}
+\section{Asymptotic Distance and Linear Work}
 \label{sec:structured-distance}
 
 We now instantiate Structured SPIN with a growing outer and fixed IMT maps.
@@ -6,7 +6,7 @@ The outer length grows logarithmically, but its encoding work is linear.
 The proof must handle both messages concentrated in a few outer blocks
 and messages occupying a constant fraction of the blocks.
 
-\subsection{Scalable constituent family}
+\subsection{Scalable Constituent Family}
 \label{sec:structured-scalable}
 
 The scalable outer begins with an even base length $a$ and an injective
@@ -35,7 +35,7 @@ bind a particular $H_a$, its spectrum, and an admissible schedule for $b$.
 Changing $a$ or $H_a$ changes the outer enumerator and may change the certified
 schedule. It does not change the route or the structured inner.
 
-\paragraph{Current certified choice.}
+\paragraph{Current Certified Choice.}
 For the theorem below, set $a:=24$ and let
 $H_{24}:\F_2^{12}\longrightarrow\F_2^{24}$ encode the extended binary Golay code. Fix a positive integer $m$ and set
 $L_m:=128m$. Let $b_m$ be the least positive multiple of $24$ satisfying
@@ -101,7 +101,7 @@ used below.
 The block constant $39/4$ is the current certified choice; improving it
 would change the schedule, not the construction.
 
-\subsection{Selecting the shared outer}
+\subsection{Selecting the Shared Outer}
 
 Suppress the family index $m$, and write $\mathcal O_b:=\mathcal O_{24,b}$.
 Let $A_{\mathcal O_b}(w)$ count its nonzero words of weight $w$, and let
@@ -169,7 +169,7 @@ For $0\le d\le N$ and $1\le Q\le L$, let $Z_{d,Q}$ count nonzero messages
 with exactly $Q$ active outer blocks and output weight at most $d$.
 Our goal is to show that the sum of their conditional expectations is $o(1)$.
 
-\subsection{From row weights to an iid comparison}
+\subsection{From Row Weights to an iid Comparison}
 
 View an outer word as an $L$-tuple of rows in $\F_2^b$. For the framework in
 Section~\ref{sec:framework}, take its class to be the ordered row-weight
@@ -262,7 +262,7 @@ The region shuffles are essential for Lemma~\ref{lem:structured-route-domination
 The deterministic transpose alone spreads each row, but it does not erase
 the row's coordinate pattern.
 
-\subsection{IMT moments at positive occupation}
+\subsection{IMT Moments at Positive Occupation}
 
 The iid comparison is useful because the inner has a finite-state
 description. For iid Bernoulli-$\beta$ input and $0<z<1$, weight each
@@ -315,7 +315,7 @@ The finite set of witnesses has bounded prefactors, so the total
 positive-occupation contribution is at most $L\exp(-\eta N+o(N))$
 for some $\eta>0$.
 
-\subsection{Sparse occupation without a large conditioning loss}
+\subsection{Sparse Occupation without a Large Conditioning Loss}
 
 The dense comparison loses a factor $(L+1)^b$.
 Although subexponential in $N$, this factor is too large when the useful
@@ -371,7 +371,7 @@ Consequently, for all sufficiently large lengths,
 Appendix~\ref{app:imt-sparse} gives the polynomial witness and every remainder.
 The explicit cutoff makes the bound uniform, even when $Q$ grows slowly.
 
-\subsection{Fixed occupation: mixing between isolated impulses}
+\subsection{Fixed Occupation: Mixing between Isolated Impulses}
 
 It remains to handle the finite set $Q<4096$.
 Each region then contains at most $Q$ active bits.
@@ -437,7 +437,7 @@ For every fixed $3\le Q<4096$, it gives
 \]
 The remainder may depend on $Q$: only finitely many such bounds are needed.
 
-\subsection{Completing the argument}
+\subsection{Completing the Argument}
 
 \begin{proof}[Theorem~\ref{thm:structured-spin-scalable}]
 Condition on any outer satisfying $\mathcal G_b$. The fixed-occupation

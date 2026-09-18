@@ -1,4 +1,4 @@
-\section{Finite BCH-256 certificate}
+\section{Finite BCH-256 Certificate}
 \label{app:finite-bch-proof}
 \label{app:structured-finite-member}
 
@@ -8,7 +8,7 @@ deterministic outer spectrum bound, a positive inner transfer, and a complete
 sum over outer occupancies. Computational witnesses supply finite upper
 bounds at these interfaces; they do not replace the probability comparisons.
 
-\subsection{The fixed outer and its spectrum}
+\subsection{The Fixed Outer and Its Spectrum}
 \label{app:finite-bch-definition}
 
 Represent $\F_{256}$ in the polynomial basis with modulus
@@ -58,7 +58,7 @@ syndrome-subspace definition of the outer. It does not identify the two
 coordinate codes. Independent row permutations make their identical
 spectra sufficient for the same first-moment bounds.
 
-\paragraph{Spectrum inequalities.}
+\paragraph{Spectrum Inequalities.}
 Write $A_w:=A_w(\mathcal B)$. Evenness, minimum distance, and complementation
 give $A_0=A_{256}=1$, $A_w=A_{256-w}$, and nonzero weights restricted to
 \[
@@ -142,7 +142,7 @@ floating feasibility tolerance, supplies the inequality consumed below.
 The published endpoint spectra remain mathematical inputs; empirical
 spectrum estimates do not.
 
-\subsection{Selected IMT maps and positive transfers}
+\subsection{Selected IMT Maps and Positive Transfers}
 \label{app:finite-inner-definition}
 
 The half-rate construction uses exactly the maps in Table~\ref{tab:imt-maps}.
@@ -173,7 +173,7 @@ or Fourier moment bound of Appendix~\ref{app:imt-finite-transfers}.
 Every selection bounds the same terminal moment; an entrywise minimum of
 different measure representations would not be justified.
 
-\subsection{One active outer row}
+\subsection{One Active Outer Row}
 
 A row of weight $w$ reaches a uniform $w$-subset of the $256$ regions.
 Its single position in each reached region is independently uniform.
@@ -202,7 +202,7 @@ $b_w^\star$. Complement symmetry and nonnegativity imply
 This reuses a weighted outer inequality, not a probability computed for
 another inner. All $c_w$ are evaluated for the selected IMT instance.
 
-\subsection{Sparse occupancies and constant-row compositions}
+\subsection{Sparse Occupancies and Constant-Row Compositions}
 
 Partition ordinary weights into twelve bands:
 \[
@@ -254,7 +254,7 @@ For $d=0$ there is no density cost. Summing every $h=0,\ldots,q$ with
 $d=q-h$ covers occupancy $q$. Witness choices may vary with the composition.
 Only complete, checked sums enter the final ledger.
 
-\subsection{Dense occupancies by a change of input law}
+\subsection{Dense Occupancies by a Change of Input Law}
 
 The dense bound compresses the ordinary/all-one compositions into occupancy
 and mean reference density. It needs the following pointwise comparison.
@@ -329,7 +329,7 @@ ensure that the intervals still cover every assignment.
 At $q=L,\nu=1$, the all-one cost cancels the normalization exactly;
 no ordinary-band multiplicity is charged to that word.
 
-\paragraph{Finite rectangle certificates.}
+\paragraph{Finite Rectangle Certificates.}
 The retained checker fixes $r\in(0,1)$ within each rectangle and chooses
 $x(\vartheta)=\vartheta(1-r)/(r(1-\vartheta))$.
 Since $x$ now depends on $\nu$, it applies the label sum separately at each
@@ -361,7 +361,7 @@ The original evaluations pay $(L+1)^{256}$; the refined receipts multiply
 their bounds by the exact rational factor $(D_L/(L+1))^{256}$.
 This changes only the density comparison, not any transfer or cover.
 
-\paragraph{Short-length refinements.}
+\paragraph{Short-Length Refinements.}
 The two shortest instances need sharper bounds, not a different encoder.
 First, activation from zero can retain uniform-shell mass. For a
 weight-$j$ input, let $c_j$ bound every nonzero syndrome fiber. A valid
@@ -453,7 +453,7 @@ unsplit bound. No separately rounded normalizers are subtracted.
 Our derivation note \path{SHORT_LENGTH_BOUNDS.md} derives the rectangle
 optimizations and records their exact-arithmetic tests.
 
-\subsection{The quarter-rate outer and feedback}
+\subsection{The Quarter-Rate Outer and Feedback}
 \label{app:finite-quarter-definition}
 
 Over $\F_{128}$ with modulus $X^7+X+1$ and primitive element $X$, let
@@ -550,7 +550,7 @@ comparison, not additional randomness in the encoder setup.
 The outward producer, higher-precision replay, and exact-union checker
 are separate from the binary64 witness search.
 
-\subsection{Complete finite margins}
+\subsection{Complete Finite Margins}
 \label{app:finite-margin-tables}
 
 Tables~\ref{tab:finite-bch-margins} and~\ref{tab:finite-quarter-margins}
@@ -592,7 +592,7 @@ $\delta$ & cutoff $\lfloor\delta N\rfloor$ & target $\lambda$ & margin (bits) \\
 \end{table}
 \FloatBarrier
 
-\subsection{Certificate completion}
+\subsection{Certificate Completion}
 
 The half-rate exact unions have the following component margins, rounded
 only for display. Here $q_{\max}$ is the last sparse occupancy.

@@ -1,14 +1,14 @@
-\section{A common first-moment framework}
+\section{A Common First-Moment Framework}
 \label{sec:framework}
 
 This section isolates the calculation shared by all SPIN families. We first
 define the complete sampled encoder. We then count low-weight outputs of
 nonzero messages.
 
-Fix lengths $K,N\ge1$. The construction samples an outer encoder
-$O:\F_2^K\to\F_2^N$ and a pair $(\Pi,I)$, where $\Pi$ is a permutation of
-$[N]$ and $I:\F_2^N\to\F_2^N$ is linear. Assume that $O$ is independent
-of $(\Pi,I)$. The realized SPIN encoder is $E:=I\circ\Pi\circ O$.
+Fix lengths $K,N\ge1$. The construction independently samples an outer
+encoder $O:\F_2^K\to\F_2^N$, a permutation $\Pi$ of $[N]$, and a linear
+inner encoder $I:\F_2^N\to\F_2^N$. Fixed components are deterministic
+choices. The realized SPIN encoder is $E:=I\circ\Pi\circ O$.
 
 Fix a finite class set $\mathcal T$ and a class map
 $c:\F_2^N\to\mathcal T$. The class map records the information about an

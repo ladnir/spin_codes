@@ -304,6 +304,11 @@ anonymity policy; the nonanonymous artifact remains fully cross-referenced.
 Retain the concise `ai_disclosure.tex` unchanged by the trimming pass, along
 with the prominent main-text reference to it.
 
+Subsequent author-requested relocation: the disclosure now appears in the
+main body immediately before the references. Its label is
+`sec:ai-disclosure`, replacing the inventory's `app:ai-disclosure`; the
+abstract reference follows the new location. The disclosure text is unchanged.
+
 ## Content-preservation ledger
 
 The tables below specify the final destinations. The pass log records which

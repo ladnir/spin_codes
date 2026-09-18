@@ -1,4 +1,4 @@
-\section{Finite-length Structured SPIN}
+\section{Finite-Length Structured SPIN}
 \label{sec:finite-certificates}
 
 The growing outer supplies the spectral control needed by the asymptotic
@@ -25,7 +25,7 @@ Appendix~\ref{app:engineering} studies how outer size, message length,
 state size, and step width affect the bound. Those diagnostic curves guide
 parameter searches; the guarantees here cover all nonzero messages.
 
-\subsection{The selected construction}
+\subsection{The Selected Construction}
 \label{sec:finite-selected-construction}
 
 We now use a binary BCH-derived constituent $\mathcal B$ of length $256$,
@@ -67,7 +67,7 @@ Thus the inner and routing distribution are shared with the asymptotic
 construction; the finite guarantee uses a fixed outer and a separate
 finite first-moment calculation.
 
-\subsection{Finite distance guarantee}
+\subsection{Finite Distance Guarantee}
 
 \begin{samepage}
 \begin{theorem}[Certified BCH-256 Structured SPIN]
@@ -99,7 +99,7 @@ The theorem covers the five listed lengths, rather than every length between
 them. It does not assert an asymptotic distance guarantee for fixed
 $\mathcal B$ and fixed inner parameters.
 
-\paragraph{Proof overview.}
+\paragraph{Proof Overview.}
 Let $Z_H$ count nonzero messages whose output weight is at most $H$.
 Let $\mathcal T$ be the ordered row-weight classes of nonzero messages;
 each class determines the number $q$ of nonzero outer rows.
@@ -131,7 +131,7 @@ included in an exact rational union. Appendix~\ref{app:finite-bch-proof}
 gives the mathematical reductions and identifies the bound inputs and
 coverage checks.
 
-\subsection{A quarter-rate operating point}
+\subsection{A Quarter-Rate Operating Point}
 \label{sec:finite-quarter}
 
 At rate $1/4$, use the fixed BCH-derived $[128,32,32]$ constituent specified

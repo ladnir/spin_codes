@@ -59,6 +59,10 @@ def table(evidence=None):
             values = [rows[mode, m]['median_ms'] for m in (16, 18, 20)]
         lines.append(f'{label} & ${rate}$ & ${guarantee}$ & ' +
                      ' & '.join(f'{v:.3f}' for v in values) + r' \\')
+        if mode == 'spin':
+            # Separate author-confirmed Ryzen measurement; no archived raw
+            # samples or smaller-length timings. See APPLICATION_RESULTS.md.
+            lines.append(r'Original BAA & $1/2$ & $\text{--}$ & -- & -- & ${\approx}32^{\dagger}$ \\')
     return '\n'.join(lines + [r'\bottomrule', r'\end{tabular}', ''])
 
 
@@ -72,7 +76,7 @@ def main():
         imt_results.require(target.read_text() == content, 'Comparison table is stale')
     else:
         target.write_text(content, encoding='utf-8', newline='\n')
-    print('IMT comparison PASS: 3 replacement cells; external measurements unchanged.')
+    print('IMT comparison PASS: 3 replacement cells; archived external measurements unchanged; separate approximate original-BAA reference included.')
 
 
 if __name__ == '__main__':

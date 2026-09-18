@@ -1,17 +1,23 @@
-\section{Building intuition: accumulation and random mixing}
+\section{Building Intuition: Accumulation and Random Mixing}
 \label{sec:spin-intuition}
 
-Two simple instances explain the roles of the outer, interleaver, and inner.
-Both use independent uniform linear injections
-$C_i:\F_2^{B/2}\to\F_2^B$, where $B$ is even and $N=MB$ for $M$ blocks.
-The outer concatenates their outputs, and a uniform permutation interleaves
-the resulting $N$ bits. Setup is sampled once and fixed for every message.
-For each fixed nonzero input to an outer block, its image is uniform over
-the nonzero $B$-bit vectors. After interleaving, a word of weight $w$ has
-uniform support among the $N$ positions. Thus the remaining question is
-how the inner transforms such a support.
+We compare two simple SPIN constructions that use the same outer and
+interleaver but different inners. Choose an even block length $B$ and split
+the message into $M$ blocks of $B/2$ bits each. The outer encodes block $i$
+into $B$ bits using a linear injection $C_i:\F_2^{B/2}\to\F_2^B$.
+Setup samples these maps independently and uniformly from all such
+injections. Concatenating their outputs gives $N=MB$ bits, which the
+interleaver shuffles using an independently sampled uniform permutation.
+The maps and permutation are sampled once and reused for every message.
 
-\paragraph{The minimal inner: an accumulator.}
+These choices make the analysis simple. For a fixed nonzero input to
+block $i$, the random choice of $C_i$ makes its output uniform over all
+nonzero $B$-bit vectors. For any fixed outer output with $w$ ones, the
+random permutation makes every choice of $w$ positions equally likely.
+We can therefore study the inner on a random input of weight $w$, then
+combine the result with the outer's weight distribution.
+
+\paragraph{The Minimal Inner: An Accumulator.}
 For interleaved input $u$, set $y_0:=0$ and compute
 \[
   y_i:=y_{i-1}+u_i,\qquad i=1,\ldots,N.
@@ -44,7 +50,7 @@ Bazzi, Mahdian, and Spielman~\cite{bms09}; Appendix~\ref{sec:bms-question}
 states the precise interpretation. The minimal construction is useful
 independently of the stronger mixing considered next.
 
-\paragraph{A stronger inner: random recursive convolution.}
+\paragraph{A Stronger Inner: Random Recursive Convolution.}
 Keep the same outer and interleaver, but use the recursive inner from
 Expand--Convolute~\cite{RaghuramanRindalTanguy2023EC}. For memory $m$, sample
 independent $\alpha_i\gets\F_2^m$ at setup, independently of the outer and
@@ -66,7 +72,7 @@ Gilbert--Varshamov value of approximately $0.110028$. The full transfer and
 the bounds for sparse and linear weights appear together in
 Appendix~\ref{sec:random-spin}.
 
-\paragraph{Toward efficient encoding.}
+\paragraph{Toward Efficient Encoding.}
 Both direct encoders require $\Theta(N\log N)$ work under their proved
 schedules: the outer blocks are dense, and the random convolution evaluates
 logarithmically many taps per coordinate. The next section replaces these

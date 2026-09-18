@@ -406,3 +406,8 @@ this worktree. The chosen-block BAA manuscript's original-BAA rerun records
 32.769 ms on Intel; that exact value is not relabeled as a Ryzen measurement.
 The archived same-host comparison remains unchanged: chosen Golay and RM
 BAA take 23.997 and 27.660 ms, or 2.37x and 2.74x the current SPIN latency.
+The main comparison table now also includes the approximate original-BAA
+Ryzen reference, marked as a separate measurement. Its smaller-length cells
+and distance/margin pair are left unassigned: the retained record does not
+bind those values to this measurement. The table generator does not treat
+this reference as part of the archived three-process campaign.

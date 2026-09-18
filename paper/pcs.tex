@@ -1,4 +1,4 @@
-\subsection{Polynomial commitment details}
+\subsection{Polynomial Commitment Details}
 \label{app:pcs-details}
 
 We use SPIN as the row encoder in a Brakedown-style polynomial commitment
@@ -50,7 +50,7 @@ identifier, commitment root, point, and claimed value before deriving
 $\alpha$. It then absorbs $m_T$ followed by $m_E$ before deriving the
 column indices. The verifier reproduces this order.
 
-\paragraph{Making the binary code useful.}
+\paragraph{Making the Binary Code Useful.}
 Expanding every bit to an extension-field element would erase much of
 SPIN's encoding advantage. We therefore keep the matrix packed and
 encode bounded groups of rows. The internal layout follows the input
@@ -73,7 +73,7 @@ event and the separate commitment-extraction and Fiat--Shamir reductions;
 the calculation does not establish a complete composed security theorem.
 Our verification code checks this bound and its parameters with exact arithmetic.
 
-\paragraph{Standalone performance.}
+\paragraph{Standalone Performance.}
 Table~\ref{tab:spin-pcs-standalone} compares SPIN--Brakedown with
 Ligerito~\cite{ligerito25} on the same $2^{32}$-bit input. SPIN uses
 $R=K=2^{16}$ for the square shape. The longer-row shape has $R=2^{14}$
@@ -127,7 +127,7 @@ baseline and optimized commitment roots match. Timings are medians of
 six measured trials per binary, across two processes with one excluded
 warmup each. Our author-side records retain the source hashes and timing boundaries.
 
-\paragraph{Opening cost in isolation.}
+\paragraph{Opening Cost in Isolation.}
 Table~\ref{tab:pcs-opening} separates opening from commitment. The two
 SPIN configurations both open in approximately $108$\,ms, including the
 row combinations and authenticated column queries. These are measured
@@ -169,7 +169,7 @@ author-side records retain these choices and the measured components. Consequent
 these figures describe the projected cost of the selected implementation
 approach, rather than a lower bound on Bolt's opening time.
 
-\paragraph{Estimated Bolt communication.}
+\paragraph{Estimated Bolt Communication.}
 The Bolt-max row in Table~\ref{tab:spin-pcs-standalone} uses the same
 amortized-limit model for time and communication. Adding the measured
 commitment to the projected opening gives $2614$\,ms, using unrounded inputs.

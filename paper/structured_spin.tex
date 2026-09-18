@@ -1,7 +1,7 @@
 \section{Structured SPIN}
 \label{sec:structured-spin}
 
-\subsection{From random mixing to structured mixing}
+\subsection{From Random Mixing to Structured Mixing}
 
 The examples in Section~\ref{sec:spin-intuition} motivate three changes:
 use a fast constituent with a certified spectrum, control how its support
@@ -34,7 +34,7 @@ This Independent-Map Transvection (IMT) inner is analyzed using its actual
 state law and the spectra of its two maps, not independent new state bits.
 The following construction specifies the maps and setup distributions.
 
-\subsection{Construction at a glance}
+\subsection{Construction at a Glance}
 
 We first define one direct member of the family. Choose a constituent length
 $b$, a constituent dimension $k\le b$, a number $L$ of outer-block
@@ -92,7 +92,7 @@ independent. After setup, every arrow in
 sequence of these parameter choices and setup laws; we suppress $m$ until the
 scalable instantiation in Section~\ref{sec:structured-scalable}.
 
-\subsection{Block-diagonal outer}
+\subsection{Block-Diagonal Outer}
 
 Write a message as $u=(u_1,\ldots,u_L)$ with
 $u_j\in\F_2^k$. The outer encoder is the direct sum
@@ -141,7 +141,7 @@ or a coefficientwise certified envelope. Minimum distance alone is generally
 insufficient because nearby low-weight shells can have much larger
 multiplicity.
 
-\subsection{Structured interleaver}
+\subsection{Structured Interleaver}
 
 Index the outer coordinates by pairs $(j,r)\in[L]\times[b]$, where $j$ is
 the outer-block position. For every $j\in[L]$, setup samples
@@ -169,7 +169,7 @@ weight, $\pi_r$ makes the support uniform within that region. These two
 symmetries remove the original coordinate pattern while preserving the
 deterministic spreading supplied by the transpose.
 
-\subsection{Structured recursive inner}
+\subsection{Structured Recursive Inner}
 
 The inner processes the serialized interleaver output in $t$-bit steps.
 For the IMT recurrences, step inputs, step outputs, and state-space vectors
@@ -224,7 +224,7 @@ $X_i=Y_i+A(Q_i)$ and then compute $Q_{i+1}$ from \eqref{eq:structured-inner}. Th
 recovers exactly one input sequence from every output sequence.
 \end{proof}
 
-\subsection{Composition and rate}
+\subsection{Composition and Rate}
 
 \begin{definition}[Structured SPIN]
 \label{def:structured-spin}

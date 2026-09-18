@@ -28,9 +28,9 @@ components once. The phrase \emph{single permutation} describes this
 interface: block shuffles, a transpose, and region shuffles may implement
 $\Pi_N$, but their composition is one global interleaver.
 
-\subsection{Results and approach}
+\subsection{Results and Approach}
 
-\paragraph{Distance and encoding work.}
+\paragraph{Distance and Encoding Work.}
 Our main construction, Structured SPIN, has rate $1/2$ and minimum distance
 greater than $0.11N$ with probability $1-o(1)$ over setup.
 Ordinary and transposed encoding require $O(N)$ bit operations at its native
@@ -43,32 +43,34 @@ The certificate uses rigorous spectrum inequalities, not an assumed exact
 BCH spectrum. Section~\ref{sec:finite-quarter} also gives two certified
 quarter-rate operating points.
 
-\paragraph{Analysis and structure.}
-The proof bounds the expected number of nonzero messages with low-weight
-outputs. It combines an outer spectrum bound with an interleaver--inner
-failure bound for each class of outer words. A uniform interleaver permits
-weight classes; structured routing also requires block occupation and
-row-weight information. Our route sends each active outer row into distinct
-regions, restricting concentrations that a uniform permutation permits.
-This improves the distance analysis as well as data movement, without
-claiming that structured permutations are universally better.
-The recursive stage uses an Independent-Map Transvection (IMT) inner.
-The contribution is the route--inner design and its analysis, rather than
-serial concatenation itself: accumulation, convolution, and the chosen-block
-outer are existing ingredients. Relative to the Random SPIN example below,
-Structured SPIN retains an $11\%$ distance guarantee while reducing the
-direct encoding work from $\Theta(N\log N)$ to $O(N)$.
+\paragraph{Analysis and Structure.}
+For this class of encoder, sparse input words are typically responsible
+for low minimum distance. The challenge for the encoder is to spread their
+nonzero bits widely without paying for dense matrix multiplication.
+First, the outer encodes short message blocks independently, so even a block
+with a single nonzero bit produces several nonzero bits.
+Next, the permutation spreads the bits of each encoded block across distinct
+regions, rather than leaving them clustered together.
+Finally, the inner processes this stream with a small running state.
+Cheap XOR updates let an input bit influence many later outputs, spreading
+local changes over a long codeword.
+Our proof establishes the distance guarantees above by
+bounding the probability that any nonzero message produces too few nonzero
+output bits. The contribution is this efficient combination and its distance
+analysis, building on established ideas from concatenated codes.
 
 Section~\ref{sec:spin-intuition} develops the idea through two simpler
-instances: Accumulator SPIN makes the counting transparent, and Random SPIN
-isolates the benefit of randomized recursive mixing. They motivate the
-structured construction; their complete proofs are in
+instances: Accumulator SPIN uses a running sum as its inner, and Random SPIN
+illustrates what stronger random mixing can achieve. Structured SPIN
+retains Random SPIN's $11\%$ distance guarantee while reducing the direct
+encoding work from $\Theta(N\log N)$ to $O(N)$.
+The complete proofs for these two motivating instances are in
 Appendix~\ref{app:supporting-constructions}.
 The minimal accumulator instance also answers the logarithmic-outer-memory
 question of Bazzi, Mahdian, and Spielman~\cite{bms09} in the
 terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 
-\paragraph{Implementation and applications.}
+\paragraph{Implementation and Applications.}
 On one Ryzen 9 7950X thread, SPIN's transposed encoder computes
 $2^{20}$ $128$-bit correlation blocks in about $10$\,ms, approximately
 $3\times$ faster than original BAA~\cite{KolesnikovEtAl2026BA}.
@@ -89,9 +91,9 @@ slower verification. Both backends receive the applicable shared
 optimizations. Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock}
 state the conditional parameter targets and comparison scope.
 
-\subsection{Related work}
+\subsection{Related Work}
 
-\paragraph{Serial concatenation.}
+\paragraph{Serial Concatenation.}
 Turbo codes use randomized interleaving~\cite{berrou93}.
 Benedetto et al.\ analyzed serial concatenation with a uniform
 interleaver~\cite{benedetto98}. Repeat--accumulate codes and their
@@ -105,10 +107,9 @@ spectra, and optimized CPU/GPU encoders~\cite{KolesnikovEtAl2026BA}.
 Accumulator SPIN is their one-accumulator truncation. Chosen-block BAA
 reuses a spectrum-controlled constituent~\cite{cryptoeprint:2026/1903};
 Structured SPIN combines that shared design idea with a structured route
-and a different recursive inner. Our benchmark compares chosen-block BAA,
-whereas the abstract's speedup is relative to original BAA.
+and a different recursive inner.
 
-\paragraph{Correlation generation.}
+\paragraph{Correlation Generation.}
 PCGs and vector-OLE use linear codes
 \cite{bcgi18,bcg19pcg,bcg19tworound,ferret20,bcg20ring}.
 Silver uses structured LDPC matrices and a banded triangular
@@ -121,9 +122,9 @@ its faster empirical parameter choices go beyond those guarantees.
 Random SPIN retains that inner but replaces the expander with independent
 random-block injections and uses an exact weight-enumerator transform.
 Structured SPIN instead combines a spectrum-controlled outer, structured
-interleaving, and IMT to prove strong distance with linear encoding work.
+interleaving, and a recursive inner to prove strong distance with linear encoding work.
 
-\paragraph{Proof systems.}
+\paragraph{Proof Systems.}
 Linear encoding is a first-order cost in constant-overhead arguments
 \cite{rr25}. Orion uses code switching~\cite{orion22}; Brakedown gives
 a field-agnostic SNARK from linear-time encodable codes~\cite{brakedown23}.
@@ -135,7 +136,7 @@ Bolt uses sketched codes to reduce commitment cost~\cite{bolt26}.
 We evaluate the Brakedown substitution and its integration into Flock,
 using Ligerito as the alternative PCS.
 
-\paragraph{Organization and artifact.}
+\paragraph{Organization and Artifact.}
 Sections~\ref{sec:preliminaries}--\ref{sec:framework} give the common framework;
 Section~\ref{sec:spin-intuition} builds intuition before the structured
 construction, asymptotic proof, and finite certificates in

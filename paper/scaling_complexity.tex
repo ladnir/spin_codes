@@ -1,10 +1,10 @@
-\subsection{Length, work, and parameter selection}
+\subsection{Length, Work, and Parameter Selection}
 \label{sec:scaling}
 
 Finite validity, asymptotic distance, and encoding complexity are separate
 properties. We state them separately for each SPIN family.
 
-\subsubsection{Native and requested lengths}
+\subsubsection{Native and Requested Lengths}
 
 The direct constructions apply at native lengths for which their block
 dimensions are integral. Their logarithmic schedules permit admissible lengths
@@ -14,7 +14,7 @@ below any sufficiently large requested length into that output length. This wrap
 injectivity and absolute minimum distance. It changes rate and relative
 distance by only $o(1)$ and preserves linear work.
 
-\subsubsection{Asymptotic statements}
+\subsubsection{Asymptotic Statements}
 
 Theorems~\ref{thm:independent-accumulator-spin}
 and~\ref{thm:independent-random-spin} give positive relative distance with
@@ -29,9 +29,9 @@ satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)
 The requested-length wrapper gives rate $1/2-o(1)$, relative distance
 $0.11-o(1)$, and linear work.
 
-\subsubsection{Linear work and working state}
+\subsubsection{Linear Work and Working State}
 
-\paragraph{Why the structured inner takes linear time.}
+\paragraph{Why the Structured Inner Takes Linear Time.}
 In the scalable family, the inner step width $t=128$ and state dimension
 $s=19$ are fixed independently of $N$. Each of the $N/t$ steps evaluates
 the fixed linear maps $A,C$, adds fixed-length vectors, and applies
@@ -49,7 +49,7 @@ setup data, separate from this working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
 
-\subsubsection{Finite parameter selection}
+\subsubsection{Finite Parameter Selection}
 \label{sec:finite-parameter-extrapolation}
 
 The finite theorem and Figure~\ref{fig:finite-bch-curve} provide certified
@@ -73,7 +73,7 @@ Changing the outer or selected map requires a matching spectrum calculation
 and inner analysis. The fixed $(128,19)$ ladder shows that useful finite
 coverage need not require retuning at every message length.
 
-\subsubsection{Cost model}
+\subsubsection{Cost Model}
 
 Let $C_{\mathrm{out}}(b)$ be the work to encode one outer block, and let
 $C_{\mathrm{in}}(t,s)$ be the work for one structured inner step. A

@@ -19,7 +19,7 @@ coefficients are independent uniform bits
 inner distribution and replaces the expander with independent random-block
 injections followed by one uniform interleaver.
 
-\subsubsection{Random recursive inner}
+\subsubsection{Random Recursive Inner}
 
 Fix a memory $m\ge1$. For every $t\in[N]$, setup samples
 \[
@@ -40,7 +40,7 @@ Write $I_{N,m}^{\mathrm{rnd}}(u):=y$. Once setup fixes
 $(\alpha_t)_{t=1}^N$, this map is linear and invertible because $y_t$ contains
 $u_t$ with coefficient one.
 
-\subsubsection{Exact convolution transfer}
+\subsubsection{Exact Convolution Transfer}
 
 The random inner admits an exact finite-state transform. Let $X$ mark input
 weight and let $S$ mark output weight. Index the matrix rows and columns by
@@ -111,7 +111,7 @@ For $\delta\in(0,1/2)$, define
   \label{eq:random-inner-slice-tail}
 \end{equation}
 
-\subsubsection{Asymptotic theorem}
+\subsubsection{Asymptotic Theorem}
 
 For an even block length $B$ dividing $N$, set $M:=N/B$. Independently
 sample uniform linear injections
@@ -186,7 +186,7 @@ extend the largest preceding native member. This preserves injectivity and
 absolute minimum distance while changing rate and relative distance by only
 $o(1)$.
 
-\subsubsection{Random-family encoding costs}
+\subsubsection{Random-Family Encoding Costs}
 
 Under either proved schedule, the outer encoder processes \(N/B\) blocks of
 length \(B=\Theta(\log N)\). Direct dense block multiplication therefore

@@ -1,4 +1,4 @@
-\section{Encoder implementation and performance}
+\section{Encoder Implementation and Performance}
 \label{sec:implementation}
 \label{sec:transposed-comparison}
 
@@ -16,19 +16,20 @@ Symbolic checks, dense reference implementations, and adjoint tests check
 the optimized maps. Appendix~\ref{app:implementation} retains the kernel
 details, memory costs, correctness checks, and source-to-certificate bindings.
 
-\paragraph{Transposed comparison.}
+\paragraph{Transposed Comparison.}
 Table~\ref{tab:transposed-comparison} compares binary encoders on one
 Ryzen 9 7950X thread, pinned to CPU~15.
 We compile with GCC~15.2.0 and flags \texttt{-O3}, \texttt{-DNDEBUG},
-and \texttt{-march=znver4}. Each cell is the median of three
+and \texttt{-march=znver4}. Except for the separately measured original-BAA
+reference, each cell is the median of three
 serial process medians; each process has three warmups and $101$ timed calls.
 Setup, allocation, and output checks are excluded. Input buffers are
 initialized once, with no copy or reset between calls. These are
 steady-state encoder latencies, not complete protocol timings.
 
-The BAA rows use the newer chosen-block Golay and RM implementations
-\cite{cryptoeprint:2026/1903}, rather than the original BAA implementation
-\cite{KolesnikovEtAl2026BA}. Their message lengths are $2^m-64$ for
+We include original BAA~\cite{KolesnikovEtAl2026BA} and the newer
+chosen-block Golay and RM implementations~\cite{cryptoeprint:2026/1903}.
+The chosen-block message lengths are $2^m-64$ for
 $m\in\{16,18,20\}$; the other rows use $K=2^m$.
 Expand--Convolute (EC) uses the older provable profile
 $(w,m)=(33,25)$~\cite{RaghuramanRindalTanguy2023EC}, with its weaker
@@ -40,7 +41,8 @@ certificate-matched campaign under the same host, compiler, and timing policy.
 \begin{table}[tb]
 \centering
 \caption{Same-host transposed-encoder latency in milliseconds.
-Entries are medians of three process medians, with no input resets.
+Entries are medians of three process medians, with no input resets,
+except for the separate approximate reference marked $\dagger$.
 The pair $(\delta,\lambda)$ gives the relative distance and margin
 in bits at the largest listed length, except for the RAA reference marked
 $*$ below; -- denotes an unassigned bound.
@@ -52,6 +54,9 @@ EC uses the older, weaker distance and margin target.}
 \par\smallskip
 \begin{minipage}{\linewidth}
 \footnotesize
+$\dagger$Separately measured original-BAA latency on Ryzen at $K=2^{20}$;
+raw samples are not retained in our comparison archive.
+\par
 $*$RAA reference bound at $K=2^{22}$, not the timed $K=2^{20}$:
 approximately $13$ bits without setup testing~\cite[Sec.~3.1]{blaze25}.
 One-time testing of low-weight messages can improve the margin to about
@@ -68,7 +73,7 @@ The table reports each construction's own distance guarantee, not a
 common application-security level. In particular, the RAA reference
 bound is not transferred to our smaller timed lengths.
 
-\paragraph{Other selected configurations.}
+\paragraph{Other Selected Configurations.}
 Quarter-rate SPIN takes $15.254$\,ms at $K=2^{20}$.
 A separate paired experiment measures half-rate ordinary and transposed
 encoding at $10.797$ and $10.674$\,ms, respectively, at that same $K$.

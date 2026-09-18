@@ -1,4 +1,4 @@
-\subsection{Flock integration and full results}
+\subsection{Flock Integration and Full Results}
 \label{app:flock-details}
 
 We integrate SPIN--Brakedown into Flock~\cite{flock26} to measure its
@@ -8,8 +8,8 @@ replaces its Ligerito PCS~\cite{ligerito25} with the construction in
 Section~\ref{sec:spin-pcs}. The final comparison improves prover throughput
 by $1.92\times$ and $1.36\times$ at the two measured workloads.
 
-\paragraph{Adapting the opening interface.}
-Flock's final claims include interpolation weights on a small group of
+\paragraph{Adapting the Opening Interface.}
+Flock's final claims include interpolation\linebreak weights on a small group of
 witness coordinates. We incorporate these weights into the PCS row
 combination, so the opening proves the functional that Flock actually
 requests. A compatible packed representation passes the witness between
@@ -21,7 +21,7 @@ extraction argument. The benchmark proves the committed batch's
 compression constraints; binding public hash inputs and outputs is a
 separate application wrapper.
 
-\paragraph{Improving the surrounding prover.}
+\paragraph{Improving the Surrounding Prover.}
 During integration, we found that field arithmetic, repeated witness
 passes, and temporary storage could obscure the PCS improvement. We
 optimized Flock's x86 kernels, reused workspaces, and evaluated the
@@ -49,7 +49,7 @@ Compressions & PCS & Prover (ms) & Verify (ms) & Proof (MiB) \\
 \end{tabular}
 \end{table}
 
-\paragraph{Measurement method.}
+\paragraph{Measurement Method.}
 The SPIN and Ligerito configurations run in one executable with the same deterministic
 input stream and compiler settings. They use the single-worker hardware
 environment of the standalone PCS experiment. Each workload has four processes per backend
@@ -58,10 +58,9 @@ measures four trials; entries average the four process medians.
 Prover time includes witness generation, commitment, and proving. Setup,
 verification, and outer proof serialization are outside the interval.
 Serialization inside the SPIN opening remains timed because its bytes
-enter the protocol transcript. All $144$ Flock proofs generated in the final
-experiment, including those from warmup runs, passed verification.
+enter the protocol transcript.
 
-\paragraph{Prover costs.}
+\paragraph{Prover Costs.}
 At the larger workload, commitment takes $101$\,ms with SPIN--Brakedown
 and $162$\,ms with Ligerito. Opening takes $61$ and $141$\,ms,
 respectively. These phases account for about $141$\,ms of the $151$\,ms total
@@ -70,7 +69,7 @@ and the remaining checking and preparation costs differ with the layouts.
 These measured rows cover the complete PCS integrations; they do not isolate
 the encoder alone.
 
-\paragraph{An optimistic Bolt projection.}
+\paragraph{An Optimistic Bolt Projection.}
 Table~\ref{tab:spin-flock} also considers replacing the PCS with
 Bolt, using the calibrated opening costs from Appendix~\ref{app:pcs-details}.
 We give Bolt favorable assumptions: free conversion of Flock's weighted
