@@ -12,6 +12,7 @@ portability spellings, and adds a private setup accessor. It also ports
 the standalone transpose range-direct dispatch through K=458752, reusing
 the forward direct route table where present. It does not
 resynthesize circuits or change the full/partial-tile kernel schedules.
+The packed-bit state update is expressed without nested conditional lambdas.
 Block storage and capability detection are package-owned files.
 The generic transpose circuits come from the same configured build.
 
@@ -20,7 +21,7 @@ The package has no runtime or build dependency on its consumer projects.
 | Source file | Import input SHA-256 | Imported SHA-256 |
 |---|---|---|
 | `Spin.h` | `b657e995bc766598588d103cbb8af572eed48db62dfbd4b90d139f64bef3fe1b` | `b2bd18613e0e7a37f377700a4afa26bd3974c4570bfe52af3b9ed5cf828cf95a` |
-| `Spin.cpp` | `3a9be018b19e50209cd456159aae89ffc34ee7bdac040a749c214c6b11112e01` | `81b0043d9331aa84d221759eac744e5de7f26a431d7db5c3df1c234ba23f6762` |
+| `Spin.cpp` | `3a9be018b19e50209cd456159aae89ffc34ee7bdac040a749c214c6b11112e01` | `99cf57292a2db6f0ad696c99aa01dd1b31a3fbb8f8436ef5a0a361f16537917b` |
 | `Inner.h` | `51c19481981366a689126b8275db98f190446026fc0a450ec8677c5e7e8b3360` | `5ae62182b4b4a2692882384e8de602c5e7d170df862bec235d0b6d2dad3c45dd` |
 | `ImtRounds.h` | `d7aad4c445e734d755a5bb6df405ddbe30ea471dc6b26f0c8cd068d92eed2fbc` | `34d4b7cc072bc74f785bd4749bd29803ea01b4e8776f6a14754793686978ddbc` |
 | `K16Inner.h` | `fb1556fb7425c2624792cc8fa6df5d3f80f8ac546e1f61e9f8b70b6b31615a52` | `3af4280c9097a8e2f51420da199c01cbdcf8cf98c1384822aa30b4fb9061025b` |

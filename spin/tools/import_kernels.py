@@ -49,6 +49,24 @@ for name in files:
             '    template<class Map> void runRange(const block*,block*,Workspace&) const;\n'
             '    std::vector<u32> mForwardDirect;')
     if name == 'Spin.cpp':
+        # Keep the packed IMT recurrence in straight-line form across compilers.
+        # Apply the transvection(s) once, then combine the two feedback parities.
+        packed_start = text.index('template<class Map> void Spin::forwardBitsMap')
+        state_start = text.index('        u32 mixed=state;\n', packed_start)
+        state_end = text.index('        state=next;\n', state_start)
+        text = text[:state_start] + '''        u32 mixed=state;
+        const auto* pair=mForwardFieldRows.data()+(isTwoRoundMap<Map>?4:2)*(base/T);
+        mixed^=(0U-u32(std::popcount(mixed&pair[1])&1))&pair[0];
+        if constexpr(isTwoRoundMap<Map>) {
+            mixed^=(0U-u32(std::popcount(mixed&pair[3])&1))&pair[2];
+        }
+        u32 next=0;
+        for(unsigned j=0;j<S;++j) {
+            auto parity=std::popcount(x0&feedbackMasks[j][0])^int((mixed>>j)&1);
+            if constexpr(W==2) parity^=std::popcount(x1&feedbackMasks[j][1]);
+            next|=(u32(parity)&1)<<j;
+        }
+''' + text[state_end:]
         anchor = '    if(packed24Available()) {mSlots24.resize'
         assert text.count(anchor) == 1
         text = text.replace(anchor, '''    // Standalone transpose's measured range-direct schedule. Reuse the
@@ -148,6 +166,7 @@ lines = ['# Kernel generation record', '',
          'the standalone transpose range-direct dispatch through K=458752, reusing',
          'the forward direct route table where present. It does not',
          'resynthesize circuits or change the full/partial-tile kernel schedules.',
+         'The packed-bit state update is expressed without nested conditional lambdas.',
          'Block storage and capability detection are package-owned files.',
          'The generic transpose circuits come from the same configured build.', '',
          'The package has no runtime or build dependency on its consumer projects.', '',
