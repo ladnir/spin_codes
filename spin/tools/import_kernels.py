@@ -52,6 +52,9 @@ for name in files:
         # Keep the packed IMT recurrence in straight-line form across compilers.
         # Apply the transvection(s) once, then combine the two feedback parities.
         packed_start = text.index('template<class Map> void Spin::forwardBitsMap')
+        # These tables depend only on fixed maps. Avoid optimized runtime
+        # initialization, which fails with MSVC 19.51, and remove its guards.
+        text = text[:packed_start] + text[packed_start:].replace('static const auto', 'static constexpr auto')
         state_start = text.index('        u32 mixed=state;\n', packed_start)
         state_end = text.index('        state=next;\n', state_start)
         text = text[:state_start] + '''        u32 mixed=state;
@@ -167,6 +170,7 @@ lines = ['# Kernel generation record', '',
          'the forward direct route table where present. It does not',
          'resynthesize circuits or change the full/partial-tile kernel schedules.',
          'The packed-bit state update is expressed without nested conditional lambdas.',
+         'Its fixed lookup tables are initialized at compile time for MSVC portability.',
          'Block storage and capability detection are package-owned files.',
          'The generic transpose circuits come from the same configured build.', '',
          'The package has no runtime or build dependency on its consumer projects.', '',

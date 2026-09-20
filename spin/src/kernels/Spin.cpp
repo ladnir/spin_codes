@@ -578,27 +578,27 @@ void Spin::forwardBits(const u64* in,std::size_t ni,u64* out,std::size_t no,
 template<class Map> void Spin::forwardBitsMap(const u64* in,u64* out,u64* scratch) const {
     constexpr unsigned S=Map::S,T=Map::T,W=T/64,G=(S+3)/4;
     // 16 KiB of four-bit BCH tables. This is the same generator as the SIMD DAG.
-    static const auto bch=[] {
+    static constexpr auto bch=[] {
         std::array<std::array<std::array<u64,4>,16>,32> t{};
         for(unsigned g=0;g<32;++g) for(unsigned b=0;b<4;++b)
             for(unsigned x=0;x<(1U<<b);++x) for(unsigned w=0;w<4;++w)
                 t[g][x+(1U<<b)][w]=t[g][x][w]^BchRows[4*g+b][w];
         return t;
     }();
-    static const auto masks=[] {
+    static constexpr auto masks=[] {
         std::array<std::array<u64,W>,S> t{};
         for(unsigned j=0;j<S;++j) for(unsigned p=0;p<T;++p)
             t[j][p/64]|=u64((Map::columns[p]>>j)&1)<<(p%64);
         return t;
     }();
-    static const auto feedback=[] {
+    static constexpr auto feedback=[] {
         std::array<std::array<std::array<u64,W>,16>,G> t{};
         for(unsigned g=0;g<G;++g) for(unsigned b=0;b<4 && 4*g+b<S;++b)
             for(unsigned x=0;x<(1U<<b);++x) for(unsigned w=0;w<W;++w)
                 t[g][x+(1U<<b)][w]=t[g][x][w]^masks[4*g+b][w];
         return t;
     }();
-    static const auto feedbackMasks=[] {
+    static constexpr auto feedbackMasks=[] {
         std::array<std::array<u64,W>,S> t{};
         for(unsigned j=0;j<S;++j) for(unsigned p=0;p<T;++p)
             t[j][p/64]|=u64((Map::feedbackColumns[p]>>j)&1)<<(p%64);
