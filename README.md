@@ -1,60 +1,66 @@
 # SPIN codes
 
-Research code and artifacts for **SPIN Codes: Single-Permutation INterleaved
-Codes**. GitHub is the authoritative workspace; Overleaf is an optional
-paper-only mirror.
+Fast binary linear encoders for cryptographic applications. The standalone
+C++20 library lives in [`spin/`](spin/README.md); the paper and supporting
+research live alongside it and are not build dependencies.
 
-Start with the [core implementation guide](artifact/README.md). The artifact
-covers encoder code, build instructions, and correctness tests, not the
-research experiments or numerical proof archives.
+## Build the library
 
-## Quick start
+```sh
+cmake -S spin -B out/spin -DCMAKE_BUILD_TYPE=Release
+cmake --build out/spin --config Release -j2
+ctest --test-dir out/spin -C Release --output-on-failure
+cmake --install out/spin --config Release --prefix /path/to/install
+```
 
-Follow the [core build and test instructions](artifact/README.md#build-and-test-the-half-rate-encoder)
-for the selected BCH/IMT implementation.
+The library supports Linux/GCC and Windows/MSVC on x86-64 with AVX2.
+AVX-512 kernels are selected at runtime where available. ARM is not yet supported.
+No Python, TeX, libOTe, or Hypercat dependency is required to build the library.
 
-To build the paper, install TeX Live with latexmk, BibTeX, PGFPlots, and placeins,
-then run from the repository root:
+```cmake
+find_package(spin 0.1 CONFIG REQUIRED)
+target_link_libraries(my_target PRIVATE spin::spin)
+```
+
+See the [library guide](spin/README.md) for API examples, supported sizes,
+generic XOR-element support, forward and transposed encoding, and tests.
+The library exposes explicit code parameters; protocol integrations choose
+their own parameter and security policies.
+
+## Repository layout
+
+| Path | Purpose |
+|---|---|
+| [`spin/`](spin/README.md) | Self-contained encoder library, public API, kernels, and correctness tests. |
+| [`paper/`](paper/README.md) | SPIN manuscript, figures, and paper build instructions. |
+| [`artifact/`](artifact/README.md) | Paper artifact guide and historical packaging/reproduction tools. |
+| [`workstreams/`](workstreams/) | Research implementations, selected results, and proof-development records. |
+| `constructions/`, `explorations/`, `scripts/`, `bch_spectrum_work/` | Supporting research, not library dependencies. |
+| `BA_paper/`, `enumerator_paper/`, `expander_codes/` | Related manuscripts and research. |
+
+Research paths remain stable because scripts and proof manifests refer to them.
+Library consumers need only `spin/`. The [kernel provenance](spin/PROVENANCE.md)
+and [retained license notices](spin/licenses/) document imported code.
+
+## Paper
+
+The manuscript can be built independently of the library:
 
 ```sh
 cd paper
 latexmk -pdf -outdir=../output/pdf -jobname=spin_codes_draft main.tex
 ```
 
-The output is `output/pdf/spin_codes_draft.pdf`. Compiling the committed
-manuscript does not require regenerating its tables or replaying numerical proofs.
+See the [paper guide](paper/README.md) for dependencies and supporting material.
+Compiling the manuscript does not require replaying numerical proofs.
+The [selected finite results](workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
+and [reproduction guide](artifact/REPRODUCING.md) describe the author-side evidence.
 
-## Where to look
+## Contributions and data
 
-| Directory | Purpose |
-|---|---|
-| [artifact/](artifact/README.md) | Core implementation guide; also retains historical author-side scripts and notes. |
-| [paper/](paper/README.md) | Current LaTeX manuscript and reproducible vector figures. |
-| [Finite IMT results](workstreams/inner_design/finite_migration/PAPER_RESULTS.md) | Current selected certificates, matching timings, implementation paths, and migration status. |
-| [workstreams/bare_bch_rm2sub/](workstreams/bare_bch_rm2sub/README.md) | Shared implementation machinery and historical RM2Sub encoder. |
-| [IMT inner](workstreams/inner_design/IMT.md) | New inner: terminology, certified instances, and source-name mapping; the supported default remains RM2Sub. |
-| [workstreams/transposed_comparison/](workstreams/transposed_comparison/README.md) | Same-host transposed SPIN, chosen BAA, Expand--Convolute, and binary RAA comparison. |
-| [workstreams/bch_rm2sub_bridge/](workstreams/bch_rm2sub_bridge/PAPER_HANDOFF.md) | Finite BCH-256 proof sources, compact ledgers, and numerical replay notes. |
-| [workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/](workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md) | Frozen asymptotic Structured SPIN certificate snapshot. |
-| [workstreams/finite_asymptotic_theory/landscape_db/](workstreams/finite_asymptotic_theory/landscape_db/CURRENT_ENGINEERING_RESULTS.md) | Small-constituent parameter study and retained numerical tables. |
-| `constructions/`, other `workstreams/`, `explorations/` | Supporting implementations and research history; not the starting point for paper reproduction. |
-| `BA_paper/`, `enumerator_paper/`, `expander_codes/` | Related research material. |
-| `output/`, `out/`, `tmp/` | Local generated PDFs, builds, and scratch results; not release inputs. |
+Commit code, documentation, compact selected results, and manifests—not build
+products or experiment archives. The repository hygiene check rejects tracked
+files over 5 MiB and bulk-output formats. See [publication policy](GITHUB_PUBLISH_POLICY.md).
+Run performance benchmarks serially.
 
-Frozen source paths are retained because manifests bind their contents and
-scripts import them directly. The artifact guide supplies a stable navigation
-layer without relocating or duplicating the research implementations.
-
-## Reproducibility and publication
-
-The quick checks verify retained results; they do not independently rerun
-every numerical proof. Full BCH evidence is inventoried by
-`python -B artifact/reproduce.py inventory`. The [reproduction guide](artifact/REPRODUCING.md)
-separates figure regeneration, numerical replay, encoder correctness, and
-benchmarking. Run benchmarks serially, never concurrently.
-
-See [the publication policy](GITHUB_PUBLISH_POLICY.md) before adding data.
-Commit source, compact selected results, and manifests, not experiment trees.
-The artifact is limited to the core implementation. A complete experimental
-or numerical-evidence archive is not a release requirement for that artifact.
-Historical reproduction commands above remain author-side tools.
+GitHub is the authoritative workspace. Overleaf is an optional paper-only mirror.

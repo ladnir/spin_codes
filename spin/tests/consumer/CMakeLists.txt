@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+project(SpinConsumer LANGUAGES CXX)
+find_package(spin CONFIG REQUIRED)
+add_executable(consumer main.cpp)
+target_link_libraries(consumer PRIVATE spin::spin)

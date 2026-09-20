@@ -1,0 +1,22 @@
+name: SPIN library
+
+on:
+  push:
+    paths: ['spin/**', '.github/workflows/spin.yml']
+  pull_request:
+    paths: ['spin/**', '.github/workflows/spin.yml']
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S spin -B out/spin -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build out/spin --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir out/spin -C Release --output-on-failure
