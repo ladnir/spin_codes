@@ -111,7 +111,7 @@ circuits = circuits.replace('template<class E> inline void bch(const E* a,E* out
     'template<class E,class Op> inline void bch(const E* a,E* out,const Op& vx) {')
 (inc / 'GenericCircuits.h').write_text(circuits, newline='\n')
 
-original = (package.parent / 'workstreams/spin_optimized/GenericSpin.h').read_text()
+original = (package.parent / 'research/workstreams/spin_optimized/GenericSpin.h').read_text()
 start = original.index('    template<class E> static inline void imt(')
 end = original.rindex('\n};')
 body = original[start:end].replace('generic_detail::', 'detail::generic::')

@@ -21,8 +21,11 @@ jobs:
       # Generated IMT evidence is author-side data, outside the core-code artifact.
       # These tests do not claim certificate or numerical-replay verification.
       - name: Artifact packaging and missing-evidence rejection tests
+        working-directory: research
         run: python -B -m unittest discover -s artifact -p "test_*.py"
       - name: Exact-union adapter tests
+        working-directory: research
         run: python -B -m unittest discover -s paper -p "test_imt_results.py"
       - name: Manuscript terminology tests
+        working-directory: research
         run: python -B -m unittest discover -s paper -p "test_imt_narrative.py"

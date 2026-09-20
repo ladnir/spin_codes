@@ -2,9 +2,9 @@ name: SPIN library
 
 on:
   push:
-    paths: ['spin/**', '.github/workflows/spin.yml']
+    paths: ['spin/**', 'CMakeLists.txt', '.github/workflows/spin.yml']
   pull_request:
-    paths: ['spin/**', '.github/workflows/spin.yml']
+    paths: ['spin/**', 'CMakeLists.txt', '.github/workflows/spin.yml']
 
 jobs:
   build-and-test:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -S spin -B out/spin -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B out/spin -DCMAKE_BUILD_TYPE=Release
       - name: Build
         run: cmake --build out/spin --config Release --parallel 2
       - name: Test

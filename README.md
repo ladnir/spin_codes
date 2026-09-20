@@ -7,7 +7,7 @@ research live alongside it and are not build dependencies.
 ## Build the library
 
 ```sh
-cmake -S spin -B out/spin -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B out/spin -DCMAKE_BUILD_TYPE=Release
 cmake --build out/spin --config Release -j2
 ctest --test-dir out/spin -C Release --output-on-failure
 cmake --install out/spin --config Release --prefix /path/to/install
@@ -32,13 +32,9 @@ their own parameter and security policies.
 | Path | Purpose |
 |---|---|
 | [`spin/`](spin/README.md) | Self-contained encoder library, public API, kernels, and correctness tests. |
-| [`paper/`](paper/README.md) | SPIN manuscript, figures, and paper build instructions. |
-| [`artifact/`](artifact/README.md) | Paper artifact guide and historical packaging/reproduction tools. |
-| [`workstreams/`](workstreams/) | Research implementations, selected results, and proof-development records. |
-| `constructions/`, `explorations/`, `scripts/`, `bch_spectrum_work/` | Supporting research, not library dependencies. |
-| `BA_paper/`, `enumerator_paper/`, `expander_codes/` | Related manuscripts and research. |
+| [`research/`](research/README.md) | Manuscript, proof records, historical experiments, and related papers. |
 
-Research paths remain stable because scripts and proof manifests refer to them.
+Research material is grouped separately, preserving its internal relative paths.
 Library consumers need only `spin/`. SPIN is [MIT licensed](spin/LICENSE).
 The [generation record](spin/PROVENANCE.md) records the kernel snapshots and hashes.
 The library license does not change the terms of the paper or research archives.
@@ -48,20 +44,20 @@ The library license does not change the terms of the paper or research archives.
 The manuscript can be built independently of the library:
 
 ```sh
-cd paper
-latexmk -pdf -outdir=../output/pdf -jobname=spin_codes_draft main.tex
+cd research/paper
+latexmk -pdf -outdir=../../output/pdf -jobname=spin_codes_draft main.tex
 ```
 
-See the [paper guide](paper/README.md) for dependencies and supporting material.
+See the [paper guide](research/paper/README.md) for dependencies and supporting material.
 Compiling the manuscript does not require replaying numerical proofs.
-The [selected finite results](workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
-and [reproduction guide](artifact/REPRODUCING.md) describe the author-side evidence.
+The [selected finite results](research/workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
+and [reproduction guide](research/artifact/REPRODUCING.md) describe the author-side evidence.
 
 ## Contributions and data
 
 Commit code, documentation, compact selected results, and manifests—not build
 products or experiment archives. The repository hygiene check rejects tracked
-files over 5 MiB and bulk-output formats. See [publication policy](GITHUB_PUBLISH_POLICY.md).
+files over 5 MiB and bulk-output formats. See [publication policy](research/GITHUB_PUBLISH_POLICY.md).
 Run performance benchmarks serially.
 
 GitHub is the authoritative workspace. Overleaf is an optional paper-only mirror.
