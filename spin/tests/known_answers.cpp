@@ -29,6 +29,15 @@ int main(int argc,char**) {
         else if(f!=expectedForward[test] || t!=expectedTranspose[test]) {
             std::cerr<<"descriptor v1 known-answer mismatch: "<<unsigned(p)<<'\n';return 1;
         }
+        // Coordinatewise bit projection commutes with this binary linear map.
+        // The reference above is anchored by the independent stored checksums.
+        std::vector<std::uint64_t> bits(c.message_size()/64),encoded(c.code_size()/64),scratch(encoded.size());
+        for(std::size_t i=0;i<c.message_size();++i) bits[i/64]|=(in[i].lanes[0]&1)<<(i%64);
+        c.forward_bits(bits,encoded,scratch);
+        for(std::size_t i=0;i<c.code_size();++i)
+            if(((encoded[i/64]>>(i%64))&1)!=(out[i].lanes[0]&1)) {
+                std::cerr<<"packed bit projection mismatch: parameters="<<unsigned(p)<<" bit="<<i<<'\n';return 1;
+            }
         ++test;
     }
 }

@@ -627,17 +627,15 @@ template<class Map> void Spin::forwardBitsMap(const u64* in,u64* out,u64* scratc
         out[base/64]=y0; if constexpr(W==2) out[base/64+1]=y1;
         if(base+T==codeBlocks()) break;
         u32 mixed=state;
+        const auto* pair=mForwardFieldRows.data()+(isTwoRoundMap<Map>?4:2)*(base/T);
+        mixed^=(0U-u32(std::popcount(mixed&pair[1])&1))&pair[0];
         if constexpr(isTwoRoundMap<Map>) {
-            const auto* pair=mForwardFieldRows.data()+4*(base/T);
-            mixed^=(0U-u32(std::popcount(mixed&pair[1])&1))&pair[0];
             mixed^=(0U-u32(std::popcount(mixed&pair[3])&1))&pair[2];
         }
         u32 next=0;
         for(unsigned j=0;j<S;++j) {
-            const auto parity=std::popcount(x0&feedbackMasks[j][0])^([&] {if constexpr(W==2) return std::popcount(x1&feedbackMasks[j][1]); else return 0;}())^
-                ([&] {if constexpr(isTwoRoundMap<Map>) return int((mixed>>j)&1);
-                else return int((state>>j)&1)^int(((mForwardFieldRows[2*(base/T)]>>j)&1) &
-                (std::popcount(state&mForwardFieldRows[2*(base/T)+1])&1));}());
+            auto parity=std::popcount(x0&feedbackMasks[j][0])^int((mixed>>j)&1);
+            if constexpr(W==2) parity^=std::popcount(x1&feedbackMasks[j][1]);
             next|=(u32(parity)&1)<<j;
         }
         state=next;
