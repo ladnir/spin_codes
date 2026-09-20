@@ -4,12 +4,14 @@ import re
 import sys
 p=Path(sys.argv[1])
 direct_max=int(sys.argv[2]) if len(sys.argv)>2 else 458752
-assert 0<=direct_max<=1<<26
+assert 0<=direct_max<=((1<<32)-1)//2
 def edit(s,a,b):
     assert s.count(a)==1,a
     return s.replace(a,b)
 def put(n,s): (p/n).write_text(s,newline='\n')
 h=(p/'Spin.h').read_text();s=(p/'Spin.cpp').read_text();f=(p/'Fast.cpp').read_text()
+(p/'LengthGeometry.h').write_bytes((Path(__file__).parent/'LengthGeometry.h').read_bytes())
+h='#include "LengthGeometry.h"\n'+h
 assert 'forwardBits(' not in h, 'Transpose target only'
 h=edit(h,'enum class Layout { Packed24, Indices32 };', '''// Explicit length in logical elements; transpose maps 2K elements to K.
 struct MessageLength { std::size_t value; };
@@ -18,7 +20,7 @@ start=h.index('    Spin(Configuration');end=h.index(';',start)+1
 decl=h[start:end]
 h=h[:end]+'\n'+decl.replace('unsigned messageExponent','MessageLength length')+h[end:]
 h=h.replace('Layout layout=Layout::Packed24','Layout layout=Layout::Auto')
-h=edit(h,'    std::size_t messageBlocks() const noexcept', '''    static constexpr std::size_t maxMessageBlocks=std::size_t{1}<<26;
+h=edit(h,'    std::size_t messageBlocks() const noexcept', '''    static constexpr std::size_t maxMessageBlocks=length_geometry::maxMessageBlocks;
     bool packed24Available() const noexcept {return codeBlocks()<=(std::size_t{1}<<24);}
     Layout preferredLayout() const noexcept {
         return mCompacted?mRetainedLayout:(packed24Available()?Layout::Packed24:Layout::Indices32);
@@ -30,8 +32,7 @@ h=edit(h,'    template<class Map> void setupInner', '''    template<class Map,bo
     template<class Map> void setupInner''')
 old='Spin::Spin(Configuration c,unsigned exponent,u64 routeSeed,u64 coefficientSeed,unsigned tileRows,Outer outer,BchBackend backend)'
 s=edit(s,old,'''static std::size_t exponentLength(unsigned exponent) {
-    if(exponent>26) throw std::invalid_argument("message exponent exceeds implementation limit");
-    return std::size_t{1}<<exponent;
+    return length_geometry::fromExponent(exponent);
 }
 '''+old+'''
     :Spin(c,MessageLength{exponentLength(exponent)},routeSeed,coefficientSeed,tileRows,outer,backend) {}
@@ -41,8 +42,7 @@ s=s.replace('supported message exponents: 16..20; tile rows must be a power of t
 s,n=re.subn(r'    if\([^\n]*exponent!=16\)\n        throw [^\n]*;\n','',s)
 assert n==1, 'certificate-only K16 restriction'
 s=edit(s,'    mK=std::size_t{1}<<exponent;', '''    mK=length.value;
-    if(!mK || mK>maxMessageBlocks || mK%(std::size_t{128}*step()))
-        throw std::invalid_argument("K must be a positive multiple of 128*t, at most 2^26");''')
+    length_geometry::check(mK,step());''')
 s=s.replace('exponent<=16','mK<=(1U<<16)').replace('exponent<=18','mK<=(1U<<18)')
 s=edit(s,'std::min<std::size_t>(selectedTile,rows)', 'std::min<std::size_t>(selectedTile,std::bit_floor(rows))')
 s=edit(s,'    if(rows%step())', '    mPartialTile=(rows%mTileRows)!=0;\n    if(rows%step())')

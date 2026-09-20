@@ -31,8 +31,9 @@ by 128t, not merely K divisible by 128.
 | `T64S12` | 64 | 12 | 1 | 8192 |
 | `T64S12R2` | 64 | 12 | 2 | 8192 |
 
-Positive aligned K up to 2^26 is accepted. This upper bound is an implementation
-limit, not a certificate boundary. The smallest supplied map permits K=8192;
+Positive aligned K is accepted within the 32-bit routing representation: K < 2^31.
+The former 2^26 policy cap is removed. Allocation can still fail when the requested
+setup and buffers exceed available memory. The smallest supplied map permits K=8192;
 K=4096 requires another map or a different region-boundary convention and is
 not implemented here. Arbitrary user-defined (t,s) pairs are not synthesized.
 
@@ -81,9 +82,38 @@ compaction; each concurrent caller needs separate workspace.
 
 ## Scope and validation
 
-This change applies only to `spin_half_transpose`. The optional bidirectional
-library and wide forward kernels retain their previous length interfaces.
-The unfinished `SPIN_FORWARD_FOUR` optimization is disabled by default.
+The same `MessageLength{K}` interface and alignment rules now apply to the
+optional bidirectional library and wide forward kernels. Both directions share
+`LengthGeometry.h`; neither uses a benchmark-size or certificate-size cap.
+Wide kernels support both Packed24 and Indices32, including partial tiles.
+The older results below document the original transpose generalization.
+
+For the combined natural-length validation, run `natural_lengths_check.sh ROOT UPSTREAM MODE`,
+with MODE `release`, `avx2`, `masked`, or `sanitize`. The release build also
+provides binaries for `natural_large_check.sh ROOT`, which checks nonzero data
+just beyond the packed-index boundary at K=8,404,992. It covers standalone
+transpose, bidirectional encoding, and both wide element widths. Allocation-free
+geometry tests cover the former 2^26 cap and the 32-bit representation boundary;
+they do not claim that allocations near the boundary fit available memory.
+
+After all builds finish, `natural_regression_check.sh ROOT` runs the selected
+power-of-two benchmarks serially and audits ISA isolation. Logs and timings
+stay ignored under `measurements/natural_lengths`.
+
+The combined change passed all eight selected suites in release, AVX2-only,
+and ASan/UBSan builds on Peach. The large nonzero-data checks passed in all
+three targets, including both wide widths, and the ISA-isolation audit passed.
+The upper representation boundary is checked without allocating enormous buffers.
+
+Power-of-two forward spot checks measured 0.345, 1.604, and 8.966 ms for one
+128-bit stream at K=2^16, 2^18, and 2^20. The preceding measurements were 0.348,
+1.601, and 9.031 ms. These are consistent with preserving the fast paths;
+they are not a simultaneous old/new comparison. The new results use three
+processes with 31 trials each, the same maps and compiler tuning, and a
+256-row tile. Medians are taken across process medians. Wide measurements
+likewise remain in the prior range, with greater small-size timing variation.
+The optional `SPIN_FORWARD_FOUR` optimization is disabled by default; see
+[FORWARD_PROGRESS.md](FORWARD_PROGRESS.md) for validation and measurements.
 The CPU fallback is still the existing AVX2 kernel. A separate, opt-in
 [generic element-type fallback](GENERIC_ELEMENTS.md) preserves the same map.
 

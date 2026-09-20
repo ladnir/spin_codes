@@ -6,7 +6,10 @@ It maps 2K input elements to K output elements. Use the optimized 128-bit API
 by default, or the explicit generic XOR-element fallback for other types.
 
 This workstream does not replace the submitted paper artifact or its source pins.
-Forward and wide-element optimization are parked, not part of the default build.
+Forward and wide-element optimization are optional, not part of the default build.
+Start with [FORWARD_USAGE.md](FORWARD_USAGE.md) for the selected forward build,
+buffer layout, and width/tile guidance. Current timings are in
+[FORWARD_SCHEDULE.md](FORWARD_SCHEDULE.md) and [WIDE_ITERATION.md](WIDE_ITERATION.md).
 
 ## Build and use
 
@@ -44,7 +47,9 @@ the implementation checks structural validity and does not round or retune K.
 | `T64S12` | (64, 12, 1) | 8192 |
 | `T64S12R2` | (64, 12, 2) | 8192 |
 
-Aligned lengths through 2^26 are supported. The supplied maps do not support
+There is no benchmark-size or certificate-size cap. Both forward and transpose
+accept naturally aligned lengths within the shared 32-bit routing representation
+(K < 2^31), subject to available memory. The supplied maps do not support
 K=4096. See [ALIGNED_LENGTHS.md](ALIGNED_LENGTHS.md) for geometry, layout selection,
 and range-based routing. The selected K16 two-round point and its certificate
 are documented in [R2_RESULTS.md](R2_RESULTS.md).
@@ -96,15 +101,16 @@ the actual length; `m` is its base-two exponent, or null for other lengths.
 Recent timings are in [ALIGNED_LENGTHS.md](ALIGNED_LENGTHS.md) and
 [GENERIC_ELEMENTS.md](GENERIC_ELEMENTS.md). Raw results remain ignored by Git.
 
-## Source layout and parked work
+## Source layout and optional work
 
 - `generate.py`, `k16*.py`, `k18.py`, `lengths.py`: generate the optimized implementation and dispatch.
 - `generic.py`, `GenericSpin.h`: generate and expose the XOR-element fallback.
 - `*_test.cpp`, `test_k16_map.py`: correctness tests; `*_check.sh` adds broader build matrices.
 - `*_screen.sh`, `*_summary.py`, `*_RESULTS.md`: tuning scripts and measured conclusions, not required dependencies for callers.
 - [INTEGRATION_HISTORY.md](INTEGRATION_HISTORY.md): earlier integration notes, options, and measurements, preserved without deleting results.
-- `cmake/OptionalForward.cmake`, `bidirectional.py`, `wide.*`: opt-in imports from a caller-supplied upstream checkout. These keep their older length interfaces.
-- [WIDE_FORWARD.md](WIDE_FORWARD.md), [WIDE_TUNING.md](WIDE_TUNING.md): parked forward work. `SPIN_FORWARD_FOUR` remains experimental and OFF.
+- `cmake/OptionalForward.cmake`, `bidirectional.py`, `forward_lengths.py`, `wide.*`: opt-in forward/wide imports with the same natural-length interface.
+- [FORWARD_USAGE.md](FORWARD_USAGE.md): selected optional forward build and application interface.
+- [WIDE_FORWARD.md](WIDE_FORWARD.md), [WIDE_TUNING.md](WIDE_TUNING.md), [FORWARD_PROGRESS.md](FORWARD_PROGRESS.md): earlier experiments, retained as measurement history.
 
 Research switches are advanced CMake options. In particular, disabling an
 exact-size direct specialization does not disable the newer range-direct path;

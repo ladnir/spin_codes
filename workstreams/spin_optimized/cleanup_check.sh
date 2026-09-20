@@ -21,10 +21,8 @@ if [[ -n $upstream ]]; then
     spin_k16_bidirectional_test spin_bidirectional_benchmark > "$result/optional-build.log" 2>&1
   flock -n /tmp/prindal-addition-encoder-benchmark.lock flock -n /tmp/bare-spin-benchmark.lock \
     ctest --test-dir "$root/build-clean-optional" -R bidirectional --output-on-failure -j1 | tee "$result/optional-tests.log"
-  if "$root/build-clean-optional/spin_bidirectional_benchmark" 20 auto 3 1 0 0 12819 81920 > "$result/reject-override.log" 2>&1; then
-    echo 'Legacy target incorrectly accepted K override' >&2;exit 1
-  fi
-  grep -q 'K override requires' "$result/reject-override.log"
+  "$root/build-clean-optional/spin_bidirectional_benchmark" 20 auto 3 1 0 0 12819 81920 > "$result/optional-length.json"
+  python3 -c 'import json,sys;v=json.load(open(sys.argv[1]));assert v["K"]==81920 and v["m"] is None' "$result/optional-length.json"
 fi
 if cmake -S "$root/workstreams/spin_optimized" -B "$root/build-clean-invalid" \
   -DSPIN_BUILD_WIDE=ON > "$result/reject-forward.log" 2>&1; then

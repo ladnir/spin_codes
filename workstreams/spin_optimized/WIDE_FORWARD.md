@@ -1,5 +1,9 @@
 # Wide forward SPIN: equal-work comparison
 
+For the current build recipe and application interface, use
+[FORWARD_USAGE.md](FORWARD_USAGE.md). This document preserves the initial experiment;
+its build command intentionally does not enable the later optimizations.
+
 This records the initial S19 comparison. The subsequent
 [K16 extension and K20 tile tuning](WIDE_TUNING.md) improve the K20 result and
 add support for the selected two-round K16 inner.

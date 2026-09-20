@@ -8,6 +8,11 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_
   "${SPIN_BIDIRECTIONAL_SOURCE}/generate_wide.py")
 execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/wide.py"
   "${SPIN_BIDIRECTIONAL_SOURCE}" "${BID}" COMMAND_ERROR_IS_FATAL ANY)
+if(SPIN_WIDE_SCHEDULE STREQUAL "dfs")
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/wide_schedule.py")
+  execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/wide_schedule.py"
+    "${BID}" COMMAND_ERROR_IS_FATAL ANY)
+endif()
 add_library(spin_wide256 OBJECT "${BID}/wide/Wide256.cpp")
 target_link_libraries(spin_wide256 PRIVATE spin_baseline)
 target_include_directories(spin_wide256 PRIVATE "${BID}")
@@ -23,6 +28,15 @@ foreach(t spin_wide spin_wide256 spin_wide512)
   set_property(TARGET ${t} PROPERTY INTERPROCEDURAL_OPTIMIZATION FALSE)
 endforeach()
 if(BUILD_TESTING)
+  add_executable(spin_wide_lengths_test natural_forward_test.cpp)
+  target_compile_definitions(spin_wide_lengths_test PRIVATE SPIN_TEST_WIDE=1)
+  target_link_libraries(spin_wide_lengths_test PRIVATE spin_wide)
+  add_test(NAME wide_natural_lengths COMMAND spin_wide_lengths_test)
+  set_tests_properties(wide_natural_lengths PROPERTIES RUN_SERIAL TRUE)
+  add_test(NAME wide_schedule_generator
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_wide_schedule.py")
+  add_test(NAME wide_schedule_generator_optimized
+    COMMAND "${Python3_EXECUTABLE}" -O "${CMAKE_CURRENT_SOURCE_DIR}/test_wide_schedule.py")
   add_executable(spin_wide_test wide_test.cpp)
   target_link_libraries(spin_wide_test PRIVATE spin_wide)
   add_test(NAME wide_forward COMMAND spin_wide_test)

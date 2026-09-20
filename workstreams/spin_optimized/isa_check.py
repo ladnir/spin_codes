@@ -12,6 +12,10 @@ paths=[
 for path in ('CMakeFiles/spin_half_transpose.dir/generated/GenericSpin.cpp.o',
              'CMakeFiles/spin_generic_test.dir/generic_test.cpp.o'):
     if (build/path).exists(): paths.append((path,False))
+if '--optional-only' in sys.argv[2:]:
+    if not (build/'bidirectional').is_dir():
+        raise RuntimeError('--optional-only requires a bidirectional build')
+    paths=[]
 if (build/'bidirectional').exists():
     paths += [
         ('CMakeFiles/spin_half_bidirectional.dir/bidirectional/Spin.cpp.o',False),
@@ -19,6 +23,9 @@ if (build/'bidirectional').exists():
         ('CMakeFiles/spin_half_bidirectional.dir/bidirectional/generated/BchForward.cpp.o',False),
         ('CMakeFiles/spin_bidir512.dir/bidirectional/Fast.cpp.o',True),
         ('CMakeFiles/spin_bidir512.dir/bidirectional/generated/BchAvx512.cpp.o',True)]
+    for path in ('CMakeFiles/spin_bidir512.dir/bidirectional/ForwardFast.cpp.o',
+                 'CMakeFiles/spin_bidir512.dir/bidirectional/generated/BchForward512.cpp.o'):
+        if (build/path).exists(): paths.append((path,True))
 if (build/'CMakeFiles/spin_wide.dir').exists():
     paths += [
         ('CMakeFiles/spin_wide.dir/Wide.cpp.o',False),

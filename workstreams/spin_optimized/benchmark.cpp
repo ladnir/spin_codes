@@ -38,7 +38,7 @@ static void lockBenchmarks() {
 }
 int main(int argc,char** argv) {
  try {
-    if(argc<3) throw std::invalid_argument("usage: spin_benchmark m backend[auto,avx2,avx512] [odd trials=101] [seed=1] [tile=0] [layout=0] [configuration=12819|6412|6412r2] [K override, generalized transpose only]");
+    if(argc<3) throw std::invalid_argument("usage: spin_benchmark m backend[auto,avx2,avx512] [odd trials=101] [seed=1] [tile=0] [layout=0] [configuration=12819|6412|6412r2] [actual K override]");
     const unsigned m=std::stoul(argv[1]),trials=argc>3?std::stoul(argv[3]):101;
     const std::string which=argv[2];const u64 routeSeed=argc>4?std::stoull(argv[4]):1;
     const unsigned tile=argc>5?std::stoul(argv[5]):0,layout=argc>6?std::stoul(argv[6]):0;

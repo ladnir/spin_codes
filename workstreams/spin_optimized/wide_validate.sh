@@ -3,6 +3,8 @@ set -euo pipefail
 root=${1:?repository root}
 cd "$root"
 result=${2:-workstreams/spin_optimized/measurements/wide}
+if (( $# >= 2 )); then shift 2; else shift; fi
+# Remaining arguments are CMake options for the configuration under test.
 mkdir -p "$result"
 for mode in masked sanitize; do
   options=(-DSPIN_TEST_NO_AVX512=ON)
@@ -12,7 +14,7 @@ for mode in masked sanitize; do
   fi
   cmake -S workstreams/spin_optimized -B "build-wide-$mode" -DCMAKE_BUILD_TYPE=Release \
     -DSPIN_BCH_AVX512=ON -DSPIN_BUILD_WIDE=ON -DSPIN_BUILD_BENCHMARK=ON \
-    -DSPIN_BIDIRECTIONAL_SOURCE="$root/hypercat/native/spin" "${options[@]}" > "$result/$mode-configure.log" 2>&1
+    -DSPIN_BIDIRECTIONAL_SOURCE="$root/hypercat/native/spin" "$@" "${options[@]}" > "$result/$mode-configure.log" 2>&1
   cmake --build "build-wide-$mode" --target spin_wide_test spin_wide_benchmark -j2 > "$result/$mode-build.log" 2>&1
   ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
     flock -n /tmp/prindal-addition-encoder-benchmark.lock flock -n /tmp/bare-spin-benchmark.lock \

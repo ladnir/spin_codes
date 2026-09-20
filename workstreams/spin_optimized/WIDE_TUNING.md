@@ -1,5 +1,8 @@
 # Selected K16 inner and K20 wide-tile tuning
 
+Follow-up: [WIDE_ITERATION.md](WIDE_ITERATION.md) records improved BCH scheduling
+and compares wide kernels with the subsequently optimized 128-bit path.
+
 The selected K16 inner now supports 256-bit and 512-bit forward encoding.
 The 256-bit path gives a 1.31x throughput gain over its 128-bit counterpart,
 including column assembly. Separately, reducing the K20 tile from 2048 to

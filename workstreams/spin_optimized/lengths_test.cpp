@@ -12,6 +12,9 @@ template<class F> static void rejects(F f) {
 }
 int main(int argc,char** argv) {
  try {
+    check(length_geometry::valid(std::size_t{1}<<27,128),"old cap remains");
+    check(length_geometry::valid(std::size_t{1}<<30,128),"32-bit geometry rejected");
+    check(!length_geometry::valid(std::size_t{1}<<31,128),"32-bit overflow accepted");
     // Optional large test crosses Packed24's exact boundary, without a huge
     // dense oracle. Exercise both tail dispatch and automatic 32-bit routing.
     if(argc>1) {
@@ -62,6 +65,7 @@ int main(int argc,char** argv) {
             std::cout<<oracle.name()<<" K="<<k<<" PASS\n";
         }
     }
-    rejects([] {Spin c(Configuration::T128S19,27);});
+    rejects([] {Spin c(Configuration::T128S19,31);});
+    rejects([] {Spin c(Configuration::T128S19,64);});
  } catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}
 }

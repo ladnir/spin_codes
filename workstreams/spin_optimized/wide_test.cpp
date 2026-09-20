@@ -17,7 +17,6 @@ int main() {
             continue;
         }
         rejects([&] {Spin c(Configuration::T64S12,16);WideWorkspace w(c,lanes);});
-        rejects([&] {Spin c(Configuration::T128S19,14);c.compact(Layout::Indices32);WideWorkspace w(c,lanes);});
         for(auto cfg:{Configuration::T128S19,Configuration::T64S12R2})
          for(unsigned m:{14U,16U,20U}) for(unsigned tile:{0U,2U,64U,128U,512U}) for(bool compact:{false,true}) {
             if(cfg==Configuration::T64S12R2 && m!=16) continue;
@@ -44,7 +43,11 @@ int main() {
                 for(std::size_t i=0;i<n;++i) check(!std::memcmp(&out[i*lanes+l],&y[i],16),"wide plane differs");
             }
             rejects([&] {wide.forward({in,k*lanes-1},{out,n*lanes});});
+            rejects([&] {wide.forward({in,k*lanes},{out,n*lanes-1});});
             rejects([&] {wide.forward({out,k*lanes},{out,n*lanes});});
+            // Both directions of partial overlap, within the allocated buffer.
+            rejects([&] {wide.forward({out+1,k*lanes},{out,n*lanes});});
+            rejects([&] {wide.forward({out,k*lanes},{out+1,n*lanes});});
             std::cout<<"lanes="<<lanes<<" config="<<c.name()<<" m="<<m<<" tile="<<tile<<" compact="<<compact<<" PASS\n";
         }
     }

@@ -9,7 +9,26 @@ option(SPIN_BCH_AVX512 "Enable runtime-dispatched four-row BCH" OFF)
 option(SPIN_TEST_NO_AVX512 "Test-only: suppress AVX-512 detection" OFF)
 option(SPIN_BUILD_BENCHMARK "Build the serial, locked experiment harness" OFF)
 option(SPIN_BUILD_WIDE "Import Hypercat's 256/512-bit forward kernels" OFF)
-option(SPIN_FORWARD_FOUR "Experimental, unvalidated four-row forward circuit" OFF)
+set(SPIN_WIDE_SCHEDULE global CACHE STRING "Wide forward BCH schedule: global or dfs")
+set_property(CACHE SPIN_WIDE_SCHEDULE PROPERTY STRINGS global dfs)
+if(NOT SPIN_WIDE_SCHEDULE MATCHES "^(global|dfs)$")
+  message(FATAL_ERROR "Unknown SPIN_WIDE_SCHEDULE")
+endif()
+if(NOT SPIN_WIDE_SCHEDULE STREQUAL "global" AND NOT SPIN_BUILD_WIDE)
+  message(FATAL_ERROR "SPIN_WIDE_SCHEDULE requires SPIN_BUILD_WIDE")
+endif()
+option(SPIN_FORWARD_FOUR "Optional four-row forward BCH circuit (requires AVX-512 backend)" OFF)
+option(SPIN_FORWARD_DIRECT "Experimental cache-resident direct forward routing through K=2^18" OFF)
+option(SPIN_INNER_PROBE "Build diagnostic contiguous/routed forward-inner benchmark" OFF)
+option(SPIN_FORWARD_EXPANSION "Experimental XOR-circuit S19 forward expansion" OFF)
+set(SPIN_FORWARD_SCHEDULE global CACHE STRING "Four-row forward BCH schedule: global, dfs, local16, local32")
+if(NOT SPIN_FORWARD_SCHEDULE MATCHES "^(global|dfs|local16|local32)$")
+  message(FATAL_ERROR "Unknown SPIN_FORWARD_SCHEDULE")
+endif()
+set(SPIN_FORWARD_PREFETCH 0 CACHE STRING "Experimental forward gather lookahead in elements; 0 disables")
+if(NOT SPIN_FORWARD_PREFETCH MATCHES "^(0|16|32|64|128)$")
+  message(FATAL_ERROR "SPIN_FORWARD_PREFETCH must be 0, 16, 32, 64, or 128")
+endif()
 option(SPIN_GENERAL_LENGTHS "Naturally aligned lengths for the transposed library" ON)
 set(SPIN_DIRECT_MAX_K 458752 CACHE STRING "Upper K for runtime-length AVX-512 direct routing; 0 disables")
 option(SPIN_FORWARD_PROFILE "Diagnostic forward-stage clocks" OFF)
@@ -46,7 +65,9 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 mark_as_advanced(SPIN_TEST_NO_AVX512 SPIN_GENERAL_LENGTHS SPIN_DIRECT_MAX_K
   SPIN_K16_DIRECT SPIN_K18_DIRECT SPIN_SMALL_EXPERIMENT SPIN_K18_EXPERIMENT
   SPIN_K20_EXPERIMENT SPIN_BCH_SCHEDULE SPIN_STAGE_PROFILE
-  SPIN_BUILD_WIDE SPIN_BIDIRECTIONAL_SOURCE SPIN_FORWARD_FOUR SPIN_FORWARD_PROFILE)
+  SPIN_BUILD_WIDE SPIN_WIDE_SCHEDULE SPIN_BIDIRECTIONAL_SOURCE SPIN_FORWARD_FOUR
+  SPIN_FORWARD_DIRECT SPIN_FORWARD_SCHEDULE SPIN_FORWARD_PROFILE SPIN_FORWARD_PREFETCH
+  SPIN_INNER_PROBE SPIN_FORWARD_EXPANSION)
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
 set(GEN "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
@@ -101,7 +122,8 @@ endif()
 # Do not propagate AVX-512 options to callers or allow LTO to cross the ISA boundary.
 add_library(spin_baseline INTERFACE)
 target_compile_options(spin_baseline INTERFACE -march=x86-64-v3 "-mtune=${SPIN_TUNE}" -mpclmul -mvpclmulqdq -fno-lto)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/lengths.py")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+  "${CMAKE_CURRENT_SOURCE_DIR}/lengths.py" "${CMAKE_CURRENT_SOURCE_DIR}/LengthGeometry.h")
 if(SPIN_GENERAL_LENGTHS)
   execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/lengths.py" "${GEN}" "${SPIN_DIRECT_MAX_K}" COMMAND_ERROR_IS_FATAL ANY)
   set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
