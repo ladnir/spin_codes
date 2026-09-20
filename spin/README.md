@@ -176,6 +176,21 @@ invalid buffers, descriptor fields, workspace ownership, concurrent calls with
 separate scratch, and allocation-free successful encoding.
 `spin_known_answers` freezes descriptor-v1 forward and transpose outputs for
 all three parameter sets, independent of compiler and selected backend.
+It also checks that packed-bit encoding agrees with the low-bit projection of
+those known-answer outputs. The API test checks the packed BCH lookup separately
+from the recursive inner.
+
+The packed encoder's fixed lookup tables must remain `constexpr`. With MSVC
+19.51.36256 and `/O2`, the former runtime feedback-table initializer compiled
+with an uninitialized loop bound, causing out-of-bounds writes, incorrect output,
+or a crash. This was reproduced in an extracted encoder and confirmed from its
+faulting instruction and disassembly. Compile-time initialization removes that
+code path; it does not disable optimization or change the encoded map.
+`tools/probe_packed.py` extracts a small standalone compiler test directly from
+the production source. Its optional `--runtime-tables` mode deliberately restores
+the failing initialization; the manual `Packed MSVC diagnosis` workflow compares
+that mode with the current optimized and unoptimized builds. This diagnostic
+does not add a Python dependency to ordinary library builds.
 
 `tests/consumer` is a separate installed-package project. It defines its own
 `osuCrypto::block`-named type to check that no imported type leaks into consumers.

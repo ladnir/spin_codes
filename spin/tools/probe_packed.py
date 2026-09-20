@@ -3,6 +3,7 @@
 Usage: python spin/tools/probe_packed.py OUTPUT.cpp
 Compile with /std:c++20 /EHsc /arch:AVX2 /Ispin/src (MSVC), or
 -std=c++20 -mavx2 -Ispin/src (GCC/Clang). No library link is needed.
+--runtime-tables deliberately restores the pre-fix table initialization.
 """
 from pathlib import Path
 import sys
@@ -13,6 +14,8 @@ start = source.index('template<class Map> void Spin::forwardBitsMap(')
 body = source[start:source.rindex('\n}')].replace('Spin::forwardBitsMap', 'Probe::forwardBitsMap')
 if '--constexpr' in sys.argv:
     body = body.replace('static const auto', 'static constexpr auto')
+if '--runtime-tables' in sys.argv:
+    body = body.replace('static constexpr auto', 'static const auto')
 prefix = r'''
 #include "kernels/Inner.h"
 #include "kernels/generated/BchCircuit.h"

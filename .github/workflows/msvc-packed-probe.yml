@@ -1,15 +1,13 @@
 name: Packed MSVC diagnosis
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/msvc-packed-bits]
 jobs:
   probe:
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        mode: [release, debug, constexpr]
+        mode: [release, debug, runtime]
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
@@ -18,7 +16,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force out | Out-Null
           $mode = '${{ matrix.mode }}'
-          if ($mode -eq 'constexpr') { python spin/tools/probe_packed.py out/probe.cpp --constexpr }
+          if ($mode -eq 'runtime') { python spin/tools/probe_packed.py out/probe.cpp --runtime-tables }
           else { python spin/tools/probe_packed.py out/probe.cpp }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $opt = if ($mode -eq 'debug') { '/Od' } else { '/O2' }
