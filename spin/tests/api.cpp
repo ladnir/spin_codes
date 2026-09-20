@@ -9,6 +9,7 @@
 #include <new>
 #include <vector>
 #include "../src/kernels/Spin.h"
+#include "../src/kernels/generated/BchCircuit.h"
 #ifdef _MSC_VER
 #include <malloc.h>
 #endif
@@ -118,7 +119,23 @@ static void test(spin::Parameters p,std::size_t k,spin::Backend backend,unsigned
     for(std::size_t i=0;i<k;++i)x[i]={{(bits[i/64]>>(i%64))&1,0}};
     c.forward<Block>(x,y,w);
     no_alloc([&]{c.forward_bits(bits,encoded,scratch);});
-    for(std::size_t i=0;i<2*k;++i)require(((encoded[i/64]>>(i%64))&1)==y[i].words[0],"packed bits");
+    // Check each boundary separately so a compiler-specific failure identifies
+    // the outer lookup, SIMD reference, or packed recurrence that disagrees.
+    std::memcpy(ri.data(),x.data(),k*16);reference.forwardReference(ri.data(),ro.data());
+    require(!std::memcmp(y.data(),ro.data(),2*k*16),"binary forward dense oracle");
+    for(std::size_t row=0;row<k/128;++row) {
+        std::array<std::uint64_t,4> outer{};
+        for(unsigned j=0;j<128;++j) if((bits[2*row+j/64]>>(j%64))&1)
+            for(unsigned word=0;word<4;++word) outer[word]^=kernel::BchRows[j][word];
+        for(unsigned word=0;word<4;++word)
+            require(scratch[4*row+word]==outer[word],"packed BCH lookup");
+    }
+    for(std::size_t i=0;i<2*k;++i) if(((encoded[i/64]>>(i%64))&1)!=y[i].words[0]) {
+        std::cerr<<"packed recurrence mismatch: parameters="<<unsigned(p)<<" K="<<k
+                 <<" bit="<<i<<" packed="<<((encoded[i/64]>>(i%64))&1)
+                 <<" reference="<<y[i].words[0]<<'\n';
+        require(false,"packed bits");
+    }
 
     rejects([&]{c.forward<Block>(std::span<const Block>(x).first(k-1),y,w);});
     rejects([&]{c.forward_bytes(std::as_bytes(std::span<const Block>(in)).first(k*16),std::as_writable_bytes(std::span(in)),w);});
