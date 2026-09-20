@@ -52,7 +52,7 @@ if(SPIN_ENABLE_AVX512)
 endif()
 install(TARGETS spin EXPORT spinTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY licenses/ DESTINATION ${CMAKE_INSTALL_DATADIR}/spin/licenses)
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/spin)
 install(EXPORT spinTargets NAMESPACE spin:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/spin)
 export(EXPORT spinTargets NAMESPACE spin:: FILE ${CMAKE_CURRENT_BINARY_DIR}/spinTargets.cmake)
 configure_package_config_file(cmake/spinConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/spinConfig.cmake

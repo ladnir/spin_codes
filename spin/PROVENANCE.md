@@ -1,8 +1,11 @@
-# Kernel provenance
+# Kernel generation record
 
-Generated from permute_conv commit `3ced6dc0` using the selected
-`ForwardRecommended.cmake` configuration, with Hypercat native/spin
-from commit `2582a9fb366d28750ef92afdd9b2dbe9538552c6`.
+SPIN is an independently licensed MIT library; see [LICENSE](LICENSE).
+The packaged kernels were generated from the SPIN research workspace at commit
+`3ced6dc0`, using `ForwardRecommended.cmake`. The wide-kernel development snapshot
+was staged at commit `2582a9fb366d28750ef92afdd9b2dbe9538552c6`.
+These references record SPIN's development and packaging history, not attribution
+of the library to its consumer projects.
 
 The import changes namespaces, internal symbol prefixes, and compiler
 portability spellings, and adds a private setup accessor. It also ports
@@ -12,8 +15,7 @@ resynthesize circuits or change the full/partial-tile kernel schedules.
 Block storage and capability detection are package-owned files.
 The generic transpose circuits come from the same configured build.
 
-Retained notices are in `licenses/`. This source snapshot has no runtime
-or build dependency on Hypercat or libOTe.
+The package has no runtime or build dependency on its consumer projects.
 
 | Source file | Import input SHA-256 | Imported SHA-256 |
 |---|---|---|

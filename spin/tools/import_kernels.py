@@ -1,14 +1,17 @@
 """Maintainer-only snapshot import; ordinary package builds never run Python.
 
-Input: configured spin_optimized build using ForwardRecommended.cmake, and the
-Hypercat checkout from which that build was generated. Writes only spin's
-private kernel snapshot, generic circuit headers, and provenance/license files.
+Input: configured spin_optimized build using ForwardRecommended.cmake.
+Writes SPIN's private kernel snapshot, generic circuit headers, and generation
+record. The library's MIT license is maintained separately, not copied from
+consumer checkouts.
 """
 from pathlib import Path
 import hashlib
 import sys
 
-build, upstream = map(Path, sys.argv[1:])
+if len(sys.argv) != 2:
+    raise SystemExit('usage: import_kernels.py CONFIGURED_SPIN_BUILD')
+build = Path(sys.argv[1])
 package = Path(__file__).resolve().parents[1]
 dest = package / 'src/kernels'
 dest.mkdir(parents=True, exist_ok=True)
@@ -133,16 +136,13 @@ body = body.replace('out+128*row)', 'out+128*row,op)')
 # Included inside GenericTranspose. Kernel bodies keep the existing compile-time shape.
 (inc / 'GenericMethods.h').write_text(body + '\n', newline='\n')
 
-licenses = package / 'licenses'
-licenses.mkdir(exist_ok=True)
-for name, source in [('Hypercat-MIT.txt', upstream / 'LICENSE'),
-                     ('libOTe-MIT.txt', upstream / 'hypercat/native/spin/libote-LICENSE')]:
-    (licenses / name).write_bytes(source.read_bytes())
-
-lines = ['# Kernel provenance', '',
-         'Generated from permute_conv commit `3ced6dc0` using the selected',
-         '`ForwardRecommended.cmake` configuration, with Hypercat native/spin',
-         'from commit `2582a9fb366d28750ef92afdd9b2dbe9538552c6`.', '',
+lines = ['# Kernel generation record', '',
+         'SPIN is an independently licensed MIT library; see [LICENSE](LICENSE).',
+         'The packaged kernels were generated from the SPIN research workspace at commit',
+         '`3ced6dc0`, using `ForwardRecommended.cmake`. The wide-kernel development snapshot',
+         'was staged at commit `2582a9fb366d28750ef92afdd9b2dbe9538552c6`.',
+         "These references record SPIN's development and packaging history, not attribution",
+         'of the library to its consumer projects.', '',
          'The import changes namespaces, internal symbol prefixes, and compiler',
          'portability spellings, and adds a private setup accessor. It also ports',
          'the standalone transpose range-direct dispatch through K=458752, reusing',
@@ -150,8 +150,7 @@ lines = ['# Kernel provenance', '',
          'resynthesize circuits or change the full/partial-tile kernel schedules.',
          'Block storage and capability detection are package-owned files.',
          'The generic transpose circuits come from the same configured build.', '',
-         'Retained notices are in `licenses/`. This source snapshot has no runtime',
-         'or build dependency on Hypercat or libOTe.', '',
+         'The package has no runtime or build dependency on its consumer projects.', '',
          '| Source file | Import input SHA-256 | Imported SHA-256 |',
          '|---|---|---|']
 lines += [f'| `{n}` | `{a}` | `{b}` |' for n, a, b in hashes]

@@ -39,8 +39,9 @@ their own parameter and security policies.
 | `BA_paper/`, `enumerator_paper/`, `expander_codes/` | Related manuscripts and research. |
 
 Research paths remain stable because scripts and proof manifests refer to them.
-Library consumers need only `spin/`. The [kernel provenance](spin/PROVENANCE.md)
-and [retained license notices](spin/licenses/) document imported code.
+Library consumers need only `spin/`. SPIN is [MIT licensed](spin/LICENSE).
+The [generation record](spin/PROVENANCE.md) records the kernel snapshots and hashes.
+The library license does not change the terms of the paper or research archives.
 
 ## Paper
 

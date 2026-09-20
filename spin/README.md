@@ -2,8 +2,8 @@
 
 This standalone C++20 library provides the optimized half-rate BCH [256,128]
 SPIN encoder. It has no build dependency on libOTe, Hypercat, Python, or the
-research workstreams. The checked-in kernels retain their source provenance in
-[PROVENANCE.md](PROVENANCE.md); imported license notices are in `licenses/`.
+research workstreams. SPIN is [MIT licensed](LICENSE), copyright Peter Rindal.
+The checked-in kernels have a [generation record](PROVENANCE.md).
 
 Forward encoding maps K records to 2K records. Transposed encoding maps 2K
 records to K records. Both apply the same binary matrix, independently to each
