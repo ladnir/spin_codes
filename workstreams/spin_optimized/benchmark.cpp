@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <chrono>
 #include <array>
+#include <bit>
 #include <cstring>
 #include <cctype>
 #include <filesystem>
@@ -42,6 +43,9 @@ int main(int argc,char** argv) {
     const std::string which=argv[2];const u64 routeSeed=argc>4?std::stoull(argv[4]):1;
     const unsigned tile=argc>5?std::stoul(argv[5]):0,layout=argc>6?std::stoul(argv[6]):0;
     const std::string configuration=argc>7?argv[7]:"12819";
+#if !SPIN_GENERAL_LENGTHS
+    if(argc>8) throw std::invalid_argument("K override requires the generalized transpose target");
+#endif
     if(configuration!="12819" && configuration!="6412" && configuration!="6412r2") throw std::invalid_argument("configuration must be 12819, 6412, or 6412r2");
     if((m!=16 && m!=18 && m!=20) || trials<3 || !(trials&1) ||
        layout>1 || (which!="auto" && which!="avx2" && which!="avx512")) throw std::invalid_argument("invalid benchmark argument");
@@ -72,7 +76,10 @@ int main(int argc,char** argv) {
     }
     auto sorted=samples;std::sort(sorted.begin(),sorted.end());u64 hash=0xcbf29ce484222325ULL;
     for(std::size_t j=0;j<code.messageBlocks();++j) for(auto v:words(data[j])) {hash^=v;hash*=0x100000001b3ULL;}
-    std::cout<<std::setprecision(10)<<"{\"configuration\":\""<<code.name()<<"\",\"m\":"<<m<<",\"backend\":\""<<(code.bchBackend()==BchBackend::Avx512?"avx512":"avx2")
+    std::cout<<std::setprecision(10)<<"{\"configuration\":\""<<code.name()<<"\",\"m\":";
+    if(std::has_single_bit(code.messageBlocks())) std::cout<<std::countr_zero(code.messageBlocks());
+    else std::cout<<"null";
+    std::cout<<",\"backend\":\""<<(code.bchBackend()==BchBackend::Avx512?"avx512":"avx2")
         <<"\",\"route_seed\":"<<routeSeed<<",\"tile_rows\":"<<code.tileBlocks()/256<<",\"layout\":"<<layout<<",\"median_ms\":"<<sorted[trials/2]
         <<",\"K\":"<<code.messageBlocks()<<",\"retained_setup_bytes\":"<<code.setupBytes()<<",\"workspace_bytes\":"<<work.bytes()
         <<",\"output_hash\":\""<<std::hex<<hash<<std::dec<<"\",\"samples_ms\":[";

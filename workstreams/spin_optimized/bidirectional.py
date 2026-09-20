@@ -73,7 +73,10 @@ s=edit(s,'        const auto outer=mRoute[i],slot=mSlots32[i];',
            (slot>=mBchOffsets32.size() || mBchOffsets32[slot]!=packFour(mOffsets32[slot]) ||
             unpack(mBchOffsets24.data()+3*slot)!=mBchOffsets32[slot]))
             throw std::runtime_error("packed BCH offset mismatch");''')
-inplace=(common/'Spin.cpp').read_text().split('void Spin::encodeInplace',1)[1].split('template<class Map,bool Packed',1)[0]
+# This port retains the historical layout interface. Do not import the newer
+# transpose target's Auto/MessageLength helpers into the upstream class.
+baseline=Path(__file__).resolve().parents[2]/'workstreams/inner_design/asymmetric/bch256/weight5/implementation/Weight5Spin.cpp'
+inplace=baseline.read_text().split('void Spin::encodeInplace',1)[1].split('template<class Map,bool Packed',1)[0]
 s=edit(s,'void Spin::validateSetup() const {','void Spin::encodeInplace'+inplace+'void Spin::validateSetup() const {')
 put('Spin.cpp',s)
 start=s.index('template<class Map,bool Packed> void Spin::run(')
