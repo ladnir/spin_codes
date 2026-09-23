@@ -63,6 +63,9 @@ public:
     std::array<std::byte,40> descriptor() const noexcept;
     bool supports_forward(Width) const noexcept;
     Workspace make_workspace(Width=Width::Bits128) const;
+    // Rebind compatible 128-bit scratch without clearing or allocating; otherwise
+    // recreate it at the same width (128 bits if moved-from). No concurrent use.
+    void prepare_workspace(Workspace&) const;
     GenericTranspose generic_transpose() const;
 
     // Byte views are the zero-copy foreign-buffer interface. Records are 16/32/64

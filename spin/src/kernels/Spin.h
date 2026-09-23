@@ -28,7 +28,8 @@ public:
     Spin(Configuration configuration, unsigned messageExponent, u64 routeSeed=1,
          u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto);
     Spin(Configuration configuration, MessageLength length, u64 routeSeed=1,
-         u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto);
+         u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto,
+         bool compactSetup=false, std::vector<u32> preparedRoute={});
     void encode(const block* input, std::size_t inputCount, block* output,
                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto) const;
     void encodeUnchecked(const block* input, block* output, Workspace& workspace,

@@ -8,6 +8,7 @@ consumer checkouts.
 from pathlib import Path
 import hashlib
 import sys
+from setup_overlay import apply_setup_overlay
 
 if len(sys.argv) != 2:
     raise SystemExit('usage: import_kernels.py CONFIGURED_SPIN_BUILD')
@@ -113,6 +114,7 @@ template void Spin::runRange<Map64S12>(const block*,block*,Workspace&) const;
 template void Spin::runRange<Map64S12R2>(const block*,block*,Workspace&) const;
 }
 '''
+    text = apply_setup_overlay(name, text)
     out = dest / name
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text, newline='\n')
@@ -154,6 +156,15 @@ body = body.replace('zeta<Map::T>(raw.data())', 'zeta<Map::T>(raw.data(),op)')
 body = body.replace('syndrome.data())', 'syndrome.data(),op)')
 body = body.replace('masks[3])', 'masks[3],op)').replace('masks[1])', 'masks[1],op)')
 body = body.replace('out+128*row)', 'out+128*row,op)')
+# PreparedEncoder supplies streaming bank routing and refreshed masks through
+# compile-time accessors; immutable Code retains the direct vector accessor.
+body = body.replace('template<class Map,unsigned Rounds,ValueElement E,class Op>',
+                    'template<class Map,unsigned Rounds,ValueElement E,class Op,class Route>')
+body = body.replace('Workspace<E>& w,const Op& op) const',
+                    'Workspace<E>& w,const Op& op,const Route& route,const u32* maskData) const')
+body = body.replace('data_->route[i]', 'route(i)').replace('data_->masks.data()', 'maskData')
+body = body.replace('const auto base=epoch*Map::T;',
+                    'const auto base=epoch*Map::T;\n            if constexpr(requires{route.begin_epoch(base);})route.begin_epoch(base);')
 # Included inside GenericTranspose. Kernel bodies keep the existing compile-time shape.
 (inc / 'GenericMethods.h').write_text(body + '\n', newline='\n')
 
@@ -171,6 +182,11 @@ lines = ['# Kernel generation record', '',
          'resynthesize circuits or change the full/partial-tile kernel schedules.',
          'The packed-bit state update is expressed without nested conditional lambdas.',
          'Its fixed lookup tables are initialized at compile time for MSVC portability.',
+         'The setup-only overlay batches random words, uses exact reciprocal modulo',
+         'sampling, and avoids generating discarded index formats. Seeded maps are unchanged.',
+         'SetupRandom.h is package-owned; tools/setup_overlay.patch records the overlay.',
+         'A private prepared-route hook supports opt-in experiments; public Code sampling is unchanged.',
+         'PreparedEncoder and BankKernel are package-owned implementations of the explicit banked heuristic mode.',
          'Block storage and capability detection are package-owned files.',
          'The generic transpose circuits come from the same configured build.', '',
          'The package has no runtime or build dependency on its consumer projects.', '',

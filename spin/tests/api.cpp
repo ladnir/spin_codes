@@ -1,5 +1,6 @@
 #include <spin/Code.h>
 #include <spin/Generic.h>
+#include <spin/PreparedEncoder.h>
 #include <algorithm>
 #include <atomic>
 #include <cstdlib>
@@ -75,6 +76,12 @@ template<unsigned L> static void wide_test(const spin::Code& c) {
         for(std::size_t i=0;i<b.size();++i)for(unsigned j=0;j<2;++j)
             require(b[i].words[j]==y[i].words[2*lane+j],"wide lane differs");
     }
+    auto spec=c.specification();++spec.route_seed;++spec.inner_seed;
+    spin::Code next(spec);next.prepare_workspace(w);
+    next.forward<Record<L>>(x,y,w);
+    auto fresh=next.make_workspace(width);std::vector<Record<L>> expected(y.size());
+    next.forward<Record<L>>(x,expected,fresh);require(y==expected,"wide scratch preparation");
+    rejects([&]{c.forward<Record<L>>(x,y,w);});
 }
 static void test(spin::Parameters p,std::size_t k,spin::Backend backend,unsigned tile) {
     spin::Code c({k,p,17,29},{backend,tile});auto w=c.make_workspace();
@@ -151,12 +158,81 @@ static void test(spin::Parameters p,std::size_t k,spin::Backend backend,unsigned
     wide_test<2>(shared);wide_test<4>(shared);
     std::cout<<"parameters="<<unsigned(p)<<" K="<<k<<" backend="<<unsigned(backend)<<" PASS\n";
 }
+static void prepared_test(spin::Parameters p,std::size_t k,spin::SetupMode mode,spin::Backend backend) {
+    const spin::CodeSpec spec{k,p,17,29};
+    const spin::SetupOptions setup{mode,913};
+    spin::PreparedEncoder c(spec,setup,{backend}),other(spec,setup,{backend});
+    auto w=c.make_workspace();auto generic=c.generic_transpose();
+    auto gw=generic.make_workspace<std::uint8_t>();
+    auto wrong=other.make_workspace();
+    std::vector<Block> in(2*k),out(k),expected(k),inplace(2*k);fill(in);
+    std::vector<std::uint8_t> gi(2*k),go(k);
+    for(std::size_t i=0;i<2*k;++i)gi[i]=std::uint8_t(in[i].words[0]);
+    require(c.owns(generic) && !other.owns(generic),"live view ownership");
+    rejects([&]{c.transpose<Block>(in,out,wrong);});
+    const auto bytes=w.bytes(),setupBytes=c.setup_bytes();
+    auto previous=c.descriptor();
+    require(previous[4]==std::byte{2} && previous[12]==std::byte(std::uint32_t(mode)),"prepared descriptor mode/version");
+    if(mode==spin::SetupMode::BankedHeuristic)
+        require(previous!=spin::PreparedEncoder(spec,{mode,914}).descriptor(),"bank seed missing from descriptor");
+    for(unsigned round=0;round<3;++round) {
+        spin::CodeSeed seed{17+round,29+round};
+        if(mode==spin::SetupMode::BankedHeuristic)no_alloc([&]{c.setCodeSeed(seed);});
+        else c.setCodeSeed(seed);
+        no_alloc([&]{c.setCodeSeed(seed);});
+        require(round==0 || c.descriptor()!=previous,"seed update identity");previous=c.descriptor();
+        no_alloc([&]{c.transpose<Block>(in,out,w);generic.transpose<std::uint8_t>(gi,go,gw);});
+        require(w.bytes()==bytes && c.setup_bytes()==setupBytes,"refresh changed capacities");
+        for(std::size_t i=0;i<k;++i)require(std::uint8_t(out[i].words[0])==go[i],"live generic/native disagreement");
+        std::copy(in.begin(),in.end(),inplace.begin());
+        no_alloc([&]{c.transpose_inplace<Block>(inplace,w);});
+        require(std::equal(out.begin(),out.end(),inplace.begin()),"prepared inplace output");
+        require(std::equal(in.begin()+k,in.end(),inplace.begin()+k),"prepared inplace suffix");
+        if(mode==spin::SetupMode::Full) {
+            spin::Code original({k,p,seed.route,seed.inner},{backend});auto ow=original.make_workspace();
+            original.transpose<Block>(in,expected,ow);
+        } else {
+            // Materialize this map only in the oracle, never in the production path.
+            spin::detail::BankState bank({k,p,seed.route,seed.inner},setup.bank_seed);
+            const auto* bankStorage=bank.bank.data();const auto bankCopy=bank.bank;
+            const auto* keys=bank.row_keys.data();const auto* masks=bank.masks.data();
+            no_alloc([&]{bank.refresh(seed.route+1,seed.inner+1);bank.refresh(seed.route,seed.inner);});
+            require(bank.bank.data()==bankStorage && bank.bank==bankCopy && bank.row_keys.data()==keys && bank.masks.data()==masks,"bank refresh rebuilt storage");
+            std::vector<std::uint32_t> route(2*k);std::vector<bool> seen(2*k),rows(bank.rows);
+            for(unsigned g=0;g<256;++g) {
+                std::fill(rows.begin(),rows.end(),false);
+                for(std::size_t j=0;j<bank.rows;++j) {
+                    const auto d=bank.destination(g,j);
+                    require(d<2*k && !seen[d] && !rows[d>>8],"bank bijection / row-region property");
+                    seen[d]=true;rows[d>>8]=true;route[g*bank.rows+j]=d;
+                }
+            }
+            namespace kernel=spin::detail::kernel;
+            const auto config=p==spin::Parameters::T128S19?kernel::Configuration::T128S19:
+                p==spin::Parameters::T64S12?kernel::Configuration::T64S12:kernel::Configuration::T64S12R2;
+            kernel::Spin reference(config,kernel::MessageLength{k},seed.route,seed.inner,256,kernel::BchBackend::Avx2,true,std::move(route));
+            reference.reference(reinterpret_cast<const kernel::block*>(in.data()),reinterpret_cast<kernel::block*>(expected.data()));
+        }
+        require(out==expected,"prepared independent oracle");
+    }
+    rejects([&]{c.transpose<Block>(in,std::span<Block>(in).first(k),w);});
+    auto moved=std::move(w);rejects([&]{c.transpose<Block>(in,out,w);});
+    auto relocated=std::move(c);relocated.setCodeSeed({77,91});
+    relocated.transpose<Block>(in,out,moved);generic.transpose<std::uint8_t>(gi,go,gw);
+    for(std::size_t i=0;i<k;++i)require(std::uint8_t(out[i].words[0])==go[i],"relocated live view");
+    std::cout<<"prepared mode="<<unsigned(mode)<<" K="<<k<<" params="<<unsigned(p)<<" backend="<<unsigned(backend)<<" PASS\n";
+}
 int main() {try {
     if(!spin::capabilities().avx2)return 77;
     std::cout<<"AVX512 BCH="<<spin::capabilities().avx512_bch
              <<" wide512="<<spin::capabilities().forward512<<'\n';
     for(auto p:{spin::Parameters::T128S19,spin::Parameters::T64S12,spin::Parameters::T64S12R2}) {
         const auto unit=spin::message_alignment(p);
+        for(auto mode:{spin::SetupMode::Full,spin::SetupMode::BankedHeuristic})
+            for(auto backend:{spin::Backend::Avx2,spin::Backend::Automatic}) {
+                prepared_test(p,unit,mode,backend);
+                prepared_test(p,3*unit,mode,backend);
+            }
         require(spin::valid_message_size(p,std::size_t{1}<<30),"representation boundary");
         require(!spin::valid_message_size(p,std::size_t{1}<<31),"overflow accepted");
         rejects([&]{spin::Code c({unit-1,p});});
@@ -164,10 +240,14 @@ int main() {try {
             test(p,3*unit,b,1024);test(p,65536,b,256);
         }
     }
+    for(auto backend:{spin::Backend::Avx2,spin::Backend::Automatic})
+        prepared_test(spin::Parameters::T128S19,1U<<18,spin::SetupMode::BankedHeuristic,backend);
     // Exercise range-direct without a forward-direct table, then tiled routing.
     test(spin::Parameters::T128S19,393216,spin::Backend::Automatic,256);
     test(spin::Parameters::T128S19,540672,spin::Backend::Automatic,1024);
     rejects([]{spin::Code c({16384,static_cast<spin::Parameters>(99)});});
+    rejects([]{spin::PreparedEncoder c({16384},{static_cast<spin::SetupMode>(99)});});
+    rejects([]{spin::PreparedEncoder c({16385},{spin::SetupMode::BankedHeuristic});});
     spin::Code c({16384});auto a=c.make_workspace(),b=c.make_workspace();
     rejects([&]{auto bad=c.make_workspace(static_cast<spin::Width>(99));});
     if(!spin::capabilities().avx512_bch)
@@ -179,6 +259,27 @@ int main() {try {
             descriptor[32]==std::byte{2},"descriptor encoding");
     require(c.descriptor()!=spin::Code({16384,spin::Parameters::T128S19,2,2}).descriptor(),"route seed identity");
     require(c.descriptor()!=spin::Code({16384,spin::Parameters::T128S19,1,3}).descriptor(),"inner seed identity");
+    {
+        spin::Code next({16384,spin::Parameters::T128S19,31,57});
+        auto reused=c.make_workspace(),fresh=next.make_workspace();
+        std::vector<Block> v(32768),r(16384),f(16384);fill(v);
+        c.transpose<Block>(v,r,reused);
+        no_alloc([&]{next.prepare_workspace(reused);next.transpose<Block>(v,r,reused);});
+        next.transpose<Block>(v,f,fresh);require(r==f,"rebound scratch output");
+        rejects([&]{c.transpose<Block>(v,r,reused);});
+        spin::Code alternate({16384,spin::Parameters::T64S12R2,31,57});
+        no_alloc([&]{alternate.prepare_workspace(reused);});
+        auto altFresh=alternate.make_workspace();
+        alternate.transpose<Block>(v,r,reused);alternate.transpose<Block>(v,f,altFresh);
+        require(r==f,"changed-parameter scratch output");
+        next.prepare_workspace(reused);next.transpose<Block>(v,f,fresh);
+        auto moved=std::move(reused);next.prepare_workspace(reused);
+        next.transpose<Block>(v,r,reused);require(r==f,"moved-from scratch preparation");
+        spin::Code larger({32768});larger.prepare_workspace(reused);
+        v.resize(65536);r.resize(32768);f.resize(32768);fill(v);
+        auto big=larger.make_workspace();larger.transpose<Block>(v,r,reused);larger.transpose<Block>(v,f,big);
+        require(r==f,"resized scratch output");
+    }
     std::vector<Block> in(16384),x(32768),y(32768);fill(in);
     std::vector<std::byte> unaligned(in.size()*16+1);
     rejects([&]{c.forward_bytes(std::span<const std::byte>(unaligned).subspan(1),std::as_writable_bytes(std::span(x)),a);});

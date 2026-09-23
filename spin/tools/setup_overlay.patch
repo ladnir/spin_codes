@@ -1,0 +1,122 @@
+diff --git a/spin/src/kernels/Spin.cpp b/spin/src/kernels/Spin.cpp
+index 0a4b7206..9102c590 100644
+--- a/spin/src/kernels/Spin.cpp
++++ b/spin/src/kernels/Spin.cpp
+@@ -2,6 +2,7 @@
+ #define SPIN_WORKSPACE_ROUTING_OPT 1
+ #endif
+ #include "WorkspaceRouting.h"
++#include "SetupRandom.h"
+ #include "Spin.h"
+ #include "Inner.h"
+ #include "K16Inner.h"
+@@ -31,21 +32,17 @@ u64 splitmix(u64& s) noexcept {
+     v=(v^(v>>27))*0x94d049bb133111ebULL;
+     return v^(v>>31);
+ }
+-static u64 below(u64& s,u64 bound) {
+-    const u64 threshold=(0-bound)%bound;
+-    for(;;) { const auto v=splitmix(s); if(v>=threshold) return v%bound; }
+-}
+-template<class T> static void shuffle(T* p,std::size_t n,u64& seed) {
++template<class T> static void shuffle(T* p,std::size_t n,setup::Words& words,const setup::Divisor* divisors) {
+     std::iota(p,p+n,T{0});
+-    for(std::size_t i=n;i>1;--i) std::swap(p[i-1],p[below(seed,i)]);
++    for(std::size_t i=n;i>1;--i) std::swap(p[i-1],p[divisors[i].sample(words,i)]);
+ }
+ static void pack(u8* p,u32 v) { p[0]=u8(v); p[1]=u8(v>>8); p[2]=u8(v>>16); }
+ static SPIN_FORCEINLINE u32 unpack(const u8* p) { u32 v; std::memcpy(&v,p,4); return v&0xffffff; }
+ 
+ Spin::Spin(Configuration c,unsigned exponent,u64 routeSeed,u64 coefficientSeed,unsigned tileRows,BchBackend backend)
+     :Spin(c,MessageLength{length_geometry::fromExponent(exponent)},routeSeed,coefficientSeed,tileRows,backend) {}
+-Spin::Spin(Configuration c,MessageLength length,u64 routeSeed,u64 coefficientSeed,unsigned tileRows,BchBackend backend)
+-    :mConfig(c),mK(0),mTileRows(tileRows) {
++Spin::Spin(Configuration c,MessageLength length,u64 routeSeed,u64 coefficientSeed,unsigned tileRows,BchBackend backend,bool compactSetup,std::vector<u32> preparedRoute)
++    :mConfig(c),mK(0),mTileRows(tileRows),mRoute(std::move(preparedRoute)) {
+     if((tileRows && (tileRows<2 || !std::has_single_bit(tileRows))))
+         throw std::invalid_argument("tile rows must be a power of two");
+     if(static_cast<unsigned>(c)>static_cast<unsigned>(Configuration::T64S12R2))
+@@ -60,22 +57,31 @@ Spin::Spin(Configuration c,MessageLength length,u64 routeSeed,u64 coefficientSee
+     const bool four=(c==Configuration::T128S19 || (c==Configuration::T64S12 || c==Configuration::T64S12R2)) && mTileRows>=4 && bchAvx512Available();
+     if(backend==BchBackend::Avx512 && !four) throw std::invalid_argument("unsupported AVX-512 BCH configuration");
+     mBchBackend=backend!=BchBackend::Avx2 && four?BchBackend::Avx512:BchBackend::Avx2;
+-    if(mBchBackend==BchBackend::Avx512) {if(packed24Available()) mBchOffsets24.resize(3*n+4);mBchOffsets32.resize(n);}
++    const bool keep32=!compactSetup || !packed24Available();
++    if(mBchBackend==BchBackend::Avx512) {if(packed24Available()) mBchOffsets24.resize(3*n+4);if(keep32)mBchOffsets32.resize(n);}
+     mPartialTile=(rows%mTileRows)!=0;
+     if(rows%step()) throw std::invalid_argument("incomplete region epochs");
++    // Private experiment hook. The public Code API never supplies a route.
++    // Experimental callers must check bijectivity/row-region uniqueness first.
++    if(!mRoute.empty() && mRoute.size()!=n)throw std::invalid_argument("prepared route size mismatch");
++    if(mRoute.empty()) {
+     std::vector<u8> regionCoordinate(n);
++    setup::Words routeWords(routeSeed);
++    std::vector<setup::Divisor> divisors(std::max<std::size_t>(256,rows)+1);
++    for(std::size_t d=2;d<divisors.size();++d)divisors[d]=setup::Divisor(d);
+     std::array<u8,256> coordinateRegion;
+     for(std::size_t row=0;row<rows;++row) {
+-        shuffle(coordinateRegion.data(),256,routeSeed);
++        shuffle(coordinateRegion.data(),256,routeWords,divisors.data());
+         for(unsigned j=0;j<256;++j) regionCoordinate[coordinateRegion[j]*rows+row]=u8(j);
+     }
+     mRoute.resize(n);
+     std::vector<u32> positions(rows);
+     for(unsigned region=0;region<256;++region) {
+-        shuffle(positions.data(),rows,routeSeed);
++        shuffle(positions.data(),rows,routeWords,divisors.data());
+         for(std::size_t row=0;row<rows;++row)
+             mRoute[region*rows+positions[row]]=u32(row*256+regionCoordinate[region*rows+row]);
+     }
++    }
+     if(mK==(1U<<16) && mBchBackend==BchBackend::Avx512) {
+         mSmallRoute32.resize(n);
+         for(std::size_t i=0;i<n;++i) mSmallRoute32[i]=packFour(mRoute[i]);
+@@ -95,17 +101,17 @@ Spin::Spin(Configuration c,MessageLength length,u64 routeSeed,u64 coefficientSee
+         for(std::size_t i=0;i<n;++i) mRangeRoute32[i]=packFour(mRoute[i]);
+     }
+     if(packed24Available()) {mSlots24.resize(3*n+4); mOffsets24.resize(3*n+4);}
+-    mSlots32.resize(n); mOffsets32.resize(n);
++    if(keep32){mSlots32.resize(n);mOffsets32.resize(n);}
+     const auto tile=tileBlocks();
+     std::vector<u32> counts((n+tile-1)/tile,u32(tile));
+     if(n%tile) counts.back()=u32(n%tile);
+     for(std::size_t inner=n;inner-->0;) {
+         const u32 outer=mRoute[inner],bucket=outer/u32(tile),local=outer&u32(tile-1);
+         const u32 slot=bucket*u32(tile)+--counts[bucket];
+-        mSlots32[inner]=slot; mOffsets32[slot]=local;
++        if(keep32){mSlots32[inner]=slot;mOffsets32[slot]=local;}
+         if(packed24Available()) {pack(mSlots24.data()+3*inner,slot); pack(mOffsets24.data()+3*slot,local);}
+         if(mBchBackend==BchBackend::Avx512) {
+-            mBchOffsets32[slot]=packFour(local);if(packed24Available()) pack(mBchOffsets24.data()+3*slot,packFour(local));
++            if(keep32)mBchOffsets32[slot]=packFour(local);if(packed24Available()) pack(mBchOffsets24.data()+3*slot,packFour(local));
+         }
+     }
+     switch(c) {
+@@ -121,10 +127,11 @@ template<class Map> void Spin::setupInner(u64 seed) {
+     const auto epochs=codeBlocks()/Map::T;
+     constexpr unsigned rounds=isTwoRoundMap<Map>?2:1;
+     if constexpr(isImtMap<Map>) {
++        setup::Words words(seed);
+         mCoefficients.resize(2*rounds*epochs);mFieldRows.resize(2*rounds*epochs);mForwardFieldRows.resize(2*rounds*epochs);
+         for(std::size_t e=0;e<rounds*epochs;++e) {
+-            u32 u;do u=u32(splitmix(seed))&((1U<<Map::S)-1);while(!u);
+-            u32 v=u32(splitmix(seed))&((1U<<Map::S)-1);
++            u32 u;do u=u32(words())&((1U<<Map::S)-1);while(!u);
++            u32 v=u32(words())&((1U<<Map::S)-1);
+             if(std::popcount(u&v)&1) v^=u&-u;
+             mCoefficients[2*e]=mFieldRows[2*e]=mForwardFieldRows[2*e]=u;
+             mCoefficients[2*e+1]=mFieldRows[2*e+1]=mForwardFieldRows[2*e+1]=v;
+diff --git a/spin/src/kernels/Spin.h b/spin/src/kernels/Spin.h
+index 005e0e36..59108579 100644
+--- a/spin/src/kernels/Spin.h
++++ b/spin/src/kernels/Spin.h
+@@ -28,7 +28,8 @@ public:
+     Spin(Configuration configuration, unsigned messageExponent, u64 routeSeed=1,
+          u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto);
+     Spin(Configuration configuration, MessageLength length, u64 routeSeed=1,
+-         u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto);
++         u64 coefficientSeed=2, unsigned tileRows=0, BchBackend backend=BchBackend::Auto,
++         bool compactSetup=false, std::vector<u32> preparedRoute={});
+     void encode(const block* input, std::size_t inputCount, block* output,
+                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto) const;
+     void encodeUnchecked(const block* input, block* output, Workspace& workspace,

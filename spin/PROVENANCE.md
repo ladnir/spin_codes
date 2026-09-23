@@ -1,5 +1,10 @@
 # Kernel generation record
 
+`PreparedEncoder.cpp`, `BankState.h`, and `BankKernel.cpp` are package-owned
+implementations of the explicit banked heuristic mode. They generalize the
+`row-rotate1` experiment without changing immutable `Code` sampling.
+Generic routing accessors are statically dispatched; the import script preserves them.
+
 SPIN is an independently licensed MIT library; see [LICENSE](LICENSE).
 The packaged kernels were generated from the SPIN research workspace at commit
 `3ced6dc0`, using `ForwardRecommended.cmake`. The wide-kernel development snapshot
@@ -14,6 +19,10 @@ the forward direct route table where present. It does not
 resynthesize circuits or change the full/partial-tile kernel schedules.
 The packed-bit state update is expressed without nested conditional lambdas.
 Its fixed lookup tables are initialized at compile time for MSVC portability.
+The setup-only overlay batches random words, uses exact reciprocal modulo
+sampling, and avoids generating discarded index formats. Seeded maps are unchanged.
+SetupRandom.h is package-owned; tools/setup_overlay.patch records the overlay.
+A private prepared-route hook supports opt-in experiments; public Code sampling is unchanged.
 Block storage and capability detection are package-owned files.
 The generic transpose circuits come from the same configured build.
 
@@ -21,8 +30,8 @@ The package has no runtime or build dependency on its consumer projects.
 
 | Source file | Import input SHA-256 | Imported SHA-256 |
 |---|---|---|
-| `Spin.h` | `b657e995bc766598588d103cbb8af572eed48db62dfbd4b90d139f64bef3fe1b` | `b2bd18613e0e7a37f377700a4afa26bd3974c4570bfe52af3b9ed5cf828cf95a` |
-| `Spin.cpp` | `3a9be018b19e50209cd456159aae89ffc34ee7bdac040a749c214c6b11112e01` | `3e70911c9b7309155b57c8f1bdd991d8afab39503d8d984aa2bb0c16e68e5755` |
+| `Spin.h` | `b657e995bc766598588d103cbb8af572eed48db62dfbd4b90d139f64bef3fe1b` | `a2ef84ad14113443ec5ec075abec4c76132cbe79f7107c20696c9d54ffc06f19` |
+| `Spin.cpp` | `3a9be018b19e50209cd456159aae89ffc34ee7bdac040a749c214c6b11112e01` | `202322fb19e55289a4dbd924042555f7715f59f7f8c5f51e1850e0e60029e66b` |
 | `Inner.h` | `51c19481981366a689126b8275db98f190446026fc0a450ec8677c5e7e8b3360` | `5ae62182b4b4a2692882384e8de602c5e7d170df862bec235d0b6d2dad3c45dd` |
 | `ImtRounds.h` | `d7aad4c445e734d755a5bb6df405ddbe30ea471dc6b26f0c8cd068d92eed2fbc` | `34d4b7cc072bc74f785bd4749bd29803ea01b4e8776f6a14754793686978ddbc` |
 | `K16Inner.h` | `fb1556fb7425c2624792cc8fa6df5d3f80f8ac546e1f61e9f8b70b6b31615a52` | `3af4280c9097a8e2f51420da199c01cbdcf8cf98c1384822aa30b4fb9061025b` |

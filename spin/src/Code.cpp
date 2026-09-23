@@ -42,7 +42,7 @@ struct Plan {
     const CodeSpec spec;
     kernel::Spin code;
     Plan(CodeSpec s,ExecutionOptions o):spec(s),code(config(s.parameters),kernel::MessageLength{s.message_size},
-        s.route_seed,s.inner_seed,o.tile_rows?o.tile_rows:256,backend(o.backend)) {code.compact();}
+        s.route_seed,s.inner_seed,o.tile_rows?o.tile_rows:256,backend(o.backend),true) {code.compact();}
 };
 struct Scratch {
     std::shared_ptr<const Plan> plan;
@@ -131,6 +131,17 @@ bool Code::supports_forward(Width width) const noexcept {
 Workspace Code::make_workspace(Width width) const {
     if(!supports_forward(width)) throw std::invalid_argument("SPIN unsupported record width, map, or CPU");
     return Workspace(plan_,width);
+}
+void Code::prepare_workspace(Workspace& w) const {
+    if(w.scratch_ && w.scratch_->plan==plan_)return;
+    if(w.scratch_ && w.scratch_->width==Width::Bits128 &&
+       w.scratch_->single->buckets.size()==code_size() &&
+       w.scratch_->single->tile.size()==plan_->code.tileBlocks()) {
+        w.scratch_->plan=plan_;
+        return;
+    }
+    const auto width=w.scratch_?w.scratch_->width:Width::Bits128;
+    w=make_workspace(width);
 }
 Workspace::Workspace(std::shared_ptr<const detail::Plan> p,Width w)
     :scratch_(std::make_unique<detail::Scratch>(std::move(p),w)) {}

@@ -18,13 +18,14 @@
         zetaStage<T,D>(x,op);
         if constexpr(D>1) zeta<T,D/2>(x,op);
     }
-    template<class Map,unsigned Rounds,ValueElement E,class Op> void run(const E* in,E* out,Workspace<E>& w,const Op& op) const {
+    template<class Map,unsigned Rounds,ValueElement E,class Op,class Route> void run(const E* in,E* out,Workspace<E>& w,const Op& op,const Route& route,const u32* maskData) const {
         std::array<E,Map::S> state,syndrome;
         std::array<E,Map::T> raw;
         const auto epochs=code_size()/Map::T;
-        auto emit=[&](std::size_t i,const E& v) {w.values_[data_->route[i]]=v;};
+        auto emit=[&](std::size_t i,const E& v) {w.values_[route(i)]=v;};
         for(std::size_t epoch=epochs;epoch-->0;) {
             const auto base=epoch*Map::T;
+            if constexpr(requires{route.begin_epoch(base);})route.begin_epoch(base);
             if(epoch+1==epochs) {
                 for(unsigned j=Map::T;j-->0;) {raw[j]=in[base+j];emit(base+j,raw[j]);}
             } else Map::emitShared(in+base,raw.data(),state.data(),base,emit,op);
@@ -32,7 +33,7 @@
             zeta<Map::T>(raw.data(),op);Map::finish(raw.data(),syndrome.data(),op);
             if(epoch+1==epochs) state=syndrome;
             else {
-                const auto* masks=data_->masks.data()+2*Rounds*epoch;
+                const auto* masks=maskData+2*Rounds*epoch;
                 if constexpr(Rounds==2) imt(state.data(),masks[2],masks[3],op);
                 imt(state.data(),masks[0],masks[1],op);
                 for(unsigned j=0;j<Map::S;++j) state[j]=op(state[j],syndrome[j]);

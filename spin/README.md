@@ -72,11 +72,83 @@ ownership of the plan. After moving a handle, use it only for destruction or
 assignment. A workspace is move-only and belongs to the plan that created it.
 Another independently constructed plan is not interchangeable, even with equal seeds.
 
+For successive maps, call `next.prepare_workspace(work)` before encoding with
+`next`. Compatible 128-bit scratch is rebound without allocation or clearing.
+The previous plan can no longer use that workspace. Different geometry and wide
+workspaces are recreated when necessary; a moved-from workspace is recreated at
+128 bits. Do not rebind while another call uses the workspace. This avoids
+repeated scratch allocation when a protocol changes only its code seeds.
+
+Setup and encoding are separate costs. The [setup benchmark report](SETUP_PERFORMANCE.md)
+records both, including repeated batches with changed seeds.
+
+Opt-in [Feistel routing experiments](experiments/feistel/README.md) compare
+compact permutation families with the exact-shuffle baseline. They are not
+public code profiles and do not inherit the existing distance certificates.
+
 Use one workspace per simultaneous call. Encoding does not allocate, resize
 scratch, copy whole input buffers, or start threads. The checked interface rejects
 bad lengths, overlap, alignment, and mismatched workspaces before encoding.
 Invalid arguments throw `std::invalid_argument`; unsupported baseline hardware
 throws `std::runtime_error`. Allocation failures propagate from setup/workspace creation.
+
+## Repeated transposed encoding and seed updates
+
+`Code` remains immutable. For successive code seeds, use the move-only
+`PreparedEncoder` controller and choose the setup mode when constructing it:
+
+```cpp
+#include <spin/PreparedEncoder.h>
+
+spin::PreparedEncoder encoder(
+    {.message_size=81920, .parameters=spin::Parameters::T128S19},
+    {.mode=spin::SetupMode::BankedHeuristic, .bank_seed=913});
+auto work=encoder.make_workspace();
+
+encoder.setCodeSeed({.route=17, .inner=29});
+encoder.transpose_inplace<Block>(encoded, work); // Exactly 2K records.
+```
+
+The constructor prepares the initial seeds from `CodeSpec`. `setCodeSeed` is a
+no-op for identical seeds. Its behavior for changed seeds depends on the fixed mode:
+
+| Mode | Seed update | Reused across updates |
+|---|---|---|
+| `Full` (default) | Rebuild the original sampled setup | Compatible workspace allocations |
+| `BankedHeuristic` | Refresh row transformations, region labels, offsets, and IMT masks | Bank and all workspace allocations |
+
+Banked refresh allocates nothing and never constructs a full per-round route.
+The optimized transpose generates addresses for one region at a time. It supports
+all three parameter sets and their natural lengths, including non-powers of two.
+`bank_seed` determines the reusable bank; code seeds do not change it. Replace the
+controller explicitly to change the bank, mode, or geometry. Both parties must agree
+on these settings and the current code seeds.
+
+`generic_transpose()` returns a live view that follows the controller's seed updates.
+Its typed workspace remains valid across updates. In contrast, a generic view from
+immutable `Code` remains a fixed map. Create views and workspaces during preparation.
+Do not refresh or create a generic view concurrently with another use of the controller
+or its views. Encoding permits concurrent calls with distinct workspaces.
+Workspaces and views retain their required setup; there is no global cache.
+Use moved-from controllers only for assignment or destruction.
+
+The prepared interface currently exposes transpose only: optimized 128-bit records
+and generic XOR elements. The immutable interface retains forward and wide support.
+The banked path uses a region buffer, so `tile_rows` does not affect that path.
+
+Prepared descriptors contain 56 little-endian bytes: magic at 0, version 2 at 4,
+parameter set at 8, mode at 12, K at 16, route seed at 24, and inner seed at 32.
+The bank seed is at 40 and bank-family revision 1 is at 48; both are zero for `Full`.
+The first three numeric fields are 32-bit; K and subsequent fields are 64-bit.
+`Code::descriptor()` retains its original 40-byte version-1 format.
+
+`BankedHeuristic` is the generalized `row-rotate1` experiment, not the original
+uniform-permutation ensemble. Its distance certificates do not follow from the
+original analysis. The K=2^18 regression compares complete routes and IMT masks
+against that prototype. The integrated K=2^18 fast path measures approximately
+8--10% fresh-code overhead on the tested Ryzen/Linux host. This is not an API-wide
+performance guarantee; other lengths retain the generalized routing path.
+See the [integration checkpoint](PREPARED_ENCODER.md) for validation and current timings.
 
 ## Parameters and natural lengths
 

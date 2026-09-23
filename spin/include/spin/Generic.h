@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include "detail/GenericCircuits.h"
+#include "detail/BankState.h"
 
 namespace spin {
 // Componentwise XOR, with no hidden allocation. bool/vector<bool> is excluded.
@@ -19,13 +20,15 @@ struct Xor {
 };
 
 // Owned, portable XOR-element fallback for the same realized binary map.
-// Creation copies routing/masks once. It does not change the optimized Code plan.
+// Code creates a fixed snapshot; PreparedEncoder creates a live view. Neither
+// changes the optimized Code plan. Live-view refresh requires exclusive access.
 class GenericTranspose {
     using u32=std::uint32_t;
     struct Data {
         Parameters config;
         std::size_t k;
         std::vector<u32> route,masks;
+        std::shared_ptr<const detail::BankState> bank;
     };
 public:
     template<ValueElement E> class Workspace {
@@ -43,7 +46,7 @@ public:
     };
     std::size_t message_size() const noexcept {return data_->k;}
     std::size_t code_size() const noexcept {return 2*data_->k;}
-    std::size_t setup_bytes() const noexcept {return 4*(data_->route.capacity()+data_->masks.capacity());}
+    std::size_t setup_bytes() const noexcept {return data_->bank?data_->bank->bytes():4*(data_->route.capacity()+data_->masks.capacity());}
     template<ValueElement E> Workspace<E> make_workspace() const {
         if(code_size()>std::numeric_limits<std::size_t>::max()/sizeof(E))
             throw std::length_error("SPIN generic workspace size overflow");
@@ -63,9 +66,10 @@ public:
     }
 private:
     friend class Code;
+    friend class PreparedEncoder;
     std::shared_ptr<const Data> data_;
     GenericTranspose(Parameters c,std::size_t k,std::vector<u32> route,std::vector<u32> masks)
-        :data_(std::make_shared<Data>(Data{c,k,std::move(route),std::move(masks)})) {}
+        :data_(std::make_shared<Data>(Data{c,k,std::move(route),std::move(masks),{}})) {}
     static bool overlap(const void* a,std::size_t na,const void* b,std::size_t nb) noexcept {
         const auto x=reinterpret_cast<std::uintptr_t>(a),y=reinterpret_cast<std::uintptr_t>(b);
         return x<=y?y-x<na:x-y<nb;
@@ -75,10 +79,29 @@ private:
             throw std::invalid_argument("SPIN generic geometry or workspace mismatch");
     }
     template<ValueElement E,class Op> void dispatch(const E* in,E* out,Workspace<E>& w,const Op& op) const {
+        if(data_->bank) {
+            const auto& b=*data_->bank;
+            // Epochs visit complete regions in reverse order. Avoid division
+            // per element, including at non-power-of-two natural lengths.
+            struct BankRoute {
+                const detail::BankState& bank;
+                mutable std::size_t region=255,base;
+                void begin_epoch(std::size_t i) const {
+                    if(i<base){--region;base-=bank.rows;}
+                }
+                u32 operator()(std::size_t i) const {return bank.destination(region,i-base);}
+            } route{b,255,255*b.rows};
+            dispatchRoute(in,out,w,op,route,b.masks.data());
+        } else {
+            auto route=[&](std::size_t i){return data_->route[i];};
+            dispatchRoute(in,out,w,op,route,data_->masks.data());
+        }
+    }
+    template<ValueElement E,class Op,class Route> void dispatchRoute(const E* in,E* out,Workspace<E>& w,const Op& op,const Route& route,const u32* masks) const {
         switch(data_->config) {
-        case Parameters::T128S19:run<detail::generic::Map128,1>(in,out,w,op);return;
-        case Parameters::T64S12:run<detail::generic::Map64,1>(in,out,w,op);return;
-        case Parameters::T64S12R2:run<detail::generic::Map64,2>(in,out,w,op);return;
+        case Parameters::T128S19:run<detail::generic::Map128,1>(in,out,w,op,route,masks);return;
+        case Parameters::T64S12:run<detail::generic::Map64,1>(in,out,w,op,route,masks);return;
+        case Parameters::T64S12R2:run<detail::generic::Map64,2>(in,out,w,op,route,masks);return;
         }
         throw std::logic_error("SPIN invalid generic configuration");
     }

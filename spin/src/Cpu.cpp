@@ -5,7 +5,7 @@
 #endif
 namespace spin::detail {
 namespace {
-struct Features { bool avx2=false,f=false,vl=false,wide=false; };
+struct Features { bool avx2=false,f=false,vl=false,wide=false,masks=false; };
 Features detect() noexcept {
     Features x;
 #ifdef _MSC_VER
@@ -18,12 +18,14 @@ Features detect() noexcept {
     if((state&0xe6)!=0xe6) return x;
     x.f=(r[1]&(1<<16))!=0; x.vl=(r[1]&(1u<<31))!=0;
     x.wide=x.f && x.vl && (r[1]&(1<<17)) && (r[1]&(1<<30));
+    x.masks=x.wide && (r[2]&(1<<14));
 #else
     __builtin_cpu_init();
     x.avx2=__builtin_cpu_supports("avx2");
     x.f=__builtin_cpu_supports("avx512f");
     x.vl=__builtin_cpu_supports("avx512vl");
     x.wide=x.f && x.vl && __builtin_cpu_supports("avx512dq") && __builtin_cpu_supports("avx512bw");
+    x.masks=x.wide && __builtin_cpu_supports("avx512vpopcntdq");
 #endif
     return x;
 }
@@ -33,6 +35,7 @@ bool cpu_avx2() noexcept {return features().avx2;}
 bool cpu_avx512f() noexcept {return SPIN_BCH_AVX512 && features().f;}
 bool cpu_avx512vl() noexcept {return SPIN_BCH_AVX512 && features().vl;}
 bool cpu_wide512() noexcept {return SPIN_BCH_AVX512 && features().wide;}
+bool cpu_mask512() noexcept {return SPIN_BCH_AVX512 && features().masks;}
 }
 namespace spin {
 Capabilities capabilities() noexcept {
