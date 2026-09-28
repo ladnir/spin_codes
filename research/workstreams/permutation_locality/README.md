@@ -10,8 +10,8 @@ but the dense checkpoint still has 199 unresolved cells.
 The saved witnesses remain local under ignored `tmp/`; this workstream
 tracks source, tests, and proof notes, not generated experiment data.
 
-The next experiment jointly tunes packet size and inner parameters for
-end-to-end encoding time. It starts with two- and four-bit packets and
+The [next experiment](JOINT_TUNING.md) jointly tunes packet size and inner
+parameters for end-to-end encoding time. It starts with two- and four-bit packets and
 two or three updates, retaining the completed two-bit proof as a fallback.
 The earlier four-bit and shared-shuffle work below remains available.
 Its partial certificates do not apply to a changed construction automatically.

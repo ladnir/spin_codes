@@ -26,8 +26,10 @@ from occupancy_sensitivity import float_placement
 from occupancy_memory import Z, C
 
 
-def epoch_grid(tilts, penalty, precision=192):
+def epoch_grid(tilts, penalty, precision=192, *, rounds=2):
     """Complete-shape baselines sharing the expensive exact censuses."""
+    if type(rounds) is not int or not 1<=rounds<=32:
+        raise ValueError('integer update count in 1..32 required')
     tilts=tuple(dict.fromkeys(map(str,tilts)))
     if not tilts or any(Q(tilt)<=0 for tilt in tilts):
         raise ValueError('at least one positive output tilt required')
@@ -44,7 +46,7 @@ def epoch_grid(tilts, penalty, precision=192):
     cancellations=cancellation_joint.census()
     cancellation_joint.check_fresh(cancellations,prepared)
     cancellation_joint.check_feedback(cancellations,feedback)
-    density=feedback_density.build(6,tilts,precision,2)
+    density=feedback_density.build(6,tilts,precision,rounds)
     ctx.prec=precision
     result={}
     for tilt in tilts:
@@ -56,20 +58,20 @@ def epoch_grid(tilts, penalty, precision=192):
         ops=baseline.collision_refine(ops,prepared,tilt,penalty,'1')
         ops=baseline.zero_refine(ops,zeros,tilt,penalty,'1')
         ops=baseline.lift(ops,inputs[3],tails,tilt,penalty,64,pairs,input_penalty='1')
-        ops=baseline.transform(ops,inputs[3],tilt,2)
-        ops=window_histogram.refine(ops,histograms,moments,penalty,2,'1')
-        ops=full_feedback_refinement.refine(ops,feedback,inputs[3],tilt,penalty,2,'1')
-        ops=cancellation_joint.refine(ops,cancellations,tilt,penalty,2,'1')
+        ops=baseline.transform(ops,inputs[3],tilt,rounds)
+        ops=window_histogram.refine(ops,histograms,moments,penalty,rounds,'1')
+        ops=full_feedback_refinement.refine(ops,feedback,inputs[3],tilt,penalty,rounds,'1')
+        ops=cancellation_joint.refine(ops,cancellations,tilt,penalty,rounds,'1')
         ops=universal_density.refine(ops,inputs[3],tilt,penalty,'1',
-                                   window_averages=windows,feedback=density,rounds=2)
-        baseline.tail_test(inputs,ops,tilt,penalty,2,'1')
+                                   window_averages=windows,feedback=density,rounds=rounds)
+        baseline.tail_test(inputs,ops,tilt,penalty,rounds,'1')
         result[tilt]=ops
     return result,feedback
 
 
-def epochs(tilt, penalty, precision=192):
+def epochs(tilt, penalty, precision=192, *, rounds=2):
     """The current complete-shape baseline; retain its integer census."""
-    result,feedback=epoch_grid([tilt],penalty,precision)
+    result,feedback=epoch_grid([tilt],penalty,precision,rounds=rounds)
     return result[str(tilt)],feedback
 
 
