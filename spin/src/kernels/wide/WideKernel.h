@@ -8,6 +8,15 @@
 #include "Spin.h"
 #include "generated/WideCircuit.h"
 #include <stdexcept>
+#include <type_traits>
+#include "../../Cpu.h"
+// The explicit-register helpers have their own ISA target. AVX2 callers can
+// select them after one runtime capability check outside the encoding loops.
+#if HC_WIDE_BITS == 256 && defined(__GNUC__) && SPIN_BCH_AVX512
+#include "generated/BchRegisterSchedule.h"
+#include "feedbackRegister.h"
+#define SPIN_WIDE_REGISTERS 1
+#endif
 
 #if HC_WIDE_BITS == 256
 #define HC_NS wide256
@@ -42,63 +51,76 @@ static_assert(sizeof(Vec)==HC_WIDE_BITS/8 && alignof(Vec)==HC_WIDE_BITS/8);
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 struct Workspace {
-    std::vector<Vec> buckets,tile;
-    explicit Workspace(Spin::WideView view):buckets(view.n),tile(view.tile) {
+    std::vector<Vec> buckets;
+    std::vector<u32> direct_slots;
+    bool registers=false;
+    explicit Workspace(const Spin& code):buckets(code.codeBlocks()),direct_slots(code.codeBlocks()) {
+        const auto view=code.wideForwardView();
+        auto packed=[](const u8* p) {u32 x;std::memcpy(&x,p,4);return x&0xffffff;};
+        // Compose the tile permutation and final gather once, including a
+        // partial final tile and either packed-24 or full-32 setup indices.
+        for(std::size_t i=0;i<view.n;++i) {
+            const auto slot=view.slots?packed(view.slots+3*i):view.slots32[i];
+            const auto offset=view.offsets?packed(view.offsets+3*slot):view.offsets32[slot];
+            direct_slots[i]=static_cast<u32>((slot/view.tile)*view.tile+offset);
+        }
+#if defined(SPIN_WIDE_REGISTERS)
+        registers=code.bchBackend()!=BchBackend::Avx2 && spin::detail::cpu_avx512vl();
+#endif
         if(workspace_routing::eligible(true,view.n/2)) {
             workspace_routing::adviseOwned(buckets.data(),buckets.size()*sizeof(Vec));
-            workspace_routing::adviseOwned(tile.data(),tile.size()*sizeof(Vec));
         }
     }
 };
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
-static SPIN_FORCEINLINE u32 unpack(const u8* p) {
-    u32 x; std::memcpy(&x,p,4); return x&0xffffff;
-}
-template<class Map,bool Packed> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w) {
-    auto* values=w.buckets.data(); auto* tile=w.tile.data();
-    for(std::size_t base=0;base<view.n;base+=view.tile) {
-        // One vector is now an entire 256/512-row record. Apply the identical
-        // BCH DAG to one outer group at a time, without half-vector packing.
-        for(std::size_t j=0;j<view.tile;j+=256)
-            Circuit::bchForward(in+(base+j)/2,tile+j);
-        for(std::size_t j=0;j<view.tile;++j)
-            values[base+j]=tile[Packed?unpack(view.offsets+3*(base+j)):view.offsets32[base+j]];
+#if defined(SPIN_WIDE_REGISTERS)
+template<class Map> struct RegisterFeedback:Map {
+    static SPIN_FORCEINLINE void feedback(const Vec* in,Vec* out) {
+        if constexpr(std::is_same_v<Map,WideMap128S19<Ops>>) feedbackRegister(in,out);
+        else Map::feedback(in,out);
     }
-    Circuit::innerForward<Map>(view.n,view.fieldRows,[&](std::size_t i) {
-        // Each routing lookup loads one complete 32/64-byte row record.
-        return values[Packed?unpack(view.slots+3*i):view.slots32[i]];
+};
+template<class Map> __attribute__((noinline)) static void registerInner(
+    Spin::WideView view,Workspace& w,Vec* out) {
+    Circuit::innerForward<RegisterFeedback<Map>>(view.n,view.fieldRows,[&](std::size_t i) {
+        return w.buckets[w.direct_slots[i]];
     },out);
 }
-template<class Map,bool Packed> static void encodeTail(Spin::WideView view,const Vec* in,Vec* out,Workspace& w) {
-    auto* values=w.buckets.data(); auto* tile=w.tile.data();
+#endif
+template<class Map,bool Registers> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w) {
+    auto* values=w.buckets.data();
     for(std::size_t base=0;base<view.n;base+=view.tile) {
-        const auto activeSize=std::min(view.tile,view.n-base);
-        // One vector is now an entire 256/512-row record. Apply the identical
-        // BCH DAG to one outer group at a time, without half-vector packing.
-        for(std::size_t j=0;j<activeSize;j+=256)
-            Circuit::bchForward(in+(base+j)/2,tile+j);
-        for(std::size_t j=0;j<activeSize;++j)
-            values[base+j]=tile[Packed?unpack(view.offsets+3*(base+j)):view.offsets32[base+j]];
+        const auto active=std::min(view.tile,view.n-base);
+        for(std::size_t j=0;j<active;j+=256) {
+#if defined(SPIN_WIDE_REGISTERS)
+            // Input and workspace output are disjoint. The register schedule
+            // may reuse already-written BCH output as dependency backing.
+            if constexpr(Registers) bchForwardRegister(in+(base+j)/2,values+base+j);
+            else
+#endif
+            Circuit::bchForward(in+(base+j)/2,values+base+j);
+        }
     }
+#if defined(SPIN_WIDE_REGISTERS)
+    if constexpr(Registers) {registerInner<Map>(view,w,out);return;}
+#endif
     Circuit::innerForward<Map>(view.n,view.fieldRows,[&](std::size_t i) {
-        // Each routing lookup loads one complete 32/64-byte row record.
-        return values[Packed?unpack(view.slots+3*i):view.slots32[i]];
+        return values[w.direct_slots[i]];
     },out);
 }
 template<class Map> static void dispatch(Spin::WideView v,const Vec* in,Vec* out,Workspace& w) {
-    if(v.n%v.tile) {
-        if(v.slots) encodeTail<Map,true>(v,in,out,w);else encodeTail<Map,false>(v,in,out,w);
-    } else {
-        if(v.slots) encode<Map,true>(v,in,out,w);else encode<Map,false>(v,in,out,w);
-    }
+#if defined(SPIN_WIDE_REGISTERS)
+    if(w.registers) {encode<Map,true>(v,in,out,w);return;}
+#endif
+    encode<Map,false>(v,in,out,w);
 }
 
 }
 
 extern "C" void* HC_NAME(spin_internal_wide_workspace)(const void* code) noexcept {
-    try { return new spin::detail::kernel::HC_NS::Workspace(static_cast<const spin::detail::kernel::Spin*>(code)->wideForwardView()); }
+    try { return new spin::detail::kernel::HC_NS::Workspace(*static_cast<const spin::detail::kernel::Spin*>(code)); }
     catch(...) { return nullptr; }
 }
 extern "C" void HC_NAME(spin_internal_wide_destroy)(void* work) noexcept {
@@ -106,7 +128,7 @@ extern "C" void HC_NAME(spin_internal_wide_destroy)(void* work) noexcept {
 }
 extern "C" std::size_t HC_NAME(spin_internal_wide_bytes)(const void* work) noexcept {
     const auto& w=*static_cast<const spin::detail::kernel::HC_NS::Workspace*>(work);
-    return (w.buckets.capacity()+w.tile.capacity())*(HC_WIDE_BITS/8);
+    return w.buckets.capacity()*(HC_WIDE_BITS/8)+w.direct_slots.capacity()*sizeof(std::uint32_t);
 }
 extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,const void* in,
                                             std::size_t ni,void* out,std::size_t no) noexcept {
@@ -114,7 +136,7 @@ extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,co
         const auto v=static_cast<const spin::detail::kernel::Spin*>(code)->wideForwardView();
         auto& w=*static_cast<spin::detail::kernel::HC_NS::Workspace*>(work);
         constexpr auto lanes=HC_WIDE_BITS/128;
-        if(!in || !out || ni!=v.n/2*lanes || no!=v.n*lanes || w.buckets.size()!=v.n || w.tile.size()!=v.tile)
+        if(!in || !out || ni!=v.n/2*lanes || no!=v.n*lanes || w.buckets.size()!=v.n || w.direct_slots.size()!=v.n)
             return 1;
         const auto a=reinterpret_cast<std::uintptr_t>(in), b=reinterpret_cast<std::uintptr_t>(out);
         if(a<=b ? b-a<ni*16 : a-b<no*16) return 1;

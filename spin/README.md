@@ -5,6 +5,9 @@ SPIN encoder. It has no build dependency on libOTe, Hypercat, Python, or the
 research workstreams. SPIN is [MIT licensed](LICENSE), copyright Peter Rindal.
 The checked-in kernels have a [generation record](PROVENANCE.md).
 
+The [wide encoding notes](WIDE_ENCODING.md) describe composed routing, the
+runtime-dispatched register kernels, regeneration, and portability tests.
+
 Forward encoding maps K records to 2K records. Transposed encoding maps 2K
 records to K records. Both apply the same binary matrix, independently to each
 bit of a record. They do not perform extension-field multiplication.
