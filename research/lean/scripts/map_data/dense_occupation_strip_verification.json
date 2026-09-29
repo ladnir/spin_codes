@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "numerical_witnesses_checked": 9,
+  "numerical_local_boxes_checked": 9,
+  "coverage": "alpha in [1/10000,10031/320000], mean active row density in [13/125,18296026121/120000000000]",
+  "scope": "Finite actual selected shared outer-seed message profile first moment; explicit outerCost and routing factors retained. Entire dense-regime coverage and profile aggregation not claimed.",
+  "axioms": {
+    "Spin.Structured.DenseOccupationFixed.vertexCheck_sound": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.klEval_mem": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.boxExponent_le_of_vertices": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.routed_counted_rate": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.Strip.covered": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.Strip.routed_rate": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.refined_le_first": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_spectrum_affine": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_profile_affine": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_profile_routed_rate": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.profileMessages_card": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.failureProbability_eq_of_card_eq": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.profile_failure_eq": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_profile_failure_rate": "propext,\n Classical.choice,\n Quot.sound"
+  },
+  "modules": [
+    {
+      "name": "DenseOccupationFixedVertices",
+      "source_sha256": "b10f244e82aa4909275e9027c9f937209168288dd3399f3f2fec44e20fabb8ba",
+      "olean_sha256": "20b751f48d741ab1ca0289bc49f1ccf037831805e1a8e6bb89c1f5e2d5ff4548"
+    },
+    {
+      "name": "DenseOccupationFixedLogDefs",
+      "source_sha256": "2ee6804c55d243629561809f6438caf604e4a074cef9cd87373428aa4e7f1365",
+      "olean_sha256": "8adfcfe923b06aa8228d39c0565fdffaa4f568f6d54a0e3e4c519293c3fe4bf8"
+    },
+    {
+      "name": "DenseOccupationFixedLog",
+      "source_sha256": "f8b228646e1e4631a9792ea1cde4bfcd2b28c9ace8a187844a37fd8511a4df62",
+      "olean_sha256": "118209c2a5552c57ef067b9c34005013c8c3ca1a7b698badfc4a61442000ef0f"
+    },
+    {
+      "name": "DenseOccupationFixedVertexDefs",
+      "source_sha256": "7c1adb7021c1548efdd2cc292881badfb140b6a233b648c5f49e67e3141fad3b",
+      "olean_sha256": "d3a54702ca02d85c0db8a658c223c3ac45b73a9a91e4580b49cf28877252602e"
+    },
+    {
+      "name": "DenseOccupationFixedVertex",
+      "source_sha256": "b12825632ac04bdbf66ca68cdb1f805d20829505804cdb01dcd0f7744f4b7a4d",
+      "olean_sha256": "90038d5ef0c9e649f7ce455dde659338f11dcb54ee313c06aec34ec8ac5d6ab8"
+    },
+    {
+      "name": "DenseOccupationFixedRate",
+      "source_sha256": "8607cb0e6c14e61e5d87ca2012da4214f053eabbbc93121eb66425f30254fe47",
+      "olean_sha256": "c11a26218d19700938c66a954ec16ff790de5bea228a73d146113394a8f911a5"
+    },
+    {
+      "name": "DenseOccupationFixedStrip",
+      "source_sha256": "2f7c58ecf01e12d3500f1fe4ed8f60599a8541b19e7f1caa5adc369a7d4858ee",
+      "olean_sha256": "e674c7fb315c02070612f198fefb8c9d66664642e211e5365f4333bb0c6b75af"
+    },
+    {
+      "name": "DenseOccupationOuterAffine",
+      "source_sha256": "1c76d1e68d7677d1e3b1bffbae1e55bfb41686eb436b232ed99ee95f8f80e3a6",
+      "olean_sha256": "d26abd197b6fa215fc8e293829d0e66228990ba1d5cfd17949a01e15cec58dbc"
+    },
+    {
+      "name": "DenseOccupationOuterStrip",
+      "source_sha256": "06163db1cc200376c76a922ba7c3dc126c128c06dd2735074e87fdced4ad9094",
+      "olean_sha256": "c3604047e6020c4e2df4d3dc8e82a940ffadbff33ae15fad3e29158eabb6e80a"
+    },
+    {
+      "name": "DenseOccupationProfileCount",
+      "source_sha256": "ffccdc7af45ee7fcf404094083935704e7081c66d6dac437b974aa89e9f946bb",
+      "olean_sha256": "1e7916da75b7975df306c7ec46e799698db66f9db14f0a66d9da5a4a6f8fdf6f"
+    },
+    {
+      "name": "DenseOccupationProfileFailure",
+      "source_sha256": "63cdf8bae5d521ce98c4f2705db95a4262ade46577b73e3742d2f10264f088a5",
+      "olean_sha256": "ce2caba9e0f484585b6e281e8d3400dee7ae6acaac4b84052775d06782f10269"
+    },
+    {
+      "name": "DenseOccupationFixedStripPin",
+      "source_sha256": "f1a08145c12cc17f943a77ee65873199b9a7c49efb64c0140683aeec947f084c",
+      "olean_sha256": "b0aefe9f292c8f7a5936e8ac0886ea35193f4afedd795d26bf9ebe254229fb3d"
+    }
+  ]
+}

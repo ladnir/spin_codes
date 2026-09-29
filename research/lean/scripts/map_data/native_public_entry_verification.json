@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "checked_at_utc": "2026-09-29T00:03:57.545078+00:00",
+  "scope": "Public import and four-result audit only. Two new modules compiled on prepared Peach using existing imports. Original closure artifact hashes revalidated by 17-gate collector; no existing proof source was edited. Not a full dependency replay.",
+  "compiler_helper": "scripts/peach-lean.py",
+  "compiler_helper_sha256": "b4e5315c28ed3c94c65d52f037ebd563aff9a94ee75b91cab991df9124a611be",
+  "modules": [
+    {
+      "source": "SpinCodes\\Native.lean",
+      "source_sha256": "8c7e84233fdbb4ae5a243890301e7b6affdb204a5d32e9b4d0c2d7ad6a385573",
+      "object_sha256": "24fc32c6a349018d42a9240eb107faeb626d1a082724323bdd18d7d062741f3f",
+      "command": [
+        "C:/Python314/python.exe",
+        "scripts/peach-lean.py",
+        "SpinCodes/Native.lean"
+      ],
+      "exit_code": 0,
+      "log": "peach_Native.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "SpinCodes\\NativePin.lean",
+      "source_sha256": "c527e9e58b993d15032a088992f69146de891130a9fc5a64db34c5267b0bd06d",
+      "object_sha256": "52e7109355c0e34d57f6925b2a0c4088bd6e2e482456b18958bab90fe3b9e984",
+      "command": [
+        "C:/Python314/python.exe",
+        "scripts/peach-lean.py",
+        "SpinCodes/NativePin.lean"
+      ],
+      "exit_code": 0,
+      "log": "peach_NativePin.log",
+      "log_sha256": "053ad32ea5d7e4ec23c041a7c1f26cf6b723317076526783414dd302d700517c"
+    }
+  ],
+  "audit_count": 4,
+  "axioms": {
+    "Spin.Structured.ConcreteNativeFamily.native_minimum_distance_failure_tendsto": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Spin.Structured.ConcreteNativeFamily.realizedCode_rate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Spin.Structured.ConcreteNativeFamily.relative_distance_success_tendsto": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Spin.Structured.ConcreteNativeFamily.eventually_exists_rate_half_distance_gt_eleven_percent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "closure_report_sha256": "da39ea89a5e401703a99e791e78199905f7719efc54799f6aa2cdb306ea793c9",
+  "source_scan": "native_public_source_scan.json",
+  "source_scan_sha256": "88211b4d3a6fb012b1799dce0213062c1fc0d67395bd13bb05fabc6853a42ceb",
+  "public_replay_plan": "scripts\\map_data\\encoder_native_replay_20260928_170315_37316\\report.json",
+  "public_replay_plan_sha256": "bf78adbf54614c888379764a50772fd489d61df870b7cc1bfee5448b7eed524f"
+}

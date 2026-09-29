@@ -1,0 +1,6 @@
+import SpinCodes.Structured.ConcreteNativeClosure
+
+#print axioms Spin.Structured.sparse_regime_eventually
+#print axioms Spin.Structured.dense_regime_eventually
+#print axioms Spin.Structured.Family.distance_whp_native_eventually
+#print axioms Spin.Structured.ConcreteNativeFamily.distance_of_remaining_regimes

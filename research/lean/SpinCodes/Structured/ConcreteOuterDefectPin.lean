@@ -1,0 +1,14 @@
+import SpinCodes.Structured.ConcreteOuterDefectEnvelope
+open Spin.Structured.ConcreteOuter Spin.Structured.ConcreteNativeFamily
+#check refined_defect
+#check expected_spectrum_uniform
+#check shellLogError_div_tendsto
+#check nativeShellRemainder_tendsto
+#check native_expected_spectrum_uniform
+#check concrete_sparse_eventually_of_tail
+#print axioms refined_defect
+#print axioms expected_spectrum_uniform
+#print axioms shellLogError_div_tendsto
+#print axioms nativeShellRemainder_tendsto
+#print axioms native_expected_spectrum_uniform
+#print axioms concrete_sparse_eventually_of_tail

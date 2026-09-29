@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "geometry_boxes_covered": 1023,
+  "scope": "Exact dense rectangular coverage, arbitrary supporting-line outer spectrum bridge, and exact occupation/profile counting cost. Geometry alone makes no new numerical box claims.",
+  "axioms": {
+    "Spin.Structured.DenseGeometry.check_sound": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseGeometry.global_cover": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseGeometry.of_box_certificates": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_spectrum_support": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.selected_profile_support": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.profile_fiber_eq": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.sum_active_eq_profiles": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.sum_active_le_profile_bound": "propext,\n Classical.choice,\n Quot.sound",
+    "Spin.Structured.DenseOccupationFixed.sum_occupation_le_profile_bound": "propext,\n Classical.choice,\n Quot.sound"
+  },
+  "modules": [
+    {
+      "name": "DenseOccupationGeometryDefs",
+      "source_sha256": "e40a7eeaf345a6afad288acc8d4e1ee8a6148fdb9cd722db9f4f3077ebe6e4b9",
+      "olean_sha256": "aa0dba5773edb6449426a05a212a678123a0265080d412c42eb1703761f0fbd0"
+    },
+    {
+      "name": "DenseOccupationGeometry",
+      "source_sha256": "a316abc1df23e4f635bfc7b0044abd17af661ab7cda87ab6f885f6302af78925",
+      "olean_sha256": "666e91ead240b61637eb24fa877f13094082e80f286b92e52335feff6728d97f"
+    },
+    {
+      "name": "DenseOccupationGeometryData",
+      "source_sha256": "51e2c20aeb32acc70bca20d5006a34e61adbae2cba4edf838d9767c58f3f45c4",
+      "olean_sha256": "a8f777fdb82fb06d251e580e3ab307dcf3352abb53aecd00c03fa71c03fd6703"
+    },
+    {
+      "name": "DenseOccupationGeometryCover",
+      "source_sha256": "e216139393de1ec56a7bed595a20e23d298a6670071153e89f6ca459836cd7a6",
+      "olean_sha256": "93bf233fb3a049653e86b0034c19a73a849fbda315637f34076cce42b56e53f9"
+    },
+    {
+      "name": "DenseOccupationOuterSupport",
+      "source_sha256": "947b4b0b17176fd05ecf7f9244ba4aea7c81d9843a4331ceebf33a251ed25eb5",
+      "olean_sha256": "da310a3d1a7ede1a5dab7b4c5d05df93802b643a8a9873dd29297ebbd6dd3101"
+    },
+    {
+      "name": "DenseOccupationProfilePartition",
+      "source_sha256": "08fd5ce8f397506790db2e68fba987ccc60959f5201dc5bbfbbfcd22f7c9a89d",
+      "olean_sha256": "57c7c08c3fa9c03c03a0b912786ffd02f45c53c2ab70bf743fc4ab35a4f6bd8a"
+    }
+  ],
+  "candidate_sha256": "3535735690499c3acaa99e17c61b23584600a6daeb9412ac62ba49701a74bffd"
+}

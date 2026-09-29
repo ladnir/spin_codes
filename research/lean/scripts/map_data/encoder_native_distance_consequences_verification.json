@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "scope": "Separate success-probability and existence corollaries; waits for audited base theorem",
+  "checks": [
+    {
+      "module": "ConcreteNativeDistanceConsequences",
+      "exit_code": 0,
+      "seconds": 17.974,
+      "log": "encoder_consequence_check_ConcreteNativeDistanceConsequences.log"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesPin",
+      "exit_code": 0,
+      "seconds": 17.231,
+      "log": "encoder_consequence_check_ConcreteNativeDistanceConsequencesPin.log"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesFinal",
+      "exit_code": 0,
+      "seconds": 78.164,
+      "log": "encoder_consequence_check_ConcreteNativeDistanceConsequencesFinal.log"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesFinalPin",
+      "exit_code": 0,
+      "seconds": 85.472,
+      "log": "encoder_consequence_check_ConcreteNativeDistanceConsequencesFinalPin.log"
+    }
+  ],
+  "base_report_sha256": "6ff120a0ce7c66a136ea2a7a7235d32f468c5fe02c6ac10095c8c8c9e2d314ac",
+  "modules": [
+    {
+      "module": "ConcreteNativeDistanceConsequences",
+      "source_sha256": "5de74f9db32ec924f1485ed65cd3be0719b26b9cea52b12612cc4bcd2b37ab20",
+      "olean_sha256": "6adaef738887fe6daa55d02c990c6c95df19d02ce6ab7a14be3eb5373ee6cd33"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesPin",
+      "source_sha256": "bee37e0515c843b158f49f00d53847c06da6b3a1322653ded359137a5b99dc4e",
+      "olean_sha256": "bf258d41d2b15c6ecea6b376b44b41827a7bc8891b525b5cff7331cca4487698"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesFinal",
+      "source_sha256": "7567e7b6e6d4a52f10957edf9b9a8ee5c730e6ef56b6ca1c9c70691c54c7bb68",
+      "olean_sha256": "d7a80f09e85ecf5e1066e7181aed387c4906e2c9c61be284208aa779f38e5768"
+    },
+    {
+      "module": "ConcreteNativeDistanceConsequencesFinalPin",
+      "source_sha256": "93541baeb860872fa9bfb865b9a9dd1c5fc6bfd195973cdbaca51f6dc2d7a14f",
+      "olean_sha256": "87c208dd21d67a463ba6ef19804b2831aa27dc6e07140c7b66221d0b5bd1f40b"
+    }
+  ],
+  "checked_module_count": 4,
+  "axiom_audit_count": 7,
+  "axiom_theorems": [
+    "Spin.Structured.ConcreteNativeFamily.relative_distance_gt_iff_threshold",
+    "Spin.Structured.ConcreteNativeFamily.probability_good_distance_eq_one_sub_bad",
+    "Spin.Structured.ConcreteNativeFamily.success_probability_tendsto_of_failure",
+    "Spin.Structured.ConcreteNativeFamily.exists_seed_of_probability_pos",
+    "Spin.Structured.ConcreteNativeFamily.eventually_exists_good_code_of_failure",
+    "Spin.Structured.ConcreteNativeFamily.relative_distance_success_tendsto",
+    "Spin.Structured.ConcreteNativeFamily.eventually_exists_rate_half_distance_gt_eleven_percent"
+  ],
+  "allowed_axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ]
+}

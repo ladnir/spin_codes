@@ -9,6 +9,7 @@ bit operations for ordinary and transposed encoding at its native output lengths
 $N$. With probability $1-o(1)$ over the random choice of the code, its minimum distance exceeds
 $0.11N$. The proof combines outer spectrum bounds with an analysis of
 structured support spreading and recursive state mixing.
+We formally verify these distance and rate guarantees in Lean.
 
 \qquad For finite lengths, a BCH-derived outer constituent and a fixed recursive
 inner give rate $1/2$ and relative distance greater than $0.10$, with setup
@@ -31,5 +32,5 @@ target; this excludes code-setup failure, extraction, and Fiat--Shamir reduction
 Within an optimized Flock implementation, replacing Ligerito with
 SPIN--Brakedown improves prover throughput by $1.36$--$1.92\times$ at the
 measured workloads, with larger proofs. The comparison gives both
-backends the applicable shared implementation optimizations.\footnote{GPT-5.6 and GPT-6.0 were used extensively in the creation of this work. See Section~\ref{sec:ai-disclosure} for more details.}
+backends the applicable shared implementation optimizations.\footnote{Generative AI tools were used extensively in this work. See Section~\ref{sec:ai-disclosure} for details.}
 \end{abstract}

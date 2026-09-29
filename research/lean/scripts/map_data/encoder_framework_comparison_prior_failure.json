@@ -1,0 +1,45 @@
+{
+  "status": "FAIL",
+  "scope": "Printed declaration/type/body/axiom comparison, not byte identity or source-output association",
+  "declarations": [
+    "Spin.nonzeroMsgs",
+    "Spin.Setup",
+    "Spin.Setup.Z",
+    "Spin.Setup.qd",
+    "Spin.Setup.qd_nonneg",
+    "Spin.Setup.qd_le_one",
+    "Spin.Setup.joint",
+    "Spin.Setup.expect_Z_eq",
+    "Spin.Setup.prob_bad_le_expect_Z",
+    "Spin.Setup.Aout",
+    "Spin.Setup.Aout_nonneg",
+    "Spin.Setup.expect_Z_le_class_sum",
+    "Spin.Setup.prob_bad_le_class_sum",
+    "Spin.Setup.ZQ",
+    "Spin.Setup.Z_eq_sum_ZQ",
+    "Spin.Setup.expect_Z_eq_sum_expect_ZQ",
+    "Spin.Setup.prob_bad_le_cond_sum",
+    "Spin.Setup.mk",
+    "Spin.Setup.rec",
+    "Spin.Setup.Pout",
+    "Spin.Setup.Pin",
+    "Spin.Setup.outer",
+    "Spin.Setup.innerWt"
+  ],
+  "checks": [
+    {
+      "mode": "live",
+      "exit_code": 1,
+      "log": "scripts/map_data/encoder_foundations_isolated_20260928_154745_45572/FrameworkDeclarations_live.log",
+      "log_sha256": "9fb686414edf82e23c9d717b0d76a91b0a5626ed4b0091a705b88d9c2ca96e46",
+      "command": [
+        "c:\\Users\\peter\\.elan\\toolchains\\leanprover--lean4---v4.34.0\\bin\\lean.EXE",
+        "-j1",
+        "-M",
+        "4000",
+        "scripts/map_data/encoder_foundations_isolated_20260928_154745_45572/EncoderFrameworkCompare.lean"
+      ]
+    }
+  ],
+  "error": ""
+}

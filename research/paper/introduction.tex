@@ -31,10 +31,14 @@ $\Pi_N$, but their composition is one global interleaver.
 \subsection{Results and Approach}
 
 \paragraph{Distance and Encoding Work.}
-Our main construction, Structured SPIN, has rate $1/2$ and minimum distance
-greater than $0.11N$ with probability $1-o(1)$ over setup.
+Every realization of our main construction, Structured SPIN, has rate $1/2$.
+Its minimum distance exceeds $0.11N$ with probability $1-o(1)$ over setup.
 Ordinary and transposed encoding require $O(N)$ bit operations at its native
-lengths. For finite lengths, we choose constituents for concrete performance
+lengths. The distance and rate claims are formally verified in Lean,
+including the construction's random setup, the analytic estimates, and the
+required numerical certificates. Appendix~\ref{app:structured-lean} describes
+the formalization.
+For finite lengths, we choose constituents for concrete performance
 rather than require the asymptotic outer. A fixed BCH-derived
 $[256,128,\ge38]$ constituent gives relative distance greater than $0.10$
 with setup failure below $2^{-40}$ at message lengths
@@ -152,3 +156,5 @@ includes the core SPIN encoder implementation and
 \artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{build instructions}.
 \fi
 The artifact does not include the numerical-search or comparison-experiment archives.
+The accompanying Lean development includes proof sources, numerical
+certificates, and reproduction instructions.

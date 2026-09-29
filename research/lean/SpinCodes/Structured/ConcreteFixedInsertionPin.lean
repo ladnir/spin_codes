@@ -1,0 +1,10 @@
+import SpinCodes.Structured.ConcreteFixedInsertionLimit
+open Spin.Structured.Placement
+#print axioms fullGapProduct_subset_expansion
+#print axioms markedSitePath_eq_selected
+#print axioms factorSitePath_ofFn
+#print axioms selectedGapProduct_eq_subtuple
+#print axioms fullSiteProduct_normalized_permuted
+#print axioms finiteInsertionAverage_eq
+#print axioms uniform_orderedSite_sum_tendsto
+#print axioms fugacityContinuum_eq_insertion

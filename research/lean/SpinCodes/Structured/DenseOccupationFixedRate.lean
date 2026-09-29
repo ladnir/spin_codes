@@ -1,0 +1,76 @@
+import SpinCodes.Structured.PositiveFiniteTilted
+import SpinCodes.Structured.DenseOccupationFixedVertices
+
+noncomputable section
+namespace Spin.Structured.DenseOccupationFixed
+open Spin.Imt ConcreteRoute ConcreteRoutedEncoder
+
+/-- Turn the actual finite powers and KL likelihood ratio into the certified box exponent. -/
+theorem finite_exponent_le {N α x p y radius z m c : ℝ} {R d : Nat}
+    (hN : 0≤N) (hα0 : 0<α) (hα1 : α≤1) (hx0 : 0<x) (hx1 : x≤1)
+    (hp0 : 0<p) (hp1 : p<1) (hy0 : 0<y) (hy1 : y<1)
+    (hr : 0<radius) (hz0 : 0<z) (hz1 : z≤1)
+    (hround : 128*(R:ℝ)=N) (hd : (d:ℝ)≤(11/100)*N) :
+    Real.exp (N*α*(m*x+c))*Real.exp (N*binKL (α*x) (p*y))*radius^R/z^d ≤
+      Real.exp (N*boxExponent m c p y radius z α x) := by
+  have heR : radius^R = Real.exp ((R:ℝ)*Real.log radius) := by
+    rw [Real.exp_nat_mul, Real.exp_log hr]
+  have hez : z^d = Real.exp ((d:ℝ)*Real.log z) := by
+    rw [Real.exp_nat_mul, Real.exp_log hz0]
+  rw [heR,hez,← Real.exp_add,← Real.exp_add,← Real.exp_sub]
+  apply Real.exp_le_exp.mpr
+  have hk := mul_le_mul_of_nonneg_left (binKL_chain hα0 hα1 hx0 hx1 hp0 hp1 hy0 hy1) hN
+  have hl : Real.log z≤0 := Real.log_nonpos hz0.le hz1
+  have hdt := mul_le_mul_of_nonneg_right hd (neg_nonneg.mpr hl)
+  unfold boxExponent
+  nlinarith [congrArg (fun t => t*Real.log radius/128) hround]
+
+/-- Finite positive-occupation rate; the outer counting cost remains an explicit input. -/
+theorem routed_counted_rate {L b R d : Nat} (hL : 0<L) (hb : 0<b)
+    (e : (Fin b × Fin L) ≃ (Fin R × Fin 128)) (rows : Fin L → Finset (Fin b))
+    (hw0 : 0<totalWeight rows) (hw1 : totalWeight rows<L*b)
+    {α x p y radius z m c η C wmin : ℝ} {w : Coords 5}
+    (hα0 : 0<α) (hα1 : α≤1) (hx0 : 0<x) (hx1 : x≤1)
+    (hden : density rows=α*x) (hp0 : 0<p) (hp1 : p<1) (hy0 : 0<y) (hy1 : y<1)
+    (hr : 0<radius) (hz0 : 0<z) (hz1 : z≤1)
+    (hmin : 0<wmin) (hZ : wmin≤w.Z) (hD : wmin≤w.D) (hS : ∀ i,wmin≤w.S i)
+    (hcol : ((Occupation.Sparse.numericalMatrix (p*y) z).applyCol w).le (Coords.smul radius w))
+    (hround : 128*R=L*b) (hd : (d:ℝ)≤(11/100)*((L:ℝ)*b))
+    (hC0 : 0≤C) (hC : C≤Real.exp (((L:ℝ)*b)*α*(m*x+c)))
+    (hbox : boxExponent m c p y radius z α x≤-η) :
+    C*(experimentLaw L b R).prob (fun ω => weight e rows ω≤d) ≤
+      (((b:ℝ)+1)^activeRows rows*((L:ℝ)+1)^b)*(w.Z/wmin)*Real.exp (-η*((L:ℝ)*b)) := by
+  have hpY0 : 0<p*y := mul_pos hp0 hy0
+  have hpY1 : p*y<1 := by nlinarith
+  have hprob := PositiveFinite.routed_tilted_probability_le hL hb e rows hw0 hw1 hpY0 hpY1
+    hz0 hz1 hmin hZ hD hS hcol d
+  have hpre0 : 0≤(((b:ℝ)+1)^activeRows rows*((L:ℝ)+1)^b)*(w.Z/wmin) := by
+    have : 0≤w.Z := hmin.le.trans hZ
+    positivity
+  have hs := finite_exponent_le (N := (L:ℝ)*b) (m := m) (c := c) (R := R) (d := d)
+    (by positivity) hα0 hα1 hx0 hx1 hp0 hp1 hy0 hy1 hr hz0 hz1
+    (by exact_mod_cast hround) hd
+  have hs' : Real.exp (((L:ℝ)*b)*α*(m*x+c))*
+      Real.exp (((L:ℝ)*b)*binKL (α*x) (p*y))*radius^R/z^d ≤
+      Real.exp (-η*((L:ℝ)*b)) := hs.trans (Real.exp_le_exp.mpr (by
+        have := mul_le_mul_of_nonneg_left hbox (show 0≤(L:ℝ)*b by positivity)
+        nlinarith))
+  calc
+    C*(experimentLaw L b R).prob (fun ω => weight e rows ω≤d)
+      ≤ C*(((((b:ℝ)+1)^activeRows rows*((L:ℝ)+1)^b)*
+        Real.exp (((L:ℝ)*b)*binKL (density rows) (p*y)))*(radius^R*w.Z/wmin)/z^d) :=
+          mul_le_mul_of_nonneg_left hprob hC0
+    _ ≤ Real.exp (((L:ℝ)*b)*α*(m*x+c))*
+        (((((b:ℝ)+1)^activeRows rows*((L:ℝ)+1)^b)*
+        Real.exp (((L:ℝ)*b)*binKL (density rows) (p*y)))*(radius^R*w.Z/wmin)/z^d) := by
+          apply mul_le_mul_of_nonneg_right hC
+          have : 0≤w.Z := hmin.le.trans hZ
+          positivity
+    _ = ((((b:ℝ)+1)^activeRows rows*((L:ℝ)+1)^b)*(w.Z/wmin))*
+        (Real.exp (((L:ℝ)*b)*α*(m*x+c))*Real.exp (((L:ℝ)*b)*binKL (α*x) (p*y))*radius^R/z^d) := by
+          rw [hden]
+          ring
+    _ ≤ _ := mul_le_mul_of_nonneg_left hs' hpre0
+
+#print axioms routed_counted_rate
+end Spin.Structured.DenseOccupationFixed

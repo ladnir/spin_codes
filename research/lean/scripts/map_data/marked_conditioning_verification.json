@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "scope": "Eight new marked-conditioning modules compiled on Peach using checked cached dependencies; eleven standard-axiom audits. No full dependency replay.",
+  "modules": [
+    {
+      "module": "ConcreteMarkedBits",
+      "source_sha256": "2a32687c92653b5b2a70bc5c6a49d7b5ea348b2cc2c6f732f868f918832e01b5",
+      "object_sha256": "50726bcf6dbdae5095e640957515c3589fe45638fc93031d6ef042e5383c9d4c",
+      "log": "peach_ConcreteMarkedBits.log"
+    },
+    {
+      "module": "ConcreteMarkedConditioning",
+      "source_sha256": "fb8c5f238b672328ab1337945b313ef6197ab1089b790c431e7f97db7e149b52",
+      "object_sha256": "034302291457cd9dd97614d4c7c9a932a28a3b2885a2b02d94da4c9a1e881b7d",
+      "log": "peach_ConcreteMarkedConditioning.log"
+    },
+    {
+      "module": "ConcreteMarkedMoment",
+      "source_sha256": "23882330de85c33d467e5664c0a18f691033ff75855f12ae820a3603091276ba",
+      "object_sha256": "b1a4077aeabb0dc7af8d3c3e1724eec406593fc37c33977af743238610c14c59",
+      "log": "peach_ConcreteMarkedMoment.log"
+    },
+    {
+      "module": "ConcreteMarkedShuffle",
+      "source_sha256": "65261d68bbaa491ce94daec47fcbde83496c19db1b2af51613c7a5cda5d8b74d",
+      "object_sha256": "70c06f32b03d2ea032121e0f0dd9b7ed07db511ef7e3bc3e47f166f738c89d6f",
+      "log": "peach_ConcreteMarkedShuffle.log"
+    },
+    {
+      "module": "ConcreteMarkedFairRows",
+      "source_sha256": "7dd4b0c7344401cd8fc1017c8d2a9a17a69f9bbb841d9554f3d662a861625255",
+      "object_sha256": "5986f549ee53754e8e66b2ad5d6e91d3a2f3e014dd9012cab75aac495ecf1a04",
+      "log": "peach_ConcreteMarkedFairRows.log"
+    },
+    {
+      "module": "ConcreteMarkedExperiment",
+      "source_sha256": "51aeec4582cc15e5ccaeed8d7f21a0a674cdbd689ffd49535ee01f3fc54b4e31",
+      "object_sha256": "51837255ca6c1fa8058f18443ef06311cc5d55d6f00bd4293620b404d3dcee19",
+      "log": "peach_ConcreteMarkedExperiment.log"
+    },
+    {
+      "module": "ConcreteMarkedReferenceMoment",
+      "source_sha256": "36f2278a1431656193fc94e1fe9d8bfa3bf425c098b1a79bb52360346c763614",
+      "object_sha256": "7eb6609e3c7a05e943362aec155f46fea313a99e96476519896e8cd60f44fc1d",
+      "log": "peach_ConcreteMarkedReferenceMoment.log"
+    },
+    {
+      "module": "ConcreteMarkedPin",
+      "source_sha256": "81649425aa8623c4a1130bc87a9202aea4c0e9932d190ee619a0be85859ffe0d",
+      "object_sha256": "1e933256b9697625ed2cfbd9c8609622d22e7f7cc0c5fc60589cb9d7870c564f",
+      "log": "peach_ConcreteMarkedPin.log"
+    }
+  ],
+  "audits": [
+    "Spin.Structured.ConcreteMarked.iid_thinning",
+    "Spin.Structured.ConcreteMarked.conditioned_marks_eq_shuffleLaw",
+    "Spin.Structured.ConcreteMarked.regionLaw_dominates",
+    "Spin.Structured.ConcreteMarked.regionsLaw_dominates",
+    "Spin.Structured.ConcreteMarked.shuffled_fairOnMarks",
+    "Spin.Structured.ConcreteMarked.fairRows_route",
+    "Spin.Structured.ConcreteMarked.markBitLaw_unconditioned",
+    "Spin.Structured.ConcreteMarked.markBitLaw_conditioned",
+    "Spin.Structured.ConcreteMarked.sparse_moment",
+    "Spin.Structured.ConcreteMarked.fairExperiment_sparse_moment",
+    "Spin.Structured.ConcreteMarked.fairExperiment_sparse_probability"
+  ]
+}

@@ -92,6 +92,9 @@ and all IMT transvections. Every realized code has rate $1/2$. Its ordinary
 and transposed encoders use $O(N_m)$ bit operations.
 \end{theorem}
 
+The distance and rate claims of Theorem~\ref{thm:structured-spin-scalable}
+are formally verified in Lean; see Appendix~\ref{app:structured-lean}.
+
 The argument has three parts. First, control the realized spectrum of the
 one sampled outer. Next, bound the route--inner failure probability for
 each number of active blocks. Finally, sum those bounds before applying
@@ -440,7 +443,10 @@ The remainder may depend on $Q$: only finitely many such bounds are needed.
 \subsection{Completing the Argument}
 
 \begin{proof}[Theorem~\ref{thm:structured-spin-scalable}]
-Condition on any outer satisfying $\mathcal G_b$. The fixed-occupation
+Fix a shared outer realization in $\mathcal G_b$. The route--inner bounds
+hold uniformly over this realization. Averaging under the outer law
+conditioned on $\mathcal G_b$ gives the conditional first-moment bounds below.
+The fixed-occupation
 arguments give a vanishing sum over the finite set $1\le Q<4096$.
 Equation~\eqref{eq:imt-sparse-final} gives a uniform geometric sum for
 $4096\le Q\le10^{-4}L$. The positive-occupation certificate bounds the

@@ -1,0 +1,23 @@
+import SpinCodes.Structured.ConcretePlacementLimitActual
+
+open Spin.Structured.Placement
+#print axioms placementOmissionError_tendsto
+#print axioms regionKernelError_tendsto
+#print axioms actual_region_coarse_eventually
+#print axioms orderedSiteDomain_convex
+#print axioms orderedSite_riemann_tendsto
+#print axioms normalizedSites_surjective
+#print axioms orderedSite_sum_eq_lattice
+#print axioms orderedSite_sum_tendsto
+#print axioms placement_normalizer_tendsto
+#print axioms weighted_orderedSite_sum_tendsto
+#print axioms siteProduct_sum_tendsto
+#print axioms positionGaps_normalizedSites_distance
+#print axioms placementProduct_site_error
+#print axioms finiteGoodKernel_site_error
+#print axioms endpoint_good_coordinates_error
+#print axioms shuffledRegionKernel_coarse_error
+#print axioms finiteSiteKernel_tendsto
+#print axioms kernelComparisonError_tendsto
+#print axioms shuffledRegionKernel_uniform_limit
+#print axioms shuffledRegionKernel_tendsto

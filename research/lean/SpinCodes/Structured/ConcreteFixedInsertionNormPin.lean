@@ -1,0 +1,9 @@
+import SpinCodes.Structured.ConcreteFixedInsertionNorm
+open Spin.Structured.Placement
+#print axioms fugacityContinuum_le_enlarged
+#print axioms diagonalPathProduct_expansion
+#print axioms fullSiteProduct_path_expansion
+#print axioms constant_pathProduct
+#print axioms fullSiteProduct_integrated_path_bound
+#print axioms enlargedInsertionKernel_action_bound
+#print axioms fugacityContinuum_rowNorm_of_spacing

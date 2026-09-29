@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "scope": "Seven native selection/sparse integration modules individually compiled on Peach; nineteen standard-axiom audits. Checked dependencies reused, no full replay. Tail and expected shell envelope assumptions remain explicit.",
+  "modules": {
+    "SpinCodes/FinitePositiveSelection.lean": {
+      "source_sha256": "51780236b43c6484664869bd97f737f1c25224db571c7e2386216a36c95b71a7",
+      "object_sha256": "ae6a3b6c1009633a92ab9f0459bfae4c43f1989ca2bf5d762e819965deef2c35",
+      "log": "peach_FinitePositiveSelection.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeSparse.lean": {
+      "source_sha256": "e3e2b1139a1edc1794794a54ff51c040e4b90eb991309dd21cf5271b55108a03",
+      "object_sha256": "b43c6ebaef93a937ebfe0839dc1a2c6393a7bd8d7cec6973dc538b23f57f25a5",
+      "log": "peach_ConcreteNativeSparse.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeSparseRate.lean": {
+      "source_sha256": "414915ebb3ff85c0da073c542426c99979f6676436b24ab3c4ad49e1a04632c7",
+      "object_sha256": "332d3b180cc440e984f2af7b3a8b997f5811458c408b9dae22639764bc39d463",
+      "log": "peach_ConcreteNativeSparseRate.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeTotal.lean": {
+      "source_sha256": "37cf26f046b92e482c803b5c6d70cf7f59f7cfb480277ec44a6598a9cf2d0c56",
+      "object_sha256": "464bafd31ad8fd98f8be11253886ea8c1040e46168a63f17ac7b2cdff43e641a",
+      "log": "peach_ConcreteNativeTotal.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeSparseSelected.lean": {
+      "source_sha256": "fcdf899ed53c01bf3772689452c191f16176e7317d3c402e8577b4ba71b72c0a",
+      "object_sha256": "5d5c7fa997d583e185683e284feff1f2ef02b309ab506d15814043a2a374c9ba",
+      "log": "peach_ConcreteNativeSparseSelected.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeAsymptotic.lean": {
+      "source_sha256": "ed5cb7fc445651d7f56c7f35c48074d802364764ebd85caf205fd4f9b10fb1ee",
+      "object_sha256": "1168525612312b3aa2ce7f1e522befdfa8e39bde42088407c91fe7d200ccfb0e",
+      "log": "peach_ConcreteNativeAsymptotic.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeAsymptoticPin.lean": {
+      "source_sha256": "5705d3125aac95d3b03f6e17766aaa4d44524dd70a156d843e4356eb952855f7",
+      "object_sha256": "3ee1848259a15337534b2454edb98baeb9f4aaa3b066c518f7f49b9238425134",
+      "log": "peach_ConcreteNativeAsymptoticPin.log"
+    }
+  },
+  "axiom_audits": 19,
+  "axiom_theorems": [
+    "Spin.FinPMF.positiveSelection_pos",
+    "Spin.FinPMF.positiveSelection_eq_eventually",
+    "Spin.Structured.ConcreteNativeFamily.concreteFamily",
+    "Spin.Structured.ConcreteNativeFamily.concrete_probBad_eq",
+    "Spin.Structured.ConcreteNativeFamily.concrete_probBad_explicit",
+    "Spin.Structured.ConcreteNativeFamily.qd_eq_tuple_failure",
+    "Spin.Structured.ConcreteNativeFamily.qd_sum_eq_tuple",
+    "Spin.Structured.ConcreteNativeFamily.rounds_length",
+    "Spin.Structured.ConcreteNativeFamily.threshold_le",
+    "Spin.Structured.ConcreteNativeFamily.qd_sum_sparse_rate",
+    "Spin.Structured.ConcreteNativeFamily.EZ_sparse_rate",
+    "Spin.Structured.ConcreteNativeFamily.native_good_spectrum_bound",
+    "Spin.Structured.ConcreteNativeFamily.selected_EZ_sparse_rate",
+    "Spin.Structured.ConcreteNativeFamily.selected_row_cost",
+    "Spin.Structured.ConcreteNativeFamily.selectedRemainder_tendsto",
+    "Spin.Structured.ConcreteNativeFamily.raw_selection_failure_tendsto",
+    "Spin.Structured.ConcreteNativeFamily.concrete_selection_failure_tendsto",
+    "Spin.Structured.ConcreteNativeFamily.nativeCut_spec",
+    "Spin.Structured.ConcreteNativeFamily.concrete_sparse_eventually"
+  ]
+}

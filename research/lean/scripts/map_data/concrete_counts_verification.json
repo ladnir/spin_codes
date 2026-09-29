@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "scope": "Final concrete spectrum, kernel counts, fiber caps, pair counts and shell assembly. Imported numerical certificates are reused; the encoder one-step law remains open.",
+  "checks": [
+    {
+      "source": "SpinCodes/Structured/FiberNumericsAll.lean",
+      "source_sha256": "bc1e9526328acf56d693e24db5cb0e9bf6bb8328c98419542456aeb9e3eeb25d",
+      "exit_code": 0,
+      "seconds": 39.73,
+      "log": "FiberNumericsAll.log",
+      "output_sha256": "e3a0861bf1a0020a27c1e0c68b5be4ee8a4f03ae96861dc2bccf364ebff0e713"
+    },
+    {
+      "source": "SpinCodes/Structured/ConcreteCounts.lean",
+      "source_sha256": "3515d13960fbf54ab571c129ce5cd61059f341d1f6b61ceeb49de23722340def",
+      "exit_code": 0,
+      "seconds": 28.59,
+      "log": "ConcreteCounts.log",
+      "output_sha256": "bce202a69477965aa56c54c9a34dac9ae22208eaf42298c9c1244362aa5e208f"
+    },
+    {
+      "source": "scripts/concrete_counts_axioms.lean",
+      "source_sha256": "7e63b1ca0ca02065a055f3dd315d343d085c84ade3be9b4b59f896a5df4bdce4",
+      "exit_code": 0,
+      "seconds": 31.68,
+      "log": "concrete_counts_axioms.log"
+    }
+  ],
+  "axiom_audits": 11
+}

@@ -1,0 +1,10 @@
+import pathlib
+s=pathlib.Path('SpinCodes/Cover/DenseTailReal.lean').read_text(encoding='utf8')
+s=s.replace('import SpinCodes.Cover.DenseTail','import SpinCodes.Structured.ConcreteOuterTailDenseCover')
+s=s.replace('namespace Spin.Cover','namespace Spin.Structured.ConcreteOuter').replace('end Spin.Cover','end Spin.Structured.ConcreteOuter')
+s=s.replace('open Spin.Numeric Spin.Numeric.Fix','open Spin.Numeric Spin.Numeric.Fix Spin.Cover')
+s=s.replace('theorem denseTail_real','theorem denseTail_closed_real')
+s=s.replace('a / 2 < b ∧ b < 1 - a / 2 ∧ b / 2 < w ∧ w < 1 - b / 2','a / 2 ≤ b ∧ b ≤ 1 - a / 2 ∧ b / 2 ≤ w ∧ w ≤ 1 - b / 2')
+s=s.replace('∧ 0 ≤ a ∧ a < 1','∧ 0 ≤ a ∧ a ≤ 1')
+s=s.replace('have h := denseTail a b w','have h := denseTail_closed a b w')
+pathlib.Path('SpinCodes/Structured/ConcreteOuterTailDenseReal.lean').write_text(s,encoding='utf8')

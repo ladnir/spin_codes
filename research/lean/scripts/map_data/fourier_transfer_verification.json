@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "scope": "Ten modules individually compiled on Peach; checked dependencies reused. Actual Fourier transfer and routed probability bridge. Zero numerical Fourier boxes checked.",
+  "modules": {
+    "SpinCodes/Structured/ConcreteFourierProduct.lean": {
+      "source_sha256": "55ca681929d49ebfdc6000b839e91de5d53fe427fc5c2e8005f40a3a3d61f25c",
+      "object_sha256": "3031f785d0828c3e6c6d736190dbf85d4225495cfb653f6aca629bf930570b19",
+      "log": "peach_ConcreteFourierProduct.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierProbability.lean": {
+      "source_sha256": "48182736d076f5c184dc5a6e2c8758b859c3a377fc84090453f540b1799008af",
+      "object_sha256": "2352cb82d23d8a328c8b999553b701320ff0d2db8f1b3d72eea3fabe71a35eb1",
+      "log": "peach_ConcreteFourierProbability.log"
+    },
+    "SpinCodes/Structured/ConcreteProductTilt.lean": {
+      "source_sha256": "490a64528e85ecd9fb296fc89af7c3d6d059e4b68e60236e52e30d30a90fd33c",
+      "object_sha256": "b309f9d50bb6afb6f44ae20471651e7e7a29b349e86ba91dde2158b1753ebf6c",
+      "log": "peach_ConcreteProductTilt.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierTilt.lean": {
+      "source_sha256": "5313a8dd0913260761a2f79be4126cc2c7f297e00e13a4c7cbed54d212802fa2",
+      "object_sha256": "3cb035dcf6a6aed51e4e0ca65b38d12ebef7dfda2d09f8b5b767d2380b9bb1ba",
+      "log": "peach_ConcreteFourierTilt.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierOverlap.lean": {
+      "source_sha256": "d2d91bf57607690f72264a240d3eb5df0e3407fcc9a58737fdf0d74004f2e184",
+      "object_sha256": "ca13a750031860e79d3f45020896261f16170ddb46530b2374fce9403e497580",
+      "log": "peach_ConcreteFourierOverlap.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierSpectrum.lean": {
+      "source_sha256": "8fc5c64d66e5efd457aa8a8f39ffdb91e36e0973f0d2a743715229021103dfd8",
+      "object_sha256": "ef97f8526163b96d93db3cb9abc97b330f8524b67ea7ceca3072f3313b840630",
+      "log": "peach_ConcreteFourierSpectrum.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierRow.lean": {
+      "source_sha256": "08b64aa4d43394f6399c087b2d138cb47ee43cf06c24900ca984c658e1212783",
+      "object_sha256": "aa25ac744a2a88d0fdf5cd5331e23b830f44ab95819345cb89f4ddbe894d4a8b",
+      "log": "peach_ConcreteFourierRow.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierTransfer.lean": {
+      "source_sha256": "0127f7165201183f0564875800b58f19b64157c01b50fc7ee7518701f1842fba",
+      "object_sha256": "41e2d9ef2d6bd99f8e860c2708a176666b227ae443dfcb40f9d22b0b2ace2fa5",
+      "log": "peach_ConcreteFourierTransfer.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierRouted.lean": {
+      "source_sha256": "97cb6ba30a59e6aaa34032db1986f2eae94d4967dd9d4840c4977d935250b970",
+      "object_sha256": "fb032bbb7bafd6ecd9ca693cb1d2396d915fc1d4b1aea1ea11fda1c9427e4c02",
+      "log": "peach_ConcreteFourierRouted.log"
+    },
+    "SpinCodes/Structured/ConcreteFourierPin.lean": {
+      "source_sha256": "8d0e7b08516d0ad8a0f3b3ddd135bfb813c99da6fe102ab255b0cfd3b78197e7",
+      "object_sha256": "75bf2c5e48a9759c3536fb6be167f2224129409c82736b056d696d1e4c3ea2e8",
+      "log": "peach_ConcreteFourierPin.log"
+    }
+  },
+  "axiom_audits": 15,
+  "axiom_theorems": [
+    "Spin.Structured.ConcreteFourier.poissonBinom_product_moment",
+    "Spin.Structured.ConcreteFourier.poissonBinom_character",
+    "Spin.Structured.ConcreteFourier.character_orthogonality",
+    "Spin.Structured.ConcreteFourier.syndrome_probability_fourier",
+    "Spin.Structured.ConcreteFourier.syndrome_probability_le",
+    "Spin.Structured.ConcreteFourier.poissonBinom_tilt_event",
+    "Spin.Structured.ConcreteFourier.weighted_syndrome_le",
+    "Spin.Structured.ConcreteFourier.overlap_product_le",
+    "Spin.Structured.ConcreteFourier.weighted_syndrome_spectrum_le",
+    "Spin.Structured.ConcreteFourier.bernoulliRow_target_le",
+    "Spin.Structured.ConcreteFourier.step_liveDominates",
+    "Spin.Structured.ConcreteFourier.moment_bound",
+    "Spin.Structured.ConcreteFourier.encoder_moment",
+    "Spin.Structured.ConcreteFourier.routed_moment",
+    "Spin.Structured.ConcreteFourier.routed_probability"
+  ],
+  "numerical_fourier_boxes_checked": 0
+}

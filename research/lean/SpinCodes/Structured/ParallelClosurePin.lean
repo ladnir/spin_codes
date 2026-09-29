@@ -1,0 +1,14 @@
+import SpinCodes.Structured.ConcreteNativePin
+import SpinCodes.Structured.ConcreteOuterPin
+import SpinCodes.Structured.ConcreteOuterCountingPin
+import SpinCodes.Structured.ConcreteOuterCountingProbabilityPin
+import SpinCodes.Structured.ConcreteMarkedPin
+import SpinCodes.Structured.SparseConditioningMassPin
+import SpinCodes.Structured.ConcreteFixedPin
+import SpinCodes.Structured.ConcreteEpochTiltPin
+
+-- These are the finite, concrete checkpoints; the full asymptotic theorem remains open.
+#print axioms Spin.Structured.ConcreteNativeFamily.selected_EZ_le_matrix_sum
+#print axioms Spin.Structured.ConcreteOuter.good_nonzero_occupation_sparse_failure
+#print axioms Spin.Structured.ConcreteMarked.fairExperiment_sparse_probability_exp
+#print axioms Spin.Structured.ConcreteEncoder.emptyKernel_tilt_scaled

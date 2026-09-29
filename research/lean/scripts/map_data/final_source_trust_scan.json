@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "checked_at_utc": "2026-09-28T23:42:11.305573+00:00",
+  "scope": "All SpinCodes/**/*.lean plus SpinCodes.lean; nested comments stripped using the existing replay parser; quoted text separately classified. No compiler run and no proof-source changes. This lexical scan complements recursive axiom audits.",
+  "source_count": 5299,
+  "inventory_sha256": "2a4465d4985c84c0e34782e76167bc2b17a39513b7a88868df70feb1f0dbd19c",
+  "inventory_encoding": "UTF-8 concatenation of sorted relative path, NUL, source SHA256, newline",
+  "script": "scripts/final-source-trust-scan.py",
+  "script_sha256": "70d7693242e8873f1c6928d8d2fcfc4be5a98e792f70a03cb885297b472a757a",
+  "comment_parser": "scripts/replay-native-closure.py",
+  "comment_parser_sha256": "bbd2dd5a99e47ee406ffcf05e262d53a98d5e74741a4034279243082251774fb",
+  "tokens": [
+    "sorry",
+    "sorryAx",
+    "admit",
+    "axiom",
+    "native_decide",
+    "ofReduceBool",
+    "trustCompiler"
+  ],
+  "code_hits": [],
+  "quoted_text_hits": [],
+  "note": "Token matching catches private/protected axiom declarations and qualified uses such as Lean.ofReduceBool and Lean.trustCompiler."
+}

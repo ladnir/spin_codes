@@ -1,0 +1,14 @@
+import SpinCodes.Structured.ConcretePlacementEncoderApprox
+
+open Spin.Structured.Placement
+#print axioms timeProduct_rowError
+#print axioms placementProduct_simplex_error
+#print axioms gaps_partialSum
+#print axioms impulsePosition_emptyGaps
+#print axioms placement_impulseInputs_length
+#print axioms mem_impulseInputs_getD
+#print axioms serializedInput_list_eq_impulseInputs
+#print axioms endpointKernel_serialized_singletons
+#print axioms regionMoment_coordinates
+#print axioms regionMoment_good_coordinates_error
+#print axioms shuffled_regionMoment_coarse_error

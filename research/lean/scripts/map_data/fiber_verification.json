@@ -1,0 +1,82 @@
+{
+  "status": "PASS",
+  "scope": "Concrete character pairing, Fourier/Parseval identities, kernel distance and four fiber bounds. Full spectra and the distance theorem remain open.",
+  "modules": [
+    {
+      "path": "SpinCodes/Structured/ConcretePairing.lean",
+      "source_sha256": "660bba8a3865de1e341ed272c01bb8d24f18a8440da3b9bbe549154aba7a62c3",
+      "output_sha256": "f4cf31ce0008f2a9feb7b4d8e55e6129e7c9c81fa7549d3aabf9b45f9ff312d5",
+      "exit_code": 0,
+      "seconds": 32.48,
+      "log": "fiber_ConcretePairing.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteFourier.lean",
+      "source_sha256": "ee311ba02c3fc023bf259c90d900c58f0dbca7bb5676525218acb30bf4d9d573",
+      "output_sha256": "842dc7c5535902ab06df6348a387a75d839d34d8cfc267c45ea22625370bbb9d",
+      "exit_code": 0,
+      "seconds": 33.51,
+      "log": "fiber_ConcreteFourier.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteVariance.lean",
+      "source_sha256": "de2931c9b2df5cfb0254e4230b311d74af3e9f88a9bf8241e96700e60bb84c6b",
+      "output_sha256": "adc33a3d51e9a7ab078d52f8a47830da4ce95b51ece23ae46fb43df674a5ac57",
+      "exit_code": 0,
+      "seconds": 36.8,
+      "log": "fiber_ConcreteVariance.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteKernel.lean",
+      "source_sha256": "e28cfa47ffb04c31d4893b314c067593bb32e359d31ab23425342ee9a0e4ad75",
+      "output_sha256": "50d2246da163bda89799052fe80fb638880cc7aacfe9153222a6270884c01329",
+      "exit_code": 0,
+      "seconds": 39.18,
+      "log": "fiber_ConcreteKernel.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteWeightSums.lean",
+      "source_sha256": "f2f702b02c0fa5f2ecfcba02f123a5ba248e496f54f09aa1f1f53247aa6360e4",
+      "output_sha256": "e9d4d99a0e541a4bfb08f68380947438d29879b22ba1a46814a62f1a230df222",
+      "exit_code": 0,
+      "seconds": 47.52,
+      "log": "fiber_ConcreteWeightSums.log"
+    },
+    {
+      "path": "SpinCodes/Structured/FiberCertificate.lean",
+      "source_sha256": "f3666c81ca35842bc116831f354244a961fd81e107754456e080e5aab44302f2",
+      "output_sha256": "ccff314d8deb2aec9e802f7166ef2199c5db2d50cba132512c597df94b1e0f92",
+      "exit_code": 0,
+      "seconds": 46.6,
+      "log": "fiber_FiberCertificate.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteFiberBounds.lean",
+      "source_sha256": "3fb2e048bf3e0c60e9280a53864954a39e5c5ca5740fe9802ba2bf2a5f84bc87",
+      "output_sha256": "18e13d5cee46a3d458ad81ff4694f01239d57e2f840c569a21252e817e8175fc",
+      "exit_code": 0,
+      "seconds": 39.33,
+      "log": "fiber_ConcreteFiberBounds.log"
+    },
+    {
+      "path": "SpinCodes/Structured/ConcreteFiberPin.lean",
+      "source_sha256": "a71e462aaf63ce394ef42268bb75194ed6d0f09645c8f7ec1412996aae0874cd",
+      "output_sha256": "8403e0a50947f29d49bfc269dc5ebae415ebe9c48bc689eafe1ad5c5c062482f",
+      "exit_code": 0,
+      "seconds": 37.01,
+      "log": "fiber_ConcreteFiberPin.log"
+    }
+  ],
+  "audit": {
+    "path": "scripts/concrete_fibers_axioms.lean",
+    "source_sha256": "82e6039f36752c777160cecd4c45fd30491fe3d21e864272ebc10230609d737d",
+    "log": "fiber_axioms.log",
+    "log_sha256": "c6366483c0a5d956a8749cf62ad4fab25ac65bcbf1c1437ea5646110686c0657",
+    "theorems": 16,
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  }
+}

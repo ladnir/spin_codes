@@ -1,0 +1,7 @@
+import SpinCodes.Structured.ConcreteNativeDistanceConsequences
+open Spin.Structured.ConcreteNativeFamily
+#print axioms relative_distance_gt_iff_threshold
+#print axioms probability_good_distance_eq_one_sub_bad
+#print axioms success_probability_tendsto_of_failure
+#print axioms exists_seed_of_probability_pos
+#print axioms eventually_exists_good_code_of_failure

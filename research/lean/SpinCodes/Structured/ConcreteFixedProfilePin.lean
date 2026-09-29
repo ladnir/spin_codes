@@ -1,0 +1,7 @@
+import SpinCodes.Structured.ConcreteFixedProfile
+open Spin.Structured.Placement
+#print axioms fugacity_product_expansion
+#print axioms fugacity_regionStream_moment
+#print axioms markCoefficient_product
+#print axioms profile_coefficient_bound
+#print axioms actual_profile_regionStream_margin

@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "scope": "Actual Golay generator fold, accumulator, shared outer and native-row binary linearity. Modules individually checked on Peach; existing checked dependencies reused, not a fresh closure replay.",
+  "modules": {
+    "SpinCodes/Structured/ConcreteOuterLinearity.lean": {
+      "source_sha256": "eecb18c496fc90a822d10a16ef58329a00cf643e1f38a670c446a4b346038330",
+      "object_sha256": "3102eaa42945530aa26cf93d5a03fcd3ed6541e6a188f58e4ab322949f0fbb67",
+      "log": "peach_ConcreteOuterLinearity.log"
+    },
+    "SpinCodes/Structured/ConcreteOuterGolayLinearity.lean": {
+      "source_sha256": "e6ff035eecfd8d336c7b921c6d8d43db23c4afcf37b51667cc49347f29cf1ded",
+      "object_sha256": "8f1a090d752674beb9a0a3852db01e3291aa78d64923ee67ad45ea9c532fe469",
+      "log": "peach_ConcreteOuterGolayLinearity.log"
+    },
+    "SpinCodes/Structured/ConcreteOuterNativeLinearity.lean": {
+      "source_sha256": "3fe3f66f531cb9166a6b9f6afb5fc0b3900fd5542880a1cb3bc022de640ee30b",
+      "object_sha256": "3a353e0d47b70054f078979e05312cebb5e175b99172aacb287839b8d6f6ff91",
+      "log": "peach_ConcreteOuterNativeLinearity.log"
+    },
+    "SpinCodes/Structured/ConcreteOuterLinearityPin.lean": {
+      "source_sha256": "4b4c3f158bd43899226a299fc1fc9624ff3ee222282d6c7ecea2964cf9d2ce1a",
+      "object_sha256": "fb608eefaf60b2c16b771b48bfd668cb1c9736b051f1e0fe06894fd8865e0def",
+      "log": "peach_ConcreteOuterLinearityPin.log"
+    }
+  },
+  "axiom_audits": 7,
+  "axiom_theorems": [
+    "Spin.Structured.ConcreteOuter.accF_xor",
+    "Spin.Structured.ConcreteOuter.golay_enc_xor",
+    "Spin.Structured.ConcreteOuter.encode_xor",
+    "Spin.Structured.ConcreteOuter.rowSupports_xor",
+    "Spin.Structured.ConcreteOuter.nativeRows_xor",
+    "Spin.Structured.ConcreteNativeFamily.rows_add",
+    "Spin.Structured.ConcreteNativeFamily.nativeSetup_outer_add"
+  ]
+}

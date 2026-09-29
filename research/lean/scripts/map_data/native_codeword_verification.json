@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "scope": "Eight modules individually compiled on Peach; checked dependencies reused. Actual emitted codeword/injectivity/weight/cardinality and eventual two-regime assembly. Fixed and positive occupation remain hypotheses. Separate outer worker modules provide full linearity.",
+  "modules": {
+    "SpinCodes/Structured/EventualRegimes.lean": {
+      "source_sha256": "ef247fd33199132d9a1a9fb6b37a337205ea55e821021e47913b656f9ff371b6",
+      "object_sha256": "fa5d9f59f654114b9ed7032024e8c61d65bd5a51c3fac64eb4c477808a3855bf",
+      "log": "peach_EventualRegimes.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeClosure.lean": {
+      "source_sha256": "8cf16a3440a39b895488b4f13224b5be199e4338173845abe2bdde2598042297",
+      "object_sha256": "8612be4222d572d2a29abf5fd33d71f4aebb192debf970382413a55ef2c23e3b",
+      "log": "peach_ConcreteNativeClosure.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeClosurePin.lean": {
+      "source_sha256": "c565fb2deb36db9f1edcbb8e03ad7b5b697a5f9337ea718fbf401b90697b4688",
+      "object_sha256": "1eedabdc3d97998c7fc49bad847ef5bf69752e1dcd532922f4dec61d9dc68f00",
+      "log": "peach_ConcreteNativeClosurePin.log"
+    },
+    "SpinCodes/Structured/ConcreteEncoderOutput.lean": {
+      "source_sha256": "36cc1d1f3c02ad112a4a39239c275ace3c0b00c6dfb031895c2d5ab83ff84a08",
+      "object_sha256": "79c2aebfd2285f8652898f2126f5a7b734bcbd86a3b3c344ee4f4dd4d57cad80",
+      "log": "peach_ConcreteEncoderOutput.log"
+    },
+    "SpinCodes/Structured/ConcreteRoutedOutput.lean": {
+      "source_sha256": "5106b50b8259da18b5ce4afbd6175d6acbacb83aca8b808cafcddb879afa3957",
+      "object_sha256": "abe95bee5b4081b518023c181f777583d15de6cdf7f45287ed6455533fa08aa4",
+      "log": "peach_ConcreteRoutedOutput.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeCodeword.lean": {
+      "source_sha256": "3e2f506aa18bfc40322d49e98626d4ebcf613a944bd6bec54378d95d39020e6e",
+      "object_sha256": "cc82f16859eed840dfadaeaa8f60888acb2e0b72d8f657bd3d818ff83de316e1",
+      "log": "peach_ConcreteNativeCodeword.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeCodewordPin.lean": {
+      "source_sha256": "7eefafd7c467d72c9ee312bb4b4f379747ae0659413f18088a1a37586fb58975",
+      "object_sha256": "f24f75710326b4b0c4272829e77230559e3b3816966571209d0331f7eee86145",
+      "log": "peach_ConcreteNativeCodewordPin.log"
+    },
+    "SpinCodes/Structured/ConcreteNativeTwoRegimes.lean": {
+      "source_sha256": "8ed96a103837ab168162959e449e024a503699fb0abe11a4ae7d3bde4955191c",
+      "object_sha256": "a17a9089437f55f5c4f427d8c43c7c09de23db0d6c23b8698da8bd9bbdf9fcbc",
+      "log": "peach_ConcreteNativeTwoRegimes.log"
+    }
+  },
+  "axiom_audits": 22,
+  "axiom_theorems": [
+    "Spin.Structured.sparse_regime_eventually",
+    "Spin.Structured.dense_regime_eventually",
+    "Spin.Structured.Family.distance_whp_native_eventually",
+    "Spin.Structured.ConcreteNativeFamily.distance_of_remaining_regimes",
+    "Spin.Structured.ConcreteEncoder.outputBlocks_weight",
+    "Spin.Structured.ConcreteEncoder.outputBlocks_injective",
+    "Spin.Structured.ConcreteEncoder.act_xor",
+    "Spin.Structured.ConcreteEncoder.outputBlocks_xor",
+    "Spin.Structured.ConcreteEncoder.outputWord_weight",
+    "Spin.Structured.ConcreteEncoder.outputWord_injective",
+    "Spin.Structured.ConcreteRoute.routeEval_injective",
+    "Spin.Structured.ConcreteRoute.routeEval_xor",
+    "Spin.Structured.ConcreteRoutedEncoder.word_xor",
+    "Spin.Structured.ConcreteNativeFamily.output_length",
+    "Spin.Structured.ConcreteNativeFamily.codeword_weight",
+    "Spin.Structured.ConcreteNativeFamily.codeword_injective",
+    "Spin.Structured.ConcreteNativeFamily.codeword_zero",
+    "Spin.Structured.ConcreteNativeFamily.codewords_card",
+    "Spin.Structured.ConcreteNativeFamily.codeword_bad_iff",
+    "Spin.Structured.ConcreteNativeFamily.concrete_probBad_codewords",
+    "Spin.Structured.ConcreteNativeFamily.distance_of_fixed_dense",
+    "Spin.Structured.ConcreteNativeFamily.codeword_distance_of_fixed_dense"
+  ]
+}

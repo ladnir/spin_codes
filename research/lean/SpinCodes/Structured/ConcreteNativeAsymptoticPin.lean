@@ -1,0 +1,21 @@
+import SpinCodes.Structured.ConcreteNativeAsymptotic
+
+#print axioms Spin.FinPMF.positiveSelection_pos
+#print axioms Spin.FinPMF.positiveSelection_eq_eventually
+#print axioms Spin.Structured.ConcreteNativeFamily.concreteFamily
+#print axioms Spin.Structured.ConcreteNativeFamily.concrete_probBad_eq
+#print axioms Spin.Structured.ConcreteNativeFamily.concrete_probBad_explicit
+#print axioms Spin.Structured.ConcreteNativeFamily.qd_eq_tuple_failure
+#print axioms Spin.Structured.ConcreteNativeFamily.qd_sum_eq_tuple
+#print axioms Spin.Structured.ConcreteNativeFamily.rounds_length
+#print axioms Spin.Structured.ConcreteNativeFamily.threshold_le
+#print axioms Spin.Structured.ConcreteNativeFamily.qd_sum_sparse_rate
+#print axioms Spin.Structured.ConcreteNativeFamily.EZ_sparse_rate
+#print axioms Spin.Structured.ConcreteNativeFamily.native_good_spectrum_bound
+#print axioms Spin.Structured.ConcreteNativeFamily.selected_EZ_sparse_rate
+#print axioms Spin.Structured.ConcreteNativeFamily.selected_row_cost
+#print axioms Spin.Structured.ConcreteNativeFamily.selectedRemainder_tendsto
+#print axioms Spin.Structured.ConcreteNativeFamily.raw_selection_failure_tendsto
+#print axioms Spin.Structured.ConcreteNativeFamily.concrete_selection_failure_tendsto
+#print axioms Spin.Structured.ConcreteNativeFamily.nativeCut_spec
+#print axioms Spin.Structured.ConcreteNativeFamily.concrete_sparse_eventually

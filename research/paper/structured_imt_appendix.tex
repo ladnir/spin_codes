@@ -481,3 +481,48 @@ proved above. Higher-precision replay is not an independent proof of those
 steps. The finite BCH/IMT results use the same transfer interface, with
 their separate finite-length evidence in
 Appendix~\ref{app:finite-bch-proof}.
+
+\subsubsection{Formal Verification}
+\label{app:structured-lean}
+
+The Lean development defines the binary encoder and setup distribution
+used in Theorem~\ref{thm:structured-spin-scalable}. It proves the distance
+statement \eqref{eq:structured-spin-distance}. It also proves that every setup
+realization has rate $1/2$. One pair of BAA permutations is shared by all outer rows;
+the route permutations and IMT transvections are sampled independently of
+that pair. The final probability is over this original setup distribution.
+Conditioning on $\mathcal G_b$ is internal to the proof.
+
+The proof includes the shared outer spectrum, the routed IMT process,
+the three occupation regimes, and the final first-moment argument.
+Lean checks both the analytic arguments and the required numerical
+inequalities. The encoding-work claim, subsequent padding corollary, and
+separate finite-length BCH results are outside the final checked statement.
+
+The formal proof uses some weaker intermediate bounds than those displayed
+above. Its positive-occupation certificate covers all $1{,}023$ indexed boxes
+with margin $4\cdot10^{-7}$, rather than the sharper numerical margin
+$4.10335\cdot10^{-7}$. For each fixed positive occupation $Q$, and all
+sufficiently large family indices $m$, it gives, with $b=b_m$ and $N=N_m$,
+\[
+ \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
+ \le
+ \begin{cases}
+  1000e^{-b/50}, & Q=1,\\
+  1000e^{-b/20}, & Q=2,\\
+  (1600/3)e^{-Qb/2000}, & Q\ge3.
+ \end{cases}
+\]
+The threshold index may depend on $Q$. For $Q=1,2$, the formalization uses
+the tilts $\theta=2,4$, respectively. For larger fixed occupations it
+reserves a fixed positive margin in the continuum transfer. These bounds
+suffice for the same limit; they do not establish every sharper intermediate
+estimate above. Fixed-$Q$ convergence is summed only over the finite set
+$1\le Q<4096$. The growing sparse range uses its separate uniform bound.
+
+The public import is \texttt{SpinCodes.Native}.
+The module \texttt{SpinCodes.NativePin} exposes the final statements and
+their recursive axiom audits, which report only \texttt{propext},
+\texttt{Classical.choice}, and \texttt{Quot.sound}. The development's
+reproduction guide, \texttt{FINAL\_REPRODUCTION.md}, describes the
+verification commands and their scope.

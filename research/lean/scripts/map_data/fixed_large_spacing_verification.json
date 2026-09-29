@@ -1,0 +1,108 @@
+{
+  "status": "PASS",
+  "scope": "Actual fixed occupation Q>=3 continuum fugacity weighted row norm. Exact finite gap permutation symmetry, actual ordered-site marginal, beta Laplace estimate, closed-form exponent, and actual matrix path integral are connected. No probability-law, marginal, or matrix estimate hypotheses remain in fugacityContinuum_paper_rowNorm.",
+  "modules": [
+    {
+      "name": "ConcreteFixedLargeLaplace",
+      "source_sha256": "d4f6fe9f6bcb721626a145b4c0fc1c3ac56a1df33617345f3de5d622c1e55747",
+      "object_sha256": "07d5e44b655aa8222f9caa8cbe584aaa9313356d3fd8c53bb227ddf745fa8f53",
+      "audits": {
+        "Spin.Structured.Placement.laplace_le_tilt": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.beta_laplace_le": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.exponent_le_three": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeExponent",
+      "source_sha256": "2bcfb8dce39937997068a838cfccc877a1d81657e013585b87f08b3b669d7d95",
+      "object_sha256": "8b894d00dd4e9d8c38a68d35b156a6fb1754538c55612d74d3246726d74ecff5",
+      "audits": {
+        "Spin.Structured.Placement.log_affine_envelope": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.largeExponent_bounds": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.paperLargeExponent_bound": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeSpacings",
+      "source_sha256": "c2930805e42330c3bc4b7b342b5999dee818345fa4db724f77999938cfbb2275",
+      "object_sha256": "7965235e23257b1907f1a7762fef7cd8c4e23d6935ad35dec09a5b84b5ec2577",
+      "audits": {
+        "Spin.Structured.Placement.orderedSite_normalized_one": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.liveDuration_mem": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.spacing_tilt_empty": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.spacing_tilt_univ": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeGapPermutation",
+      "source_sha256": "52ed577d1fa21347d634f51ef54ba3354296cca22414ae76c7582bf86664ae0e",
+      "object_sha256": "cc3d36d5a0c8a708e73d6d7759a65b9faf3c787a8819acead729c8aa1aea63bd",
+      "audits": {
+        "Spin.Structured.Placement.emptyGaps_injective": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.emptyGaps_gapBlocks": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeGapLaw",
+      "source_sha256": "f54878c6937d55f300c4faa91fdc7576e1d8bf5143e8c60dc195ab9afb718a9e",
+      "object_sha256": "0097bc042f58aca0f2f02790f27291db4427a914172ecb658ee17288fff918c7",
+      "audits": {
+        "Spin.Structured.Placement.gapPermutation": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.sum_emptyGaps_permutation": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeGapLimit",
+      "source_sha256": "e169796b0b0ff3c10a2cff3f8ccf4cdfaf3b2e501af5959ea58c3d3f467b5784",
+      "object_sha256": "0169f266b7c717d24ecf45ee4a901ef92f3d8775accce1b306247b020901503e",
+      "audits": {
+        "Spin.Structured.Placement.liveDuration_integral_permutation": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeGapSymmetry",
+      "source_sha256": "4d53b61455528d0b0c281de3477840a608dec5012ac32c1e35fe0d18a616df9c",
+      "object_sha256": "f9a7a988679a876ae23f7de200487b731715fe229574c7473ffef5d5e76d18dd",
+      "audits": {
+        "Spin.Structured.Placement.liveDuration_integral_card_eq": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.liveDuration_prefix_site": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeLaplaceEndpoints",
+      "source_sha256": "234506f7dcc0cb6cf24cf8c21de6e559df9c5fd56ef17bb1eb1a55008727ddd5",
+      "object_sha256": "56efa2eafb1b2840dcca4cbe2c8b57cd4aa36c8452721a4830f6b4b426691da3",
+      "audits": {
+        "Spin.Structured.Placement.beta_laplace_normalized": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.liveDuration_laplace_empty_le": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.liveDuration_laplace_univ_le": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeLaplaceAssembly",
+      "source_sha256": "216b8c167b3da086640639c513b6a715700387ef545f24c5757ecda3c61a4bbd",
+      "object_sha256": "f011a53544ab4f67f04f9c066edec9acf4009407e36ab9bc879589867f0a9182",
+      "audits": {
+        "Spin.Structured.Placement.liveDuration_laplace_le_of_orderStatistic": "propext,\n Classical.choice,\n Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeLaplaceActual",
+      "source_sha256": "007502dabc4dff54a8c6e13e86255b9e883b54d7cdd88c1864826255bfe07135",
+      "object_sha256": "6055c0eca4a5e762a407569cc618cecf57252b939905dd8a5211fa2aa0e34935",
+      "audits": {
+        "Spin.Structured.Placement.liveDuration_laplace_le": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.paper_liveDuration_laplace_le": "propext, Classical.choice, Quot.sound"
+      }
+    },
+    {
+      "name": "ConcreteFixedLargeNorm",
+      "source_sha256": "29ecccfb9c3e6d1013c03647a8d099ba3169f9bb36b58b6b715a251d870dd904",
+      "object_sha256": "539e8b96db7bf0ca4aca17f71e0534cdbba589fba028b5a093c0070a78bbfd62",
+      "audits": {
+        "Spin.Structured.Placement.paperLargeTheta_pos": "propext, Classical.choice, Quot.sound",
+        "Spin.Structured.Placement.fugacityContinuum_paper_rowNorm": "propext, Classical.choice, Quot.sound"
+      }
+    }
+  ]
+}

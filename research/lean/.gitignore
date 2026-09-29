@@ -1,0 +1,28 @@
+/.lake/
+/scripts/majorant_data/check_logs/
+/scripts/majorant_data/*_build.log
+/scripts/majorant_data/invariant_check.log
+/scripts/map_data/peach-*.tar.gz
+/scripts/map_data/peach-upload.txt
+/scripts/map_data/assembly_probe.lean
+/scripts/map_data/peach_extra_files.json
+
+# Reproducible proof sources and compact records are versioned; build products
+# and local replay workspaces stay on the machine that produced them.
+*.olean
+*.olean.*
+*.ilean
+*.ilean.*
+*.ir
+*.c
+*.log
+*.tar.gz
+*.tmp
+/scripts/map_data/encoder_*_isolated_*/
+/scripts/map_data/encoder_package_peach*/
+/scripts/map_data/encoder_native_replay_*/
+/scripts/map_data/kernel_logs/
+/scripts/map_data/encoder_native_evidence_coverage.json
+/scripts/map_data/*_probe.lean
+/scripts/sparse_data/check_logs/
+/scripts/map_data/KernelProbe.lean

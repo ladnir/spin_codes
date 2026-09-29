@@ -1,0 +1,8 @@
+import SpinCodes.Structured.SparseModelData
+namespace Spin.Structured.SparsePolynomial.Data
+set_option maxRecDepth 100000
+def weights : List WeightData := [weight0, weight1, weight2, weight3, weight4, weight5, weight6, weight7, weight8, weight9, weight10, weight11, weight12, weight13, weight14, weight15, weight16, weight17, weight18, weight19, weight20, weight21, weight22, weight23, weight24, weight25, weight26, weight27, weight28, weight29, weight30, weight31, weight32, weight33, weight34, weight35, weight36, weight37, weight38, weight39, weight40, weight41, weight42, weight43, weight44, weight45, weight46, weight47, weight48, weight49, weight50, weight51, weight52, weight53, weight54, weight55, weight56, weight57, weight58, weight59, weight60, weight61, weight62, weight63, weight64, weight65, weight66, weight67, weight68, weight69, weight70, weight71, weight72, weight73, weight74, weight75, weight76, weight77, weight78, weight79, weight80, weight81, weight82, weight83, weight84, weight85, weight86, weight87, weight88, weight89, weight90, weight91, weight92, weight93, weight94, weight95, weight96, weight97, weight98, weight99, weight100, weight101, weight102, weight103, weight104, weight105, weight106, weight107, weight108, weight109, weight110, weight111, weight112, weight113, weight114, weight115, weight116, weight117, weight118, weight119, weight120, weight121, weight122, weight123, weight124, weight125, weight126, weight127, weight128]
+def weight (j : Fin 129) : WeightData := weights.getD j weight0
+theorem weights_length : weights.length = 129 := by decide
+end Spin.Structured.SparsePolynomial.Data
+

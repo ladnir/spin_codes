@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "scope": "Four scalar transfer modules individually compiled on Peach;9 standard-only audits;checked dependencies reused. Numerical scalar boxes not yet checked.",
+  "modules": {
+    "SpinCodes/Structured/ConcreteScalarBits.lean": {
+      "source_sha256": "a7a0eb3c5b714607b58ff3e7a20ebac8882a4f0b5004c8cecdd13598d7dbe562",
+      "object_sha256": "cdaaa1818f44c62bc4969bf5bcaffdf295f9ef68f93755e037e9db69375b527d",
+      "log": "peach_ConcreteScalarBits.log"
+    },
+    "SpinCodes/Structured/ConcreteScalarMoment.lean": {
+      "source_sha256": "cd89affba1227be6e7ad4f504b81eff6d09b66b7aabb967c3b63790db8012eef",
+      "object_sha256": "ad43273562c2133d43e13945b32590340698a884b60789eebaa80cc106713d70",
+      "log": "peach_ConcreteScalarMoment.log"
+    },
+    "SpinCodes/Structured/ConcreteScalarRouted.lean": {
+      "source_sha256": "dc7afac1f000f49bbb13a881ddf7507a6472550391d9e36d2e51c2438dcc7436",
+      "object_sha256": "6ad51591d5e31e35556e5b187c6984bfdadce42b8d82a0109c8f09c97fa12988",
+      "log": "peach_ConcreteScalarRouted.log"
+    },
+    "SpinCodes/Structured/ConcreteScalarPin.lean": {
+      "source_sha256": "78291795767a81114609bf492adf7333f0f4eeba53bc56cd83474d5a88a3c262",
+      "object_sha256": "df1b9e0bf01d810b00e3918514991ad4f4b1ecd9049d68aa60be2711a7609848",
+      "log": "peach_ConcreteScalarPin.log"
+    }
+  },
+  "axiom_audits": 9,
+  "axiom_theorems": [
+    "Spin.Structured.ConcreteScalar.poissonBinom_xor",
+    "Spin.Structured.ConcreteScalar.bernoulli_xor_moment",
+    "Spin.Structured.ConcreteScalar.scalarF_le_bound",
+    "Spin.Structured.ConcreteScalar.emission_expect",
+    "Spin.Structured.ConcreteScalar.averagedMoment_le_scalar",
+    "Spin.Structured.ConcreteScalar.bernoulli_encoder_scalar",
+    "Spin.Structured.ConcreteScalar.scalarF_half",
+    "Spin.Structured.ConcreteScalar.routed_scalar_moment",
+    "Spin.Structured.ConcreteScalar.routed_scalar_probability"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "scope": "Sound exact-rational evaluator and checked-iterate implication for the concrete occupation matrix. Zero numerical positive-occupation boxes have been discharged. Compiled on Peach with checked cached dependencies; no full dependency replay.",
+  "axioms": {
+    "Spin.Structured.DenseOccupation.cast_hyperMoment": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupation.cast_fixedColumn": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupation.cast_column": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupation.check_sound": "propext, Classical.choice, Quot.sound",
+    "Spin.Structured.DenseOccupation.checked_iterate": "propext, Classical.choice, Quot.sound"
+  },
+  "modules": [
+    {
+      "name": "DenseOccupationDefs",
+      "source_sha256": "093b600fa97abad6bb49fd7aaf3cb4cdf1cb973baddd9b716f8b3fc6e6b7d56f",
+      "olean_sha256": "ec60e3682b5622912712d051e81fa13ba95b8b80b6aa2b6f2514935aa30fa306"
+    },
+    {
+      "name": "DenseOccupationSound",
+      "source_sha256": "5607c9b83a0bfe42622f671ab07dca58eadfe904cf7ce5d789f83f9aa127d4be",
+      "olean_sha256": "009fff8686a2ad1d70f2c1176bec22a330e7f869edc09f15cce836188feb0583"
+    },
+    {
+      "name": "DenseOccupationCheck",
+      "source_sha256": "297d9d4c3772268cbb1f7f93d940663448a1412469b230950898d7ae9ec3ba14",
+      "olean_sha256": "69bb4add809c4fcd0a403b9cf85f739281f6301614d3fd2851c9abcf7b8c4c06"
+    },
+    {
+      "name": "DenseOccupationPin",
+      "source_sha256": "31faad05a349aca7f8a070e2e7af52165d3e666d6f5e3b6f0bc48713e1eb05b1",
+      "olean_sha256": "8e69d403881fe25b04f2f9eed383ab809692795113cfba518a35718585969fd3"
+    }
+  ],
+  "remaining_certificate_primitives": [
+    "Outward integer interval evaluator for the rational occupation column, using existing Fix arithmetic plus min/max/list folding and exact lazy-branch decision",
+    "Generate rational z and rational radius candidates for 133 distinct occupation witnesses; retain 433 box mapping",
+    "Kernel-check matrix inequality and four rational logarithmic exponent vertices for each retained box",
+    "Prove finite geometry cover and affine outer-majorant segment connection; root separately handles statefree/Fourier families"
+  ]
+}

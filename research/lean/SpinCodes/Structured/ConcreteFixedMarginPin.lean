@@ -1,0 +1,16 @@
+import SpinCodes.Structured.ConcreteFixedFairProduct
+open Spin.Structured.Placement
+#print axioms actual_region_weighted_margin
+#print axioms fugacityKernel_uniform_limit
+#print axioms actual_fugacity_weighted_margin
+#print axioms matrixExpect_pi_product
+#print axioms endpointKernel_regionStream
+#print axioms shuffled_regionStream_endpoint
+#print axioms shuffled_regionStream_moment
+#print axioms Spin.Structured.FiniteKernel.WeightedBound.ofFn
+#print axioms actual_fugacity_product_margin
+#print axioms actual_fugacity_product_total
+#print axioms fairRegionKernel_eq_fugacity
+#print axioms fair_regionStream_endpoint
+#print axioms fair_regionStream_moment
+#print axioms actual_fair_regionStream_margin

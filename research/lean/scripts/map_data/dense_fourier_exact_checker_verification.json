@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "scope": "Exact integer polynomial identities and checked Collatz inequality for actual ConcreteFourier transfer, with actual routed PointRate consequence. Modules individually checked on Peach; checked dependencies reused, not a fresh closure replay.",
+  "modules": [
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactDefs.lean",
+      "source_sha256": "3676a8c01ef5d68cf357bfbaeb514eef36b811816cc9e049c87481d3ced399c1",
+      "object_sha256": "e500b6d2a2566b8b49687e01cd4a60525e45c27b55240597d10fb3b5a4b6a70f",
+      "log": "peach_DenseFourierExactDefs.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactMonomial.lean",
+      "source_sha256": "16ebe5a319ce6d2b222bd97ca1686da71e6d63ad96f462eda16def2f7023ca57",
+      "object_sha256": "2c72d3edf287291cd61aeec62a06fd31e474ae9b320b25fd854fce81a5b07a0e",
+      "log": "peach_DenseFourierExactMonomial.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactTarget.lean",
+      "source_sha256": "6fbb56aafb71a7b7f13c305a6a053cabedc12661944132313d59d1399e6f5c3e",
+      "object_sha256": "5c32362ed06c438a22b732012ac47e7da016c7fc128fd435b67636bf537c94d1",
+      "log": "peach_DenseFourierExactTarget.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactColumnDefs.lean",
+      "source_sha256": "f3b247202063232bc13262c730c351960b02a403772dafc15752189ba6ab35c8",
+      "object_sha256": "702a93dad661f15f1b342188cb7eb9e615c11a265999c182af8c20b63e0b1626",
+      "log": "peach_DenseFourierExactColumnDefs.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactZero.lean",
+      "source_sha256": "2a8a60f8dc72b245b76a5be06330f8e82f61d32d2e414cf4879dd0fbdc459987",
+      "object_sha256": "6ff99581f6e8f9bdd6227d9c7dc3b2e2d66e965477dcb65969d8bed9250627ec",
+      "log": "peach_DenseFourierExactZero.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactCheck.lean",
+      "source_sha256": "4ffaa95bc30df1623e1762c439adbba0ca86bf31f5147bff3003b3b4f1c5a1be",
+      "object_sha256": "d54a96939ac288281a95bdceef288780d1ed252a18ff2103a1054c448fa3ff3c",
+      "log": "peach_DenseFourierExactCheck.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactRate.lean",
+      "source_sha256": "210c50238ed04f7db5bec2f9518bafab3397cad915dc01fa9795baa185a3a8ed",
+      "object_sha256": "637936e3fb47ced3beb6c6a1859f0c9c77316e53cdaebbb456fa34517ffdb208",
+      "log": "peach_DenseFourierExactRate.log"
+    },
+    {
+      "source": "SpinCodes/Structured/DenseFourierExactPin.lean",
+      "source_sha256": "b988f0f12eb0e77b7d15067333a7b18eb8069010f3d0ec6dd54932a94f6b39e7",
+      "object_sha256": "1decd2c1a5aa84ac79530d72ff625a92f7b03ed850b3f6a4909eee672589c9a0",
+      "log": "peach_DenseFourierExactPin.log"
+    }
+  ],
+  "axiom_audits": 5,
+  "axiom_theorems": [
+    "Spin.Structured.DenseFourierExact.targetCap_rational",
+    "Spin.Structured.DenseFourierExact.zeroColumn_rational",
+    "Spin.Structured.DenseFourierExact.checked_collatz",
+    "Spin.Structured.DenseFourierExact.routed_counted_rate",
+    "Spin.Structured.DenseFourierExact.fourier_pointRate"
+  ]
+}
