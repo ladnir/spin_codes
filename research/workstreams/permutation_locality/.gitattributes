@@ -1,0 +1,7 @@
+# These retained research sources are authenticated by byte-level SHA256.
+# Preserve their exact bytes across Windows/Linux checkouts.
+gfni_t64_probe.cpp -text
+inner_packet_probe.cpp -text
+
+# Research runners must also execute directly after a Windows checkout.
+*.sh text eol=lf
