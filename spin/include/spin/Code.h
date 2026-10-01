@@ -9,27 +9,50 @@
 
 namespace spin {
 // Stable identifiers for supplied maps, not arbitrary (t,s) synthesis.
-enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3 };
-enum class Backend { Automatic, Avx2, Avx512 };
+enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketT64S16=4 };
+enum class Backend { Automatic, Avx2, Avx512, Portable };
 enum class Width : unsigned { Bits128=16, Bits256=32, Bits512=64 };
+enum class MemoryPolicy { Normal, PreferHugePages };
 struct CodeSpec {
     std::size_t message_size;
     Parameters parameters=Parameters::T128S19;
+    // For PacketT64S16, route_seed also generates the GL32 outer mixing;
+    // inner_seed generates GL16 updates. Equal seeds reproduce PacketCode(seed).
     std::uint64_t route_seed=1;
     std::uint64_t inner_seed=2;
 };
 struct ExecutionOptions {
     Backend backend=Backend::Automatic;
-    unsigned tile_rows=0; // 0 selects 256 rows, the measured single-stream default.
+    // 0 selects the family default: 256 for IMT, 4 for PacketT64S16.
+    // PacketT64S16 accepts only 0 or 4; its four-row geometry is fixed.
+    unsigned tile_rows=0;
 };
 struct Capabilities { bool avx2, avx512_bch, forward256, forward512; };
 Capabilities capabilities() noexcept;
 std::size_t message_alignment(Parameters);
 bool valid_message_size(Parameters, std::size_t) noexcept;
 
-namespace detail { struct Plan; struct Scratch; }
+namespace detail { struct Plan; struct Scratch; struct BufferAllocation; }
 class GenericTranspose;
 class Code;
+
+// Optional zero-initialized owned storage, independent of the selected family.
+// Normal: 64-byte alignment. PreferHugePages: 2 MiB alignment/rounding and
+// best-effort Linux page advice during allocation, never during encoding.
+class Buffer {
+public:
+    explicit Buffer(std::size_t bytes,MemoryPolicy=MemoryPolicy::Normal);
+    ~Buffer();
+    Buffer(Buffer&&) noexcept;
+    Buffer& operator=(Buffer&&) noexcept;
+    Buffer(const Buffer&)=delete;
+    Buffer& operator=(const Buffer&)=delete;
+    std::span<std::byte> bytes() noexcept;
+    std::span<const std::byte> bytes() const noexcept;
+    std::size_t allocation_bytes() const noexcept;
+private:
+    std::unique_ptr<detail::BufferAllocation> allocation_;
+};
 
 // Move-only scratch. Retains its plan; moving/destroying Code handles is safe.
 // One workspace per concurrent call. No allocation occurs during encoding.
@@ -44,7 +67,7 @@ public:
     Width width() const noexcept;
 private:
     friend class Code;
-    Workspace(std::shared_ptr<const detail::Plan>, Width);
+    Workspace(std::shared_ptr<const detail::Plan>, Width, MemoryPolicy);
     std::unique_ptr<detail::Scratch> scratch_;
 };
 
@@ -52,6 +75,7 @@ private:
 // Supplied half-rate codes: forward K -> 2K; transpose 2K -> K.
 class Code {
 public:
+    using Workspace=spin::Workspace;
     explicit Code(CodeSpec, ExecutionOptions={});
     std::size_t message_size() const noexcept;
     std::size_t code_size() const noexcept;
@@ -61,8 +85,12 @@ public:
     // Canonical little-endian descriptor, version 1. Includes map and both seeds;
     // excludes backend, tile size, and route packing. Consumers choose the hash.
     std::array<std::byte,40> descriptor() const noexcept;
-    bool supports_forward(Width) const noexcept;
-    Workspace make_workspace(Width=Width::Bits128) const;
+    bool supports_forward(Width=Width::Bits128) const noexcept;
+    bool supports_transpose(Width=Width::Bits128) const noexcept;
+    bool supports_generic_transpose() const noexcept;
+    Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
+    // Optional storage for exactly code_size() records at the selected width.
+    Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
     // Rebind compatible 128-bit scratch without clearing or allocating; otherwise
     // recreate it at the same width (128 bits if moved-from). No concurrent use.
     void prepare_workspace(Workspace&) const;
@@ -77,13 +105,21 @@ public:
     void transpose_inplace_bytes(std::span<std::byte>, Workspace&) const;
 
     template<class E> void forward(std::span<const E> in, std::span<E> out, Workspace& w) const {
-        check_record<E>(w); forward_bytes(std::as_bytes(in), std::as_writable_bytes(out), w);
+        check_record<E>(w);
+        if(in.size()!=message_size() || out.size()!=code_size())
+            throw std::invalid_argument("SPIN forward element count mismatch");
+        forward_bytes(std::as_bytes(in), std::as_writable_bytes(out), w);
     }
     template<class E> void transpose(std::span<const E> in, std::span<E> out, Workspace& w) const {
-        check_record<E>(w); transpose_bytes(std::as_bytes(in), std::as_writable_bytes(out), w);
+        check_record<E>(w);
+        if(in.size()!=code_size() || out.size()!=message_size())
+            throw std::invalid_argument("SPIN transpose element count mismatch");
+        transpose_bytes(std::as_bytes(in), std::as_writable_bytes(out), w);
     }
     template<class E> void transpose_inplace(std::span<E> buffer, Workspace& w) const {
-        check_record<E>(w); transpose_inplace_bytes(std::as_writable_bytes(buffer), w);
+        check_record<E>(w);
+        if(buffer.size()!=code_size())throw std::invalid_argument("SPIN inplace element count mismatch");
+        transpose_inplace_bytes(std::as_writable_bytes(buffer), w);
     }
     // One bit-packed binary message: word bit j is coordinate 64*i+j.
     // Caller scratch is exactly code_size()/64 words. All three ranges disjoint.

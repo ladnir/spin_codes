@@ -1,6 +1,7 @@
 #include "BankKernel.h"
 #include "Inner.h"
 #include "generated/BchCircuit.h"
+#include <stdexcept>
 
 namespace spin::detail::kernel {
 #if SPIN_BCH_AVX512
@@ -102,6 +103,7 @@ void bankTranspose(const BankState& b,bool four,const void* in,void* out,block* 
     case Parameters::T128S19:bankDispatch<Map128S19>(b,four,input,output,scratch,addresses);break;
     case Parameters::T64S12:bankDispatch<Map64S12>(b,four,input,output,scratch,addresses);break;
     case Parameters::T64S12R2:bankDispatch<Map64S12R2>(b,four,input,output,scratch,addresses);break;
+    case Parameters::PacketT64S16:throw std::logic_error("SPIN packet family does not support banked setup");
     }
 }
 }

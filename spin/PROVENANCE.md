@@ -1,5 +1,17 @@
 # Kernel generation record
 
+The packet construction uses `src/packet/PacketInnerFast.h` and
+`PacketOuterFast.h`, imported by `tools/import_packet.py`. Their headers record
+the exact research-source hashes. The importer selects wide-state emission,
+composed GL16 updates, cached four-record routing, and the compact mixed-layout
+GL32/BCH kernel. It excludes alternate experiments and benchmark drivers.
+`PacketSetup.cpp` preserves the research seed schedule, including unused draws;
+`PacketScalar.cpp` evaluates the original physical maps independently. The library
+tests freeze outputs checked against the retained research encoder. `Code` and
+full-mode `PreparedEncoder` select this construction with `PacketT64S16`;
+the original IMT families retain their seeded maps and descriptor identifiers.
+The single-seed `PacketCode` interface remains compatible with the prototype.
+
 `PreparedEncoder.cpp`, `BankState.h`, and `BankKernel.cpp` are package-owned
 implementations of the explicit banked heuristic mode. They generalize the
 `row-rotate1` experiment without changing immutable `Code` sampling.

@@ -4,6 +4,7 @@
 #include "kernels/WorkspaceRouting.h"
 #include "Cpu.h"
 #include <algorithm>
+#include <limits>
 #include <numeric>
 #include <optional>
 
@@ -89,9 +90,11 @@ struct PreparedState {
     bool four=false;
     PreparedState(CodeSpec s,SetupOptions o,ExecutionOptions e):spec(s),setup(o),execution(e) {
         if(!valid_message_size(s.parameters,s.message_size))throw std::invalid_argument("SPIN invalid prepared geometry");
-        if(!capabilities().avx2)throw std::runtime_error("SPIN requires AVX2 with OS support");
         if(o.mode==SetupMode::Full)full.emplace(s,e);
         else if(o.mode==SetupMode::BankedHeuristic) {
+            if(s.parameters==Parameters::PacketT64S16)
+                throw std::invalid_argument("SPIN PacketT64S16 requires full setup; banked setup is unsupported");
+            if(!capabilities().avx2)throw std::runtime_error("SPIN requires AVX2 with OS support");
             if(e.backend!=Backend::Automatic && e.backend!=Backend::Avx2 && e.backend!=Backend::Avx512)
                 throw std::invalid_argument("SPIN unknown backend");
             if(e.backend==Backend::Avx512 && !capabilities().avx512_bch)
@@ -103,18 +106,27 @@ struct PreparedState {
 };
 struct PreparedScratch {
     std::shared_ptr<PreparedState> owner;
+    Width width;
     std::optional<spin::Workspace> full;
     std::vector<storage::block> values;
     std::vector<std::uint32_t> addresses;
-    explicit PreparedScratch(std::shared_ptr<PreparedState> s):owner(std::move(s)) {
-        if(owner->full)full.emplace(owner->full->make_workspace());
+    PreparedScratch(std::shared_ptr<PreparedState> s,Width w,MemoryPolicy policy)
+        :owner(std::move(s)),width(w) {
+        if(policy!=MemoryPolicy::Normal && policy!=MemoryPolicy::PreferHugePages)
+            throw std::invalid_argument("SPIN unknown memory policy");
+        if(owner->full)full.emplace(owner->full->make_workspace(w,policy));
         else {
             values.resize(2*owner->spec.message_size);addresses.resize(owner->bank->rows);
-            if(kernel::workspace_routing::eligible(true,owner->spec.message_size))
+            if(policy==MemoryPolicy::PreferHugePages ||
+               kernel::workspace_routing::eligible(true,owner->spec.message_size))
                 kernel::workspace_routing::adviseOwned(values.data(),values.size()*sizeof(storage::block));
         }
     }
 };
+static const PreparedState& checkedPreparedState(const std::shared_ptr<PreparedState>& state) {
+    if(!state) throw std::invalid_argument("SPIN moved-from prepared encoder");
+    return *state;
+}
 }
 namespace spin {
 PreparedEncoder::PreparedEncoder(CodeSpec s,SetupOptions o,ExecutionOptions e)
@@ -123,6 +135,7 @@ PreparedEncoder::~PreparedEncoder()=default;
 PreparedEncoder::PreparedEncoder(PreparedEncoder&&) noexcept=default;
 PreparedEncoder& PreparedEncoder::operator=(PreparedEncoder&&) noexcept=default;
 void PreparedEncoder::setCodeSeed(CodeSeed seed) {
+    detail::checkedPreparedState(state_);
     if(seed==CodeSeed{state_->spec.route_seed,state_->spec.inner_seed})return;
     if(state_->bank)state_->bank->refresh(seed.route,seed.inner);
     else {
@@ -139,17 +152,32 @@ void PreparedEncoder::setCodeSeed(CodeSeed seed) {
     }
     state_->spec.route_seed=seed.route;state_->spec.inner_seed=seed.inner;
 }
-CodeSpec PreparedEncoder::specification() const noexcept{return state_->spec;}
-SetupOptions PreparedEncoder::setup_options() const noexcept{return state_->setup;}
-std::size_t PreparedEncoder::message_size() const noexcept{return state_->spec.message_size;}
+CodeSpec PreparedEncoder::specification() const noexcept{return state_?state_->spec:CodeSpec{0};}
+SetupOptions PreparedEncoder::setup_options() const noexcept{return state_?state_->setup:SetupOptions{};}
+std::size_t PreparedEncoder::message_size() const noexcept{return state_?state_->spec.message_size:0;}
 std::size_t PreparedEncoder::code_size() const noexcept{return 2*message_size();}
 std::size_t PreparedEncoder::setup_bytes() const noexcept {
+    if(!state_)return 0;
     if(state_->bank)return state_->bank->bytes();
     return state_->full->setup_bytes()+
         (state_->generic?state_->generic->setup_bytes():0);
 }
+Backend PreparedEncoder::backend() const noexcept {
+    if(!state_)return Backend::Automatic;
+    if(state_->full)return state_->full->backend();
+    return state_->four?Backend::Avx512:Backend::Avx2;
+}
+bool PreparedEncoder::supports_transpose(Width width) const noexcept {
+    if(!state_)return false;
+    return state_->full?state_->full->supports_transpose(width):width==Width::Bits128;
+}
+bool PreparedEncoder::supports_generic_transpose() const noexcept {
+    if(!state_)return false;
+    return state_->full?state_->full->supports_generic_transpose():true;
+}
 std::array<std::byte,56> PreparedEncoder::descriptor() const noexcept {
     std::array<std::byte,56> out{};
+    if(!state_)return out;
     out[0]=std::byte{'S'};out[1]=std::byte{'P'};out[2]=std::byte{'I'};out[3]=std::byte{'N'};
     auto put=[&](unsigned pos,std::uint64_t x,unsigned n){for(unsigned i=0;i<n;++i)out[pos+i]=std::byte((x>>(8*i))&255);};
     put(4,2,4);put(8,std::uint32_t(state_->spec.parameters),4);put(12,std::uint32_t(state_->setup.mode),4);
@@ -157,8 +185,8 @@ std::array<std::byte,56> PreparedEncoder::descriptor() const noexcept {
     if(state_->bank){put(40,state_->setup.bank_seed,8);put(48,1,8);}
     return out;
 }
-PreparedEncoder::Workspace::Workspace(std::shared_ptr<detail::PreparedState> s)
-    :scratch_(std::make_unique<detail::PreparedScratch>(std::move(s))) {}
+PreparedEncoder::Workspace::Workspace(std::shared_ptr<detail::PreparedState> s,Width width,MemoryPolicy policy)
+    :scratch_(std::make_unique<detail::PreparedScratch>(std::move(s),width,policy)) {}
 PreparedEncoder::Workspace::~Workspace()=default;
 PreparedEncoder::Workspace::Workspace(Workspace&&) noexcept=default;
 PreparedEncoder::Workspace& PreparedEncoder::Workspace::operator=(Workspace&&) noexcept=default;
@@ -167,8 +195,35 @@ std::size_t PreparedEncoder::Workspace::bytes() const noexcept {
     return scratch_->full?scratch_->full->bytes():
         scratch_->values.capacity()*16+scratch_->addresses.capacity()*4;
 }
-PreparedEncoder::Workspace PreparedEncoder::make_workspace() const{return Workspace(state_);}
+Width PreparedEncoder::Workspace::width() const noexcept {
+    return scratch_?scratch_->width:Width::Bits128;
+}
+PreparedEncoder::Workspace PreparedEncoder::make_workspace(Width width,MemoryPolicy policy) const {
+    detail::checkedPreparedState(state_);
+    if(!supports_transpose(width))
+        throw std::invalid_argument("SPIN prepared transpose does not support this record width");
+    return Workspace(state_,width,policy);
+}
+Buffer PreparedEncoder::make_buffer(Width width,MemoryPolicy policy) const {
+    detail::checkedPreparedState(state_);
+    if(!supports_transpose(width))
+        throw std::invalid_argument("SPIN prepared transpose does not support this record width");
+    if(state_->full)return state_->full->make_buffer(width,policy);
+    const auto element=static_cast<unsigned>(width);
+    if(code_size()>std::numeric_limits<std::size_t>::max()/element)
+        throw std::length_error("SPIN prepared buffer size overflow");
+    return Buffer(code_size()*element,policy);
+}
+void PreparedEncoder::prepare_workspace(Workspace& w) const {
+    detail::checkedPreparedState(state_);
+    if(!w.scratch_ || w.scratch_->owner!=state_ || w.scratch_->width!=Width::Bits128)
+        throw std::invalid_argument("SPIN prepared workspace mismatch");
+    if(state_->full)state_->full->prepare_workspace(*w.scratch_->full);
+}
 GenericTranspose PreparedEncoder::generic_transpose() const {
+    detail::checkedPreparedState(state_);
+    if(!supports_generic_transpose())
+        throw std::invalid_argument("SPIN PacketT64S16 does not support generic transpose");
     if(!state_->generic) {
         if(state_->full)state_->generic.emplace(state_->full->generic_transpose());
         else {
@@ -180,16 +235,18 @@ GenericTranspose PreparedEncoder::generic_transpose() const {
     return *state_->generic;
 }
 bool PreparedEncoder::owns(const GenericTranspose& view) const noexcept {
-    return state_->generic && state_->generic->data_==view.data_;
+    return state_ && state_->generic && state_->generic->data_==view.data_;
 }
 static bool overlaps(const void* a,std::size_t na,const void* b,std::size_t nb) {
     const auto x=reinterpret_cast<std::uintptr_t>(a),y=reinterpret_cast<std::uintptr_t>(b);
     return x<=y?y-x<na:x-y<nb;
 }
 void PreparedEncoder::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w) const {
+    detail::checkedPreparedState(state_);
     if(overlaps(in.data(),in.size(),out.data(),out.size()))
         throw std::invalid_argument("SPIN buffers overlap; use transpose_inplace");
-    if(!w.scratch_ || w.scratch_->owner!=state_)throw std::invalid_argument("SPIN prepared workspace mismatch");
+    if(!w.scratch_ || w.scratch_->owner!=state_ || w.scratch_->width!=Width::Bits128)
+        throw std::invalid_argument("SPIN prepared workspace mismatch");
     if(in.size()!=code_size()*16 || out.size()!=message_size()*16 || !in.data() || !out.data() ||
        reinterpret_cast<std::uintptr_t>(in.data())%16 || reinterpret_cast<std::uintptr_t>(out.data())%16)
         throw std::invalid_argument("SPIN prepared buffer geometry or alignment mismatch");
@@ -198,7 +255,9 @@ void PreparedEncoder::transpose_bytes(std::span<const std::byte> in,std::span<st
     else detail::kernel::bankTranspose(*state_->bank,state_->four,in.data(),out.data(),s.values.data(),s.addresses.data());
 }
 void PreparedEncoder::transpose_inplace_bytes(std::span<std::byte> buf,Workspace& w) const {
-    if(!w.scratch_ || w.scratch_->owner!=state_)throw std::invalid_argument("SPIN prepared workspace mismatch");
+    detail::checkedPreparedState(state_);
+    if(!w.scratch_ || w.scratch_->owner!=state_ || w.scratch_->width!=Width::Bits128)
+        throw std::invalid_argument("SPIN prepared workspace mismatch");
     if(buf.size()!=code_size()*16 || !buf.data() || reinterpret_cast<std::uintptr_t>(buf.data())%16)
         throw std::invalid_argument("SPIN prepared buffer geometry or alignment mismatch");
     auto& s=*w.scratch_;

@@ -30,16 +30,20 @@ target_link_libraries(my_target PRIVATE spin::spin)
 
 The target exports C++20 and its public include directory, not ISA flags or
 cryptoTools headers. Public headers contain no SIMD types. The implementation
-uses private x86 kernels, with runtime AVX-512 dispatch and an AVX2 baseline.
+uses private x86 kernels with runtime AVX-512 dispatch. The IMT families require
+AVX2; the packet family also has an SSE2 fallback.
 `SPIN_ENABLE_AVX512=OFF` omits the AVX-512 objects. `SPIN_TUNE=znver4` changes
 GCC/Clang instruction scheduling without changing the required ISA.
 
 Linux/GCC and Windows/MSVC are supported. With a Visual Studio generator, use
 `--config Release` for building/installing and `-C Release` for CTest.
 Clang is accepted but has not been validated in this first package pass.
-ARM and CPUs without AVX2 are not supported by `Code` construction.
+ARM is not supported. On x86-64 CPUs without AVX2, only the packet family is supported.
 
 ## Single-stream use
+
+All supplied families use `CodeSpec`, `Code`, and `Workspace`. Changing the
+family changes the specification, not the sizing or transposed-encoding calls.
 
 Use your own trivially copyable, 16-byte record type. The buffer addresses must
 be 16-byte aligned. No conversion to a library-owned block type is required.
@@ -68,6 +72,17 @@ code.transpose_inplace<Block>(encoded, work);
 For separate transpose buffers, use `code.transpose<Block>(input, output, work)`.
 Separate input and output ranges must not overlap. The in-place operation requires
 exactly 2K records and is supported for 128-bit records only.
+
+Select `Parameters::PacketT64S16` for the newer packet construction. It supports
+the same transpose calls, but not forward encoding or generic XOR elements yet.
+Query `supports_forward(width)`, `supports_transpose(width)`, and
+`supports_generic_transpose()` before using an optional operation.
+Unsupported operations throw; they never substitute another code family.
+
+For library-owned storage, `code.make_buffer()` returns a zero-initialized,
+64-byte-aligned `Buffer` holding exactly `code_size()` records. Its `bytes()` view
+works directly with the byte-based encoding methods. Caller-owned storage remains
+supported; no copy into library storage is required.
 
 `Code` is an immutable shared handle. Copying it shares the plan. Moving or
 destroying a handle does not invalidate its workspaces; each workspace retains
@@ -117,15 +132,21 @@ no-op for identical seeds. Its behavior for changed seeds depends on the fixed m
 
 | Mode | Seed update | Reused across updates |
 |---|---|---|
-| `Full` (default) | Rebuild the original sampled setup | Compatible workspace allocations |
+| `Full` (default) | Rebuild the selected family's sampled setup | Compatible workspace allocations |
 | `BankedHeuristic` | Refresh row transformations, region labels, offsets, and IMT masks | Bank and all workspace allocations |
 
 Banked refresh allocates nothing and never constructs a full per-round route.
 The optimized transpose generates addresses for one region at a time. It supports
-all three parameter sets and their natural lengths, including non-powers of two.
+the three IMT parameter sets and their natural lengths, including non-powers of two.
+The packet family supports `Full` only; `BankedHeuristic` is rejected for that family.
 `bank_seed` determines the reusable bank; code seeds do not change it. Replace the
 controller explicitly to change the bank, mode, or geometry. Both parties must agree
 on these settings and the current code seeds.
+
+After a `Full` refresh, `encoder.prepare_workspace(work)` rebinds compatible
+scratch and releases its previous setup before the timed encoding call. Encoding
+also performs this check automatically; omitting explicit preparation can defer
+that deallocation until the first call. `BankedHeuristic` keeps its existing setup.
 
 `generic_transpose()` returns a live view that follows the controller's seed updates.
 Its typed workspace remains valid across updates. In contrast, a generic view from
@@ -135,8 +156,10 @@ or its views. Encoding permits concurrent calls with distinct workspaces.
 Workspaces and views retain their required setup; there is no global cache.
 Use moved-from controllers only for assignment or destruction.
 
-The prepared interface currently exposes transpose only: optimized 128-bit records
-and generic XOR elements. The immutable interface retains forward and wide support.
+The prepared interface exposes transpose only, with the same capability queries,
+size queries, buffer allocation, and width argument as `Code`. Generic XOR elements
+remain available for the IMT families only. The immutable interface retains forward
+and wide support for the families listed below.
 The banked path uses a region buffer, so `tile_rows` does not affect that path.
 
 Prepared descriptors contain 56 little-endian bytes: magic at 0, version 2 at 4,
@@ -160,17 +183,29 @@ See the [integration checkpoint](PREPARED_ENCODER.md) for validation and current
 | `T128S19` | (128,19,1) | 16,384 |
 | `T64S12` | (64,12,1) | 8,192 |
 | `T64S12R2` | (64,12,2) | 8,192 |
+| `PacketT64S16` | (64,16), GL16 updates | 512 |
 
 `message_alignment` and `valid_message_size` provide allocation-free queries.
 The implementation never rounds K or changes the chosen parameter set.
-Current 32-bit routing requires K < 2^31; available memory also limits allocations.
+Current 32-bit routing requires K < 2^31. Packet routing has padding and a slightly
+smaller maximum K of 2,139,127,296. Available memory also limits allocations.
 There is no additional benchmark-size or certificate-size cap.
 The caller remains responsible for certificate coverage at the selected parameters.
 
 `ExecutionOptions` selects a backend and an optional tile size. The default tile
-is 256 outer rows, clamped to the code geometry. Use 512 explicitly when desired
+for IMT is 256 outer rows, clamped to the code geometry. Use 512 explicitly when desired
 for the previously measured large wide workload. These are execution choices,
 not changes to the binary code. Compaction and route packing are internal.
+Packet encoding uses four-row tiles and accepts only `tile_rows=0` or `4`.
+
+| Family | 128-bit transpose | 128-bit forward | Wide forward | Generic XOR transpose |
+|---|---|---|---|---|
+| `T128S19` | Yes | Yes | 256/512 bits | Yes |
+| `T64S12` | Yes | Yes | No | Yes |
+| `T64S12R2` | Yes | Yes | 256/512 bits | Yes |
+| `PacketT64S16` | Yes | No | No | No |
+
+Wide support also depends on the CPU and compiled backends.
 
 The exact-size transpose specializations and the range-direct path through
 K=458752 remain available. Full and partial tiles use separate kernel bodies.
@@ -207,7 +242,7 @@ std::vector<std::uint8_t> choices(code.code_size());
 generic.transpose_inplace<std::uint8_t>(choices, bytes);
 ```
 
-The generic plan copies the same realized routing and inner samples once during
+For an IMT family, the generic plan copies the same realized routing and inner samples once during
 creation. It owns that data independently of `Code`. Encoding uses compile-time
 XOR circuits, without per-element runtime dispatch. Elements must be copyable
 and default constructible. By default, `operator^` implements addition.
@@ -217,9 +252,105 @@ must not allocate when allocation-free encoding is required.
 Use bytes rather than `vector<bool>`.
 Generic forward and wide transpose are not provided in this first release.
 
+## Precomputed four-bit packet transpose
+
+`Parameters::PacketT64S16` selects the newer packet construction through `Code`.
+It combines the BCH [256,128] outer with GL32 mixing, four-bit
+packets, and a t64/s16 inner with GL16 updates. This API currently supports only
+transposed encoding of 128-bit records; it does not replace the forward API.
+
+```cpp
+#include <spin/Code.h>
+
+spin::Code packet({.message_size=1u<<18,
+                   .parameters=spin::Parameters::PacketT64S16,
+                   .route_seed=1, .inner_seed=1});
+auto scratch=packet.make_workspace();             // Prepare once, outside timing.
+auto buffer=packet.make_buffer();                 // Optional 64-byte-aligned owner.
+// Fill buffer.bytes() with 2K records, then encode repeatedly:
+packet.transpose_inplace_bytes(buffer.bytes(), scratch);
+```
+
+Caller-owned buffers use `transpose_inplace<Block>(records, scratch)` or
+`transpose<Block>(input, output, scratch)`. They need 16-byte alignment; 64-byte
+alignment is preferable. In-place calls preserve the final K records. Separate
+input/output ranges must not overlap. Encoding does not allocate or copy the
+whole input. Copied handles share immutable setup; concurrent calls need separate
+workspaces. A workspace accepts only handles sharing its original plan.
+
+K must be a positive multiple of `message_alignment(Parameters::PacketT64S16)`, currently 512:
+four BCH rows carrying 128 message elements each. Non-powers of two, such as
+K=66048 or K=262656, use the same optimized kernel. Construction preserves K
+exactly and performs no implicit padding or rounding. Transposed buffers contain
+exactly 2K input records and K output records.
+
+There is no benchmark-size or certificate-range cap. The upper limit follows the
+32-bit padded route representation; `valid_message_size(Parameters::PacketT64S16,K)` checks it
+without allocation or setup. The query does not check available memory.
+Accepting a size does not certify its distance. The current numerical certificate
+covers K=2^20, relative distance above 10%, and failure margin above 55.08 bits
+under the ideal independent setup distribution. Smaller sizes have implementation
+checks and timings, not that certificate. Version 1 preserves the prototype's
+deterministic SplitMix seed schedule; it does not guarantee distance for every seed.
+
+`Backend::Automatic` selects the AVX-512/VBMI/GFNI kernel when available,
+otherwise a literal SSE2 fallback. `Portable` forces the fallback;
+`Avx512` requires the fast backend and throws if unavailable. Packet encoding
+rejects `Avx2`; the IMT families reject `Portable`. The fallback is
+for compatibility and checking, not comparable performance. SIMD requirements
+stay private to the library. `SPIN_ENABLE_AVX512=OFF` also supports this API.
+
+Scratch preparation gives best-effort Linux page advice on owned pages.
+`make_buffer(Width::Bits128,MemoryPolicy::PreferHugePages)` and the same arguments
+to `make_workspace` additionally use 2 MiB-aligned, rounded allocations for packet
+scratch. IMT scratch retains its existing allocation layout. Advice may
+fail harmlessly; actual huge pages are not promised. No advice or allocation
+occurs during encoding, and the library never advises caller-owned buffers.
+
+Packet `Code` uses the common 40-byte descriptor below, with parameter identifier 4.
+The route seed controls routing and GL32 mixing; the inner seed controls GL16 updates.
+The earlier `PacketCode` API remains for source compatibility. It uses one seed
+for both stages and retains its 32-byte `SPKP` descriptor unchanged. Thus
+`Code({K,Parameters::PacketT64S16,seed,seed})` realizes exactly the same map as
+`PacketCode({K,seed})`, although their descriptor formats differ. New consumers
+should use `Code`.
+
+`spin_packet_test` includes frozen research known answers, portable/fast equality,
+natural non-power-of-two sizes, buffer guards, and allocation/lifetime checks.
+`spin_packet_bench K [seed] [calls] [normal|huge]` measures only precomputed
+in-place encoding. Build it with `SPIN_BUILD_BENCHMARKS=ON`; run benchmarks serially.
+The private generated kernels can be checked by `python -B tools/import_packet.py
+--check` from this directory when the research sources are available. Package
+builds and installed consumers need neither those sources nor Python.
+
+Precomputed transpose on Ryzen 7950X, GCC 15.2, `SPIN_TUNE=znver4` (milliseconds):
+
+| Implementation / owned buffers | K=2^16 | K=2^18 |
+|---|---:|---:|
+| Retained research, 64-byte alignment | 0.20554 | 0.82675 |
+| Library, 64-byte alignment | 0.20628 | 0.83067 |
+| Retained research, huge-page alignment | 0.20270 | 0.81724 |
+| Library, huge-page alignment | 0.20381 | 0.82132 |
+
+Each entry is the median of eight process medians: four seeds, two execution
+orders, five warmups, and 301 timed calls per process, pinned to one core.
+The matched output checksums agree. Setup, allocation, and page preparation are
+excluded; these are encoder timings, not OT or proof-system throughput.
+
+The common `Code` interface was also compared against the direct `PacketCode`
+binary on the same host, using the same serial protocol and normal alignment.
+Median times were 0.20484 versus 0.20611 ms at K=2^16, and 0.83302 versus
+0.82836 ms at K=2^18. Both differences were below 1%; output checksums matched.
+
+The promotion passes all six library tests on Linux/GCC 15.2 and Windows/MSVC
+19.50, plus installed-package consumers on both platforms. The AVX-512-disabled
+build passes all six tests; its packet test also passes AddressSanitizer and
+UndefinedBehaviorSanitizer. Research/library comparisons check all setup tables
+and full outputs at six sizes and four seeds.
+
 ## Identity and memory
 
-`descriptor()` returns 40 canonical bytes. A consumer can hash them using its
+For every `Code` family, `descriptor()` returns 40 canonical bytes. A consumer can hash them using its
 existing hash implementation. The layout is little-endian:
 
 | Byte offset | Content |
@@ -237,10 +368,10 @@ coordinate conventions in this snapshot. Backend, tile size, and packing do not
 affect the descriptor. Any future change to the realized map for these inputs
 requires a new version, not a silent implementation update.
 
-`setup_bytes()` and `workspace.bytes()` report allocated vector capacities,
+`setup_bytes()` and `workspace.bytes()` report owned storage capacities,
 excluding inputs, outputs, allocator overhead, and small object headers.
-The initial package prepares both directions and retains routing for bit-packed
-forward. Direction-specific setup pruning is a possible later memory optimization.
+IMT setup prepares both directions and retains routing for bit-packed forward.
+Packet setup prepares transpose only.
 
 ## Validation and remaining integration
 
