@@ -8,6 +8,10 @@ combined with that conversion. Packed GL32/BCH processing remains about
 3.1 ms. Both campaigns and unsuccessful alternatives are preserved below.
 No code distribution or distance claim changes.
 
+The follow-up [small-size campaign](inner_size_REPORT.md) reaches 0.222 ms
+at K=2^16 and 0.899 ms at K=2^18. It adds cached routing and a combined
+outer layout. The measurements below remain the original K=2^20 campaign.
+
 All measurements use K=2^20, rate one-half, 128-bit XOR elements, and
 Peach's Ryzen 7950X on CPU15. The forward code maps K bits to 2K bits;
 the timed transpose consumes 2K elements and writes K elements in place.
@@ -632,9 +636,9 @@ versioned experiment data.
 | VBMI conversions | `c13dba64599bac5c67159ea03c03211ec9176f8548acb0908ddc834088c84e94` |
 | Complete executable | `4ce4ce451a523fb90c0c8030cbd9412b66cf28c6340d0b54741c7536244cb767` |
 
-Next: extract the conversion-only candidate into the reusable kernel and
-check K=2^16 and K=2^18 scaling before changing a default. Keep the existing
-conversion as the non-VBMI fallback. Larger gains now require attacking
+The [small-size follow-up](inner_size_REPORT.md) extracts the reusable
+kernel and completes the K=2^16/K=2^18 tuning campaign. It retains the existing
+conversion as a checked non-VBMI fallback. At K=2^20, larger gains require attacking
 the approximately 3.1-ms outer phase or changing the construction; another
 small reduction in inner source XOR counts is unlikely to dominate.
 

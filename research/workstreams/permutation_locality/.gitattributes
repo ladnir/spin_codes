@@ -5,3 +5,9 @@ inner_packet_probe.cpp -text
 
 # Research runners must also execute directly after a Windows checkout.
 *.sh text eol=lf
+
+# Keep the new measured source hashes stable across platforms.
+PacketInnerKernel.h text eol=lf
+PacketInnerBoundaryTests.h text eol=lf
+inner_size_probe.cpp text eol=lf
+outer_layout_codegen.py text eol=lf
