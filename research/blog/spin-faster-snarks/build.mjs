@@ -10,7 +10,10 @@ const {marked}=req('marked');
 const here=path.dirname(fileURLToPath(import.meta.url));
 const figures=path.join(here,'figures');
 await fs.mkdir(figures,{recursive:true});
-const data=JSON.parse(await fs.readFile(path.join(here,'performance.json'),'utf8'));
+const applicationData=JSON.parse(await fs.readFile(path.join(here,'../../paper/data/application_results.json'),'utf8'));
+const data={method:applicationData.measurement_method.flock_method,flock:applicationData.flock,
+  provenance:applicationData.flock_provenance,receipt:applicationData.receipts.flock};
+await fs.writeFile(path.join(here,'performance.json'),JSON.stringify(data,null,2)+'\n');
 const C={bg:'#FAF9F6',ink:'#202326',muted:'#5E656B',line:'#D7D8D4',zero:'#E8E8E2',orange:'#CD461A',pale:'#FADED1',purple:'#7259A6',green:'#267660',gray:'#606B75'};
 const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 let parts=[];
@@ -115,7 +118,7 @@ text(x+15,y+33,Math.round(s.total)+' ms',23,C.ink,'start',600);
 });
 [['Commitment',C.orange,42],['Opening',C.purple,235],['Remaining prover work',C.gray,411]].forEach(([label,color,x])=>{rect(x,458,18,18,color);text(x+28,473,label,18,C.ink);});
 await save('05-flock-performance');
-await fs.writeFile(path.join(figures,'flock-breakdown.json'),JSON.stringify({source:'performance.json',workload:16384,units:'milliseconds',remainingDefinition:'total_ms - commit_ms - open_ms',breakdown},null,2));
+await fs.writeFile(path.join(figures,'flock-breakdown.json'),JSON.stringify({source:'../../paper/data/application_results.json',workload:16384,units:'milliseconds',remainingDefinition:'total_ms - commit_ms - open_ms',breakdown},null,2));
 
 const md=await fs.readFile(path.join(here,'post.md'),'utf8');
 const body=marked.parse(md);

@@ -1,11 +1,11 @@
 {
-  "method": "Mean of two process medians; each median uses trials 5\u20138 after five warmup/settling proofs. All 108 generated proofs verified. Times in milliseconds.",
+  "method": "Mean of two process medians; each median uses trials 5–8 after five warmup/settling proofs. All 108 generated proofs verified. Times in milliseconds.",
   "flock": {
     "14": {
       "spin": {
         "trial": 6.5,
-        "compressions": 16384.0,
-        "witness_bytes": 33554432.0,
+        "compressions": 16384,
+        "witness_bytes": 33554432,
         "total_ms": 94.16118549999999,
         "verify_ms": 37.25030075,
         "proof_bytes": 6498544,
@@ -14,10 +14,10 @@
         "zerocheck_ms": 40.1716055,
         "lincheck_ms": 6.629493999999999,
         "open_ms": 17.05793125,
-        "alloc_ms": 2e-05,
-        "layout_ms": 2.25e-05,
+        "alloc_ms": 0.00002,
+        "layout_ms": 0.0000225,
         "encode_ms": 7.88476925,
-        "transpose_ms": 0.0,
+        "transpose_ms": 0,
         "leaves_ms": 6.681335499999999,
         "parents_ms": 1.0811935,
         "runs": [
@@ -27,8 +27,8 @@
       },
       "native-fast100": {
         "trial": 6.5,
-        "compressions": 16384.0,
-        "witness_bytes": 33554432.0,
+        "compressions": 16384,
+        "witness_bytes": 33554432,
         "total_ms": 215.33200449999998,
         "verify_ms": 27.72505175,
         "proof_bytes": 296617,
@@ -45,8 +45,8 @@
     "16": {
       "spin": {
         "trial": 6.5,
-        "compressions": 65536.0,
-        "witness_bytes": 134217728.0,
+        "compressions": 65536,
+        "witness_bytes": 134217728,
         "total_ms": 350.89169775,
         "verify_ms": 42.2319015,
         "proof_bytes": 11047536,
@@ -55,10 +55,10 @@
         "zerocheck_ms": 159.65603700000003,
         "lincheck_ms": 23.703999000000003,
         "open_ms": 46.01752525,
-        "alloc_ms": 2e-05,
-        "layout_ms": 2.25e-05,
+        "alloc_ms": 0.00002,
+        "layout_ms": 0.0000225,
         "encode_ms": 28.01001275,
-        "transpose_ms": 0.0,
+        "transpose_ms": 0,
         "leaves_ms": 33.149246500000004,
         "parents_ms": 1.07112725,
         "runs": [
@@ -68,8 +68,8 @@
       },
       "native-fast100": {
         "trial": 6.5,
-        "compressions": 65536.0,
-        "witness_bytes": 134217728.0,
+        "compressions": 65536,
+        "witness_bytes": 134217728,
         "total_ms": 571.4056095000001,
         "verify_ms": 27.935382,
         "proof_bytes": 415657,
@@ -82,52 +82,6 @@
           "16-3-current-native-fast100"
         ]
       }
-    }
-  },
-  "previous_spin": {
-    "14": {
-      "trial": 6.5,
-      "compressions": 16384.0,
-      "witness_bytes": 33554432.0,
-      "total_ms": 112.15248125,
-      "verify_ms": 37.9580515,
-      "proof_bytes": 7027792,
-      "witness_ms": 13.356515,
-      "commit_ms": 32.02266575,
-      "zerocheck_ms": 40.217296,
-      "lincheck_ms": 6.630969500000001,
-      "open_ms": 19.930568,
-      "alloc_ms": 0.000123,
-      "encode_ms": 14.13661675,
-      "transpose_ms": 3.8578107499999996,
-      "leaves_ms": 12.94726625,
-      "parents_ms": 1.075703,
-      "runs": [
-        "14-0-baseline-spin",
-        "14-5-baseline-spin"
-      ]
-    },
-    "16": {
-      "trial": 6.5,
-      "compressions": 65536.0,
-      "witness_bytes": 134217728.0,
-      "total_ms": 414.5195585,
-      "verify_ms": 45.84473774999999,
-      "proof_bytes": 13449040,
-      "witness_ms": 69.1120545,
-      "commit_ms": 101.25650775,
-      "zerocheck_ms": 158.71151625,
-      "lincheck_ms": 23.795832750000002,
-      "open_ms": 61.51154025,
-      "alloc_ms": 0.00016525,
-      "encode_ms": 55.523108750000006,
-      "transpose_ms": 0.0,
-      "leaves_ms": 44.63372475,
-      "parents_ms": 1.0833822499999999,
-      "runs": [
-        "16-0-baseline-spin",
-        "16-5-baseline-spin"
-      ]
     }
   },
   "provenance": {
@@ -146,7 +100,10 @@
       "current.tgz": "c2dc7e64057be7223ed94d3f5364881887ce545842ec22a5ef8dcf986a09bb72"
     },
     "receipt": "artifacts/bench-final/receipt.json",
-    "scope": "Complete PCS integrations including layout, hashing, opening, and witness generation; not an isolated code substitution. Setup, verification and outer serialization excluded from prover time. Proof sizes are serialized bytes.",
-    "local_evidence": "C:/Users/peter/repo/hypercat-spin-integration/results/flock-spin/commit-integration-20260929"
+    "scope": "Complete PCS integrations including layout, hashing, opening, and witness generation; not an isolated code substitution. Setup, verification and outer serialization excluded from prover time. Proof sizes are serialized bytes."
+  },
+  "receipt": {
+    "path": "data/flock_integrated_20260929.json",
+    "sha256": "bb8b1fead10e3bf3580c465ed8db77525fcc5affe1bd4559be2f2dda5ced03ba"
   }
 }
