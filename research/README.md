@@ -9,7 +9,8 @@ separate, in [`../spin/`](../spin/README.md), and does not depend on this tree.
 | [artifact/](artifact/README.md) | Paper artifact packaging and author-side reproduction tools. |
 | [workstreams/](workstreams/) | Proof development, experimental implementations, and selected results. |
 | `scripts/`, `constructions/`, `explorations/`, `bch_spectrum_work/` | Supporting research and historical experiments. |
-| `BA_paper/`, `enumerator_paper/`, `expander_codes/` | Related manuscripts. |
+| `BA_paper/`, `enumerator_paper/` | Related manuscripts. |
+| [Expander codes](https://github.com/ladnir/expander_codes) | Separate repository for the expander-code manuscript, source, and certificates. |
 | `collaboration/` and top-level Markdown notes | Historical plans, audits, and handoffs. |
 
 ## Running historical commands
