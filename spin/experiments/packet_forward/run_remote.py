@@ -14,4 +14,3 @@ for logk in [16,18,20]:
  for mode in ['transpose','forward','gather']:
   args=['taskset','-c','15',str(build/'spin_packet_forward_bench'),mode,str(2**logk),'1','51','huge' if logk==20 else 'normal']
   print(subprocess.check_output(args,text=True),flush=True)
-

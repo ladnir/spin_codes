@@ -12,6 +12,7 @@ MAX_TRACKED_BYTES = 5 * 1024 * 1024
 FORBIDDEN_DIRECTORIES = {
     "__pycache__",
     ".pytest_cache",
+    "node_modules",
     "old",
     "out",
     "output",

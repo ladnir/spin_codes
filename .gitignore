@@ -26,6 +26,11 @@ out/
 output/
 .pytest_cache/
 tmp/
+node_modules/
+# Talk materials are maintained outside this repository.
+/research/talks/
+# Local immutable proof snapshots, including selected numerical witnesses.
+research/.proof-archives/
 *.o
 *.obj
 *.exe
@@ -47,3 +52,14 @@ related_work/
 *.stdout.txt
 *.stderr.txt
 dist_*.txt
+
+# Author-side numerical evidence and measurement logs remain local. Some are
+# required by current paper checks: ignoring them does not make them disposable.
+# Deliberately selected compact artifacts may be force-added after review.
+/research/workstreams/**/measurements/
+/research/workstreams/**/optimization_records/
+/research/workstreams/**/*.json
+/research/workstreams/**/*.jsonl
+/research/workstreams/**/*.log
+/research/workstreams/**/*.sha256
+/research/workstreams/**/*.wd
