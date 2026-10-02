@@ -1,5 +1,13 @@
 # Joint tuning of packet routing and the inner
 
+The initial two-bit timings below used direct scatter and omitted the
+optimized tiled schedule. See [TWO_BIT_IMPLEMENTATION.md](TWO_BIT_IMPLEMENTATION.md)
+for the corrected implementation and comparison. The 13.38 ms result must
+not be treated as the cost of the two-bit construction itself.
+The follow-up [packet frontier](PACKET_FRONTIER.md) compares the corrected
+baseline with four-bit candidates and extends the proof diagnostics to
+80, 96, and 128 active groups at a common 9.25% target.
+
 ## Objective and checkpoint
 
 Minimize precomputed, single-threaded transposed encoding time for K=2^20
@@ -154,12 +162,12 @@ The isolated remote root is `/tmp/spin-joint-9n57TT`; raw samples are in
 `measurements/joint-screen-t80iRT` and `measurements/joint-confirm-zA6P6C`.
 They are not part of the Git commit.
 
-The next proof candidate is the four-bit route with three updates.
+This initial screen nominated the four-bit route with three updates.
 Its 6.73 ms measurement is still above the approximate 5 ms objective.
-First test harder proof cases at 9.25% and 10%, retaining two updates
-as a cheaper alternative if its bound suffices. Then compare batch widths
-before investing in a full cover. The completed two-bit theorem remains
-the proof fallback, not the current performance winner.
+That recommendation omitted the optimized two-bit tiled schedule and is
+deferred pending the corrected implementation comparison linked above.
+The four-bit proof diagnostics remain useful, but the direct-scatter
+comparison alone does not justify changing the proved construction.
 
 ## Initial proof sensitivity
 

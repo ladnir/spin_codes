@@ -16,12 +16,14 @@ def main():
     parser.add_argument('--penalty',default='.9')
     parser.add_argument('--groups',type=int,nargs='+',default=[64,80])
     parser.add_argument('--supports',type=int,nargs='+',default=[192,200,208])
+    parser.add_argument('--thresholds',type=int,nargs='+',default=[209715])
     args=parser.parse_args()
     if (any(not 1<=r<=32 for r in args.rounds) or any(Q(t)<=0 for t in args.tilts)
             or not 0<Q(args.penalty)<=1 or any(not 1<=q<=2048 for q in args.groups)
-            or any(not 38<=u<256 for u in args.supports)):
-        parser.error('valid update counts, tilts, penalty, groups, and supports required')
-    print('Selected four-bit support events, cutoff 209715; binary64 screen, NOT a full certificate.',flush=True)
+            or any(not 38<=u<256 for u in args.supports)
+            or any(not 0<=d<(1<<21) for d in args.thresholds)):
+        parser.error('valid update counts, tilts, penalty, groups, supports, and output cutoffs required')
+    print('Selected four-bit support events, cutoffs',args.thresholds,'; binary64 screen, NOT a full certificate.',flush=True)
     caps=baseline.authenticated_caps()
     cdf=baseline.integer_cdf(baseline.weighted_cdf_upper(caps,1<<128,full_weight=1/Q(args.penalty)))
     shells=baseline.weighted_union_shells(caps,full_weight=1/Q(args.penalty))
@@ -32,9 +34,10 @@ def main():
             region=float_placement(as_array(ops),max(args.groups))
             for q in args.groups:
                 for u in args.supports:
-                    value,p=score(region,q,u,min(Q(cdf[u]),shells[u]),tilt)
-                    print('FOUR-BIT updates/q/u',rounds,q,u,'tilt/rho',tilt,args.penalty,
-                          'log2 proposal',value,'support tilt',p,flush=True)
+                    for cutoff in args.thresholds:
+                        value,p=score(region,q,u,min(Q(cdf[u]),shells[u]),tilt,cutoff=cutoff)
+                        print('FOUR-BIT updates/q/u',rounds,q,u,'cutoff',cutoff,'tilt/rho',tilt,args.penalty,
+                              'log2 proposal',value,'support tilt',p,flush=True)
 
 
 if __name__=='__main__':main()

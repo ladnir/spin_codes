@@ -1,5 +1,11 @@
 # Proof exploration: independently shuffled BCH rows
 
+A [first full four-bit certificate](dense_closure/FIRST_CLOSURE.md) now
+closes at relative distance greater than 0.5%, with more than 43.744 bits
+of setup-failure margin, for the unchanged two-update construction. This
+lower-distance result was replayed at 256-bit precision. The original
+10% target discussed below remains open beyond the sparse range.
+
 This is a separate ensemble from the shared-shuffle route in the parent
 directory. Both remain active; see [PROOF_TRACKS.md](../PROOF_TRACKS.md).
 The implementation measures 6.50 ms versus 5.42 ms for the shared route.
@@ -13,6 +19,12 @@ from conditional inner bounds to this averaged outer measure.
 [REFINEMENTS.md](REFINEMENTS.md) records a stronger selected-class bound
 at occupancy 64. [DENSE_DIAGNOSIS.md](DENSE_DIAGNOSIS.md) identifies the
 remaining middle-occupancy gap and the new density-column calculations.
+
+[SHAPE_POTENTIAL.md](SHAPE_POTENTIAL.md) explores a continuation bound
+inspired by the companion lifting paper. It preserves whole packet shapes
+within a step and derives an exact two-epoch single-packet return moment.
+These research bounds do not extend the completed occupancy cover or
+change the encoder.
 
 ## Why this route may be easier to prove
 
@@ -216,6 +228,9 @@ unchanged throughout a cached run.
 
 The experimental hill-climb drivers can also reuse source-bound local
 families with `--epoch-cache`; see [DENSITY_EXTENSION.md](DENSITY_EXTENSION.md).
+[FOUR_BIT_ATTACK.md](FOUR_BIT_ATTACK.md) records the later mixing and
+history experiments, including an outward three-update bound for one
+96-group support class. It does not extend the complete occupancy cover.
 [OVERLAP_MEAN.md](OVERLAP_MEAN.md) records a newer exact overlap calculation
 and local cancellation bound. Its 1000-shape census and small exact checks
 pass, but it has not yet extended the complete occupancy coverage.

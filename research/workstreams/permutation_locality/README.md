@@ -1,20 +1,171 @@
 # Faster permutations for SPIN
 
-## Current checkpoint (2026-09-28)
+Start with the [proof index](PROOF_INDEX.md) for retained constructions,
+complete versus partial guarantees, replay entry points, and the local
+checksummed preservation snapshot. The [shared-shuffle GF16
+experiment](gf16_packets/SHARED_SHUFFLE.md) stopped at a documented plateau,
+with q=1–22 covered at the 10% target (restricted margin above 44.12 bits).
+The active [pairwise-shuffle follow-on](gf16_packets/PAIRWISE_SHUFFLE.md)
+has verified every occupancy q=1–49, with a 48.401-bit restricted margin,
+but no whole-code certificate. Occupancies q=50–2048 are not fully covered.
+Both are separate from the complete independent-row certificates below.
+
+## Current checkpoint (2026-09-29)
+
+The strongest complete GF16 result is now **distance greater than 10%
+with 48.6501 bits of setup-failure margin**, using four inner updates.
+The fresh 384-bit full assembly regenerates q=1--48 and replays all
+427 dense intervals for q=49--2048, with no unresolved cases. The dense
+contribution has 90.9171 bits of margin, so the sparse contribution
+controls the complete bound. The dense witnesses previously passed
+256-bit checks, and the sparse prefix has separate independent 256-
+and 384-bit checks. The two-update design retains its complete >9%
+certificate with 46.85 bits, independently replayed at both precisions.
+The 10% full replay and exact scope-and-sum audit have passed. The
+independently regenerated sparse endpoint matches exactly. Minimum
+distance is at least 209716 of N=2097152, except with setup probability
+below 2.264e-15. The hill-climb goal is closed; no production default or
+paper claim is changed. The unfinished two-update 9.25% assembly and
+9.5% search were stopped, preserving their checkpoints and partial logs.
+
+The remaining proof margin is controlled by lightest-support terms in
+the q=1 CDF-majorant bound, not the dense range. Support 38 contributes
+about 98.46% of that q=1 bound. This is a bound attribution, not an
+observed code failure or a claim about the actual BCH spectrum.
+
+A new serial paired benchmark at K=2^20 measures **6.881, 7.184, and
+7.484 ms** for two, three, and four updates, respectively. Four updates
+cost 8.76% over two. All three share the same routing and GF randomizer.
+Regular and sanitizer checks pass. See the
+[GF16 record](gf16_packets/README.md#four-update-comparison) for scope,
+run order, hashes, and the complete proof record. The next step is to
+optimize the certified implementation with its distribution fixed.
+All 214 proof-tool tests and fresh normal/sanitizer control checks pass.
+The detailed chronology
+below records earlier checkpoints, not additional complete claims.
+
+The separate [GF(16) packet randomizer](gf16_packets/README.md) replaces
+four-bit lane permutations with independent nonzero field multipliers.
+Its two-update version took about 6.86 ms in the first confirmed
+implementation and has a **complete 9% distance certificate at K=2^20,
+with more than 46.85 bits of setup-failure margin**. The proof retains refreshed-state information,
+uses exact GF feedback counts, and couples cancellation to emitted weight.
+Exact q=1 placement, fresh sparse covers for occupancies 2--96, and a
+complete 116-cell dense cover for 97--2048 were replayed at 256-bit
+precision. An independent full 384-bit replay has passed. Earlier
+certificates remain available. That gain also retains
+the expansion weight of newly activated states.
+The replayed sparse and dense contributions have 46.85 and 78.77 bits
+of margin, respectively; their sum gives the complete bound above.
+An exact regional-placement calculation separately gives 42.12 bits
+for all one-active-group messages at 10%. Retaining BCH row parity also
+improves the dense comparison and completes the 8.2% result. At 8.5%, a fresh-state density
+bound and a variance-sensitive shuffle comparison close all 155 dense
+cells for q=97--2048. Its full replay verified every sparse occupancy
+except q=4, where the old tilt grid missed its stopping budget. The
+8.6% dense partition also closes, with 154 cells; its full replay was
+stopped after finding the same q=4 gap. Both logs remain available,
+and neither run supplies a whole-code claim. Retaining the expansion weight of newly activated states and
+retuning the proof's reference tilt close the 9% dense range in 116 cells;
+the fresh full assembly has now completed. The 8.7% dense cover closes in 156
+cells. Its sparse q=48 bound closes after expanding the output-tilt grid
+and retaining newborn state weights; fresh 256- and 384-bit checks
+agree at 175.14 bits. Its first full replay passed every sparse occupancy
+except q=4. A fine grid subsequently verifies that occupancy at 9%
+with 89.25 bits; the new 9% assembly uses this grid. Retaining regional
+packet counts also closes the 9.25% dense range in 172 cells, with
+an independent 384-bit aggregate replay giving 76.4285 bits for
+q=97--2048. The finer-grid sparse q=96 check also closes, with 50.2158
+bits after 247 subdivisions. A fresh full 9.25% assembly was started,
+without importing earlier selected-occupancy checks. It was stopped
+after the four-update 10% result closed; its partial logs are retained.
+The 9.25% partial results do not replace the complete 9% claim above.
+The two-update 10% whole-code target remains unresolved. These proof changes do not
+change encoder performance.
+
+An actual inner change is now being tested as a separate option: three
+updates instead of two. A serial paired benchmark on Peach gives
+7.194 ms versus 6.873 ms, about 4.68% extra time. The three-update
+regional bound passes two difficult 9.5% intervals with substantial
+slack, although the corresponding 10% interval checks still leave gaps.
+Its exact q=1 calculation at 10% gives 46.4989 bits, reproduced at 256
+and 384 bits. Selected q=2,3,4,8 checks also close at 10%. A full three-update
+9.9% dense search used direct regional count masses
+to reduce interval losses. Two wider selected intervals pass outward
+checks with about 71 and 99 bits; complete coverage remains required.
+The all-support check at q=48 passes at 9.9% with 54.31 bits. The first
+q=64 search exhausted 200 subdivisions without a certificate. A focused
+retry omitted important low tilts. The corrected union-grid run also
+finished without a certificate after 400 subdivisions, with floating
+log2 sum +32.8086. The q=64 retry with checked joint-return and
+lazy-density bounds closes at 117.4341 bits after one subdivision.
+An independent 384-bit replay reproduces that margin and verifies
+q=96 at 56.0982 bits. The first,
+unrefined q=96 check exhausted its budget without a certificate.
+An earlier dense handoff is also being tested. At q>=49, three selected
+9.9% mean intervals have verified bounds of about 140, 84, and 73 bits.
+A full dense search now starts there; if it closes, only q=1--48 will
+need the separate sparse proof. That complete q=1--48 prefix has now
+been regenerated, with 46.8901 bits of margin. The dense range remains
+unresolved, so these results are not yet a whole-code certificate.
+An exact small-state sampler test also validates the
+one-, two-, and three-update mixture used by the proof.
+This is not yet a whole-code three-update certificate; none of the
+two-update results is silently reused for it.
+Retaining density through lazy updates and using exact three-packet
+return counts now closes two troublesome 10% mean intervals with
+roughly 220 and 69 bits. Independent 256- and 384-bit checks agree.
+These refinements change the proof, not the encoder, and are available
+to the resumed 9.9% search. Complete-domain and sparse coverage remain.
+They are now optional in the sparse verifier as well, with matching
+fresh-regeneration support in the assembler. Three two-update 9.5%
+mean intervals now pass outward checks, with bounds of about 887, 498,
+and 382 bits, agreeing under independent 256- and 384-bit evaluation.
+A full dense cover and a refined q=96 support cover are
+running. This could improve the bound without paying for a third update,
+but is not yet a whole-code certificate. A floating-search underflow was
+fixed without changing the outward verifier; the main three-update
+search has resumed from its preserved partition.
+The latest diagnostics locate a remaining moderate-activity gap in the
+regional comparison. Finer variance parts and the tested output tilts
+do not close it. Extending the density allocation also fails there.
+A new GF-feedback density bound passes small exact tests but does not
+improve the tested actual-size interval, so it remains outside the
+certificate path. This motivates retaining mass and density together;
+none of these diagnostics is a distance limit or a complete certificate.
+The existing constructions below are unchanged controls.
 
 The [two-bit construction](two_bit/FIRST_CLOSURE.md) has a complete proof
 at K=2^20: relative distance greater than 9.25%, with setup-failure margin
-above 49.11 bits. Its exact encoder has not yet been benchmarked.
+above 49.11 bits. The [tiled implementation](TWO_BIT_IMPLEMENTATION.md)
+preserves that construction and replaces the initial slow direct scatter.
+Its confirmed precomputed transpose takes 7.42 ms, compared with 9.65 ms
+for the production one-bit encoder on the same machine and workload.
 The 9.5% search is paused: sparse coverage reaches 424 active pairs,
 but the dense checkpoint still has 199 unresolved cells.
 The saved witnesses remain local under ignored `tmp/`; this workstream
 tracks source, tests, and proof notes, not generated experiment data.
 
-The [next experiment](JOINT_TUNING.md) jointly tunes packet size and inner
+The [joint experiment](JOINT_TUNING.md) tunes packet size and inner
 parameters for end-to-end encoding time. It starts with two- and four-bit packets and
 two or three updates, retaining the completed two-bit proof as a fallback.
 The earlier four-bit and shared-shuffle work below remains available.
 Its partial certificates do not apply to a changed construction automatically.
+
+[The packet-frontier update](PACKET_FRONTIER.md) rejects a slower two-bit
+gather schedule and compares two- versus three-update four-bit bounds at
+9.25% and 10% distance. The later
+[complete four-bit certificate](independent_rows/dense_closure/FIRST_CLOSURE.md)
+reaches 0.5% distance with more than 43.744 bits of margin; higher-distance
+coverage remains incomplete. That certificate does not transfer to the
+new GF(16) construction.
+
+[The shape-potential experiment](independent_rows/SHAPE_POTENTIAL.md)
+applies a proof idea from the companion lifting paper without changing
+the encoder. It improves selected four-bit bounds by 26--29 bits, but
+does not close the middle occupancies. An exact two-epoch return calculation
+identifies packet history lost by the current fresh-state envelope; a
+small history-aware bound is the next proof experiment.
 
 ## Earlier experiments
 
@@ -22,7 +173,7 @@ Two active proof tracks are maintained; see [PROOF_TRACKS.md](PROOF_TRACKS.md).
 The shared-shuffle route remains the faster candidate with its existing
 partial certificates intact. The separate [independent-row track](independent_rows/README.md)
 now has exact averaged outer-support bounds and complete outward covers
-for every occupancy from 1 through 128, with a combined margin above
+for every occupancy from 1 through 58, with a combined margin above
 43.74 bits for that restricted message class. See
 [LOW_OCCUPANCIES.md](independent_rows/LOW_OCCUPANCIES.md).
 It does not replace the shared-route driver or inherit its certificates.

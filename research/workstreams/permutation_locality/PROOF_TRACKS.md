@@ -1,5 +1,10 @@
 # Two active permutation proof tracks
 
+> Historical checkpoint, retained unchanged below. For current complete
+> certificates, partial tracks, and the preservation snapshot, use the
+> [Packet-Route Proof Index](PROOF_INDEX.md). Statements about unchanged
+> files below describe this checkpoint, not all subsequent development.
+
 The independent-row experiment is an additional route, not a replacement
 for the existing proof effort. Both retain BCH[256,128], K = 2^20,
 N = 2^21, IMT(128,19), two updates, and four-row packets. The target remains

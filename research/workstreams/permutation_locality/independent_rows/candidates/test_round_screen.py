@@ -2,6 +2,9 @@
 from contextlib import ExitStack
 import unittest
 from unittest.mock import patch
+from fractions import Fraction
+from math import log
+from types import SimpleNamespace
 
 import mass_density_screen as screen
 
@@ -15,6 +18,21 @@ class RoundScreen(unittest.TestCase):
         for rounds in (0,33,True,2.5):
             with self.assertRaises(ValueError):
                 screen.epoch_grid(['.056'],'.9',rounds=rounds)
+
+    def test_output_cutoff_changes_only_chernoff_factor(self):
+        with patch.object(screen.baseline,'matrix_for_probabilities',return_value=None), \
+             patch.object(screen.baseline,'log_power_moment',return_value=-100), \
+             patch.object(screen.baseline,'log_binomial_mass',return_value=-2), \
+             patch.object(screen,'minimize_scalar',side_effect=lambda f,**kw:SimpleNamespace(fun=f(0),x=0)):
+            high,p=screen.score(None,80,200,Fraction(17),'.056')
+            low,p2=screen.score(None,80,200,Fraction(17),'.056',cutoff=193986)
+        self.assertEqual(p,p2)
+        self.assertAlmostEqual(high-low,.056*(209715-193986)/log(2),places=10)
+
+    def test_reject_invalid_cutoff(self):
+        for cutoff in (-1,1<<21,True,193986.0):
+            with self.assertRaises(ValueError):
+                screen.score(None,80,200,Fraction(1),'.056',cutoff=cutoff)
 
     def test_propagate_count_and_preserve_default(self):
         for rounds in (None,2,3):

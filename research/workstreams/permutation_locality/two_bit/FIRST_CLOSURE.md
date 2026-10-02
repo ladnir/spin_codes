@@ -15,8 +15,9 @@ by the proof model. The state starts at zero and is not flushed.
 The theorem concerns this ideal independent setup distribution.
 
 No inner parameter or encoder implementation was changed to obtain this result.
-Two-bit encoding performance has not been measured in this experiment;
-the theorem does not establish a 5 ms implementation.
+Performance was not measured during this proof experiment. The subsequent
+[tiled implementation](../TWO_BIT_IMPLEMENTATION.md) preserves the construction;
+the theorem itself does not establish a 5 ms implementation.
 
 ## How the two parts cover every message
 
@@ -99,8 +100,10 @@ q=424, but the q>=425 dense checkpoint still has 199 unresolved cells.
 Finishing that cover and replaying the aggregate would be required for
 a 9.5% claim. These saved calculations do not change the encoder.
 
-Next measure the exact proved two-bit construction, then compare packet
-sizes and inner parameters jointly. Three updates have repaired a
+The exact proved construction now has a
+[tiled implementation and benchmark](../TWO_BIT_IMPLEMENTATION.md).
+Use it as the control when comparing packet sizes and inner parameters.
+Three updates have repaired a
 selected 10% bottleneck and passed the
 complete q=1,...,32 checks, but do not yet have a full certificate. See
 [HILL_CLIMB.md](HILL_CLIMB.md) for the results and remaining obligations.
