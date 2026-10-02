@@ -396,7 +396,7 @@ static void unifiedCode() {
         require(work.width()==spin::Width::Bits128,"unified packet workspace width");
         require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:spin::Backend::Portable),"unified packet backend");
         require(reference.backend()==spin::Backend::Portable && reference.descriptor()==code.descriptor(),"unified portable descriptor");
-        require(code.supports_transpose() && !code.supports_forward() && !code.supports_generic_transpose(),"unified packet capabilities");
+        require(code.supports_transpose() && code.supports_forward() && !code.supports_generic_transpose(),"unified packet capabilities");
         require(!code.supports_transpose(spin::Width::Bits256) && !code.supports_forward(spin::Width::Bits512),"unified packet wide capability");
         std::vector<Block> input(2*k),expected(k),actual(k);fill(input);
         const auto original=input;
@@ -425,7 +425,9 @@ static void unifiedCode() {
             descriptor[32+i]=std::byte((seeds.inner>>(8*i))&255);
         }
         require(code.descriptor()==descriptor,"unified packet descriptor or seed fields");
-        rejects([&]{code.forward<Block>(expected,input,work);});
+        std::vector<Block> forwardExpected(2*k);
+        noAlloc([&]{reference.forward<Block>(expected,forwardExpected,rw);code.forward<Block>(expected,input,work);});
+        require(input==forwardExpected,"unified forward result");
         rejects([&]{code.generic_transpose();});
         std::vector<std::uint64_t> bitInput(k/64),bitOutput(2*k/64),bitScratch(2*k/64);
         rejects([&]{code.forward_bits(bitInput,bitOutput,bitScratch);});
@@ -592,6 +594,83 @@ static void movedUnifiedHandles() {
     require(actual==expected,"Prepared move invalidated retained workspace");
 }
 
+
+static void forwardApi() {
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
+    for(auto k:{256U,768U,65536U,262144U,262400U,1048576U}) {
+        const std::size_t n=2*std::size_t(k);
+        spin::Code code({k,family,17,43}),reference({k,family,17,43},{spin::Backend::Portable});
+        auto work=code.make_workspace(),rw=reference.make_workspace();
+        spin::Buffer input(k*16+64),output(n*16+128),expected(n*16);
+        auto in=input.bytes().subspan(16,k*16); // Foreign minimum alignment.
+        auto typed=std::span<Block>(reinterpret_cast<Block*>(in.data()),k);
+        auto inputBefore=std::vector<std::byte>(in.size());
+        for(unsigned mode=0;mode<3;++mode) {
+            fill(typed,mode+77);
+            if(mode)std::fill(in.begin(),in.end(),std::byte{});
+            if(mode==2) {in.front()=std::byte{1};in.back()=std::byte{0x80};}
+            std::copy(in.begin(),in.end(),inputBefore.begin());
+            noAlloc([&]{reference.forward_bytes(in,expected.bytes(),rw);});
+            for(unsigned offset=0;offset<4;++offset) {
+                std::fill(output.bytes().begin(),output.bytes().end(),std::byte{0xa5});
+                auto out=output.bytes().subspan(64+16*offset,n*16);
+                noAlloc([&]{code.forward_bytes(in,out,work);});
+                require(!std::memcmp(out.data(),expected.bytes().data(),out.size()),"forward API alignment/reference");
+                require(std::equal(in.begin(),in.end(),inputBefore.begin()),"forward modified input");
+                require(std::all_of(output.bytes().begin(),output.bytes().begin()+64+16*offset,[](auto x){return x==std::byte{0xa5};}),"forward prefix guard");
+                require(std::all_of(out.end(),output.bytes().end(),[](auto x){return x==std::byte{0xa5};}),"forward suffix guard");
+            }
+        }
+        // Switch directions and rebind dirty workspace to different seeds.
+        noAlloc([&]{code.transpose_bytes(expected.bytes(),in,work);code.forward_bytes(in,output.bytes().first(n*16),work);});
+        spin::Code different({k,family,43,17});auto dw=different.make_workspace();
+        different.forward_bytes(in,expected.bytes(),dw);
+        noAlloc([&]{different.prepare_workspace(work);different.forward_bytes(in,output.bytes().first(n*16),work);});
+        require(!std::memcmp(output.bytes().data(),expected.bytes().data(),n*16),"forward workspace rebind");
+        rejects([&]{code.forward_bytes(in,output.bytes().first(n*16),work);});
+        code.prepare_workspace(work);
+        rejects([&]{code.forward_bytes(in.first(in.size()-1),output.bytes().first(n*16),work);});
+        rejects([&]{code.forward_bytes(in,output.bytes().first(n*16-1),work);});
+        rejects([&]{code.forward_bytes(in,output.bytes().subspan(1,n*16),work);});
+        rejects([&]{code.forward_bytes(input.bytes().subspan(1,k*16),output.bytes().first(n*16),work);});
+        rejects([&]{code.forward_bytes(output.bytes().first(k*16),output.bytes().first(n*16),work);});
+        rejects([&]{code.forward_bytes(output.bytes().subspan(32,k*16),output.bytes().first(n*16),work);});
+        rejects([&]{code.forward_bytes(output.bytes().first(k*16),output.bytes().subspan(16,n*16),work);});
+        auto saved=code, moved=std::move(code);auto movedWork=std::move(work);
+        require(!code.supports_forward(),"moved forward capability");
+        rejects([&]{code.forward_bytes(in,output.bytes().first(n*16),movedWork);});
+        rejects([&]{saved.forward_bytes(in,output.bytes().first(n*16),work);});
+        noAlloc([&]{saved.forward_bytes(in,output.bytes().first(n*16),movedWork);});
+        auto huge=moved.make_buffer(spin::Width::Bits128,spin::MemoryPolicy::PreferHugePages);
+        auto hw=moved.make_workspace(spin::Width::Bits128,spin::MemoryPolicy::PreferHugePages);
+        noAlloc([&]{moved.forward_bytes(in,huge.bytes(),hw);});
+        require(!std::memcmp(huge.bytes().data(),output.bytes().data(),n*16),"forward memory policy");
+    }
+    for(auto backend:{spin::PacketBackend::Portable,spin::PacketBackend::Automatic}) {
+        constexpr std::size_t k=768;
+        spin::PacketCode code({k,17},backend);
+        spin::Code common({k,family,17,17});auto cw=common.make_workspace();
+        auto w=code.make_workspace();std::vector<Block> in(k),out(2*k),expected(2*k);fill(in);
+        require(code.supports_forward() && !code.supports_forward(spin::Width::Bits256),"PacketCode forward capability");
+        common.forward<Block>(in,expected,cw);
+        noAlloc([&]{code.forward<Block>(in,out,w);});require(out==expected,"PacketCode forward map");
+        rejects([&]{code.forward<Block>(std::span<const Block>(in).first(k-1),out,w);});
+        rejects([&]{code.forward_bytes(std::as_bytes(std::span(in)),std::as_writable_bytes(std::span(out)).first(16),w);});
+        rejects([&]{code.forward<Block>(std::span<const Block>(out).first(k),out,w);});
+        spin::PacketCode other({k,17});auto wrong=other.make_workspace();
+        rejects([&]{code.forward<Block>(in,out,wrong);});
+        auto movedWork=std::move(w);auto saved=code,moved=std::move(code);
+        require(!code.supports_forward(),"moved PacketCode forward");
+        rejects([&]{code.forward<Block>(in,out,movedWork);});
+        rejects([&]{saved.forward<Block>(in,out,w);});
+        noAlloc([&]{saved.forward<Block>(in,out,movedWork);});require(out==expected,"copied PacketCode forward");
+        // Shared immutable setup, one workspace per concurrent call.
+        auto run=[saved,&in,&expected] {auto w=saved.make_workspace();std::vector<Block> out(2*k);
+            saved.forward<Block>(in,out,w);require(out==expected,"concurrent forward");};
+        auto a=std::async(std::launch::async,run),b=std::async(std::launch::async,run);a.get();b.get();
+    }
+}
+
 int main() {try {
     for(auto k:{std::size_t{0},std::size_t{1},std::size_t{255},std::size_t{257},std::size_t{511},std::size_t{513},std::numeric_limits<std::size_t>::max()}) {
         require(!spin::valid_packet_message_size(k),"invalid K query accepted");rejects([&]{spin::PacketCode c({k,1});});
@@ -603,7 +682,7 @@ int main() {try {
     }
     for(auto k:{256U,512U,768U,1024U,1536U,2560U,4096U,12288U,65536U,262144U})for(auto seed:{1ULL,17ULL})test(k,seed);
     sizing();largePacket();retiredFamily();knownAnswers();coordinateBasis();binaryAdjoint();concurrent();commonBuffers();unifiedCode();preparedPacket();
-    workspaceConversions();movedUnifiedHandles();automaticMemory();
+    workspaceConversions();movedUnifiedHandles();automaticMemory();forwardApi();
     std::cout<<"packet API PASS: scalar/fast, research known answers, coordinate basis, natural sizes and K20, retired family rejection, unified/prepared APIs, buffers, boundaries, alignment, ownership, no allocation\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

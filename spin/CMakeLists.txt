@@ -28,7 +28,7 @@ else()
   target_compile_options(spin_kernels PRIVATE -mavx2 -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
 endif()
 add_library(spin STATIC src/Code.cpp src/PreparedEncoder.cpp src/PacketCode.cpp src/Buffer.cpp
-  src/packet/PacketSetup.cpp src/packet/PacketScalar.cpp src/Cpu.cpp $<TARGET_OBJECTS:spin_kernels>)
+  src/packet/PacketSetup.cpp src/packet/PacketForwardSetup.cpp src/packet/PacketScalar.cpp src/Cpu.cpp $<TARGET_OBJECTS:spin_kernels>)
 add_library(spin::spin ALIAS spin)
 target_compile_features(spin PUBLIC cxx_std_20)
 target_include_directories(spin PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -55,7 +55,9 @@ if(SPIN_ENABLE_AVX512)
   target_sources(spin PRIVATE $<TARGET_OBJECTS:spin_kernels512>)
   # Packet-specific ISA stays in private translation units. Neither setup nor the
   # public API is compiled for AVX-512, and old kernel requirements stay intact.
-  add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp)
+  add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp
+    src/packet/PacketForwardOuter.cpp src/packet/PacketForwardInner.cpp
+    src/packet/PacketForwardOuterGather.cpp src/packet/PacketForwardInnerGather.cpp)
   target_compile_features(spin_packet512 PRIVATE cxx_std_20)
   set_target_properties(spin_packet512 PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
   if(MSVC)
@@ -78,6 +80,12 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/spinConfigVersion.c
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/spinConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/spinConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/spin)
 if(SPIN_BUILD_EXPERIMENTS)
+  if(SPIN_ENABLE_AVX512 AND NOT MSVC)
+    add_executable(spin_packet_forward_bench experiments/packet_forward/bench.cpp)
+    target_link_libraries(spin_packet_forward_bench PRIVATE spin::spin)
+    target_compile_options(spin_packet_forward_bench PRIVATE -mavx2 -mavx512f -mavx512vl
+      -mavx512bw -mavx512dq -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing)
+  endif()
   foreach(name test bench screen direct scalar phases)
     if(name STREQUAL "scalar")
       add_executable(spin_feistel_scalar experiments/feistel/direct.cpp)
@@ -120,6 +128,8 @@ if(SPIN_BUILD_BENCHMARKS)
   add_executable(spin_setup_bench bench/setup.cpp)
   target_compile_definitions(spin_setup_bench PRIVATE SPIN_BENCH_REUSE=1)
   target_link_libraries(spin_setup_bench PRIVATE spin::spin)
+  add_executable(spin_packet_forward_api_bench bench/packet_forward.cpp)
+  target_link_libraries(spin_packet_forward_api_bench PRIVATE spin::spin)
   add_executable(spin_packet_bench bench/packet.cpp)
   target_link_libraries(spin_packet_bench PRIVATE spin::spin)
 endif()

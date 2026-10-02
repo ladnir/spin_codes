@@ -51,6 +51,9 @@ void transposeFast(const Block* input,Block* output,Block* scratch,const Plan&);
 void reverseRoute(const Block* input,Block* scratch,const Plan&);
 void outerFast(const Block* scratch,Block* output,const Plan&);
 
+// Allocation-free portable forward; same buffer contract as the fast path.
+void forwardScalar(const Block* message,Block* encoded,Block* scratch,const Plan&);
+
 // Literal independent forward oracle, used by package correctness tests.
 // Unlike the encoder entry points above, it allocates scratch storage.
 void forwardScalar(const Block* message,Block* encoded,const Plan&);

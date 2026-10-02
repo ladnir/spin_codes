@@ -54,7 +54,9 @@ public:
     PacketSpec specification() const noexcept;
     PacketBackend backend() const noexcept;
     std::size_t setup_bytes() const noexcept;
-    bool supports_forward(Width=Width::Bits128) const noexcept { return false; }
+    bool supports_forward(Width width=Width::Bits128) const noexcept {
+        return message_size()!=0 && width==Width::Bits128;
+    }
     bool supports_transpose(Width width=Width::Bits128) const noexcept {
         return message_size()!=0 && width==Width::Bits128;
     }
@@ -69,6 +71,15 @@ public:
     // Zero-initialized storage for exactly 2K 128-bit elements.
     PacketBuffer make_buffer(PacketMemory=PacketMemory::Automatic) const;
     // No allocation during encoding. One workspace per concurrent call.
+    // Exact sizes: K inputs, 2K outputs, 16 bytes per element. No overlap.
+    // Both buffers require 16-byte alignment; 64-byte output alignment is faster.
+    void forward_bytes(std::span<const std::byte>,std::span<std::byte>,Workspace&) const;
+    template<class E> void forward(std::span<const E> in,std::span<E> out,Workspace& w) const {
+        static_assert(std::is_trivially_copyable_v<E> && sizeof(E)==16);
+        if(in.size()!=message_size() || out.size()!=code_size())
+            throw std::invalid_argument("SPIN packet forward element count mismatch");
+        forward_bytes(std::as_bytes(in),std::as_writable_bytes(out),w);
+    }
     // Exact sizes: 2K inputs, K outputs, 16 bytes per element. No overlap.
     void transpose_bytes(std::span<const std::byte>,std::span<std::byte>,Workspace&) const;
     // Overwrite the first K elements; preserve the last K elements.

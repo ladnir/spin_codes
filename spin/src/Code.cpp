@@ -4,7 +4,7 @@
 #include "MemoryPolicy.h"
 #include "kernels/Spin.h"
 #include "kernels/WorkspaceRouting.h"
-#include "packet/PacketPlan.h"
+#include "packet/PacketForward.h"
 #include <limits>
 #include <optional>
 #include <vector>
@@ -50,10 +50,11 @@ struct Plan {
     Backend selected;
     std::optional<kernel::Spin> code;
     std::optional<packet::Plan> packets;
+    std::optional<packet::ForwardPlan> forward;
     Plan(CodeSpec s,ExecutionOptions o):spec(s),selected(o.backend) {
         if(s.parameters==Parameters::PacketRsT64S20) {
             if(o.tile_rows && o.tile_rows!=8)
-                throw std::invalid_argument("SPIN RS packet transpose requires eight-row tiles");
+                throw std::invalid_argument("SPIN RS packet requires eight-row tiles");
             switch(o.backend) {
             case Backend::Automatic:
                 selected=cpu_packet512()?Backend::Avx512:Backend::Portable;
@@ -64,10 +65,11 @@ struct Plan {
                     throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
                 break;
             case Backend::Avx2:
-                throw std::invalid_argument("SPIN packet transpose has no AVX2 backend; select Portable or Automatic");
+                throw std::invalid_argument("SPIN packet has no AVX2 backend; select Portable or Automatic");
             default:throw std::invalid_argument("SPIN unknown backend");
             }
             packets.emplace(s.message_size,s.route_seed,s.inner_seed);
+            if(selected==Backend::Avx512)forward.emplace(*packets);
         } else {
             if(o.backend==Backend::Portable)
                 throw std::invalid_argument("SPIN Portable backend is available only for PacketRsT64S20");
@@ -178,7 +180,7 @@ Backend Code::backend() const noexcept {
 }
 std::size_t Code::setup_bytes() const noexcept {
     if(!plan_) return 0;
-    return plan_->packets?plan_->packets->setupBytes():plan_->code->setupBytes();
+    return plan_->packets?plan_->packets->setupBytes()+(plan_->forward?plan_->forward->setupBytes():0):plan_->code->setupBytes();
 }
 std::array<std::byte,40> Code::descriptor() const noexcept {
     std::array<std::byte,40> out{};
@@ -193,7 +195,8 @@ std::array<std::byte,40> Code::descriptor() const noexcept {
     return out;
 }
 bool Code::supports_forward(Width width) const noexcept {
-    if(!plan_ || plan_->packets) return false;
+    if(!plan_) return false;
+    if(plan_->packets)return width==Width::Bits128;
     if(width==Width::Bits128) return true;
     if(plan_->spec.parameters==Parameters::T64S12) return false;
     return width==Width::Bits256?capabilities().forward256:
@@ -262,6 +265,19 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
     detail::aligned(in.data());detail::aligned(out.data());
     if(detail::overlap(in.data(),in.size(),out.data(),out.size()))
         throw std::invalid_argument("SPIN forward buffers overlap");
+    if(plan_->packets) {
+        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
+        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
+        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
+#if SPIN_BCH_AVX512
+        if(plan_->selected==Backend::Avx512) {
+            detail::packet::forwardSelected(input,output,work,*plan_->packets,*plan_->forward);
+            return;
+        }
+#endif
+        detail::packet::forwardScalar(input,output,work,*plan_->packets);
+        return;
+    }
     if(width==16) {
         plan_->code->forwardUnchecked(reinterpret_cast<const detail::storage::block*>(in.data()),
             reinterpret_cast<detail::storage::block*>(out.data()),*scratch.single);

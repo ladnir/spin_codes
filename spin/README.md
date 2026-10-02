@@ -76,7 +76,8 @@ Separate input and output ranges must not overlap. The in-place operation requir
 exactly 2K records and is supported for 128-bit records only.
 
 Select `Parameters::PacketRsT64S20` for the newer packet construction. It supports
-the same transpose calls, but not forward encoding or generic XOR elements yet.
+128-bit forward and transpose calls, with a portable fallback. Wider records,
+bit-packed forward encoding, and generic XOR elements remain unsupported for this family.
 Query `supports_forward(width)`, `supports_transpose(width)`, and
 `supports_generic_transpose()` before using an optional operation.
 Unsupported operations throw; they never substitute another code family.
@@ -206,7 +207,7 @@ RS packet encoding uses eight-row tiles and accepts only `tile_rows=0` or `8`.
 | `T128S19` | Yes | Yes | 256/512 bits | Yes |
 | `T64S12` | Yes | Yes | No | Yes |
 | `T64S12R2` | Yes | Yes | 256/512 bits | Yes |
-| `PacketRsT64S20` | Yes | No | No | No |
+| `PacketRsT64S20` | Yes | Yes | No | No |
 
 Wide support also depends on the CPU and compiled backends.
 
@@ -255,7 +256,7 @@ must not allocate when allocation-free encoding is required.
 Use bytes rather than `vector<bool>`.
 Generic forward and wide transpose are not provided in this first release.
 
-## Precomputed RS packet transpose
+## Precomputed RS packet encoding
 
 `Parameters::PacketRsT64S20` selects eight parallel GF16 RS [16,8] rows per
 group, with 256 binary inputs and 512 binary outputs. Independent GF(2^32)
@@ -264,8 +265,8 @@ through structured routing and a t64/s20 inner with independent GL20 updates.
 The forward construction uses the binary adjoints of the field multipliers;
 the transposed kernel evaluates the field multipliers themselves.
 
-This family currently supports transposed encoding of 128-bit records only.
-Paper SPIN remains available for forward encoding, wide records, and generic XOR types.
+This family supports forward and transposed encoding of 128-bit records.
+Paper SPIN remains available for wide records, bit-packed forward encoding, and generic XOR types.
 
 ```cpp
 #include <spin/Code.h>
@@ -277,6 +278,9 @@ auto scratch=packet.make_workspace(); // Prepare once, outside timing.
 auto buffer=packet.make_buffer();
 // Fill buffer.bytes() with 2K records, then encode repeatedly:
 packet.transpose_inplace_bytes(buffer.bytes(), scratch);
+// Or fill a separate K-record message and encode forward:
+spin::Buffer message(packet.message_size()*16);
+packet.forward_bytes(message.bytes(), buffer.bytes(), scratch);
 ```
 
 K must be a positive multiple of 256. Non-powers of two use the same kernel;
@@ -285,6 +289,13 @@ construction preserves K without implicit rounding. Transpose consumes exactly
 Separate buffers must not overlap and need 16-byte alignment. A 64-byte-aligned
 output enables the measured non-temporal-store path; other supported alignments
 use ordinary stores for the same map. Encoding allocates nothing.
+
+Forward consumes K records and writes 2K records into disjoint output. Through
+K=2^18 it uses contiguous outer scratch and a gathered inner. Above that size,
+64-byte-aligned output permits direct cache-line scattering followed by an
+in-place inner pass. Other valid output alignments route through the existing
+workspace. `PacketCode` exposes the same `forward_bytes` and typed `forward`
+interfaces. Neither forward path changes the map descriptor.
 
 The current numerical certificate covers K=2^20, rate 1/2, relative distance
 above 10%, and a 68.103757-bit setup-failure margin under independent ideal setup.
@@ -338,6 +349,9 @@ Generate/check the private RS kernels with
 Ordinary builds and installed consumers need neither Python nor research sources.
 
 Build `spin_packet_bench` with `SPIN_BUILD_BENCHMARKS=ON`.
+The same option builds `spin_packet_forward_api_bench`; it accepts the same
+arguments and measures public `Code::forward_bytes` calls with a fixed message
+and separate output. Both benchmarks exclude setup and allocation.
 `spin_packet_bench K [seed] [calls] [auto|normal|huge]` measures precomputed
 in-place encoding, excluding setup and allocation. Run benchmarks serially.
 The frozen research kernel measured 3.259 ms at K=2^20 on Ryzen 7950X,
@@ -393,7 +407,10 @@ identifier or version, not a silent implementation update.
 `setup_bytes()` and `workspace.bytes()` report owned storage capacities,
 excluding inputs, outputs, allocator overhead, and small object headers.
 IMT setup prepares both directions and retains routing for bit-packed forward.
-Packet setup prepares transpose only.
+Packet setup prepares both directions on the AVX-512 backend. Its additional
+forward coefficients, updates, and inverse route are included in `setup_bytes()`.
+Portable forward reuses the original map representation. Both directions share
+the existing workspace allocation and allocate nothing during encoding.
 
 ## Validation and remaining integration
 

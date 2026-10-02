@@ -119,8 +119,12 @@ void transposeScalar(const Block* input,Block* output,Block* scratch,const Plan&
 
 void forwardScalar(const Block* message,Block* encoded,const Plan& plan) {
     std::vector<Block> routed(plan.scratchBlocks());
+    forwardScalar(message,encoded,routed.data(),plan);
+}
+
+void forwardScalar(const Block* message,Block* encoded,Block* routed,const Plan& plan) {
     for(std::size_t group=0;group<plan.groups;++group)
-        outerForwardGroup(message+256*group,routed.data()+groupStride*group,plan.outerMatrices.data()+16*group);
+        outerForwardGroup(message+256*group,routed+groupStride*group,plan.outerMatrices.data()+16*group);
     for(std::size_t i=0;i<plan.n;++i)encoded[i]=routed[plan.route[i/4]+(i&3)];
     __m128i state[20]{},next[20]{},feedback[20];
     for(std::size_t epoch=0;epoch<plan.n/64;++epoch) {

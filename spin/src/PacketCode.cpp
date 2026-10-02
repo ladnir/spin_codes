@@ -1,7 +1,8 @@
 #include <spin/PacketCode.h>
 #include "Cpu.h"
 #include "MemoryPolicy.h"
-#include "packet/PacketPlan.h"
+#include "packet/PacketForward.h"
+#include <optional>
 #include "kernels/WorkspaceRouting.h"
 #include <stdexcept>
 #include <utility>
@@ -11,7 +12,10 @@ struct PacketState {
     PacketSpec spec;
     PacketBackend backend;
     packet::Plan plan;
-    PacketState(PacketSpec s,PacketBackend b):spec(s),backend(b),plan(s.message_size,s.seed) {}
+    std::optional<packet::ForwardPlan> forward;
+    PacketState(PacketSpec s,PacketBackend b):spec(s),backend(b),plan(s.message_size,s.seed) {
+        if(b==PacketBackend::Avx512Gfni)forward.emplace(plan);
+    }
 };
 struct PacketScratch {
     std::shared_ptr<const PacketState> state;
@@ -73,7 +77,7 @@ std::size_t PacketCode::message_size() const noexcept {return state_?state_->spe
 std::size_t PacketCode::code_size() const noexcept {return 2*message_size();}
 PacketSpec PacketCode::specification() const noexcept {return state_?state_->spec:PacketSpec{0,0};}
 PacketBackend PacketCode::backend() const noexcept {return state_?state_->backend:PacketBackend::Automatic;}
-std::size_t PacketCode::setup_bytes() const noexcept {return state_?state_->plan.setupBytes():0;}
+std::size_t PacketCode::setup_bytes() const noexcept {return state_?state_->plan.setupBytes()+(state_->forward?state_->forward->setupBytes():0):0;}
 std::array<std::byte,32> PacketCode::descriptor() const noexcept {
     std::array<std::byte,32> out{};
     if(!state_)return out;
@@ -101,6 +105,24 @@ detail::PacketScratch& PacketCode::checked_workspace(Workspace& w) const {
     if(!w.scratch_ || w.scratch_->state!=state_)
         throw std::invalid_argument("SPIN packet workspace belongs to another plan or was moved");
     return *w.scratch_;
+}
+void PacketCode::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w) const {
+    auto& work=checked_workspace(w);
+    if(in.size()!=message_size()*16 || out.size()!=code_size()*16)
+        throw std::invalid_argument("SPIN packet forward buffer size mismatch");
+    detail::aligned(in.data());detail::aligned(out.data());
+    if(detail::overlap(in.data(),in.size(),out.data(),out.size()))
+        throw std::invalid_argument("SPIN packet forward buffers overlap");
+    const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
+    auto* output=reinterpret_cast<detail::storage::block*>(out.data());
+    auto* scratch=reinterpret_cast<detail::storage::block*>(work.allocation.bytes().data());
+#if SPIN_BCH_AVX512
+    if(state_->backend==PacketBackend::Avx512Gfni) {
+        detail::packet::forwardSelected(input,output,scratch,state_->plan,*state_->forward);
+        return;
+    }
+#endif
+    detail::packet::forwardScalar(input,output,scratch,state_->plan);
 }
 void PacketCode::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w) const {
     auto& work=checked_workspace(w);

@@ -102,6 +102,8 @@ public:
     // Byte views are the zero-copy foreign-buffer interface. Records are 16/32/64
     // bytes according to the workspace; buffers require 16-byte alignment.
     // Exact sizes only, no overlap. Wider records apply the same map lane-wise.
+    // PacketRsT64S20 supports 128-bit forward/transpose. A 64-byte-aligned
+    // forward output (as supplied by Buffer) enables its fastest large-size path.
     void forward_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&) const;
     void transpose_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&) const;
     // Exactly 2K 128-bit records; overwrite the first K and preserve the suffix.
