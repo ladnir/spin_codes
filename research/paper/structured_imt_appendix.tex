@@ -11,7 +11,8 @@ The nonzero image weights of $A$ and their multiplicities are
 \]
 Every coordinate of $A$ is a nonzero linear functional. The $128$ columns
 of $C$ are distinct nonzero vectors of weight five and span $\F_2^{19}$.
-Our verification code checks these properties and both spectra by exact enumeration.
+The interval verifier of Appendix~\ref{app:structured-scalable-certificate}
+checks these properties and both spectra by exact enumeration.
 
 \begin{table}[t]
 \centering
@@ -156,7 +157,7 @@ point probability by $H_d$. Thus every target, including zero, receives
 weighted mass at most $F_d(H_d/2+1/(2M))$. Define $T_{\rm F}$ by placing
 this value in column $Z$ and $c_h$ times this value in column $S_h$ for an
 entering shell $S_i$ with $d=d_i$. For an entering $D$, maximize over $d_i$.
-Its zero row is the exact binomial mixture of the zero rows of $T_j$.
+The zero row of $T_{\rm F}$ is the exact binomial mixture of the zero rows of $T_j$.
 
 Finally the state-independent scalar envelope is
 \[
@@ -209,9 +210,9 @@ spectrum's polynomial factors. The summed first moment is therefore $o(1)$.
 
 For sparse profiles, the factor $(L+1)^b$ would be too costly. We instead
 compare the counting measure on each permuted active outer row with fair
-bits. The original, coarser $31$-segment outer majorant already proves
+bits. The coarser $31$-segment outer majorant $\widehat a_{31}$ already proves
 \[
- \sup_{x\in\mathcal W}\bigl(\widehat a_{\rm old}(x)-h(x)+\ln(2)/2\bigr)
+ \sup_{x\in\mathcal W}\bigl(\widehat a_{31}(x)-h(x)+\ln(2)/2\bigr)
  <\ell,\qquad \ell:=0.01281.
 \]
 Hence, uniformly over all selected outers and weights, for some
@@ -232,13 +233,13 @@ $p=(8/5)\alpha$ and condition their count to equal $Q$. Without that
 conditioning, all input bits are iid with $\beta=p/2=(4/5)\alpha$.
 The reference regions are independent. Since $Q$ is a mode of
 $\operatorname{Bin}(L,\alpha)$, Chebyshev's inequality gives modal mass
-at least $1/(8\sqrt Q)$. The exact binomial likelihood ratio yields
+at least $1/(8\sqrt Q)$. Indeed, probability at least $3/4$ lies in at most
+$4\sqrt Q+1\le5\sqrt Q$ integer locations about the mean, so a mode has mass
+at least $3/(20\sqrt Q)$. The exact binomial likelihood ratio yields
 \[
  \Prob[\operatorname{Bin}(L,p)=Q]
  \ge \frac{e^{-LD_{\rm KL}(\alpha\Vert p)}}{8\sqrt Q}.
 \]
-Indeed, probability at least $3/4$ lies in at most $4\sqrt Q+1\le5\sqrt Q$
-integer locations about the mean, so a mode has mass at least $3/(20\sqrt Q)$.
 
 Put $z=1-(8/5)\alpha$. An exact rational polynomial certificate proves
 \begin{equation}
@@ -259,7 +260,8 @@ with
 The shell-weighted average of the corrections is zero. Every coordinate is
 at least $1/2048$. In the variable $x=10000\alpha$, the verifier constructs
 degree-$257$ rational polynomial upper bounds for the seven residuals.
-It certifies every maximum replacement over $[0,1]$. Each residual vanishes
+It certifies over $[0,1]$ that each polynomial substituted for a maximum
+in a residual dominates that maximum. Each residual vanishes
 at zero. After removing that factor, its constant coefficient plus the sum
 of its positive remaining coefficients is strictly negative. This proves
 the whole interval, including arbitrarily small positive $\alpha$.
@@ -302,7 +304,7 @@ fixed $Q$, allowing constants to depend on $Q$. Define
  r:=1/M,\qquad p_0:=2^{18}/M,\qquad
  P_0:=\begin{pmatrix}0&1\\r&1-r\end{pmatrix}.
 \]
-During empty epochs a live state has transition $P=(I+\Pi)/2$, where
+During empty steps, whose $t$ input bits are all zero, a live state has transition $P=(I+\Pi)/2$, where
 $\Pi$ replaces it by a uniform nonzero state. Write $f(q):=\wt(Aq)$.
 Its stationary mean is $\mu=128p_0$. For any initial live state,
 \[
@@ -319,7 +321,7 @@ $\operatorname{Cov}(f(q_i),f(q_j))=2^{-(j-i)}\operatorname{Var}(f(q_i))$.
 It does not require a stationary initial state.
 
 Fix $\theta>0$, and set $z_L=e^{-\theta/L}$ and $\gamma=p_0\theta$.
-Let $W_0(z_L)$ be the actual full-state weighted empty-step kernel.
+Let $W_0(z_L)$ be the full-state weighted empty-step kernel.
 The Lipschitz bound for $e^{-x}$ and
 $P^g=2^{-g}I+(1-2^{-g})\Pi$ give, for every live $q,q'$,
 \begin{equation}
@@ -342,8 +344,8 @@ columns of $C$ give the exact identity
 \[
  RW_1(1)J=P_0.
 \]
-For a fixed $a\le Q$ uniformly placed impulses in one region, an epoch
-collision has probability $O_Q(1/L)$. A boundary or inter-impulse gap shorter
+For a fixed $a\le Q$ uniformly placed impulses in one region, two impulses in
+one step have probability $O_Q(1/L)$. A boundary or inter-impulse gap shorter
 than $\lceil3\log_2L\rceil$ has probability $O_Q(\log(L)/L)$.
 On the complement, replace each empty gap using
 \eqref{eq:imt-empty-limit} and each impulse by $W_1(1)$. The finite products
@@ -355,10 +357,10 @@ $at/L=O_Q(1/L)$. Riemann sums for the ordered uniform sites then give
  \label{eq:imt-continuum}
 \end{equation}
 For $a=0$, $K_0=D_\gamma(1)$. The simplex integral uses $a$ independent
-coordinates. The actual region kernel $F_{a,L}(z_L)$ differs from $JK_aR$
+coordinates. The region kernel $F_{a,L}(z_L)$ differs from $JK_aR$
 by $O_{Q,M,\theta}(L^{-1/2}+\log(L)/L)$ in every entry, uniformly over
 initial and final states. Bad placement events cost at most their probability
-because weighted actual kernels have row sums at most one.
+because weighted kernels have row sums at most one.
 
 The additive comparison becomes multiplicative. For $a=0$, both zero/live
 cross entries vanish exactly. For $a=1$, zero-to-zero vanishes exactly.
@@ -428,7 +430,7 @@ For the weighted row norm with $v=(1,v_1)^\top$,
  \le e^{QG_Q}\prod_jm_v(u_j),\qquad G_Q\le G_3.
  \label{eq:imt-product-norm}
 \end{equation}
-For completeness, insert all $Q$ potential impulse sites, using $I$ for
+To prove it, insert all $Q$ potential impulse sites, using $I$ for
 an unused site and $P_+$ for a used site. If a fixed class path has $l$ live
 spacings, their total duration $Y$ has distribution
 $\operatorname{Beta}(l,Q+1-l)$, with deterministic endpoint cases. The identity
@@ -447,11 +449,11 @@ Submultiplicativity, $\|D_\sigma\|_v\le1$, and
 $\|(I+uP_+)D_\sigma\|_v=m_v(u)$ prove \eqref{eq:imt-product-norm}.
 This reasoning requires nonnegative coefficients, not stochasticity of $P_+$.
 
-The old $31$-segment majorant suffices here. For each segment choose one
-rational $u>0$. Convexity in $x$ reduces the following inequality to its
-two endpoints:
+The $31$-segment majorant $\widehat a_{31}$ suffices here. For each segment
+choose one rational $u>0$. Convexity in $x$ reduces the following inequality
+to its two endpoints:
 \[
- \widehat a_{\rm old}(x)-h(x)-x\ln u+\ln m_v(u)
+ \widehat a_{31}(x)-h(x)-x\ln u+\ln m_v(u)
  +G_3+0.11\tau/p_0+\ln(2)/c<-0.0008679786.
 \]
 All $62$ outward checks pass. The row-weight tuples and finite coefficient
@@ -467,20 +469,20 @@ The proof of Theorem~\ref{thm:structured-spin-scalable} in
 Section~\ref{sec:structured-distance} combines these regimes and accounts
 for ordinary and transposed work.
 
-The imported outer event and its coarse majorant retain the $31$-entry
-manifest in the
-\artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md}{outer certificate snapshot}.
-The IMT evidence has separate source bindings, including the refined
-outer and dense replay.
-The \artifactlink{https://github.com/ladnir/permute_conv/blob/main/workstreams/inner_design/imt_asymptotic/README.md}{author-side IMT verification guide}
-identifies the source bindings and commands. The numerical certificates check
+Theorem~\ref{thm:structured-spin-scalable} uses only the probability space
+and inequalities stated in Section~\ref{sec:structured-distance} and this
+appendix. The certificates for the outer tails, the $31$- and $39$-segment
+majorants, and the IMT estimates, including the $512$-bit replay of the
+positive-occupation cover, are documented with their verification
+commands\repositorycite; the verifier sources and hash-bound arithmetic
+witnesses lie outside the core encoder artifact. The numerical certificates check
 the finite spectra, interval covers, Collatz inequalities, exact sparse
 polynomials, and fixed-occupation constants. The analytic steps are the
 measure comparisons, transfer induction, continuum limit, and final union
 proved above. Higher-precision replay is not an independent proof of those
-steps. The finite BCH/IMT results use the same transfer interface, with
-their separate finite-length evidence in
-Appendix~\ref{app:finite-bch-proof}.
+steps. The finite BCH-256 certificate of
+Appendix~\ref{app:finite-bch-proof} uses the same transfer interface, with
+separate finite-length evidence.
 
 \subsubsection{Formal Verification}
 \label{app:structured-lean}

@@ -7,8 +7,8 @@ nonzero messages.
 
 Fix lengths $K,N\ge1$. The construction independently samples an outer
 encoder $O:\F_2^K\to\F_2^N$, a permutation $\Pi$ of $[N]$, and a linear
-inner encoder $I:\F_2^N\to\F_2^N$. Fixed components are deterministic
-choices. The realized SPIN encoder is $E:=I\circ\Pi\circ O$.
+inner encoder $I:\F_2^N\to\F_2^N$. A fixed component is sampled from a
+point mass. The realized SPIN encoder is $E:=I\circ\Pi\circ O$.
 
 Fix a finite class set $\mathcal T$ and a class map
 $c:\F_2^N\to\mathcal T$. The class map records the information about an
@@ -23,8 +23,8 @@ probability
   \label{eq:conditional-inner-failure}
 \end{equation}
 The probability is over the interleaver and inner setup; the word $u$ is
-fixed. For every class $\tau\in\mathcal T$, let $Q_\tau(d)$ be any certified
-envelope satisfying
+fixed. For every class $\tau\in\mathcal T$, let $Q_\tau(d)$ be any
+\emph{failure envelope}, that is, an upper bound satisfying
 \begin{equation}
   q_d(u)\le Q_\tau(d)
   \qquad\text{for every $u$ with $c(u)=\tau$}.
@@ -57,7 +57,7 @@ For $d\in\{0,\ldots,N\}$, define
 Then
 \begin{equation}
 \begin{split}
-  \Prob[E\text{ is not injective or }d_{\min}(E(\F_2^K))\le d]
+  \Prob[E\text{ is not injective or }d_{\min}(E)\le d]
   \le
   \E[Z_d]
   &=
@@ -96,14 +96,16 @@ under the condition in the theorem statement.
 \end{proof}
 
 If $\mathcal G$ is an event determined only by the outer setup, the theorem
-also applies under the conditional law $O\mid\mathcal G$. The pair $(\Pi,I)$
-remains independent of the conditioned outer encoder. This observation lets a
-proof first select an outer spectrum event and then certify route envelopes on
-that event.
+also applies with $O$ drawn from its conditional distribution given
+$\mathcal G$. The pair $(\Pi,I)$ remains independent of the conditioned outer
+encoder. A proof can therefore first restrict to an event $\mathcal G$ on which
+the outer spectrum obeys a required bound, and then certify the failure
+envelopes $Q_\tau(d)$ on that event.
 
-For a uniform interleaver independent of the inner setup, the conditional
-law depends only on the outer word's weight. Section~\ref{sec:spin-intuition}
+For a uniform interleaver independent of the inner setup, the failure
+probability $q_d(u)$ depends only on $\wt(u)$. Section~\ref{sec:spin-intuition}
 uses this specialization to explain the two supporting constructions;
 Appendix~\ref{app:supporting-framework} gives its full statement.
 Structured SPIN instead uses occupation and row-weight classes, with a
-uniform failure envelope for every word in each class.
+uniform failure envelope for every word in each class
+(Section~\ref{sec:structured-distance}).

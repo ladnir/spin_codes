@@ -2,51 +2,57 @@
 \label{sec:implementation}
 \label{sec:transposed-comparison}
 
-We implement the certified BCH/IMT encoders from
-Section~\ref{sec:finite-certificates}. The transposed encoder maps $N$
+We implement the certified BCH--IMT encoders from
+Section~\ref{sec:finite-certificates}, with an additional small-length variant
+described in Appendix~\ref{app:small-k-variant}. The transposed encoder maps $N$
 input blocks to $K$ output blocks; each $128$-bit block carries $128$
 parallel binary instances. It applies the transposed inner, reverses the
 routing, and applies the transposed BCH outer.
 
-The configurations share tiled routing and an IMT template. Pruned SIMD
-zeta stages implement expansion, and unrolled XORs implement sparse
-feedback. Packed $24$-bit routing indices and workspace-local page routing
-reduce data movement. Online calls allocate no memory.
+The configurations share an IMT template and fixed XOR circuits for the
+inner maps. Small instances use direct routing; larger instances use
+tiled routing. Packed indices and workspace-local page routing reduce
+data movement. Online calls allocate no memory.
 Symbolic checks, dense reference implementations, and adjoint tests check
-the optimized maps. Appendix~\ref{app:implementation} retains the kernel
+the optimized maps. Appendix~\ref{app:implementation} gives the kernel
 details, memory costs, correctness checks, and source-to-certificate bindings.
 
 \paragraph{Transposed Comparison.}
 Table~\ref{tab:transposed-comparison} compares binary encoders on one
 Ryzen 9 7950X thread, pinned to CPU~15.
-We compile with GCC~15.2.0 and flags \texttt{-O3}, \texttt{-DNDEBUG},
-and \texttt{-march=znver4}. Except for the separately measured original-BAA
-reference, each cell is the median of three
+We compile with GCC~15.2.0, release optimization, and Zen~4 tuning,
+with boost disabled; compiler flags differ per implementation
+(Appendix~\ref{app:implementation}). The rate-$1/2$ BCH circuit uses AVX-512.
+Except for the original-BAA reference, which is the authors' measurement
+of the original BAA implementation, each cell is the median of three
 serial process medians; each process has three warmups and $101$ timed calls.
 Setup, allocation, and output checks are excluded. Input buffers are
 initialized once, with no copy or reset between calls. These are
-steady-state encoder latencies, not complete protocol timings.
+steady-state encoder latencies.
 
 We include original BAA~\cite{KolesnikovEtAl2026BA} and the newer
 chosen-block Golay and RM implementations~\cite{cryptoeprint:2026/1903}.
 The chosen-block message lengths are $2^m-64$ for
 $m\in\{16,18,20\}$; the other rows use $K=2^m$.
-Expand--Convolute (EC) uses the older provable profile
+Expand--Convolute (EC) uses the conservative profile
 $(w,m)=(33,25)$~\cite{RaghuramanRindalTanguy2023EC}, with its weaker
 distance and margin. Binary RAA uses repetition three or four
 \cite{blaze25}. Routing is included: BAA and RAA use Feistel permutations,
-whereas SPIN uses packed tables. The SPIN cells come from a separate
-certificate-matched campaign under the same host, compiler, and timing policy.
+whereas SPIN uses packed tables. The SPIN cells use the certificate-matched
+configurations under the same host and timing policy.
+Rate-$1/2$ SPIN uses $(t,s)=(64,12)$ with two transvections per step at
+$K=2^{16}$, and the original $(128,19)$ inner at the larger lengths.
+All SPIN setup is precomputed; these timings do not use heuristic code refresh.
 
 \begin{table}[tb]
 \centering
 \caption{Same-host transposed-encoder latency in milliseconds.
 Entries are medians of three process medians, with no input resets,
-except for the separate approximate reference marked $\dagger$.
+except for the approximate original-BAA reference.
 The pair $(\delta,\lambda)$ gives the relative distance and margin
 in bits at the largest listed length, except for the RAA reference marked
-$*$ below; -- denotes an unassigned bound.
-EC uses the older, weaker distance and margin target.}
+$*$ below; -- denotes no bound or no timing reported.
+EC uses the conservative, weaker distance and margin target.}
 \label{tab:transposed-comparison}
 \small
 \setlength{\tabcolsep}{3pt}
@@ -54,9 +60,6 @@ EC uses the older, weaker distance and margin target.}
 \par\smallskip
 \begin{minipage}{\linewidth}
 \footnotesize
-$\dagger$Separately measured original-BAA latency on Ryzen at $K=2^{20}$;
-raw samples are not retained in our comparison archive.
-\par
 $*$RAA reference bound at $K=2^{22}$, not the timed $K=2^{20}$:
 approximately $13$ bits without setup testing~\cite[Sec.~3.1]{blaze25}.
 One-time testing of low-weight messages can improve the margin to about
@@ -65,19 +68,17 @@ $40$ bits ($41.5$ bits at this size), with near-quadratic setup work
 \end{minipage}
 \end{table}
 
-At $K=2^{20}$, half-rate SPIN takes $10.110$\,ms, versus $23.997$\,ms
+At $K=2^{20}$, rate-$1/2$ SPIN takes $9.289$\,ms, versus $23.997$\,ms
 and $27.660$\,ms for chosen Golay and RM BAA.
-The original half-rate BAA baseline takes approximately $32$\,ms,
-giving the approximately $3\times$ comparison in the abstract.
+The original rate-$1/2$ BAA baseline takes approximately $32$\,ms,
+giving the approximately $3.4\times$ comparison in the abstract.
 The table reports each construction's own distance guarantee, not a
 common application-security level. In particular, the RAA reference
 bound is not transferred to our smaller timed lengths.
 
 \paragraph{Other Selected Configurations.}
-Quarter-rate SPIN takes $15.254$\,ms at $K=2^{20}$.
-A separate paired experiment measures half-rate ordinary and transposed
-encoding at $10.797$ and $10.674$\,ms, respectively, at that same $K$.
-Thus the two directions have similar cost, but these paired measurements
-use a different buffer and repetition policy from the main table.
+Rate-$1/4$ SPIN takes $15.254$\,ms at $K=2^{20}$.
+Rate-$1/2$ ordinary encoding takes $9.031$\,ms at that same $K$, under
+the same precomputed, repeated-call timing policy. Thus the two directions
+have similar cost.
 Appendix~\ref{app:implementation} gives the full tables and protocols.
-We report no encoding timings at $K=2^{22}$ or $2^{24}$.

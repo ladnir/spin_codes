@@ -5,7 +5,9 @@ The [core-code guide](README.md) defines the artifact; numerical evidence and
 comparison experiments are outside that scope.
 
 LaTeX labels identify results across renumbering. GitHub is authoritative;
-older notes may contain historical worktree paths.
+older notes may contain historical worktree paths. Unless a section changes
+directories explicitly, run its commands from `research/` (`cd research` from
+the repository root).
 
 ## Manuscript layout
 
@@ -74,7 +76,7 @@ tails use reflection of the limiting accumulator exponent, with the finite
 parity shifts handled by continuity. This does not assert symmetry of a
 realized constituent's spectrum.
 
-From the repository root, run the exact finite regression checks:
+From `research/`, run the exact finite regression checks:
 
 ```text
 python -B -m unittest discover -s paper -p test_ba_outer_tails.py

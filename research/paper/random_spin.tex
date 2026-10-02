@@ -9,15 +9,21 @@ Appendix~\ref{sec:accumulator-spin}.
 
 Silver codes predate Expand-Convolute and use a banded lower-triangular solve
 for linear-time encoding~\cite{CouteauRindalRaghuraman2021Silver}. The solve
-is an earlier structured recursive encoder of convolutional form. Silver does
+is itself a structured recursive encoder of convolutional form. Silver does
 not sample independent convolution taps at every time step.
 
 Expand-Convolute makes the random convolution explicit. It combines a sparse
 expander with a non-wrapping recursion whose time-dependent feedback
 coefficients are independent uniform bits
-\cite{RaghuramanRindalTanguy2023EC}. The Random SPIN theorem retains that
+\cite{RaghuramanRindalTanguy2023EC}. The Random SPIN theorem uses that
 inner distribution and replaces the expander with independent random-block
 injections followed by one uniform interleaver.
+
+We give an exact expected input--output weight enumerator
+for this inner. We mark input and output weight in the transitions of its
+trailing-zero state. This preserves the averaged weight law without
+state-process relaxations and fits the first-moment framework directly:
+we extract lower-tail bounds and combine them with the outer spectrum.
 
 \subsubsection{Random Recursive Inner}
 
@@ -156,21 +162,22 @@ For the ensemble in~\eqref{eq:independent-random-spin},
   \qquad(M\to\infty).
   \label{eq:independent-random-spin-distance}
 \end{equation}
-The family has rate $1/2$, relative distance greater than $0.11002$,\linebreak and
-$\Theta(N_M^*\log N_M^*)$ direct encoding cost.
+The family has rate $1/2$ and relative distance greater than $0.11002$;
+direct encoding costs $\Theta(N_M^*\log N_M^*)$.
 \end{theorem}
 
 \begin{proof}
 Let $A_{N,h}^{\mathrm{out}}$ be the number of outer words of weight $h$, and
 let $p_{N,h}(\delta_*)$ be the probability in
-\eqref{eq:random-convolution-tail} with
+\eqref{eq:random-inner-slice-tail}, which
+\eqref{eq:random-convolution-tail} bounds with
 $D=\lfloor\delta_*N\rfloor$. Split the first-moment sum at
 $h=N/5000$ and $h=0.9N$.
 
 Lemma~\ref{lem:random-spin-sparse-closure} shows that the first range is
 $o(1)$. Lemma~\ref{lem:random-spin-linear-closure} is uniform for
 $h/N\in[1/5000,0.9]$, so the middle range is $2^{-\Omega(N)}$. For the final
-range, use $p_{N,h}\le1$ and the rate-half random-block outer exponent:
+range, use $p_{N,h}\le1$ and the rate-$1/2$ random-block outer exponent:
 \[
   \sum_{h\ge0.9N}\E[A_{N,h}^{\mathrm{out}}]
   \le
@@ -181,14 +188,15 @@ The complete first moment tends to zero. Markov's inequality proves
 \eqref{eq:independent-random-spin-distance}.
 \end{proof}
 
-The admissible lengths have relative gaps $o(1)$. For a requested length, zero
-extend the largest preceding native member. This preserves injectivity and
+The admissible lengths have relative gaps $o(1)$. For a requested length,
+zero-extend the largest preceding native member. This preserves injectivity and
 absolute minimum distance while changing rate and relative distance by only
 $o(1)$.
 
 \subsubsection{Random-Family Encoding Costs}
 
-Under either proved schedule, the outer encoder processes \(N/B\) blocks of
+Under the schedules of Theorems~\ref{thm:independent-accumulator-spin}
+and~\ref{thm:independent-random-spin}, the outer encoder processes \(N/B\) blocks of
 length \(B=\Theta(\log N)\). Direct dense block multiplication therefore
 costs \(\Theta(N\log N)\) bit operations. The accumulator costs \(O(N)\).
 The Random SPIN recurrence evaluates \(m=\Theta(\log N)\) taps per output

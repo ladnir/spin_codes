@@ -51,7 +51,7 @@ The manuscript can be built independently of the library:
 
 ```sh
 cd research/paper
-latexmk -pdf -outdir=../../output/pdf -jobname=spin_codes_draft main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../../output/pdf' '-jobname=spin_codes_draft' main.tex
 ```
 
 See the [paper guide](research/paper/README.md) for dependencies and supporting material.

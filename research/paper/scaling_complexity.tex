@@ -1,8 +1,8 @@
 \subsection{Length, Work, and Parameter Selection}
 \label{sec:scaling}
 
-Finite validity, asymptotic distance, and encoding complexity are separate
-properties. We state them separately for each SPIN family.
+We state finite validity, asymptotic distance, and encoding complexity
+separately for each SPIN family.
 
 \subsubsection{Native and Requested Lengths}
 
@@ -38,13 +38,13 @@ the fixed linear maps $A,C$, adds fixed-length vectors, and applies
 a sampled transvection as specified in
 \eqref{eq:structured-inner}. Even a direct bit implementation takes a
 constant number of operations per step, so the total inner work is
-$O(N)$. The sampled mixer changes with the step, but neither its
+$O(N)$. The sampled transvection changes with the step, but neither its
 width nor the arithmetic cost grows. The recursive state therefore has
 constant size. If the encoder also tracks its position to select the next
-mixer, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
+transvection, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
 working state. If the position is supplied externally, the working state
 remains constant. This distinction does not change the linear encoding
-work. The stored mixer schedule and interleaver description are
+work. The stored transvection schedule and interleaver description are
 setup data, separate from this working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
@@ -57,7 +57,7 @@ choices, rather than an extrapolated parameter schedule.
 The selector's objective is measured encoding cost subject to a complete
 first-moment bound at the requested length and margin.
 A diagnostic calculation can rank candidates, but acceptance requires
-outward arithmetic and coverage of every nonzero occupancy.
+outward arithmetic and coverage of every nonzero occupation.
 
 The inner parameters control different costs. Increasing $t$ reduces the
 number of recursive steps; increasing $s$ can suppress cancellations but
@@ -70,8 +70,9 @@ $\operatorname{RM}(2,m)$ requires
 \end{equation}
 This dimension constraint is an admissibility test, not a distance guarantee.
 Changing the outer or selected map requires a matching spectrum calculation
-and inner analysis. The fixed $(128,19)$ ladder shows that useful finite
-coverage need not require retuning at every message length.
+and inner analysis. The fixed $(128,19)$ inner, certified at all five
+tested lengths, shows that useful finite coverage need not require
+retuning at every message length.
 
 \subsubsection{Cost Model}
 
@@ -91,7 +92,7 @@ where the last term covers routing and permutation work.
 
 For any fixed base constituent with a constant-size encoding circuit, tiling,
 two permutations, and two accumulators give
-$C_{\mathrm{out}}(b)=O(b)$.\linebreak The fixed $(128,19)$ IMT step has constant cost.
-Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The current
-certificate uses extended Golay as the base constituent, but the cost argument
-does not depend on its 24-bit length.
+$C_{\mathrm{out}}(b)=O(b)$. The fixed $(128,19)$ IMT step has constant cost.
+Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The asymptotic
+BAA constituent uses extended Golay base blocks, but the cost argument
+does not depend on their 24-bit length.

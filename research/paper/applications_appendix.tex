@@ -7,8 +7,115 @@ and the distinction between measurements and projected costs.
 
 \subsection{Silent OT Integration}
 \label{app:pcg-details}
+\paragraph{Regular-Noise Batches.}
+The regular-noise integration reuses the full precomputed rate-$1/2$ BCH--IMT code,
+with $(t,s)=(128,19)$ and weight-five feedback. There is no heuristic
+permutation bank or per-batch code refresh. Each batch expands fresh trees,
+compresses their outputs, and hashes both sender messages.
+Table~\ref{tab:spin-regular-current} reports sender computation
+at two batch sizes. All entries use VAES and streaming output stores.
+
+\begin{table}[!htbp]
+\centering
+\caption{Regular-noise sender computation. Initial setup,
+base-correlation generation, and network transport are excluded.}
+\label{tab:spin-regular-current}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Timed work & $K=2^{18}$ & $K=2^{20}$ \\
+\midrule
+Tree expansion (ms) & 1.033 & 4.093 \\
+SPIN compression (ms) & 1.482 & 11.351 \\
+Hash both sender messages (ms) & 0.428 & 1.728 \\
+Total (ms) & 2.944 & 17.186 \\
+Million hashed OTs/s & 89.0 & 61.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both sizes use $128$ noise partitions, with $4096$ and $16384$ leaves
+per tree, respectively, and no padding. Each batch consumes $1536$ or
+$1792$ fresh base-OT correlations, supplied outside timing.
+The noise configurator uses an effective-distance tuning value of $0.25$;
+this is not a certified relative distance or a new hardness claim.
+The runs use the hardware, compilers, and three-process measurement protocol
+described below for stationary mode. Setup, workspace and output allocation,
+base-correlation generation, transport, and output consumption are untimed.
+The measured calls include routine allocation and local message enqueueing.
+Separate paired runs check OT correctness.
+
+With ordinary cached stores, totals are $3.066$ and $17.495$\,ms.
+Including an immediate sequential scan of the streaming outputs raises
+the totals to $3.171$ and $17.971$\,ms. A stationary run matched to these
+measurements takes $3.103$\,ms at $K=2^{18}$, or $84.5$ million hashed OTs
+per second; Table~\ref{tab:spin-stationary-ot}, measured separately,
+reports $3.101$\,ms.
+The modes consume different base correlations, whose generation is excluded;
+these timings do not establish which complete protocol has lower cost.
+
+\paragraph{Stationary Batches.}
+The stationary integration uses the rate-$1/2$ BCH--IMT encoder at $K=2^{18}$,
+with $(t,s)=(128,19)$ and weight-five feedback.
+The parties retain a precomputed permutation bank and tree seeds between
+batches. Each batch refreshes the routing parameters and IMT masks, generates
+fresh leaves, and applies the transposed encoder. The refreshed permutations
+form a heuristic family; the uniform-setup distance certificates do not apply.
+
+\begin{table}[!htbp]
+\centering
+\caption{Stationary sender computation for $2^{18}$ hashed OTs per batch.
+Both modes use VAES; only the output-store policy differs.
+Initial setup, base-correlation generation, and network transport are excluded.}
+\label{tab:spin-stationary-ot}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Timed work & Cached stores (ms) & Streaming stores (ms) \\
+\midrule
+Fresh leaves and padding & 0.941 & 0.917 \\
+Code refresh and compression & 2.213 & 1.752 \\
+Hash both sender messages & 0.423 & 0.429 \\
+Total & 3.577 & 3.101 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The stationary configuration uses $312$ trees of $1680$ leaves and pads the
+remaining $128$ coordinates to length $2^{19}$ with zeros. Cached leaf seeds
+occupy about $8$\,MiB per party. Each batch consumes $312$ fresh base-VOLE
+correlations, supplied outside timing. Initial tree expansion, permutation-bank
+construction, and workspace and output allocation are also untimed.
+The timer covers fresh-leaf generation and sums, padding, code refresh,
+compression, and AES hashing of both sender messages.
+Routine allocation and local message enqueueing within these calls remain
+timed; transport, transcript draining, and output consumption do not.
+
+For both modes in Table~\ref{tab:spin-stationary-ot}, we report the median
+of three process medians.
+Each process measures $101$ batches after five warmups. Stage medians need not sum to
+the median total. The processes run serially on one Ryzen 9 7950X core
+at a requested $4.5$\,GHz with boost disabled. libOTe and cryptoTools use
+GCC~13.4 with VAES enabled; the SPIN library uses GCC~15.2.0 with Zen~4 tuning
+and runtime-dispatched AVX-512 BCH kernels.
+Before timing, the harness initializes both endpoints and checks their OT
+outputs. It then releases the receiver's buffers to measure the sender alone.
+Separate paired runs check agreement across successive code refreshes.
+
+Streaming stores avoid filling the cache with the $8$\,MiB sender-output
+buffer. Their main benefit appears in the next batch's compression, not
+in hashing itself. Including an immediate sequential scan of all output bytes
+raises the streaming total to $3.425$\,ms, or $76.5$ million OTs per second;
+cached stores take $3.884$\,ms with the same scan.
+This scan is a memory-access control, not a downstream protocol benchmark.
+Streaming stores remain opt-in because the benefit depends on batch size
+and the consumer's access pattern.
+
+\paragraph{Regular-Noise Integration at $K=2^{20}$.}
+We also report an integration measurement with a different length, noise
+configuration, and encoder implementation. It is not a matched baseline for
+Table~\ref{tab:spin-stationary-ot}, and its sender totals are not comparable
+with Table~\ref{tab:spin-regular-current}.
 We replace the linear map in libOTe's semi-honest Silent OT path with the
-half-rate BCH--IMT encoder at $K=2^{20}$, $(t,s)=(128,19)$ and weight-five
+rate-$1/2$ BCH--IMT encoder at $K=2^{20}$, $(t,s)=(128,19)$ and weight-five
 feedback. Table~\ref{tab:spin-ot} reports protocol computation, not an
 encoder-based projection.
 
@@ -57,12 +164,12 @@ $4.5$\,GHz with boost disabled, and GCC~15.2.0 with
 one warmup. Hash-enabled totals are medians of per-call sums of protocol
 and hashing time, not sums of independently computed medians.
 The no-hash sender times range from $19.474$ to $19.911$\,ms and receiver
-times from $20.532$ to $20.754$\,ms. Our benchmark records pin the source revision and log hashes. No integrated baseline speedup is claimed.
+times from $20.532$ to $20.754$\,ms.
 
 For context, the chosen-block BAA evaluation reports $22.810$\,ms for Golay
-and $24.278$\,ms for RM at the same code parameters, using an Intel
+and $24.278$\,ms for RM for the same $K$ and rate, using an Intel
 i9-14900HX and MSVC. Table~\ref{tab:transposed-comparison} instead uses
-our same-host rerun and does not combine cross-machine timings.
+our same-host measurements and does not combine cross-machine timings.
 
 
 \input{pcs}

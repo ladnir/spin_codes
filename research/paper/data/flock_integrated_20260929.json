@@ -1,0 +1,151 @@
+{
+  "method": "Mean of two process medians; each median uses trials 5\u20138 after five warmup/settling proofs. All 108 generated proofs verified. Times in milliseconds.",
+  "flock": {
+    "14": {
+      "spin": {
+        "trial": 6.5,
+        "compressions": 16384.0,
+        "witness_bytes": 33554432.0,
+        "total_ms": 94.16118549999999,
+        "verify_ms": 37.25030075,
+        "proof_bytes": 6498544,
+        "witness_ms": 14.54639825,
+        "commit_ms": 15.65978675,
+        "zerocheck_ms": 40.1716055,
+        "lincheck_ms": 6.629493999999999,
+        "open_ms": 17.05793125,
+        "alloc_ms": 2e-05,
+        "layout_ms": 2.25e-05,
+        "encode_ms": 7.88476925,
+        "transpose_ms": 0.0,
+        "leaves_ms": 6.681335499999999,
+        "parents_ms": 1.0811935,
+        "runs": [
+          "14-1-current-spin",
+          "14-4-current-spin"
+        ]
+      },
+      "native-fast100": {
+        "trial": 6.5,
+        "compressions": 16384.0,
+        "witness_bytes": 33554432.0,
+        "total_ms": 215.33200449999998,
+        "verify_ms": 27.72505175,
+        "proof_bytes": 296617,
+        "commit_ms": 43.73,
+        "witness_ms": 13.7775,
+        "open_ms": 102.825,
+        "encode_ms": 26.8925,
+        "runs": [
+          "14-2-current-native-fast100",
+          "14-3-current-native-fast100"
+        ]
+      }
+    },
+    "16": {
+      "spin": {
+        "trial": 6.5,
+        "compressions": 65536.0,
+        "witness_bytes": 134217728.0,
+        "total_ms": 350.89169775,
+        "verify_ms": 42.2319015,
+        "proof_bytes": 11047536,
+        "witness_ms": 59.316407999999996,
+        "commit_ms": 62.20024325,
+        "zerocheck_ms": 159.65603700000003,
+        "lincheck_ms": 23.703999000000003,
+        "open_ms": 46.01752525,
+        "alloc_ms": 2e-05,
+        "layout_ms": 2.25e-05,
+        "encode_ms": 28.01001275,
+        "transpose_ms": 0.0,
+        "leaves_ms": 33.149246500000004,
+        "parents_ms": 1.07112725,
+        "runs": [
+          "16-1-current-spin",
+          "16-4-current-spin"
+        ]
+      },
+      "native-fast100": {
+        "trial": 6.5,
+        "compressions": 65536.0,
+        "witness_bytes": 134217728.0,
+        "total_ms": 571.4056095000001,
+        "verify_ms": 27.935382,
+        "proof_bytes": 415657,
+        "commit_ms": 161.9925,
+        "witness_ms": 55.375,
+        "open_ms": 141.685,
+        "encode_ms": 98.5925,
+        "runs": [
+          "16-2-current-native-fast100",
+          "16-3-current-native-fast100"
+        ]
+      }
+    }
+  },
+  "previous_spin": {
+    "14": {
+      "trial": 6.5,
+      "compressions": 16384.0,
+      "witness_bytes": 33554432.0,
+      "total_ms": 112.15248125,
+      "verify_ms": 37.9580515,
+      "proof_bytes": 7027792,
+      "witness_ms": 13.356515,
+      "commit_ms": 32.02266575,
+      "zerocheck_ms": 40.217296,
+      "lincheck_ms": 6.630969500000001,
+      "open_ms": 19.930568,
+      "alloc_ms": 0.000123,
+      "encode_ms": 14.13661675,
+      "transpose_ms": 3.8578107499999996,
+      "leaves_ms": 12.94726625,
+      "parents_ms": 1.075703,
+      "runs": [
+        "14-0-baseline-spin",
+        "14-5-baseline-spin"
+      ]
+    },
+    "16": {
+      "trial": 6.5,
+      "compressions": 65536.0,
+      "witness_bytes": 134217728.0,
+      "total_ms": 414.5195585,
+      "verify_ms": 45.84473774999999,
+      "proof_bytes": 13449040,
+      "witness_ms": 69.1120545,
+      "commit_ms": 101.25650775,
+      "zerocheck_ms": 158.71151625,
+      "lincheck_ms": 23.795832750000002,
+      "open_ms": 61.51154025,
+      "alloc_ms": 0.00016525,
+      "encode_ms": 55.523108750000006,
+      "transpose_ms": 0.0,
+      "leaves_ms": 44.63372475,
+      "parents_ms": 1.0833822499999999,
+      "runs": [
+        "16-0-baseline-spin",
+        "16-5-baseline-spin"
+      ]
+    }
+  },
+  "provenance": {
+    "date": "2026-09-29",
+    "cpu": "AMD Ryzen 9 7950X, CPU 15, fixed 4.5 GHz, boost disabled",
+    "compiler": "Rust 1.96.0, GCC 15.2",
+    "profile": "target-cpu=native; CXXFLAGS=-march=znver4; 64-byte function alignment; one prover/verifier thread",
+    "baseline_revisions": {
+      "hypercat": "f3bf1265cfded640295f969a3d245a8d4a2a8d9d",
+      "flock": "5a18418f2d76cf4dc9d9982392c3c431833a685c",
+      "spin": "ae0f4f9c8663c139b0479259f626c34fe998f6b6"
+    },
+    "built_source_manifest_sha256": "203a2133512c7161f9c3b4ce01afd45686f14c87be62f405614852b886eaed79",
+    "source_snapshots": {
+      "baseline.tgz": "a51074a14574bbd804cd7f06bf509a70630ca762efc58ed2d796329cbdc9ed0d",
+      "current.tgz": "c2dc7e64057be7223ed94d3f5364881887ce545842ec22a5ef8dcf986a09bb72"
+    },
+    "receipt": "artifacts/bench-final/receipt.json",
+    "scope": "Complete PCS integrations including layout, hashing, opening, and witness generation; not an isolated code substitution. Setup, verification and outer serialization excluded from prover time. Proof sizes are serialized bytes."
+  }
+}

@@ -5,19 +5,21 @@ We integrate SPIN--Brakedown into Flock~\cite{flock26} to measure its
 effect inside a larger prover. Flock checks batches of Boolean constraints
 and reduces them to claims about a committed witness. Our integration
 replaces its Ligerito PCS~\cite{ligerito25} with the construction in
-Section~\ref{sec:spin-pcs}. The final comparison improves prover throughput
-by $1.92\times$ and $1.36\times$ at the two measured workloads.
+Section~\ref{sec:spin-pcs}. SPIN improves prover throughput
+by $2.29\times$ and $1.63\times$ at the two measured workloads.
 
 \paragraph{Adapting the Opening Interface.}
-Flock's final claims include interpolation\linebreak weights on a small group of
-witness coordinates. We incorporate these weights into the PCS row
+Flock's final claims carry interpolation weights on a small group
+of witness coordinates. We incorporate these weights into the PCS row
 combination, so the opening proves the functional that Flock actually
-requests. A compatible packed representation passes the witness between
-the two implementations without repacking it. The current adapter uses
+requests. A public permutation of witness variables preserves the six-coordinate
+interpolation prefix and groups known padding into zero rows. The commitment
+omits these rows; the opening accounts for their zero contribution. Flock
+generates the packed witness directly in this compact layout, avoiding a
+separate permutation pass. The adapter uses
 two separate openings with $2110$ column samples each and $K=2^{16}$.
 Their conditional fixed-matrix error bounds sum to less than $2^{-102}$.
-Composition with Flock's adaptive claims requires the corresponding
-extraction argument. The benchmark proves the committed batch's
+The benchmark proves the committed batch's
 compression constraints; binding public hash inputs and outputs is a
 separate application wrapper.
 
@@ -35,8 +37,8 @@ implementation, rather than attributing shared improvements to SPIN.
 \begin{table}[tb]
 \centering
 \caption{Flock proofs of BLAKE3-compression constraints on one Ryzen
-core. SPIN and Ligerito (Fast100) are measured with the applicable shared
-optimizations. Bolt entries are optimistic projections assuming free claim
+core. SPIN and Ligerito, using its Fast100 profile, are measured with the
+applicable shared optimizations. Bolt entries are optimistic projections assuming free claim
 conversion, shared opening work, and amortized matrix-proof cost;
 Bolt--Flock is not implemented. Dashes denote unestimated quantities.}
 \label{tab:spin-flock}
@@ -52,39 +54,49 @@ Compressions & PCS & Prover (ms) & Verify (ms) & Proof (MiB) \\
 \paragraph{Measurement Method.}
 The SPIN and Ligerito configurations run in one executable with the same deterministic
 input stream and compiler settings. They use the single-worker hardware
-environment of the standalone PCS experiment. Each workload has four processes per backend
-in a balanced serial order. Each process excludes five warmups and
-measures four trials; entries average the four process medians.
+environment of the standalone PCS experiment: one Ryzen 9 7950X core at
+$4.5$\,GHz, with boost disabled. The build uses Rust 1.96.0, GCC 15.2,
+native CPU instructions, and 64-byte function alignment. Each workload has
+two processes per backend in a balanced serial order. Each process excludes
+five warmup and settling proofs and measures four trials; each entry is
+the mean of two process medians. Every generated proof is verified.
 Prover time includes witness generation, commitment, and proving. Setup,
 verification, and outer proof serialization are outside the interval.
 Serialization inside the SPIN opening remains timed because its bytes
 enter the protocol transcript.
 
 \paragraph{Prover Costs.}
-At the larger workload, commitment takes $101$\,ms with SPIN--Brakedown
-and $162$\,ms with Ligerito. Opening takes $61$ and $141$\,ms,
-respectively. These phases account for about $141$\,ms of the $151$\,ms total
-difference. Witness generation is faster in the Ligerito configuration,
-and the remaining checking and preparation costs differ with the layouts.
-These measured rows cover the complete PCS integrations; they do not isolate
-the encoder alone.
+At the smaller workload, commitment takes $15.7$\,ms with SPIN--Brakedown
+and $43.7$\,ms with Ligerito; opening takes $17.1$ and $102.8$\,ms.
+At the larger workload, these costs are $62.2$ versus $162.0$\,ms for
+commitment and $46.0$ versus $141.7$\,ms for opening. The larger-workload
+PCS savings account for about $195$\,ms of the $221$\,ms total reduction.
+Encoding alone takes $7.9$ and $28.0$\,ms with SPIN, versus $26.9$ and
+$98.6$\,ms with Reed--Solomon. These are complete integrations with
+different layouts and hashing; the measurements do not isolate an
+encoder-only substitution.
+
+Four times the workload raises SPIN commitment and opening from $32.7$
+to $108.2$\,ms, improving their cost per compression. The surrounding
+prover takes $242.7$\,ms at the larger size, about $69\%$ of the total.
+Ligerito opening grows only from $102.8$ to $141.7$\,ms, which helps
+explain the smaller relative prover speedup at that size. Within SPIN
+commitment, leaf hashing grows from $6.7$ to $33.1$\,ms and is a
+remaining optimization target.
 
 \paragraph{An Optimistic Bolt Projection.}
 Table~\ref{tab:spin-flock} also considers replacing the PCS with
 Bolt, using the calibrated opening costs from Appendix~\ref{app:pcs-details}.
 We give Bolt favorable assumptions: free conversion of Flock's weighted
 claims, shared opening work across its two claims, and negligible
-matrix-proof cost per opening in the amortized limit. We retain the
+matrix-proof cost per opening in the amortized limit. We keep the
 surrounding prover time measured with SPIN and substitute Bolt's measured
 commitment and projected opening costs. The resulting totals are
-$228$ and $983$\,ms, compared with the measured SPIN totals of $113$
-and $420$\,ms. Thus the projected Bolt configuration remains slower even
+$228$ and $967$\,ms, compared with the measured SPIN totals of $94$
+and $351$\,ms. Thus the projected Bolt configuration remains slower even
 with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.
 
-The current SPIN--Brakedown integration favors prover time at a substantial
-communication cost. At the larger workload, its proof is $12.8$\,MiB,
+The SPIN--Brakedown integration favors prover time at a substantial
+communication cost. At the larger workload, its proof is $10.5$\,MiB,
 compared with $0.4$\,MiB for Ligerito, which also verifies faster.
-The application result complements the standalone PCS measurements:
-SPIN's encoding performance supports a fast commitment path, and that
-advantage remains useful after integration into Flock.

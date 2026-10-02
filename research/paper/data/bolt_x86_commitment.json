@@ -1,0 +1,44 @@
+{
+  "source_repository": "bolt-rs",
+  "base_revision": "9b45089585106b2d861a91f7fae8e32fbf5aee6d",
+  "branch": "codex/bolt-x86-expander",
+  "source_lf_sha256": "e5f98ad4e163d745ca0e643348e15ccc9c3d9c77a0bf4f59ba57a1b96a55ff72",
+  "baseline_binary_sha256": "0105c3174cb9884219b8860e97fdb7c0501616a14606e23dec1d7fd867c44a98",
+  "optimized_binary_sha256": "2b6754d380633e8692bdcb4f1b2ef5fb5cef865f20dcbc1bafadd15d49e92c0d",
+  "variant": "bolt-max-xor-d8",
+  "hash": "sha256",
+  "threads": 1,
+  "width": 128,
+  "machine": "Peach AMD Ryzen 9 7950X; CPU15; requested 4.5 GHz; boost disabled",
+  "build": "Rust 1.94.1; target-cpu=native; release LTO; codegen-units=1; standalone locked dependencies",
+  "method": "Median of six measured repetitions per binary across two processes, each with one excluded warmup; process order baseline/optimized/optimized/baseline; serial shared benchmark lock",
+  "scope": "Measured complete CPU commitment, sequential encoding and hashing; setup, input generation, initial allocation and final destruction excluded. Only the 128-symbol x86 XOR expander was changed; opening estimates are unchanged.",
+  "receipt_root": "/tmp/bolt-x86-expander-20260917/tools/standalone/xor-results",
+  "cases": {
+    "32": {
+      "receipt": "20260917-161100/summary.json",
+      "receipt_sha256": "3eae890918e58edaa66a3bd21c38080d8c3dfe0c27721b17cd61c4ce3e7474ad",
+      "baseline_expander_ms": 25.826431,
+      "expander_ms": 8.977816,
+      "baseline_commit_ms": 79.7342085,
+      "commit_ms": 63.0015895
+    },
+    "128": {
+      "receipt": "20260917-155329/summary.json",
+      "receipt_sha256": "6b7d7624dfda10efea36b67fa20e3b7177ef2b3c18dd99609fade5930b97dbfc",
+      "baseline_expander_ms": 167.029837,
+      "expander_ms": 74.2180275,
+      "baseline_commit_ms": 397.889337,
+      "commit_ms": 307.7880395
+    },
+    "512": {
+      "receipt": "20260917-155145/summary.json",
+      "receipt_sha256": "c36d6015c79d780ca1b034aab5ef16a741c85aeee9e938996ff60a68f5f4c766",
+      "baseline_expander_ms": 732.9903245,
+      "expander_ms": 330.9322805,
+      "baseline_commit_ms": 1757.1455855,
+      "commit_ms": 1341.6295525
+    }
+  },
+  "validation": "All 16 baseline/optimized commitments at each input size have identical roots. Scalar-reference tests pass in native and baseline x86-64 builds; twelve native expander/Brakedown tests pass."
+}

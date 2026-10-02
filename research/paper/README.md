@@ -1,10 +1,26 @@
 # SPIN manuscript (LLNCS)
 
+The updated half-rate encoder tables use the optimized precomputed campaign:
+0.340, 1.460, and 9.289 ms for transposed encoding at K=2^16, 2^18, and 2^20.
+See [the performance ledger](PRECOMPUTED_PERFORMANCE.md) for source bindings,
+timing policy, and the standalone-library regression kept separate from this
+update. The K=2^16 row uses the additional (64,12,2) inner, described informally;
+the original one-round certificate ladder is unchanged. Quarter-rate and standalone PCS timings are unchanged by that encoder update. The lead regular-noise Silent OT result is
+2.944 ms per sender batch at K=2^18 (89.0 million hashed OTs/s), using the full
+precomputed code. See [the regular-noise timing ledger](REGULAR_OT_PERFORMANCE.md).
+The stationary heuristic-refresh comparison remains separate at 84.5 million
+OTs/s; see [its timing ledger](STATIONARY_OT_PERFORMANCE.md).
+`precomputed_results.py` authenticates
+the six new forward/transpose cells from retained local measurements.
+
+Unless stated otherwise, run commands from the repository root. The current
+Windows checkout is `C:\Users\peter\repo\permute_conv-github-bch`.
+
 The PCS application revision adds ordinary-encoder measurements, a standalone
 SPIN–Brakedown section, and the optimized Flock comparison. See
 [the application evidence map](../artifact/APPLICATION_RESULTS.md) for retained
 measurements, timing definitions, and the conditional security scope.
-Run `python -B paper/build_application_tables.py --check` from the repository
+Run `python -B research/paper/build_application_tables.py --check` from the repository
 root to check its tables without benchmarking.
 
 The asymptotic construction now uses [Independent-Map Transvection (IMT)](../workstreams/inner_design/IMT.md)
@@ -29,18 +45,19 @@ fixed steps, length-dependent steps, and fixed-map full-refresh references.
 The [length study](../workstreams/inner_design/finite_migration/ADAPTIVE_LENGTH.md)
 derives a local cancellation probability, separates proof slack from encoder
 changes, and gives numerical replay commands. Reproduce its plot with
-`python -B paper/build_imt_length_figure.py`; add `--check` to authenticate it.
+`python -B research/paper/build_imt_length_figure.py`; add `--check` to authenticate it.
 The earlier multi-round study is retained as supporting research, not an
 active figure or an additional construction parameter in this section.
 
-Run `python -B paper/check_imt_integration.py` from the repository root to
+Run `python -B research/paper/check_imt_integration.py` from the repository root to
 check all 38 shared map words and the retained 11% evidence bindings.
-The finite checker authenticates seven selected certificate targets, four
-timing cells, and the shared and quarter-rate map tables. These checks need
+The finite checker authenticates the seven original certificate targets and
+the additional two-round small-length certificate, seven timing cells, and
+the selected maps. These checks need
 the local generated evidence; a clean source checkout does not include it.
 The asymptotic check is additional to the finite checker and is not
-included in the historical `artifact/reproduce.py quick` command.
-Use `python -B paper/build_imt_comparison.py --check` for the current
+included in the historical `research/artifact/reproduce.py quick` command.
+Use `python -B research/paper/build_imt_comparison.py --check` for the current
 comparison table. The preceding comparison generator remains historical.
 The [review record](../workstreams/inner_design/imt_asymptotic/d11/PAPER_REVIEW.md)
 describes the analytic review and the preserved evidence boundary.
@@ -55,62 +72,73 @@ not been shortened to meet the length limits. The non-submission draft includes
 a table of contents after the abstract; submission mode omits it. The draft
 date was removed to use the conference front matter.
 
-## Compile from PowerShell on this machine
-
-LaTeX is installed inside WSL Ubuntu. These commands can be run from any
-PowerShell directory. Bash preserves the `latexmk` arguments across WSL.
-
-Author version:
+The September 29 Flock refresh uses the integrated compact-layout implementation:
+94/351 ms for SPIN and 215/571 ms for Ligerito at 16k/65k compressions
+(2.29x/1.63x throughput). The two-process measurements, proof sizes and
+provenance are pinned in `data/flock_integrated_20260929.json` and imported
+into `data/application_results.json`. Its `historical_flock` entry preserves
+the preceding campaign. Regenerate with:
 
 ```powershell
-wsl -d Ubuntu --cd /mnt/c/Users/stani/OneDrive/Documents/SPIN_CODES/permute_conv/paper -- bash -lc 'latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=../output/pdf -jobname=spin_codes_draft main.tex'
+python -B research/paper/build_application_tables.py --flock-summary research/paper/data/flock_integrated_20260929.json
 ```
 
-Anonymous submission version (same full text):
+The blog builder reads the same application data. The Bolt--Flock projection
+uses the updated surrounding-prover residual while retaining its original
+commitment measurements and opening calibration.
+
+## Compile the paper
+
+TeX Live 2026 is installed natively on this Windows machine. From PowerShell:
 
 ```powershell
-wsl -d Ubuntu --cd /mnt/c/Users/stani/OneDrive/Documents/SPIN_CODES/permute_conv/paper -- bash -lc 'latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=../output/pdf -jobname=spin_codes_submission submission.tex'
+Set-Location 'C:\Users\peter\repo\permute_conv-github-bch\research\paper'
+latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../../output/pdf' '-jobname=spin_codes_draft' main.tex
 ```
 
-The outputs are `../output/pdf/spin_codes_draft.pdf` and
-`../output/pdf/spin_codes_submission.pdf`. Run the same command after edits;
-`latexmk` automatically runs LaTeX and BibTeX as often as needed.
-
-The `\ifsubmission` macro is declared in `main.tex`. Its default is
-`\submissionfalse` (authors and institutions shown); change this to
-`\submissiontrue` for anonymous review. The `submission.tex` entry point forces
-submission mode without changing the default. Submission mode also clears the
-PDF author metadata and renders artifact links as plain descriptions so the
-identifying GitHub repository is not exposed. Prior papers remain cited in the
-third person. Both Chosen-Block BAA (ePrint 2026/1903) and the original
-Block-Accumulate paper (CRYPTO 2026; ePrint 2025/1828) are cited in the
-introduction's construction overview and related-work discussion.
-
-With a native Windows TeX installation on `PATH`, the equivalent commands are:
+This builds the author version for ePrint. To build the anonymous version from
+that same directory, use:
 
 ```powershell
-Set-Location 'C:\Users\stani\OneDrive\Documents\SPIN_CODES\permute_conv\paper'
-latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../output/pdf' '-jobname=spin_codes_draft' main.tex
-latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../output/pdf' '-jobname=spin_codes_submission' submission.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../../output/pdf' '-jobname=spin_codes_submission' submission.tex
+```
+
+For another checkout or Linux, start at the repository root and run:
+
+```sh
+cd research/paper
+latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../../output/pdf' '-jobname=spin_codes_draft' main.tex
+```
+
+Both builds write to the repository's `output/pdf/` directory. Quote the complete
+`-outdir=...` and `-jobname=...` arguments in PowerShell. LaTeX dependencies are
+BibTeX, latexmk, PGFPlots, and placeins; building the paper does not require the
+numerical evidence. Repeating the command rebuilds changed inputs as needed.
+
+`main.tex` defaults to `\submissionfalse`, showing authors, affiliations,
+repository links, the repository citation, and the contents list.
+`submission.tex` selects anonymous mode without editing that default. It clears
+PDF author metadata and suppresses identifying repository links and the citation.
+Prior papers remain cited in the third person.
+
+Return to the repository root before running the checks below:
+
+```sh
+cd ../..
 ```
 
 ## Reproduction checks
 
 Start at the repository's [artifact guide](../artifact/README.md) for the
 one-command checks and [paper-to-code map](../artifact/PAPER_MAP.md).
-The root command `python -B artifact/reproduce.py paper` checks the compact
-inputs and builds the draft using the instructions below.
+The historical wrapper `python -B research/artifact/reproduce.py paper` first
+checks retained evidence, then builds under `research/output/pdf/`. It requires
+local research inputs. Use the direct build above for the ePrint PDF under
+`output/pdf/`; that build has no numerical-evidence dependency.
 
 The current revision plan is [REVISION_PLAN.md](REVISION_PLAN.md). It covers
 the asymptotic/finite structured-SPIN narrative, BCH-256 certificates, and
 measured implementation. The root-level restructure plan is historical.
-
-The manuscript entry point is `main.tex`. Build from this directory with
-TeX Live (including PGFPlots), BibTeX, and latexmk:
-
-```text
-latexmk -pdf -interaction=nonstopmode -halt-on-error "-outdir=../output/pdf" "-jobname=spin_codes_draft" main.tex
-```
 
 The pre-restart root-level TeX draft is preserved in
 `../old/paper_draft_pre_spin_2026-08-31/`. Its `ARCHIVE_MANIFEST.md` records
@@ -119,27 +147,26 @@ the moved files, byte lengths, and SHA-256 hashes.
 Check finite integration from the repository root:
 
 ```text
-python -B paper/check_finite_integration.py
+python -B research/paper/check_finite_integration.py
 ```
 
 Reproduce or check the IMT Q1 slices and matched certificate curve from the retained
 pinned Q1 grid and full-certificate receipts (no grid search or numerical proof replay):
 
 ```text
-python -B paper/build_imt_parameter_figures.py
-python -B paper/build_imt_parameter_figures.py --check
+python -B research/paper/build_imt_parameter_figures.py
+python -B research/paper/build_imt_parameter_figures.py --check
 ```
 
 The generator authenticates both the no-constant state grid (130 geometries)
 and the adaptive-length grid (110 cells), with their replay receipts and maps,
 then writes native PGFPlots
-inputs under `paper/figures/`. Each input records the Q1 producer's SHA-256.
+inputs under `research/paper/figures/`. Each input records the Q1 producer's SHA-256.
 The selected BCH-256 plot compares Q1 with the full certificate for the exact
 same maps at five lengths. It does not certify the different smaller-outer
 diagnostic maps. See the [reproduction guide](../artifact/REPRODUCING.md) for
 the evidence-package boundary and separate replay instructions.
 
-The LLNCS revision was also compiled with TeX Live 2023 in WSL Ubuntu and writes its PDF to
-`../output/pdf/spin_codes_draft.pdf`. The September 7 revision adds the finite
-BCH-256 theorem, engineering curve, implementation results, and finite proof
-appendix. The archived sources above remain unchanged.
+Earlier revisions were also compiled with TeX Live in WSL Ubuntu. Their old
+checkout and output paths are historical; use the commands above for this tree.
+The archived manuscript sources remain unchanged.

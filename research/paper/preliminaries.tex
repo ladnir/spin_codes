@@ -18,7 +18,7 @@ a joint distribution is declared.
 
 For $q\in[0,1]$, define the binary entropy function
 $H_2(q):=-q\log_2q-(1-q)\log_2(1-q)$, where $0\log_20:=0$. For integers $a,b$, we set $\binom{a}{b}:=0$ unless
-$0\le b\le a$. These conventions shorten the enumerator formulas below.
+$0\le b\le a$. These conventions shorten the enumerator formulas later.
 
 \subsection{Linear Encoders and Codes}
 
@@ -34,8 +34,7 @@ For a nonzero linear code $\mathcal C\subseteq\F_2^N$, define
   d_{\min}(\mathcal C)
   :=\min_{c\in\mathcal C\setminus\{0\}}\wt(c).
 \]
-For bookkeeping in statements that test injectivity separately, set
-$d_{\min}(\{0\}):=+\infty$, and write
+By convention, set $d_{\min}(\{0\}):=+\infty$, and write
 $d_{\min}(E):=d_{\min}(\mathcal C(E))$. The relative distance is
 $d_{\min}(\mathcal C)/N$.
 
@@ -59,12 +58,13 @@ capture it.
 
 \subsection{Sampled Families and Asymptotics}
 
-A sampled encoder includes its setup distribution. After setup, the realized
+A sampled encoder is specified together with the distribution from which
+setup draws its components. After setup, the realized
 linear map and its image code are fixed. Expectations and probabilities refer
 to the declared setup distribution unless a subscript specifies a smaller
 probability space.
 
 For a family indexed by native lengths $N_m\to\infty$, the notation $o(1)$
 refers to the limit $m\to\infty$. An event holds \emph{with high probability}
-if its failure probability is $o(1)$ over setup. A deterministic wrapper may
-map these native members to a denser set of requested lengths.
+if its failure probability is $o(1)$ over setup. Other output lengths are obtained by zero extension of the
+largest smaller native member (Section~\ref{sec:scaling}).

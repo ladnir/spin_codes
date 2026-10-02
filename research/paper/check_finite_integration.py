@@ -10,6 +10,7 @@ import imt_results as evidence
 import build_imt_comparison
 import build_imt_parameter_figures
 import build_imt_length_figure
+import precomputed_results
 
 ROOT, require = evidence.ROOT, evidence.require
 PAPER = ROOT / 'paper'
@@ -83,18 +84,30 @@ def check():
     for key in ('parent_generator_hex', 'subcode_generator_hex'):
         require(data['quarter_proof']['outer'][key][2:] in appendix, 'Wrong quarter polynomial')
 
-    half_times = [cell['summaries']['sparse_pages']['median_ms'] for cell in data['timing']['cells']]
+    # The optimized campaign replaces the half-rate timings, not the original
+    # one-round certificate ladder. Its loader authenticates the separate K16
+    # two-round certificate and implementation maps as well as the timing runs.
+    optimized = precomputed_results.load()
+    half_times = [optimized[m, 'transpose']['median_ms'] for m in (16, 18, 20)]
     expected = r'BCH-256, $1/2$ & ' + ' & '.join(f'{v:.3f}' for v in half_times)
     require(expected in implementation, 'Wrong selected timing row')
     require(r'BCH-128, $1/4$ & -- & -- & ' +
             f"{data['quarter_timing']['median_ms']:.3f}" in implementation, 'Wrong quarter timing row')
-    for row, key in ((data['timing']['cells'][-1]['summaries']['sparse_pages'], 'process_medians_ms'),
-                     (data['quarter_timing'], 'medians_ms')):
-        for value in (min(row[key]), max(row[key])):
+    for row, medians_key, setup_key in (
+            (optimized[20, 'transpose'], 'process_medians', 'setup_bytes'),
+            (data['quarter_timing'], 'medians_ms', 'retained_setup_bytes')):
+        for value in (min(row[medians_key]), max(row[medians_key])):
             require(f'{value:.3f}' in implementation, 'Wrong timing range')
-        require(f"{row['retained_setup_bytes']/2**20:.2f}" in implementation, 'Wrong setup memory')
+        require(f"{row[setup_key]/2**20:.2f}" in implementation, 'Wrong setup memory')
         require('$' + str(row['workspace_bytes']//2**20) + '$' in implementation, 'Wrong workspace memory')
-    require('10.110' in implementation, 'Missing current measured transpose time')
+    for direction, label in (('forward', 'Ordinary'), ('transpose', 'Transposed')):
+        expected = label + ' & ' + ' & '.join(
+            f"{optimized[m, direction]['median_ms']:.3f}" for m in (16, 18, 20))
+        require(expected in read('tables/ordinary_encoding.tex'), 'Wrong paired encoding row')
+        require(f"{optimized[20, direction]['median_ms']:.3f}" in implementation,
+                'Missing current measured encoding time')
+    require('$' + str(optimized[20, 'forward']['workspace_bytes']//2**20) + '$' in implementation,
+            'Wrong ordinary workspace memory')
     for name in ('abstract.tex', 'introduction.tex', 'implementation.tex'):
         require('11.259' not in read(name), 'Historical headline presented as current')
     require(r'Q_{i+1}=M_iQ_i+C(X_i)' in finite, 'Wrong finite state update')
@@ -132,8 +145,10 @@ def check():
                 'Moved evidence is not included in the supplement')
     require(r'\input{scaling_complexity}' in engineering, 'Missing parameter-selection discussion')
     require(r'\ref{app:engineering}' in finite, 'Missing main-text parameter-study pointer')
-    return dict(status='SELECTED_FINITE_IMT_INTEGRATION_PASSED', selected_certificates=7,
-                matched_timing_cells=4, map_words_checked=57,
+    return dict(status='SELECTED_FINITE_IMT_INTEGRATION_PASSED', selected_certificates=8,
+                matched_timing_cells=7, map_words_checked=57,
+                additional_k16_two_round_certificate=True,
+                precomputed_timing_files=18,
                 authenticated_files=data['authenticated_files'], full_interval_replay=False,
                 parameter_plot_migration_complete=True, parameter_study=parameter_check,
                 adaptive_length_study=length_check)

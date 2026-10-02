@@ -4,13 +4,20 @@ Historical author-side instructions, not artifact requirements. The artifact
 now covers only the [core implementation](README.md). Commands below may
 require unpublished local research inputs; no complete replay bundle is promised.
 
-Run commands from the repository root unless stated otherwise. Use `python3`
+Run commands from `research/` unless stated otherwise. From the repository root:
+
+```sh
+cd research
+```
+
+Paths such as `paper/`, `artifact/`, `workstreams/`, `out/`, and `output/` below
+are relative to that directory. Use `python3`
 in place of `python` if needed. The quick path uses Python 3.11+ and no
 third-party Python packages. It is intended for both Windows and Linux;
 Windows is the locally tested platform for this revision.
 
 On Windows, enable long paths for the clone because some frozen source paths
-are long: `git clone -c core.longpaths=true https://github.com/ladnir/permute_conv.git`.
+are long: `git clone -c core.longpaths=true https://github.com/ladnir/spin_codes.git`.
 The Windows CI job enables this setting before checkout as well.
 
 Automatic **Paper artifact source checks** run packaging, missing-evidence
@@ -31,7 +38,10 @@ python -B -m unittest discover -s artifact -p 'test_*.py'
 ```
 
 The first command reports `SELECTED_FINITE_IMT_INTEGRATION_PASSED`: seven
-certificate targets, four timing cells, 57 map words, and exact union checks.
+original certificate targets plus the two-round small-length target, seven
+timing cells, 57 shared/quarter-rate map words, the small-length maps, and exact
+union checks. The optimized encoder campaign is documented in the
+[precomputed performance ledger](../paper/PRECOMPUTED_PERFORMANCE.md).
 The historical `quick` wrapper also checks the 130 retained RM2Sub geometries
 and 31 imported asymptotic manifest entries. Its old progress labels are not
 an IMT inventory. Neither command performs parameter search, interval replay,
@@ -58,7 +68,9 @@ python -B artifact/reproduce.py paper
 ```
 
 The first command rewrites only the four generated IMT TeX figure inputs.
-The second runs quick checks and builds `output/pdf/spin_codes_draft.pdf`.
+The second runs quick checks and builds `research/output/pdf/spin_codes_draft.pdf`
+(relative to the repository root). For the current ePrint build under the root
+`output/pdf/` without evidence checks, follow the [paper guide](../paper/README.md).
 The PDF uses the build date, so its bytes need not match an earlier build.
 No plotting library is needed: the figures are native vector PGFPlots.
 

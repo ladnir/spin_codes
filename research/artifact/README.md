@@ -9,7 +9,26 @@ The repository is a broader author workspace. Historical reproduction scripts
 and research notes remain available, but they are not artifact deliverables.
 Their commands may require local inputs that are not distributed.
 
+## Current standalone library
+
+The packaged library and its portable build instructions are in
+[`spin/`](../../spin/README.md). From the repository root:
+
+```sh
+cmake -S . -B out/spin -DCMAKE_BUILD_TYPE=Release
+cmake --build out/spin --config Release -j2
+ctest --test-dir out/spin -C Release --output-on-failure
+```
+
+The library includes post-submission optimizations. The research build below
+retains the implementation used for the submitted half-rate measurements.
+
 ## Core source
+
+Post-submission optimization: the optional
+[four-row BCH integration](../workstreams/spin_optimized/README.md) adds an
+AVX-512 backend with an AVX2 fallback. The submitted source paths below and
+the existing supplemental archive remain unchanged.
 
 The selected half-rate encoder uses the BCH [256,128] outer, randomized bit
 transpose permutation, and IMT inner with (t,s) = (128,19), weight-five feedback.
@@ -33,20 +52,19 @@ From the repository root on Linux with CMake 3.20+ and a C++20 GCC-compatible
 compiler supporting `-march=znver4`:
 
 ```sh
-cmake -S workstreams/inner_design/asymmetric/bch256/weight5/implementation -B out/spin-core -DCMAKE_BUILD_TYPE=Release
+cmake -S research/workstreams/inner_design/asymmetric/bch256/weight5/implementation -B out/spin-core -DCMAKE_BUILD_TYPE=Release
 cmake --build out/spin-core --target sparse_pages sparse_pages_test -j 3
 ctest --test-dir out/spin-core -R '^sparse_pages_test$' --output-on-failure
 ```
 
-The current build targets Zen 4 and requires compatible x86 SIMD instructions;
+This research build targets Zen 4 and requires compatible x86 SIMD instructions;
 it is not a portable-binary configuration. The `sparse_pages` target selects
 the optimized weight-five encoder. Its correctness test demonstrates setup,
 workspace use, and encoding through the shared interface. No numerical receipt
 or benchmark log is required to build this target.
 
-A clean standalone package and matching quarter-rate build entry point can be
-prepared from these sources; this guide does not claim that such a release has
-already been assembled. Never run two benchmarks concurrently.
+The standalone library has its own parameter interface and build targets; see
+its guide above. Never run two benchmarks concurrently.
 
 ## Author-side material
 

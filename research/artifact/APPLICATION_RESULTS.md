@@ -1,5 +1,12 @@
 # Ordinary encoding, SPIN–Brakedown, and Flock
 
+The current standalone encoder timings are recorded in the
+[precomputed performance ledger](../paper/PRECOMPUTED_PERFORMANCE.md).
+At K=2^20, ordinary encoding takes 9.031 ms and transposed encoding takes
+9.289 ms; the approximate original-BAA comparison is now 3.4x. These replace
+the earlier standalone encoder timings below. The OT and standalone PCS measurements retain their separate campaigns.
+Flock uses the new integrated campaign described below; no measurements are rescaled.
+
 The 2026-09-17 OT integration replaces the former 8 ms tree / 50M OT/s projection
 with existing measured libOTe results: 19.531/20.625 ms per sender/receiver
 without hashing, and 22.099/21.841 ms with hashing, at K=2^20. See
@@ -18,6 +25,37 @@ PCS and Flock tables display whole milliseconds. Their proof-size columns
 use one decimal place consistently because some entries are below 1 MiB.
 The pinned measurements and calculations retain full precision.
 
+## Integrated Flock refresh (2026-09-29)
+
+The current paper and blog use `paper/data/flock_integrated_20260929.json`,
+imported into `paper/data/application_results.json`. The earlier Flock rows
+are preserved in `historical_flock`. This refresh changes only the Flock
+measurements and projections that use their surrounding-prover residual.
+
+| BLAKE3 compressions | SPIN prove / verify | Ligerito prove / verify | Prover speedup | SPIN / Ligerito proof |
+|---|---|---|---|---|
+| 16,384 | 94 / 37 ms | 215 / 28 ms | 2.29x | 6.2 / 0.3 MiB |
+| 65,536 | 351 / 42 ms | 571 / 28 ms | 1.63x | 10.5 / 0.4 MiB |
+
+Each entry averages two process medians, with four measured proofs after five
+warmup/settling proofs per process. All runs were serial on Peach CPU15 at
+4.5 GHz with boost disabled. All 108 proofs, including the preceding-integration
+controls, verified. Hypercat retains the raw CSVs, logs, resource receipts,
+source manifests and binary hashes under
+`results/flock-spin/commit-integration-20260929/`. The measurement summary
+records the built source snapshots; the integrated sources were committed as
+Hypercat `6d01ed88`, FLOCK `15adea5`, and SPIN `71bcf093`.
+
+The PCS compacts known zero rows, fuses witness output into the PCS layout,
+and uses the standalone register kernels. Compact layout changes the commitment
+format; code parameters, query counts and the two-opening protocol are unchanged.
+The Bolt projection retains its earlier opening calibration and commitment
+measurements, yielding 228/967 ms with the new surrounding-prover residual.
+
+Reimport using `python -B paper/build_application_tables.py --flock-summary
+paper/data/flock_integrated_20260929.json` from `research/`, or use `--check`
+to validate generated tables without changing them.
+
 ## Tables and reproduction
 
 The 2026-09-17 Bolt refresh is pinned separately in
@@ -29,13 +67,14 @@ projections; historical commitment receipts and all opening estimates remain
 unchanged. See [the Bolt accounting](BOLT_PCS_ESTIMATE.md) for timing boundaries,
 baseline comparisons, hashes, and the resulting 2614 ms headline estimate.
 
-`paper/data/application_results.json` retains the final IMT campaign from
-Hypercat revision `f98b02a`, with Flock at `e15d047`. It includes the SHA-256
+`paper/data/application_results.json` retains the standalone IMT campaign from
+Hypercat revision `f98b02a`. The former Flock campaign at `e15d047` is historical;
+current Flock results carry their own `flock_provenance` record. It includes the SHA-256
 and relative path of the source summary and its run receipt. Earlier Bolt
 and standalone Ligerito measurements retain their original provenance.
 The measured executable/source receipts remain authoritative for the runs.
 
-### IMT refresh (2026-09-16)
+### Historical IMT refresh (2026-09-16)
 
 The paper branch merges permute_conv `ec7bce79` in `b9548db3`, preserving
 the application sections and recent editorial changes. The application
@@ -67,7 +106,7 @@ executable. The remaining historical sections below document earlier
 measurements and calibration choices; the final summary supersedes their
 SPIN and integrated Flock times.
 
-From the paper repository root:
+From `research/` (`cd research` from the repository root):
 
 ```
 python -B paper/build_application_tables.py --check
@@ -91,7 +130,7 @@ source-summary hash and raw-run receipts.
 | Ordinary encoding (`tab:ordinary-encoding`) | `results/imt-20260916/final-summary.json` | Median of 31 trials for each `imt-k16/18/20` run. |
 | Standalone PCS (`tab:spin-pcs-standalone`) | SPIN `results/imt-20260916/final-summary.json`; standalone Ligerito below | Ten pooled trials from two processes per configuration. |
 | Opening only (`tab:pcs-opening`) | Same SPIN and Ligerito summaries; Bolt source below | Measured `open_ms` medians; Bolt sum of component medians and work proxies. |
-| Flock (`tab:spin-flock`) | `results/imt-20260916/final-summary.json` | Mean of four process medians; four measured trials after five warmups per process. |
+| Flock (`tab:spin-flock`) | `results/flock-spin/commit-integration-20260929/summary.json` | Mean of two process medians; four measured trials after five warmup/settling proofs per process. |
 
 The Bolt commitment comparison comes from `results/bolt-one-thread/summary.json`.
 The current comparison uses 401.335489 ms for IMT SPIN commitment: subtract
@@ -107,7 +146,7 @@ a controlled encoder-only replacement is made for this comparison.
 
 The Ligerito rows are newly measured standalone binary-MLE commitments and
 openings, not extracted Flock phase times. The implementation base is Flock
-`2d667ca`, the same optimized source used by the integrated comparison.
+`2d667ca`, the optimized source used by the preceding integrated comparison.
 Revision `cd4189e` adds `crates/flock-prover/examples/pcs_standalone.rs`.
 The runner, raw CSV files, machine/compiler/configuration hashes, build log,
 summary validator, and timing contract are in `benchmarks/pcs-standalone/`.
@@ -400,14 +439,15 @@ PCS pages were rendered and inspected after rebuilding the draft.
 
 The abstract's approximately 3x encoding speedup compares SPIN's 10.110 ms
 with approximately 32 ms for original rate-1/2 BAA, not with chosen-block
-BAA. Peter confirmed on 2026-09-16 that separate measurements find comparable
-original-BAA latency on Ryzen. Those separate run logs are not archived in
-this worktree. The chosen-block BAA manuscript's original-BAA rerun records
-32.769 ms on Intel; that exact value is not relabeled as a Ryzen measurement.
+BAA. Original BAA was measured on the server. Peter reaffirmed this on
+2026-09-22; earlier notes treating that server measurement as an unresolved
+provenance issue are out of date. The separate chosen-block BAA manuscript
+records 32.769 ms on Intel; that value is not the server measurement.
 The archived same-host comparison remains unchanged: chosen Golay and RM
 BAA take 23.997 and 27.660 ms, or 2.37x and 2.74x the current SPIN latency.
 The main comparison table now also includes the approximate original-BAA
-Ryzen reference, marked as a separate measurement. Its smaller-length cells
-and distance/margin pair are left unassigned: the retained record does not
-bind those values to this measurement. The table generator does not treat
-this reference as part of the archived three-process campaign.
+Ryzen reference. Its smaller-length timing cells remain unassigned.
+The distance/margin pair is (0.10,20), the published conservative sigma=32
+profile at K=2^20 (original BAA, Figure 10, ePrint 2025/1828).
+The table generator does not treat this reference as part of the archived
+three-process campaign.

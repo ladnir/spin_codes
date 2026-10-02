@@ -2,15 +2,15 @@
 
 Block-Accumulate (BA) codes concatenate a random block-diagonal outer with
 one or more stages, each consisting of a uniform interleaver and an accumulator
-\cite{KolesnikovEtAl2026BA}. Accumulator SPIN retains the first such stage and
-therefore may be viewed as a truncated BA code. We retain the SPIN name to
+\cite{KolesnikovEtAl2026BA}. Accumulator SPIN keeps only the first such stage and
+therefore may be viewed as a truncated BA code. We use the SPIN name to
 place this construction in the common outer--interleaver--inner interface, but
 the block-accumulate architecture and the random-block enumerator below are
 due to Kolesnikov et al.
 
 Accumulator SPIN follows the BA ensemble at this level: setup samples the
-local maps independently. The theorem below conditions each local map to be
-injective. This condition makes every realized outer encoder injective.
+local maps independently. Theorem~\ref{thm:independent-accumulator-spin} conditions each local map to
+be injective. This condition makes every realized outer encoder injective.
 
 Chosen-block BAA studies the related fixed-constituent choice
 \cite{cryptoeprint:2026/1903}. It fixes a short constituent code and

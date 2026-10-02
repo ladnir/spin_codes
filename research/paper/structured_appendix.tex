@@ -1,4 +1,5 @@
 \section{Asymptotic Structured SPIN Certificate}
+\label{app:structured}
 
 \subsection{Certificate for the Scalable Family}
 \label{app:structured-scalable-certificate}
@@ -6,20 +7,20 @@
 This appendix supplies the detailed estimates for the proof of
 Theorem~\ref{thm:structured-spin-scalable} in
 Section~\ref{sec:structured-distance}. The argument
-first selects one Golay--BA-3 constituent whose realized spectrum obeys a
+first selects one Golay BAA constituent whose realized spectrum obeys a
 certified envelope. It then reduces the structured route to occupation and
 mean row weight. The final first-moment bound separates four regimes:
 $Q=1,2$, fixed $Q\ge3$, growing sparse $Q$, and positive relative
 occupation. Finite IMT transfers handle the last two regimes. Continuum
-transfers handle the fixed regimes.
+transfers handle $Q=1,2$ and fixed $Q\ge3$.
 
 For $0\le d\le N$ and $1\le Q\le L$, let $Z_{d,Q}$ count nonzero messages
 with exactly $Q$ active outer blocks and encoded weight at most $d$. Unless a
 display states otherwise, expectations and probabilities include the shared
-BA constituent, the route permutations, and the IMT transvections. The
+BAA constituent, the route permutations, and the IMT transvections. The
 finite-length specialization is not part of this probability space.
 
-\subsubsection{The One-Sampled Golay--BA-3 Outer}
+\subsubsection{The One-Sampled Golay BAA Outer}
 
 We begin with the exact expected spectrum before selecting the shared
 constituent. Let
@@ -43,7 +44,7 @@ We set $T_b(0,0):=1$ and $T_b(0,c):=0$ for $c\ne0$. Binomial coefficients
 outside their natural range are zero. Thus $P_b(a,c)$ is the exact
 weight-transition probability of a uniformly interleaved accumulator.
 
-For a realized BA constituent $\mathcal O_b$, let
+For a realized BAA constituent $\mathcal O_b$, let
 $A_{\mathcal O_b}(w)$ count its nonzero words of weight $w$, and define
 \[
   \overline A_b(w)
@@ -51,7 +52,7 @@ $A_{\mathcal O_b}(w)$ count its nonzero words of weight $w$, and define
   \E_{\tau_1,\tau_2}[A_{\mathcal O_b}(w)].
 \]
 
-\begin{lemma}[Exact expected BA spectrum]
+\begin{lemma}[Exact expected BAA spectrum]
 \label{lem:structured-exact-ba-spectrum}
 For every $0\le w\le b$,
 \begin{equation}
@@ -109,13 +110,13 @@ Uniform coefficient and Stirling bounds in
   \label{eq:structured-ba-asymptotic}
 \end{equation}
 
-\begin{lemma}[BA outer tails]
+\begin{lemma}[BAA outer tails]
 \label{lem:structured-ba-tails}
 As $b\to\infty$ through multiples of $24$,
 \[
   \sum_{w/b\notin[0.104,0.896]}\overline A_b(w)=o(1).
 \]
-The expectation is over the two independent BA permutations.
+The expectation is over the two independent outer permutations $\tau_1,\tau_2$.
 \end{lemma}
 
 \begin{proof}
@@ -208,7 +209,7 @@ of sparse upper-tail words by $b(\zeta^{-2}+1)S_b=O(b^{-1/2})=o(1)$.
 It remains to bound messages with $j>\eta b$. Write
 $\alpha:=a/b$, $\beta:=H_1/b$, and $x:=H_2/b$.
 Then $\alpha\ge8\eta=0.008$. Accumulator support constraints imply
-$x\ge\alpha/4\ge0.002$. For the lower tail, the interval verifier proves
+$x\ge\alpha/4\ge0.002$. For the lower tail, our interval verifier\repositorycite{} proves
 \begin{equation}
   g(\alpha)+\pi(\alpha,\beta)+\pi(\beta,x)
   <-7.68\cdot10^{-8}
@@ -233,9 +234,8 @@ also gives exponential decay for the dense upper tail.
 Combining the sparse and dense estimates proves the lemma.
 \end{proof}
 
-Our verification code checks the monotonicity and geometric constants,
-and uses interval arithmetic to check \eqref{eq:structured-ba-dense-tail}.
-The author-side paper-to-code map gives the sources and replay commands.
+The monotonicity and geometric constants and the interval check of
+\eqref{eq:structured-ba-dense-tail} are checked by the same verifier.
 Lemma~\ref{lem:structured-one-sample-selection} now selects the shared
 outer. We next bound its spectrum on $\mathcal W=[0.104,0.896]$.
 
@@ -246,22 +246,24 @@ lower envelope of rational affine supports. It proves
   \qquad(x\in\mathcal W).
   \label{eq:ba-spectrum-majorant}
 \end{equation}
-The refined majorant has $39$ affine segments. It retains the old supports
-and adds five left-half supports with slopes $0.09,0.07,0.05,0.03,0.01$,
-together with their reflections. Each new intercept is an outward rational
+The majorant has $39$ affine segments. It contains the supports of the
+$31$-segment majorant of Appendix~\ref{app:imt-sparse} and five further
+left-half supports with slopes $0.09$, $0.07$, $0.05$, $0.03$, and $0.01$, together with
+their reflections. Each of these ten intercepts is an outward rational
 upper bound on $\ln(1+e^{-s})-(\ln2)/2+10^{-5}$ for its slope $s$.
 This expression proposes the line; validity follows from outward checks of
 \eqref{eq:structured-ba-variational} over its entire active interval.
-The refinement accepts $5{,}363$ leaves after $10{,}721$ box checks, with
+The check of these supports accepts $5{,}363$ leaves after $10{,}721$ box checks, with
 largest upper residual below $-1.70\cdot10^{-9}$. Exact partition replay
 and higher working precision confirm every leaf. Reflection uses
 $\pi(c,x)=\pi(c,1-x)$, not a symmetry of each realized constituent.
-Inherited intervals only shrink. The central support is an outward rational
+Adding supports only shrinks the active interval of each $31$-segment
+support, so its validity checks carry over. The central support is an outward rational
 rounding of the exact code-size bound $(\ln2)/2$. Taking the lower envelope
 preserves concavity.
 Equations~\eqref{eq:structured-ba-asymptotic} and
 \eqref{eq:ba-spectrum-majorant} give the outer exponent used below. The
-verification records retain all affine supports and box witnesses.
+certificate records all affine supports and box witnesses.
 
 \subsubsection{Routing and the Inner Estimates}
 

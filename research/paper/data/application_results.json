@@ -11,6 +11,10 @@
     "bolt": {
       "path": "results/bolt-one-thread/summary.json",
       "sha256": "08b30416ef14b1362ebb19a04aa5830fbf3348debca17fd3920a7066b1402432"
+    },
+    "flock": {
+      "path": "data/flock_integrated_20260929.json",
+      "sha256": "bb8b1fead10e3bf3580c465ed8db77525fcc5affe1bd4559be2f2dda5ced03ba"
     }
   },
   "encoding": {
@@ -223,64 +227,84 @@
   "flock": {
     "14": {
       "spin": {
+        "trial": 6.5,
         "compressions": 16384.0,
         "witness_bytes": 33554432.0,
-        "total_ms": 112.86148987499999,
-        "verify_ms": 38.148826375,
-        "proof_bytes": 7028048.0,
-        "witness_ms": 13.588537625,
-        "commit_ms": 32.237238625,
-        "zerocheck_ms": 40.376181625,
-        "lincheck_ms": 6.656943875,
-        "open_ms": 19.93520175,
-        "round1 URM": 15.345,
-        "round2 fused fold": 16.11125,
-        "rounds 3+ tail": 8.8025
+        "total_ms": 94.16118549999999,
+        "verify_ms": 37.25030075,
+        "proof_bytes": 6498544,
+        "witness_ms": 14.54639825,
+        "commit_ms": 15.65978675,
+        "zerocheck_ms": 40.1716055,
+        "lincheck_ms": 6.629493999999999,
+        "open_ms": 17.05793125,
+        "alloc_ms": 2e-05,
+        "layout_ms": 2.25e-05,
+        "encode_ms": 7.88476925,
+        "transpose_ms": 0.0,
+        "leaves_ms": 6.681335499999999,
+        "parents_ms": 1.0811935,
+        "runs": [
+          "14-1-current-spin",
+          "14-4-current-spin"
+        ]
       },
       "native-fast100": {
+        "trial": 6.5,
         "compressions": 16384.0,
         "witness_bytes": 33554432.0,
-        "total_ms": 216.942798,
-        "verify_ms": 27.7822825,
-        "proof_bytes": 296617.0,
-        "round1 URM": 13.5475,
-        "round2 fused fold": 18.21,
-        "rounds 3+ tail": 10.0275,
-        "witness_ms": 13.63375,
-        "commit_ms": 44.64375,
-        "piop_and_banks_ms": 54.85875,
-        "open_ms": 103.625
+        "total_ms": 215.33200449999998,
+        "verify_ms": 27.72505175,
+        "proof_bytes": 296617,
+        "commit_ms": 43.73,
+        "witness_ms": 13.7775,
+        "open_ms": 102.825,
+        "encode_ms": 26.8925,
+        "runs": [
+          "14-2-current-native-fast100",
+          "14-3-current-native-fast100"
+        ]
       }
     },
     "16": {
       "spin": {
+        "trial": 6.5,
         "compressions": 65536.0,
         "witness_bytes": 134217728.0,
-        "total_ms": 420.48762525,
-        "verify_ms": 45.531301375,
-        "proof_bytes": 13469488.0,
-        "witness_ms": 75.84970925,
-        "commit_ms": 100.97791375,
-        "zerocheck_ms": 158.42016625000002,
-        "lincheck_ms": 23.761545125,
-        "open_ms": 61.353781999999995,
-        "round1 URM": 60.0475,
-        "round2 fused fold": 63.96125,
-        "rounds 3+ tail": 34.31375
+        "total_ms": 350.89169775,
+        "verify_ms": 42.2319015,
+        "proof_bytes": 11047536,
+        "witness_ms": 59.316407999999996,
+        "commit_ms": 62.20024325,
+        "zerocheck_ms": 159.65603700000003,
+        "lincheck_ms": 23.703999000000003,
+        "open_ms": 46.01752525,
+        "alloc_ms": 2e-05,
+        "layout_ms": 2.25e-05,
+        "encode_ms": 28.01001275,
+        "transpose_ms": 0.0,
+        "leaves_ms": 33.149246500000004,
+        "parents_ms": 1.07112725,
+        "runs": [
+          "16-1-current-spin",
+          "16-4-current-spin"
+        ]
       },
       "native-fast100": {
+        "trial": 6.5,
         "compressions": 65536.0,
         "witness_bytes": 134217728.0,
-        "total_ms": 571.2948220000001,
-        "verify_ms": 27.928806375,
-        "proof_bytes": 415657.0,
-        "round1 URM": 53.50375,
-        "round2 fused fold": 72.3,
-        "rounds 3+ tail": 40.886250000000004,
-        "witness_ms": 54.84375,
-        "commit_ms": 161.80625,
-        "piop_and_banks_ms": 213.26999999999998,
-        "open_ms": 141.1225
+        "total_ms": 571.4056095000001,
+        "verify_ms": 27.935382,
+        "proof_bytes": 415657,
+        "commit_ms": 161.9925,
+        "witness_ms": 55.375,
+        "open_ms": 141.685,
+        "encode_ms": 98.5925,
+        "runs": [
+          "16-2-current-native-fast100",
+          "16-3-current-native-fast100"
+        ]
       }
     }
   },
@@ -310,6 +334,93 @@
     ],
     "encoding_method": "31 trials; five initial paired warmups; per-direction warmup then three calls; independent inputs/workspaces; alternating directions",
     "pcs_method": "two processes per shape; five trials after one warmup; 512 MiB input; one thread; znver4; existing release profile",
-    "flock_method": "four processes per backend/workload; five warmups and four measured proofs; native CPU and 64-byte function alignment; thin LTO, one codegen unit"
+    "flock_method": "Mean of two process medians; each median uses trials 5\u20138 after five warmup/settling proofs. All 108 generated proofs verified. Times in milliseconds."
+  },
+  "historical_flock": {
+    "source_revision": "f98b02a",
+    "flock_revision": "e15d047",
+    "measurement_method": "four processes per backend/workload; five warmups and four measured proofs; native CPU and 64-byte function alignment; thin LTO, one codegen unit",
+    "rows": {
+      "14": {
+        "spin": {
+          "compressions": 16384.0,
+          "witness_bytes": 33554432.0,
+          "total_ms": 112.86148987499999,
+          "verify_ms": 38.148826375,
+          "proof_bytes": 7028048.0,
+          "witness_ms": 13.588537625,
+          "commit_ms": 32.237238625,
+          "zerocheck_ms": 40.376181625,
+          "lincheck_ms": 6.656943875,
+          "open_ms": 19.93520175,
+          "round1 URM": 15.345,
+          "round2 fused fold": 16.11125,
+          "rounds 3+ tail": 8.8025
+        },
+        "native-fast100": {
+          "compressions": 16384.0,
+          "witness_bytes": 33554432.0,
+          "total_ms": 216.942798,
+          "verify_ms": 27.7822825,
+          "proof_bytes": 296617.0,
+          "round1 URM": 13.5475,
+          "round2 fused fold": 18.21,
+          "rounds 3+ tail": 10.0275,
+          "witness_ms": 13.63375,
+          "commit_ms": 44.64375,
+          "piop_and_banks_ms": 54.85875,
+          "open_ms": 103.625
+        }
+      },
+      "16": {
+        "spin": {
+          "compressions": 65536.0,
+          "witness_bytes": 134217728.0,
+          "total_ms": 420.48762525,
+          "verify_ms": 45.531301375,
+          "proof_bytes": 13469488.0,
+          "witness_ms": 75.84970925,
+          "commit_ms": 100.97791375,
+          "zerocheck_ms": 158.42016625000002,
+          "lincheck_ms": 23.761545125,
+          "open_ms": 61.353781999999995,
+          "round1 URM": 60.0475,
+          "round2 fused fold": 63.96125,
+          "rounds 3+ tail": 34.31375
+        },
+        "native-fast100": {
+          "compressions": 65536.0,
+          "witness_bytes": 134217728.0,
+          "total_ms": 571.2948220000001,
+          "verify_ms": 27.928806375,
+          "proof_bytes": 415657.0,
+          "round1 URM": 53.50375,
+          "round2 fused fold": 72.3,
+          "rounds 3+ tail": 40.886250000000004,
+          "witness_ms": 54.84375,
+          "commit_ms": 161.80625,
+          "piop_and_banks_ms": 213.26999999999998,
+          "open_ms": 141.1225
+        }
+      }
+    }
+  },
+  "flock_provenance": {
+    "date": "2026-09-29",
+    "cpu": "AMD Ryzen 9 7950X, CPU 15, fixed 4.5 GHz, boost disabled",
+    "compiler": "Rust 1.96.0, GCC 15.2",
+    "profile": "target-cpu=native; CXXFLAGS=-march=znver4; 64-byte function alignment; one prover/verifier thread",
+    "baseline_revisions": {
+      "hypercat": "f3bf1265cfded640295f969a3d245a8d4a2a8d9d",
+      "flock": "5a18418f2d76cf4dc9d9982392c3c431833a685c",
+      "spin": "ae0f4f9c8663c139b0479259f626c34fe998f6b6"
+    },
+    "built_source_manifest_sha256": "203a2133512c7161f9c3b4ce01afd45686f14c87be62f405614852b886eaed79",
+    "source_snapshots": {
+      "baseline.tgz": "a51074a14574bbd804cd7f06bf509a70630ca762efc58ed2d796329cbdc9ed0d",
+      "current.tgz": "c2dc7e64057be7223ed94d3f5364881887ce545842ec22a5ef8dcf986a09bb72"
+    },
+    "receipt": "artifacts/bench-final/receipt.json",
+    "scope": "Complete PCS integrations including layout, hashing, opening, and witness generation; not an isolated code substitution. Setup, verification and outer serialization excluded from prover time. Proof sizes are serialized bytes."
   }
 }

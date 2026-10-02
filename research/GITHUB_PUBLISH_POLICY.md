@@ -3,7 +3,7 @@
 GitHub is the authoritative repository for the manuscript, source code, proof
 prose, compact manifests, spectra, and the small machine-readable artifacts
 needed to audit a claimed result. The shared integration branch is `origin/main`
-at https://github.com/ladnir/permute_conv.
+at https://github.com/ladnir/spin_codes.
 
 Overleaf is an optional paper-only publishing mirror, not a competing source
 of truth. Export the manuscript and required assets from a recorded GitHub
@@ -27,8 +27,8 @@ bulk-output formats or directories. If a future proof artifact genuinely needs
 more space, store its generator and a checksum in Git, then publish the artifact
 through an external release or artifact store after review.
 
-Before pushing, run:
+Before pushing, run from the repository root:
 
 ```text
-python scripts/check_repository_hygiene.py
+python research/scripts/check_repository_hygiene.py
 ```

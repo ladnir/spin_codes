@@ -1,6 +1,6 @@
 \subsubsection{The Weight-Indexed Calculation}
 
-All three lines use the same first-moment idea. Fix a target distance $d$,
+All three families use the same first-moment idea. Fix a target distance $d$,
 and count nonzero messages whose encoded words have weight at most $d$.
 If the expected count is below one, then some sampled encoder is injective and
 has minimum distance greater than $d$.
@@ -60,7 +60,6 @@ Under a uniform interleaver independent of $O$ and $I$,
 
 Accumulator SPIN and Random SPIN use
 Corollary~\ref{cor:weight-first-moment}. Structured SPIN uses
-Theorem~\ref{thm:class-first-moment} with occupation and row-weight classes.
-The structured-route analysis supplies a uniform failure envelope for every
-such class; it does not require the conditional probability to be identical
-for all words in the class.
+Theorem~\ref{thm:class-first-moment} with occupation and row-weight classes;
+the uniform envelope does not require the conditional failure probability to
+be identical for all words in a class.

@@ -22,9 +22,8 @@ For an admissible output length $N$, a SPIN encoder has the form
 \end{equation}
 The outer $O_N$ maps the message to $N$ intermediate bits, $\Pi_N$ permutes
 these coordinates, and the recursive linear inner $I_N$ preserves length.
-The outer prevents sparse messages from remaining too sparse; the interleaver
-spreads their support before recursive encoding. Setup samples the specified
-components once. The phrase \emph{single permutation} describes this
+The outer gives sparse messages an initial weight floor; the interleaver
+spreads the resulting support before recursive encoding. The phrase \emph{single permutation} describes this
 interface: block shuffles, a transpose, and region shuffles may implement
 $\Pi_N$, but their composition is one global interleaver.
 
@@ -33,42 +32,42 @@ $\Pi_N$, but their composition is one global interleaver.
 \paragraph{Distance and Encoding Work.}
 Every realization of our main construction, Structured SPIN, has rate $1/2$.
 Its minimum distance exceeds $0.11N$ with probability $1-o(1)$ over setup.
-Ordinary and transposed encoding require $O(N)$ bit operations at its native
-lengths. The distance and rate claims are formally verified in Lean,
+Ordinary and transposed encoding require $O(N)$ bit operations at the family's
+native lengths. The distance and rate claims are formally verified in Lean,
 including the construction's random setup, the analytic estimates, and the
 required numerical certificates. Appendix~\ref{app:structured-lean} describes
 the formalization.
 For finite lengths, we choose constituents for concrete performance
 rather than require the asymptotic outer. A fixed BCH-derived
 $[256,128,\ge38]$ constituent gives relative distance greater than $0.10$
-with setup failure below $2^{-40}$ at message lengths
+with setup-failure probability below $2^{-40}$ at message lengths
 $2^{16},2^{18},2^{20},2^{22},2^{24}$.
 The certificate uses rigorous spectrum inequalities, not an assumed exact
 BCH spectrum. Section~\ref{sec:finite-quarter} also gives two certified
-quarter-rate operating points.
+rate-$1/4$ operating points.
 
 \paragraph{Analysis and Structure.}
-For this class of encoder, sparse input words are typically responsible
-for low minimum distance. The challenge for the encoder is to spread their
-nonzero bits widely without paying for dense matrix multiplication.
+For this class of encoder, sparse messages typically cause low minimum
+distance. The encoder must spread their nonzero bits widely without dense
+matrix multiplication.
 First, the outer encodes short message blocks independently, so even a block
 with a single nonzero bit produces several nonzero bits.
 Next, the permutation spreads the bits of each encoded block across distinct
-regions, rather than leaving them clustered together.
+regions.
 Finally, the inner processes this stream with a small running state.
 Cheap XOR updates let an input bit influence many later outputs, spreading
 local changes over a long codeword.
 Our proof establishes the distance guarantees above by
 bounding the probability that any nonzero message produces too few nonzero
-output bits. The contribution is this efficient combination and its distance
-analysis, building on established ideas from concatenated codes.
+output bits. Our contribution is this efficient combination and its distance
+analysis; its ingredients build on established ideas from concatenated codes.
 
 Section~\ref{sec:spin-intuition} develops the idea through two simpler
-instances: Accumulator SPIN uses a running sum as its inner, and Random SPIN
+supporting constructions: Accumulator SPIN uses a running sum as its inner, and Random SPIN
 illustrates what stronger random mixing can achieve. Structured SPIN
-retains Random SPIN's $11\%$ distance guarantee while reducing the direct
+matches Random SPIN's $11\%$ distance guarantee while reducing the direct
 encoding work from $\Theta(N\log N)$ to $O(N)$.
-The complete proofs for these two motivating instances are in
+The complete proofs for these two supporting constructions are in
 Appendix~\ref{app:supporting-constructions}.
 The minimal accumulator instance also answers the logarithmic-outer-memory
 question of Bazzi, Mahdian, and Spielman~\cite{bms09} in the
@@ -76,24 +75,29 @@ terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 
 \paragraph{Implementation and Applications.}
 On one Ryzen 9 7950X thread, SPIN's transposed encoder computes
-$2^{20}$ $128$-bit correlation blocks in about $10$\,ms, approximately
-$3\times$ faster than original BAA~\cite{KolesnikovEtAl2026BA}.
+$2^{20}$ $128$-bit correlation blocks in about $9.3$\,ms after precomputation,
+approximately $3.4\times$ faster than the original
+block--accumulate--accumulate (BAA) codes~\cite{KolesnikovEtAl2026BA}.
 Ordinary encoding has similar cost.
 Our same-host encoder comparison also includes newer chosen-block BAA,
 whose fastest measured configuration takes about $24$\,ms.
-In a libOTe Silent OT integration, expansion and SPIN take about $20$\,ms
-per party for $2^{20}$ correlations; output hashing brings the cost to
-about $22$\,ms. These measured computations exclude base OT, setup, and
-network latency. Section~\ref{sec:spin-pcg} gives the per-party results.
+In libOTe's regular-noise Silent OT path, the sender produces $2^{18}$ hashed
+OTs in $2.944$\,ms, or $89.0$ million OTs per second on one core.
+This experiment reuses the full precomputed SPIN code and does not refresh
+its permutations between batches; such refresh is a heuristic outside our
+distance certificates.
+It measures local computation with supplied base correlations,
+excluding initial setup and network transport; Section~\ref{sec:spin-pcg}
+specifies the timing scope.
 
 As application evidence, we substitute SPIN into a Brakedown-style
 PCS~\cite{brakedown23} and integrate it into Flock~\cite{flock26}.
 Standalone commitment and one opening of $512$\,MiB take $509$\,ms on one
 core. Replacing Ligerito~\cite{ligerito25} within Flock improves throughput
-by $1.36$--$1.92\times$ at the measured workloads, with larger proofs and
+by $1.63$--$2.29\times$ at the measured workloads, with larger proofs and
 slower verification. Both backends receive the applicable shared
 optimizations. Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock}
-state the conditional parameter targets and comparison scope.
+state the security targets, what they exclude, and the comparison scope.
 
 \subsection{Related Work}
 
@@ -108,13 +112,13 @@ Bazzi, Mahdian, and Spielman give limitations for depth-two constant-memory
 concatenations and positive results with two accumulators~\cite{bms09}.
 Block-Accumulate codes use random block-diagonal maps, detailed expected
 spectra, and optimized CPU/GPU encoders~\cite{KolesnikovEtAl2026BA}.
-Accumulator SPIN is their one-accumulator truncation. Chosen-block BAA
-reuses a spectrum-controlled constituent~\cite{cryptoeprint:2026/1903};
-Structured SPIN combines that shared design idea with a structured route
+Accumulator SPIN truncates BAA to a single accumulator stage.
+Chosen-block BAA reuses a spectrum-controlled constituent~\cite{cryptoeprint:2026/1903};
+Structured SPIN combines that shared design idea with a structured interleaver
 and a different recursive inner.
 
 \paragraph{Correlation Generation.}
-PCGs and vector-OLE use linear codes
+PCGs and VOLE use linear codes
 \cite{bcgi18,bcg19pcg,bcg19tworound,ferret20,bcg20ring}.
 Silver uses structured LDPC matrices and a banded triangular
 solve~\cite{CouteauRindalRaghuraman2021Silver}; its heuristic
@@ -123,7 +127,7 @@ Expand--Accumulate combines a sparse expander and accumulator~\cite{ea22}.
 Expand--Convolute uses random time-varying convolution and proves distance
 through coupling and concentration~\cite{RaghuramanRindalTanguy2023EC};
 its faster empirical parameter choices go beyond those guarantees.
-Random SPIN retains that inner but replaces the expander with independent
+Random SPIN uses that inner but replaces the expander with independent
 random-block injections and uses an exact weight-enumerator transform.
 Structured SPIN instead combines a spectrum-controlled outer, structured
 interleaving, and a recursive inner to prove strong distance with linear encoding work.
@@ -134,11 +138,9 @@ Linear encoding is a first-order cost in constant-overhead arguments
 a field-agnostic SNARK from linear-time encodable codes~\cite{brakedown23}.
 Other constructions use Expand--Accumulate~\cite{fieldEA24} or
 interleaved RAA with improved binary distance bounds~\cite{blaze25}.
-Blaze's generic code-switching framework also accommodates SPIN in theory
-with smaller asymptotic proofs than our measured Brakedown-style PCS.
+SPIN could also instantiate Blaze's generic code-switching framework, which
+gives asymptotically smaller proofs than our Brakedown-style PCS.
 Bolt uses sketched codes to reduce commitment cost~\cite{bolt26}.
-We evaluate the Brakedown substitution and its integration into Flock,
-using Ligerito as the alternative PCS.
 
 \paragraph{Organization and Artifact.}
 Sections~\ref{sec:preliminaries}--\ref{sec:framework} give the common framework;
@@ -146,15 +148,13 @@ Section~\ref{sec:spin-intuition} builds intuition before the structured
 construction, asymptotic proof, and finite certificates in
 Sections~\ref{sec:structured-spin}--\ref{sec:finite-certificates}.
 Sections~\ref{sec:implementation} and~\ref{sec:applications} evaluate the encoder
-and applications. The appendices retain the complete supporting proofs,
+and applications. The appendices contain the complete supporting proofs,
 parameter studies, and detailed experiments.
 \ifsubmission
 The artifact provides the core SPIN encoder implementation and build instructions.
 \else
-The \artifactlink{https://github.com/ladnir/permute_conv}{source repository}
-includes the core SPIN encoder implementation and
-\artifactlink{https://github.com/ladnir/permute_conv/blob/main/artifact/README.md}{build instructions}.
+The source repository~\cite{spinCodeRepository} includes the core SPIN
+encoder implementation and build instructions.
 \fi
-The artifact does not include the numerical-search or comparison-experiment archives.
 The accompanying Lean development includes proof sources, numerical
 certificates, and reproduction instructions.

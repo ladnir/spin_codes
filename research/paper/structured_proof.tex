@@ -2,7 +2,8 @@
 \label{sec:structured-distance}
 
 We now instantiate Structured SPIN with a growing outer and fixed IMT maps.
-The outer length grows logarithmically, but its encoding work is linear.
+The constituent length $b$ grows logarithmically, but the outer encoding
+work is linear.
 The proof must handle both messages concentrated in a few outer blocks
 and messages occupying a constant fraction of the blocks.
 
@@ -10,7 +11,7 @@ and messages occupying a constant fraction of the blocks.
 \label{sec:structured-scalable}
 
 The scalable outer begins with an even base length $a$ and an injective
-rate-one-half map $H_a:\F_2^{a/2}\longrightarrow\F_2^a$.
+rate-$1/2$ map $H_a:\F_2^{a/2}\longrightarrow\F_2^a$.
 Its weight enumerator
 \[
   W_a(z):=\sum_{v\in\F_2^{a/2}}z^{\wt(H_a(v))}
@@ -18,7 +19,7 @@ Its weight enumerator
 must be known exactly or bounded by a certified envelope. For any multiple
 $b$ of $a$, let $H_{a,b}$ be the direct sum of $b/a$ copies of $H_a$.
 Setup samples two independent permutations $\tau_1,\tau_2\gets S_b$ and
-constructs the rate-one-half BA-3 constituent
+constructs the rate-$1/2$ BAA constituent
 \begin{equation}
   \mathcal O_{a,b}
   :=
@@ -27,15 +28,15 @@ constructs the rate-one-half BA-3 constituent
   \label{eq:ba3-outer}
 \end{equation}
 It samples $\mathcal O_{a,b}$ once and reuses that realization in every outer
-position. This is the chosen-block form of the BA construction
+position. This is the chosen-block form of the BAA construction
 \cite{KolesnikovEtAl2026BA,cryptoeprint:2026/1903}.
 
 The base length $a$ is a construction parameter. A distance certificate must
-bind a particular $H_a$, its spectrum, and an admissible schedule for $b$.
+fix a particular $H_a$, its spectrum, and an admissible schedule for $b$.
 Changing $a$ or $H_a$ changes the outer enumerator and may change the certified
 schedule. It does not change the route or the structured inner.
 
-\paragraph{Current Certified Choice.}
+\paragraph{The Asymptotic Instantiation.}
 For the theorem below, set $a:=24$ and let
 $H_{24}:\F_2^{12}\longrightarrow\F_2^{24}$ encode the extended binary Golay code. Fix a positive integer $m$ and set
 $L_m:=128m$. Let $b_m$ be the least positive multiple of $24$ satisfying
@@ -47,7 +48,7 @@ $L_m:=128m$. Let $b_m$ be the least positive multiple of $24$ satisfying
   K_m:=N_m/2.
   \label{eq:structured-native-schedule}
 \end{equation}
-Then $b_m=\frac{39}{4}\log_2N_m+O(1)$, and consecutive direct lengths have relative
+Then $b_m=\frac{39}{4}\log_2N_m+O(1)$, and consecutive native lengths have relative
 gap $o(1)$.
 
 Use $\mathcal O_{24,b_m}$ from \eqref{eq:ba3-outer}. Setup reuses this sampled
@@ -57,21 +58,18 @@ The expectation over $(\tau_1,\tau_2)$ remains outside the
 $q$th enumerator power, as in
 \eqref{eq:shared-constituent-enumerator}.
 
-After sampling this shared constituent, setup follows the generic
-construction. It samples one independent $\sigma_j\gets S_{b_m}$ for every
-outer position and one independent $\pi_r\gets S_{L_m}$ for every region.
+Setup then samples the block shuffles, region shuffles, and transvections
+as in Section~\ref{sec:structured-spin}, independently of $(\tau_1,\tau_2)$.
 The inner fixes $(t,s)=(128,19)$ and the IMT maps $A,C$ in
-Table~\ref{tab:imt-maps}. Setup samples one independent transvection per
-inner step as above. All route permutations and transvections are independent
-of $(\tau_1,\tau_2)$.
+Table~\ref{tab:imt-maps}.
 
 The selected maps have a small, explicit weight structure. For nonzero
 states $q$, the only values of $\wt(Aq)$ are $48,56,64,72,80$.
 The transfer analysis tracks these five shells rather than all $2^{19}$
 states. The $128$ columns of $C$ are distinct nonzero weight-five vectors
 spanning $\F_2^{19}$, so each input coordinate contributes to only five
-state coordinates. This gives sparse feedback without treating its
-syndromes as uniform: the proof uses the exact spectrum of $C^\top$ to
+state coordinates. This gives sparse feedback. The proof does not treat
+the feedback syndromes $C(X_i)$ as uniform: it uses the exact spectrum of $C^\top$ to
 bound cancellations. The appendix supplies the map bases, shell
 multiplicities, and transfer entries; Section~\ref{sec:implementation}
 describes the circuits used to apply the maps.
@@ -87,7 +85,7 @@ For the setup above,
   \qquad(m\to\infty).
   \label{eq:structured-spin-distance}
 \end{equation}
-The probability includes the two BA permutations, all route permutations,
+The probability is over the two BAA permutations, all route permutations,
 and all IMT transvections. Every realized code has rate $1/2$. Its ordinary
 and transposed encoders use $O(N_m)$ bit operations.
 \end{theorem}
@@ -101,8 +99,8 @@ each number of active blocks. Finally, sum those bounds before applying
 the first-moment theorem. Appendix~\ref{app:structured-scalable-certificate}
 gives the spectrum calculations, transfer entries, and numerical witnesses
 used below.
-The block constant $39/4$ is the current certified choice; improving it
-would change the schedule, not the construction.
+The block constant $39/4$ is the value certified here; a smaller certified
+constant would change the schedule, not the construction.
 
 \subsection{Selecting the Shared Outer}
 
@@ -121,7 +119,7 @@ proves
 
 \begin{lemma}[One-sample selection]
 \label{lem:structured-one-sample-selection}
-There is an event $\mathcal G_b$, determined by the two BA permutations, such
+There is an event $\mathcal G_b$, determined by the two BAA permutations, such
 that
 \begin{equation}
   \Prob[\mathcal G_b]=1-o(1).
@@ -149,14 +147,14 @@ A union bound over at most $b+1$ weights costs $O(1/b)$. Intersecting the two
 events proves the lemma.
 \end{proof}
 
-The event in Lemma~\ref{lem:structured-one-sample-selection} is paid once.
+The $o(1)$ loss from Lemma~\ref{lem:structured-one-sample-selection} is
+incurred once.
 After setup samples $\mathcal O_b$, the construction reuses that realization
 at every outer position.
 
 Fix any realization satisfying $\mathcal G_b$. All subsequent bounds are
 uniform over this choice; the remaining randomness consists of the
 independent route permutations and IMT transvections.
-The resulting bounds therefore also hold conditional on $\mathcal G_b$.
 The spectrum calculation also gives a concave function
 $\widehat a_{\rm BA}$ on $\mathcal W$ such that
 \[
@@ -170,7 +168,8 @@ It does not replace the expectation of a power by a power of the mean.
 
 For $0\le d\le N$ and $1\le Q\le L$, let $Z_{d,Q}$ count nonzero messages
 with exactly $Q$ active outer blocks and output weight at most $d$.
-Our goal is to show that the sum of their conditional expectations is $o(1)$.
+Our goal is to show that
+$\sum_{Q=1}^L\E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]=o(1)$.
 
 \subsection{From Row Weights to an iid Comparison}
 
@@ -193,8 +192,9 @@ $w_1,\ldots,w_Q$, and set
   \qquad
   q:=\alpha x.
 \]
-The next lemma justifies the reduction from the complete weight tuple to
-$(\alpha,x)$ when $\alpha$ has a positive lower bound.
+When $\alpha$ has a positive lower bound, the next lemma reduces the routing
+law to a comparison that depends only on $q$, and the concavity step
+\eqref{eq:structured-ba-jensen} reduces the outer spectrum to $(\alpha,x)$.
 We use binary relative entropy with natural logarithms,
 \[
  D_{\rm KL}(u\Vert v)
@@ -204,7 +204,8 @@ with the usual continuous endpoint conventions.
 
 \begin{lemma}[Route domination]
 \label{lem:structured-route-domination}
-Let $F$ be any nonnegative function of the routed $L$-by-$b$ binary array.
+Let $F$ be any nonnegative function of the routed word, viewed as $b$
+regions of $L$ bits.
 Conditioned on the row weights $w_1,\ldots,w_Q$, the structured route
 satisfies
 \begin{equation}
@@ -272,8 +273,9 @@ description. For iid Bernoulli-$\beta$ input and $0<z<1$, weight each
 transition by $z$ to the emitted Hamming weight. Track mass at zero,
 arbitrary nonzero mass, and uniform mass on each of the five nonzero
 image-weight shells of $A$. This gives seven nonnegative coordinates.
-The lazy branch can cancel through $CX=Q_i$; the refresh branch spreads
-a live state uniformly. Both effects enter the transfer bound.
+For a live state, the transvection law of Section~\ref{sec:structured-spin}
+is a mixture of two branches. The lazy branch, $M_iQ_i=Q_i$, can cancel
+through $CX=Q_i$; the refresh branch spreads a live state uniformly. Both effects enter the transfer bound.
 
 Appendix~\ref{app:imt-finite-transfers} constructs nonnegative matrices
 $T(\beta,z)$ that dominate these weighted measures step by step.
@@ -288,8 +290,6 @@ A positive column vector $\boldsymbol v$ satisfying
 $T\boldsymbol v\le\lambda\boldsymbol v$ therefore gives a bound
 $C_{\boldsymbol v}\lambda^{N/128}$, with
 $C_{\boldsymbol v}:=v_Z/\min_i v_i$.
-This is a componentwise inequality, not an assumption that numerical
-eigenvalues are exact. The appendix also gives a scalar envelope.
 
 Fix $\alpha\ge10^{-4}$ and mean row weight $x\in\mathcal W$.
 Markov's inequality contributes $z^{-0.11N}$.
@@ -298,7 +298,9 @@ $\exp\{N\alpha\widehat a_{\rm BA}(x)+o(N)\}$.
 The factors for choosing active positions, row weights, and routing are
 also $\exp(o(N))$, uniformly in this range.
 
-We may choose a reference density $\beta=py$ rather than $\alpha x$.
+We may choose a reference density $\beta=py$ rather than $\alpha x$, where
+$p$ and $y$ are witness parameters in $(0,1)$ playing the roles of $\alpha$
+and $x$.
 Every routed array in the profile has weight $N\alpha x$.
 On that slice, changing the reference law costs
 $\exp\{ND_{\rm KL}(\alpha x\Vert py)\}$.
@@ -313,7 +315,8 @@ The resulting exponent per output bit is
 The certificate fixes witnesses on finitely many boxes covering
 $[10^{-4},1]\times\mathcal W$. On each affine segment of the outer majorant,
 this expression is convex in $(\alpha,\alpha x)$; vertex bounds suffice.
-Outward arithmetic gives an upper bound below $-4.10335\cdot10^{-7}$.
+Outward-rounded interval arithmetic bounds this exponent above by
+$-4.10335\cdot10^{-7}$ on every box.
 The finite set of witnesses has bounded prefactors, so the total
 positive-occupation contribution is at most $L\exp(-\eta N+o(N))$
 for some $\eta>0$.
@@ -360,8 +363,8 @@ Multiplying the row-counting, conditioning, and moment bounds yields
  (1-96\alpha)^{N/128}z^{-0.11N}.
  \end{aligned}
 \]
-The schedule pays for choosing active positions, since
-$\ln L/b\le4(\ln2)/39$. The leading coefficient per $Qb$ is below
+The schedule \eqref{eq:structured-native-schedule} gives
+$\ln L/b\le4(\ln2)/39$, which bounds the cost of choosing active positions. The leading coefficient per $Qb$ is below
 $-0.01340384$. When $Q\ge4096$, the remaining conditioning cost per $Qb$
 is below $0.002$.
 The other remainders vanish uniformly as $b$ grows.
@@ -385,7 +388,7 @@ $2^{-g}$ times its entering law plus $(1-2^{-g})$ times the uniform
 nonzero law. Mixing does not make the state zero.
 
 Put $M:=2^{19}-1$ and $p_0:=2^{18}/M$.
-Every coordinate of $A$ is nonzero, so a uniform live state emits
+Every row of $A$ is nonzero, so a uniform live state emits
 mean weight $128p_0$ per empty step.
 The geometric mixing law bounds the variance over $g$ empty steps by
 $3t^2g$. With the tilt $z_L=e^{-\theta/L}$, the weighted empty-interval
@@ -393,7 +396,7 @@ kernel therefore converges to
 $D_\gamma(u):=\operatorname{diag}(1,e^{-\gamma u})$ on zero/live states,
 where $\gamma=p_0\theta$ and $u$ is the interval's fraction of a region.
 
-An isolated input bit starts a zero state because the columns of $C$
+An isolated input bit moves a zero state to a live state because the columns of $C$
 are nonzero. From a uniform live state, it cancels with probability $1/M$.
 Its limiting transition is thus
 \[
@@ -442,7 +445,7 @@ The remainder may depend on $Q$: only finitely many such bounds are needed.
 
 \subsection{Completing the Argument}
 
-\begin{proof}[Theorem~\ref{thm:structured-spin-scalable}]
+\begin{proof}[Proof of Theorem~\ref{thm:structured-spin-scalable}]
 Fix a shared outer realization in $\mathcal G_b$. The route--inner bounds
 hold uniformly over this realization. Averaging under the outer law
 conditioned on $\mathcal G_b$ gives the conditional first-moment bounds below.
@@ -452,14 +455,14 @@ Equation~\eqref{eq:imt-sparse-final} gives a uniform geometric sum for
 $4096\le Q\le10^{-4}L$. The positive-occupation certificate bounds the
 remaining sum by $L\exp(-\eta N+o(N))$ for some $\eta>0$.
 Thus $\sum_{Q=1}^L\E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]=o(1)$.
-The explicit cutoff makes this a summable union, not merely a statement
-about each occupation sequence. Markov's inequality and
+Markov's inequality and
 $\Prob[\mathcal G_b^c]=o(1)$ prove the distance claim.
 
 Rate follows from injectivity. Every outer row costs $O(b)$ in either circuit
 direction: it uses fixed Golay circuits, two permutations, and two accumulators.
 The route costs $O(N)$, and the fixed-size binary IMT steps cost $O(1)$ each.
-The displayed adjoint gives the same bound for transposed encoding.
+The transposed recurrence \eqref{eq:structured-inner-transpose} gives the
+same bound for transposed encoding.
 \end{proof}
 
 For any sufficiently large requested output length $n$, let $m(n)$ be the
@@ -471,8 +474,7 @@ largest index satisfying $N_{m(n)}\le n$. Define
   \label{eq:structured-requested-length-wrapper}
 \end{equation}
 This zero extension preserves injectivity and minimum distance. Consecutive
-direct lengths have relative gap $o(1)$, so
+native lengths have relative gap $o(1)$, so
 $N_{m(n)}/n=1-o(1)$. The wrapped family therefore has rate
 $1/2-o(1)$, relative distance greater than $0.11-o(1)$ with high probability,
-and $O(n)$ ordinary and transposed work. The native-length theorem remains
-the primary statement.
+and $O(n)$ ordinary and transposed work.

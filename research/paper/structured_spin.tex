@@ -4,39 +4,54 @@
 \subsection{From Random Mixing to Structured Mixing}
 
 The examples in Section~\ref{sec:spin-intuition} motivate three changes:
-use a fast constituent with a certified spectrum, control how its support
-reaches the inner, and amortize random mixing over groups of coordinates.
+use a fast outer constituent with a certified spectrum, control how the outer
+support reaches the inner, and amortize random mixing over groups of coordinates.
 A sparse message illustrates the design; the proof must also control
 larger supports because their multiplicities can dominate the first moment.
 
-First, replace each dense random injection by a constituent with a fast
-encoding circuit. Its minimum distance alone is insufficient: nearby
-low-weight shells may contain many more words. We require bounds on those
-multiplicities. Equal-weight words can still have different coordinate
-patterns. Independently permuting each block's coordinates makes
-its support uniform conditional on weight, for each fixed message, even
-when positions reuse the same constituent.
+First, change the outer. Following chosen-block BAA~\cite{cryptoeprint:2026/1903},
+replace the outer's independently sampled dense maps with repeated copies of a
+chosen constituent code. We can select this code for both efficient
+encoding and a favorable weight distribution, then reuse its encoding
+circuit across blocks. The proof needs more than its minimum distance:
+we must also bound how many codewords occur at each low weight.
+Equal-weight words can still have different coordinate
+patterns. Independently permuting the coordinates of each block removes
+this pattern: for each fixed message, each block's support is uniform
+given its weight, even when all positions share one constituent.
 
 Second, replace the uniform global interleaver. It can concentrate an
 active block near the end of the recursion, leaving too little time to
 spread its support. Requiring heavier outer words can reduce that risk
 but may increase encoding cost. Instead, transpose the independently
 shuffled blocks into regions and shuffle each region independently.
-A row of weight $w$ then reaches exactly $w$ distinct regions, with at
+This structure also speeds up encoding: the transpose admits tiled data
+movement, and each regional shuffle accesses only part of the full vector.
+We call an outer block a row. A row of weight $w$ then reaches exactly $w$ distinct regions, with at
 most one bit per region. This constrains late activation without
 excluding it; the shuffles randomize the remaining alignment.
 
-Third, batch the inner computation. Fixed expansion and feedback maps
-combine an input group with a small persistent state, reusing compact
-circuits. Each step also applies a sampled transvection, whose action on
-a fixed nonzero state mixes a lazy update with uniform refresh.
-This Independent-Map Transvection (IMT) inner is analyzed using its actual
-state law and the spectra of its two maps, not independent new state bits.
-The following construction specifies the maps and setup distributions.
+Third, process the inner in steps that each consume a group of
+coordinates, rather than one coordinate at a time.
+With $m$-bit memory, the random convolution uses $\Theta(m^2)$ operations
+to produce $m$ output bits. Grouping lets us replace these dense inner
+products with fast fixed circuits: for example, an $O(m\log m)$ transform
+can process $m$ coordinates together. The work is shared across the group
+rather than repeated at every coordinate.
+
+Grouping also lets us reduce randomness, which is expensive to apply.
+Ideally, the inner would use only fixed maps, but we do not have a
+tractable distance proof for that choice. Our compromise keeps the
+expansion and feedback maps fixed and introduces random state mixing once
+per step. The Independent-Map Transvection (IMT) inner implements this
+mixing with a cheap transvection sampled at setup for each step. This
+retains the randomness needed by the proof without paying for dense random
+feedback at every coordinate. The following construction specifies these
+maps and their setup distributions.
 
 \subsection{Construction at a Glance}
 
-We first define one direct member of the family. Choose a constituent length
+We first define one native-length member of the family. Choose a constituent length
 $b$, a constituent dimension $k\le b$, a number $L$ of outer-block
 positions, an inner step width $t$, and a state dimension $s$, with $t\mid L$.
 Set
@@ -77,19 +92,20 @@ The next three subsections define these arrows.
 
 There are two kinds of construction data. The fixed data are the integers
 $(L,b,k,t,s)$, two linear maps $A:\F_2^s\to\F_2^t$ and
-$C:\F_2^t\to\F_2^s$, a setup law for invertible state maps $M_i:\F_2^s\to\F_2^s$, and a joint setup law for
+$C:\F_2^t\to\F_2^s$, a sampling distribution for invertible state maps
+$M_i:\F_2^s\to\F_2^s$, and a joint sampling distribution for
 injective constituent maps $G_j:\F_2^k\to\F_2^b$ for $j\in[L]$.
-This joint law must state whether the positions use one fixed constituent, one
+The construction must specify whether the positions use one fixed constituent, one
 shared sampled constituent, or independently sampled constituents. The
 distinction changes the expected outer enumerator.
 
-Setup samples the constituent maps from this joint law. Independently, it
+Setup samples the constituent maps from this joint distribution. Independently, it
 samples one uniform coordinate permutation for every outer block, one uniform
 permutation for every region, and one state map for
 every inner step. All routing permutations and state maps are mutually
 independent. After setup, every arrow in
-\eqref{eq:structured-dataflow} is fixed. A family selector $\theta_m$ is a
-sequence of these parameter choices and setup laws; we suppress $m$ until the
+\eqref{eq:structured-dataflow} is fixed. A family selector is a sequence
+$(\theta_m)_m$ of these parameter choices and sampling distributions; we suppress $m$ until the
 scalable instantiation in Section~\ref{sec:structured-scalable}.
 
 \subsection{Block-Diagonal Outer}
@@ -105,10 +121,11 @@ $u_j\in\F_2^k$. The outer encoder is the direct sum
 \end{equation}
 Equivalently, a generator matrix for $O$ places the local generator matrices
 on the diagonal. The most basic instantiation repeats one constituent
-$G:\F_2^k\to\F_2^b$ in every position. The scalable construction below builds
-this shared map from a parameterized base constituent and two accumulator
-layers. The current certificate uses an extended Golay base constituent, but
-the construction interface does not fix that choice or its length.
+$G:\F_2^k\to\F_2^b$ in every position. The asymptotic construction in
+Section~\ref{sec:structured-scalable} uses a growing, Golay-based BAA
+constituent: extended Golay blocks followed by two permute--accumulate
+stages. The finite-length constructions
+in Section~\ref{sec:finite-certificates} instead repeat fixed BCH constituents.
 
 The outer proof interface is its local weight enumerator. For a realized local
 map $G_j$, define
@@ -118,12 +135,24 @@ map $G_j$, define
   \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
   \label{eq:local-constituent-enumerator}
 \end{equation}
+The variable $z$ records weight: the coefficient of $z^w$ counts the
+nonzero block messages whose encoded output has weight $w$.
+These coefficients are ordinary integer counts, not elements of $\F_2$.
+We write $[z^h]F(z)$ for the coefficient of $z^h$ in a polynomial $F(z)$.
 If one deterministic map $G$ is repeated, the number of messages with exactly
 $q$ active blocks and outer weight $h$ is
 \begin{equation}
   \binom Lq [z^h]P_G(z)^q.
   \label{eq:repeated-constituent-enumerator}
 \end{equation}
+Here $\binom Lq$ chooses the $q$ nonzero message-block positions.
+Expanding $P_G(z)^q$ chooses one nonzero message for each of these blocks;
+multiplication adds their output weights in the exponent of $z$.
+The coefficient $[z^h]$ therefore counts exactly the choices with total
+outer weight $h$. For example, if $P_G(z)=2z^2+z^4$, then
+$[z^6]P_G(z)^2=4$: either block can supply weight two, with two choices
+for its message, while the other supplies weight four.
+
 For independently sampled, identically distributed local maps, expectation
 replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
 $\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
@@ -171,14 +200,12 @@ deterministic spreading supplied by the transpose.
 
 \subsection{Structured Recursive Inner}
 
-The inner processes the serialized interleaver output in $t$-bit steps.
+The inner processes the serialized interleaver output
+$X=(X_0,\ldots,X_{R-1})$ in $t$-bit steps, with $X_i\in\F_2^t$.
 For the IMT recurrences, step inputs, step outputs, and state-space vectors
-are columns.
-Write that output as $X=(X_0,\ldots,X_{R-1})$, with $X_i\in\F_2^t$ and
-$R:=N/t=be$. The state space is $\F_2^s$.
-Fix linear maps $A:\F_2^s\to\F_2^t$ and $C:\F_2^t\to\F_2^s$.
-Their matrices have dimensions $t\times s$ and $s\times t$, respectively.
-Their choice need not satisfy $C=A^\top$ or $CA=0$.
+are columns. The state space is $\F_2^s$.
+The matrices of $A$ and $C$ have dimensions $t\times s$ and $s\times t$,
+respectively. They need not satisfy $C=A^\top$ or $CA=0$.
 For IMT, setup samples $u_i\gets\F_2^s\setminus\{0\}$ and then
 $v_i\gets\{v\in\F_2^s:\langle u_i,v\rangle=0\}$, including zero, and sets
 $M_i:=I+u_iv_i^\top$. The pairs are independent over $0\le i<R$.
@@ -197,19 +224,20 @@ State persists across region boundaries. For each fixed $q\ne0$,
   \mathcal L(M_iq)=
   \tfrac12\delta_q+\tfrac12\operatorname{Unif}(\F_2^s\setminus\{0\}).
 \]
-Here the right side denotes a mixture of probability measures. To see the
-identity, $u_i=q$ always fixes $q$; for every other $u_i$, the bit
-$\langle v_i,q\rangle$ is fair. Thus any distinct nonzero target has
+Here the right side denotes a mixture of probability measures. If $u_i=q$,
+then $\langle v_i,q\rangle=0$ and $M_iq=q$; for every other $u_i$, the bit
+$\langle v_i,q\rangle$ is fair. Thus any nonzero target other than $q$ has
 probability $1/(2(2^s-1))$.
+The finite constructions below use this same transvection law.
 
-For transposed input groups $U_i\in\F_2^t$, start with $r_R=0\in\F_2^s$
-and process steps in reverse, emitting groups $V_i\in\F_2^t$:
-\[
+The transpose $I^\top$ processes input groups $U_i\in\F_2^t$ in reverse
+order. Starting from $r_R=0\in\F_2^s$, it emits groups $V_i\in\F_2^t$:
+\begin{equation}
  V_i=U_i+C^\top r_{i+1},\qquad
  r_i=A^\top U_i+M_i^\top r_{i+1}.
-\]
+ \label{eq:structured-inner-transpose}
+\end{equation}
 Both feedback computations consume the raw input, not the emitted output.
-The finite constructions below use this same transvection law.
 
 \begin{lemma}[Inner bijectivity]
 \label{lem:structured-inner-bijective}

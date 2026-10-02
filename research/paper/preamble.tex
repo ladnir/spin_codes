@@ -26,8 +26,8 @@
 \let\lncsendproof\endproof
 \renewcommand{\endproof}{\qed\lncsendproof}
 
-% Keep artifact descriptions, but suppress identifying links during review.
-\newcommand{\artifactlink}[2]{\ifsubmission#2\else\href{#1}{#2}\fi}
+% Cite the repository as a whole, without identifying it in anonymous review.
+\newcommand{\repositorycite}{\ifsubmission\else~\cite{spinCodeRepository}\fi}
 
 \newcommand{\F}{\mathbb F}
 \newcommand{\E}{\mathbb E}

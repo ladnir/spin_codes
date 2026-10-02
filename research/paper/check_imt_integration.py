@@ -48,7 +48,9 @@ def main():
     assert 'RM2Sub-S19' not in body
     assert r'\sum_{a=1}^b\sum_{c=0}^b' in (paper/'structured_appendix.tex').read_text()
     assert r'Q_{i+1}=M_iQ_i+C(X_i)' in (paper/'finite_certificates.tex').read_text()
-    assert '10.110' in (paper/'implementation.tex').read_text()
+    import precomputed_results
+    latest = precomputed_results.load()
+    assert f"{latest[20, 'transpose']['median_ms']:.3f}" in (paper/'implementation.tex').read_text()
     print('IMT manuscript integration PASS: 38 map words, 11% evidence bindings, and shared finite inner.')
 
 
