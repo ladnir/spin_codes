@@ -103,7 +103,7 @@ void bankTranspose(const BankState& b,bool four,const void* in,void* out,block* 
     case Parameters::T128S19:bankDispatch<Map128S19>(b,four,input,output,scratch,addresses);break;
     case Parameters::T64S12:bankDispatch<Map64S12>(b,four,input,output,scratch,addresses);break;
     case Parameters::T64S12R2:bankDispatch<Map64S12R2>(b,four,input,output,scratch,addresses);break;
-    case Parameters::PacketT64S16:throw std::logic_error("SPIN packet family does not support banked setup");
+    case Parameters::PacketRsT64S20:throw std::logic_error("SPIN packet family does not support banked setup");
     }
 }
 }

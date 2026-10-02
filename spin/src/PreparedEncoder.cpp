@@ -3,6 +3,7 @@
 #include "kernels/SetupRandom.h"
 #include "kernels/WorkspaceRouting.h"
 #include "Cpu.h"
+#include "MemoryPolicy.h"
 #include <algorithm>
 #include <limits>
 #include <numeric>
@@ -92,8 +93,8 @@ struct PreparedState {
         if(!valid_message_size(s.parameters,s.message_size))throw std::invalid_argument("SPIN invalid prepared geometry");
         if(o.mode==SetupMode::Full)full.emplace(s,e);
         else if(o.mode==SetupMode::BankedHeuristic) {
-            if(s.parameters==Parameters::PacketT64S16)
-                throw std::invalid_argument("SPIN PacketT64S16 requires full setup; banked setup is unsupported");
+            if(s.parameters==Parameters::PacketRsT64S20)
+                throw std::invalid_argument("SPIN PacketRsT64S20 requires full setup; banked setup is unsupported");
             if(!capabilities().avx2)throw std::runtime_error("SPIN requires AVX2 with OS support");
             if(e.backend!=Backend::Automatic && e.backend!=Backend::Avx2 && e.backend!=Backend::Avx512)
                 throw std::invalid_argument("SPIN unknown backend");
@@ -112,12 +113,11 @@ struct PreparedScratch {
     std::vector<std::uint32_t> addresses;
     PreparedScratch(std::shared_ptr<PreparedState> s,Width w,MemoryPolicy policy)
         :owner(std::move(s)),width(w) {
-        if(policy!=MemoryPolicy::Normal && policy!=MemoryPolicy::PreferHugePages)
-            throw std::invalid_argument("SPIN unknown memory policy");
+        (void)resolveMemoryPolicy(0,policy);
         if(owner->full)full.emplace(owner->full->make_workspace(w,policy));
         else {
             values.resize(2*owner->spec.message_size);addresses.resize(owner->bank->rows);
-            if(policy==MemoryPolicy::PreferHugePages ||
+            if(resolveMemoryPolicy(values.size()*sizeof(storage::block),policy)==MemoryPolicy::PreferHugePages ||
                kernel::workspace_routing::eligible(true,owner->spec.message_size))
                 kernel::workspace_routing::adviseOwned(values.data(),values.size()*sizeof(storage::block));
         }
@@ -223,7 +223,7 @@ void PreparedEncoder::prepare_workspace(Workspace& w) const {
 GenericTranspose PreparedEncoder::generic_transpose() const {
     detail::checkedPreparedState(state_);
     if(!supports_generic_transpose())
-        throw std::invalid_argument("SPIN PacketT64S16 does not support generic transpose");
+        throw std::invalid_argument("SPIN PacketRsT64S20 does not support generic transpose");
     if(!state_->generic) {
         if(state_->full)state_->generic.emplace(state_->full->generic_transpose());
         else {

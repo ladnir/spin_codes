@@ -1,6 +1,7 @@
 #include <spin/Code.h>
 #include <spin/Generic.h>
 #include "Cpu.h"
+#include "MemoryPolicy.h"
 #include "kernels/Spin.h"
 #include "kernels/WorkspaceRouting.h"
 #include "packet/PacketPlan.h"
@@ -31,7 +32,7 @@ static kernel::Configuration config(Parameters p) {
     case Parameters::T128S19:return kernel::Configuration::T128S19;
     case Parameters::T64S12:return kernel::Configuration::T64S12;
     case Parameters::T64S12R2:return kernel::Configuration::T64S12R2;
-    case Parameters::PacketT64S16:break;
+    case Parameters::PacketRsT64S20:break;
     }
     throw std::invalid_argument("SPIN unknown parameter set");
 }
@@ -50,9 +51,9 @@ struct Plan {
     std::optional<kernel::Spin> code;
     std::optional<packet::Plan> packets;
     Plan(CodeSpec s,ExecutionOptions o):spec(s),selected(o.backend) {
-        if(s.parameters==Parameters::PacketT64S16) {
-            if(o.tile_rows && o.tile_rows!=4)
-                throw std::invalid_argument("SPIN packet transpose requires four-row tiles");
+        if(s.parameters==Parameters::PacketRsT64S20) {
+            if(o.tile_rows && o.tile_rows!=8)
+                throw std::invalid_argument("SPIN RS packet transpose requires eight-row tiles");
             switch(o.backend) {
             case Backend::Automatic:
                 selected=cpu_packet512()?Backend::Avx512:Backend::Portable;
@@ -69,7 +70,7 @@ struct Plan {
             packets.emplace(s.message_size,s.route_seed,s.inner_seed);
         } else {
             if(o.backend==Backend::Portable)
-                throw std::invalid_argument("SPIN Portable backend is available only for PacketT64S16");
+                throw std::invalid_argument("SPIN Portable backend is available only for PacketRsT64S20");
             if(!capabilities().avx2) throw std::runtime_error("SPIN requires AVX2 with OS support");
             code.emplace(config(s.parameters),kernel::MessageLength{s.message_size},
                 s.route_seed,s.inner_seed,o.tile_rows?o.tile_rows:256,backend(o.backend),true);
@@ -87,14 +88,13 @@ struct Scratch {
     void* wide=nullptr;
     Scratch(std::shared_ptr<const Plan> p,Width w,MemoryPolicy memory)
         :plan(std::move(p)),width(w),policy(memory) {
-        if(memory!=MemoryPolicy::Normal && memory!=MemoryPolicy::PreferHugePages)
-            throw std::invalid_argument("SPIN unknown memory policy");
+        (void)resolveMemoryPolicy(0,memory);
         if(plan->packets) {
             packetScratch.emplace(plan->packets->scratchBlocks()*16,memory);
             // The allocation is owned here, so all advised whole pages belong
             // to this workspace. Foreign input/output buffers are never advised.
             // PreferHugePages already advises its owned allocation in Buffer.
-            if(memory==MemoryPolicy::Normal)
+            if(resolveMemoryPolicy(packetScratch->bytes().size(),memory)==MemoryPolicy::Normal)
                 kernel::workspace_routing::adviseOwned(packetScratch->bytes().data(),
                                                        packetScratch->allocation_bytes());
         } else if(w==Width::Bits128)
@@ -143,8 +143,7 @@ static void transposePacket(const Plan& plan,const storage::block* input,
     auto* work=reinterpret_cast<storage::block*>(scratch.packetScratch->bytes().data());
 #if SPIN_BCH_AVX512
     if(plan.selected==Backend::Avx512) {
-        packet::transposeFast(input,output,work,prepared.n,prepared.route.data(),
-            prepared.compactCoefficients(),prepared.composedUpdates.data());
+        packet::transposeFast(input,output,work,prepared);
         return;
     }
 #endif
@@ -156,12 +155,12 @@ std::size_t message_alignment(Parameters p) {
     switch(p) {
     case Parameters::T128S19:return 16384;
     case Parameters::T64S12:case Parameters::T64S12R2:return 8192;
-    case Parameters::PacketT64S16:return 512;
+    case Parameters::PacketRsT64S20:return 256;
     }
     throw std::invalid_argument("SPIN unknown parameter set");
 }
 bool valid_message_size(Parameters p,std::size_t k) noexcept {
-    if(p==Parameters::PacketT64S16) return detail::packet::validMessageSize(k);
+    if(p==Parameters::PacketRsT64S20) return detail::packet::validMessageSize(k);
     const auto unit=p==Parameters::T128S19?16384u:
         (p==Parameters::T64S12 || p==Parameters::T64S12R2)?8192u:0u;
     return unit && k && k<=std::numeric_limits<std::uint32_t>::max()/2 && k%unit==0;
@@ -189,7 +188,7 @@ std::array<std::byte,40> Code::descriptor() const noexcept {
         for(unsigned i=0;i<bytes;++i) out[offset+i]=std::byte((x>>(8*i))&255);
     };
     put(4,1,4);put(8,static_cast<std::uint32_t>(plan_->spec.parameters),4);
-    // Bytes 12..15 are reserved, zero. This version fixes the BCH [256,128] outer.
+    // Bytes 12..15 are reserved, zero. The parameter identifier fixes the construction.
     put(16,message_size(),8);put(24,plan_->spec.route_seed,8);put(32,plan_->spec.inner_seed,8);
     return out;
 }
@@ -237,7 +236,7 @@ void Code::prepare_workspace(Workspace& w) const {
         return;
     }
     const auto width=w.scratch_?w.scratch_->width:Width::Bits128;
-    const auto policy=w.scratch_?w.scratch_->policy:MemoryPolicy::Normal;
+    const auto policy=w.scratch_?w.scratch_->policy:MemoryPolicy::Automatic;
     w=make_workspace(width,policy);
 }
 Workspace::Workspace(std::shared_ptr<const detail::Plan> p,Width w,MemoryPolicy policy)
@@ -300,13 +299,13 @@ void Code::forward_bits(std::span<const std::uint64_t> in,std::span<std::uint64_
                         std::span<std::uint64_t> scratch) const {
     detail::checkedPlan(plan_);
     if(plan_->packets)
-        throw std::invalid_argument("SPIN PacketT64S16 does not support bit-packed forward encoding");
+        throw std::invalid_argument("SPIN PacketRsT64S20 does not support bit-packed forward encoding");
     plan_->code->forwardBits(in.data(),in.size(),out.data(),out.size(),scratch.data(),scratch.size());
 }
 GenericTranspose Code::generic_transpose() const {
     detail::checkedPlan(plan_);
     if(!supports_generic_transpose())
-        throw std::invalid_argument("SPIN PacketT64S16 does not support generic transpose");
+        throw std::invalid_argument("SPIN PacketRsT64S20 does not support generic transpose");
     return GenericTranspose(plan_->spec.parameters,message_size(),
         detail::kernel::Access::route(*plan_->code),detail::kernel::Access::masks(*plan_->code));
 }

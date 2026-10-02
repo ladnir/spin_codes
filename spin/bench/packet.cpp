@@ -10,14 +10,15 @@
 // Serial, precomputed transpose benchmark. Setup and memory preparation are
 // outside timing; repeated calls reuse the in-place buffer, as the research run.
 int main(int argc,char** argv) {try {
-    if(argc<2 || argc>5)throw std::invalid_argument("usage: spin_packet_bench K [seed=1] [calls=301] [normal|huge]");
+    if(argc<2 || argc>5)throw std::invalid_argument("usage: spin_packet_bench K [seed=1] [calls=301] [auto|normal|huge]");
     const auto k=std::stoull(argv[1]);const auto seed=argc>2?std::stoull(argv[2]):1;
     const auto calls=argc>3?std::stoull(argv[3]):301;
     if(!calls || calls>1000000)throw std::invalid_argument("calls must be in [1,1000000]");
-    const std::string policy=argc>4?argv[4]:"normal";
-    if(policy!="normal" && policy!="huge")throw std::invalid_argument("unknown memory policy");
-    const auto memory=policy=="huge"?spin::MemoryPolicy::PreferHugePages:spin::MemoryPolicy::Normal;
-    spin::Code code({k,spin::Parameters::PacketT64S16,seed,seed});
+    const std::string policy=argc>4?argv[4]:"auto";
+    if(policy!="auto" && policy!="normal" && policy!="huge")throw std::invalid_argument("unknown memory policy");
+    const auto memory=policy=="auto"?spin::MemoryPolicy::Automatic:
+        policy=="huge"?spin::MemoryPolicy::PreferHugePages:spin::MemoryPolicy::Normal;
+    spin::Code code({k,spin::Parameters::PacketRsT64S20,seed,seed});
     auto work=code.make_workspace(spin::Width::Bits128,memory);
     auto buffer=code.make_buffer(spin::Width::Bits128,memory);
     std::uint64_t state=913;
@@ -34,7 +35,8 @@ int main(int argc,char** argv) {try {
         t=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();}
     std::sort(times.begin(),times.end());
     std::uint64_t hash=0;
-    for(std::size_t i=0;i<buffer.bytes().size();i+=8) {
+    // Hash only the K output records, matching the frozen RS research harness.
+    for(std::size_t i=0;i<k*16;i+=8) {
         std::uint64_t v;std::memcpy(&v,buffer.bytes().data()+i,8);hash=(hash^v)*0x100000001b3ULL;
     }
     std::cout<<"K,seed,calls,backend,memory,median_ms,p10_ms,p90_ms,checksum\n"

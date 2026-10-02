@@ -4,6 +4,11 @@ Fast binary linear encoders for cryptographic applications. The standalone
 C++20 library lives in [`spin/`](spin/README.md); the paper and supporting
 research live alongside it and are not build dependencies.
 
+The library offers paper SPIN (BCH outer, IMT inner) and the newer RS packet
+construction. Both use the common `Code` interface. RS packets currently support
+precomputed transposed encoding of 128-bit records; paper SPIN also supports
+forward encoding, wide records, and generic XOR types.
+
 ## Build the library
 
 ```sh
@@ -13,12 +18,13 @@ ctest --test-dir out/spin -C Release --output-on-failure
 cmake --install out/spin --config Release --prefix /path/to/install
 ```
 
-The library supports Linux/GCC and Windows/MSVC on x86-64 with AVX2.
-AVX-512 kernels are selected at runtime where available. ARM is not yet supported.
+The library supports Linux/GCC and Windows/MSVC on x86-64. Paper SPIN requires
+AVX2; RS packets also have an SSE2 fallback. AVX-512 kernels are selected at
+runtime where available. ARM is not yet supported.
 No Python, TeX, libOTe, or Hypercat dependency is required to build the library.
 
 ```cmake
-find_package(spin 0.1 CONFIG REQUIRED)
+find_package(spin 0.3 CONFIG REQUIRED)
 target_link_libraries(my_target PRIVATE spin::spin)
 ```
 

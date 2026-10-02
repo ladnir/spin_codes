@@ -1,15 +1,12 @@
 #include "PacketPlan.h"
-#include "../kernels/generated/BchCircuit.h"
 #include <bit>
 #include <cstring>
 
 namespace spin::detail::packet {
 namespace {
-using storage::block;
-// The physical t64/s16 expansion map, selected-map SHA256
-// 4652916f85eb3484d9fef6ce86fffeb0d6bca0e0ec0508eea801009e5b212fe7.
-// Feedback is its transpose. These are original, not fused-basis coordinates.
-constexpr std::uint16_t columns[64] = {
+// Literal expansion map of the measured t64/s20 inner. The last four
+// coordinates are x0*x1, x0*x2, x0*x3, x0*x4; feedback is its transpose.
+constexpr std::uint16_t columns[64]={
     0x1,0x3,0x5,0x3507,0x9,0x118b,0x940d,0xb08f,
     0x11,0x5993,0xe415,0x8897,0xd999,0x919b,0xa99d,0xd49f,
     0x21,0x2ca3,0xb8a5,0xa127,0x1a29,0x272b,0x36ad,0x3eaf,
@@ -18,66 +15,131 @@ constexpr std::uint16_t columns[64] = {
     0xb6d1,0x20d3,0x5cd5,0xffd7,0x8159,0x6db,0xff5d,0x4ddf,
     0x78e1,0x9be3,0xce65,0x1867,0x8ce9,0x7e6b,0xae6d,0x69ef,
     0xa871,0x12f3,0xfaf5,0x7577,0x85f9,0x2efb,0x437d,0xdd7f};
+constexpr unsigned column(unsigned p) {
+    return unsigned(columns[p])|(((p&1U)*((p>>1)&1U))<<16)
+        |(((p&1U)*((p>>2)&1U))<<17)|(((p&1U)*((p>>3)&1U))<<18)
+        |(((p&1U)*((p>>4)&1U))<<19);
+}
+constexpr unsigned multiply(unsigned a,unsigned b) {
+    unsigned result=0;
+    for(unsigned i=0;i<4;++i) {
+        if(b&1)result^=a;
+        b>>=1;a<<=1;if(a&16)a^=0x13;
+    }
+    return result;
+}
+constexpr unsigned inverse(unsigned a) {
+    unsigned result=1;
+    for(unsigned i=0;i<14;++i)result=multiply(result,a);
+    return result;
+}
+// Independent Lagrange generator, not the optimized parity factorization.
+constexpr auto rsRows=[] {
+    std::array<std::uint64_t,32> rows{};
+    for(unsigned messageBit=0;messageBit<32;++messageBit)
+        for(unsigned symbol=0;symbol<16;++symbol) {
+            unsigned numerator=1,denominator=1;
+            for(unsigned other=0;other<8;++other)
+                if(other!=messageBit/4) {
+                    numerator=multiply(numerator,symbol^other);
+                    denominator=multiply(denominator,(messageBit/4)^other);
+                }
+            rows[messageBit]|=std::uint64_t(multiply(multiply(numerator,inverse(denominator)),1U<<(messageBit%4)))<<(4*symbol);
+        }
+    return rows;
+}();
+constexpr unsigned index(unsigned symbol,unsigned coordinate) {
+    return 32*symbol+16*(coordinate/16)+4*(coordinate%4)+(coordinate%16)/4;
+}
 
-void innerRoute(const block* input, block* scratch, const Plan& plan) {
-    alignas(16) __m128i state[16]{}, next[16], feedback[16];
-    const auto epochs = plan.n / 64;
-    for(std::size_t epoch = epochs; epoch-- > 0;) {
-        for(auto& x : feedback) x = _mm_setzero_si128();
-        for(unsigned p = 0; p < 64; ++p) {
-            const auto i = 64 * epoch + p;
-            const auto raw = input[i].mData;
-            auto value = raw;
-            for(unsigned mask = columns[p]; mask; mask &= mask - 1) {
-                const auto j = std::countr_zero(mask);
-                value = _mm_xor_si128(value, state[j]);
-                // Use raw input: this oracle does not rely on A^T A=0.
-                feedback[j] = _mm_xor_si128(feedback[j], raw);
+void outerForwardGroup(const Block* message,Block* routed,const std::array<std::uint32_t,32>* matrices) {
+    Block coded[512];
+    for(unsigned lane=0;lane<8;++lane)
+        for(unsigned bit=0;bit<64;++bit) {
+            auto value=_mm_setzero_si128();
+            for(unsigned messageBit=0;messageBit<32;++messageBit)
+                if((rsRows[messageBit]>>bit)&1)value=_mm_xor_si128(value,message[32*lane+messageBit].mData);
+            coded[index(bit/4,4*lane+bit%4)]=Block(value);
+        }
+    for(unsigned symbol=0;symbol<16;++symbol)
+        for(unsigned row=0;row<32;++row) {
+            auto value=_mm_setzero_si128();
+            for(unsigned c=0;c<32;++c)
+                if((matrices[symbol][c]>>row)&1)value=_mm_xor_si128(value,coded[index(symbol,c)].mData);
+            routed[index(symbol,row)]=Block(value);
+        }
+}
+
+void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
+    for(std::size_t group=0;group<plan.groups;++group) {
+        const auto* routed=scratch+groupStride*group;const auto* matrices=plan.outerMatrices.data()+16*group;
+        Block mixed[512];
+        for(unsigned symbol=0;symbol<16;++symbol)
+            for(unsigned row=0;row<32;++row) {
+                auto value=_mm_setzero_si128();
+                for(auto mask=matrices[symbol][row];mask;mask&=mask-1)
+                    value=_mm_xor_si128(value,routed[index(symbol,std::countr_zero(mask))].mData);
+                mixed[index(symbol,row)]=Block(value);
             }
-            scratch[plan.route[i / 4] + (i & 3)] = block(value);
-        }
-        if(!epoch) break; // No flushing and no update after the final output.
-        for(unsigned j = 0; j < 16; ++j) {
-            auto value = feedback[j];
-            for(unsigned mask = plan.reverseMatrices[epoch][j]; mask; mask &= mask - 1)
-                value = _mm_xor_si128(value, state[std::countr_zero(mask)]);
-            next[j] = value;
-        }
-        std::memcpy(state, next, sizeof(state));
+        for(unsigned lane=0;lane<8;++lane)
+            for(unsigned messageBit=0;messageBit<32;++messageBit) {
+                auto value=_mm_setzero_si128();
+                for(auto mask=rsRows[messageBit];mask;mask&=mask-1) {
+                    const auto bit=std::countr_zero(mask);
+                    value=_mm_xor_si128(value,mixed[index(bit/4,4*lane+bit%4)].mData);
+                }
+                output[256*group+32*lane+messageBit]=Block(value);
+            }
     }
 }
+}
 
-void outerTile(const block* routed, block* output,
-               const std::array<std::uint32_t, 32>* matrices) {
-    alignas(16) block mixed[1024];
-    for(unsigned group = 0; group < 32; ++group)
-        for(unsigned row = 0; row < 32; ++row) {
-            auto value = _mm_setzero_si128();
-            for(auto mask = matrices[group][row]; mask; mask &= mask - 1) {
-                const auto c = std::countr_zero(mask);
-                value = _mm_xor_si128(value, routed[4 * (8 * group + c % 8) + c / 8].mData);
+void transposeScalar(const Block* input,Block* output,Block* scratch,const Plan& plan) {
+    __m128i state[20]{},next[20]{},feedback[20];
+    for(std::size_t epoch=plan.n/64;epoch-->0;) {
+        for(auto& value:feedback)value=_mm_setzero_si128();
+        for(unsigned p=0;p<64;++p) {
+            const auto i=64*epoch+p;const auto raw=input[i].mData;auto value=raw;
+            for(unsigned mask=column(p);mask;mask&=mask-1) {
+                const auto j=std::countr_zero(mask);value=_mm_xor_si128(value,state[j]);
+                feedback[j]=_mm_xor_si128(feedback[j],raw);
             }
-            mixed[4 * (8 * group + row % 8) + row / 8] = block(value);
+            scratch[plan.route[i/4]+(i&3)]=Block(value);
         }
-    // Literal BCH action gives an independent fallback for the fused circuit.
-    for(unsigned lane = 0; lane < 4; ++lane)
-        for(unsigned row = 0; row < 128; ++row) {
-            auto value = _mm_setzero_si128();
-            for(unsigned limb = 0; limb < 4; ++limb)
-                for(auto mask = kernel::BchRows[row][limb]; mask; mask &= mask - 1) {
-                    const auto c = 64 * limb + std::countr_zero(mask);
-                    value = _mm_xor_si128(value, mixed[4 * c + lane].mData);
-                }
-            output[128 * lane + row] = block(value);
+        if(!epoch)break;
+        for(unsigned j=0;j<20;++j) {
+            auto value=feedback[j];
+            for(unsigned mask=plan.reverseMatrices[epoch][j];mask;mask&=mask-1)value=_mm_xor_si128(value,state[std::countr_zero(mask)]);
+            next[j]=value;
         }
-}
+        std::memcpy(state,next,sizeof(state));
+    }
+    outerScalar(scratch,output,plan);
 }
 
-void transposeScalar(const storage::block* input, storage::block* output,
-                     storage::block* scratch, const Plan& plan) {
-    innerRoute(input, scratch, plan);
-    for(std::size_t tile = 0; tile < plan.n / 1024; ++tile)
-        outerTile(scratch + tile * tileStride, output + tile * 512,
-                  plan.outerMatrices.data() + tile * 32);
+void forwardScalar(const Block* message,Block* encoded,const Plan& plan) {
+    std::vector<Block> routed(plan.scratchBlocks());
+    for(std::size_t group=0;group<plan.groups;++group)
+        outerForwardGroup(message+256*group,routed.data()+groupStride*group,plan.outerMatrices.data()+16*group);
+    for(std::size_t i=0;i<plan.n;++i)encoded[i]=routed[plan.route[i/4]+(i&3)];
+    __m128i state[20]{},next[20]{},feedback[20];
+    for(std::size_t epoch=0;epoch<plan.n/64;++epoch) {
+        for(auto& value:feedback)value=_mm_setzero_si128();
+        for(unsigned p=0;p<64;++p) {
+            const auto i=64*epoch+p;const auto raw=encoded[i].mData;auto value=raw;
+            for(unsigned mask=column(p);mask;mask&=mask-1) {
+                const auto j=std::countr_zero(mask);value=_mm_xor_si128(value,state[j]);
+                feedback[j]=_mm_xor_si128(feedback[j],raw);
+            }
+            encoded[i]=Block(value);
+        }
+        if(epoch+1==plan.n/64)break;
+        for(unsigned j=0;j<20;++j) {
+            auto value=feedback[j];
+            for(unsigned c=0;c<20;++c)if((plan.reverseMatrices[epoch][c]>>j)&1)value=_mm_xor_si128(value,state[c]);
+            next[j]=value;
+        }
+        std::memcpy(state,next,sizeof(state));
+    }
 }
 }

@@ -102,7 +102,7 @@ private:
         case Parameters::T128S19:run<detail::generic::Map128,1>(in,out,w,op,route,masks);return;
         case Parameters::T64S12:run<detail::generic::Map64,1>(in,out,w,op,route,masks);return;
         case Parameters::T64S12R2:run<detail::generic::Map64,2>(in,out,w,op,route,masks);return;
-        case Parameters::PacketT64S16:break;
+        case Parameters::PacketRsT64S20:break;
         }
         throw std::logic_error("SPIN invalid generic configuration");
     }

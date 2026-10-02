@@ -52,8 +52,8 @@ public:
     // Version 2 includes setup mode, bank seed, and bank-family revision.
     // Execution backend and workspace layout do not identify the binary map.
     std::array<std::byte,56> descriptor() const noexcept;
-    Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
-    Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
+    Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
+    Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // After setCodeSeed, rebind Full scratch and release its previous setup
     // outside a critical path. Compatible scratch does not allocate. Encoding
     // also prepares automatically for existing callers. Banked scratch is unchanged.

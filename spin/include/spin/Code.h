@@ -9,22 +9,23 @@
 
 namespace spin {
 // Stable identifiers for supplied maps, not arbitrary (t,s) synthesis.
-enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketT64S16=4 };
+// Value 4 identified the retired BCH packet construction; it is not reused.
+enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketRsT64S20=5 };
 enum class Backend { Automatic, Avx2, Avx512, Portable };
 enum class Width : unsigned { Bits128=16, Bits256=32, Bits512=64 };
-enum class MemoryPolicy { Normal, PreferHugePages };
+enum class MemoryPolicy { Normal, PreferHugePages, Automatic };
 struct CodeSpec {
     std::size_t message_size;
     Parameters parameters=Parameters::T128S19;
-    // For PacketT64S16, route_seed also generates the GL32 outer mixing;
-    // inner_seed generates GL16 updates. Equal seeds reproduce PacketCode(seed).
+    // For PacketRsT64S20, route_seed also generates the GF(2^32) outer maps;
+    // inner_seed generates GL20 updates. Equal seeds reproduce PacketCode(seed).
     std::uint64_t route_seed=1;
     std::uint64_t inner_seed=2;
 };
 struct ExecutionOptions {
     Backend backend=Backend::Automatic;
-    // 0 selects the family default: 256 for IMT, 4 for PacketT64S16.
-    // PacketT64S16 accepts only 0 or 4; its four-row geometry is fixed.
+    // 0 selects the family default: 256 for IMT, 8 for PacketRsT64S20.
+    // PacketRsT64S20 accepts only 0 or 8; its eight-row geometry is fixed.
     unsigned tile_rows=0;
 };
 struct Capabilities { bool avx2, avx512_bch, forward256, forward512; };
@@ -37,11 +38,13 @@ class GenericTranspose;
 class Code;
 
 // Optional zero-initialized owned storage, independent of the selected family.
+// Automatic (default): PreferHugePages for allocations >=16 MiB on supported
+// platforms (currently Linux), Normal otherwise. Explicit overrides stay fixed.
 // Normal: 64-byte alignment. PreferHugePages: 2 MiB alignment/rounding and
 // best-effort Linux page advice during allocation, never during encoding.
 class Buffer {
 public:
-    explicit Buffer(std::size_t bytes,MemoryPolicy=MemoryPolicy::Normal);
+    explicit Buffer(std::size_t bytes,MemoryPolicy=MemoryPolicy::Automatic);
     ~Buffer();
     Buffer(Buffer&&) noexcept;
     Buffer& operator=(Buffer&&) noexcept;
@@ -88,9 +91,9 @@ public:
     bool supports_forward(Width=Width::Bits128) const noexcept;
     bool supports_transpose(Width=Width::Bits128) const noexcept;
     bool supports_generic_transpose() const noexcept;
-    Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
+    Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // Optional storage for exactly code_size() records at the selected width.
-    Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Normal) const;
+    Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // Rebind compatible 128-bit scratch without clearing or allocating; otherwise
     // recreate it at the same width (128 bits if moved-from). No concurrent use.
     void prepare_workspace(Workspace&) const;

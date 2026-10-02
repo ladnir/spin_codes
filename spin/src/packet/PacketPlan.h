@@ -1,42 +1,57 @@
 #pragma once
 #include "../kernels/Block.h"
+#include "PacketLargeTypes.h"
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
 
 namespace spin::detail::packet {
-inline constexpr std::size_t tileStride = 1028;
+using Block=storage::block;
+inline constexpr std::size_t groupStride=516;
 bool validMessageSize(std::size_t k) noexcept;
 
-// One immutable setup, shared by the scalar and fused implementations.
+// The 16+4 state coordinates are packed as two full byteplanes and one
+// four-bit plane. Layout exactly matches the measured fused refresh kernel.
+struct BorderRow {
+    large::Dense16Row base;
+    std::uint64_t upper[2]{},lower[2]{},corner=0;
+};
+static_assert(sizeof(BorderRow)==72);
+
+// Fixed rate-1/2 RS packet construction: eight GF16 RS[16,8] rows, independent
+// adjoint GF32 multipliers, 128 packet regions, and the t64/s20 inner.
 // All counts and route offsets are in 128-bit records, not bytes.
 struct Plan {
-    explicit Plan(std::size_t k, std::uint64_t seed);
-    Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed);
+    explicit Plan(std::size_t k,std::uint64_t seed);
+    Plan(std::size_t k,std::uint64_t routeSeed,std::uint64_t innerSeed);
     Plan(const Plan&)=delete;
     Plan& operator=(const Plan&)=delete;
     Plan(Plan&&)=delete;
     Plan& operator=(Plan&&)=delete;
-    std::size_t n = 0;
+    std::size_t k=0,n=0,groups=0;
     std::vector<std::uint32_t> route;
-    std::vector<std::array<std::uint16_t, 16>> reverseMatrices;
-    std::vector<std::array<std::uint32_t, 32>> outerMatrices;
+    std::vector<std::array<std::uint32_t,20>> reverseMatrices;
+    std::vector<std::array<std::uint32_t,32>> outerMatrices;
     std::vector<std::uint64_t> compactStorage;
-    std::vector<std::uint64_t> composedUpdates;
+    std::vector<BorderRow> updates;
 
     const std::uint64_t* compactCoefficients() const noexcept;
-    std::size_t scratchBlocks() const noexcept { return (n / 1024) * tileStride; }
+    std::size_t scratchBlocks() const noexcept { return groups*groupStride; }
     std::size_t setupBytes() const noexcept;
 };
 
 // Allocation-free. The whole input is consumed before any output is written,
-// so output may equal input. Scratch is disjoint and holds scratchBlocks().
-void transposeScalar(const storage::block* input, storage::block* output,
-                     storage::block* scratch, const Plan&);
-void transposeFast(const storage::block* input, storage::block* output,
-                   storage::block* scratch, std::size_t n,
-                   const std::uint32_t* routeBases,
-                   const std::uint64_t* compactCoefficients,
-                   const std::uint64_t* composedUpdateWords);
+// so output may equal input. Scratch is disjoint, 64-byte aligned, and holds
+// scratchBlocks() records. Input/output need only 16-byte alignment.
+void transposeScalar(const Block* input,Block* output,Block* scratch,const Plan&);
+void transposeFast(const Block* input,Block* output,Block* scratch,const Plan&);
+
+// Private stage boundaries used by the retained fast kernel.
+void reverseRoute(const Block* input,Block* scratch,const Plan&);
+void outerFast(const Block* scratch,Block* output,const Plan&);
+
+// Literal independent forward oracle, used by package correctness tests.
+// Unlike the encoder entry points above, it allocates scratch storage.
+void forwardScalar(const Block* message,Block* encoded,const Plan&);
 }

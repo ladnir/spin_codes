@@ -1,16 +1,25 @@
 # Kernel generation record
 
-The packet construction uses `src/packet/PacketInnerFast.h` and
-`PacketOuterFast.h`, imported by `tools/import_packet.py`. Their headers record
-the exact research-source hashes. The importer selects wide-state emission,
-composed GL16 updates, cached four-record routing, and the compact mixed-layout
-GL32/BCH kernel. It excludes alternate experiments and benchmark drivers.
-`PacketSetup.cpp` preserves the research seed schedule, including unused draws;
-`PacketScalar.cpp` evaluates the original physical maps independently. The library
-tests freeze outputs checked against the retained research encoder. `Code` and
-full-mode `PreparedEncoder` select this construction with `PacketT64S16`;
-the original IMT families retain their seeded maps and descriptor identifiers.
-The single-seed `PacketCode` interface remains compatible with the prototype.
+The current packet construction is imported by `tools/import_rs_packet.py`
+from the frozen RS research implementation in
+`research/workstreams/k16_design/implementation/rs16x8_border`.
+Generated files record their input hashes. The importer retains the selected
+s20 fused reverse route and the paired GFNI outer with non-temporal output stores.
+An ordinary-store variant handles supported outputs without 64-byte alignment.
+The unrolled inner and outer schedules are not replaced by generic loops.
+
+`PacketSetup.cpp` preserves the reference setup sequence and binary maps.
+`PacketScalar.cpp` evaluates those maps independently with baseline SSE2.
+The tests freeze known answers from the literal research encoder, including
+different route and inner seeds. `Code` and full-mode `PreparedEncoder` select
+this construction with `PacketRsT64S20` (identifier 5).
+The three paper-SPIN identifiers and seeded maps are unchanged.
+
+The earlier BCH packet family (identifier 4) is retired. Its proof and research
+sources remain archived; it is not a runtime option. A few private generated
+helper headers remain because the frozen research sources import them.
+They do not expose another code family. The RS importer is the authoritative
+generator for the current packet backend.
 
 `PreparedEncoder.cpp`, `BankState.h`, and `BankKernel.cpp` are package-owned
 implementations of the explicit banked heuristic mode. They generalize the

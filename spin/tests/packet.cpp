@@ -1,6 +1,8 @@
 #include <spin/PacketCode.h>
 #include <spin/PreparedEncoder.h>
+#include "../src/packet/PacketPlan.h"
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cstdlib>
 #include <cstring>
@@ -128,45 +130,80 @@ static void concurrent() {
     auto first=std::async(std::launch::async,run),second=std::async(std::launch::async,run);first.get();second.get();
 }
 static void knownAnswers() {
-    // Frozen against the retained research encoder, not generated from either
-    // library backend: K, seed, hash of all 2K records after one inplace call.
-    struct Answer {std::size_t k;std::uint64_t seed,hash;};
-    constexpr Answer answers[]={{512,1,0xa011c1a36862a018ULL},{512,17,0x6d4c655324880a31ULL},
-        {1536,1,0x1af105fb37d235efULL},{1536,17,0x2032ac91043db7b6ULL},
-        {65536,1,0xa611428b3f82c409ULL},{262144,17,0x7867d2fb90feb72cULL}};
+    // Frozen against research/workstreams/k16_design/implementation at
+    // ad4e7711, not either library backend. RsBorderSetup/RsBorderScalar and
+    // RsWideSetup/RsWideScalar, Plan(K, routeSeed, innerSeed, 20), scalar
+    // transpose; the RS oracle uses literal Lagrange interpolation. Hash the
+    // K output records, low then high payload word, using the fold below.
+    struct Answer {std::size_t k;std::uint64_t routeSeed,innerSeed,hash;};
+    constexpr Answer answers[]={{4096,1,18,0x326c6ee2a5f2493fULL},
+        {4096,17,34,0xc38644b2f45f8158ULL},{12288,1,18,0x6c01adf670e2fd3bULL},
+        {12288,17,34,0xe91168212580ef87ULL}};
     for(const auto& a:answers) {
-        spin::PacketCode code({a.k,a.seed});auto work=code.make_workspace();
-        std::vector<Block> input(code.code_size());fill(input);
+        spin::Code code({a.k,spin::Parameters::PacketRsT64S20,a.routeSeed,a.innerSeed});
+        auto work=code.make_workspace();
+        std::vector<Block> input(code.code_size()),expected(a.k);fill(input);
         // Research block(hi,lo) draws the high half first.
         for(auto& b:input)std::swap(b.words[0],b.words[1]);
+        spin::Code portable(code.specification(),{spin::Backend::Portable});
+        auto pw=portable.make_workspace();portable.transpose<Block>(input,expected,pw);
         code.transpose_inplace<Block>(input,work);
         std::uint64_t hash=0;
-        for(const auto& b:input)for(auto w:b.words)hash=(hash^w)*0x100000001b3ULL;
+        for(const auto& b:std::span<const Block>(input).first(a.k))
+            for(auto w:b.words)hash=(hash^w)*0x100000001b3ULL;
         require(hash==a.hash,"research-anchored packet known answer");
-        auto descriptor=code.descriptor();
+        require(std::equal(expected.begin(),expected.end(),input.begin()),"research known answer portable backend");
+        spin::PacketCode packet({a.k,a.routeSeed});
+        auto descriptor=packet.descriptor();
         require(descriptor[0]==std::byte{'S'} && descriptor[1]==std::byte{'P'} &&
             descriptor[2]==std::byte{'K'} && descriptor[3]==std::byte{'P'} &&
-            descriptor[4]==std::byte{1} && descriptor[8]==std::byte{1},"packet descriptor family");
+            descriptor[4]==std::byte{2} && descriptor[8]==std::byte{2},"packet descriptor family");
         for(unsigned i=0;i<8;++i)require(descriptor[16+i]==std::byte((a.k>>(8*i))&255) &&
-            descriptor[24+i]==std::byte((a.seed>>(8*i))&255),"packet descriptor K/seed");
+            descriptor[24+i]==std::byte((a.routeSeed>>(8*i))&255),"packet descriptor K/seed");
     }
 }
 static void coordinateBasis() {
     if(!spin::packet_fast_available())return;
-    spin::PacketCode code({512,43}),reference({512,43},spin::PacketBackend::Portable);
+    spin::PacketCode code({256,43}),reference({256,43},spin::PacketBackend::Portable);
     auto work=code.make_workspace(),rw=reference.make_workspace();
-    std::vector<Block> input(1024),expected(512),actual(512);
+    std::vector<Block> input(512),expected(256),actual(256);
     // All input coordinates of the smallest natural geometry, through both
     // payload halves. The fallback uses literal physical maps throughout.
-    for(unsigned i=0;i<1024;++i) {
+    for(unsigned i=0;i<512;++i) {
         if(i)input[i-1]={};input[i]={{0x948763ab1352fcedULL,0x0360d45b87abc921ULL}};
         reference.transpose<Block>(input,expected,rw);code.transpose<Block>(input,actual,work);
         require(expected==actual,"packet complete coordinate basis");
     }
 }
+static void binaryAdjoint() {
+    namespace packet=spin::detail::packet;
+    const auto dot=[](std::span<const Block> a,std::span<const Block> b) {
+        require(a.size()==b.size(),"adjoint vector size");Block result{};
+        for(std::size_t i=0;i<a.size();++i)for(unsigned word=0;word<2;++word)
+            result.words[word]^=a[i].words[word]&b[i].words[word];
+        return result;
+    };
+    for(auto k:{std::size_t{256},std::size_t{768}}) {
+        const packet::Plan plan(k,17,43);
+        spin::Code code({k,spin::Parameters::PacketRsT64S20,17,43});
+        auto work=code.make_workspace();
+        std::vector<Block> message(k),input(2*k),encoded(2*k),transposed(k);
+        std::vector<packet::Block> oracleMessage(k),oracleEncoded(2*k);
+        for(auto seed:{1ULL,2947ULL,79897ULL}) {
+            fill(message,seed);fill(input,seed+17);
+            std::memcpy(oracleMessage.data(),message.data(),k*sizeof(Block));
+            packet::forwardScalar(oracleMessage.data(),oracleEncoded.data(),plan);
+            std::memcpy(encoded.data(),oracleEncoded.data(),2*k*sizeof(Block));
+            noAlloc([&]{code.transpose<Block>(input,transposed,work);});
+            // Check all 128 independent payload-bit identities, rather than
+            // reducing them to a single parity that could hide cancellation.
+            require(dot(encoded,input)==dot(message,transposed),"literal forward/binary transpose adjoint");
+        }
+    }
+}
 static void sizing() {
     constexpr auto unit=spin::packet_message_alignment();
-    static_assert(unit==4*128);
+    static_assert(unit==256);
     // Validate the complete requested engineering range without allocating
     // giant code plans. Execution coverage is separate below.
     noAlloc([&]{
@@ -175,22 +212,78 @@ static void sizing() {
             require(!spin::valid_packet_message_size(k-1),"unaligned size query accepted");
             require(!spin::valid_packet_message_size(k+1),"unaligned size query accepted");
             for(auto value:{k-1,k,k+1})require(
-                spin::valid_message_size(spin::Parameters::PacketT64S16,value)==spin::valid_packet_message_size(value),
+                spin::valid_message_size(spin::Parameters::PacketRsT64S20,value)==spin::valid_packet_message_size(value),
                 "unified natural size query disagrees with PacketCode");
         }
     });
     // Padded route offsets use 32 bits. Exercise the bound without allocating.
-    constexpr auto maxK=(std::size_t{std::numeric_limits<std::uint32_t>::max()}/1028)*unit;
+    constexpr auto maxK=(std::size_t{std::numeric_limits<std::uint32_t>::max()}/516)*unit;
     require(spin::valid_packet_message_size(maxK),"last representable size rejected");
     require(!spin::valid_packet_message_size(maxK+unit),"padded route overflow accepted");
-    require(spin::valid_message_size(spin::Parameters::PacketT64S16,maxK) &&
-        !spin::valid_message_size(spin::Parameters::PacketT64S16,maxK+unit),"unified padded route limit");
+    require(spin::valid_message_size(spin::Parameters::PacketRsT64S20,maxK) &&
+        !spin::valid_message_size(spin::Parameters::PacketRsT64S20,maxK+unit),"unified padded route limit");
     rejects([&]{spin::PacketCode code({maxK+unit,1});});
     // Around both the inner/region alignment boundary (16 groups) and the
     // measured powers of two. These execute the same selected backend.
     for(auto k:{15*unit,16*unit,17*unit,(std::size_t{1}<<16)-unit,
         (std::size_t{1}<<16)+unit,(std::size_t{1}<<18)-unit,(std::size_t{1}<<18)+unit})
         test(k,43);
+}
+
+static void largePacketCase(std::size_t k) {
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
+    constexpr std::uint64_t seed=43;
+    const spin::CodeSpec spec{k,family,seed,seed};
+    spin::Code reference(spec,{spin::Backend::Portable}),code(spec,{spin::Backend::Avx512});
+    auto rw=reference.make_workspace(),work=code.make_workspace();
+    require(code.backend()==spin::Backend::Avx512 && reference.descriptor()==code.descriptor(),
+        "large packet backend or descriptor");
+    const auto n=2*k;
+    std::vector<Block> original(n),expected(k);fill(original,seed);
+    // Force the legal16-byte but non-cache-line-aligned API boundary. Routing
+    // scratch remains owned and64-byte aligned, as required by streaming stores.
+    spin::Buffer input((n+2)*sizeof(Block)),output((k+2)*sizeof(Block));
+    auto* x=reinterpret_cast<Block*>(input.bytes().data())+1;
+    auto* y=reinterpret_cast<Block*>(output.bytes().data())+1;
+    require(reinterpret_cast<std::uintptr_t>(x)%64==16 &&
+        reinterpret_cast<std::uintptr_t>(y)%64==16,"large packet alignment fixture");
+    const Block marker{{0x764ac51efe0328b9ULL,0x84c0d973123afed1ULL}};
+    x[-1]=x[n]=y[-1]=y[k]=marker;
+    std::copy(original.begin(),original.end(),x);
+    noAlloc([&]{reference.transpose<Block>(original,expected,rw);});
+    noAlloc([&]{code.transpose<Block>({x,n},{y,k},work);});
+    require(std::equal(expected.begin(),expected.end(),y),"routing boundary scalar vs fast");
+    require(std::equal(original.begin(),original.end(),x),"routing boundary changed separate input");
+    require(x[-1]==marker && x[n]==marker && y[-1]==marker && y[k]==marker,
+        "routing boundary separate guard");
+    noAlloc([&]{code.transpose_inplace_bytes(std::as_writable_bytes(std::span<Block>(x,n)),work);});
+    require(std::equal(expected.begin(),expected.end(),x),"routing boundary inplace result");
+    require(std::equal(original.begin()+k,original.end(),x+k),"routing boundary inplace suffix");
+    require(x[-1]==marker && x[n]==marker,"routing boundary inplace guard");
+    // The compatibility facade must reach the same large-size map.
+    if(k==(std::size_t{1}<<20)) {
+        spin::PacketCode legacy({k,seed},spin::PacketBackend::Avx512Gfni);
+        auto legacyWork=legacy.make_workspace();
+        std::copy(original.begin(),original.end(),x);
+        noAlloc([&]{legacy.transpose_inplace<Block>({x,n},legacyWork);});
+        require(std::equal(expected.begin(),expected.end(),x),"K20 PacketCode differs from Code");
+        require(std::equal(original.begin()+k,original.end(),x+k),"K20 PacketCode suffix changed");
+        require(x[-1]==marker && x[n]==marker,"K20 PacketCode guard");
+    }
+}
+
+static void largePacket() {
+    // Exercise the certified geometry without timing assertions. Natural
+    // non-power-of-two lengths and physical-step tails are covered by sizing().
+    if(spin::packet_fast_available())largePacketCase(std::size_t{1}<<20);
+}
+
+static void retiredFamily() {
+    constexpr auto retired=static_cast<spin::Parameters>(4);
+    require(!spin::valid_message_size(retired,512),"retired packet family accepted by size query");
+    rejects([]{spin::message_alignment(retired);});
+    rejects([]{spin::Code code({512,retired,17,43});});
+    rejects([]{spin::PreparedEncoder code({512,retired,17,43});});
 }
 
 static void commonBuffers() {
@@ -210,7 +303,7 @@ static void commonBuffers() {
     spin::Buffer assigned(1);assigned=std::move(moved);
     require(moved.bytes().empty() && assigned.bytes().data()==address,"common buffer move assignment");
     rejects([]{spin::Buffer invalid(0,static_cast<spin::MemoryPolicy>(99));});
-    for(auto policy:{spin::MemoryPolicy::Normal,spin::MemoryPolicy::PreferHugePages}) {
+    for(auto policy:{spin::MemoryPolicy::Normal,spin::MemoryPolicy::PreferHugePages,spin::MemoryPolicy::Automatic}) {
         noAlloc([&]{
             bool failed=false;
             try{spin::Buffer overflow(std::numeric_limits<std::size_t>::max(),policy);}
@@ -220,10 +313,80 @@ static void commonBuffers() {
     }
 }
 
+static constexpr std::size_t memoryAlignment(std::size_t bytes,spin::MemoryPolicy policy) {
+    if(policy==spin::MemoryPolicy::PreferHugePages)return 2*1024*1024;
+#if defined(__linux__)
+    if(policy==spin::MemoryPolicy::Automatic && bytes>=16*1024*1024)return 2*1024*1024;
+#endif
+    return 64;
+}
+static constexpr std::size_t memoryBytes(std::size_t bytes,spin::MemoryPolicy policy) {
+    const auto a=memoryAlignment(bytes,policy);
+    return (bytes+a-1)&~(a-1);
+}
+static void automaticMemory() {
+    using spin::MemoryPolicy;
+    constexpr std::size_t threshold=16*1024*1024;
+    static_assert(int(MemoryPolicy::Normal)==0 && int(MemoryPolicy::PreferHugePages)==1);
+    for(auto bytes:{std::size_t{65},threshold-1,threshold,threshold+1}) {
+        // The omitted argument must select Automatic, including at the exact
+        // logical-byte boundary; explicit policies override it at every size.
+        spin::Buffer automatic(bytes);
+        require(automatic.allocation_bytes()==memoryBytes(bytes,MemoryPolicy::Automatic),"automatic buffer rounding");
+        require(reinterpret_cast<std::uintptr_t>(automatic.bytes().data())%
+            memoryAlignment(bytes,MemoryPolicy::Automatic)==0,"automatic buffer alignment");
+        require(automatic.bytes().size()==bytes && automatic.bytes().front()==std::byte{} &&
+            automatic.bytes().back()==std::byte{},"automatic buffer logical size/initialization");
+        for(auto policy:{MemoryPolicy::Normal,MemoryPolicy::PreferHugePages}) {
+            spin::Buffer explicitBuffer(bytes,policy);
+            require(explicitBuffer.allocation_bytes()==memoryBytes(bytes,policy),"explicit memory policy rounding");
+            require(reinterpret_cast<std::uintptr_t>(explicitBuffer.bytes().data())%memoryAlignment(bytes,policy)==0,
+                "explicit memory policy alignment");
+        }
+    }
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
+    // Just above K19 distinguishes the factory defaults by allocation size:
+    // Normal rounds by 64 bytes, Automatic/Linux rounds by 2 MiB.
+    constexpr std::size_t smallK=256,bigK=(std::size_t{1}<<19)+256;
+    const auto scratchBytes=[](std::size_t k){return (k/256)*516*16;};
+    // Padded scratch crosses first: the input still fits below 16 MiB at
+    // K=2033*256. Resolve both from their own logical bytes, not from K alone.
+    for(auto k:{std::size_t{2032*256},std::size_t{2033*256}}) {
+        spin::Code boundary({k,family,17,43});
+        auto bw=boundary.make_workspace();auto bb=boundary.make_buffer();
+        require(bw.bytes()==memoryBytes(scratchBytes(k),MemoryPolicy::Automatic),"scratch-specific automatic boundary");
+        require(bb.allocation_bytes()==memoryBytes(32*k,MemoryPolicy::Automatic),"input-specific automatic boundary");
+    }
+    spin::Code small({smallK,family,17,43}),big({bigK,family,17,43});
+    auto work=small.make_workspace();
+    require(work.bytes()==memoryBytes(scratchBytes(smallK),MemoryPolicy::Automatic),"small automatic workspace");
+    big.prepare_workspace(work);
+    require(work.bytes()==memoryBytes(scratchBytes(bigK),MemoryPolicy::Automatic),"automatic workspace resize up");
+    auto normal=big.make_workspace(spin::Width::Bits128,MemoryPolicy::Normal);
+    std::vector<Block> input(2*bigK),expected(bigK),actual(bigK);fill(input);
+    noAlloc([&]{big.transpose<Block>(input,expected,normal);big.transpose<Block>(input,actual,work);});
+    require(expected==actual,"automatic policy changed code map");
+    noAlloc([&]{big.prepare_workspace(work);});
+    small.prepare_workspace(work);
+    require(work.bytes()==memoryBytes(scratchBytes(smallK),MemoryPolicy::Automatic),"automatic workspace resize down");
+    small.prepare_workspace(normal);big.prepare_workspace(normal);
+    require(normal.bytes()==memoryBytes(scratchBytes(bigK),MemoryPolicy::Normal),"resize lost explicit Normal");
+    auto buffer=big.make_buffer();
+    require(buffer.allocation_bytes()==memoryBytes(32*bigK,MemoryPolicy::Automatic),"Code buffer default policy");
+    spin::PacketCode packet({bigK,17});auto pw=packet.make_workspace();auto pb=packet.make_buffer();
+    require(pw.bytes()==memoryBytes(scratchBytes(bigK),MemoryPolicy::Automatic) &&
+        pb.allocation_bytes()==memoryBytes(32*bigK,MemoryPolicy::Automatic),"PacketCode default policy");
+    spin::PreparedEncoder prepared({bigK,family,17,43});auto fw=prepared.make_workspace();auto fb=prepared.make_buffer();
+    require(fw.bytes()==memoryBytes(scratchBytes(bigK),MemoryPolicy::Automatic) &&
+        fb.allocation_bytes()==memoryBytes(32*bigK,MemoryPolicy::Automatic),"PreparedEncoder default policy");
+    rejects([&]{big.make_workspace(spin::Width::Bits128,static_cast<MemoryPolicy>(99));});
+    rejects([&]{prepared.make_workspace(spin::Width::Bits128,static_cast<MemoryPolicy>(99));});
+}
+
 static void unifiedCode() {
     constexpr std::size_t k=1536;
-    constexpr auto family=spin::Parameters::PacketT64S16;
-    require(spin::message_alignment(family)==512 && spin::valid_message_size(family,k),"unified packet geometry");
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
+    require(spin::message_alignment(family)==256 && spin::valid_message_size(family,k),"unified packet geometry");
     require(!spin::valid_message_size(family,k+1),"unified packet geometry accepted misalignment");
     for(auto seeds:{spin::CodeSeed{17,17},spin::CodeSeed{43,17},spin::CodeSeed{43,91}}) {
         const spin::CodeSpec spec{k,family,seeds.route,seeds.inner};
@@ -249,13 +412,13 @@ static void unifiedCode() {
             const auto d=legacy.descriptor();
             std::array<std::byte,32> frozen{};
             frozen[0]=std::byte{'S'};frozen[1]=std::byte{'P'};frozen[2]=std::byte{'K'};frozen[3]=std::byte{'P'};
-            frozen[4]=std::byte{1};frozen[8]=std::byte{1};
+            frozen[4]=std::byte{2};frozen[8]=std::byte{2};
             for(unsigned i=0;i<8;++i) {frozen[16+i]=std::byte((k>>(8*i))&255);frozen[24+i]=std::byte((seeds.route>>(8*i))&255);}
-            require(d==frozen,"PacketCode descriptor changed during API unification");
+            require(d==frozen,"PacketCode descriptor family/version");
         }
         std::array<std::byte,40> descriptor{};
         descriptor[0]=std::byte{'S'};descriptor[1]=std::byte{'P'};descriptor[2]=std::byte{'I'};descriptor[3]=std::byte{'N'};
-        descriptor[4]=std::byte{1};descriptor[8]=std::byte{4};
+        descriptor[4]=std::byte{1};descriptor[8]=std::byte{5};
         for(unsigned i=0;i<8;++i) {
             descriptor[16+i]=std::byte((k>>(8*i))&255);
             descriptor[24+i]=std::byte((seeds.route>>(8*i))&255);
@@ -289,8 +452,8 @@ static void unifiedCode() {
     }
     rejects([&]{spin::Code c({k,family},{spin::Backend::Avx2});});
     rejects([&]{spin::Code c({k,family},{static_cast<spin::Backend>(99)});});
-    rejects([&]{spin::Code c({k,family},{spin::Backend::Portable,8});});
-    spin::Code fixedTile({k,family},{spin::Backend::Portable,4});
+    rejects([&]{spin::Code c({k,family},{spin::Backend::Portable,4});});
+    spin::Code fixedTile({k,family},{spin::Backend::Portable,8});
     require(fixedTile.backend()==spin::Backend::Portable,"explicit fixed packet tile");
     if(!spin::packet_fast_available()) {
         bool failed=false;
@@ -301,7 +464,7 @@ static void unifiedCode() {
 
 static void preparedPacket() {
     constexpr std::size_t k=1536;
-    constexpr auto family=spin::Parameters::PacketT64S16;
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
     spin::PreparedEncoder prepared({k,family,17,17});
     auto work=prepared.make_workspace(spin::Width::Bits128,spin::MemoryPolicy::Normal);
     require(prepared.supports_transpose() && !prepared.supports_transpose(spin::Width::Bits256) &&
@@ -328,7 +491,7 @@ static void preparedPacket() {
         const auto spec=prepared.specification();
         require(spec.route_seed==seeds.route && spec.inner_seed==seeds.inner,"prepared packet seed fields");
         const auto d=prepared.descriptor();
-        require(d[4]==std::byte{2} && d[8]==std::byte{4} && d[12]==std::byte{},"prepared packet descriptor family/mode");
+        require(d[4]==std::byte{2} && d[8]==std::byte{5} && d[12]==std::byte{},"prepared packet descriptor family/mode");
         for(unsigned i=0;i<8;++i)require(d[24+i]==std::byte((seeds.route>>(8*i))&255) &&
             d[32+i]==std::byte((seeds.inner>>(8*i))&255),"prepared packet descriptor seed refresh");
     }
@@ -366,7 +529,7 @@ static void preparedPacket() {
 }
 
 static void workspaceConversions() {
-    constexpr auto family=spin::Parameters::PacketT64S16;
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
     constexpr std::size_t smallK=1536;
     spin::Code first({smallK,family,1,17}),second({smallK,family,43,91});
     auto huge=first.make_workspace(spin::Width::Bits128,spin::MemoryPolicy::PreferHugePages);
@@ -399,7 +562,7 @@ static void workspaceConversions() {
 
 static void movedUnifiedHandles() {
     constexpr std::size_t k=512;
-    constexpr auto family=spin::Parameters::PacketT64S16;
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
     std::vector<Block> input(2*k),expected(k),actual(k);fill(input);
     spin::Code source({k,family,17,43},{spin::Backend::Portable});auto work=source.make_workspace();
     source.transpose<Block>(input,expected,work);
@@ -430,7 +593,7 @@ static void movedUnifiedHandles() {
 }
 
 int main() {try {
-    for(auto k:{std::size_t{0},std::size_t{1},std::size_t{511},std::size_t{513},std::numeric_limits<std::size_t>::max()}) {
+    for(auto k:{std::size_t{0},std::size_t{1},std::size_t{255},std::size_t{257},std::size_t{511},std::size_t{513},std::numeric_limits<std::size_t>::max()}) {
         require(!spin::valid_packet_message_size(k),"invalid K query accepted");rejects([&]{spin::PacketCode c({k,1});});
     }
     rejects([]{spin::PacketCode c({512,1},static_cast<spin::PacketBackend>(99));});
@@ -438,9 +601,9 @@ int main() {try {
         bool failed=false;try{spin::PacketCode c({512,1},spin::PacketBackend::Avx512Gfni);}catch(const std::runtime_error&){failed=true;}
         require(failed,"forced unavailable packet ISA");
     }
-    for(auto k:{512U,1024U,1536U,2560U,65536U,262144U})for(auto seed:{1ULL,17ULL})test(k,seed);
-    sizing();knownAnswers();coordinateBasis();concurrent();commonBuffers();unifiedCode();preparedPacket();
-    workspaceConversions();movedUnifiedHandles();
-    std::cout<<"packet API PASS: scalar/fast, research known answers, coordinate basis, natural sizes, unified/prepared APIs, buffers, boundaries, alignment, ownership, no allocation\n";
+    for(auto k:{256U,512U,768U,1024U,1536U,2560U,4096U,12288U,65536U,262144U})for(auto seed:{1ULL,17ULL})test(k,seed);
+    sizing();largePacket();retiredFamily();knownAnswers();coordinateBasis();binaryAdjoint();concurrent();commonBuffers();unifiedCode();preparedPacket();
+    workspaceConversions();movedUnifiedHandles();automaticMemory();
+    std::cout<<"packet API PASS: scalar/fast, research known answers, coordinate basis, natural sizes and K20, retired family rejection, unified/prepared APIs, buffers, boundaries, alignment, ownership, no allocation\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

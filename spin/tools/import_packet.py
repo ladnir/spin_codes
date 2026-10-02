@@ -1,9 +1,17 @@
-"""Import the measured packet transpose into a standalone private SIMD unit.
+"""Regenerate the retained helper headers used by frozen packet research.
+
+The public BCH packet family is retired. Current library kernels are generated
+by import_rs_packet.py. This script preserves only the three historical helper
+headers required by frozen research and the selected RS inner; it does not
+restore the retired outer or compiled backend.
 
 Maintainer-only: normal package builds consume the committed headers and never
-read research sources or invoke Python.  The importer selects the wide-state
-false/false stream, compact coefficients, and mixed-layout BCH transpose.  It
-does not copy benchmark drivers, setup owners, alternate kernels, or tests.
+read research sources or invoke Python.  The small schedule selects the
+wide-state false/false stream and mixed-layout BCH transpose.  The large
+schedule selects retained inner_fusion_probe mode 19 and the separately
+compiled PackedCoeff1 Compact outer (tile-mode 1).  Constant-branch selection
+and namespace/type renaming preserve the retained statement ordering.  Neither
+schedule copies benchmark drivers, setup owners, alternate kernels, or tests.
 
 Run from any directory: python -B spin/tools/import_packet.py [--check]
 """
@@ -11,8 +19,10 @@ import argparse
 from contextlib import redirect_stdout
 import hashlib
 from io import StringIO
+import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 PACKAGE = Path(__file__).resolve().parents[1]
@@ -166,11 +176,181 @@ def outer_header():
     return result
 
 
+def replace_once(source, old, new):
+    """Make a checked spelling/constant-branch substitution, never a rewrite."""
+    if source.count(old) != 1:
+        raise ArithmeticError(f'expected one retained source fragment: {old}')
+    return source.replace(old, new)
+
+
+def large_prelude(paths, header=True):
+    text = header_prelude(paths).replace(
+        '// Selected exact t64/s16 packet transpose. Private to PacketFast.cpp.',
+        '// Retained inner_fusion_probe mode 19 and PackedCoeff1 tile-mode 1.')
+    return text if header else text.replace('#pragma once\n', '')
+
+
+def large_types_header():
+    source = WORKSTREAM / 'FusedR4Gfni.h'
+    row = definition(source.read_text(), 'struct Dense16Row', True)
+    return (large_prelude([source]) + '#include <cstdint>\n'
+            'namespace spin::detail::packet::large {\n' + row + '\n'
+            'static_assert(sizeof(Dense16Row)==32);\n'
+            '} // namespace spin::detail::packet::large\n')
+
+
+def large_inner_header():
+    """Select mode 19 branches verbatim; retain their original issue order."""
+    names = ('FusedR4Gfni.h', 'InnerPacketMaps.h', 'InnerPacketFeedback.h',
+             'InnerVbmiState.h', 'InnerPacketStream.h', 'inner_packet_probe.cpp',
+             'inner_fusion_probe.cpp')
+    paths = [WORKSTREAM / name for name in names]
+    gf, maps, feedback, vbmi, stream, packet, fusion = [p.read_text() for p in paths]
+    selected_maps = maps[maps.index('template<> struct Maps<true>'):]
+    chunks = [large_prelude(paths),
+              '#include "PacketLargeTypes.h"\n#include "../kernels/Block.h"\n'
+              '#include <array>\n#include <cstddef>\n#include <utility>\n'
+              'namespace spin::detail::packet::large {\nusing block=storage::block;\n'
+              'struct alignas(64) PackedState { __m512i v[4]; };\n']
+    specs = (
+        (maps, 'static SPIN_FORCEINLINE __m128i vx('),
+        (maps, 'static SPIN_FORCEINLINE __m512i join('),
+        (vbmi, 'template<unsigned FirstPayloadByte>\nstatic SPIN_FORCEINLINE __m512i packIndex('),
+        (vbmi, 'template<unsigned FirstCoordinate>\nstatic SPIN_FORCEINLINE __m512i unpackIndex('),
+        (vbmi, 'template<unsigned Group>\nstatic SPIN_FORCEINLINE void packGroup('),
+        (vbmi, 'template<unsigned First>\nstatic SPIN_FORCEINLINE void storeFour('),
+        (vbmi, 'template<unsigned Group>\nstatic SPIN_FORCEINLINE void unpackGroup('),
+        (vbmi, 'static SPIN_FORCEINLINE void widePackVbmi('),
+        (vbmi, 'static SPIN_FORCEINLINE void wideUnpackVbmi('),
+        (feedback, 'struct FourMoments'),
+        (feedback, 'template<unsigned First>\nSPIN_PACKET_FEEDBACK_INLINE FourMoments firstStage('),
+        (feedback, 'template<unsigned Mask, unsigned Degree>\nSPIN_PACKET_FEEDBACK_INLINE void storeLowMoments('),
+        (feedback, 'SPIN_PACKET_FEEDBACK_INLINE void packetMoments('),
+        (selected_maps, 'static SPIN_FORCEINLINE void finish('),
+        (packet, 'template<std::size_t... I> SPIN_FORCEINLINE void loadPackets('),
+    )
+    for source, marker in specs:
+        text = definition(source, marker, marker.startswith('struct '))
+        text = (text.replace('spin::research::gfni_r4::Packed<16>', 'PackedState')
+                .replace('spin::research::gfni_r4::join(', 'join(')
+                .replace('vbmi_state_detail::', '')
+                .replace('SPIN_PACKET_FEEDBACK_INLINE', 'static SPIN_FORCEINLINE')
+                .replace('using feedback_detail::firstStage;', '')
+                .replace('using feedback_detail::storeLowMoments;', '')
+                .replace('k::block', 'block'))
+        chunks.append(text)
+
+    dense = definition(gf, 'template<bool Add=false> SPIN_FORCEINLINE void denseStep16(')
+    add = definition(dense, 'if constexpr(Add)')
+    otherwise = definition(dense[dense.index(add) + len(add):], 'else')
+    dense = replace_once(dense, add + ' ' + otherwise, add[len('if constexpr(Add) {'):-1])
+    dense = dense.replace('template<bool Add=false> ', '').replace('Packed<16>', 'PackedState')
+    chunks.append(dense)
+
+    high = definition(stream, 'template<bool Pruned,bool Incremental=true,class Emit>\n'
+                      'static SPIN_FORCEINLINE void streamStepHigh(')
+    incremental = definition(high, 'if constexpr(Incremental)')
+    grouped = definition(high[high.index(incremental) + len(incremental):], 'else')
+    high = replace_once(high, incremental + grouped, grouped[len('else{'):-1])
+    high = '\n'.join(line for line in high.splitlines() if 'const auto cache' not in line)
+    high = re.sub(r'Pruned\?[^:;]+:([^;]+)', r'\1', high)
+    step = definition(stream, 'template<bool Pruned,bool Incremental=true,class Emit>\n'
+                      'static SPIN_FORCEINLINE void streamStep(')
+    for text in (high, step):
+        text = (text.replace('template<bool Pruned,bool Incremental=true,class Emit>', 'template<class Emit>')
+                .replace('<Pruned,Incremental>', '')
+                .replace('spin::detail::kernel::block', 'block')
+                .replace('using feedback_detail::storeLowMoments;', ''))
+        if 'Pruned' in text or 'Incremental' in text:
+            raise ArithmeticError('unselected mode-19 stream branch survived import')
+        chunks.append(text)
+
+    reverse = definition(fusion, 'template<int Mode,class Emit>\nSPIN_FORCEINLINE void reverseNew(')
+    reverse = replace_once(reverse, '    using O=Options<Mode>;\n', '')
+    reverse = replace_once(reverse,
+        '            if constexpr(O::vbmiUnpack)ip::wideUnpackVbmi(state,words);\n'
+        '            else if constexpr(O::unpack)ip::wideUnpack(state,words);\n'
+        '            else gf::unpack(state,words);',
+        '            ip::wideUnpackVbmi(state,words);')
+    reverse = replace_once(reverse,
+        '            // Emission consumes old coordinate words, whereas the next packed\n'
+        '            // state can already compute its independent matrix product.\n'
+        '            if constexpr(O::early)if(epoch)gf::denseStep16<false>(state,rows[epoch]);\n', '')
+    # Restrict extraction before the later feedback branch to keep markers unique.
+    emission = reverse[reverse.index('            if constexpr(O::stream)'):reverse.index('        if(!epoch)break;')]
+    stream_branch = definition(emission, 'if constexpr(O::stream)')
+    nonstream_branch = definition(emission[emission.index(stream_branch) + len(stream_branch):], 'else')
+    reverse = replace_once(reverse, stream_branch + ' ' + nonstream_branch,
+                           'ip::streamStep(words,raw,16*epoch,emit,moments);')
+    direct = definition(reverse, 'if constexpr(O::direct)')
+    indirect_source = reverse[reverse.index(direct) + len(direct):reverse.index('        if(first)state=feedback;')]
+    # The body contains further else clauses; select its outer opening uniquely.
+    indirect = definition(indirect_source.replace('else {', 'SELECTED_ELSE {', 1), 'SELECTED_ELSE')
+    indirect = indirect.replace('SELECTED_ELSE', 'else', 1)
+    reverse = replace_once(reverse, direct + ' ' + indirect, indirect[len('else {'):-1])
+    reverse = replace_once(reverse,
+        '            if constexpr(O::stream) {if(first)ip::packetMoments(packets,moments);}\n'
+        '            else ip::packetMoments(packets,moments);',
+        '            if(first)ip::packetMoments(packets,moments);')
+    reverse = replace_once(reverse,
+        '            if constexpr(O::vbmiPack)ip::widePackVbmi(syndrome,feedback);\n'
+        '            else if constexpr(O::pack)ip::widePack(syndrome,feedback);\n'
+        '            else gf::pack<16>(syndrome,feedback);',
+        '            ip::widePackVbmi(syndrome,feedback);')
+    early = definition(reverse, 'if constexpr(O::early)')
+    reverse = replace_once(reverse, 'else ' + early + ' else ', 'else ')
+    reverse = (reverse.replace('template<int Mode,class Emit>', 'template<class Emit>')
+               .replace('reverseNew(', 'reverse(').replace('Emit&& emit', 'Emit& emit')
+               .replace('k::block', 'block').replace('gf::Dense16Row', 'Dense16Row')
+               .replace('gf::Packed<16>', 'PackedState').replace('gf::denseStep16<true>', 'denseStep16')
+               .replace('ip::Maps<true>::finish', 'finish').replace('ip::', ''))
+    if 'O::' in reverse or 'Options' in reverse:
+        raise ArithmeticError('unselected mode-19 reverse branch survived import')
+    chunks.append(reverse)
+    chunks.append('} // namespace spin::detail::packet::large\n')
+    result = '\n'.join(line.rstrip() for line in '\n'.join(chunks).splitlines()) + '\n'
+    if any(word in result for word in ('spin::research', 'gf::', 'ip::', 'k::')):
+        raise ArithmeticError('research interface survived large inner import')
+    return result
+
+
+def large_outer_files():
+    """Copy exactly the retained tile-mode-1 generator's selected definitions."""
+    header = PACKAGE / 'src/kernels/generated/BchCircuit.h'
+    generator = WORKSTREAM / 'packed_coeff_codegen.py'
+    run = subprocess.run([sys.executable, '-B', str(generator), str(header), '--tile-mode', '1'],
+                         check=True, capture_output=True, text=True,
+                         env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
+    source = run.stdout
+    sources = [generator, WORKSTREAM / 'packed_bch_tune_codegen.py',
+               WORKSTREAM / 'packed_mixer_codegen.py', header]
+    declaration = (large_prelude(sources) + '#include "../kernels/Block.h"\n#include <cstdint>\n'
+                   'namespace spin::detail::packet::large {\n'
+                   'SPIN_NOINLINE void outerCompact(const storage::block* __restrict a,\n'
+                   '    storage::block* __restrict out,const std::uint64_t* __restrict coeff);\n'
+                   '} // namespace spin::detail::packet::large\n')
+    chunks = [large_prelude(sources, header=False),
+              '// Exact full generated source (LF) SHA256: ' + hashlib.sha256(source.encode()).hexdigest(),
+              '#include "PacketLargeOuter.h"\n#include "../kernels/generated/BchCircuit.h"\n'
+              'namespace spin::detail::packet::large {\nusing block=storage::block;\n'
+              'using spin::detail::kernel::BchRows;\nnamespace coeff_probe_detail {']
+    for marker in ('alignas(64) static constexpr std::uint64_t matrices',
+                   'static SPIN_FORCEINLINE void orthoBlend(',
+                   'template<unsigned output> static SPIN_NOINLINE void packedCoeffTile('):
+        chunks.append(definition(source, marker, marker.startswith('alignas')))
+    chunks.append('} // namespace coeff_probe_detail')
+    chunks.append(definition(source, 'SPIN_NOINLINE void bchPackedCoeffCompact(')
+                  .replace('bchPackedCoeffCompact(', 'outerCompact('))
+    chunks.append('} // namespace spin::detail::packet::large\n')
+    return declaration, '\n'.join(chunks)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='verify committed generated files without writing')
     args = parser.parse_args()
-    outputs = {'PacketInnerFast.h': inner_header(), 'PacketOuterFast.h': outer_header()}
+    outputs = {'PacketInnerFast.h': inner_header(),
+               'PacketLargeTypes.h': large_types_header(), 'PacketLargeInner.h': large_inner_header()}
     for name, text in outputs.items():
         path = DESTINATION / name
         if args.check:

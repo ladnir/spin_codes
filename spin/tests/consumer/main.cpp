@@ -6,8 +6,8 @@
 namespace osuCrypto { struct alignas(16) block { std::array<unsigned long long,2> words{}; }; }
 int main() {
     for(auto family:{spin::Parameters::T128S19,spin::Parameters::T64S12,
-                    spin::Parameters::T64S12R2,spin::Parameters::PacketT64S16}) {
-        if(family!=spin::Parameters::PacketT64S16 && !spin::capabilities().avx2)continue;
+                    spin::Parameters::T64S12R2,spin::Parameters::PacketRsT64S20}) {
+        if(family!=spin::Parameters::PacketRsT64S20 && !spin::capabilities().avx2)continue;
         const auto k=3*spin::message_alignment(family);
         if(!spin::valid_message_size(family,k))return 1;
         spin::Code code({k,family,17,17});

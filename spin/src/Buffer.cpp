@@ -1,5 +1,5 @@
 #include <spin/Code.h>
-#include "kernels/WorkspaceRouting.h"
+#include "MemoryPolicy.h"
 #include <cstring>
 #include <limits>
 #include <new>
@@ -11,8 +11,6 @@ struct BufferAllocation {
     std::size_t logical = 0, allocated = 0, alignment = 64;
 
     BufferAllocation(std::size_t bytes, MemoryPolicy policy) : logical(bytes) {
-        if(policy != MemoryPolicy::Normal && policy != MemoryPolicy::PreferHugePages)
-            throw std::invalid_argument("SPIN unknown memory policy");
         if(policy == MemoryPolicy::PreferHugePages) alignment = 2 * 1024 * 1024;
         if(bytes > std::numeric_limits<std::size_t>::max() - (alignment - 1))
             throw std::bad_alloc();
@@ -32,8 +30,7 @@ struct BufferAllocation {
 
 namespace spin {
 Buffer::Buffer(std::size_t bytes, MemoryPolicy policy) {
-    if(policy != MemoryPolicy::Normal && policy != MemoryPolicy::PreferHugePages)
-        throw std::invalid_argument("SPIN unknown memory policy");
+    policy = detail::resolveMemoryPolicy(bytes, policy);
     const std::size_t alignment = policy == MemoryPolicy::PreferHugePages ? 2 * 1024 * 1024 : 64;
     if(bytes > std::numeric_limits<std::size_t>::max() - (alignment - 1))
         throw std::bad_alloc();

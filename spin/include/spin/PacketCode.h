@@ -9,8 +9,9 @@
 #include <type_traits>
 
 namespace spin {
-// Compatibility interface for four-row BCH packets with GL32 outer mixing and
-// the t64/s16 inner with GL16 updates. New consumers use Code with PacketT64S16.
+// Convenience interface for eight-row GF16 RS packets with GF(2^32) outer
+// randomizers and the t64/s20 inner with GL20 updates. Code provides the same
+// construction under Parameters::PacketRsT64S20, with separate setup seeds.
 struct PacketSpec {
     std::size_t message_size;
     std::uint64_t seed=1;
@@ -20,9 +21,9 @@ enum class PacketBackend { Automatic, Portable, Avx512Gfni };
 using PacketMemory=MemoryPolicy;
 using PacketBuffer=Buffer;
 bool packet_fast_available() noexcept;
-// Natural message-size unit: four BCH rows, each carrying 128 elements.
+// Natural message-size unit: eight RS rows, each carrying 32 binary elements.
 // Transposed buffers hold exactly 2K input elements and K output elements.
-inline constexpr std::size_t packet_message_alignment() noexcept { return 512; }
+inline constexpr std::size_t packet_message_alignment() noexcept { return 256; }
 // No allocation, setup, rounding, or certificate lookup. Includes representation
 // bounds; a valid size can still exceed the caller's available memory.
 bool valid_packet_message_size(std::size_t) noexcept;
@@ -58,14 +59,15 @@ public:
         return message_size()!=0 && width==Width::Bits128;
     }
     bool supports_generic_transpose() const noexcept { return false; }
-    // Little-endian SPKP descriptor: version1, family1, reserved0, K, seed.
+    // Little-endian SPKP descriptor: version2, family2, reserved0, K, seed.
+    // Version1/family1 described the retired BCH packet construction.
     // Backend and memory policy never change the represented binary map.
     std::array<std::byte,32> descriptor() const noexcept;
-    // Scratch is 64-byte aligned with best-effort advice on owned pages.
-    // PreferHugePages additionally requests 2 MiB-aligned backing storage.
-    Workspace make_workspace(PacketMemory=PacketMemory::Normal) const;
+    // Scratch uses the same size-aware Automatic policy as Buffer. Normal keeps
+    // 64-byte alignment; PreferHugePages forces 2 MiB-aligned backing storage.
+    Workspace make_workspace(PacketMemory=PacketMemory::Automatic) const;
     // Zero-initialized storage for exactly 2K 128-bit elements.
-    PacketBuffer make_buffer(PacketMemory=PacketMemory::Normal) const;
+    PacketBuffer make_buffer(PacketMemory=PacketMemory::Automatic) const;
     // No allocation during encoding. One workspace per concurrent call.
     // Exact sizes: 2K inputs, K outputs, 16 bytes per element. No overlap.
     void transpose_bytes(std::span<const std::byte>,std::span<std::byte>,Workspace&) const;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(spin VERSION 0.2.0 LANGUAGES CXX)
+project(spin VERSION 0.3.0 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 option(SPIN_ENABLE_AVX512 "Build runtime-dispatched AVX-512 kernels" ON)
@@ -53,16 +53,16 @@ if(SPIN_ENABLE_AVX512)
     set_source_files_properties(${KERNEL}/BankMasks.cpp PROPERTIES COMPILE_OPTIONS "-mavx512bw;-mavx512dq;-mavx512vpopcntdq")
   endif()
   target_sources(spin PRIVATE $<TARGET_OBJECTS:spin_kernels512>)
-  # Packet-specific ISA stays in one translation unit. Neither setup nor the
+  # Packet-specific ISA stays in private translation units. Neither setup nor the
   # public API is compiled for AVX-512, and old kernel requirements stay intact.
-  add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp)
+  add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp)
   target_compile_features(spin_packet512 PRIVATE cxx_std_20)
   set_target_properties(spin_packet512 PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
   if(MSVC)
     target_compile_options(spin_packet512 PRIVATE /arch:AVX512)
     target_compile_definitions(spin_packet512 PRIVATE SPIN_PACKET_ENABLE_VBMI=1)
   else()
-    target_compile_options(spin_packet512 PRIVATE -mavx2 -mavx512f -mavx512vl -mavx512bw
+    target_compile_options(spin_packet512 PRIVATE -mavx2 -mavx512f -mavx512vl -mavx512bw -mavx512dq
       -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
   endif()
   target_sources(spin PRIVATE $<TARGET_OBJECTS:spin_packet512>)

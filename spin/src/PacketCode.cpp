@@ -1,5 +1,6 @@
 #include <spin/PacketCode.h>
 #include "Cpu.h"
+#include "MemoryPolicy.h"
 #include "packet/PacketPlan.h"
 #include "kernels/WorkspaceRouting.h"
 #include <stdexcept>
@@ -19,7 +20,7 @@ struct PacketScratch {
         :state(std::move(s)),allocation(state->plan.scratchBlocks()*16,policy) {
         // Match the measured routed workspace: preparation advises its owned
         // pages even with normal alignment. The huge-page buffer does this itself.
-        if(policy==PacketMemory::Normal)
+        if(resolveMemoryPolicy(allocation.bytes().size(),policy)==PacketMemory::Normal)
             kernel::workspace_routing::adviseOwned(allocation.bytes().data(),allocation.allocation_bytes());
     }
 };
@@ -38,8 +39,7 @@ void encode(const PacketState& s,const void* in,void* out,void* scratch) {
     auto* work=static_cast<storage::block*>(scratch);
 #if SPIN_BCH_AVX512
     if(s.backend==PacketBackend::Avx512Gfni) {
-        packet::transposeFast(input,output,work,s.plan.n,s.plan.route.data(),
-            s.plan.compactCoefficients(),s.plan.composedUpdates.data());
+        packet::transposeFast(input,output,work,s.plan);
         return;
     }
 #endif
@@ -52,7 +52,7 @@ bool packet_fast_available() noexcept {return detail::cpu_packet512();}
 bool valid_packet_message_size(std::size_t k) noexcept {return detail::packet::validMessageSize(k);}
 PacketCode::PacketCode(PacketSpec spec,PacketBackend backend) {
     if(!valid_packet_message_size(spec.message_size))
-        throw std::invalid_argument("SPIN packet K must be a positive supported multiple of 512");
+        throw std::invalid_argument("SPIN packet K must be a positive supported multiple of 256");
     switch(backend) {
     case PacketBackend::Automatic:
         backend=packet_fast_available()?PacketBackend::Avx512Gfni:PacketBackend::Portable;
@@ -81,7 +81,7 @@ std::array<std::byte,32> PacketCode::descriptor() const noexcept {
     const auto put=[&](unsigned offset,std::uint64_t v,unsigned bytes) {
         for(unsigned i=0;i<bytes;++i)out[offset+i]=std::byte((v>>(8*i))&255);
     };
-    put(4,1,4);put(8,1,4);put(16,message_size(),8);put(24,state_->spec.seed,8);
+    put(4,2,4);put(8,2,4);put(16,message_size(),8);put(24,state_->spec.seed,8);
     return out;
 }
 PacketCode::Workspace PacketCode::make_workspace(PacketMemory p) const {

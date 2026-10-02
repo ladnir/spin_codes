@@ -29,7 +29,7 @@ Features detect() noexcept {
     x.vl=__builtin_cpu_supports("avx512vl");
     x.wide=x.f && x.vl && __builtin_cpu_supports("avx512dq") && __builtin_cpu_supports("avx512bw");
     x.masks=x.wide && __builtin_cpu_supports("avx512vpopcntdq");
-    x.packet=x.avx2 && x.f && x.vl && __builtin_cpu_supports("avx512bw") &&
+    x.packet=x.avx2 && x.wide &&
         __builtin_cpu_supports("avx512vbmi") && __builtin_cpu_supports("gfni");
 #endif
     return x;

@@ -1,7 +1,8 @@
 # SPIN encoding library
 
-This standalone C++20 library provides the optimized half-rate BCH [256,128]
-SPIN encoder. It has no build dependency on libOTe, Hypercat, Python, or the
+This standalone C++20 library provides two half-rate binary-code families:
+paper SPIN with a BCH [256,128] outer and IMT inner, and the newer RS packet
+construction. It has no build dependency on libOTe, Hypercat, Python, or the
 research workstreams. SPIN is [MIT licensed](LICENSE), copyright Peter Rindal.
 The checked-in kernels have a [generation record](PROVENANCE.md).
 
@@ -10,7 +11,8 @@ runtime-dispatched register kernels, regeneration, and portability tests.
 
 Forward encoding maps K records to 2K records. Transposed encoding maps 2K
 records to K records. Both apply the same binary matrix, independently to each
-bit of a record. They do not perform extension-field multiplication.
+bit of a record. The RS packet kernels use finite-field instructions internally
+to evaluate that binary matrix; callers still supply ordinary 128-bit records.
 
 ## Build and link
 
@@ -73,7 +75,7 @@ For separate transpose buffers, use `code.transpose<Block>(input, output, work)`
 Separate input and output ranges must not overlap. The in-place operation requires
 exactly 2K records and is supported for 128-bit records only.
 
-Select `Parameters::PacketT64S16` for the newer packet construction. It supports
+Select `Parameters::PacketRsT64S20` for the newer packet construction. It supports
 the same transpose calls, but not forward encoding or generic XOR elements yet.
 Query `supports_forward(width)`, `supports_transpose(width)`, and
 `supports_generic_transpose()` before using an optional operation.
@@ -183,12 +185,13 @@ See the [integration checkpoint](PREPARED_ENCODER.md) for validation and current
 | `T128S19` | (128,19,1) | 16,384 |
 | `T64S12` | (64,12,1) | 8,192 |
 | `T64S12R2` | (64,12,2) | 8,192 |
-| `PacketT64S16` | (64,16), GL16 updates | 512 |
+| `PacketRsT64S20` | (64,20), GL20 updates | 256 |
 
 `message_alignment` and `valid_message_size` provide allocation-free queries.
 The implementation never rounds K or changes the chosen parameter set.
-Current 32-bit routing requires K < 2^31. Packet routing has padding and a slightly
-smaller maximum K of 2,139,127,296. Available memory also limits allocations.
+Current 32-bit routing requires K < 2^31. RS packet routing stores padded groups,
+so its representation bound is slightly smaller. Query `valid_message_size`
+rather than hard-coding that bound. Available memory also limits allocations.
 There is no additional benchmark-size or certificate-size cap.
 The caller remains responsible for certificate coverage at the selected parameters.
 
@@ -196,18 +199,18 @@ The caller remains responsible for certificate coverage at the selected paramete
 for IMT is 256 outer rows, clamped to the code geometry. Use 512 explicitly when desired
 for the previously measured large wide workload. These are execution choices,
 not changes to the binary code. Compaction and route packing are internal.
-Packet encoding uses four-row tiles and accepts only `tile_rows=0` or `4`.
+RS packet encoding uses eight-row tiles and accepts only `tile_rows=0` or `8`.
 
 | Family | 128-bit transpose | 128-bit forward | Wide forward | Generic XOR transpose |
 |---|---|---|---|---|
 | `T128S19` | Yes | Yes | 256/512 bits | Yes |
 | `T64S12` | Yes | Yes | No | Yes |
 | `T64S12R2` | Yes | Yes | 256/512 bits | Yes |
-| `PacketT64S16` | Yes | No | No | No |
+| `PacketRsT64S20` | Yes | No | No | No |
 
 Wide support also depends on the CPU and compiled backends.
 
-The exact-size transpose specializations and the range-direct path through
+For paper SPIN, the exact-size transpose specializations and the range-direct path through
 K=458752 remain available. Full and partial tiles use separate kernel bodies.
 Forward direct routing retains its selected threshold of K=2^18.
 
@@ -252,101 +255,120 @@ must not allocate when allocation-free encoding is required.
 Use bytes rather than `vector<bool>`.
 Generic forward and wide transpose are not provided in this first release.
 
-## Precomputed four-bit packet transpose
+## Precomputed RS packet transpose
 
-`Parameters::PacketT64S16` selects the newer packet construction through `Code`.
-It combines the BCH [256,128] outer with GL32 mixing, four-bit
-packets, and a t64/s16 inner with GL16 updates. This API currently supports only
-transposed encoding of 128-bit records; it does not replace the forward API.
+`Parameters::PacketRsT64S20` selects eight parallel GF16 RS [16,8] rows per
+group, with 256 binary inputs and 512 binary outputs. Independent GF(2^32)
+randomizers act on the aligned 32-bit outer symbols. Four-bit packets then pass
+through structured routing and a t64/s20 inner with independent GL20 updates.
+The forward construction uses the binary adjoints of the field multipliers;
+the transposed kernel evaluates the field multipliers themselves.
+
+This family currently supports transposed encoding of 128-bit records only.
+Paper SPIN remains available for forward encoding, wide records, and generic XOR types.
 
 ```cpp
 #include <spin/Code.h>
 
-spin::Code packet({.message_size=1u<<18,
-                   .parameters=spin::Parameters::PacketT64S16,
+spin::Code packet({.message_size=1u<<20,
+                   .parameters=spin::Parameters::PacketRsT64S20,
                    .route_seed=1, .inner_seed=1});
-auto scratch=packet.make_workspace();             // Prepare once, outside timing.
-auto buffer=packet.make_buffer();                 // Optional 64-byte-aligned owner.
+auto scratch=packet.make_workspace(); // Prepare once, outside timing.
+auto buffer=packet.make_buffer();
 // Fill buffer.bytes() with 2K records, then encode repeatedly:
 packet.transpose_inplace_bytes(buffer.bytes(), scratch);
 ```
 
-Caller-owned buffers use `transpose_inplace<Block>(records, scratch)` or
-`transpose<Block>(input, output, scratch)`. They need 16-byte alignment; 64-byte
-alignment is preferable. In-place calls preserve the final K records. Separate
-input/output ranges must not overlap. Encoding does not allocate or copy the
-whole input. Copied handles share immutable setup; concurrent calls need separate
-workspaces. A workspace accepts only handles sharing its original plan.
+K must be a positive multiple of 256. Non-powers of two use the same kernel;
+construction preserves K without implicit rounding. Transpose consumes exactly
+2K records and produces K records. In-place calls preserve the last K records.
+Separate buffers must not overlap and need 16-byte alignment. A 64-byte-aligned
+output enables the measured non-temporal-store path; other supported alignments
+use ordinary stores for the same map. Encoding allocates nothing.
 
-K must be a positive multiple of `message_alignment(Parameters::PacketT64S16)`, currently 512:
-four BCH rows carrying 128 message elements each. Non-powers of two, such as
-K=66048 or K=262656, use the same optimized kernel. Construction preserves K
-exactly and performs no implicit padding or rounding. Transposed buffers contain
-exactly 2K input records and K output records.
+The current numerical certificate covers K=2^20, rate 1/2, relative distance
+above 10%, and a 68.103757-bit setup-failure margin under independent ideal setup.
+It covers all 4,096 outer-group occupancies. Other accepted lengths are
+implementation support, not additional certificate claims.
+The [construction and replay instructions](../research/workstreams/k16_design/README.md)
+and [standalone replay](../research/workstreams/k16_design/reproduce_rs16_k20.py)
+preserve the proof and its frozen source dependencies.
 
-There is no benchmark-size or certificate-range cap. The upper limit follows the
-32-bit padded route representation; `valid_message_size(Parameters::PacketT64S16,K)` checks it
-without allocation or setup. The query does not check available memory.
-Accepting a size does not certify its distance. The current numerical certificate
-covers K=2^20, relative distance above 10%, and failure margin above 55.08 bits
-under the ideal independent setup distribution. Smaller sizes have implementation
-checks and timings, not that certificate. Version 1 preserves the prototype's
-deterministic SplitMix seed schedule; it does not guarantee distance for every seed.
+Setup is immutable and sampled once. The implementation retains the research
+prototype's deterministic seed expansion. `route_seed` generates the routing
+and outer field maps; `inner_seed` generates the GL20 updates.
+The seed expansion does not certify every individual seed.
 
-`Backend::Automatic` selects the AVX-512/VBMI/GFNI kernel when available,
-otherwise a literal SSE2 fallback. `Portable` forces the fallback;
-`Avx512` requires the fast backend and throws if unavailable. Packet encoding
-rejects `Avx2`; the IMT families reject `Portable`. The fallback is
-for compatibility and checking, not comparable performance. SIMD requirements
-stay private to the library. `SPIN_ENABLE_AVX512=OFF` also supports this API.
+`Backend::Automatic` selects the AVX-512F/VL/BW/DQ, VBMI, and GFNI kernel when
+available, otherwise the literal SSE2 fallback. `Portable` forces the fallback;
+`Avx512` requires the fast backend. Packet encoding rejects `Avx2`.
+`SPIN_ENABLE_AVX512=OFF` supports the fallback without compiling the fast kernel.
+The fallback is for compatibility and checking, not comparable performance.
+`PreparedEncoder` supports this family in `Full` mode only.
 
-Scratch preparation gives best-effort Linux page advice on owned pages.
-`make_buffer(Width::Bits128,MemoryPolicy::PreferHugePages)` and the same arguments
-to `make_workspace` additionally use 2 MiB-aligned, rounded allocations for packet
-scratch. IMT scratch retains its existing allocation layout. Advice may
-fail harmlessly; actual huge pages are not promised. No advice or allocation
-occurs during encoding, and the library never advises caller-owned buffers.
+Owned buffers and packet scratch default to `MemoryPolicy::Automatic`: allocations
+of at least 16 MiB use 2 MiB-aligned, rounded storage with best-effort Linux huge-page
+advice. Smaller allocations and unsupported platforms keep 64-byte alignment.
+The threshold applies separately to each allocation, before rounding.
+`Normal` keeps 64-byte alignment; `PreferHugePages` requests 2 MiB alignment
+at every size. Normal packet scratch retains its best-effort page advice.
+Preparation never advises caller-owned buffers or runs inside encoding.
+Actual huge pages are not guaranteed.
 
-Packet `Code` uses the common 40-byte descriptor below, with parameter identifier 4.
-The route seed controls routing and GL32 mixing; the inner seed controls GL16 updates.
-The earlier `PacketCode` API remains for source compatibility. It uses one seed
-for both stages and retains its 32-byte `SPKP` descriptor unchanged. Thus
-`Code({K,Parameters::PacketT64S16,seed,seed})` realizes exactly the same map as
-`PacketCode({K,seed})`, although their descriptor formats differ. New consumers
-should use `Code`.
+The RS family has parameter identifier 5. Identifier 4, used by the previous BCH
+packet family, is retired and rejected. That implementation is no longer selectable.
+The three paper-SPIN identifiers and their seeded maps are unchanged.
 
-`spin_packet_test` includes frozen research known answers, portable/fast equality,
-natural non-power-of-two sizes, buffer guards, and allocation/lifetime checks.
-`spin_packet_bench K [seed] [calls] [normal|huge]` measures only precomputed
-in-place encoding. Build it with `SPIN_BUILD_BENCHMARKS=ON`; run benchmarks serially.
-The private generated kernels can be checked by `python -B tools/import_packet.py
---check` from this directory when the research sources are available. Package
-builds and installed consumers need neither those sources nor Python.
+`PacketCode({K,seed})` is a convenience wrapper for
+`Code({K,Parameters::PacketRsT64S20,seed,seed})`. Its 32-byte `SPKP` descriptor
+now has version 2 and family 2; the former version 1/family 1 identified BCH packets.
+This is an intentional construction change in library version 0.3, not a
+seed-compatible replacement. New consumers should use the common `Code` interface.
 
-Precomputed transpose on Ryzen 7950X, GCC 15.2, `SPIN_TUNE=znver4` (milliseconds):
+`spin_packet_test` checks independent frozen research known answers,
+portable/fast equality, natural lengths, buffer guards, and workspace ownership.
+It also checks forward/transpose adjoint identities using an independent literal
+forward oracle. The promoted package passes all six tests and an installed-package
+consumer on Linux/GCC 15.2 and Windows/MSVC, including an AVX-512-disabled Windows
+build. Linux exercises the fast packet kernel; the Windows host uses the fallback.
+The AVX-512-disabled Linux packet test also passes AddressSanitizer and
+UndefinedBehaviorSanitizer with leak detection enabled.
+Generate/check the private RS kernels with
+`python -B tools/import_rs_packet.py --check` from this directory.
+Ordinary builds and installed consumers need neither Python nor research sources.
 
-| Implementation / owned buffers | K=2^16 | K=2^18 |
-|---|---:|---:|
-| Retained research, 64-byte alignment | 0.20554 | 0.82675 |
-| Library, 64-byte alignment | 0.20628 | 0.83067 |
-| Retained research, huge-page alignment | 0.20270 | 0.81724 |
-| Library, huge-page alignment | 0.20381 | 0.82132 |
+Build `spin_packet_bench` with `SPIN_BUILD_BENCHMARKS=ON`.
+`spin_packet_bench K [seed] [calls] [auto|normal|huge]` measures precomputed
+in-place encoding, excluding setup and allocation. Run benchmarks serially.
+The frozen research kernel measured 3.259 ms at K=2^20 on Ryzen 7950X,
+GCC 15.2, with four seeds, two execution orders, five warmups, and 501 timed calls.
+The library imports that fused routing and outer schedule directly.
 
-Each entry is the median of eight process medians: four seeds, two execution
-orders, five warmups, and 301 timed calls per process, pinned to one core.
-The matched output checksums agree. Setup, allocation, and page preparation are
-excluded; these are encoder timings, not OT or proof-system throughput.
+The promoted public `Code` path was compared against that frozen binary on the
+same host and core, using two seeds, both execution orders, and 501 calls:
 
-The common `Code` interface was also compared against the direct `PacketCode`
-binary on the same host, using the same serial protocol and normal alignment.
-Median times were 0.20484 versus 0.20611 ms at K=2^16, and 0.83302 versus
-0.82836 ms at K=2^18. Both differences were below 1%; output checksums matched.
+| K | Frozen reference (ms) | Library (ms) | Buffer policy |
+|---|---:|---:|---|
+| 2^16 | 0.21290 | 0.21215 | Normal |
+| 2^18 | 0.83851 | 0.82970 | Normal |
+| 2^20 | 3.29603 | 3.27232 | PreferHugePages |
 
-The promotion passes all six library tests on Linux/GCC 15.2 and Windows/MSVC
-19.50, plus installed-package consumers on both platforms. The AVX-512-disabled
-build passes all six tests; its packet test also passes AddressSanitizer and
-UndefinedBehaviorSanitizer. Research/library comparisons check all setup tables
-and full outputs at six sizes and four seeds.
+Entries are medians of four process medians. Every matched output checksum
+agrees; all differences are within 1.1%. These measurements check preservation
+of the reference performance, not a speedup from packaging. `Automatic` selects
+the listed allocation policy for these sizes on Linux.
+
+For future changes within the RS family, retain the accepted executable and use:
+
+```sh
+bash spin/tools/compare_packet.sh /path/to/accepted/spin_packet_bench \
+  /path/to/candidate/spin_packet_bench /existing/external/log/directory
+```
+
+Use matched build settings and memory policy. This serial check compares timing
+and checksums at K=2^16, 2^18, 2^19, and 2^20. It is not a shared-CI timing assertion
+and cannot compare checksums across different code families. Keep raw logs out
+of version control.
 
 ## Identity and memory
 
@@ -363,10 +385,10 @@ existing hash implementation. The layout is little-endian:
 | 24 | 64-bit route seed |
 | 32 | 64-bit inner seed |
 
-Version 1 fixes the BCH [256,128] outer, map definitions, setup expansion, and
-coordinate conventions in this snapshot. Backend, tile size, and packing do not
-affect the descriptor. Any future change to the realized map for these inputs
-requires a new version, not a silent implementation update.
+The descriptor version and parameter identifier together fix the construction,
+map definitions, setup expansion, and coordinate conventions. Backend, tile size,
+and packing do not affect the descriptor. A changed realized map requires a new
+identifier or version, not a silent implementation update.
 
 `setup_bytes()` and `workspace.bytes()` report owned storage capacities,
 excluding inputs, outputs, allocator overhead, and small object headers.
@@ -381,7 +403,7 @@ It covers natural lengths, partial tiles, exact-size and range-direct paths,
 invalid buffers, descriptor fields, workspace ownership, concurrent calls with
 separate scratch, and allocation-free successful encoding.
 `spin_known_answers` freezes descriptor-v1 forward and transpose outputs for
-all three parameter sets, independent of compiler and selected backend.
+all three paper-SPIN parameter sets, independent of compiler and selected backend.
 It also checks that packed-bit encoding agrees with the low-bit projection of
 those known-answer outputs. The API test checks the packed BCH lookup separately
 from the recursive inner.
@@ -410,5 +432,4 @@ These are correctness and integration checks, not performance measurements.
 
 The libOTe adapter now supports coefficient contexts and Silent OT; its build and
 tests live in the libOTe checkout. Hypercat's C ABI/Rust migration remains next.
-This package pass does not supply new performance measurements
-or certificates; previous kernel timing reports remain in the research workstream.
+The packet section above links the RS construction's certificate and measured reference.
