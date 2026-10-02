@@ -4,6 +4,7 @@ Every operator includes collisions within an epoch. Selected support points
 and numerical optimization are diagnostics, not a certificate.
 """
 from itertools import combinations_with_replacement
+from collections import Counter
 from math import comb,log
 import argparse
 
@@ -21,9 +22,22 @@ from two_group_screen import log_power_moment,log_binomial_mass
 
 def matrix_for_probabilities(region,probabilities):
     masses=np.array([1.])
-    for p in probabilities:
-        masses=np.convolve(masses,[1-p,p])
-    return sum(mass*matrix for mass,matrix in zip(masses,region))
+    # Cover boxes usually contain only one or two distinct probabilities.
+    # Batch their identical linear factors by positive polynomial powers.
+    # This helper only proposes witnesses; outward replay uses Arb below
+    # the cover interface and does not trust these floating coefficients.
+    groups=Counter(probabilities)
+    if len(probabilities)>=8 and len(groups)<=8:
+        for p,count in groups.items():
+            factor=np.array([1-p,p])
+            while count:
+                if count&1:masses=np.convolve(masses,factor)
+                count>>=1
+                if count:factor=np.convolve(factor,factor)
+    else:
+        for p in probabilities:masses=np.convolve(masses,[1-p,p])
+    matrices=np.asarray(region[:len(masses)])
+    return (masses@matrices.reshape(len(masses),-1)).reshape(matrices.shape[1:])
 
 
 def point_bound(region,supports,tilt,probabilities,terminal=None):

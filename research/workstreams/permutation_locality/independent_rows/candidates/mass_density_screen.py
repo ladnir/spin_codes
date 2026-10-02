@@ -26,7 +26,7 @@ from occupancy_sensitivity import float_placement
 from occupancy_memory import Z, C
 
 
-def epoch_grid(tilts, penalty, precision=192, *, rounds=2):
+def epoch_grid(tilts, penalty, precision=192, *, rounds=2, details=False):
     """Complete-shape baselines sharing the expensive exact censuses."""
     if type(rounds) is not int or not 1<=rounds<=32:
         raise ValueError('integer update count in 1..32 required')
@@ -43,12 +43,18 @@ def epoch_grid(tilts, penalty, precision=192, *, rounds=2):
     feedback=full_feedback_refinement.census(6)
     full_feedback_refinement.check_pairs(feedback)
     histograms=window_histogram.census(prepared)
-    cancellations=cancellation_joint.census()
+    if details:
+        joint=cancellation_joint.census(by_fresh_class=True)
+        cancellations=joint[:2]
+        fresh_classes=joint[2]
+    else:
+        cancellations=cancellation_joint.census()
     cancellation_joint.check_fresh(cancellations,prepared)
     cancellation_joint.check_feedback(cancellations,feedback)
     density=feedback_density.build(6,tilts,precision,rounds)
     ctx.prec=precision
     result={}
+    shape_details={}
     for tilt in tilts:
         windows=baseline.averages(inputs,tilt)
         moments=window_histogram.moments(histograms,tilt,8)
@@ -66,6 +72,15 @@ def epoch_grid(tilts, penalty, precision=192, *, rounds=2):
                                    window_averages=windows,feedback=density,rounds=rounds)
         baseline.tail_test(inputs,ops,tilt,penalty,rounds,'1')
         result[tilt]=ops
+        if details:
+            shape_details[tilt]={'histograms':histograms,'moments':moments,
+                                 'cancellations':cancellations,
+                                 'fresh_classes':fresh_classes,
+                                 'density':density['bounds'][str(tilt)],
+                                 'spectrum':inputs[3],
+                                 'parameters':(Q(tilt),Q(penalty),rounds)}
+    if details:
+        return result,feedback,shape_details
     return result,feedback
 
 
@@ -79,12 +94,14 @@ def as_array(ops):
     return np.array([[[float(t[i,j]) for j in range(11)] for i in range(11)] for t in ops])
 
 
-def score(region, q, support, count, tilt):
+def score(region, q, support, count, tilt, *, cutoff=209715):
+    if type(cutoff) is not int or not 0<=cutoff<(1<<21):
+        raise ValueError('integer output cutoff in [0,2^21) required')
     def objective(z):
         p=1/(1+np.exp(-z))
         return (baseline.log_power_moment(baseline.matrix_for_probabilities(region,[p]*q),256,
                                           baseline.TAIL_TERMINAL)
-                +float(tilt)*209715-q*baseline.log_binomial_mass(256,support,p))
+                +float(tilt)*cutoff-q*baseline.log_binomial_mass(256,support,p))
     fit=minimize_scalar(objective,bounds=(-8.,16.),method='bounded')
     outer=q*(log(count.numerator)-log(count.denominator))+log(comb(2048,q))
     return (fit.fun+outer)/log(2),1/(1+np.exp(-fit.x))

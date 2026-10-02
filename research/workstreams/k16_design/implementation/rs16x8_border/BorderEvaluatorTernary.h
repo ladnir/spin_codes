@@ -1,0 +1,235 @@
+// Isolated copy of PacketLargeInner.h's retained unrolled stream evaluator.
+// Added monomials x0*x1,x0*x2,x0*x3,x0*x4 only change c3,c5,c9,c17.
+// Do not generalize its fixed schedule: all existing zeta moments are reused.
+#pragma once
+#include "../../../../../spin/src/packet/PacketLargeInner.h"
+namespace spin::research::rsborder::fastternary {
+using namespace detail::packet::large;
+static SPIN_FORCEINLINE __m128i vx3(__m128i a,__m128i b,__m128i c){return _mm_ternarylogic_epi64(a,b,c,0x96);}
+static SPIN_FORCEINLINE __m512i vz3(__m512i a,__m512i b,__m512i c){return _mm512_ternarylogic_epi64(a,b,c,0x96);}
+static SPIN_FORCEINLINE void finishTernary(const __m128i* z,__m128i* out){
+// P A^T on the same 22 zeta moments: 32 XMM XORs.
+const auto fse0=vx(z[9],z[34]);
+const auto fse1=vx(z[5],z[6]);
+const auto fse2=vx(z[24],fse0);
+const auto fse3=vx(z[33],z[36]);
+const auto fse4=vx(z[10],z[12]);
+const auto fse5=vx(z[18],z[48]);
+const auto fse6=vx(z[20],z[40]);
+const auto fse7=vx(fse3,fse5);
+const auto fse8=vx(z[17],fse1);
+const auto fse9=vx(z[40],fse2);
+const auto fse10=vx(fse4,fse7);
+const auto f0=z[0];
+const auto f1=z[1];
+const auto f2=z[2];
+const auto f3=z[4];
+const auto f4=z[8];
+const auto f5=z[16];
+const auto f6=z[32];
+const auto f7=vx(z[34],fse6);
+const auto f8=vx(vx3(z[9],z[12],z[20]),fse8);
+const auto f9=vx(vx3(z[18],fse1,fse2),fse4);
+const auto f10=vx3(fse1,fse6,fse7);
+const auto f11=vx(vx3(z[17],z[24],z[34]),fse10);
+const auto f12=vx(vx3(z[48],fse2,fse6),fse8);
+const auto f13=vx(z[33],fse9);
+const auto f14=vx(vx3(z[3],z[6],fse0),fse10);
+const auto f15=vx3(z[5],fse3,fse9);
+out[0]=f0;
+out[1]=f1;
+out[2]=f2;
+out[3]=f3;
+out[4]=f4;
+out[5]=f5;
+out[6]=f6;
+out[7]=f7;
+out[8]=f8;
+out[9]=f9;
+out[10]=f10;
+out[11]=f11;
+out[12]=f12;
+out[13]=f13;
+out[14]=f14;
+out[15]=f15;
+}
+
+template<unsigned Extra,class Emit>
+static SPIN_FORCEINLINE void streamStepHighBorder(const __m128i* state,
+const __m128i* extra,const block* raw,std::size_t packetBase,Emit& emit,__m512i* high){
+// State to 22 ANF coefficients: 12 XMM XORs.
+const auto cs0=vx(state[10],state[12]);
+const auto cs1=vx(state[12],state[15]);
+const auto cs2=vx(state[11],state[13]);
+const auto c0=state[0];
+const auto c1=state[1];
+const auto c2=state[2];
+const auto c3=vx(state[7],extra[0]);
+const auto c4=state[3];
+const auto c5=Extra>=2?vx(state[8],extra[1]):state[8];
+const auto c6=state[12];
+const auto c8=state[4];
+const auto c9=Extra>=3?vx(state[9],extra[2]):state[9];
+const auto c10=state[13];
+const auto c12=state[15];
+const auto c16=state[5];
+const auto c17=Extra>=4?vx(state[10],extra[3]):state[10];
+const auto c18=cs0;
+const auto c20=vx3(state[9],state[14],cs1);
+const auto c24=vx(cs1,cs2);
+const auto c32=state[6];
+const auto c33=state[11];
+const auto c34=state[14];
+const auto c36=vx3(vx3(state[7],state[8],state[9]),cs0,cs2);
+const auto c40=vx(state[14],cs0);
+const auto c48=vx(state[7],cs1);
+const auto l01=vx(c0,c1);
+const auto l02=vx(c0,c2);
+const auto l03=vx3(l01,c2,c3);
+const auto d0=join(c0,l01,l02,l03);
+const auto l11=vx(c4,c5);
+const auto l12=vx(c4,c6);
+const auto l13=vx(l11,c6);
+const auto d1=join(c4,l11,l12,l13);
+const auto l21=vx(c8,c9);
+const auto l22=vx(c8,c10);
+const auto l23=vx(l21,c10);
+const auto d2=join(c8,l21,l22,l23);
+const auto d3=_mm512_broadcast_i32x4(c12);
+const auto l41=vx(c16,c17);
+const auto l42=vx(c16,c18);
+const auto l43=vx(l41,c18);
+const auto d4=join(c16,l41,l42,l43);
+const auto d5=_mm512_broadcast_i32x4(c20);
+const auto d6=_mm512_broadcast_i32x4(c24);
+const auto l81=vx(c32,c33);
+const auto l82=vx(c32,c34);
+const auto l83=vx(l81,c34);
+const auto d8=join(c32,l81,l82,l83);
+const auto d9=_mm512_broadcast_i32x4(c36);
+const auto d10=_mm512_broadcast_i32x4(c40);
+const auto d12=_mm512_broadcast_i32x4(c48);
+// Shared group-2 coefficients reduce the block evaluator from29 to26 XORs.
+
+__m512i g30,g31,g32,g33;
+{
+const auto b0=_mm512_xor_si512(vz3(d0,d4,d8),d12);
+const auto b1=vz3(d1,d5,d9);
+const auto b2=vz3(d2,d6,d10);
+const auto e1=_mm512_xor_si512(b0,b1);
+const auto e2=_mm512_xor_si512(b0,b2);
+const auto e3=vz3(e1,b2,d3);
+const auto y3=_mm512_xor_si512(e3,_mm512_loadu_si512(raw+60));
+emit(packetBase+15,y3);
+const auto y2=_mm512_xor_si512(e2,_mm512_loadu_si512(raw+56));
+emit(packetBase+14,y2);
+const auto y1=_mm512_xor_si512(e1,_mm512_loadu_si512(raw+52));
+emit(packetBase+13,y1);
+const auto y0=_mm512_xor_si512(b0,_mm512_loadu_si512(raw+48));
+emit(packetBase+12,y0);
+g31=_mm512_xor_si512(y1,y3);
+g32=_mm512_xor_si512(y2,y3);
+g30=_mm512_ternarylogic_epi64(y0,y2,g31,0x96);
+g33=y3;
+}
+__m512i g20,g21,g22,g23;
+{
+const auto b0=_mm512_xor_si512(d0,d8);
+const auto b1=_mm512_xor_si512(d1,d9);
+const auto b2=_mm512_xor_si512(d2,d10);
+const auto e1=_mm512_xor_si512(b0,b1);
+const auto e2=_mm512_xor_si512(b0,b2);
+const auto e3=vz3(e1,b2,d3);
+const auto y3=_mm512_xor_si512(e3,_mm512_loadu_si512(raw+44));
+emit(packetBase+11,y3);
+const auto y2=_mm512_xor_si512(e2,_mm512_loadu_si512(raw+40));
+emit(packetBase+10,y2);
+const auto y1=_mm512_xor_si512(e1,_mm512_loadu_si512(raw+36));
+emit(packetBase+9,y1);
+const auto y0=_mm512_xor_si512(b0,_mm512_loadu_si512(raw+32));
+emit(packetBase+8,y0);
+g21=_mm512_xor_si512(y1,y3);
+g22=_mm512_xor_si512(y2,y3);
+g20=_mm512_ternarylogic_epi64(y0,y2,g21,0x96);
+g23=y3;
+}
+const auto cd0=_mm512_xor_si512(g20,g30);
+const auto cd1=_mm512_xor_si512(g21,g31);
+const auto cd2=_mm512_xor_si512(g22,g32);
+const auto cd3=_mm512_xor_si512(g23,g33);
+__m512i g10,g11,g12,g13;
+{
+const auto b0=_mm512_xor_si512(d0,d4);
+const auto b1=_mm512_xor_si512(d1,d5);
+const auto b2=_mm512_xor_si512(d2,d6);
+const auto e1=_mm512_xor_si512(b0,b1);
+const auto e2=_mm512_xor_si512(b0,b2);
+const auto e3=vz3(e1,b2,d3);
+const auto y3=_mm512_xor_si512(e3,_mm512_loadu_si512(raw+28));
+emit(packetBase+7,y3);
+const auto y2=_mm512_xor_si512(e2,_mm512_loadu_si512(raw+24));
+emit(packetBase+6,y2);
+const auto y1=_mm512_xor_si512(e1,_mm512_loadu_si512(raw+20));
+emit(packetBase+5,y1);
+const auto y0=_mm512_xor_si512(b0,_mm512_loadu_si512(raw+16));
+emit(packetBase+4,y0);
+g11=_mm512_xor_si512(y1,y3);
+g12=_mm512_xor_si512(y2,y3);
+g10=_mm512_ternarylogic_epi64(y0,y2,g11,0x96);
+g13=y3;
+}
+__m512i g00,g01,g02,g03;
+{
+const auto b0=d0;
+const auto b1=d1;
+const auto b2=d2;
+const auto e1=_mm512_xor_si512(b0,b1);
+const auto e2=_mm512_xor_si512(b0,b2);
+const auto e3=vz3(e1,b2,d3);
+const auto y3=_mm512_xor_si512(e3,_mm512_loadu_si512(raw+12));
+emit(packetBase+3,y3);
+const auto y2=_mm512_xor_si512(e2,_mm512_loadu_si512(raw+8));
+emit(packetBase+2,y2);
+const auto y1=_mm512_xor_si512(e1,_mm512_loadu_si512(raw+4));
+emit(packetBase+1,y1);
+const auto y0=_mm512_xor_si512(b0,_mm512_loadu_si512(raw+0));
+emit(packetBase+0,y0);
+g01=_mm512_xor_si512(y1,y3);
+g02=_mm512_xor_si512(y2,y3);
+g00=_mm512_ternarylogic_epi64(y0,y2,g01,0x96);
+g03=y3;
+}
+high[0]=_mm512_ternarylogic_epi64(g00,g10,cd0,0x96);
+high[4]=_mm512_xor_si512(g10,g30);
+high[8]=cd0;
+high[1]=_mm512_ternarylogic_epi64(g01,g11,cd1,0x96);
+high[5]=_mm512_xor_si512(g11,g31);
+high[9]=cd1;
+high[2]=_mm512_ternarylogic_epi64(g02,g12,cd2,0x96);
+high[6]=_mm512_xor_si512(g12,g32);
+high[10]=cd2;
+high[3]=_mm512_ternarylogic_epi64(g03,g13,cd3,0x96);
+high[12]=g30;
+
+}
+template<unsigned Extra,class Emit>
+static SPIN_FORCEINLINE void streamStepBorder(const __m128i* state,
+const __m128i* extra,const block* raw,std::size_t packetBase,Emit& emit,__m128i* moments){
+alignas(64) __m512i high[16];
+streamStepHighBorder<Extra>(state,extra,raw,packetBase,emit,high);
+
+storeLowMoments<0,2>(high[0],moments);
+storeLowMoments<4,1>(high[1],moments);
+storeLowMoments<8,1>(high[2],moments);
+storeLowMoments<12,0>(high[3],moments);
+storeLowMoments<16,1>(high[4],moments);
+storeLowMoments<20,0>(high[5],moments);
+storeLowMoments<24,0>(high[6],moments);
+storeLowMoments<32,1>(high[8],moments);
+storeLowMoments<36,0>(high[9],moments);
+storeLowMoments<40,0>(high[10],moments);
+storeLowMoments<48,0>(high[12],moments);
+}
+}
+
+

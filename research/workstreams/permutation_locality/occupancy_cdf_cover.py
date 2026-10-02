@@ -12,7 +12,7 @@ from collections import Counter
 import numpy as np
 from scipy.optimize import minimize,minimize_scalar
 from scipy.special import gammaln,logsumexp
-from flint import arb,arb_mat,ctx
+from flint import arb,arb_mat,arb_poly,ctx
 
 from bch_joint_support import authenticated_caps,support_caps
 from basis_lattice import improve_caps
@@ -24,6 +24,22 @@ from occupancy_screen import matrix_for_probabilities
 from two_group_screen import log_power_moment,log_binomial_mass
 from occupancy_memory_verify import DENOMINATOR
 from group_rank_one_verify import up
+
+
+def bernoulli_masses(numerators):
+    """Outward coefficients of the Bernoulli-count polynomial.
+
+    Equal exact probabilities are grouped before Arb polynomial powering.
+    This evaluates the same product as the scalar recurrence, including
+    the endpoint probabilities zero and one.
+    """
+    if any(type(n) is not int or not 0<=n<=DENOMINATOR for n in numerators):
+        raise ValueError('integer probability numerators in the fixed denominator required')
+    polynomial=arb_poly([1])
+    for numerator,count in Counter(numerators).items():
+        p=arb(numerator)/DENOMINATOR
+        polynomial*=arb_poly([1-p,p])**count
+    return [polynomial[i] for i in range(len(numerators)+1)]
 
 
 def increments(counts,lo,hi):
@@ -331,8 +347,10 @@ def main():
                 print('Unlisted occupancies remain; not a full-code certificate.',flush=True)
 
 
-def cover(args,operators,count_sets,terminal):
+def cover(args,operators,count_sets,terminal,*,cutoff=209715):
     """Independent support cover and outward replay for args.groups."""
+    if type(cutoff) is not int or not 0<=cutoff<(1<<21):
+        raise ValueError('integer output-weight cutoff in [0,2^21) required')
     size=len(terminal)
     assert all(len(exact)>args.groups and len(region)>args.groups
                for exact,region in operators.values())
@@ -343,13 +361,14 @@ def cover(args,operators,count_sets,terminal):
             lo,hi=interval
             region=operators[choice][1]
             counts=count_sets[choice[1]]
+            fold=fold_function(counts,lo,hi)
             def objective(z):
                 p=1/(1+np.exp(-z))
-                return log_power_moment(matrix_for_probabilities(region,[p]*args.groups),256,terminal)+args.groups*fold_log(counts,lo,hi,p)
+                return log_power_moment(matrix_for_probabilities(region,[p]*args.groups),256,terminal)+args.groups*fold(p)
             fit=minimize_scalar(objective,bounds=(-8.,16.),method='bounded',options={'xatol':1e-7})
             p=1/(1+np.exp(-fit.x))
             numerator=max(1,min(DENOMINATOR-1,round(p*DENOMINATOR)))
-            cache[key]=numerator,fold_log(counts,lo,hi,numerator/DENOMINATOR)
+            cache[key]=numerator,fold(numerator/DENOMINATOR)
         return cache[key]
     def witness(box):
         best=None
@@ -359,7 +378,7 @@ def cover(args,operators,count_sets,terminal):
             items=[proposal(choice,interval) for interval in box]
             nums=[n for n,_ in items]
             value=log_power_moment(matrix_for_probabilities(region,[n/DENOMINATOR for n in nums]),256,terminal)
-            value+=float(tilt)*209715+sum(w for _,w in items)
+            value+=float(tilt)*cutoff+sum(w for _,w in items)
             if best is None or value<best[0]:
                 best=value,choice,nums
             candidates.append((value,choice,nums))
@@ -375,9 +394,15 @@ def cover(args,operators,count_sets,terminal):
                     ps=1/(1+np.exp(-logits))
                     value=log_power_moment(matrix_for_probabilities(region,[ps[i] for i in indices]),256,terminal)
                     folds=[f(p) for f,p in zip(functions,ps)]
-                    return value+float(choice[0])*209715+sum(folds[i] for i in indices)
-                fit=minimize(objective,np.log(start/(1-start)),method='L-BFGS-B',bounds=[(-8.,16.)]*len(start),
-                             options={'maxiter':60,'ftol':1e-11})
+                    return value+float(choice[0])*cutoff+sum(folds[i] for i in indices)
+                if getattr(args,'analytic_gradient',False):
+                    from gf16_packets.cdf_gradient import JointObjective
+                    analytic=JointObjective(region,box,counts,terminal,float(choice[0])*cutoff)
+                    fit=minimize(analytic,np.log(start/(1-start)),jac=True,method='L-BFGS-B',
+                                 bounds=[(-8.,16.)]*len(start),options={'maxiter':60,'ftol':1e-11})
+                else:
+                    fit=minimize(objective,np.log(start/(1-start)),method='L-BFGS-B',bounds=[(-8.,16.)]*len(start),
+                                 options={'maxiter':60,'ftol':1e-11})
                 ps=1/(1+np.exp(-fit.x))
                 numbers=[max(1,min(DENOMINATOR-1,round(p*DENOMINATOR))) for p in ps]
                 quantized=np.array(numbers)/DENOMINATOR
@@ -409,7 +434,16 @@ def cover(args,operators,count_sets,terminal):
         if tree is not None:
             tree.add(item,parent)
     push(((38,256),)*args.groups,1)
-    threshold=-(args.target_bits+2)*log(2)
+    # This buffer only decides when to attempt the outward replay. It is
+    # not part of the proof bound: the final Arb result must still be
+    # strictly below 2**(-target_bits). Preserve the existing default.
+    proposal_buffer=getattr(args,'proposal_buffer_bits',2)
+    if not 0<=proposal_buffer<=64:
+        raise ValueError('proposal buffer must be between zero and 64 bits')
+    threshold=-(args.target_bits+proposal_buffer)*log(2)
+    check_interval=getattr(args,'check_interval',25)
+    if type(check_interval) is not int or check_interval<1:
+        raise ValueError('positive integer cover check interval required')
     score=-heap[0][0]
     steps=0
     while heap and steps<args.max_splits and score>threshold:
@@ -427,7 +461,7 @@ def cover(args,operators,count_sets,terminal):
         if tree is not None:
             tree.update(item[1])
         steps+=1
-        if steps%25==0:
+        if steps%check_interval==0:
             score=tree.nodes[1]['best'] if tree is not None else float(logsumexp([-x[0] for x in heap]))
             if steps%250==0:
                 print('CDF-cover splits',steps,'leaves',len(heap),'log2 union',score/log(2),flush=True)
@@ -441,24 +475,26 @@ def cover(args,operators,count_sets,terminal):
         print('No outward certificate from this run.',flush=True)
         return
     total=arb(0)
+    # Precision and count_sets stay fixed throughout this replay. Many
+    # groups in a box have the same interval and exact probability; avoid
+    # reconstructing their identical outward folds once per group.
+    outward_folds={}
     for index,(_,_,box,mult,choice,nums) in enumerate(heap,1):
         tilt,penalty=choice
         ps=[arb(n)/DENOMINATOR for n in nums]
-        masses=[arb(1)]
-        for p in ps:
-            updated=[arb(0)]*(len(masses)+1)
-            for j,m in enumerate(masses):
-                updated[j]+=m*(1-p);updated[j+1]+=m*p
-            masses=updated
+        masses=bernoulli_masses(nums)
         matrix=sum((m*r for m,r in zip(masses,operators[choice][0])),arb_mat(size,size))**256
-        term=sum((matrix[0,j] for j in range(size) if terminal[j]),arb(0))*(arb(tilt)*209715).exp()*locations*mult
-        for (lo,hi),p in zip(box,ps):
-            term=up(term*fold_arb(count_sets[penalty],lo,hi,p))
+        term=sum((matrix[0,j] for j in range(size) if terminal[j]),arb(0))*(arb(tilt)*cutoff).exp()*locations*mult
+        for (lo,hi),numerator,p in zip(box,nums,ps):
+            key=penalty,lo,hi,numerator
+            if key not in outward_folds:
+                outward_folds[key]=fold_arb(count_sets[penalty],lo,hi,p)
+            term=up(term*outward_folds[key])
         total=up(total+term)
         if index%1000==0:
             print('Outward CDF-cover leaves',index,'/',len(heap),flush=True)
     assert 0<total<arb(2)**-args.target_bits
-    print('VERIFIED all supports at occupancy',args.groups,'precision',args.precision,'upper',total,
+    print('VERIFIED all supports at occupancy',args.groups,'cutoff',cutoff,'precision',args.precision,'upper',total,
           'margin',-total.log()/arb(2).log(),flush=True)
     print('Other occupancies remain; not a full-code certificate.')
     return total

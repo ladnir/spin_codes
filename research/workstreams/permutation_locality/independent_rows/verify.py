@@ -181,9 +181,13 @@ def main():
     parser.add_argument('--prefix-rank',action='store_true',help='Combine nested prefix and shell constraints; implies --shell-cover')
     parser.add_argument('--max-splits',type=int,default=200)
     parser.add_argument('--target-bits',type=int,default=40)
+    parser.add_argument('--threshold',type=int,default=209715,help='Integer bad-output-weight cutoff for the CDF cover')
     parser.add_argument('--screen-only',action='store_true')
     args=parser.parse_args()
     args.shell_cover=args.shell_cover or args.prefix_rank
+    if not 0<=args.threshold<(1<<21):parser.error('threshold must be in [0,2^21)')
+    if args.threshold!=209715 and (args.shell_points or args.shell_cover):
+        parser.error('variable threshold currently requires the CDF cover, not shell modes')
     if args.precision<128 or any(Q(t)<=0 for t in args.tilts) or any(not 0<Q(p)<=1 for p in args.penalties) or Q(args.weight_tilt)<=0:
         parser.error('precision >=128, positive tilts, penalties in (0,1], and positive weight tilt required')
     if any(not 38<=u<=256 for u in args.probe_supports):
@@ -198,6 +202,7 @@ def main():
     args.joint_top=2
     print('ENSEMBLE: INDEPENDENT ROW SHUFFLES; two inner updates. Old certificates are not inputs.',flush=True)
     print('Total-input-weight coefficient witness:',args.weight_tilt,flush=True)
+    print('Bad-output-weight cutoff:',args.threshold,flush=True)
     mixing_test();folding_test();geometry_test();retained_test();placement_prefix_test()
     spectrum=authenticated_caps()
     count_sets={}
@@ -225,7 +230,7 @@ def main():
             result=combined_cover(args,operators,count_sets,TAIL_TERMINAL,shell_sets,
                                   prefix_rank=args.prefix_rank)
         else:
-            result=cover(args,operators,count_sets,TAIL_TERMINAL)
+            result=cover(args,operators,count_sets,TAIL_TERMINAL,cutoff=args.threshold)
         totals.append(result)
     if all(value is not None for value in totals):
         total=arb(0)

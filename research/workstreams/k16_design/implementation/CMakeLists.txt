@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.20)
+project(spin_k16_rs_experiment LANGUAGES CXX)
+
+# Research-only executable; no new public library target or default family.
+get_filename_component(SPIN_REPOSITORY "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
+set(SPIN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(SPIN_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+set(SPIN_BUILD_EXPERIMENTS OFF CACHE BOOL "" FORCE)
+set(SPIN_ENABLE_AVX512 ON CACHE BOOL "" FORCE)
+add_subdirectory("${SPIN_REPOSITORY}/spin" spin)
+
+add_executable(spin_k16_rs driver.cpp RsSetup.cpp RsScalar.cpp RsFast.cpp RsLarge.cpp)
+target_compile_features(spin_k16_rs PRIVATE cxx_std_20)
+target_link_libraries(spin_k16_rs PRIVATE spin::spin)
+if(MSVC)
+  set_source_files_properties(RsFast.cpp RsLarge.cpp PROPERTIES COMPILE_OPTIONS /arch:AVX512)
+  set_source_files_properties(RsFast.cpp RsLarge.cpp PROPERTIES COMPILE_DEFINITIONS SPIN_PACKET_ENABLE_VBMI=1)
+else()
+  target_compile_options(spin_k16_rs PRIVATE -fno-strict-aliasing -fno-lto -mtune=${SPIN_TUNE})
+  set_source_files_properties(RsFast.cpp RsLarge.cpp PROPERTIES COMPILE_OPTIONS
+    "-mavx2;-mavx512f;-mavx512dq;-mavx512vl;-mavx512bw;-mavx512vbmi;-mgfni")
+endif()
+enable_testing()
+add_test(NAME rs_correctness COMMAND spin_k16_rs check)
+set_tests_properties(rs_correctness PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
