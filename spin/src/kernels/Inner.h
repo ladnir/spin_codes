@@ -87,21 +87,26 @@ template<class Map,class Emit,std::size_t... R> SPIN_FORCEINLINE void emitPoints
     const block* in,__m128i* values,const __m128i table[][16],std::size_t base,Emit& emit,std::index_sequence<R...>) {
     (emitPoint<Map,R>(in,values,table,base,emit),...);
 }
-template<class Map,std::size_t P,class Gather> SPIN_FORCEINLINE void forwardPoint(
+template<bool Stream> SPIN_FORCEINLINE void forwardStore(block* out,__m128i value) {
+    if constexpr(Stream) _mm_stream_si128(reinterpret_cast<__m128i*>(out),value);
+    else _mm_storeu_si128(reinterpret_cast<__m128i*>(out),value);
+}
+template<class Map,std::size_t P,bool Stream,class Gather> SPIN_FORCEINLINE void forwardPoint(
     Gather& gather,block* out,__m128i* values,const __m128i table[][16],std::size_t base) {
     constexpr auto column=(SPIN_GROUPED_A && isImtMap<Map>)?Map::groupedColumns[P]:Map::columns[P];
     const auto raw=gather(base+P).mData;
     const auto v=_mm_xor_si128(raw,fixedSum<column>(table));
-    if constexpr(isImtMap<Map>) values[P]=raw; else values[P]=v; out[base+P]=block(v);
+    if constexpr(isImtMap<Map>) values[P]=raw; else values[P]=v;
+    forwardStore<Stream>(out+base+P,v);
 }
-template<class Map,class Gather,std::size_t... P> SPIN_FORCEINLINE void forwardPoints(
+template<class Map,bool Stream,class Gather,std::size_t... P> SPIN_FORCEINLINE void forwardPoints(
     Gather& gather,block* out,__m128i* values,const __m128i table[][16],std::size_t base,std::index_sequence<P...>) {
-    (forwardPoint<Map,P>(gather,out,values,table,base),...);
+    (forwardPoint<Map,P,Stream>(gather,out,values,table,base),...);
 }
 // Forward recurrence y=x+Aq, q'=Fq+Bx, with no flush and q initially zero.
 // IMT uses separate expansion and feedback: retain raw x for Bx. The older
 // configurations retain their BA=0 shortcut. Both gather and emit in one pass.
-template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
+template<class Map,bool Stream=false,class Gather> SPIN_FORCEINLINE void innerForward(
     std::size_t n,const u32* fieldRows,Gather&& gather,block* out) {
     alignas(32) __m128i state[Map::S]{};
     alignas(32) __m128i syndrome[Map::S],grouped[Map::S],values[Map::T],table[(Map::S+3)/4][16];
@@ -109,14 +114,14 @@ template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
     for(std::size_t epoch=0;epoch<epochs;++epoch) {
         const auto base=epoch*Map::T;
         if(epoch==0) {
-            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v.mData; out[base+p]=v; }
+            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v.mData; forwardStore<Stream>(out+base+p,v.mData); }
         }
         else {
             if constexpr(SPIN_GROUPED_A && isImtMap<Map>) {
                 for(unsigned j=0;j<Map::S;++j) grouped[j]=state[Map::groupOrder[j]];
                 tables<Map::S>(grouped,table);
             } else tables<Map::S>(state,table);
-            forwardPoints<Map>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
+            forwardPoints<Map,Stream>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
         }
         if(epoch+1==epochs) break;
         if constexpr(isImtMap<Map>) Map::feedback(values,syndrome);
@@ -139,6 +144,16 @@ template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
                 state[j]=_mm_xor_si128(variableSum<Map::S>(table,fieldRows[epoch*Map::S+j]),syndrome[j]);
         }
     }
+    if constexpr(Stream) _mm_sfence();
+}
+
+// One policy/alignment decision per inner pass, never a branch per store.
+// All BCH values and feedback scratch remain cached under either policy.
+template<class Map,class Gather> SPIN_FORCEINLINE void innerForwardWithStores(
+    std::size_t n,const u32* fieldRows,Gather&& gather,block* out,bool stream) {
+    if(stream && (reinterpret_cast<std::uintptr_t>(out)&15)==0)
+        innerForward<Map,true>(n,fieldRows,gather,out);
+    else innerForward<Map,false>(n,fieldRows,gather,out);
 }
 
 template<u32 Mask> SPIN_FORCEINLINE __m128i imtSparseSum(const __m128i* state) {

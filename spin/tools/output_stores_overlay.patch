@@ -1,0 +1,444 @@
+diff --git a/spin/src/kernels/ForwardFast.cpp b/spin/src/kernels/ForwardFast.cpp
+index 17e55517..bddc2348 100644
+--- a/spin/src/kernels/ForwardFast.cpp
++++ b/spin/src/kernels/ForwardFast.cpp
+@@ -5,7 +5,7 @@
+ namespace spin::detail::kernel {
+ void bchForward4(const block*,block*);
+ static SPIN_FORCEINLINE u32 unpack(const u8* p) {u32 v;std::memcpy(&v,p,4);return v&0xffffff;}
+-template<class Map,bool Packed> void Spin::runForwardFour(const block* in,block* out,Workspace& w) const {
++template<class Map,bool Packed> void Spin::runForwardFour(const block* in,block* out,Workspace& w,bool stream) const {
+     block* values=w.buckets.data(); block* tile=w.tile.data();
+     const auto tileSize=tileBlocks(),n=codeBlocks();
+     for(std::size_t base=0;base<n;base+=tileSize) {
+@@ -16,12 +16,12 @@ template<class Map,bool Packed> void Spin::runForwardFour(const block* in,block*
+             values[base+j]=tile[offset];
+         }
+     }
+-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
++    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
+         else return values[mSlots32[i]];
+-    },out);
++    },out,stream);
+ }
+-template<class Map,bool Packed> void Spin::runForwardFourTail(const block* in,block* out,Workspace& w) const {
++template<class Map,bool Packed> void Spin::runForwardFourTail(const block* in,block* out,Workspace& w,bool stream) const {
+     block* values=w.buckets.data(); block* tile=w.tile.data();
+     const auto tileSize=tileBlocks(),n=codeBlocks();
+     for(std::size_t base=0;base<n;base+=tileSize) {
+@@ -33,31 +33,31 @@ template<class Map,bool Packed> void Spin::runForwardFourTail(const block* in,bl
+             values[base+j]=tile[offset];
+         }
+     }
+-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
++    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
+         else return values[mSlots32[i]];
+-    },out);
++    },out,stream);
+ }
+-template void Spin::runForwardFour<Map128S19,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFour<Map128S19,false>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFour<Map64S12,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFour<Map64S12,false>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFour<Map64S12R2,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFour<Map64S12R2,false>(const block*,block*,Workspace&) const;
+-template<class Map> void Spin::runForwardDirect(const block* in,block* out,Workspace& w) const {
++template void Spin::runForwardFour<Map128S19,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFour<Map128S19,false>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFour<Map64S12,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFour<Map64S12,false>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFour<Map64S12R2,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFour<Map64S12R2,false>(const block*,block*,Workspace&,bool) const;
++template<class Map> void Spin::runForwardDirect(const block* in,block* out,Workspace& w,bool stream) const {
+     auto* values=w.buckets.data();const auto n=codeBlocks();
+     for(std::size_t j=0;j<n;j+=1024) bchForward4(in+j/2,values+j);
+-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
++    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+         return values[mForwardDirect[i]];
+-    },out);
++    },out,stream);
+ }
+-template void Spin::runForwardDirect<Map128S19>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardDirect<Map64S12>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardDirect<Map64S12R2>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map128S19,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map128S19,false>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map64S12,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map64S12,false>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map64S12R2,true>(const block*,block*,Workspace&) const;
+-template void Spin::runForwardFourTail<Map64S12R2,false>(const block*,block*,Workspace&) const;
++template void Spin::runForwardDirect<Map128S19>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardDirect<Map64S12>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardDirect<Map64S12R2>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map128S19,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map128S19,false>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map64S12,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map64S12,false>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map64S12R2,true>(const block*,block*,Workspace&,bool) const;
++template void Spin::runForwardFourTail<Map64S12R2,false>(const block*,block*,Workspace&,bool) const;
+ }
+diff --git a/spin/src/kernels/Inner.h b/spin/src/kernels/Inner.h
+index efae3d97..3a25526a 100644
+--- a/spin/src/kernels/Inner.h
++++ b/spin/src/kernels/Inner.h
+@@ -87,21 +87,26 @@ template<class Map,class Emit,std::size_t... R> SPIN_FORCEINLINE void emitPoints
+     const block* in,__m128i* values,const __m128i table[][16],std::size_t base,Emit& emit,std::index_sequence<R...>) {
+     (emitPoint<Map,R>(in,values,table,base,emit),...);
+ }
+-template<class Map,std::size_t P,class Gather> SPIN_FORCEINLINE void forwardPoint(
++template<bool Stream> SPIN_FORCEINLINE void forwardStore(block* out,__m128i value) {
++    if constexpr(Stream) _mm_stream_si128(reinterpret_cast<__m128i*>(out),value);
++    else _mm_storeu_si128(reinterpret_cast<__m128i*>(out),value);
++}
++template<class Map,std::size_t P,bool Stream,class Gather> SPIN_FORCEINLINE void forwardPoint(
+     Gather& gather,block* out,__m128i* values,const __m128i table[][16],std::size_t base) {
+     constexpr auto column=(SPIN_GROUPED_A && isImtMap<Map>)?Map::groupedColumns[P]:Map::columns[P];
+     const auto raw=gather(base+P).mData;
+     const auto v=_mm_xor_si128(raw,fixedSum<column>(table));
+-    if constexpr(isImtMap<Map>) values[P]=raw; else values[P]=v; out[base+P]=block(v);
++    if constexpr(isImtMap<Map>) values[P]=raw; else values[P]=v;
++    forwardStore<Stream>(out+base+P,v);
+ }
+-template<class Map,class Gather,std::size_t... P> SPIN_FORCEINLINE void forwardPoints(
++template<class Map,bool Stream,class Gather,std::size_t... P> SPIN_FORCEINLINE void forwardPoints(
+     Gather& gather,block* out,__m128i* values,const __m128i table[][16],std::size_t base,std::index_sequence<P...>) {
+-    (forwardPoint<Map,P>(gather,out,values,table,base),...);
++    (forwardPoint<Map,P,Stream>(gather,out,values,table,base),...);
+ }
+ // Forward recurrence y=x+Aq, q'=Fq+Bx, with no flush and q initially zero.
+ // IMT uses separate expansion and feedback: retain raw x for Bx. The older
+ // configurations retain their BA=0 shortcut. Both gather and emit in one pass.
+-template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
++template<class Map,bool Stream=false,class Gather> SPIN_FORCEINLINE void innerForward(
+     std::size_t n,const u32* fieldRows,Gather&& gather,block* out) {
+     alignas(32) __m128i state[Map::S]{};
+     alignas(32) __m128i syndrome[Map::S],grouped[Map::S],values[Map::T],table[(Map::S+3)/4][16];
+@@ -109,14 +114,14 @@ template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
+     for(std::size_t epoch=0;epoch<epochs;++epoch) {
+         const auto base=epoch*Map::T;
+         if(epoch==0) {
+-            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v.mData; out[base+p]=v; }
++            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v.mData; forwardStore<Stream>(out+base+p,v.mData); }
+         }
+         else {
+             if constexpr(SPIN_GROUPED_A && isImtMap<Map>) {
+                 for(unsigned j=0;j<Map::S;++j) grouped[j]=state[Map::groupOrder[j]];
+                 tables<Map::S>(grouped,table);
+             } else tables<Map::S>(state,table);
+-            forwardPoints<Map>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
++            forwardPoints<Map,Stream>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
+         }
+         if(epoch+1==epochs) break;
+         if constexpr(isImtMap<Map>) Map::feedback(values,syndrome);
+@@ -139,6 +144,16 @@ template<class Map,class Gather> SPIN_FORCEINLINE void innerForward(
+                 state[j]=_mm_xor_si128(variableSum<Map::S>(table,fieldRows[epoch*Map::S+j]),syndrome[j]);
+         }
+     }
++    if constexpr(Stream) _mm_sfence();
++}
++
++// One policy/alignment decision per inner pass, never a branch per store.
++// All BCH values and feedback scratch remain cached under either policy.
++template<class Map,class Gather> SPIN_FORCEINLINE void innerForwardWithStores(
++    std::size_t n,const u32* fieldRows,Gather&& gather,block* out,bool stream) {
++    if(stream && (reinterpret_cast<std::uintptr_t>(out)&15)==0)
++        innerForward<Map,true>(n,fieldRows,gather,out);
++    else innerForward<Map,false>(n,fieldRows,gather,out);
+ }
+ 
+ template<u32 Mask> SPIN_FORCEINLINE __m128i imtSparseSum(const __m128i* state) {
+diff --git a/spin/src/kernels/Spin.cpp b/spin/src/kernels/Spin.cpp
+index 9102c590..75125af0 100644
+--- a/spin/src/kernels/Spin.cpp
++++ b/spin/src/kernels/Spin.cpp
+@@ -439,7 +439,7 @@ void Spin::reference(const block* in,block* out) const {
+     }
+ }
+ 
+-void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Workspace& w,Layout layout) const {
++void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Workspace& w,Layout layout,bool stream) const {
+     if(layout==Layout::Auto) layout=preferredLayout();
+     if(layout==Layout::Packed24 && !packed24Available()) throw std::invalid_argument("Packed24 index range exceeded; use Auto or Indices32");
+ 
+@@ -451,9 +451,9 @@ void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Work
+         throw std::invalid_argument("input and output must not overlap");
+     if(layout!=Layout::Packed24 && layout!=Layout::Indices32) throw std::invalid_argument("unknown layout");
+     if(mCompacted && layout!=mRetainedLayout) throw std::invalid_argument("routing layout was discarded");
+-    forwardUnchecked(in,out,w,layout);
++    forwardUnchecked(in,out,w,layout,stream);
+ }
+-template<class Map,bool Packed> void Spin::runForward(const block* in,block* out,Workspace& w) const {
++template<class Map,bool Packed> void Spin::runForward(const block* in,block* out,Workspace& w,bool stream) const {
+     block* values=w.buckets.data(); block* tile=w.tile.data();
+     const auto tileSize=tileBlocks(),n=codeBlocks();
+     for(std::size_t base=0;base<n;base+=tileSize) {
+@@ -464,12 +464,12 @@ template<class Map,bool Packed> void Spin::runForward(const block* in,block* out
+             values[base+j]=tile[offset];
+         }
+     }
+-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
++    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
+         else return values[mSlots32[i]];
+-    },out);
++    },out,stream);
+ }
+-template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block* out,Workspace& w) const {
++template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block* out,Workspace& w,bool stream) const {
+     block* values=w.buckets.data(); block* tile=w.tile.data();
+     const auto tileSize=tileBlocks(),n=codeBlocks();
+     for(std::size_t base=0;base<n;base+=tileSize) {
+@@ -481,34 +481,34 @@ template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block*
+             values[base+j]=tile[offset];
+         }
+     }
+-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
++    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
+         else return values[mSlots32[i]];
+-    },out);
++    },out,stream);
+ }
+-void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layout) const {
++void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layout,bool stream) const {
+     if(layout==Layout::Auto) layout=preferredLayout();
+     if(mPartialTile && mForwardDirect.empty()) {
+ #if SPIN_BCH_AVX512
+         if(mBchBackend==BchBackend::Avx512) {
+-            if(mConfig==Configuration::T128S19) {if(layout==Layout::Packed24) runForwardFourTail<Map128S19,true>(in,out,w);else runForwardFourTail<Map128S19,false>(in,out,w);return;}
+-            if(mConfig==Configuration::T64S12) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12,true>(in,out,w);else runForwardFourTail<Map64S12,false>(in,out,w);return;}
+-            if(mConfig==Configuration::T64S12R2) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12R2,true>(in,out,w);else runForwardFourTail<Map64S12R2,false>(in,out,w);return;}
++            if(mConfig==Configuration::T128S19) {if(layout==Layout::Packed24) runForwardFourTail<Map128S19,true>(in,out,w,stream);else runForwardFourTail<Map128S19,false>(in,out,w,stream);return;}
++            if(mConfig==Configuration::T64S12) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12,true>(in,out,w,stream);else runForwardFourTail<Map64S12,false>(in,out,w,stream);return;}
++            if(mConfig==Configuration::T64S12R2) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12R2,true>(in,out,w,stream);else runForwardFourTail<Map64S12R2,false>(in,out,w,stream);return;}
+         }
+ #endif
+         switch(mConfig) {
+-            case Configuration::T64S16:if(layout==Layout::Packed24) runForwardTail<Map64S16,true>(in,out,w);else runForwardTail<Map64S16,false>(in,out,w);return;
+-            case Configuration::T64S20:if(layout==Layout::Packed24) runForwardTail<Map64S20,true>(in,out,w);else runForwardTail<Map64S20,false>(in,out,w);return;
+-            case Configuration::T128S19:if(layout==Layout::Packed24) runForwardTail<Map128S19,true>(in,out,w);else runForwardTail<Map128S19,false>(in,out,w);return;
+-            case Configuration::T256S14:if(layout==Layout::Packed24) runForwardTail<Map256S14,true>(in,out,w);else runForwardTail<Map256S14,false>(in,out,w);return;
+-            case Configuration::T64S12:if(layout==Layout::Packed24) runForwardTail<Map64S12,true>(in,out,w);else runForwardTail<Map64S12,false>(in,out,w);return;
+-            case Configuration::T64S12R2:if(layout==Layout::Packed24) runForwardTail<Map64S12R2,true>(in,out,w);else runForwardTail<Map64S12R2,false>(in,out,w);return;
++            case Configuration::T64S16:if(layout==Layout::Packed24) runForwardTail<Map64S16,true>(in,out,w,stream);else runForwardTail<Map64S16,false>(in,out,w,stream);return;
++            case Configuration::T64S20:if(layout==Layout::Packed24) runForwardTail<Map64S20,true>(in,out,w,stream);else runForwardTail<Map64S20,false>(in,out,w,stream);return;
++            case Configuration::T128S19:if(layout==Layout::Packed24) runForwardTail<Map128S19,true>(in,out,w,stream);else runForwardTail<Map128S19,false>(in,out,w,stream);return;
++            case Configuration::T256S14:if(layout==Layout::Packed24) runForwardTail<Map256S14,true>(in,out,w,stream);else runForwardTail<Map256S14,false>(in,out,w,stream);return;
++            case Configuration::T64S12:if(layout==Layout::Packed24) runForwardTail<Map64S12,true>(in,out,w,stream);else runForwardTail<Map64S12,false>(in,out,w,stream);return;
++            case Configuration::T64S12R2:if(layout==Layout::Packed24) runForwardTail<Map64S12R2,true>(in,out,w,stream);else runForwardTail<Map64S12R2,false>(in,out,w,stream);return;
+         }
+     }
+ 
+ #if SPIN_BCH_AVX512
+     if(mBchBackend==BchBackend::Avx512) {
+-#define FAST_FORWARD(Enum,Map) case Configuration::Enum: if(!mForwardDirect.empty()) runForwardDirect<Map>(in,out,w); else if(layout==Layout::Packed24) runForwardFour<Map,true>(in,out,w); else runForwardFour<Map,false>(in,out,w); return
++#define FAST_FORWARD(Enum,Map) case Configuration::Enum: if(!mForwardDirect.empty()) runForwardDirect<Map>(in,out,w,stream); else if(layout==Layout::Packed24) runForwardFour<Map,true>(in,out,w,stream); else runForwardFour<Map,false>(in,out,w,stream); return
+         switch(mConfig) {
+             FAST_FORWARD(T128S19,Map128S19);FAST_FORWARD(T64S12,Map64S12);FAST_FORWARD(T64S12R2,Map64S12R2);
+             default:break;
+@@ -516,7 +516,7 @@ void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layou
+ #undef FAST_FORWARD
+     }
+ #endif
+-#define FORWARD_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) runForward<Map,true>(in,out,w); else runForward<Map,false>(in,out,w); break
++#define FORWARD_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) runForward<Map,true>(in,out,w,stream); else runForward<Map,false>(in,out,w,stream); break
+     switch(mConfig) {
+         FORWARD_CASE(T64S16,Map64S16); FORWARD_CASE(T64S20,Map64S20);
+         FORWARD_CASE(T64S12R2,Map64S12R2); FORWARD_CASE(T64S12,Map64S12); FORWARD_CASE(T128S19,Map128S19); FORWARD_CASE(T256S14,Map256S14);
+diff --git a/spin/src/kernels/Spin.h b/spin/src/kernels/Spin.h
+index 59108579..9fb32fd9 100644
+--- a/spin/src/kernels/Spin.h
++++ b/spin/src/kernels/Spin.h
+@@ -38,9 +38,10 @@ public:
+     void reference(const block* input, block* output) const;
+     // Expanding encoder E: K input blocks to 2K output blocks. Existing encode is E^T.
+     void forward(const block* input, std::size_t inputCount, block* output,
+-                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto) const;
++                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto,
++                 bool stream=false) const;
+     void forwardUnchecked(const block* input, block* output, Workspace& workspace,
+-                          Layout layout=Layout::Auto) const;
++                          Layout layout=Layout::Auto, bool stream=false) const;
+     void forwardReference(const block* input, block* output) const;
+     // One binary row, bit-packed across coordinates. Scratch is codeBlocks()/64 words.
+     void forwardBits(const std::uint64_t* input, std::size_t inputWords,
+@@ -105,17 +106,17 @@ private:
+     std::vector<u32> mK18Route32;
+     void runK18(const block*,block*,Workspace&) const;
+     template<class Map,bool Packed> void runTail(const block*,block*,Workspace&) const;
+-    template<class Map,bool Packed> void runForwardTail(const block*,block*,Workspace&) const;
++    template<class Map,bool Packed> void runForwardTail(const block*,block*,Workspace&,bool) const;
+     template<class Map> void setupInner(u64 seed);
+     template<class Map, bool Packed> void run(const block*,block*,Workspace&) const;
+     template<class Map> void oracle(const block*,block*) const;
+     std::vector<u32> mRangeRoute32;
+     template<class Map> void runRange(const block*,block*,Workspace&) const;
+     std::vector<u32> mForwardDirect;
+-    template<class Map> void runForwardDirect(const block*,block*,Workspace&) const;
+-    template<class Map, bool Packed> void runForwardFour(const block*,block*,Workspace&) const;
+-    template<class Map, bool Packed> void runForwardFourTail(const block*,block*,Workspace&) const;
+-    template<class Map, bool Packed> void runForward(const block*,block*,Workspace&) const;
++    template<class Map> void runForwardDirect(const block*,block*,Workspace&,bool) const;
++    template<class Map, bool Packed> void runForwardFour(const block*,block*,Workspace&,bool) const;
++    template<class Map, bool Packed> void runForwardFourTail(const block*,block*,Workspace&,bool) const;
++    template<class Map, bool Packed> void runForward(const block*,block*,Workspace&,bool) const;
+     template<class Map> void forwardOracle(const block*,block*) const;
+ };
+ u64 splitmix(u64& state) noexcept;
+diff --git a/spin/src/kernels/wide/WideKernel.h b/spin/src/kernels/wide/WideKernel.h
+index c58c5273..edfba452 100644
+--- a/spin/src/kernels/wide/WideKernel.h
++++ b/spin/src/kernels/wide/WideKernel.h
+@@ -34,12 +34,14 @@ struct Ops {
+     static SPIN_FORCEINLINE Vec vx(Vec a,Vec b) { return _mm256_xor_si256(a,b); }
+     static SPIN_FORCEINLINE Vec load(const Vec* p) { return _mm256_loadu_si256(p); }
+     static SPIN_FORCEINLINE void store(Vec* p,Vec v) { _mm256_storeu_si256(p,v); }
++    static SPIN_FORCEINLINE void stream(Vec* p,Vec v) { _mm256_stream_si256(p,v); }
+ #else
+     using Vec=__m512i;
+     static SPIN_FORCEINLINE Vec zero() { return _mm512_setzero_si512(); }
+     static SPIN_FORCEINLINE Vec vx(Vec a,Vec b) { return _mm512_xor_si512(a,b); }
+     static SPIN_FORCEINLINE Vec load(const Vec* p) { return _mm512_loadu_si512(p); }
+     static SPIN_FORCEINLINE void store(Vec* p,Vec v) { _mm512_storeu_si512(p,v); }
++    static SPIN_FORCEINLINE void stream(Vec* p,Vec v) { _mm512_stream_si512(p,v); }
+ #endif
+ };
+ using Vec=Ops::Vec;
+@@ -82,14 +84,20 @@ template<class Map> struct RegisterFeedback:Map {
+         else Map::feedback(in,out);
+     }
+ };
+-template<class Map> __attribute__((noinline)) static void registerInner(
++template<class Map,bool Stream> __attribute__((noinline)) static void registerInner(
+     Spin::WideView view,Workspace& w,Vec* out) {
+-    Circuit::innerForward<RegisterFeedback<Map>>(view.n,view.fieldRows,[&](std::size_t i) {
++    Circuit::innerForward<RegisterFeedback<Map>,Stream>(view.n,view.fieldRows,[&](std::size_t i) {
+         return w.buckets[w.direct_slots[i]];
+     },out);
+ }
+ #endif
+-template<class Map,bool Registers> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w) {
++template<class Map,bool Stream> static SPIN_FORCEINLINE void inner(
++    Spin::WideView view,Workspace& w,Vec* out) {
++    Circuit::innerForward<Map,Stream>(view.n,view.fieldRows,[&](std::size_t i) {
++        return w.buckets[w.direct_slots[i]];
++    },out);
++}
++template<class Map,bool Registers> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w,bool stream) {
+     auto* values=w.buckets.data();
+     for(std::size_t base=0;base<view.n;base+=view.tile) {
+         const auto active=std::min(view.tile,view.n-base);
+@@ -104,17 +112,20 @@ template<class Map,bool Registers> static void encode(Spin::WideView view,const
+         }
+     }
+ #if defined(SPIN_WIDE_REGISTERS)
+-    if constexpr(Registers) {registerInner<Map>(view,w,out);return;}
++    if constexpr(Registers) {
++        if(stream) registerInner<Map,true>(view,w,out);
++        else registerInner<Map,false>(view,w,out);
++        return;
++    }
+ #endif
+-    Circuit::innerForward<Map>(view.n,view.fieldRows,[&](std::size_t i) {
+-        return values[w.direct_slots[i]];
+-    },out);
++    if(stream) inner<Map,true>(view,w,out);
++    else inner<Map,false>(view,w,out);
+ }
+-template<class Map> static void dispatch(Spin::WideView v,const Vec* in,Vec* out,Workspace& w) {
++template<class Map> static void dispatch(Spin::WideView v,const Vec* in,Vec* out,Workspace& w,bool stream) {
+ #if defined(SPIN_WIDE_REGISTERS)
+-    if(w.registers) {encode<Map,true>(v,in,out,w);return;}
++    if(w.registers) {encode<Map,true>(v,in,out,w,stream);return;}
+ #endif
+-    encode<Map,false>(v,in,out,w);
++    encode<Map,false>(v,in,out,w,stream);
+ }
+ 
+ }
+@@ -131,7 +142,7 @@ extern "C" std::size_t HC_NAME(spin_internal_wide_bytes)(const void* work) noexc
+     return w.buckets.capacity()*(HC_WIDE_BITS/8)+w.direct_slots.capacity()*sizeof(std::uint32_t);
+ }
+ extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,const void* in,
+-                                            std::size_t ni,void* out,std::size_t no) noexcept {
++                                            std::size_t ni,void* out,std::size_t no,bool stream) noexcept {
+     try {
+         const auto v=static_cast<const spin::detail::kernel::Spin*>(code)->wideForwardView();
+         auto& w=*static_cast<spin::detail::kernel::HC_NS::Workspace*>(work);
+@@ -143,8 +154,11 @@ extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,co
+         using namespace spin::detail::kernel;
+         using Ops=HC_NS::Ops;
+         const auto* input=static_cast<const HC_NS::Vec*>(in);auto* output=static_cast<HC_NS::Vec*>(out);
+-        if(v.configuration==Configuration::T64S12R2) HC_NS::dispatch<WideMap64S12R2<Ops>>(v,input,output,w);
+-        else HC_NS::dispatch<WideMap128S19<Ops>>(v,input,output,w);
++        // Streaming stores require vector alignment. Unaligned caller buffers
++        // use the cached storeu circuit, selected once before encoding.
++        stream=stream && (b&(HC_WIDE_BITS/8-1))==0;
++        if(v.configuration==Configuration::T64S12R2) HC_NS::dispatch<WideMap64S12R2<Ops>>(v,input,output,w,stream);
++        else HC_NS::dispatch<WideMap128S19<Ops>>(v,input,output,w,stream);
+         return 0;
+     } catch(...) { return 1; }
+ }
+diff --git a/spin/src/kernels/wide/generated/WideCircuit.h b/spin/src/kernels/wide/generated/WideCircuit.h
+index e1cb4bd1..60b89456 100644
+--- a/spin/src/kernels/wide/generated/WideCircuit.h
++++ b/spin/src/kernels/wide/generated/WideCircuit.h
+@@ -2229,21 +2229,26 @@ static SPIN_FORCEINLINE void imtStep(Vec* state,u32 dotMask,u32 xorMask) {
+     while(dotMask) {const auto j=std::countr_zero(dotMask);dotMask&=dotMask-1;dot=Ops::vx(dot,state[j]);}
+     while(xorMask) {const auto j=std::countr_zero(xorMask);xorMask&=xorMask-1;state[j]=Ops::vx(state[j],dot);}
+ }
+-template<class Map,std::size_t P,class Gather> static SPIN_FORCEINLINE void forwardPoint(
++template<bool Stream> static SPIN_FORCEINLINE void forwardStore(Vec* out,Vec value) {
++    if constexpr(Stream) Ops::stream(out,value);
++    else Ops::store(out,value);
++}
++template<class Map,std::size_t P,bool Stream,class Gather> static SPIN_FORCEINLINE void forwardPoint(
+     Gather& gather,Vec* out,Vec* values,const Vec table[][16],std::size_t base) {
+     constexpr auto column=(SPIN_GROUPED_A && (Map::Rounds>0))?Map::groupedColumns[P]:Map::columns[P];
+     const auto raw=gather(base+P);
+     const auto v=Ops::vx(raw,fixedSum<column>(table));
+-    if constexpr((Map::Rounds>0)) values[P]=raw; else values[P]=v; Ops::store(out+base+P,v);
++    if constexpr((Map::Rounds>0)) values[P]=raw; else values[P]=v;
++    forwardStore<Stream>(out+base+P,v);
+ }
+-template<class Map,class Gather,std::size_t... P> static SPIN_FORCEINLINE void forwardPoints(
++template<class Map,bool Stream,class Gather,std::size_t... P> static SPIN_FORCEINLINE void forwardPoints(
+     Gather& gather,Vec* out,Vec* values,const Vec table[][16],std::size_t base,std::index_sequence<P...>) {
+-    (forwardPoint<Map,P>(gather,out,values,table,base),...);
++    (forwardPoint<Map,P,Stream>(gather,out,values,table,base),...);
+ }
+ // Forward recurrence y=x+Aq, q'=Fq+Bx, with no flush and q initially zero.
+ // IMT uses separate expansion and feedback: retain raw x for Bx. The older
+ // configurations retain their BA=0 shortcut. Both gather and emit in one pass.
+-template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
++template<class Map,bool Stream=false,class Gather> static SPIN_FORCEINLINE void innerForward(
+     std::size_t n,const u32* fieldRows,Gather&& gather,Vec* out) {
+     alignas(64) Vec state[Map::S]{};
+     alignas(64) Vec syndrome[Map::S],grouped[Map::S],values[Map::T],table[(Map::S+3)/4][16];
+@@ -2251,14 +2256,14 @@ template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
+     for(std::size_t epoch=0;epoch<epochs;++epoch) {
+         const auto base=epoch*Map::T;
+         if(epoch==0) {
+-            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v; Ops::store(out+base+p,v); }
++            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v; forwardStore<Stream>(out+base+p,v); }
+         }
+         else {
+             if constexpr(SPIN_GROUPED_A && (Map::Rounds>0)) {
+                 for(unsigned j=0;j<Map::S;++j) grouped[j]=state[Map::groupOrder[j]];
+                 tables<Map::S>(grouped,table);
+             } else tables<Map::S>(state,table);
+-            forwardPoints<Map>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
++            forwardPoints<Map,Stream>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
+         }
+         if(epoch+1==epochs) break;
+         if constexpr((Map::Rounds>0)) Map::feedback(values,syndrome);
+@@ -2281,6 +2286,7 @@ template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
+                 state[j]=Ops::vx(variableSum<Map::S>(table,fieldRows[epoch*Map::S+j]),syndrome[j]);
+         }
+     }
++    if constexpr(Stream) _mm_sfence();
+ }
+ 
+ 

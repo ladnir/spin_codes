@@ -12,7 +12,7 @@ runtime-dispatched register kernels, regeneration, and portability tests.
 Forward encoding maps K records to 2K records. Transposed encoding maps 2K
 records to K records. Both apply the same binary matrix, independently to each
 bit of a record. The RS packet kernels use finite-field instructions internally
-to evaluate that binary matrix; callers still supply ordinary 128-bit records.
+to evaluate that binary matrix; callers supply ordinary fixed-width binary records.
 
 ## Build and link
 
@@ -76,8 +76,11 @@ Separate input and output ranges must not overlap. The in-place operation requir
 exactly 2K records and is supported for 128-bit records only.
 
 Select `Parameters::PacketRsT64S20` for the newer packet construction. It supports
-128-bit forward and transpose calls, with a portable fallback. Wider records,
-bit-packed forward encoding, and generic XOR elements remain unsupported for this family.
+128/256/512-bit forward and 128-bit transpose calls, with a portable fallback.
+Bit-packed forward encoding and generic XOR elements remain unsupported for this family.
+For exactly K=65,536, `Parameters::PacketRsT64S15K16` selects the smaller outer
+and paired-s15 inner from the frozen K16 research checkpoint, with the same
+supported directions and record widths. This is a distinct binary code and descriptor.
 Query `supports_forward(width)`, `supports_transpose(width)`, and
 `supports_generic_transpose()` before using an optional operation.
 Unsupported operations throw; they never substitute another code family.
@@ -94,8 +97,9 @@ assignment. A workspace is move-only and belongs to the plan that created it.
 Another independently constructed plan is not interchangeable, even with equal seeds.
 
 For successive maps, call `next.prepare_workspace(work)` before encoding with
-`next`. Compatible 128-bit scratch is rebound without allocation or clearing.
-The previous plan can no longer use that workspace. Different geometry and wide
+`next`. Compatible 128-bit scratch, and packet scratch at any supported width,
+is rebound without allocation or clearing.
+The previous plan can no longer use that workspace. Different geometry and other wide
 workspaces are recreated when necessary; a moved-from workspace is recreated at
 128 bits. Do not rebind while another call uses the workspace. This avoids
 repeated scratch allocation when a protocol changes only its code seeds.
@@ -181,33 +185,36 @@ See the [integration checkpoint](PREPARED_ENCODER.md) for validation and current
 
 ## Parameters and natural lengths
 
-| Parameter set | Inner (t,s,rounds) | K must be a positive multiple of |
+| Parameter set | Inner (t,s,rounds) | Accepted K |
 |---|---|---:|
-| `T128S19` | (128,19,1) | 16,384 |
-| `T64S12` | (64,12,1) | 8,192 |
-| `T64S12R2` | (64,12,2) | 8,192 |
-| `PacketRsT64S20` | (64,20), GL20 updates | 256 |
+| `T128S19` | (128,19,1) | Positive multiples of 16,384 |
+| `T64S12` | (64,12,1) | Positive multiples of 8,192 |
+| `T64S12R2` | (64,12,2) | Positive multiples of 8,192 |
+| `PacketRsT64S20` | (64,20), GL20 updates | Positive multiples of 256 |
+| `PacketRsT64S15K16` | (64,15), paired map / GL15 updates | Exactly 65,536 |
 
 `message_alignment` and `valid_message_size` provide allocation-free queries.
 The implementation never rounds K or changes the chosen parameter set.
 Current 32-bit routing requires K < 2^31. RS packet routing stores padded groups,
 so its representation bound is slightly smaller. Query `valid_message_size`
 rather than hard-coding that bound. Available memory also limits allocations.
-There is no additional benchmark-size or certificate-size cap.
+The paired-s15 profile is deliberately restricted to its K16 geometry.
 The caller remains responsible for certificate coverage at the selected parameters.
 
 `ExecutionOptions` selects a backend and an optional tile size. The default tile
 for IMT is 256 outer rows, clamped to the code geometry. Use 512 explicitly when desired
 for the previously measured large wide workload. These are execution choices,
 not changes to the binary code. Compaction and route packing are internal.
-RS packet encoding uses eight-row tiles and accepts only `tile_rows=0` or `8`.
+The s20 packet profile uses eight-row tiles (`tile_rows=0` or `8`);
+the K16 paired-s15 profile uses four-row tiles (`tile_rows=0` or `4`).
 
 | Family | 128-bit transpose | 128-bit forward | Wide forward | Generic XOR transpose |
 |---|---|---|---|---|
 | `T128S19` | Yes | Yes | 256/512 bits | Yes |
 | `T64S12` | Yes | Yes | No | Yes |
 | `T64S12R2` | Yes | Yes | 256/512 bits | Yes |
-| `PacketRsT64S20` | Yes | Yes | No | No |
+| `PacketRsT64S20` | Yes | Yes | 256/512 bits | No |
+| `PacketRsT64S15K16` | Yes | Yes | 256/512 bits | No |
 
 Wide support also depends on the CPU and compiled backends.
 
@@ -222,9 +229,42 @@ For 256- or 512-bit records, create a workspace with `Width::Bits256` or
 adjacent 128-bit lanes. Input and output use the same coordinate-major layout.
 Only 16-byte external alignment is required, including for 512-bit records.
 
+Forward calls accept an explicit output-store preference:
+
+```cpp
+// Stream a large codeword that will be consumed after a batch of encodings.
+code.forward_bytes(message, encoded, workspace, spin::OutputStores::Streaming);
+// Keep an immediately consumed result in cache.
+code.forward_bytes(message, encoded, workspace, spin::OutputStores::Cached);
+// The typed API has the same optional argument.
+code.forward<Record>(input, output, workspace, spin::OutputStores::Cached);
+```
+
+The default is `OutputStores::Streaming` for every profile and supported record
+width. It requests non-temporal output stores where the selected kernel and
+alignment support them; other cases use cached stores. `Cached` forces ordinary
+output stores, including at 64-byte-aligned addresses. Alignment establishes
+which stores are legal; the caller chooses the policy from the result's reuse
+pattern. The output is ready to read when the call returns.
+
+This is a per-call execution choice. The same code and workspace can alternate
+policies without rebuilding setup, reallocating scratch, or changing the
+descriptor, encoded bytes, or transcript. It does not change transpose,
+`forward_bits`, or owned scratch handling. This public default can change the
+store behavior of older IMT and large-packet paths; use `Cached` when that suits
+the consumer's access pattern. Compare both choices with the complete workload,
+including subsequent reads.
+
 Query `code.supports_forward(width)` before selecting a width. Wide forward
-supports T128S19 and T64S12R2. A width request is explicit: dispatch never changes
-the application's record layout. 512-bit records require AVX-512F/VL/BW/DQ.
+supports T128S19, T64S12R2, and both packet profiles. A width request is explicit:
+dispatch never changes the application's record layout. The IMT families require
+AVX-512F/VL/BW/DQ for 512-bit records; packet wide forward also has a portable fallback.
+
+The packet AVX-512 path loads interleaved input directly and interleaves the output
+of each 64-coordinate inner block in bounded local scratch. It retains the unrolled
+128-bit arithmetic schedule, uses one routing table for all lanes, and avoids full-buffer
+input and output conversions. All proportional scratch belongs to the workspace;
+encoding allocates no memory. This interface also serves applications outside FLOCK.
 
 The `forward_bytes`, `transpose_bytes`, and `transpose_inplace_bytes` methods
 accept zero-copy byte views. This is the intended boundary for foreign record
@@ -265,8 +305,9 @@ through structured routing and a t64/s20 inner with independent GL20 updates.
 The forward construction uses the binary adjoints of the field multipliers;
 the transposed kernel evaluates the field multipliers themselves.
 
-This family supports forward and transposed encoding of 128-bit records.
-Paper SPIN remains available for wide records, bit-packed forward encoding, and generic XOR types.
+This family supports forward encoding of 128/256/512-bit records and transposed
+encoding of 128-bit records. Paper SPIN remains available for bit-packed forward
+encoding and generic XOR types.
 
 ```cpp
 #include <spin/Code.h>
@@ -287,15 +328,18 @@ K must be a positive multiple of 256. Non-powers of two use the same kernel;
 construction preserves K without implicit rounding. Transpose consumes exactly
 2K records and produces K records. In-place calls preserve the last K records.
 Separate buffers must not overlap and need 16-byte alignment. A 64-byte-aligned
-output enables the measured non-temporal-store path; other supported alignments
-use ordinary stores for the same map. Encoding allocates nothing.
+transpose output enables the measured non-temporal-store path; other supported
+alignments use ordinary stores for the same map. Encoding allocates nothing.
 
 Forward consumes K records and writes 2K records into disjoint output. Through
 K=2^18 it uses contiguous outer scratch and a gathered inner. Above that size,
 64-byte-aligned output permits direct cache-line scattering followed by an
 in-place inner pass. Other valid output alignments route through the existing
-workspace. `PacketCode` exposes the same `forward_bytes` and typed `forward`
-interfaces. Neither forward path changes the map descriptor.
+workspace. `Code` forward output stores follow the per-call `OutputStores`
+preference; the large direct route can use output as intermediate storage.
+The compatibility `PacketCode` facade retains its three-argument `forward_bytes`
+and typed `forward` calls and uses the default preference. Use `Code` to select
+the policy explicitly. Neither forward path changes the map descriptor.
 
 The current numerical certificate covers K=2^20, rate 1/2, relative distance
 above 10%, and a 68.103757-bit setup-failure margin under independent ideal setup.
@@ -326,7 +370,8 @@ at every size. Normal packet scratch retains its best-effort page advice.
 Preparation never advises caller-owned buffers or runs inside encoding.
 Actual huge pages are not guaranteed.
 
-The RS family has parameter identifier 5. Identifier 4, used by the previous BCH
+The s20 RS profile has parameter identifier 5. The [K16 paired-s15 profile](PAIRED15.md)
+has identifier 6. Identifier 4, used by the previous BCH
 packet family, is retired and rejected. That implementation is no longer selectable.
 The three paper-SPIN identifiers and their seeded maps are unchanged.
 
@@ -352,6 +397,16 @@ Build `spin_packet_bench` with `SPIN_BUILD_BENCHMARKS=ON`.
 The same option builds `spin_packet_forward_api_bench`; it accepts the same
 arguments and measures public `Code::forward_bytes` calls with a fixed message
 and separate output. Both benchmarks exclude setup and allocation.
+For FLOCK-sized forward batches, also build `spin_forward_batch_bench`.
+It compares cached and streaming output over distinct K16 codewords, with
+producer-written input, reused-buffer controls, or explicit cache eviction.
+It records raw samples, full-output checks, and allocation/advice details.
+See the [batch methodology and results](../research/workstreams/forward_batch/README.md)
+before extrapolating a single-call measurement to commitment performance.
+The [full FLOCK comparison](../research/workstreams/flock_output_stores/README.md)
+confirms the streaming default for these workloads, including subsequent hashing.
+An [encoder-only RS comparison](../research/workstreams/rs_distance_encode/README.md)
+matches input bytes and column widths against RS at 10% field-symbol distance.
 `spin_packet_bench K [seed] [calls] [auto|normal|huge]` measures precomputed
 in-place encoding, excluding setup and allocation. Run benchmarks serially.
 The frozen research kernel measured 3.259 ms at K=2^20 on Ryzen 7950X,
@@ -371,6 +426,12 @@ Entries are medians of four process medians. Every matched output checksum
 agrees; all differences are within 1.1%. These measurements check preservation
 of the reference performance, not a speedup from packaging. `Automatic` selects
 the listed allocation policy for these sizes on Linux.
+
+The subsequent [cached-store optimization](experiments/packet_k16/README.md)
+reduces the public transpose time to **0.151 ms at K=2^16** and **0.608 ms at
+K=2^18**, from 0.212 and 0.825 ms in its matched baseline run. K=2^20 remains
+about 3.32 ms. The implementation uses cached stores through K=2^18 and retains
+streaming stores above that size. The encoded map and certificate are unchanged.
 
 For future changes within the RS family, retain the accepted executable and use:
 

@@ -2229,21 +2229,26 @@ static SPIN_FORCEINLINE void imtStep(Vec* state,u32 dotMask,u32 xorMask) {
     while(dotMask) {const auto j=std::countr_zero(dotMask);dotMask&=dotMask-1;dot=Ops::vx(dot,state[j]);}
     while(xorMask) {const auto j=std::countr_zero(xorMask);xorMask&=xorMask-1;state[j]=Ops::vx(state[j],dot);}
 }
-template<class Map,std::size_t P,class Gather> static SPIN_FORCEINLINE void forwardPoint(
+template<bool Stream> static SPIN_FORCEINLINE void forwardStore(Vec* out,Vec value) {
+    if constexpr(Stream) Ops::stream(out,value);
+    else Ops::store(out,value);
+}
+template<class Map,std::size_t P,bool Stream,class Gather> static SPIN_FORCEINLINE void forwardPoint(
     Gather& gather,Vec* out,Vec* values,const Vec table[][16],std::size_t base) {
     constexpr auto column=(SPIN_GROUPED_A && (Map::Rounds>0))?Map::groupedColumns[P]:Map::columns[P];
     const auto raw=gather(base+P);
     const auto v=Ops::vx(raw,fixedSum<column>(table));
-    if constexpr((Map::Rounds>0)) values[P]=raw; else values[P]=v; Ops::store(out+base+P,v);
+    if constexpr((Map::Rounds>0)) values[P]=raw; else values[P]=v;
+    forwardStore<Stream>(out+base+P,v);
 }
-template<class Map,class Gather,std::size_t... P> static SPIN_FORCEINLINE void forwardPoints(
+template<class Map,bool Stream,class Gather,std::size_t... P> static SPIN_FORCEINLINE void forwardPoints(
     Gather& gather,Vec* out,Vec* values,const Vec table[][16],std::size_t base,std::index_sequence<P...>) {
-    (forwardPoint<Map,P>(gather,out,values,table,base),...);
+    (forwardPoint<Map,P,Stream>(gather,out,values,table,base),...);
 }
 // Forward recurrence y=x+Aq, q'=Fq+Bx, with no flush and q initially zero.
 // IMT uses separate expansion and feedback: retain raw x for Bx. The older
 // configurations retain their BA=0 shortcut. Both gather and emit in one pass.
-template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
+template<class Map,bool Stream=false,class Gather> static SPIN_FORCEINLINE void innerForward(
     std::size_t n,const u32* fieldRows,Gather&& gather,Vec* out) {
     alignas(64) Vec state[Map::S]{};
     alignas(64) Vec syndrome[Map::S],grouped[Map::S],values[Map::T],table[(Map::S+3)/4][16];
@@ -2251,14 +2256,14 @@ template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
     for(std::size_t epoch=0;epoch<epochs;++epoch) {
         const auto base=epoch*Map::T;
         if(epoch==0) {
-            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v; Ops::store(out+base+p,v); }
+            for(unsigned p=0;p<Map::T;++p) { const auto v=gather(base+p); values[p]=v; forwardStore<Stream>(out+base+p,v); }
         }
         else {
             if constexpr(SPIN_GROUPED_A && (Map::Rounds>0)) {
                 for(unsigned j=0;j<Map::S;++j) grouped[j]=state[Map::groupOrder[j]];
                 tables<Map::S>(grouped,table);
             } else tables<Map::S>(state,table);
-            forwardPoints<Map>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
+            forwardPoints<Map,Stream>(gather,out,values,table,base,std::make_index_sequence<Map::T>{});
         }
         if(epoch+1==epochs) break;
         if constexpr((Map::Rounds>0)) Map::feedback(values,syndrome);
@@ -2281,6 +2286,7 @@ template<class Map,class Gather> static SPIN_FORCEINLINE void innerForward(
                 state[j]=Ops::vx(variableSum<Map::S>(table,fieldRows[epoch*Map::S+j]),syndrome[j]);
         }
     }
+    if constexpr(Stream) _mm_sfence();
 }
 
 

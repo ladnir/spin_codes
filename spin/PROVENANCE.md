@@ -1,6 +1,24 @@
 # Kernel generation record
 
-The current packet construction is imported by `tools/import_rs_packet.py`
+Forward output-store selection is a package-owned execution option. The IMT
+importer preserves it through `tools/output_stores_overlay.patch`, with exact
+context checks. Packet forward generation applies
+`tools/generate_packet_store_policy.py` after deriving the retained schedules.
+These overlays specialize output writers and dispatch; they do not change the
+binary maps, XOR schedules, or descriptors. Streaming is the public `Code`
+default, and callers can request cached output on each forward call.
+
+`PacketRsT64S15K16` (identifier 6) promotes the frozen
+`k16-rs16-paired15-v1` construction. Its separate `src/paired15` module preserves
+the mode-52 transpose schedule and setup streams. The forward outer is the
+binary adjoint of the retained circuit; the forward inner uses transposed state
+updates and direct gathers through the same routing table. The independent
+scalar implementation constructs the RS matrix by interpolation.
+Both generators in that directory provide `--check` and record source hashes.
+The optional frozen-research test compares both public directions byte-for-byte;
+ordinary builds have no research or Python dependency. See [the profile](PAIRED15.md).
+
+The s20 packet construction is imported by `tools/import_rs_packet.py`
 from the frozen RS research implementation in
 `research/workstreams/k16_design/implementation/rs16x8_border`.
 Generated files record their input hashes. The importer retains the selected

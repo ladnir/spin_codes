@@ -9,6 +9,7 @@ from pathlib import Path
 import hashlib
 import sys
 from setup_overlay import apply_setup_overlay
+from output_stores_overlay import apply_output_stores_overlay
 
 if len(sys.argv) != 2:
     raise SystemExit('usage: import_kernels.py CONFIGURED_SPIN_BUILD')
@@ -115,6 +116,7 @@ template void Spin::runRange<Map64S12R2>(const block*,block*,Workspace&) const;
 }
 '''
     text = apply_setup_overlay(name, text)
+    text = apply_output_stores_overlay(name, text)
     out = dest / name
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(text, newline='\n')
@@ -185,6 +187,9 @@ lines = ['# Kernel generation record', '',
          'The setup-only overlay batches random words, uses exact reciprocal modulo',
          'sampling, and avoids generating discarded index formats. Seeded maps are unchanged.',
          'SetupRandom.h is package-owned; tools/setup_overlay.patch records the overlay.',
+         'The output-store overlay preserves the per-call cached/streaming policy after research imports.',
+         'It specializes only final output stores; scratch stays cached and XOR schedules are unchanged.',
+         'tools/output_stores_overlay.patch records the six-file overlay and rejects changed source context.',
          'A private prepared-route hook supports opt-in experiments; public Code sampling is unchanged.',
          'PreparedEncoder and BankKernel are package-owned implementations of the explicit banked heuristic mode.',
          'Block storage and capability detection are package-owned files.',

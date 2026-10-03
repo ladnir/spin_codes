@@ -10,21 +10,28 @@
 namespace spin {
 // Stable identifiers for supplied maps, not arbitrary (t,s) synthesis.
 // Value 4 identified the retired BCH packet construction; it is not reused.
-enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketRsT64S20=5 };
+enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketRsT64S20=5, PacketRsT64S15K16=6 };
 enum class Backend { Automatic, Avx2, Avx512, Portable };
 enum class Width : unsigned { Bits128=16, Bits256=32, Bits512=64 };
 enum class MemoryPolicy { Normal, PreferHugePages, Automatic };
+// Forward output stores only; does not change the code or its descriptor.
+// Streaming prefers non-temporal stores, with cached fallback where the backend
+// or output alignment requires it. Cached uses ordinary stores for immediate reuse.
+enum class OutputStores { Streaming, Cached };
 struct CodeSpec {
     std::size_t message_size;
     Parameters parameters=Parameters::T128S19;
     // For PacketRsT64S20, route_seed also generates the GF(2^32) outer maps;
     // inner_seed generates GL20 updates. Equal seeds reproduce PacketCode(seed).
+    // PacketRsT64S15K16 uses the frozen K16 small-outer/paired-s15 map.
+    // It accepts exactly K=65536 and has its own stable descriptor identifier.
     std::uint64_t route_seed=1;
     std::uint64_t inner_seed=2;
 };
 struct ExecutionOptions {
     Backend backend=Backend::Automatic;
-    // 0 selects the family default: 256 for IMT, 8 for PacketRsT64S20.
+    // 0 selects the family default: 256 for IMT, 8 for PacketRsT64S20,
+    // 4 for PacketRsT64S15K16.
     // PacketRsT64S20 accepts only 0 or 8; its eight-row geometry is fixed.
     unsigned tile_rows=0;
 };
@@ -86,7 +93,7 @@ public:
     Backend backend() const noexcept;
     std::size_t setup_bytes() const noexcept;
     // Canonical little-endian descriptor, version 1. Includes map and both seeds;
-    // excludes backend, tile size, and route packing. Consumers choose the hash.
+    // excludes backend, tile size, route packing, and store policy. Consumers choose the hash.
     std::array<std::byte,40> descriptor() const noexcept;
     bool supports_forward(Width=Width::Bits128) const noexcept;
     bool supports_transpose(Width=Width::Bits128) const noexcept;
@@ -94,7 +101,7 @@ public:
     Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // Optional storage for exactly code_size() records at the selected width.
     Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
-    // Rebind compatible 128-bit scratch without clearing or allocating; otherwise
+    // Rebind compatible 128-bit or packet scratch without clearing or allocating; otherwise
     // recreate it at the same width (128 bits if moved-from). No concurrent use.
     void prepare_workspace(Workspace&) const;
     GenericTranspose generic_transpose() const;
@@ -102,18 +109,24 @@ public:
     // Byte views are the zero-copy foreign-buffer interface. Records are 16/32/64
     // bytes according to the workspace; buffers require 16-byte alignment.
     // Exact sizes only, no overlap. Wider records apply the same map lane-wise.
-    // PacketRsT64S20 supports 128-bit forward/transpose. A 64-byte-aligned
-    // forward output (as supplied by Buffer) enables its fastest large-size path.
-    void forward_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&) const;
+    // Both packet profiles support all forward widths and 128-bit transpose.
+    // Streaming is the default for large outputs. Use Cached when the next stage
+    // immediately reuses a cache-resident result. Alignment is checked separately:
+    // streaming stores use the backend's required alignment, otherwise cached stores.
+    // Buffer supplies 64-byte alignment, sufficient for every streaming backend.
+    // Owned scratch handling is unchanged; streaming writes are fenced before return.
+    void forward_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&,
+                       OutputStores=OutputStores::Streaming) const;
     void transpose_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&) const;
     // Exactly 2K 128-bit records; overwrite the first K and preserve the suffix.
     void transpose_inplace_bytes(std::span<std::byte>, Workspace&) const;
 
-    template<class E> void forward(std::span<const E> in, std::span<E> out, Workspace& w) const {
+    template<class E> void forward(std::span<const E> in, std::span<E> out, Workspace& w,
+                                  OutputStores stores=OutputStores::Streaming) const {
         check_record<E>(w);
         if(in.size()!=message_size() || out.size()!=code_size())
             throw std::invalid_argument("SPIN forward element count mismatch");
-        forward_bytes(std::as_bytes(in), std::as_writable_bytes(out), w);
+        forward_bytes(std::as_bytes(in), std::as_writable_bytes(out), w, stores);
     }
     template<class E> void transpose(std::span<const E> in, std::span<E> out, Workspace& w) const {
         check_record<E>(w);

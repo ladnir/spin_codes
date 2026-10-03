@@ -93,8 +93,8 @@ struct PreparedState {
         if(!valid_message_size(s.parameters,s.message_size))throw std::invalid_argument("SPIN invalid prepared geometry");
         if(o.mode==SetupMode::Full)full.emplace(s,e);
         else if(o.mode==SetupMode::BankedHeuristic) {
-            if(s.parameters==Parameters::PacketRsT64S20)
-                throw std::invalid_argument("SPIN PacketRsT64S20 requires full setup; banked setup is unsupported");
+            if(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRsT64S15K16)
+                throw std::invalid_argument("SPIN packet profiles require full setup; banked setup is unsupported");
             if(!capabilities().avx2)throw std::runtime_error("SPIN requires AVX2 with OS support");
             if(e.backend!=Backend::Automatic && e.backend!=Backend::Avx2 && e.backend!=Backend::Avx512)
                 throw std::invalid_argument("SPIN unknown backend");
@@ -223,7 +223,7 @@ void PreparedEncoder::prepare_workspace(Workspace& w) const {
 GenericTranspose PreparedEncoder::generic_transpose() const {
     detail::checkedPreparedState(state_);
     if(!supports_generic_transpose())
-        throw std::invalid_argument("SPIN PacketRsT64S20 does not support generic transpose");
+        throw std::invalid_argument("SPIN packet profiles do not support generic transpose");
     if(!state_->generic) {
         if(state_->full)state_->generic.emplace(state_->full->generic_transpose());
         else {

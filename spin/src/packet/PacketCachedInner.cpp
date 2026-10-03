@@ -67,7 +67,7 @@ static SPIN_FORCEINLINE void update(PackedState& state,PackedExtra& extra,const 
 struct StreamingRoute {
     Block* scratch;const std::uint32_t* bases;
     SPIN_FORCEINLINE void operator()(std::size_t packet,__m512i value) {
-        _mm512_stream_si512(reinterpret_cast<__m512i*>(scratch+bases[packet]),value);
+        _mm512_store_si512(reinterpret_cast<__m512i*>(scratch+bases[packet]),value);
     }
 };
 template<unsigned Extra,class Emit>
@@ -97,20 +97,9 @@ static SPIN_NOINLINE void reverseBorder(const Block* input,std::size_t n,const B
     }
 }
 }
-void reverseRoute(const Block* input,Block* scratch,const Plan& plan) {
+void reverseRouteCached(const Block* input,Block* scratch,const Plan& plan) {
     StreamingRoute emit{scratch,plan.route.data()};
     reverseBorder<4>(input,plan.n,plan.updates.data(),emit);
-    _mm_sfence();
-}
-
-void transposeFast(const Block* input,Block* output,Block* scratch,const Plan& plan) {
-    if(plan.k<=262144) {
-        reverseRouteCached(input,scratch,plan);
-        outerFastCached(scratch,output,plan);
-        return;
-    }
-    reverseRoute(input,scratch,plan);
-    outerFast(scratch,output,plan);
 }
 
 } // namespace spin::detail::packet

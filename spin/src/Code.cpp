@@ -5,6 +5,7 @@
 #include "kernels/Spin.h"
 #include "kernels/WorkspaceRouting.h"
 #include "packet/PacketForward.h"
+#include "paired15/Paired15.h"
 #include <limits>
 #include <optional>
 #include <vector>
@@ -13,7 +14,7 @@
 extern "C" void* spin_internal_wide_workspace##B(const void*) noexcept; \
 extern "C" void spin_internal_wide_destroy##B(void*) noexcept; \
 extern "C" std::size_t spin_internal_wide_bytes##B(const void*) noexcept; \
-extern "C" int spin_internal_wide_encode##B(const void*,void*,const void*,std::size_t,void*,std::size_t) noexcept;
+extern "C" int spin_internal_wide_encode##B(const void*,void*,const void*,std::size_t,void*,std::size_t,bool) noexcept;
 WIDE_DECL(256)
 #if SPIN_BCH_AVX512
 WIDE_DECL(512)
@@ -32,7 +33,7 @@ static kernel::Configuration config(Parameters p) {
     case Parameters::T128S19:return kernel::Configuration::T128S19;
     case Parameters::T64S12:return kernel::Configuration::T64S12;
     case Parameters::T64S12R2:return kernel::Configuration::T64S12R2;
-    case Parameters::PacketRsT64S20:break;
+    case Parameters::PacketRsT64S20:case Parameters::PacketRsT64S15K16:break;
     }
     throw std::invalid_argument("SPIN unknown parameter set");
 }
@@ -51,10 +52,15 @@ struct Plan {
     std::optional<kernel::Spin> code;
     std::optional<packet::Plan> packets;
     std::optional<packet::ForwardPlan> forward;
+    std::optional<paired15::Plan> paired;
+    std::size_t packetScratchBlocks() const noexcept {
+        return paired?paired->scratchBlocks():packets?packets->scratchBlocks():0;
+    }
     Plan(CodeSpec s,ExecutionOptions o):spec(s),selected(o.backend) {
-        if(s.parameters==Parameters::PacketRsT64S20) {
-            if(o.tile_rows && o.tile_rows!=8)
-                throw std::invalid_argument("SPIN RS packet requires eight-row tiles");
+        if(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRsT64S15K16) {
+            const auto rows=s.parameters==Parameters::PacketRsT64S15K16?4u:8u;
+            if(o.tile_rows && o.tile_rows!=rows)
+                throw std::invalid_argument("SPIN packet tile geometry is fixed by its profile");
             switch(o.backend) {
             case Backend::Automatic:
                 selected=cpu_packet512()?Backend::Avx512:Backend::Portable;
@@ -68,11 +74,15 @@ struct Plan {
                 throw std::invalid_argument("SPIN packet has no AVX2 backend; select Portable or Automatic");
             default:throw std::invalid_argument("SPIN unknown backend");
             }
-            packets.emplace(s.message_size,s.route_seed,s.inner_seed);
-            if(selected==Backend::Avx512)forward.emplace(*packets);
+            if(s.parameters==Parameters::PacketRsT64S15K16)
+                paired.emplace(s.message_size,s.route_seed,s.inner_seed);
+            else {
+                packets.emplace(s.message_size,s.route_seed,s.inner_seed);
+                if(selected==Backend::Avx512)forward.emplace(*packets);
+            }
         } else {
             if(o.backend==Backend::Portable)
-                throw std::invalid_argument("SPIN Portable backend is available only for PacketRsT64S20");
+                throw std::invalid_argument("SPIN Portable backend is available only for packet profiles");
             if(!capabilities().avx2) throw std::runtime_error("SPIN requires AVX2 with OS support");
             code.emplace(config(s.parameters),kernel::MessageLength{s.message_size},
                 s.route_seed,s.inner_seed,o.tile_rows?o.tile_rows:256,backend(o.backend),true);
@@ -91,8 +101,8 @@ struct Scratch {
     Scratch(std::shared_ptr<const Plan> p,Width w,MemoryPolicy memory)
         :plan(std::move(p)),width(w),policy(memory) {
         (void)resolveMemoryPolicy(0,memory);
-        if(plan->packets) {
-            packetScratch.emplace(plan->packets->scratchBlocks()*16,memory);
+        if(plan->packets || plan->paired) {
+            packetScratch.emplace(plan->packetScratchBlocks()*static_cast<unsigned>(w),memory);
             // The allocation is owned here, so all advised whole pages belong
             // to this workspace. Foreign input/output buffers are never advised.
             // PreferHugePages already advises its owned allocation in Buffer.
@@ -141,8 +151,18 @@ static const Plan& checkedPlan(const std::shared_ptr<const Plan>& plan) {
 }
 static void transposePacket(const Plan& plan,const storage::block* input,
                             storage::block* output,Scratch& scratch) {
-    const auto& prepared=*plan.packets;
     auto* work=reinterpret_cast<storage::block*>(scratch.packetScratch->bytes().data());
+    if(plan.paired) {
+#if SPIN_BCH_AVX512
+        if(plan.selected==Backend::Avx512) {
+            paired15::transposeFast(input,output,work,*plan.paired);
+            return;
+        }
+#endif
+        paired15::transposeScalar(input,output,work,*plan.paired);
+        return;
+    }
+    const auto& prepared=*plan.packets;
 #if SPIN_BCH_AVX512
     if(plan.selected==Backend::Avx512) {
         packet::transposeFast(input,output,work,prepared);
@@ -158,11 +178,13 @@ std::size_t message_alignment(Parameters p) {
     case Parameters::T128S19:return 16384;
     case Parameters::T64S12:case Parameters::T64S12R2:return 8192;
     case Parameters::PacketRsT64S20:return 256;
+    case Parameters::PacketRsT64S15K16:return 65536;
     }
     throw std::invalid_argument("SPIN unknown parameter set");
 }
 bool valid_message_size(Parameters p,std::size_t k) noexcept {
     if(p==Parameters::PacketRsT64S20) return detail::packet::validMessageSize(k);
+    if(p==Parameters::PacketRsT64S15K16) return k==65536;
     const auto unit=p==Parameters::T128S19?16384u:
         (p==Parameters::T64S12 || p==Parameters::T64S12R2)?8192u:0u;
     return unit && k && k<=std::numeric_limits<std::uint32_t>::max()/2 && k%unit==0;
@@ -180,6 +202,7 @@ Backend Code::backend() const noexcept {
 }
 std::size_t Code::setup_bytes() const noexcept {
     if(!plan_) return 0;
+    if(plan_->paired)return plan_->paired->setupBytes();
     return plan_->packets?plan_->packets->setupBytes()+(plan_->forward?plan_->forward->setupBytes():0):plan_->code->setupBytes();
 }
 std::array<std::byte,40> Code::descriptor() const noexcept {
@@ -196,7 +219,7 @@ std::array<std::byte,40> Code::descriptor() const noexcept {
 }
 bool Code::supports_forward(Width width) const noexcept {
     if(!plan_) return false;
-    if(plan_->packets)return width==Width::Bits128;
+    if(plan_->packets || plan_->paired)return width==Width::Bits128 || width==Width::Bits256 || width==Width::Bits512;
     if(width==Width::Bits128) return true;
     if(plan_->spec.parameters==Parameters::T64S12) return false;
     return width==Width::Bits256?capabilities().forward256:
@@ -206,7 +229,7 @@ bool Code::supports_transpose(Width width) const noexcept {
     return plan_ && width==Width::Bits128;
 }
 bool Code::supports_generic_transpose() const noexcept {
-    return plan_ && !plan_->packets;
+    return plan_ && !plan_->packets && !plan_->paired;
 }
 Workspace Code::make_workspace(Width width,MemoryPolicy policy) const {
     detail::checkedPlan(plan_);
@@ -226,9 +249,9 @@ Buffer Code::make_buffer(Width width,MemoryPolicy policy) const {
 void Code::prepare_workspace(Workspace& w) const {
     detail::checkedPlan(plan_);
     if(w.scratch_ && w.scratch_->plan==plan_)return;
-    if(w.scratch_ && w.scratch_->width==Width::Bits128 && plan_->packets &&
+    if(w.scratch_ && supports_forward(w.scratch_->width) && (plan_->packets || plan_->paired) &&
        w.scratch_->packetScratch &&
-       w.scratch_->packetScratch->bytes().size()==plan_->packets->scratchBlocks()*16) {
+       w.scratch_->packetScratch->bytes().size()==plan_->packetScratchBlocks()*static_cast<unsigned>(w.scratch_->width)) {
         w.scratch_->plan=plan_;
         return;
     }
@@ -255,8 +278,12 @@ detail::Scratch& Code::check_workspace(Workspace& w) const {
         throw std::invalid_argument("SPIN workspace belongs to another plan or was moved");
     return *w.scratch_;
 }
-void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w) const {
+void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w,
+                         OutputStores stores) const {
     auto& scratch=check_workspace(w);
+    if(stores!=OutputStores::Streaming && stores!=OutputStores::Cached)
+        throw std::invalid_argument("SPIN unknown forward output store policy");
+    const bool stream=stores==OutputStores::Streaming;
     if(!supports_forward(scratch.width))
         throw std::invalid_argument("SPIN selected family does not support forward encoding at this width");
     const auto width=static_cast<unsigned>(scratch.width);
@@ -265,28 +292,47 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
     detail::aligned(in.data());detail::aligned(out.data());
     if(detail::overlap(in.data(),in.size(),out.data(),out.size()))
         throw std::invalid_argument("SPIN forward buffers overlap");
+    if(plan_->paired) {
+        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
+        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
+        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
+#if SPIN_BCH_AVX512
+        if(plan_->selected==Backend::Avx512) {
+            detail::paired15::forwardFast(input,output,work,*plan_->paired,width/16,stream);
+            return;
+        }
+#endif
+        detail::paired15::forwardScalar(input,output,work,*plan_->paired,width/16);
+        return;
+    }
     if(plan_->packets) {
         const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
         auto* output=reinterpret_cast<detail::storage::block*>(out.data());
         auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
 #if SPIN_BCH_AVX512
         if(plan_->selected==Backend::Avx512) {
-            detail::packet::forwardSelected(input,output,work,*plan_->packets,*plan_->forward);
+            if(width==16)detail::packet::forwardSelected(input,output,work,*plan_->packets,*plan_->forward,stream);
+            else {
+                detail::packet::forwardOuterWide(input,work,*plan_->packets,*plan_->forward,unsigned(width/16));
+                detail::packet::forwardInnerWide(work,output,*plan_->packets,*plan_->forward,unsigned(width/16),stream);
+            }
             return;
         }
 #endif
-        detail::packet::forwardScalar(input,output,work,*plan_->packets);
+        if(width==16)detail::packet::forwardScalar(input,output,work,*plan_->packets);
+        else detail::packet::forwardScalarWide(input,output,work,*plan_->packets,unsigned(width/16));
         return;
     }
     if(width==16) {
         plan_->code->forwardUnchecked(reinterpret_cast<const detail::storage::block*>(in.data()),
-            reinterpret_cast<detail::storage::block*>(out.data()),*scratch.single);
+            reinterpret_cast<detail::storage::block*>(out.data()),*scratch.single,
+            detail::kernel::Layout::Auto,stream);
         return;
     }
     int error=1;
-    if(width==32) error=spin_internal_wide_encode256(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16);
+    if(width==32) error=spin_internal_wide_encode256(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16,stream);
 #if SPIN_BCH_AVX512
-    else error=spin_internal_wide_encode512(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16);
+    else error=spin_internal_wide_encode512(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16,stream);
 #endif
     if(error) throw std::runtime_error("SPIN wide kernel rejected validated buffers");
 }
@@ -299,7 +345,7 @@ void Code::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> ou
         throw std::invalid_argument("SPIN transpose buffers overlap; use transpose_inplace");
     const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
     auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-    if(plan_->packets) detail::transposePacket(*plan_,input,output,scratch);
+    if(plan_->packets || plan_->paired) detail::transposePacket(*plan_,input,output,scratch);
     else plan_->code->encodeUnchecked(input,output,*scratch.single);
 }
 void Code::transpose_inplace_bytes(std::span<std::byte> buffer,Workspace& w) const {
@@ -308,20 +354,20 @@ void Code::transpose_inplace_bytes(std::span<std::byte> buffer,Workspace& w) con
         throw std::invalid_argument("SPIN in-place transpose requires 2K 128-bit records");
     detail::aligned(buffer.data());
     auto* p=reinterpret_cast<detail::storage::block*>(buffer.data());
-    if(plan_->packets) detail::transposePacket(*plan_,p,p,scratch);
+    if(plan_->packets || plan_->paired) detail::transposePacket(*plan_,p,p,scratch);
     else plan_->code->encodeUnchecked(p,p,*scratch.single);
 }
 void Code::forward_bits(std::span<const std::uint64_t> in,std::span<std::uint64_t> out,
                         std::span<std::uint64_t> scratch) const {
     detail::checkedPlan(plan_);
-    if(plan_->packets)
-        throw std::invalid_argument("SPIN PacketRsT64S20 does not support bit-packed forward encoding");
+    if(plan_->packets || plan_->paired)
+        throw std::invalid_argument("SPIN packet profiles do not support bit-packed forward encoding");
     plan_->code->forwardBits(in.data(),in.size(),out.data(),out.size(),scratch.data(),scratch.size());
 }
 GenericTranspose Code::generic_transpose() const {
     detail::checkedPlan(plan_);
     if(!supports_generic_transpose())
-        throw std::invalid_argument("SPIN PacketRsT64S20 does not support generic transpose");
+        throw std::invalid_argument("SPIN packet profiles do not support generic transpose");
     return GenericTranspose(plan_->spec.parameters,message_size(),
         detail::kernel::Access::route(*plan_->code),detail::kernel::Access::masks(*plan_->code));
 }
