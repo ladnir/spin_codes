@@ -3,6 +3,12 @@
 Start with the [SPIN manuscript](paper/README.md). The production library is
 separate, in [`../spin/`](../spin/README.md), and does not depend on this tree.
 
+The [width-eight packet study](workstreams/packet8_codesign/README.md) is
+parked: it has a complete K16 proof, but only modest small-size gains and
+a K20 regression. Its sources and results are retained separately from
+production. The certified four-bit design remains the main path; see the
+[K16 co-design checkpoint](workstreams/k16_codesign_100us/README.md).
+
 | Directory | Contents |
 |---|---|
 | [paper/](paper/README.md) | Current manuscript, figures, and supporting paper scripts. |
