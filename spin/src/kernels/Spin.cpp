@@ -439,7 +439,7 @@ void Spin::reference(const block* in,block* out) const {
     }
 }
 
-void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Workspace& w,Layout layout) const {
+void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Workspace& w,Layout layout,bool stream) const {
     if(layout==Layout::Auto) layout=preferredLayout();
     if(layout==Layout::Packed24 && !packed24Available()) throw std::invalid_argument("Packed24 index range exceeded; use Auto or Indices32");
 
@@ -451,9 +451,9 @@ void Spin::forward(const block* in,std::size_t ni,block* out,std::size_t no,Work
         throw std::invalid_argument("input and output must not overlap");
     if(layout!=Layout::Packed24 && layout!=Layout::Indices32) throw std::invalid_argument("unknown layout");
     if(mCompacted && layout!=mRetainedLayout) throw std::invalid_argument("routing layout was discarded");
-    forwardUnchecked(in,out,w,layout);
+    forwardUnchecked(in,out,w,layout,stream);
 }
-template<class Map,bool Packed> void Spin::runForward(const block* in,block* out,Workspace& w) const {
+template<class Map,bool Packed> void Spin::runForward(const block* in,block* out,Workspace& w,bool stream) const {
     block* values=w.buckets.data(); block* tile=w.tile.data();
     const auto tileSize=tileBlocks(),n=codeBlocks();
     for(std::size_t base=0;base<n;base+=tileSize) {
@@ -464,12 +464,12 @@ template<class Map,bool Packed> void Spin::runForward(const block* in,block* out
             values[base+j]=tile[offset];
         }
     }
-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
         else return values[mSlots32[i]];
-    },out);
+    },out,stream);
 }
-template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block* out,Workspace& w) const {
+template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block* out,Workspace& w,bool stream) const {
     block* values=w.buckets.data(); block* tile=w.tile.data();
     const auto tileSize=tileBlocks(),n=codeBlocks();
     for(std::size_t base=0;base<n;base+=tileSize) {
@@ -481,34 +481,34 @@ template<class Map,bool Packed> void Spin::runForwardTail(const block* in,block*
             values[base+j]=tile[offset];
         }
     }
-    innerForward<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
+    innerForwardWithStores<Map>(n,mForwardFieldRows.data(),[&](std::size_t i) {
         if constexpr(Packed) return values[unpack(mSlots24.data()+3*i)];
         else return values[mSlots32[i]];
-    },out);
+    },out,stream);
 }
-void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layout) const {
+void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layout,bool stream) const {
     if(layout==Layout::Auto) layout=preferredLayout();
     if(mPartialTile && mForwardDirect.empty()) {
 #if SPIN_BCH_AVX512
         if(mBchBackend==BchBackend::Avx512) {
-            if(mConfig==Configuration::T128S19) {if(layout==Layout::Packed24) runForwardFourTail<Map128S19,true>(in,out,w);else runForwardFourTail<Map128S19,false>(in,out,w);return;}
-            if(mConfig==Configuration::T64S12) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12,true>(in,out,w);else runForwardFourTail<Map64S12,false>(in,out,w);return;}
-            if(mConfig==Configuration::T64S12R2) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12R2,true>(in,out,w);else runForwardFourTail<Map64S12R2,false>(in,out,w);return;}
+            if(mConfig==Configuration::T128S19) {if(layout==Layout::Packed24) runForwardFourTail<Map128S19,true>(in,out,w,stream);else runForwardFourTail<Map128S19,false>(in,out,w,stream);return;}
+            if(mConfig==Configuration::T64S12) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12,true>(in,out,w,stream);else runForwardFourTail<Map64S12,false>(in,out,w,stream);return;}
+            if(mConfig==Configuration::T64S12R2) {if(layout==Layout::Packed24) runForwardFourTail<Map64S12R2,true>(in,out,w,stream);else runForwardFourTail<Map64S12R2,false>(in,out,w,stream);return;}
         }
 #endif
         switch(mConfig) {
-            case Configuration::T64S16:if(layout==Layout::Packed24) runForwardTail<Map64S16,true>(in,out,w);else runForwardTail<Map64S16,false>(in,out,w);return;
-            case Configuration::T64S20:if(layout==Layout::Packed24) runForwardTail<Map64S20,true>(in,out,w);else runForwardTail<Map64S20,false>(in,out,w);return;
-            case Configuration::T128S19:if(layout==Layout::Packed24) runForwardTail<Map128S19,true>(in,out,w);else runForwardTail<Map128S19,false>(in,out,w);return;
-            case Configuration::T256S14:if(layout==Layout::Packed24) runForwardTail<Map256S14,true>(in,out,w);else runForwardTail<Map256S14,false>(in,out,w);return;
-            case Configuration::T64S12:if(layout==Layout::Packed24) runForwardTail<Map64S12,true>(in,out,w);else runForwardTail<Map64S12,false>(in,out,w);return;
-            case Configuration::T64S12R2:if(layout==Layout::Packed24) runForwardTail<Map64S12R2,true>(in,out,w);else runForwardTail<Map64S12R2,false>(in,out,w);return;
+            case Configuration::T64S16:if(layout==Layout::Packed24) runForwardTail<Map64S16,true>(in,out,w,stream);else runForwardTail<Map64S16,false>(in,out,w,stream);return;
+            case Configuration::T64S20:if(layout==Layout::Packed24) runForwardTail<Map64S20,true>(in,out,w,stream);else runForwardTail<Map64S20,false>(in,out,w,stream);return;
+            case Configuration::T128S19:if(layout==Layout::Packed24) runForwardTail<Map128S19,true>(in,out,w,stream);else runForwardTail<Map128S19,false>(in,out,w,stream);return;
+            case Configuration::T256S14:if(layout==Layout::Packed24) runForwardTail<Map256S14,true>(in,out,w,stream);else runForwardTail<Map256S14,false>(in,out,w,stream);return;
+            case Configuration::T64S12:if(layout==Layout::Packed24) runForwardTail<Map64S12,true>(in,out,w,stream);else runForwardTail<Map64S12,false>(in,out,w,stream);return;
+            case Configuration::T64S12R2:if(layout==Layout::Packed24) runForwardTail<Map64S12R2,true>(in,out,w,stream);else runForwardTail<Map64S12R2,false>(in,out,w,stream);return;
         }
     }
 
 #if SPIN_BCH_AVX512
     if(mBchBackend==BchBackend::Avx512) {
-#define FAST_FORWARD(Enum,Map) case Configuration::Enum: if(!mForwardDirect.empty()) runForwardDirect<Map>(in,out,w); else if(layout==Layout::Packed24) runForwardFour<Map,true>(in,out,w); else runForwardFour<Map,false>(in,out,w); return
+#define FAST_FORWARD(Enum,Map) case Configuration::Enum: if(!mForwardDirect.empty()) runForwardDirect<Map>(in,out,w,stream); else if(layout==Layout::Packed24) runForwardFour<Map,true>(in,out,w,stream); else runForwardFour<Map,false>(in,out,w,stream); return
         switch(mConfig) {
             FAST_FORWARD(T128S19,Map128S19);FAST_FORWARD(T64S12,Map64S12);FAST_FORWARD(T64S12R2,Map64S12R2);
             default:break;
@@ -516,7 +516,7 @@ void Spin::forwardUnchecked(const block* in,block* out,Workspace& w,Layout layou
 #undef FAST_FORWARD
     }
 #endif
-#define FORWARD_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) runForward<Map,true>(in,out,w); else runForward<Map,false>(in,out,w); break
+#define FORWARD_CASE(Enum,Map) case Configuration::Enum: if(layout==Layout::Packed24) runForward<Map,true>(in,out,w,stream); else runForward<Map,false>(in,out,w,stream); break
     switch(mConfig) {
         FORWARD_CASE(T64S16,Map64S16); FORWARD_CASE(T64S20,Map64S20);
         FORWARD_CASE(T64S12R2,Map64S12R2); FORWARD_CASE(T64S12,Map64S12); FORWARD_CASE(T128S19,Map128S19); FORWARD_CASE(T256S14,Map256S14);

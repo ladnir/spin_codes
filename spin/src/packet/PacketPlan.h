@@ -50,6 +50,9 @@ void transposeFast(const Block* input,Block* output,Block* scratch,const Plan&);
 // Private stage boundaries used by the retained fast kernel.
 void reverseRoute(const Block* input,Block* scratch,const Plan&);
 void outerFast(const Block* scratch,Block* output,const Plan&);
+// Exact same map and instruction schedule, cached stores for small working sets.
+void reverseRouteCached(const Block* input,Block* scratch,const Plan&);
+void outerFastCached(const Block* scratch,Block* output,const Plan&);
 
 // Allocation-free portable forward; same buffer contract as the fast path.
 void forwardScalar(const Block* message,Block* encoded,Block* scratch,const Plan&);

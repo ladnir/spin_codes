@@ -1,6 +1,7 @@
 #include <spin/Code.h>
 #include <spin/Generic.h>
 #include <spin/PreparedEncoder.h>
+#include "forward_output_stores.h"
 #include <algorithm>
 #include <atomic>
 #include <cstdlib>
@@ -238,6 +239,8 @@ int main() {try {
         rejects([&]{spin::Code c({unit-1,p});});
         for(auto b:{spin::Backend::Avx2,spin::Backend::Automatic}) {
             test(p,3*unit,b,1024);test(p,65536,b,256);
+            spin::Code stores({unit,p,17,29},{b});
+            spin::test::forwardOutputStores(stores,[](auto operation){no_alloc(operation);});
         }
     }
     for(auto backend:{spin::Backend::Avx2,spin::Backend::Automatic})

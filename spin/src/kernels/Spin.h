@@ -38,9 +38,10 @@ public:
     void reference(const block* input, block* output) const;
     // Expanding encoder E: K input blocks to 2K output blocks. Existing encode is E^T.
     void forward(const block* input, std::size_t inputCount, block* output,
-                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto) const;
+                 std::size_t outputCount, Workspace& workspace, Layout layout=Layout::Auto,
+                 bool stream=false) const;
     void forwardUnchecked(const block* input, block* output, Workspace& workspace,
-                          Layout layout=Layout::Auto) const;
+                          Layout layout=Layout::Auto, bool stream=false) const;
     void forwardReference(const block* input, block* output) const;
     // One binary row, bit-packed across coordinates. Scratch is codeBlocks()/64 words.
     void forwardBits(const std::uint64_t* input, std::size_t inputWords,
@@ -105,17 +106,17 @@ private:
     std::vector<u32> mK18Route32;
     void runK18(const block*,block*,Workspace&) const;
     template<class Map,bool Packed> void runTail(const block*,block*,Workspace&) const;
-    template<class Map,bool Packed> void runForwardTail(const block*,block*,Workspace&) const;
+    template<class Map,bool Packed> void runForwardTail(const block*,block*,Workspace&,bool) const;
     template<class Map> void setupInner(u64 seed);
     template<class Map, bool Packed> void run(const block*,block*,Workspace&) const;
     template<class Map> void oracle(const block*,block*) const;
     std::vector<u32> mRangeRoute32;
     template<class Map> void runRange(const block*,block*,Workspace&) const;
     std::vector<u32> mForwardDirect;
-    template<class Map> void runForwardDirect(const block*,block*,Workspace&) const;
-    template<class Map, bool Packed> void runForwardFour(const block*,block*,Workspace&) const;
-    template<class Map, bool Packed> void runForwardFourTail(const block*,block*,Workspace&) const;
-    template<class Map, bool Packed> void runForward(const block*,block*,Workspace&) const;
+    template<class Map> void runForwardDirect(const block*,block*,Workspace&,bool) const;
+    template<class Map, bool Packed> void runForwardFour(const block*,block*,Workspace&,bool) const;
+    template<class Map, bool Packed> void runForwardFourTail(const block*,block*,Workspace&,bool) const;
+    template<class Map, bool Packed> void runForward(const block*,block*,Workspace&,bool) const;
     template<class Map> void forwardOracle(const block*,block*) const;
 };
 u64 splitmix(u64& state) noexcept;

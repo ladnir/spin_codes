@@ -3,7 +3,8 @@
 Maintainer-only. Package builds consume the committed C++ snapshots and do not
 read research files or run Python. The selected implementation is the fixed
 t64/s20 reverseRouteFused followed by outerFastFusedPairNt with TowerByte32.
-Only namespaces, includes, entry-point plumbing, and constant branches change.
+Small inputs use the same schedule with cached stores; large inputs retain
+the streaming-store schedule. Selection happens once, outside the hot loops.
 Run: python -B spin/tools/import_rs_packet.py [--check]
 """
 import argparse
@@ -86,7 +87,7 @@ def inner_header():
     return prelude([path], True) + source
 
 
-def inner_source():
+def inner_source(cached=False):
     path = SOURCE / 'rs16x8_border/RsBorderFused.cpp'
     source = path.read_text()
     chunks = [prelude([path]), '#include "PacketPlan.h"\n#include "PacketRsInner.h"\n'
@@ -103,15 +104,26 @@ def inner_source():
     chunks.append('}\nvoid reverseRoute(const Block* input,Block* scratch,const Plan& plan) {\n'
                   '    StreamingRoute emit{scratch,plan.route.data()};\n'
                   '    reverseBorder<4>(input,plan.n,plan.updates.data(),emit);\n'
-                  '    _mm_sfence();\n}\n'
+                  '    _mm_sfence();\n}\n')
+    if not cached:
+        chunks.append(
                   'void transposeFast(const Block* input,Block* output,Block* scratch,const Plan& plan) {\n'
+                  '    if(plan.k<=262144) {\n'
+                  '        reverseRouteCached(input,scratch,plan);\n'
+                  '        outerFastCached(scratch,output,plan);\n'
+                  '        return;\n    }\n'
                   '    reverseRoute(input,scratch,plan);\n'
-                  '    outerFast(scratch,output,plan);\n}\n'
-                  '} // namespace spin::detail::packet')
-    return '\n'.join(chunks) + '\n'
+                  '    outerFast(scratch,output,plan);\n}\n')
+    chunks.append('} // namespace spin::detail::packet')
+    result = '\n'.join(chunks) + '\n'
+    if cached:
+        result = result.replace('void reverseRoute(', 'void reverseRouteCached(')
+        result = result.replace('_mm512_stream_si512', '_mm512_store_si512')
+        result = result.replace('    _mm_sfence();\n', '')
+    return result
 
 
-def outer_source():
+def outer_source(cached=False):
     path = SOURCE / 'rs16x8/RsWideOuterVariants.cpp'
     source = path.read_text()
     chunks = [prelude([path]), '#include "PacketPlan.h"\n#include "PacketRsField.h"\n'
@@ -157,7 +169,12 @@ def outer_source():
                   '    for(std::size_t group=0;group<plan.groups;++group)\n'
                   '        outerGroupFusedPairNt(scratch+groupStride*group,output+256*group,coeff+144*group);\n'
                   '    _mm_sfence();\n}\n} // namespace spin::detail::packet')
-    return '\n'.join(chunks) + '\n'
+    result = '\n'.join(chunks) + '\n'
+    if cached:
+        result = result.replace('void outerFast(', 'void outerFastCached(')
+        result = result.replace('_mm512_stream_si512', '_mm512_store_si512')
+        result = result.replace('    _mm_sfence();\n', '')
+    return result
 
 
 def main():
@@ -165,7 +182,9 @@ def main():
     parser.add_argument('--check', action='store_true', help='verify committed snapshots without writing')
     args = parser.parse_args()
     outputs = {'PacketRsField.h': field_header(), 'PacketRsInner.h': inner_header(),
-               'PacketFast.cpp': inner_source(), 'PacketOuterFast.cpp': outer_source()}
+               'PacketFast.cpp': inner_source(), 'PacketOuterFast.cpp': outer_source(),
+               'PacketCachedInner.cpp': inner_source(cached=True),
+               'PacketCachedOuter.cpp': outer_source(cached=True)}
     for name, text in outputs.items():
         text = '\n'.join(line.rstrip() for line in text.splitlines()) + '\n'
         path = DESTINATION / name

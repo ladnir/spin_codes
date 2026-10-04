@@ -96,12 +96,110 @@ t=t.replace('raw+4*h','raw+addresses[h]')
 t=t.replace('_mm512_storeu_si512(output+4*p,v);',
  '''if((reinterpret_cast<std::uintptr_t>(output)&63)==0)_mm512_stream_si512(reinterpret_cast<__m512i*>(output+4*p),v);else _mm512_storeu_si512(output+4*p,v);''')
 (dest/'PacketForwardInnerGather.cpp').write_text(t)
+
+# Wide payloads retain the same 128-bit arithmetic schedule. Deinterleave at
+# the outer load and interleave one inner epoch while it is still in L1.
+t=(dest/'PacketForwardOuterGather.cpp').read_text()
+t=t.replace('template<unsigned S,unsigned P>', 'template<unsigned L,unsigned S,unsigned P>')
+loader="""template<unsigned L> static SPIN_FORCEINLINE __m512i loadQuad(const Block* in) {
+    auto v=_mm512_castsi128_si512(_mm_loadu_si128(reinterpret_cast<const __m128i*>(in)));
+    v=_mm512_inserti32x4(v,_mm_loadu_si128(reinterpret_cast<const __m128i*>(in+L)),1);
+    v=_mm512_inserti32x4(v,_mm_loadu_si128(reinterpret_cast<const __m128i*>(in+2*L)),2);
+    return _mm512_inserti32x4(v,_mm_loadu_si128(reinterpret_cast<const __m128i*>(in+3*L)),3);
+}
+"""
+t=t.replace('template<unsigned L,unsigned S,unsigned P>',loader+'template<unsigned L,unsigned S,unsigned P>')
+t=t.replace('_mm512_loadu_si512(in+32*P+4*S)','loadQuad<L>(in+L*(32*P+4*S))')
+t=t.replace('_mm512_loadu_si512(in+32*(P+1)+4*S)','loadQuad<L>(in+L*(32*(P+1)+4*S))')
+t=t.replace('static SPIN_NOINLINE void groupForward','template<unsigned L> static SPIN_NOINLINE void groupForward')
+t=t.replace('packMessage<','packMessage<L,').replace('in+128,hi','in+128*L,hi')
+t=t[:t.index('void forwardOuterGather(')]+"""
+template<unsigned L> void outerWide(const Block* in,Block* out,const Plan& p,const ForwardPlan& f) {
+    for(std::size_t g=0;g<p.groups;++g) {
+        if constexpr(L==2) {
+            // Stage the next input group in L2 without evicting the current
+            // group's GFNI working set from L1. Keep prefetches in bounds.
+            if(g+1<p.groups) {
+                const auto* next=reinterpret_cast<const char*>(in+256*(g+1)*L);
+                for(unsigned line=0;line<256*L*16;line+=64) _mm_prefetch(next+line,_MM_HINT_T1);
+            }
+        }
+        groupForward<L>(in+256*g*L,out+groupStride*g,f.outer.data()+16*g,nullptr);
+        groupForward<L>(in+256*g*L+1,out+p.scratchBlocks()+groupStride*g,f.outer.data()+16*g,nullptr);
+        if constexpr(L==4) {
+            groupForward<L>(in+256*g*L+2,out+2*p.scratchBlocks()+groupStride*g,f.outer.data()+16*g,nullptr);
+            groupForward<L>(in+256*g*L+3,out+3*p.scratchBlocks()+groupStride*g,f.outer.data()+16*g,nullptr);
+        }
+    }
+}
+void forwardOuterWide(const Block* in,Block* out,const Plan& p,const ForwardPlan& f,unsigned lanes) {
+    if(lanes==2)outerWide<2>(in,out,p,f);else outerWide<4>(in,out,p,f);
+}
+}
+"""
+# Gathered outer stores are contiguous; it has no routing pointer dependency.
+t=t.replace('route+8*s+4','route').replace('route+8*s','route')
+from generate_packet_forward_wide import outer_k16, inner_k16
+(dest/'PacketForwardOuterWide.cpp').write_text(outer_k16(t))
+t=(dest/'PacketForwardInnerGather.cpp').read_text()
+start=t.index('struct DirectOutput')
+end=t.index('template<unsigned Extra,class Emit>',start)
+t=t[:start]+"""struct EpochOutput {
+    __m512i* packets;
+    SPIN_FORCEINLINE void operator()(std::size_t p,__m512i v) {packets[p&15]=v;}
+};
+template<bool Stream> static SPIN_FORCEINLINE void storeWide(Block* out,__m512i v) {
+    if constexpr(Stream)_mm512_stream_si512(reinterpret_cast<__m512i*>(out),v);
+    else _mm512_storeu_si512(out,v);
+}
+template<unsigned L,bool Stream> static SPIN_FORCEINLINE void emitWide(Block* out,const __m512i (&v)[L][16]) {
+    const auto low=_mm512_setr_epi64(0,1,8,9,2,3,10,11);
+    const auto high=_mm512_setr_epi64(4,5,12,13,6,7,14,15);
+    for(unsigned p=0;p<16;++p) {
+        const auto a=_mm512_permutex2var_epi64(v[0][p],low,v[1][p]);
+        const auto b=_mm512_permutex2var_epi64(v[0][p],high,v[1][p]);
+        if constexpr(L==2) {storeWide<Stream>(out+8*p,a);storeWide<Stream>(out+8*p+4,b);}
+        else {
+            const auto c=_mm512_permutex2var_epi64(v[2][p],low,v[3][p]);
+            const auto d=_mm512_permutex2var_epi64(v[2][p],high,v[3][p]);
+            storeWide<Stream>(out+16*p,_mm512_shuffle_i32x4(a,c,0x44));
+            storeWide<Stream>(out+16*p+4,_mm512_shuffle_i32x4(a,c,0xee));
+            storeWide<Stream>(out+16*p+8,_mm512_shuffle_i32x4(b,d,0x44));
+            storeWide<Stream>(out+16*p+12,_mm512_shuffle_i32x4(b,d,0xee));
+        }
+    }
+}
+"""+t[end:]
+t=t.replace('template<unsigned Extra,class Emit>\nstatic SPIN_NOINLINE void forwardBorder',
+            'template<unsigned L,bool Stream,unsigned Extra=4>\nstatic SPIN_NOINLINE void forwardBorder')
+t=t.replace('const std::uint32_t* route,Emit& emit) {','const std::uint32_t* route,Block* output,std::size_t stride) {')
+t=t.replace('PackedState state{},feedback;PackedExtra extra{};',
+"PackedState states[L]{},feedback;PackedExtra extras[L]{};\n    alignas(64) __m512i results[L][16];")
+t=t.replace('const auto* raw=input;const auto* addresses=route+16*epoch;const bool first=epoch==0;',
+"const auto* addresses=route+16*epoch;const bool first=epoch==0;\n        for(unsigned lane=0;lane<L;++lane) {\n        const auto* raw=input+stride*lane;auto& state=states[lane];auto& extra=extras[lane];\n        EpochOutput emit{results[lane]};")
+t=t.replace('if(epoch+1==n/64)break;', 'if(epoch+1==n/64)continue;')
+t=t.replace('else update(state,extra,feedback,extraFeedback,rows[epoch]);',
+"else update(state,extra,feedback,extraFeedback,rows[epoch]);\n        }\n        emitWide<L,Stream>(output+64*L*epoch,results);")
+t=t[:t.index('void forwardInnerGather(')]+"""
+template<unsigned L> void innerWide(const Block* in,Block* out,const Plan& p,const ForwardPlan& f) {
+    if((reinterpret_cast<std::uintptr_t>(out)&63)==0)
+        forwardBorder<L,true>(in,p.n,f.updates.data(),p.route.data(),out,p.scratchBlocks());
+    else forwardBorder<L,false>(in,p.n,f.updates.data(),p.route.data(),out,p.scratchBlocks());
+    _mm_sfence();
+}
+void forwardInnerWide(const Block* in,Block* out,const Plan& p,const ForwardPlan& f,unsigned lanes) {
+    if(lanes==2)innerWide<2>(in,out,p,f);else innerWide<4>(in,out,p,f);
+}
+}
+"""
+(dest/'PacketForwardInnerWide.cpp').write_text(inner_k16(t, (root/'src/packet/PacketLargeInner.h').read_text()))
 print('Generated exact adjoint outer and fused inner variants.')
 
-for name in ['Outer','Inner','OuterGather','InnerGather']:
+from generate_packet_store_policy import apply_output_stores
+for name in ['Outer','Inner','OuterGather','InnerGather','OuterWide','InnerWide']:
  p=dest/('PacketForward'+name+'.cpp')
- p.write_text(p.read_text(), newline='\n')
+ p.write_text(apply_output_stores(name,p.read_text()), newline='\n')
 if check:
  for p in dest.iterdir():
-  assert p.read_bytes()==(root/"src/packet"/p.name).read_bytes(),p.name+" is stale"
+  assert p.read_text()==(root/"src/packet"/p.name).read_text(),p.name+" is stale"
  print("Production forward sources match generator.")

@@ -7,7 +7,7 @@
 
 extern "C" void* spin_internal_wide_workspace256(const void*) noexcept;
 extern "C" void spin_internal_wide_destroy256(void*) noexcept;
-extern "C" int spin_internal_wide_encode256(const void*,void*,const void*,std::size_t,void*,std::size_t) noexcept;
+extern "C" int spin_internal_wide_encode256(const void*,void*,const void*,std::size_t,void*,std::size_t,bool) noexcept;
 
 int main() {
     if(!spin::capabilities().avx2)return 77;
@@ -31,7 +31,7 @@ int main() {
                 rng^=rng<<13;rng^=rng>>7;rng^=rng<<17;x=kind==0?rng:0;
             }
             if(kind==2)input.back().words[3]=1;
-            if(spin_internal_wide_encode256(&code,work,input.data(),2*k,output.data(),4*k))return 2;
+            if(spin_internal_wide_encode256(&code,work,input.data(),2*k,output.data(),4*k,false))return 2;
             for(unsigned j=0;j<2;++j) {
                 for(std::size_t i=0;i<k;++i)std::memcpy(&lane[i],input[i].words.data()+2*j,16);
                 code.forward(lane.data(),k,expected.data(),2*k,reference,layout);

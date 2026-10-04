@@ -10,6 +10,7 @@ endif()
 option(SPIN_BUILD_TESTS "Build standalone API tests" ${SPIN_TESTS_DEFAULT})
 option(SPIN_BUILD_BENCHMARKS "Build serial setup/encoding benchmark" OFF)
 option(SPIN_BUILD_EXPERIMENTS "Build uncertified permutation routing experiments" OFF)
+option(SPIN_BUILD_RESEARCH_ORACLE_TESTS "Check packet profiles against frozen research implementations (repository checkout required)" OFF)
 set(SPIN_TUNE generic CACHE STRING "Compiler scheduling target (not required ISA)")
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
   message(FATAL_ERROR "This SPIN release requires 64-bit x86; ARM is not yet supported")
@@ -28,6 +29,9 @@ else()
   target_compile_options(spin_kernels PRIVATE -mavx2 -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
 endif()
 add_library(spin STATIC src/Code.cpp src/PreparedEncoder.cpp src/PacketCode.cpp src/Buffer.cpp
+  src/rs8/SetupScalar.cpp
+  src/certified22/Setup.cpp src/certified22/Scalar.cpp
+  src/paired15/Paired15.cpp src/paired15/Paired15Scalar.cpp
   src/packet/PacketSetup.cpp src/packet/PacketForwardSetup.cpp src/packet/PacketScalar.cpp src/Cpu.cpp $<TARGET_OBJECTS:spin_kernels>)
 add_library(spin::spin ALIAS spin)
 target_compile_features(spin PUBLIC cxx_std_20)
@@ -56,8 +60,13 @@ if(SPIN_ENABLE_AVX512)
   # Packet-specific ISA stays in private translation units. Neither setup nor the
   # public API is compiled for AVX-512, and old kernel requirements stay intact.
   add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp
+    src/rs8/Fast.cpp
+    src/certified22/RouteFast.cpp src/certified22/OuterFast.cpp src/certified22/Fast.cpp
+    src/paired15/Paired15Fast.cpp src/paired15/Paired15ForwardOuter.cpp
+    src/packet/PacketCachedInner.cpp src/packet/PacketCachedOuter.cpp
     src/packet/PacketForwardOuter.cpp src/packet/PacketForwardInner.cpp
-    src/packet/PacketForwardOuterGather.cpp src/packet/PacketForwardInnerGather.cpp)
+    src/packet/PacketForwardOuterGather.cpp src/packet/PacketForwardInnerGather.cpp
+    src/packet/PacketForwardOuterWide.cpp src/packet/PacketForwardInnerWide.cpp)
   target_compile_features(spin_packet512 PRIVATE cxx_std_20)
   set_target_properties(spin_packet512 PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
   if(MSVC)
@@ -121,6 +130,24 @@ if(SPIN_BUILD_EXPERIMENTS)
   endforeach()
 endif()
 if(SPIN_BUILD_BENCHMARKS)
+  add_executable(spin_rs8_bench bench/rs8.cpp)
+  target_link_libraries(spin_rs8_bench PRIVATE spin::spin)
+  if(SPIN_BUILD_RESEARCH_ORACLE_TESTS AND SPIN_ENABLE_AVX512)
+    target_sources(spin_rs8_bench PRIVATE experiments/rs8_sizes/Setup15.cpp
+      experiments/rs8_sizes/Route15.cpp experiments/k20_two_ms/rs8/SetupScalar.cpp
+      experiments/k20_two_ms/rs8/Fast.cpp)
+    target_compile_definitions(spin_rs8_bench PRIVATE SPIN_RS8_RESEARCH_ORACLE=1)
+    if(MSVC)
+      target_compile_options(spin_rs8_bench PRIVATE /arch:AVX512)
+    else()
+      target_compile_options(spin_rs8_bench PRIVATE -mavx2 -mavx512f -mavx512vl
+        -mavx512bw -mavx512dq -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
+    endif()
+  endif()
+  add_executable(spin_forward_batch_bench bench/forward_batch.cpp)
+  target_link_libraries(spin_forward_batch_bench PRIVATE spin::spin)
+  add_executable(spin_paired15_bench bench/paired15.cpp)
+  target_link_libraries(spin_paired15_bench PRIVATE spin::spin)
   add_executable(spin_paper_bench bench/paper.cpp)
   target_link_libraries(spin_paper_bench PRIVATE spin::spin)
   add_executable(spin_prepared_bench bench/prepared.cpp)
@@ -135,6 +162,65 @@ if(SPIN_BUILD_BENCHMARKS)
 endif()
 if(SPIN_BUILD_TESTS)
   enable_testing()
+  add_executable(spin_rs8_test tests/rs8.cpp)
+  target_link_libraries(spin_rs8_test PRIVATE spin::spin)
+  add_test(NAME spin_rs8 COMMAND spin_rs8_test)
+  set_tests_properties(spin_rs8 PROPERTIES RUN_SERIAL TRUE)
+  add_executable(spin_certified22_test tests/certified22.cpp)
+  target_link_libraries(spin_certified22_test PRIVATE spin::spin)
+  add_test(NAME spin_certified22 COMMAND spin_certified22_test)
+  set_tests_properties(spin_certified22 PROPERTIES RUN_SERIAL TRUE)
+  add_executable(spin_paired15_test tests/paired15.cpp)
+  target_link_libraries(spin_paired15_test PRIVATE spin::spin)
+  add_test(NAME spin_paired15 COMMAND spin_paired15_test)
+  set_tests_properties(spin_paired15 PROPERTIES RUN_SERIAL TRUE)
+  if(SPIN_BUILD_RESEARCH_ORACLE_TESTS AND SPIN_ENABLE_AVX512)
+    add_executable(spin_rs8_research_test tests/rs8_research.cpp
+      experiments/rs8_sizes/Setup15.cpp experiments/rs8_sizes/Route15.cpp
+      experiments/k20_two_ms/rs8/SetupScalar.cpp experiments/k20_two_ms/rs8/Fast.cpp)
+    target_link_libraries(spin_rs8_research_test PRIVATE spin::spin)
+    if(MSVC)
+      target_compile_options(spin_rs8_research_test PRIVATE /arch:AVX512)
+    else()
+      target_compile_options(spin_rs8_research_test PRIVATE -mavx2 -mavx512f -mavx512vl
+        -mavx512bw -mavx512dq -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
+    endif()
+    add_test(NAME spin_rs8_research COMMAND spin_rs8_research_test)
+    set_tests_properties(spin_rs8_research PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+    set(PAIRED15_RESEARCH experiments/k16_codesign_100us)
+    set(PAIRED15_RETAINED ${CMAKE_CURRENT_SOURCE_DIR}/../research/workstreams/k16_design/implementation)
+    add_executable(spin_certified22_research_test tests/certified22_research.cpp
+      ${PAIRED15_RETAINED}/RsSetup.cpp ${PAIRED15_RESEARCH}/ScalarAdapters.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16NativeSetup.cpp
+      experiments/k18_certified22/K18Setup.cpp experiments/k18_certified22/K18Scalar.cpp)
+    target_link_libraries(spin_certified22_research_test PRIVATE spin::spin)
+    if(MSVC)
+      target_compile_options(spin_certified22_research_test PRIVATE /arch:AVX512)
+    else()
+      target_compile_options(spin_certified22_research_test PRIVATE -mavx2 -mavx512f -mavx512vl
+        -mavx512bw -mavx512dq -mavx512vbmi -mgfni -fno-strict-aliasing -fno-lto)
+    endif()
+    add_test(NAME spin_certified22_research COMMAND spin_certified22_research_test)
+    set_tests_properties(spin_certified22_research PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+    add_executable(spin_paired15_research_test tests/paired15_research.cpp
+      ${PAIRED15_RETAINED}/RsSetup.cpp ${PAIRED15_RESEARCH}/ScalarAdapters.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16NativeSetup.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16Paired15Scalar.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16Paired15Setup.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16Paired15ShuffleSetup.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16PairedBasisSetup.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16PairedOptimizedSetup.cpp
+      ${PAIRED15_RESEARCH}/kernel/K16Paired.cpp)
+    target_link_libraries(spin_paired15_research_test PRIVATE spin::spin)
+    if(MSVC)
+      target_compile_options(spin_paired15_research_test PRIVATE /arch:AVX512)
+    else()
+      target_compile_options(spin_paired15_research_test PRIVATE -mavx2 -mavx512f -mavx512vl
+        -mavx512bw -mavx512dq -mavx512vbmi -mgfni -fno-strict-aliasing -fno-lto)
+    endif()
+    add_test(NAME spin_paired15_research COMMAND spin_paired15_research_test)
+    set_tests_properties(spin_paired15_research PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+  endif()
   find_package(Threads REQUIRED)
   add_executable(spin_packet_test tests/packet.cpp)
   target_link_libraries(spin_packet_test PRIVATE spin::spin Threads::Threads)

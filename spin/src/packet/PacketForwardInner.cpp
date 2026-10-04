@@ -241,7 +241,14 @@ static SPIN_FORCEINLINE void update(PackedState& state,PackedExtra& extra,const 
     state.v[0]=n0;state.v[1]=n1;state.v[2]=n2;state.v[3]=n3;
     extra.lo=n4;extra.hi=n5;
 }
-struct DirectOutput {Block* output; SPIN_FORCEINLINE void operator()(std::size_t p,__m512i v) {_mm512_storeu_si512(output+4*p,v);}};
+template<bool Stream> static SPIN_FORCEINLINE void storeOutput(Block* out,__m512i value) {
+    if constexpr(Stream)_mm512_stream_si512(reinterpret_cast<__m512i*>(out),value);
+    else _mm512_storeu_si512(out,value);
+}
+template<bool Stream> struct DirectOutput {
+    Block* output;
+    SPIN_FORCEINLINE void operator()(std::size_t p,__m512i value) {storeOutput<Stream>(output+4*p,value);}
+};
 template<unsigned Extra,class Emit>
 static SPIN_NOINLINE void forwardBorder(const Block* input,std::size_t n,const BorderRow* rows,const std::uint32_t* route,Emit& emit) {
     alignas(64) __m128i words[16],extraWords[4],moments[64],syndrome[16],extraSyndrome[4];
@@ -278,5 +285,14 @@ static SPIN_NOINLINE void forwardBorder(const Block* input,std::size_t n,const B
     }
 }
 }
-void forwardInner(const Block* in,Block* out,const Plan& p,const ForwardPlan& f) {DirectOutput emit{out};forwardBorder<4>(in,p.n,f.updates.data(),p.route.data(),emit);_mm_sfence();}
+void forwardInner(const Block* in,Block* out,const Plan& p,const ForwardPlan& f,bool stream) {
+    if(stream && (reinterpret_cast<std::uintptr_t>(out)&63U)==0) {
+        DirectOutput<true> emit{out};
+        forwardBorder<4>(in,p.n,f.updates.data(),p.route.data(),emit);
+        _mm_sfence();
+    } else {
+        DirectOutput<false> emit{out};
+        forwardBorder<4>(in,p.n,f.updates.data(),p.route.data(),emit);
+    }
+}
 }

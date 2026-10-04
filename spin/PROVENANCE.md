@@ -1,6 +1,41 @@
 # Kernel generation record
 
-The current packet construction is imported by `tools/import_rs_packet.py`
+`PacketRs8T64` (identifier 8) promotes the common RS8 outer from
+`experiments/k20_two_ms/rs8`, with the paired-s15 inner through K16 and the
+exact s22 inner above it. Its package-owned `src/rs8` module preserves the
+field basis, sampling domain, and unrolled flat-nine-product outer schedule.
+The existing inner modules expose their route stages without generating the
+unused RS16 outer tables. Earlier profile identifiers and seeded maps are unchanged.
+Ordinary builds have no research-source dependency. Optional frozen-reference
+checks and the [profile record](RS8.md) document this promotion.
+
+`PacketRsT64S22` (identifier 7) preserves the exact K18 certified22 maps and
+the native GF(2^16) small outer. Its independent `src/certified22` module ports
+the measured packed-state route and cached/streaming outer schedules from
+`experiments/k20_small_outer`; setup and scalar references preserve the original
+research streams. It does not include research sources in ordinary builds.
+The [profile record](CERTIFIED22.md) identifies certificate scope and validation.
+Frozen research controls and earlier profile identifiers remain unchanged.
+
+Forward output-store selection is a package-owned execution option. The IMT
+importer preserves it through `tools/output_stores_overlay.patch`, with exact
+context checks. Packet forward generation applies
+`tools/generate_packet_store_policy.py` after deriving the retained schedules.
+These overlays specialize output writers and dispatch; they do not change the
+binary maps, XOR schedules, or descriptors. Streaming is the public `Code`
+default, and callers can request cached output on each forward call.
+
+`PacketRsT64S15K16` (identifier 6) promotes the frozen
+`k16-rs16-paired15-v1` construction. Its separate `src/paired15` module preserves
+the mode-52 transpose schedule and setup streams. The forward outer is the
+binary adjoint of the retained circuit; the forward inner uses transposed state
+updates and direct gathers through the same routing table. The independent
+scalar implementation constructs the RS matrix by interpolation.
+Both generators in that directory provide `--check` and record source hashes.
+The optional frozen-research test compares both public directions byte-for-byte;
+ordinary builds have no research or Python dependency. See [the profile](PAIRED15.md).
+
+The s20 packet construction is imported by `tools/import_rs_packet.py`
 from the frozen RS research implementation in
 `research/workstreams/k16_design/implementation/rs16x8_border`.
 Generated files record their input hashes. The importer retains the selected

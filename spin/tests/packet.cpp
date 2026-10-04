@@ -1,5 +1,6 @@
 #include <spin/PacketCode.h>
 #include <spin/PreparedEncoder.h>
+#include "forward_output_stores.h"
 #include "../src/packet/PacketPlan.h"
 #include <algorithm>
 #include <array>
@@ -397,7 +398,7 @@ static void unifiedCode() {
         require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:spin::Backend::Portable),"unified packet backend");
         require(reference.backend()==spin::Backend::Portable && reference.descriptor()==code.descriptor(),"unified portable descriptor");
         require(code.supports_transpose() && code.supports_forward() && !code.supports_generic_transpose(),"unified packet capabilities");
-        require(!code.supports_transpose(spin::Width::Bits256) && !code.supports_forward(spin::Width::Bits512),"unified packet wide capability");
+        require(!code.supports_transpose(spin::Width::Bits256) && code.supports_forward(spin::Width::Bits512),"unified packet wide capability");
         std::vector<Block> input(2*k),expected(k),actual(k);fill(input);
         const auto original=input;
         noAlloc([&]{reference.transpose<Block>(input,expected,rw);code.transpose<Block>(input,actual,work);});
@@ -431,7 +432,7 @@ static void unifiedCode() {
         rejects([&]{code.generic_transpose();});
         std::vector<std::uint64_t> bitInput(k/64),bitOutput(2*k/64),bitScratch(2*k/64);
         rejects([&]{code.forward_bits(bitInput,bitOutput,bitScratch);});
-        for(auto width:{spin::Width::Bits256,spin::Width::Bits512,static_cast<spin::Width>(17)}) {
+        for(auto width:{static_cast<spin::Width>(17)}) {
             rejects([&]{code.make_workspace(width);});rejects([&]{code.make_buffer(width);});
         }
         spin::Code other(spec);auto wrong=other.make_workspace();
@@ -671,6 +672,47 @@ static void forwardApi() {
     }
 }
 
+
+static void forwardWideApi() {
+    constexpr auto family=spin::Parameters::PacketRsT64S20;
+    for(auto k:{256U,768U,65536U,262400U})for(auto backend:{spin::Backend::Portable,spin::Backend::Automatic}) {
+        spin::Code code({k,family,17,43},{backend});auto rw=code.make_workspace();
+        spin::Buffer plane(k*16),expected(2*k*16);
+        for(auto width:{spin::Width::Bits256,spin::Width::Bits512}) {
+            const unsigned lanes=static_cast<unsigned>(width)/16;
+            auto w=code.make_workspace(width);
+            spin::Buffer input(k*16*lanes+64),output(2*k*16*lanes+128);
+            auto in=input.bytes().subspan(16,k*16*lanes);
+            auto before=std::vector<std::byte>(in.size());
+            for(unsigned mode=0;mode<3;++mode) {
+                fill({reinterpret_cast<Block*>(in.data()),k*lanes},mode+91);
+                if(mode)std::fill(in.begin(),in.end(),std::byte{});
+                if(mode==2){in.front()=std::byte{1};in.back()=std::byte{128};}
+                std::copy(in.begin(),in.end(),before.begin());
+                for(unsigned offset:{0U,16U,32U,48U}) {
+                    std::fill(output.bytes().begin(),output.bytes().end(),std::byte{0xa5});
+                    auto out=output.bytes().subspan(64+offset,2*k*16*lanes);
+                    noAlloc([&]{code.forward_bytes(in,out,w);});
+                    for(unsigned lane=0;lane<lanes;++lane) {
+                        for(unsigned i=0;i<k;++i)std::memcpy(plane.bytes().data()+16*i,in.data()+16*(i*lanes+lane),16);
+                        code.forward_bytes(plane.bytes(),expected.bytes(),rw);
+                        for(unsigned i=0;i<2*k;++i)require(!std::memcmp(expected.bytes().data()+16*i,out.data()+16*(i*lanes+lane),16),"wide plane oracle");
+                    }
+                    require(std::equal(in.begin(),in.end(),before.begin()),"wide input changed");
+                    require(std::all_of(output.bytes().begin(),out.begin(),[](auto x){return x==std::byte{0xa5};}),"wide prefix guard");
+                    require(std::all_of(out.end(),output.bytes().end(),[](auto x){return x==std::byte{0xa5};}),"wide suffix guard");
+                }
+            }
+            spin::Code other({k,family,43,17},{backend});
+            rejects([&]{other.forward_bytes(in,output.bytes().first(2*k*16*lanes),w);});
+            noAlloc([&]{other.prepare_workspace(w);other.forward_bytes(in,output.bytes().first(2*k*16*lanes),w);});
+            auto ow=other.make_workspace(width);spin::Buffer rebound(2*k*16*lanes);
+            other.forward_bytes(in,rebound.bytes(),ow);
+            require(!std::memcmp(rebound.bytes().data(),output.bytes().data(),rebound.bytes().size()),"wide workspace rebind");
+        }
+    }
+}
+
 int main() {try {
     for(auto k:{std::size_t{0},std::size_t{1},std::size_t{255},std::size_t{257},std::size_t{511},std::size_t{513},std::numeric_limits<std::size_t>::max()}) {
         require(!spin::valid_packet_message_size(k),"invalid K query accepted");rejects([&]{spin::PacketCode c({k,1});});
@@ -680,9 +722,18 @@ int main() {try {
         bool failed=false;try{spin::PacketCode c({512,1},spin::PacketBackend::Avx512Gfni);}catch(const std::runtime_error&){failed=true;}
         require(failed,"forced unavailable packet ISA");
     }
-    for(auto k:{256U,512U,768U,1024U,1536U,2560U,4096U,12288U,65536U,262144U})for(auto seed:{1ULL,17ULL})test(k,seed);
+    for(auto k:{256U,512U,768U,1024U,1536U,2560U,4096U,12288U,65280U,65536U,65792U,261888U,262144U,262400U})for(auto seed:{1ULL,17ULL})test(k,seed);
     sizing();largePacket();retiredFamily();knownAnswers();coordinateBasis();binaryAdjoint();concurrent();commonBuffers();unifiedCode();preparedPacket();
-    workspaceConversions();movedUnifiedHandles();automaticMemory();forwardApi();
+    workspaceConversions();movedUnifiedHandles();automaticMemory();forwardApi();forwardWideApi();
+    for(auto k:{768U,262400U})for(auto backend:{spin::Backend::Portable,spin::Backend::Automatic}) {
+        spin::Code stores({k,spin::Parameters::PacketRsT64S20,17,43},{backend});
+        spin::test::forwardOutputStores(stores,[](auto operation){noAlloc(operation);});
+    }
+    {
+        // K16 has a distinct 256-bit forward schedule from the general wide path.
+        spin::Code stores({65536,spin::Parameters::PacketRsT64S20,17,43});
+        spin::test::forwardOutputStores(stores,[](auto operation){noAlloc(operation);});
+    }
     std::cout<<"packet API PASS: scalar/fast, research known answers, coordinate basis, natural sizes and K20, retired family rejection, unified/prepared APIs, buffers, boundaries, alignment, ownership, no allocation\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

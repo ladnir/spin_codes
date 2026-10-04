@@ -102,8 +102,15 @@ void reverseRoute(const Block* input,Block* scratch,const Plan& plan) {
     reverseBorder<4>(input,plan.n,plan.updates.data(),emit);
     _mm_sfence();
 }
+
 void transposeFast(const Block* input,Block* output,Block* scratch,const Plan& plan) {
+    if(plan.k<=262144) {
+        reverseRouteCached(input,scratch,plan);
+        outerFastCached(scratch,output,plan);
+        return;
+    }
     reverseRoute(input,scratch,plan);
     outerFast(scratch,output,plan);
 }
+
 } // namespace spin::detail::packet

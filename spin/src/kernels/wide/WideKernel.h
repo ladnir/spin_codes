@@ -34,12 +34,14 @@ struct Ops {
     static SPIN_FORCEINLINE Vec vx(Vec a,Vec b) { return _mm256_xor_si256(a,b); }
     static SPIN_FORCEINLINE Vec load(const Vec* p) { return _mm256_loadu_si256(p); }
     static SPIN_FORCEINLINE void store(Vec* p,Vec v) { _mm256_storeu_si256(p,v); }
+    static SPIN_FORCEINLINE void stream(Vec* p,Vec v) { _mm256_stream_si256(p,v); }
 #else
     using Vec=__m512i;
     static SPIN_FORCEINLINE Vec zero() { return _mm512_setzero_si512(); }
     static SPIN_FORCEINLINE Vec vx(Vec a,Vec b) { return _mm512_xor_si512(a,b); }
     static SPIN_FORCEINLINE Vec load(const Vec* p) { return _mm512_loadu_si512(p); }
     static SPIN_FORCEINLINE void store(Vec* p,Vec v) { _mm512_storeu_si512(p,v); }
+    static SPIN_FORCEINLINE void stream(Vec* p,Vec v) { _mm512_stream_si512(p,v); }
 #endif
 };
 using Vec=Ops::Vec;
@@ -82,14 +84,20 @@ template<class Map> struct RegisterFeedback:Map {
         else Map::feedback(in,out);
     }
 };
-template<class Map> __attribute__((noinline)) static void registerInner(
+template<class Map,bool Stream> __attribute__((noinline)) static void registerInner(
     Spin::WideView view,Workspace& w,Vec* out) {
-    Circuit::innerForward<RegisterFeedback<Map>>(view.n,view.fieldRows,[&](std::size_t i) {
+    Circuit::innerForward<RegisterFeedback<Map>,Stream>(view.n,view.fieldRows,[&](std::size_t i) {
         return w.buckets[w.direct_slots[i]];
     },out);
 }
 #endif
-template<class Map,bool Registers> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w) {
+template<class Map,bool Stream> static SPIN_FORCEINLINE void inner(
+    Spin::WideView view,Workspace& w,Vec* out) {
+    Circuit::innerForward<Map,Stream>(view.n,view.fieldRows,[&](std::size_t i) {
+        return w.buckets[w.direct_slots[i]];
+    },out);
+}
+template<class Map,bool Registers> static void encode(Spin::WideView view,const Vec* in,Vec* out,Workspace& w,bool stream) {
     auto* values=w.buckets.data();
     for(std::size_t base=0;base<view.n;base+=view.tile) {
         const auto active=std::min(view.tile,view.n-base);
@@ -104,17 +112,20 @@ template<class Map,bool Registers> static void encode(Spin::WideView view,const 
         }
     }
 #if defined(SPIN_WIDE_REGISTERS)
-    if constexpr(Registers) {registerInner<Map>(view,w,out);return;}
+    if constexpr(Registers) {
+        if(stream) registerInner<Map,true>(view,w,out);
+        else registerInner<Map,false>(view,w,out);
+        return;
+    }
 #endif
-    Circuit::innerForward<Map>(view.n,view.fieldRows,[&](std::size_t i) {
-        return values[w.direct_slots[i]];
-    },out);
+    if(stream) inner<Map,true>(view,w,out);
+    else inner<Map,false>(view,w,out);
 }
-template<class Map> static void dispatch(Spin::WideView v,const Vec* in,Vec* out,Workspace& w) {
+template<class Map> static void dispatch(Spin::WideView v,const Vec* in,Vec* out,Workspace& w,bool stream) {
 #if defined(SPIN_WIDE_REGISTERS)
-    if(w.registers) {encode<Map,true>(v,in,out,w);return;}
+    if(w.registers) {encode<Map,true>(v,in,out,w,stream);return;}
 #endif
-    encode<Map,false>(v,in,out,w);
+    encode<Map,false>(v,in,out,w,stream);
 }
 
 }
@@ -131,7 +142,7 @@ extern "C" std::size_t HC_NAME(spin_internal_wide_bytes)(const void* work) noexc
     return w.buckets.capacity()*(HC_WIDE_BITS/8)+w.direct_slots.capacity()*sizeof(std::uint32_t);
 }
 extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,const void* in,
-                                            std::size_t ni,void* out,std::size_t no) noexcept {
+                                            std::size_t ni,void* out,std::size_t no,bool stream) noexcept {
     try {
         const auto v=static_cast<const spin::detail::kernel::Spin*>(code)->wideForwardView();
         auto& w=*static_cast<spin::detail::kernel::HC_NS::Workspace*>(work);
@@ -143,8 +154,11 @@ extern "C" int HC_NAME(spin_internal_wide_encode)(const void* code,void* work,co
         using namespace spin::detail::kernel;
         using Ops=HC_NS::Ops;
         const auto* input=static_cast<const HC_NS::Vec*>(in);auto* output=static_cast<HC_NS::Vec*>(out);
-        if(v.configuration==Configuration::T64S12R2) HC_NS::dispatch<WideMap64S12R2<Ops>>(v,input,output,w);
-        else HC_NS::dispatch<WideMap128S19<Ops>>(v,input,output,w);
+        // Streaming stores require vector alignment. Unaligned caller buffers
+        // use the cached storeu circuit, selected once before encoding.
+        stream=stream && (b&(HC_WIDE_BITS/8-1))==0;
+        if(v.configuration==Configuration::T64S12R2) HC_NS::dispatch<WideMap64S12R2<Ops>>(v,input,output,w,stream);
+        else HC_NS::dispatch<WideMap128S19<Ops>>(v,input,output,w,stream);
         return 0;
     } catch(...) { return 1; }
 }
