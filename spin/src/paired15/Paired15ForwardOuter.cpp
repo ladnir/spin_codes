@@ -158,15 +158,91 @@ static SPIN_NOINLINE void groupForward(const Block* input,Block* output,std::siz
         (mixSymbol(packed.v[Lane]+4*symbol,output+Lane*stride+16*symbol,m0,m1,m2),...);
     }
 }
+template<unsigned P>
+static SPIN_FORCEINLINE void packNarrowHalf(const Block* input, Packed<1>& packed) {
+    static_assert(P == 0 || P == 2);
+    const auto x0 = _mm512_loadu_si512(input + 32 * P + 4 * 0);
+    const auto x1 = _mm512_loadu_si512(input + 32 * P + 4 * 1);
+    const auto x2 = _mm512_loadu_si512(input + 32 * P + 4 * 2);
+    const auto x3 = _mm512_loadu_si512(input + 32 * P + 4 * 3);
+    const auto x4 = _mm512_loadu_si512(input + 32 * P + 4 * 4);
+    const auto x5 = _mm512_loadu_si512(input + 32 * P + 4 * 5);
+    const auto x6 = _mm512_loadu_si512(input + 32 * P + 4 * 6);
+    const auto x7 = _mm512_loadu_si512(input + 32 * P + 4 * 7);
+    const auto y0 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 0);
+    const auto y1 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 1);
+    const auto y2 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 2);
+    const auto y3 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 3);
+    const auto y4 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 4);
+    const auto y5 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 5);
+    const auto y6 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 6);
+    const auto y7 = _mm512_loadu_si512(input + 32 * (P + 1) + 4 * 7);
+    // Keep all sixteen demand loads ahead of packing. This empty compiler
+    // barrier requires live ZMM inputs but emits no CPU fence or instruction.
+    // Other compilers retain the same arithmetic with their own load schedule.
+#if defined(__GNUC__) || defined(__clang__)
+    asm volatile("" : : "v"(x0), "v"(x1), "v"(x2), "v"(x3),
+                          "v"(x4), "v"(x5), "v"(x6), "v"(x7),
+                          "v"(y0), "v"(y1), "v"(y2), "v"(y3),
+                          "v"(y4), "v"(y5), "v"(y6), "v"(y7) : "memory");
+#endif
+    packMessage<0, P>(x0, y0, packed.v[0]);
+    packMessage<1, P>(x1, y1, packed.v[0]);
+    packMessage<2, P>(x2, y2, packed.v[0]);
+    packMessage<3, P>(x3, y3, packed.v[0]);
+    packMessage<4, P>(x4, y4, packed.v[0]);
+    packMessage<5, P>(x5, y5, packed.v[0]);
+    packMessage<6, P>(x6, y6, packed.v[0]);
+    packMessage<7, P>(x7, y7, packed.v[0]);
+}
+
+static SPIN_NOINLINE void groupForwardNarrowBatched(
+    const Block* input, Block* output, const std::array<std::uint64_t, 3>* coeff) {
+    Packed<1> packed;
+    packNarrowHalf<0>(input, packed);
+    packNarrowHalf<2>(input, packed);
+    parityPlanes(packed.v[0]);
+    for(unsigned symbol = 0; symbol < 16; ++symbol) {
+        const auto m0 = _mm512_set1_epi64(coeff[symbol][0]);
+        const auto m1 = _mm512_set1_epi64(coeff[symbol][1]);
+        const auto m2 = _mm512_set1_epi64(coeff[symbol][2]);
+        mixSymbol(packed.v[0] + 4 * symbol, output + 16 * symbol, m0, m1, m2);
+    }
+}
+
+template<std::size_t... Line>
+static SPIN_FORCEINLINE void prefetchNarrowGroup(
+    const Block* input, std::index_sequence<Line...>) {
+    (_mm_prefetch(reinterpret_cast<const char*>(input) + 64 * Line, _MM_HINT_T1), ...);
+}
+
+static SPIN_FORCEINLINE void runNarrowGroup(
+    const Block* input, Block* scratch, const Plan& p, std::size_t group) {
+    groupForwardNarrowBatched(input + 128 * group, scratch + groupStride * group,
+                             p.outerAdjoint.data() + 16 * group);
+}
+
 template<unsigned L> void outer(const Block* input,Block* scratch,const Plan& p) {
     for(std::size_t group=0;group<p.groups;++group)
         groupForward<L>(input+128*L*group,scratch+groupStride*group,p.scratchBlocks(),
                         p.outerAdjoint.data()+16*group,std::make_integer_sequence<unsigned,L>{});
 }
 }
-void forwardOuterFast(const Block* input,Block* scratch,const Plan& p,unsigned lanes) {
-    if(lanes==1)outer<1>(input,scratch,p);
-    else if(lanes==2)outer<2>(input,scratch,p);
-    else outer<4>(input,scratch,p);
+void forwardOuterFast(const Block* input, Block* scratch, const Plan& p, unsigned lanes) {
+    if(lanes != 1) {
+        if(lanes==2)outer<2>(input,scratch,p);
+        else outer<4>(input,scratch,p);
+        return;
+    }
+    std::size_t group = 0;
+    const auto prefetchedGroups = p.groups > 1 ? p.groups - 1 : 0;
+    for(; group < prefetchedGroups; ++group) {
+        prefetchNarrowGroup(input + 128 * (group + 1), std::make_index_sequence<32>{});
+        runNarrowGroup(input, scratch, p, group);
+    }
+    // No prefetch outside the caller's message, including on the final group.
+    for(; group < p.groups; ++group)
+        runNarrowGroup(input, scratch, p, group);
 }
+
 }

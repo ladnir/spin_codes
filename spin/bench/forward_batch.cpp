@@ -33,7 +33,7 @@ constexpr unsigned warmupBatches = 3;
 constexpr std::uint64_t inputSeed = 913;
 constexpr std::byte guardValue{0xa5};
 constexpr std::string_view usage =
-    "usage: spin_forward_batch_bench imt|packet|paired15 128|256 hot|g24|g92 "
+    "usage: spin_forward_batch_bench imt|packet|paired15 128|256|512 hot|g16|g24|g92|g512 "
     "reused|cold|produced cached|streaming ROUTE_SEED INNER_SEED ITERATIONS normal|huge|automatic|flock\n"
     "       spin_forward_batch_bench --self-test";
 
@@ -67,14 +67,17 @@ Config parse(int argc, char** argv) {
     else if(c.profile == "paired15") c.parameters = spin::Parameters::PacketRsT64S15K16;
     else throw std::invalid_argument("profile must be imt, packet, or paired15");
     const auto bits = number(argv[2], "width");
-    if(bits != 128 && bits != 256) throw std::invalid_argument("width must be 128 or 256");
+    if(bits != 128 && bits != 256 && bits != 512)
+        throw std::invalid_argument("width must be 128, 256 or 512");
     c.bits = unsigned(bits);
     c.width = static_cast<spin::Width>(c.bits/8);
     c.shape = argv[3];
     if(c.shape == "hot") c.calls = 1;
+    else if(c.shape == "g16") c.calls = 16/(c.bits/128);
     else if(c.shape == "g24") c.calls = 24/(c.bits/128);
     else if(c.shape == "g92") c.calls = 92/(c.bits/128);
-    else throw std::invalid_argument("shape must be hot, g24, or g92");
+    else if(c.shape == "g512") c.calls = 512/(c.bits/128);
+    else throw std::invalid_argument("shape must be hot, g16, g24, g92 or g512");
     c.cacheName = argv[4];
     if(c.cacheName == "reused") c.cache = CacheMode::Reused;
     else if(c.cacheName == "cold") c.cache = CacheMode::Cold;
@@ -269,7 +272,44 @@ void selfTest() {
     }
     if(number("18446744073709551615","self-test") != UINT64_MAX)
         throw std::runtime_error("integer parser rejected maximum seed");
-    std::cout << "PASS: deterministic SSE2 cache preparation, guards, and strict integer parsing\n";
+    // Check exact call counts at every width, including the existing shapes.
+    // No large allocation or encoding is needed to validate the CLI geometry.
+    struct ShapeCase {const char* name;std::size_t calls[3];std::size_t inputMiB;};
+    constexpr ShapeCase shapes[] = {
+        {"hot", {1,1,1},0}, {"g16", {16,8,4},16},
+        {"g24", {24,12,6},24}, {"g92", {92,46,23},92},
+        {"g512", {512,256,128},512}};
+    const char* widths[] = {"128","256","512"};
+    const char* arguments[] = {"spin_forward_batch_bench","paired15","128","g16",
+                              "reused","streaming","1","2","7","normal"};
+    char* testArgv[10];
+    for(unsigned i=0;i<10;++i)testArgv[i]=const_cast<char*>(arguments[i]);
+    for(unsigned width=0;width<3;++width)for(const auto& shape:shapes) {
+        testArgv[2]=const_cast<char*>(widths[width]);
+        testArgv[3]=const_cast<char*>(shape.name);
+        const auto c=parse(10,testArgv);
+        const auto bits=128U<<width;
+        const auto inputBytes=c.calls*k*(c.bits/8);
+        const auto expectedBytes=shape.inputMiB ? shape.inputMiB*(std::size_t{1}<<20)
+                                              : k*(bits/8);
+        if(c.bits!=bits || c.width!=static_cast<spin::Width>(bits/8) ||
+           c.calls!=shape.calls[width] || c.shape!=shape.name || inputBytes!=expectedBytes)
+            throw std::runtime_error("batch CLI geometry mismatch");
+    }
+    testArgv[3]=const_cast<char*>("g16");
+    for(const auto width:{"64","384","1024"}) {
+        testArgv[2]=const_cast<char*>(width);
+        bool rejected=false;
+        try {(void)parse(10,testArgv);}catch(const std::invalid_argument&){rejected=true;}
+        if(!rejected)throw std::runtime_error("batch CLI accepted unsupported width");
+    }
+    testArgv[2]=const_cast<char*>("512");
+    testArgv[3]=const_cast<char*>("g17");
+    bool rejected=false;
+    try {(void)parse(10,testArgv);}catch(const std::invalid_argument&){rejected=true;}
+    if(!rejected)throw std::runtime_error("batch CLI accepted unsupported shape");
+    std::cout << "PASS: deterministic SSE2 cache preparation, guards, strict integer parsing, "
+                 "and all five batch shapes at 128/256/512 bits\n";
 }
 
 void run(const Config& c) {
