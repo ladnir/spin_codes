@@ -416,6 +416,10 @@ For FLOCK-sized forward batches, also build `spin_forward_batch_bench`.
 It compares cached and streaming output over distinct K16 codewords, with
 producer-written input, reused-buffer controls, or explicit cache eviction.
 It records raw samples, full-output checks, and allocation/advice details.
+The driver accepts 128/256/512-bit records and `g16`/`g512` batches for
+matched 16 MiB/512 MiB workloads. The paired-s15 128-bit forward path now
+uses the [sixteen-cache-line load schedule](bench/LOAD16_20261031.md)
+originally measured in Hypercat.
 Measure the complete consumer workload, including subsequent hashing, before
 extrapolating a single-call measurement to commitment performance.
 `spin_packet_bench K [seed] [calls] [auto|normal|huge]` measures precomputed

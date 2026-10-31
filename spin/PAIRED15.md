@@ -51,6 +51,14 @@ Streaming avoids the output traffic regression observed when encoding complete
 FLOCK matrices, while cached stores can suit a reused standalone output buffer.
 Workspace scratch is owned, aligned, and reusable across compatible setups.
 
+The AVX-512 128-bit forward path batches sixteen cache-line loads before
+packing each half of an outer group, with one-group L2 prefetch. It uses the
+same arithmetic and workspace as before. The wider paths retain their
+original schedule. See the [load-schedule comparison](bench/LOAD16_20261031.md)
+for standalone and full-PCS measurements. Regenerate this kernel with
+`python src/paired15/generate_forward_outer.py`; `--check` verifies that the
+checked-in source matches its generator.
+
 The standalone `spin_paired15_test` checks scalar/SIMD agreement, all forward
 widths, adjoint identities, alignment, guards, workspace reuse, and allocation
 behavior. It also checks both output policies against the default, typed calls,
