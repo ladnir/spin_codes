@@ -21,13 +21,20 @@ The [selected shared-outer candidate](SHARED_OUTER_CANDIDATE.md) uses
 the exact RS8 expected enumerator to show that fixed local profiles
 with packet minimum distance at least 19 exist. It has no global
 distance certificate yet; sharing a profile changes the outer proof.
+The [pair-return obstruction](PAIR_RETURN_OBSTRUCTION.md) shows that
+even a selected good fixed outer cannot support an asymptotic
+`1-o(1)` positive-distance theorem with the current fixed-width route
+and uniform-GL inner: a fixed one-group message has a small but
+length-independent probability of pairwise state returns and output
+weight at most `N/16`. The shared-profile candidate remains relevant
+only to finite-size or redesigned-inner questions.
 
-**Next decision.** Test a concrete selected shared RS8 profile against
-the one-active-group tail and the full outer spectrum. If that route
-does not yield a scalable proof at acceptable setup cost, retain the
-older growing-outer theorem and pursue Turbo only as a finite-size
-construction. The finite K=2^22/2^24 certificate sweep is independent
-of this asymptotic decision.
+**Next decision.** Retain the older growing-outer theorem and pursue
+current Turbo as a finite-size construction. To seek a new scalable
+Turbo family, test a growing supergroup built from the existing fast
+RS8 kernel, or a route/inner rule that rules out the pair-return event.
+The finite K=2^22/2^24 certificate sweep is independent of this
+asymptotic redesign.
 
 ## Baseline and gaps
 

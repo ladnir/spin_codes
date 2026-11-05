@@ -7,6 +7,10 @@ next construction samples eight GF(2^32) column multipliers once,
 selects a favorable tuple, and reuses it for all groups. Independent
 group packet shuffles and regional permutations remain. This is a
 candidate, not a distance certificate or an implementation win.
+The later [pair-return obstruction](PAIR_RETURN_OBSTRUCTION.md) rules
+out an asymptotic high-probability distance theorem for this candidate
+with the unchanged fixed-width route and uniform-GL inner. Its scope
+is therefore finite-size analysis or a route/inner redesign.
 
 ## Exact local selection budget
 
@@ -69,7 +73,7 @@ Efficiently certifying one profile is a separate problem. A low-packet-
 weight search can be formulated as binary rank tests on the subcode
 shortened outside each candidate packet support, exploiting the RS
 column structure. No complete search or explicit tuple is recorded yet.
-The next gate is to find and verify a concrete profile and then test
-one-active-group output tails for that fixed local spectrum. A failure
-there would motivate changing the route or inner rather than tuning
-the first-moment weights around the old distribution.
+Because the pair-return obstruction survives every fixed profile, such
+a search is useful only if a fixed outer improves finite-size setup or
+is paired with a redesigned route/inner. It is no longer a standalone
+asymptotic-proof gate.
