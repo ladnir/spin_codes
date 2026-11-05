@@ -27,6 +27,10 @@ selected shared RS8 outer or independently conditioned good local
 profiles **if their route and GL updates remain as above**. It does
 not undermine any finite-size certificate. The lower bound is
 astronomically small.
+The manuscript already discusses the broader constant-outer-memory
+limitation in its Bazzi--Mahdian--Spielman section. The event here is a
+specific witness for the Turbo setup law and map, not a claim of a new
+general limitation on serial concatenation.
 
 ## One-group event
 

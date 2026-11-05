@@ -2,6 +2,15 @@
 
 ## Root cause
 
+The manuscript already cites the Bazzi--Mahdian--Spielman limitation
+for depth-two serial concatenation: a constant-memory outer paired
+with a sublinear-memory inner cannot give an asymptotically good code
+in that setting; see `research/paper/supporting_bms.tex`. Its fixed
+BCH-256 Structured SPIN profile is accordingly a finite-length
+instance, while its asymptotic theorem uses a growing BAA outer. The
+Turbo events below give explicit witnesses for the particular RS8
+route and GL inner. They are not a new general no-go theorem.
+
 The fixed RS8 constituent is not defective at the certified finite
 lengths. The asymptotic problem is that one active local group always
 has at most 64 active packets, while the number of possible groups
