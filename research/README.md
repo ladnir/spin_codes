@@ -3,6 +3,11 @@
 Start with the [SPIN manuscript](paper/README.md). The production library is
 separate, in [`../spin/`](../spin/README.md), and does not depend on this tree.
 
+The [Turbo SPIN migration workstream](workstreams/turbo_spin_migration/README.md)
+tracks which binary RS-packet results can replace the older Structured SPIN
+proofs, timings, and applications. Manuscript edits are paused while these
+proof and implementation gates are evaluated.
+
 The [one-route coupled-scan study](workstreams/one_route_coupled_scan/README.md)
 preserves the fixed field-quartet construction and its global inverse/RS-rank
 proof work. The target is rate 1/2, 45% distance, and a 40-bit setup-failure
