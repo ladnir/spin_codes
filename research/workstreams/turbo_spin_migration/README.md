@@ -28,6 +28,11 @@ and uniform-GL inner: a fixed one-group message has a small but
 length-independent probability of pairwise state returns and output
 weight at most `N/16`. The shared-profile candidate remains relevant
 only to finite-size or redesigned-inner questions.
+The [growing RS8 bridge](SCALABLE_RS8_BRIDGE.md) gives a concrete
+asymptotic research candidate: reuse the fast RS8 row circuit inside
+a growing two-accumulator outer, then reprove the packet-route/s22
+transfers. Its exact base enumerator is recorded; no 11% certificate
+for that candidate is claimed.
 
 **Next decision.** Retain the older growing-outer theorem and pursue
 current Turbo as a finite-size construction. To seek a new scalable
