@@ -1,15 +1,16 @@
 \section{Applications}
 \label{sec:applications}
 
-We evaluate SPIN as a component of existing protocols. The three applications use different parts of the
-encoder interface. We distinguish measured computation costs from
+We evaluate the BCH--IMT SPIN encoder as a component of existing protocols.
+The three applications use different parts of its interface.
+We distinguish measured computation costs from
 projected costs and conditional security calculations.
 
 \subsection{Pseudorandom Correlation Generation}
 \label{sec:spin-pcg}
 
 PCGs use the transposed encoder to compress pseudorandom tree outputs
-into correlation blocks. At rate $1/2$, the standalone SPIN encoder maps
+into correlation blocks. At rate $1/2$, the standalone BCH--IMT encoder maps
 $2^{21}$ input blocks to $2^{20}$ output blocks of $128$ bits in about
 $9.3$\,ms after precomputation.
 At $K=2^{18}$, in-place transposed encoding takes $1.419$\,ms,
@@ -33,7 +34,7 @@ ordinary-store comparisons, and timing contracts.
 \subsection{Polynomial Commitments}
 \label{sec:spin-pcs}
 
-We use SPIN as the row encoder in a Brakedown-style PCS
+We use BCH--IMT SPIN as the row encoder in a Brakedown-style PCS
 \cite{brakedown23}. Arrange a Boolean evaluation table in $R$ rows of
 $K$ bits, encode each row to $N=2K$ bits, and Merkle-commit to the columns.
 In the interactive protocol, the commitment and evaluation claim precede

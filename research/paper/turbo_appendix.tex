@@ -1,0 +1,130 @@
+\section{Finite Turbo SPIN Certificate}
+\label{app:turbo-proof}
+
+This appendix specifies the fixed maps and the first-moment interfaces
+behind Theorem~\ref{thm:turbo-spin}. The bounds average over independently
+sampled outer column maps, packet and regional permutations, and state
+updates. They concern the ideal setup distribution, rather than the
+distance of a particular seeded implementation.
+
+\paragraph{Outer code and expected measure.}
+Represent $\F_{16}$ in the polynomial basis with modulus
+$X^4+X+1$. Each RS row interpolates its four input values at
+$0,1,2,3\in\F_{16}$ and evaluates at $0,\ldots,7$.
+Write $Q=2^{32}$. For a group, the number $A_h$ of nonzero outer words
+with exactly $h$ nonzero $32$-bit columns is
+\begin{equation}
+ A_h=\binom8h\sum_{j=0}^{h-5}(-1)^j\binom hj
+       \bigl(Q^{h-4-j}-1\bigr),\qquad 5\le h\le8.
+ \label{eq:turbo-column-spectrum}
+\end{equation}
+Indeed, shortening the eight RS rows to a specified set of $h$ columns
+leaves $8(h-4)$ dimensions over $\F_{16}$; inclusion--exclusion requires
+all selected columns to be nonzero.
+
+For each nonzero column, multiplication by a uniform nonzero element of
+$\F_{2^{32}}$ sends any fixed nonzero vector uniformly to the nonzero
+$32$-bit vectors. The adjoint family has the same property: if two
+coefficients send one fixed nonzero vector to the same image, their
+difference gives a nonzero field multiplication with zero adjoint image,
+which is impossible. Let $C_v$ be the expected number of nonzero group
+messages yielding $v$ active four-bit packets before the group shuffle.
+Then
+\begin{equation}
+  P(z):=(1+15z)^8-1,\qquad
+  \sum_{v=5}^{64}C_vz^v
+   =\sum_{h=5}^{8}A_h\left(\frac{P(z)}{Q-1}\right)^h.
+  \label{eq:turbo-packet-spectrum}
+\end{equation}
+The coefficient of $z^v$ is an expected message count, not a probability
+or the realized spectrum of a sampled group. The sum of the coefficients
+is $2^{128}-1$. Given $v$, the group shuffle makes the packet support
+uniform among $\binom{64}{v}$ choices, with uniform nonzero labels on the
+active packets.
+
+\paragraph{Fixed inner maps.}
+For $s=15$, index the $64$ output positions by
+$z=(z_0,\ldots,z_5)\in\F_2^6$, with coordinate number
+$\sum_i2^iz_i$. The columns of $A$ are the truth tables of
+$1,z_0,\ldots,z_5$ and the following eight functions, in order:
+\[
+\begin{gathered}
+ z_0z_1,\quad z_0z_3,\quad z_4z_5,\quad
+ z_0z_5+z_2z_3,\quad z_1z_3+z_2z_4,\\
+ z_0z_4+z_2z_5,\quad z_1z_5+z_3z_4,\quad
+ z_1z_2+z_3z_5.
+\end{gathered}
+\]
+This is the paired $15$-state map. For $s=22$, the columns of $A$ are
+the following $64$-bit masks; bit $j$ is output coordinate $j$:
+\begin{center}\footnotesize\ttfamily
+\begin{tabular}{@{}llll@{}}
+ffffffffffffffff & aaaaaaaaaaaaaaaa & cccccccccccccccc & f0f0f0f0f0f0f0f0\\
+ff00ff00ff00ff00 & ffff0000ffff0000 & ffffffff00000000 & 3693af0a9cc6faa0\\
+d882d88272287228 & 666669960ff00000 & b874edded1e28448 & a5ffcc96cc965a00\\
+8e2b4de88ed4b2e8 & 2de14b78ddee4488 & cca5cc5a69009600 & 9556599a300cfcc0\\
+8888888888888888 & a0a0a0a0a0a0a0a0 & aa00aa00aa00aa00 & aaaa0000aaaa0000\\
+aaaaaaaa00000000 & cccc0000cccc0000 & &
+\end{tabular}
+\end{center}
+In both cases the feedback is $A^\top$. Each step uses an independent
+uniform invertible state map. These are separate certified maps, not
+instances of the paper's BCH--IMT transvection family.
+
+\paragraph{First moment and occupation coverage.}
+Let $Z_H$ count nonzero messages with output weight at most $H$, and let
+$q$ count their nonzero groups. Write $W_v$ for an upper bound on the
+conditional output-weight event for one group with $v$ active packets,
+averaged over its support, labels, route, and inner updates. Likewise,
+$V_{u,v}$ bounds the corresponding two-group event. The first two
+contributions obey
+\begin{equation}
+ U_1=L\sum_{v=5}^{64}C_vW_v,\qquad
+ U_2=\binom L2\sum_{5\le u\le v\le64}
+       (2-\1_{u=v})C_uC_vV_{u,v}.
+ \label{eq:turbo-sparse-fold}
+\end{equation}
+The factors count unordered group positions and both support assignments
+when $u\ne v$. The two-group computation keeps the common route and the
+inner state across every region.
+
+For larger occupations, the numerical calculation compares Turbo SPIN
+with a reference outer that maps each $128$-bit group through four
+RS$[16,8]$ rows over $\F_{16}$. Its $16$ aligned $16$-bit columns receive
+independent nonzero $\F_{2^{16}}$ scalar randomizers. It then uses the
+same $64$ four-bit packet positions, route, and fixed inner map as Turbo
+SPIN at the selected length. Complete numerical bounds for this reference
+outer were checked for every occupation; the following pointwise
+comparison transfers them without assuming identical outer spectra.
+
+For a fixed nonzero $256$-bit vector with $h$ nonzero columns, the
+number of RS words with that column support is at most $(Q-1)^{h-4}$.
+Independent column randomization therefore bounds its expected atom count
+by $(Q-1)^{-4}$. Relative to uniform input, the outer-group measure has
+pointwise multiplier
+\[
+ \beta_{\rm Turbo}=\frac{2^{256}}{(2^{32}-1)^4}
+ <\frac{2^{256}}{(2^{16}-1)^8}
+ =\beta_{\rm RS16}.
+\]
+For each fixed active-group set, this domination transfers the retained
+uniform-input and routing-conditioned bounds for $q\ge3$, with the same
+inner and route. The transfer is over the complete outer measure;
+one-column marginals alone would not justify it.
+
+At $K=2^{20}$ the old RS$[16,8]$ outer has no words with fewer than nine
+active packets, whereas Turbo SPIN can have five through eight. The
+certificate charges the event that any group has such a word by
+$\Delta=L\sum_{v=5}^8C_v$, and transfers the remaining two-group terms
+after restricting both supports to at least nine. The one-group sum above
+still includes all supports. At the two smaller lengths, the complete
+one- and two-group sums include those supports directly.
+
+The checked occupation sets are $q=1,\ldots,L$ with $L=512,2048,8192$
+for the three lengths. Directed numerical upper bounds are summed as
+positive dyadic rationals. The resulting margins are
+$61.8840972765$, $58.245625332$, and $51.822466415$ bits, respectively.
+The exact cutoff weights are $13107$, $52428$, and $209715$; hence the
+integer minimum-distance lower bounds outside the failure event are
+$13108$, $52429$, and $209716$. The repository records the authenticated
+endpoints, source bindings, and replay procedures\repositorycite.

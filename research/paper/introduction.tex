@@ -45,6 +45,12 @@ $2^{16},2^{18},2^{20},2^{22},2^{24}$.
 The certificate uses rigorous spectrum inequalities, not an assumed exact
 BCH spectrum. Section~\ref{sec:finite-quarter} also gives two certified
 rate-$1/4$ operating points.
+Turbo SPIN is a second finite, binary half-rate construction. It uses
+short RS rows, randomized $32$-bit columns, a four-bit packet route, and
+a separately certified recursive inner. At $K=2^{16},2^{18},2^{20}$,
+its relative distance exceeds $0.10$ with more than $51$ bits of
+setup-failure margin. This claim is distinct from the asymptotic theorem
+and the BCH finite-length certificates.
 
 \paragraph{Analysis and Structure.}
 For this class of encoder, sparse messages typically cause low minimum
@@ -74,11 +80,13 @@ question of Bazzi, Mahdian, and Spielman~\cite{bms09} in the
 terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 
 \paragraph{Implementation and Applications.}
-On one Ryzen 9 7950X thread, SPIN's transposed encoder computes
-$2^{20}$ $128$-bit correlation blocks in about $9.3$\,ms after precomputation,
+On one Ryzen 9 7950X thread, Turbo SPIN's precomputed transposed encoder
+produces $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms.
+In the separate BCH--IMT comparison campaign, transposed encoding takes
+about $9.3$\,ms at the same length,
 approximately $3.4\times$ faster than the original
 block--accumulate--accumulate (BAA) codes~\cite{KolesnikovEtAl2026BA}.
-Ordinary encoding has similar cost.
+For BCH--IMT, ordinary encoding has similar cost.
 Our same-host encoder comparison also includes newer chosen-block BAA,
 whose fastest measured configuration takes about $24$\,ms.
 In libOTe's regular-noise Silent OT path, the sender produces $2^{18}$ hashed
@@ -146,7 +154,7 @@ Bolt uses sketched codes to reduce commitment cost~\cite{bolt26}.
 Sections~\ref{sec:preliminaries}--\ref{sec:framework} give the common framework;
 Section~\ref{sec:spin-intuition} builds intuition before the structured
 construction, asymptotic proof, and finite certificates in
-Sections~\ref{sec:structured-spin}--\ref{sec:finite-certificates}.
+Sections~\ref{sec:structured-spin}--\ref{sec:turbo-spin}.
 Sections~\ref{sec:implementation} and~\ref{sec:applications} evaluate the encoder
 and applications. The appendices contain the complete supporting proofs,
 parameter studies, and detailed experiments.

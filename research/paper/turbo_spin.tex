@@ -1,0 +1,67 @@
+\section{Turbo SPIN: A Finite RS-Packet Construction}
+\label{sec:turbo-spin}
+
+The BCH--IMT construction above has five certified half-rate lengths; its
+asymptotic family uses a growing outer. For transposed encoding at the
+three smaller finite lengths, we also give a binary
+construction with less outer work. We call this operating family
+\emph{Turbo SPIN}. Its guarantees below are finite-length statements; the
+asymptotic theorem of Section~\ref{sec:structured-distance} concerns the
+Structured SPIN family defined there.
+
+\paragraph{Construction.}
+Fix $K\in\{2^{16},2^{18},2^{20}\}$, put $N=2K$, and divide the message into
+$L=K/128$ groups of $128$ bits. Interpret each group as eight rows of four
+symbols over $\F_{16}$. Encode each row by the same systematic MDS
+RS$[8,4]$ code. The eight symbols at one code position form a $32$-bit
+column. For each group and each of its eight columns, independently sample
+a nonzero element of $\F_{2^{32}}$ and apply the binary adjoint of
+multiplication by that element. This orientation makes the transposed
+encoder apply field multiplication directly. The column maps are part of
+the sampled code and remain fixed for every message.
+
+Split each randomized column into eight four-bit packets. Independently
+shuffle the $64$ packets of each group into $64$ regions, one packet per
+region. In every region, independently permute the $L$ group slots.
+The composition is one permutation of the $N$ binary coordinates.
+Serialize the regions and process them in $64$-bit steps. For step input
+$X_i\in\F_2^{64}$ and state $Q_i\in\F_2^s$, set
+\[
+  Q_0=0,\qquad Y_i=X_i+A Q_i,\qquad Q_{i+1}=M_iQ_i+A^\top X_i.
+\]
+The fixed map $A:\F_2^s\to\F_2^{64}$ and independently sampled uniform
+$M_i\in\mathrm{GL}(s,2)$ use $s=15$ at $K=2^{16}$ and $s=22$ at the two
+larger lengths. The state continues across region boundaries and is
+discarded after the last output. Outer coefficients, both sets of
+permutations, and state updates are mutually independent in the ideal
+setup distribution. Appendix~\ref{app:turbo-proof} specifies the two
+fixed maps and the finite proof calculation.
+
+\begin{theorem}[Finite Turbo SPIN distance]
+\label{thm:turbo-spin}
+For each listed $K$, every setup defines an injective binary linear
+$[2K,K]$ encoder. Let $H=\lfloor N/10\rfloor$. Over the ideal setup
+distribution just defined,
+\[
+  \Prob_\theta\bigl[\exists x\ne0:\wt(E_\theta(x))\le H\bigr]
+  <2^{-\lambda_K},
+\]
+where $(\lambda_{2^{16}},\lambda_{2^{18}},\lambda_{2^{20}})$ may be taken
+as $(61.88,58.24,51.82)$ bits, respectively. In particular, the minimum
+distance exceeds $N/10$ except with setup probability below $2^{-40}$.
+\end{theorem}
+
+The outer is injective, and the inner is triangular with identity diagonal,
+so the rate holds for every setup. For distance, independent column
+randomization makes every fixed nonzero column uniform over the nonzero
+$32$-bit vectors. This gives an exact expected packet-weight enumerator.
+The first-moment calculation treats one and two active groups with their
+support information intact. For three or more, a pointwise bound on the
+outer measure transfers the existing regional inner bounds. At $K=2^{20}$,
+the few words with only five through eight active packets receive a
+separate union charge. Appendix~\ref{app:turbo-proof} gives the equations
+and the exact scope of the three numerical certificates.
+
+Table~\ref{tab:turbo-performance} reports the corresponding precomputed
+transposed encoding times. These measurements do not transfer the
+BCH--IMT application results to Turbo SPIN.

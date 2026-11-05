@@ -1,5 +1,14 @@
 # SPIN manuscript (LLNCS)
 
+Turbo SPIN is a separate finite RS-packet construction in the manuscript.
+Its public binary encoder uses precomputed transposed encoding and has
+certificates at K=2^16, 2^18, and 2^20. The corresponding same-host
+public-API times are 0.099526, 0.461416, and 2.861814 ms; see
+[the RS8 profile](../../spin/RS8.md) for the complete timing protocol.
+The existing BCH--IMT comparison table and application measurements
+retain their original attribution. The Turbo results have a distinct
+proof appendix and are not covered by the asymptotic BCH--IMT theorem.
+
 The updated half-rate encoder tables use the optimized precomputed campaign:
 0.340, 1.460, and 9.289 ms for transposed encoding at K=2^16, 2^18, and 2^20.
 See [the performance ledger](PRECOMPUTED_PERFORMANCE.md) for source bindings,

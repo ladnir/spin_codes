@@ -17,15 +17,17 @@ probability below $2^{-40}$. We certify this bound at message lengths
 $2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum inequalities,
 without assuming the constituent's exact weight spectrum.
 
-\qquad For pseudorandom correlation generators (PCGs), SPIN's transposed encoder
-computes $2^{20}$ $128$-bit correlation blocks in about $9.3$\,ms on one
-Ryzen 9 7950X thread after precomputation. This is approximately $3.4\times$ faster than the original
-rate-$1/2$ BAA codes of Kolesnikov et al.\ (CRYPTO
-2026)~\cite{KolesnikovEtAl2026BA}. Ordinary encoding has similar cost.
-With a precomputed code, libOTe's regular-noise Silent OT sender
-achieves $89.0$ million hashed OTs per second on one core, in batches of $2^{18}$.
-Timings exclude initial
-setup, base-correlation generation, and network transport.
+\qquad A second binary finite construction, Turbo SPIN, uses an RS-packet
+outer and randomized column maps. At $K=2^{16},2^{18},2^{20}$ it has rate
+$1/2$, relative distance greater than $0.10$, and setup-failure margins
+above $51$ bits.
+
+\qquad After precomputation, Turbo SPIN transposed encoding produces
+$2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms
+on one Ryzen 9 7950X thread.
+With the separate BCH--IMT encoder, libOTe's regular-noise Silent OT sender
+achieves $89.0$ million hashed OTs per second on one core. This OT timing
+excludes initial setup, base-correlation generation, and network transport.
 
 \qquad We also use SPIN in a Brakedown-style polynomial commitment scheme
 and integrate it into Flock. Commitment and one opening of $512$\,MiB

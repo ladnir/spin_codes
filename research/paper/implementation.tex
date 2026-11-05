@@ -82,3 +82,46 @@ Rate-$1/2$ ordinary encoding takes $9.031$\,ms at that same $K$, under
 the same precomputed, repeated-call timing policy. Thus the two directions
 have similar cost.
 Appendix~\ref{app:implementation} gives the full tables and protocols.
+
+\subsection{Precomputed Turbo SPIN}
+\label{sec:turbo-performance}
+
+We separately measure the binary Turbo SPIN construction of
+Section~\ref{sec:turbo-spin} through the public encoder interface. Its
+transposed call includes the inner, packet routing, randomized column
+maps, RS outer, and store fences. Each input and output record contains
+$128$ bits. Table~\ref{tab:turbo-performance} gives the full online call
+time; setup, allocation, and input filling are excluded.
+
+\begin{table}[h]
+\centering
+\caption{Precomputed Turbo SPIN transposed encoding on one Ryzen 9 7950X
+core, in milliseconds. The certified distance is greater than $0.10N$;
+$\lambda$ is the ideal-setup failure margin in bits.}
+\label{tab:turbo-performance}
+\setlength{\tabcolsep}{9pt}
+\begin{tabular}{@{}rrr@{}}
+\toprule
+$K$ & Margin $\lambda$ & Time (ms) \\
+\midrule
+$2^{16}$ & 61.884 & 0.099526 \\
+$2^{18}$ & 58.246 & 0.461416 \\
+$2^{20}$ & 51.822 & 2.861814 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The measurements use GCC~15.2 with Zen~4 tuning, one thread pinned to
+CPU~15, four setup seeds, and both comparison orders. Each process has
+five warmups, followed by $2001$, $1001$, or $301$ timed calls at the
+three respective lengths. The entries are medians of eight process
+medians. Input is not restored between calls. $K=2^{16}$ uses normal
+pages; the larger runs request huge pages for data and scratch. The
+operating system may decline that request. All runs are serial.
+Appendix~\ref{app:implementation} gives the implementation scope.
+
+The BCH--IMT comparison above uses a different measurement campaign
+and memory policy. We have no matched BAA or ordinary-encoding timing
+for Turbo SPIN, so we report no corresponding speedup or direction
+comparison. The OT and PCS application
+results in Section~\ref{sec:applications} also use BCH--IMT, not Turbo SPIN.
