@@ -112,10 +112,11 @@ a better fixed outer removes that event, but the pair-return event
 survives. Conditioning independent local profiles on high packet
 minimum distance also leaves it intact.
 
-An asymptotic repair must change at least one fixed-width mechanism:
-make the number of active local packets grow with length; make the
-probability of each pair return vanish with length (for example through
-a growing state, with its encoding cost accounted for); or constrain
-the route and feedback so close, cancellable pairs cannot occur. The
-existing growing-outer theorem takes the first route. We have no
-replacement asymptotic proof for a finite RS8 outer.
+Eliminating this specific event would require changing a fixed-width
+mechanism: growing local support, changing the route, or suppressing
+returns. Eliminating one event alone is not an asymptotic-distance
+proof. In particular, the manuscript's cited constant-outer-memory
+limitation still applies to a depth-two serial construction with a
+sublinear-memory inner; merely growing the state slowly would not
+resolve that broader issue. The existing positive theorem grows the
+outer. We have no replacement asymptotic proof for a finite RS8 outer.
