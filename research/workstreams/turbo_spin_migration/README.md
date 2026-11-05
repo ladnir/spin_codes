@@ -8,6 +8,27 @@ The provisional paper draft is frozen at `0f3f0c4a` on
 Neither the draft's new claims nor a timing ratio substitutes for a matched
 certificate and implementation result.
 
+**First result.** The [setup audit](SETUP_AUDIT.md) found no algebraic
+map or sampling-interface mismatch in the RS8 profile, while preserving
+the ideal-setup versus seeded-implementation distinction. The
+[one-group obstruction](ONE_GROUP_OBSTRUCTION.md) proves that the fixed
+RS8/64-region family has asymptotic minimum distance at most 5/64 with
+probability tending to one. The direct 10%/11% asymptotic transfer gate
+is closed negatively; finite-length migration remains open. A scalable
+Turbo-like family needs a new local packet-support floor or a growing
+outer. No manuscript claim is changed by this result.
+The [selected shared-outer candidate](SHARED_OUTER_CANDIDATE.md) uses
+the exact RS8 expected enumerator to show that fixed local profiles
+with packet minimum distance at least 19 exist. It has no global
+distance certificate yet; sharing a profile changes the outer proof.
+
+**Next decision.** Test a concrete selected shared RS8 profile against
+the one-active-group tail and the full outer spectrum. If that route
+does not yield a scalable proof at acceptable setup cost, retain the
+older growing-outer theorem and pursue Turbo only as a finite-size
+construction. The finite K=2^22/2^24 certificate sweep is independent
+of this asymptotic decision.
+
 ## Baseline and gaps
 
 | Result | Retained evidence | Migration gap |
