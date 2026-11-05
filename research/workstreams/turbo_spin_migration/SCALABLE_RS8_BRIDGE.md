@@ -102,13 +102,19 @@ theorem; the very low tails and numerical optimization need certified
 coverage. The exploratory screen is
 `python research/workstreams/turbo_spin_migration/screen_rs8_ba_exponent.py`.
 
-There are two distinct next proof steps:
+This RS8 base is a possible later outer optimization. The first
+[architectural replacement gate](TURBO_FAMILY_BRIDGE.md) instead keeps
+the paper's already certified growing Golay--BAA outer and tests
+Turbo's packet route and s22 inner. That isolates the construction
+changes responsible for the new proof obligation. If it closes, an
+RS8 base can be substituted and tested separately.
+
+There are two proof steps for this later RS8-base variant:
 
 * **Outer bridge:** certify the BAA spectrum tail and concave envelope
-  with `R(z)^(8g)`, then select one good shared outer. This can first be
-  tested with the paper's bitwise route and IMT inner, whose transfer
-  certificate already exists. The Golay certificate does not transfer
-  automatically because its base polynomial changed.
+  with `R(z)^(8g)`, then select one good shared outer. The Golay
+  certificate does not transfer automatically because its base
+  polynomial changed.
 * **Turbo bridge:** route the growing outer through four-bit packet
   regions and retain the width-64/s22 inner. Here the number of regions
   must grow as `b/4`; otherwise one supergroup supplies many packets to
@@ -116,9 +122,7 @@ There are two distinct next proof steps:
   labels and the s22 fixed-occupation/dense transfers require fresh
   bounds. This is the family closest to the fast finite Turbo encoder.
 
-The first step might yield a closely related scalable theorem while
-keeping the RS8 base circuit. The second is the desired performance
-and proof target. Neither is certified yet. The currently proved
+Neither step is certified yet. The currently proved
 11%/linear-work asymptotic family remains the Golay-BAA/IMT one. In
 particular, the paper's constant `39/4` belongs to that certified
 Golay/IMT instance; it is not a certified schedule for this RS8/s22

@@ -1,8 +1,10 @@
 # Turbo SPIN results before manuscript revision
 
-This workstream asks whether the binary RS-packet encoder can carry the
-distance, encoding, and application results now attributed to the older
-Structured SPIN profiles. Work here before making further manuscript edits.
+This workstream asks whether Turbo's packet-route/s22 architecture can
+carry the finite, asymptotic, encoding, and application results now
+attributed to Structured SPIN. Its finite outer is RS8; its asymptotic
+outer must grow, as the paper's current Golay--BAA outer does. Work
+here before making further manuscript edits.
 The provisional paper draft is frozen at `0f3f0c4a` on
 `codex/turbo-spin-paper`; this research branch starts from `f0656bf4`.
 Neither the draft's new claims nor a timing ratio substitutes for a matched
@@ -28,18 +30,16 @@ and uniform-GL inner: a fixed one-group message has a small but
 length-independent probability of pairwise state returns and output
 weight at most `N/16`. The shared-profile candidate remains relevant
 only to finite-size or redesigned-inner questions.
-The [growing RS8 bridge](SCALABLE_RS8_BRIDGE.md) gives a concrete
-asymptotic research candidate: reuse the fast RS8 row circuit inside
-a growing two-accumulator outer, then reprove the packet-route/s22
-transfers. Its exact base enumerator is recorded; no 11% certificate
-for that candidate is claimed.
+The [family bridge](TURBO_FAMILY_BRIDGE.md) fixes the replacement target:
+finite RS8 and growing Golay--BAA outers with Turbo's packet route and
+s22 inner. The [growing RS8 base](SCALABLE_RS8_BRIDGE.md) is a later
+outer-performance option, not a prerequisite for the asymptotic proof.
 
-**Next decision.** Retain the older growing-outer theorem and pursue
-current Turbo as a finite-size construction. To seek a new scalable
-Turbo family, test a growing supergroup built from the existing fast
-RS8 kernel, or a route/inner rule that rules out the pair-return event.
-The finite K=2^22/2^24 certificate sweep is independent of this
-asymptotic redesign.
+**Next decision.** Keep the existing Structured theorem as the control.
+Test the known growing Golay--BAA outer under Turbo's packet route and
+s22 inner. First check the one-active-block packet/label law, then the
+sparse and dense first moments. The finite K=2^22/2^24 certificate
+sweep is independent of that asymptotic proof.
 
 ## Baseline and gaps
 
@@ -47,7 +47,7 @@ asymptotic redesign.
 |---|---|---|
 | Half-rate finite distance | RS8 packet code has >10% distance with 61.884, 58.246, and 51.822 bits of setup-failure margin at K=2^16, 2^18, and 2^20 | K=2^22 and 2^24, plus any intermediate lengths we claim |
 | Transposed 128-bit encoding | Public RS8 profile: 0.099526, 0.461416, and 2.861814 ms at those three lengths | A matched BCH/IMT and BAA campaign; scaling at larger lengths |
-| Scalable distance | Older growing-outer/IMT family: rate 1/2, >11% distance with probability 1-o(1), O(N) ordinary and transposed work, Lean proof | A specified Turbo-like family and a complete asymptotic proof, or a structural obstruction |
+| Scalable distance | Growing Golay--BAA outer with bit route and IMT: rate 1/2, >11% distance with probability 1-o(1), O(N) ordinary and transposed work, Lean proof | Keep the growing outer as control; certify it with Turbo's packet route and s22 inner |
 | Quarter-rate distance | Older BCH/IMT profile at K=2^20: >16.5% with 40 bits and >19% with 30 bits | A binary RS-packet quarter-rate construction, certificate, and timing |
 | Ordinary and wide encoding | Older profile has tuned forward and wide kernels; RS8 forward is a scalar fallback | Optimized Turbo forward kernels and matched measurements |
 | Applications | Existing Silent OT, PCS, and Flock results use BCH/IMT | Re-run with the exact certified Turbo profile and report complete workload boundaries |
@@ -67,15 +67,13 @@ structured permutation.
    randomizers, packet route, inner maps, setup independence, and forward
    adjoints. Verify that the public encoder and each proof use the same
    distribution. Keep the existing three finite certificates as controls.
-2. **Test scalability before promoting the narrative.** Define a Turbo-like
-   sequence of code lengths and parameter maps. Start with the one-active-
-   group term, including its packet-support tail and its dependence on K.
-   Then test small fixed occupations and the dense rate function. Compare
-   the actual inner to an idealized inner to locate any obstruction. A
-   failed bound is not a code counterexample; seek an explicit bad-message
-   family before concluding that a construction cannot work. The gate is
-   either a complete >11% / O(N) theorem, a clearly identified obstacle
-   and redesigned family, or a decision to retain the older theorem.
+2. **Test the common Turbo architecture.** Use the paper's growing
+   Golay--BAA outer first, with `b=Theta(log N)` and `b/4` packet regions.
+   Keep Turbo's packet route and s22 inner. Start with fixed occupation,
+   including the binary-weight-to-packet-support and label interface.
+   Then cover growing sparse and positive occupation. The gate is a
+   complete >11% / O(N) theorem or a precise obstruction for this
+   route/inner. Do not require an RS8-based growing outer for this gate.
 3. **Extend the finite ladder.** For K=2^22 and 2^24, first evaluate the
    existing RS8/s22 distribution at the 10% cutoff. If its margin falls
    below 40 bits, change one parameter or component at a time and record
