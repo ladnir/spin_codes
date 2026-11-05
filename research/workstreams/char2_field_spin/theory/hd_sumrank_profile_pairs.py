@@ -37,11 +37,15 @@ def coefficients(z,alphas,*,state=8,mixer='feedback_refresh',cutoff=16,packet_so
         return [np.log2(coeff) for coeff in result]
 
 
-def screen(rows,z,alpha,coeff,*,regional=False,width=128,outer_length=256):
+def screen(rows,z,alpha,coeff,*,regional=False,width=128,outer_length=256,forbidden_weight=838860):
     if outer_length not in (64,128,256):raise ValueError('Unsupported rate-half RS outer')
+    if not isinstance(forbidden_weight,int) or not 0<=forbidden_weight<2**21:
+        raise ValueError('Invalid forbidden output weight')
     region_length=2**21//outer_length;dimension=outer_length//2
+    if not 1<=rows<=region_length or region_length%width:
+        raise ValueError('Invalid row count or packet geometry')
     lc=log2(comb(region_length,rows))
-    prefix=lc+alpha*(rows*(16*outer_length-dimension*log2(65535))-log2(65535)-838860*log2(z))
+    prefix=lc+alpha*(rows*(16*outer_length-dimension*log2(65535))-log2(65535)-forbidden_weight*log2(z))
     def local(odds):
         return logsumexp((coeff+(np.arange(width+1)*odds)[:,None,None])*np.log(2),axis=0)/np.log(2)
     if regional:
@@ -60,13 +64,13 @@ def screen(rows,z,alpha,coeff,*,regional=False,width=128,outer_length=256):
             return prefix+total(power(tuple(tuple(row) for row in local(odds)),2**21//width)[0])-outer_length*(lc+rows*odds)
         chosen=minimize_scalar(objective,bounds=(-24,20),method='bounded')
         value=float(chosen.fun); marker=float(chosen.x)
-    return dict(active_rows=rows,mark=z,alpha=alpha,marker_log_odds=marker,regional=regional,
+    return dict(active_rows=rows,mark=z,alpha=alpha,marker_log_odds=marker,regional=regional,forbidden_weight=forbidden_weight,
                 log2_upper_screen=value,directed=False,whole_code_certificate=False)
 
 
-def exact_region_screen(rows,z,alpha,coeff,*,width=128,outer_length=256):
+def exact_region_screen(rows,z,alpha,coeff,*,width=128,outer_length=256,forbidden_weight=838860):
     from hd_sumrank_regions import product
-    proposal=screen(rows,z,alpha,coeff,width=width,outer_length=outer_length)
+    proposal=screen(rows,z,alpha,coeff,width=width,outer_length=outer_length,forbidden_weight=forbidden_weight)
     region_length=2**21//outer_length;dimension=outer_length//2
     odds=proposal['marker_log_odds']
     p=1/(1+2**(-odds))
@@ -87,9 +91,9 @@ def exact_region_screen(rows,z,alpha,coeff,*,width=128,outer_length=256):
     lc=log2(comb(region_length,rows))
     mass=lc+rows*log2(p)+(region_length-rows)*log2(1-p)
     region=np.log2(value[rows])+scale-mass
-    bound=(lc+alpha*(rows*(16*outer_length-dimension*log2(65535))-log2(65535)-838860*log2(z))
+    bound=(lc+alpha*(rows*(16*outer_length-dimension*log2(65535))-log2(65535)-forbidden_weight*log2(z))
            +total(power(tuple(tuple(row) for row in region),outer_length)[0]))
-    return dict(active_rows=rows,mark=z,alpha=alpha,marker_log_odds=odds,
+    return dict(active_rows=rows,mark=z,alpha=alpha,marker_log_odds=odds,forbidden_weight=forbidden_weight,
                 log2_upper_screen=bound,exact_regional_coefficient=True,
                 directed=False,whole_code_certificate=False)
 

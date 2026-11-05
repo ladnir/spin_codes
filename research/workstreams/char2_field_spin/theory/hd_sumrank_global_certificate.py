@@ -9,9 +9,16 @@ from hd_sumrank_paired_certificate import grouped_packets,scalar_power,pair_coef
 from hd_randomized_outer_quiet_exact import _arb_fraction
 
 
-def witness(z,alpha,marker,state=16,precision=256,feedthrough='cauchy',width=64,paired=False,right_feedthrough=None):
+def witness(z,alpha,marker,state=16,precision=256,feedthrough='cauchy',width=64,paired=False,right_feedthrough=None,outer_length=256,forbidden_weight=838860,field_order=65536,packet_source=None):
     z,alpha,marker=F(z),F(alpha),F(marker)
+    if outer_length not in (64,128,256) or not isinstance(forbidden_weight,int) or not 0<=forbidden_weight<2**21:
+        raise ValueError('Invalid outer length or forbidden output weight')
+    if not 0<z<1 or not 0<alpha<=1 or not 0<marker<1 or (2**21//outer_length)%(width*(2 if paired else 1)):
+        raise ValueError('Invalid witness or packet geometry')
     if right_feedthrough is not None and not paired:raise ValueError('Alternating feedback requires paired composition')
+    if field_order<2 or field_order&(field_order-1) or (field_order!=65536 and packet_source is None):
+        raise ValueError('A different field requires its own exact packet source')
+    if packet_source is not None and paired:raise ValueError('Custom exact source currently requires single-packet composition')
     with ctx.workprec(precision):
         p,a=_arb_fraction(marker),_arb_fraction(alpha)
         matrix=[arb(0) for _ in range(4)]
@@ -22,31 +29,35 @@ def witness(z,alpha,marker,state=16,precision=256,feedthrough='cauchy',width=64,
             for i,row in enumerate(coefficients):
                 matrix[i]=sum(value*p**j*(1-p)**(packet_width-j) for j,value in enumerate(row))
         else:
-            for j,count,entries in grouped_packets(z,state,width,feedthrough=feedthrough,width=width):
+            groups=packet_source(z,width) if packet_source else grouped_packets(z,state,width,feedthrough=feedthrough,width=width)
+            for j,count,entries in groups:
                 weight=count*p**j*(1-p)**(width-j)
                 for i,value in enumerate(entries):
                     if value: matrix[i]+=weight*_arb_fraction(value)**a
         run=scalar_power(tuple(matrix),2097152//packet_width)
         log2=lambda x:x.log()/arb(2).log()
-        intercept=(log2(run[0]+run[1])-a*(log2(arb(65535))+838860*log2(_arb_fraction(z)))
-                   -256*8192*log2(1-p))
-        slope=a*(4096-128*log2(arb(65535)))-256*log2(p)+256*log2(1-p)
+        intercept=(log2(run[0]+run[1])-a*(log2(arb(field_order-1))+forbidden_weight*log2(_arb_fraction(z)))
+                   -2097152*log2(1-p))
+        slope=a*((field_order.bit_length()-1)*outer_length-(outer_length//2)*log2(arb(field_order-1)))-outer_length*log2(p)+outer_length*log2(1-p)
         return slope,intercept
 
 
-def receipt(center,z,alpha,marker,state=16,precision=256,threshold=-64,feedthrough='cauchy',width=64,paired=False,right_feedthrough=None):
+def receipt(center,z,alpha,marker,state=16,precision=256,threshold=-64,feedthrough='cauchy',width=64,paired=False,right_feedthrough=None,outer_length=256,forbidden_weight=838860,field_order=65536,packet_source=None):
+    rows=2097152//outer_length
+    if not 1<=center<=rows:raise ValueError('Invalid center row count')
     with ctx.workprec(precision):
-        slope,intercept=witness(z,alpha,marker,state,precision,feedthrough,width,paired,right_feedthrough)
+        slope,intercept=witness(z,alpha,marker,state,precision,feedthrough,width,paired,right_feedthrough,outer_length,forbidden_weight,field_order,packet_source)
         def bound(r):
-            return r*slope+intercept-255*arb(comb(8192,r)).log()/arb(2).log()
+            return r*slope+intercept-(outer_length-1)*arb(comb(rows,r)).log()/arb(2).log()
         if not bound(center)<threshold:
             return dict(center=center,accepted=False,log2_upper=str(bound(center)),whole_code_certificate=False)
         left,right=center,center
         while left>1 and bound(left-1)<threshold: left-=1
-        while right<8192 and bound(right+1)<threshold: right+=1
+        while right<rows and bound(right+1)<threshold: right+=1
         worst=max(bound(left),bound(right))
         union=worst+arb(right-left+1).log()/arb(2).log()
         return dict(construction='sumrank-feedback-refresh',feedthrough=feedthrough,right_feedthrough=right_feedthrough,state=state,packet_width=width,paired=paired,mark=str(F(z)),alpha=str(F(alpha)),
+                    outer_length=outer_length,forbidden_weight=forbidden_weight,field_order=field_order,
                     marker=str(F(marker)),certified_intervals=[[left,right]],center=center,
                     union_log2_upper=str(union),weakest_log2_upper=str(worst),accepted=True,
                     directed=True,whole_code_certificate=False)

@@ -3,11 +3,29 @@
 Start with the [SPIN manuscript](paper/README.md). The production library is
 separate, in [`../spin/`](../spin/README.md), and does not depend on this tree.
 
+The [one-route coupled-scan study](workstreams/one_route_coupled_scan/README.md)
+preserves the fixed field-quartet construction and its global inverse/RS-rank
+proof work. The target is rate 1/2, 45% distance, and a 40-bit setup-failure
+margin at K20. Several complete support classes are bounded, but the low-rank
+remainder and whole-code certificate remain open. The goal is paused; the
+[checkpoint](workstreams/one_route_coupled_scan/GOAL.md) records the latest
+restricted diagnostics and the unreported full-population control.
+
 The new [characteristic-two field family](workstreams/char2_field_spin/README.md)
 explores genuine GF(2^m)-linear SPIN codes separately from the binary profiles.
 Its [certified GF256 high-rate winner](workstreams/char2_field_spin/GF8_HIGH_RATE_WINNER.md)
-is preserved. The active [high-distance blockwise restart](workstreams/char2_field_spin/HD_BLOCKWISE_RESTART.md)
-targets rate 1/2, 40% distance, and sub-5ms forward encoding at K20.
+is preserved. The earlier [full-alphabet distance ladder](workstreams/char2_field_spin/HD_FIELD128_LADDER.md)
+lifts the leading 35%-distance paired-route design to GF(2^128), then seeks
+higher distance at K20 and rate 1/2. Its literal 35% lift has a complete
+108.117-bit ideal-setup certificate, but measures about 22.7 ms. A separate
+gamma30 construction now has a [complete 40% certificate](workstreams/char2_field_spin/HD_FIELD128_GAMMA30_CLOSED.md)
+with 49.171 bits of ideal-setup failure margin. Its 274 event bounds cover
+all 8,192 active-group weights. This construction is not yet timed;
+45% and higher-distance rungs remain open.
+The GF256 3.80-ms checkpoint remains the faster certified reference.
+
+The earlier [high-distance blockwise restart](workstreams/char2_field_spin/HD_BLOCKWISE_RESTART.md)
+targeted rate 1/2, 40% distance, and sub-5ms forward encoding at K20.
 A [sixteen-state refinement](workstreams/char2_field_spin/HD_SUMRANK_FEEDBACK_CERTIFICATE.md)
 now has a complete 40%-distance certificate with more than 59.87 bits of
 setup-failure margin. The [encoding refinement](workstreams/char2_field_spin/HD_ENCODING_OPTIMIZATION.md)
@@ -24,7 +42,20 @@ replayed at 384-bit precision. The independent-map
 [6.3-ms checkpoint](workstreams/char2_field_spin/HD_SYSTEMATIC_MDS.md) is preserved.
 The [optimization checkpoint](workstreams/char2_field_spin/HD_OPTIMIZED_CHECKPOINT.md)
 records the validated approximately 5.5-ms frontier. Sub-5ms encoding
-remains unmet; no library promotion has been made.
+at 40% remains unmet; no library promotion has been made. At 35%, the
+[grouped small-RS outer](workstreams/char2_field_spin/HD_GROUPED_OUTER.md)
+now has a GF256 candidate with a complete 72.3975-bit certificate and
+about 4.0 ms K20 forward encoding. It combines invertible Toeplitz column
+mixers, compact byte coefficients, and an exact-map striped inner schedule.
+Repeated shared-host runs compare against the preceding 4.4--4.5 ms version
+and the approximately 4.76 ms RS256 control; production is unchanged.
+The newer [paired-route checkpoint](workstreams/char2_field_spin/HD_SHIFTED_CLOSED_CERTIFICATE.md)
+now has a complete 35%-distance certificate above 55.09 bits. Matched
+serial timings give 3.80 ms versus 4.05 ms for the retained reference;
+native output layout alone gives 3.87 ms. The proof covers every nonzero
+active-group weight, with matching 256/384-bit replays and an independent
+complete probability sum. The next structural target is cheaper column
+mixing; production and paper results remain unchanged.
 The [randomized-outer baseline](workstreams/char2_field_spin/HD_RANDOMIZED_OUTER.md)
 restores the binary proof's measure comparison at a measured0.48-ms cost:
 7.02ms versus6.53--6.55ms for its fixed-outer control. The

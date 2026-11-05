@@ -166,6 +166,26 @@ struct DiagonalRefresh {
         wide16::prepare(d1,before.data(),16);wide16::prepare(d2,after.data(),16);
     }
 };
+// Separate setup type: the subfield ensemble is not the GF65536 ensemble.
+// Preserve the four-record packed layout and dispatch at compile time.
+#ifndef HD_SUMRANK_BYTE_KEYS
+#define HD_SUMRANK_BYTE_KEYS 0
+#endif
+struct ByteDiagonalRefresh {
+    using ByteCoefficient=std::conditional_t<HD_SUMRANK_BYTE_KEYS,std::uint8_t,Coefficient>;
+    std::array<ByteCoefficient,16> before{},after{};
+    void prepare(const Scalar* d1,const Scalar* d2){
+        for(unsigned j=0;j!=16;++j){
+            if(!d1[j]||d1[j]>255||!d2[j]||d2[j]>255)
+                throw std::invalid_argument("nonzero GF256 refresh coefficients required");
+#if HD_SUMRANK_BYTE_KEYS
+            before[j]=std::uint8_t(d1[j]);after[j]=std::uint8_t(d2[j]);
+#else
+            before[j]=wide16::prepareCoefficient(d1[j]);after[j]=wide16::prepareCoefficient(d2[j]);
+#endif
+        }
+    }
+};
 inline Matrix cauchyRefreshMatrix(){
     Matrix a(16,std::vector<Scalar>(16)),b=a;
     for(unsigned i=0;i!=16;++i)for(unsigned j=0;j!=16;++j){a[i][j]=power(i,j);b[i][j]=power(i+16,j);}
@@ -586,6 +606,34 @@ HDS_INLINE __m512i dotProduct16(const State& state,const Coefficient* coefficien
 #endif
 }
 
+template<unsigned I,class ByteCoefficient>
+HDS_INLINE __m512i byteRefreshProduct(__m512i value,const std::array<ByteCoefficient,16>& coefficients){
+    if constexpr(std::is_same_v<ByteCoefficient,std::uint8_t>){
+        std::uint32_t four;std::memcpy(&four,coefficients.data()+4*I,sizeof(four));
+        const auto packed=_mm512_set1_epi32(static_cast<int>(four));
+        const auto select=_mm512_setr_epi64(0,0,0x0101010101010101LL,0x0101010101010101LL,
+            0x0202020202020202LL,0x0202020202020202LL,0x0303030303030303LL,0x0303030303030303LL);
+        return _mm512_gf2p8mul_epi8(value,_mm512_shuffle_epi8(packed,select));
+    }else{
+        const auto packed=_mm512_broadcast_i32x4(_mm_loadu_si128(reinterpret_cast<const __m128i*>(coefficients.data()+4*I)));
+        return _mm512_gf2p8mul_epi8(value,wide16::expandPairs<0>(packed));
+    }
+}
+
+template<bool Affine,bool Shared,unsigned Carried=0,bool RankTwo=false,class MixerData=Mixer>
+HDS_INLINE void mdsFinish(State& state,State feedback,const MixerData&,const ByteDiagonalRefresh& t){
+    static_assert(Carried==2&&!RankTwo,"Byte refresh currently supports only the common-refresh recurrence");
+    c8Unroll(std::make_index_sequence<4>{},[&](auto i){
+        feedback.values[i]=byteRefreshProduct<i>(_mm512_xor_si512(state.values[i],feedback.values[i]),t.before);
+    });
+    using Kind=hdbw::detail::Kind;
+    naturalFft16<0,Kind::Inverse,Affine>(feedback.values[0],feedback.values[1],feedback.values[2],feedback.values[3]);
+    naturalFft16<16,Kind::Forward,Affine>(feedback.values[0],feedback.values[1],feedback.values[2],feedback.values[3]);
+    c8Unroll(std::make_index_sequence<4>{},[&](auto i){
+        state.values[i]=byteRefreshProduct<i>(feedback.values[i],t.after);
+    });
+}
+
 template<bool Affine,bool Shared,unsigned Carried=0,bool RankTwo=false,class MixerData=Mixer>
 HDS_INLINE void mdsFinish(State& state,State feedback,const MixerData& mixer,const DiagonalRefresh& t){
     if constexpr(Carried){
@@ -651,19 +699,29 @@ HDS_INLINE __m512i stripedInput4(const Block* input,const Index* route,unsigned 
 
 // Same RS maps, SIMD-striped over the four sixteen-point cosets. FFT
 // butterflies are now lane-local; transpose only at the packet interface.
-template<bool Routed,class Index,bool Shared=false,unsigned LocalRank=16,unsigned EmissionRank=16,unsigned Carried=0,bool RankTwo=false,bool Stream=false,bool StripedInput=false,class MixerData=Mixer>
+template<bool Routed,class Index,bool Shared=false,unsigned LocalRank=16,unsigned EmissionRank=16,unsigned Carried=0,bool RankTwo=false,bool Stream=false,bool StripedInput=false,class MixerData=Mixer,class RefreshData=DiagonalRefresh>
 HDS_INLINE void mdsStriped(const Block* input,const Index* route,Block* output,State& state,
-                           const MixerData& mixer,const DiagonalRefresh& t,bool eightChecks=false){
-    static_assert(LocalRank==0||LocalRank==4||LocalRank==8||LocalRank==16);
-    static_assert(EmissionRank==16||EmissionRank==8||EmissionRank==4);
+                           const MixerData& mixer,const RefreshData& t,bool eightChecks=false){
+    static_assert(LocalRank==0||LocalRank==1||LocalRank==2||LocalRank==4||LocalRank==8||LocalRank==16);
+    static_assert(EmissionRank==16||EmissionRank==8||EmissionRank==4||EmissionRank==2||EmissionRank==1);
+    static_assert(Carried!=3||LocalRank==4);
     static_assert(!StripedInput||Routed);
     __m512i x[16];
-    if constexpr(EmissionRank==4){
+    if constexpr(EmissionRank<=4){
         auto a=state.values[0],b=state.values[1],c=state.values[2],d=state.values[3];
         transposeRecords4(a,b,c,d);
-        x[0]=a;x[1]=b;x[2]=c;x[3]=d;
-        c8Unroll(std::make_index_sequence<4>{},[&](auto i){x[i+4]=x[i];x[i+8]=x[i];x[i+12]=x[i];});
-        stripedStage<1,false,16>(x);stripedStage<0,false,16>(x);
+        if constexpr(EmissionRank==4){
+            x[0]=a;x[1]=b;x[2]=c;x[3]=d;
+            c8Unroll(std::make_index_sequence<4>{},[&](auto i){x[i+4]=x[i];x[i+8]=x[i];x[i+12]=x[i];});
+            stripedStage<1,false,16>(x);stripedStage<0,false,16>(x);
+        }else{
+            const __m512i q[4]{a,b,c,d};
+            c8Unroll(std::make_index_sequence<16>{},[&](auto i){
+                constexpr unsigned j=decltype(i)::value;
+                x[j]=q[EmissionRank*(j/(4*EmissionRank))+j%EmissionRank];
+            });
+            if constexpr(EmissionRank==2)stripedStage<0,false,8>(x);
+        }
     }else if constexpr(EmissionRank==8){
         // Two independent RS[32,8] emission maps, one per packet half.
         // Four SIMD records carry two cosets of each map. The omitted
@@ -758,12 +816,21 @@ HDS_INLINE void mdsStriped(const Block* input,const Index* route,Block* output,S
             feedback.values[g]=_mm512_xor_si512(a,b);
             feedback.values[2+g]=_mm512_xor_si512(c,d);
         });
-    }else{
+    }else if constexpr(LocalRank==4){
         stripedStage<0,true,16,Carried==3?16:0>(x);stripedStage<1,true,16,Carried==3?16:0>(x);
         c8Unroll(std::make_index_sequence<4>{},[&](auto j){
             feedback.values[j]=_mm512_xor_si512(_mm512_xor_si512(x[j],x[j+4]),_mm512_xor_si512(x[j+8],x[j+12]));
         });
         if constexpr(Carried!=3)transposeRecords4(feedback.values[0],feedback.values[1],feedback.values[2],feedback.values[3]);
+    }else{
+        if constexpr(LocalRank==2)stripedStage<0,true,8>(x);
+        c8Unroll(std::make_index_sequence<4>{},[&](auto i){
+            constexpr unsigned j=decltype(i)::value;
+            constexpr unsigned start=(j/LocalRank)*(4*LocalRank)+j%LocalRank;
+            feedback.values[j]=_mm512_xor_si512(_mm512_xor_si512(x[start],x[start+LocalRank]),
+                                               _mm512_xor_si512(x[start+2*LocalRank],x[start+3*LocalRank]));
+        });
+        transposeRecords4(feedback.values[0],feedback.values[1],feedback.values[2],feedback.values[3]);
     }
     mdsFinish<true,Shared,Carried,RankTwo>(state,feedback,mixer,t);
 }

@@ -1,7 +1,7 @@
 """Exact GF256 principal-nullity scan for the local return map I+A A^T.
 
 The determinant lemma reduces every principal submatrix to I+C_D A_D.
-This computes all 2^16 subsets, not sampled minors. No distance certificate.
+This computes all 2^(4h) subsets, not sampled minors. No distance certificate.
 """
 from functools import lru_cache
 import numpy as np
@@ -11,13 +11,14 @@ from hd_blockwise_shared_transfer import multiply
 
 @lru_cache(None)
 def nullities(h=4,beta=1):
-    if h!=4 or not 0<beta<256:raise ValueError('Only the sixteen-position local map is scanned')
-    _,full_c=maps(local_rank=h);c=np.array([row[:16] for row in full_c[:h]],dtype=np.uint16)
+    if h not in (1,2,4) or not 0<beta<256:raise ValueError('Unsupported local map')
+    length=4*h
+    _,full_c=maps(local_rank=h);c=np.array([row[:length] for row in full_c[:h]],dtype=np.uint16)
     table=np.array([[multiply(i,j,65536) for j in range(256)] for i in range(256)],dtype=np.uint16)
     inv=np.zeros(256,dtype=np.uint16)
     for i in range(1,256):inv[i]=int(np.flatnonzero(table[i]==1)[0])
-    gram=np.zeros((1<<16,h,h),dtype=np.uint16)
-    for i in range(16):
+    gram=np.zeros((1<<length,h,h),dtype=np.uint16)
+    for i in range(length):
         leaf=table[c[:,i,None],c[None,:,i]]
         gram[1<<i:1<<(i+1)]=gram[:1<<i]^leaf
     gram=table[beta,gram]^np.eye(h,dtype=np.uint16)[None,:,:]

@@ -122,13 +122,13 @@ def fractional(logs,alpha,state,tiles=8):
         return np.log2(result)
 
 
-def bound(rows,z,alpha,odds,packets,tiles=8,input_mark=1.0):
+def bound(rows,z,alpha,odds,packets,tiles=8,input_mark=1.0,forbidden_weight=838860):
     from scipy.special import logsumexp
     width=tiles*8
     choose=np.log2(np.array([comb(width,j) for j in range(width+1)],dtype=float))
     local=logsumexp((packets+(choose+np.arange(width+1)*odds)[:,None,None])*np.log(2),axis=0)/np.log(2)
     lc=log2(comb(8192,rows))
-    return (lc+alpha*(rows*(4096-128*log2(65535))-log2(65535)-838860*log2(z)-129*rows*log2(input_mark))
+    return (lc+alpha*(rows*(4096-128*log2(65535))-log2(65535)-forbidden_weight*log2(z)-129*rows*log2(input_mark))
             +total(power(tuple(tuple(row) for row in local),2**21//width)[0])-256*(lc+rows*odds))
 
 

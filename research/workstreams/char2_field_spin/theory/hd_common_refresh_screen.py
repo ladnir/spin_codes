@@ -14,9 +14,9 @@ from hd_systematic_mds_screen import optimize
 
 @lru_cache(None)
 def principal_defects(h):
-    if h!=4:return (h,)*(4*h+1)
+    if h not in (1,2,4):return (h,)*(4*h+1)
     from hd_common_refresh_principal import nullities
-    values=nullities();sizes=np.array([i.bit_count() for i in range(len(values))])
+    values=nullities(h);sizes=np.array([i.bit_count() for i in range(len(values))])
     return tuple(int(values[sizes==c].max()) for c in range(4*h+1))
 
 
@@ -34,8 +34,11 @@ def local_return_cap(l,z,h,length,q=65536.):
 
 
 @lru_cache(1)
-def matrices(z,state=16,width=64,h=4,cross_blocks=False,exact_small=0,scattered=False,joint_rank=False):
-    q=65536.;d=q**state-1;blocks=state//h;length=width//blocks
+def matrices(z,state=16,width=64,h=4,cross_blocks=False,exact_small=0,scattered=False,joint_rank=False,field_order=65536):
+    if field_order not in (256,65536):raise ValueError('Unsupported screening field')
+    if field_order!=65536 and (cross_blocks or exact_small or scattered or joint_rank):
+        raise ValueError('Subfield screen requires ordinary common refresh')
+    q=float(field_order);d=q**state-1;blocks=state//h;length=width//blocks
     items=profiles(state,width,h)
     occ=np.array([row for row,count in items]);degrees=occ.sum(axis=1)
     quiet=np.array([sum(comb(j,c)*z**(j-c)*(1-z)**c*q**(-c-min(h,j-c))

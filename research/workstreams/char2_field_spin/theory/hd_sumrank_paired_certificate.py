@@ -32,6 +32,10 @@ def grouped_packets(z,state=16,cutoff=20,bits=12,maximum=None,feedthrough='cauch
         raise ValueError('Unsupported packet width for this construction')
     if maximum is None:maximum=width
     if not 0<=maximum<=width:raise ValueError('Invalid packet degree cutoff')
+    if feedthrough in ('common1','common2','common4'):
+        if state!=16 or width!=64:raise ValueError('Common refresh requires state16, width64')
+        from hd_common_refresh_packets import grouped_packets as common_groups
+        return common_groups(z,bits,maximum,int(feedthrough[-1]))
     if feedthrough in ('block4-rank2-fb4','block4-rank2-fb8'):
         if state!=16 or width!=64:raise ValueError('Rank-two block profile requires state16, width64')
         from hd_rank_two_block_packets import grouped_packets as rank_two_groups
@@ -96,32 +100,50 @@ def scalar_power(matrix,exponent):
     return result
 
 
-def receipt(first,last,z,alpha,marker,*,state=16,cutoff=20,bits=12,precision=256,threshold=-64,progress=None,feedthrough='cauchy',width=64,right_feedthrough=None):
+def receipt(first,last,z,alpha,marker,*,state=16,cutoff=20,bits=12,precision=256,threshold=-64,progress=None,feedthrough='cauchy',width=64,right_feedthrough=None,outer_length=256,forbidden_weight=838860,paired=True,field_order=65536,packet_source=None):
     z,alpha,marker=F(z),F(alpha),F(marker)
-    if not 1<=first<=last<=8192 or not 0<z<1 or not 0<alpha<=1 or not 0<marker<1:
+    if outer_length not in (64,128,256) or not isinstance(forbidden_weight,int) or not 0<=forbidden_weight<2**21:
+        raise ValueError('Invalid outer length or forbidden output weight')
+    rows=2**21//outer_length
+    packet_width=width*(2 if paired else 1)
+    if rows%packet_width or not 1<=first<=last<=rows or not 0<z<1 or not 0<alpha<=1 or not 0<marker<1:
         raise ValueError('Invalid witness or interval')
+    if right_feedthrough is not None and not paired:
+        raise ValueError('Alternating feedback requires paired composition')
+    if field_order<2 or field_order&(field_order-1) or (field_order!=65536 and packet_source is None):
+        raise ValueError('A different field requires its own exact packet source')
+    if packet_source is not None and paired:raise ValueError('Custom exact source currently requires single-packet composition')
     with ctx.workprec(precision):
-        coefficients,count=pair_coefficients(z,alpha,state,cutoff,bits,progress,min(last,width),feedthrough,width,right_feedthrough)
+        if paired:
+            coefficients,count=pair_coefficients(z,alpha,state,cutoff,bits,progress,min(last,width),feedthrough,width,right_feedthrough)
+        else:
+            groups=packet_source(z,min(last,width)) if packet_source else grouped_packets(z,state,cutoff,bits,min(last,width),feedthrough,width)
+            count=len(groups)
+            coefficients=[[arb(0) for _ in range(width+1)] for _ in range(4)]
+            aa=_arb_fraction(alpha)
+            for j,multiplicity,entries in groups:
+                for i,value in enumerate(entries):
+                    if value:coefficients[i][j]+=multiplicity*_arb_fraction(value)**aa
         p=_arb_fraction(marker)
-        base=tuple(arb_poly([v*p**j*(1-p)**(2*width-j) for j,v in enumerate(row[:min(last,2*width)+1])]) for row in coefficients)
+        base=tuple(arb_poly([v*p**j*(1-p)**(packet_width-j) for j,v in enumerate(row[:min(last,packet_width)+1])]) for row in coefficients)
         result=(arb_poly([1]),arb_poly([]),arb_poly([]),arb_poly([1]))
-        exponent=8192//(2*width)
+        exponent=rows//packet_width
         while exponent:
             if exponent&1: result=poly_product(result,base,last)
             exponent>>=1
             if exponent: base=poly_product(base,base,last)
         log2=lambda x:x.log()/arb(2).log()
         az,aa=_arb_fraction(z),_arb_fraction(alpha)
-        log_beta=4096-128*log2(arb(65535))
+        log_beta=(field_order.bit_length()-1)*outer_length-(outer_length//2)*log2(arb(field_order-1))
         accepted=[]; union=arb(0); rejected=[]; worst=None
         for r in range(first,last+1):
-            choose=arb(comb(8192,r))
-            mass=choose*p**r*(1-p)**(8192-r)
+            choose=arb(comb(rows,r))
+            mass=choose*p**r*(1-p)**(rows-r)
             # All exact coefficients are nonnegative. Upper endpoints give
             # a positive majorant even if an irrelevant tiny ball crosses 0.
             region=tuple(arb(max(arb(0),poly[r].upper()))/mass for poly in result)
-            matrix=scalar_power(region,256)
-            prefactor=arb(2)**(log2(choose)+aa*(r*log_beta-log2(arb(65535))-838860*log2(az)))
+            matrix=scalar_power(region,outer_length)
+            prefactor=arb(2)**(log2(choose)+aa*(r*log_beta-log2(arb(field_order-1))-forbidden_weight*log2(az)))
             value=prefactor*(matrix[0]+matrix[1])
             bound=log2(value)
             if bound<threshold:
@@ -133,7 +155,8 @@ def receipt(first,last,z,alpha,marker,*,state=16,cutoff=20,bits=12,precision=256
         for r in accepted:
             if intervals and r==intervals[-1][1]+1: intervals[-1][1]=r
             else: intervals.append([r,r])
-        return dict(construction='sumrank-feedback-refresh',feedthrough=feedthrough,right_feedthrough=right_feedthrough,state=state,packet_width=width,mark=str(z),alpha=str(alpha),
+        return dict(construction='sumrank-feedback-refresh',feedthrough=feedthrough,right_feedthrough=right_feedthrough,state=state,packet_width=width,paired=paired,mark=str(z),alpha=str(alpha),
+                    outer_length=outer_length,forbidden_weight=forbidden_weight,field_order=field_order,
                     marker=str(marker),cutoff=cutoff,mantissa_bits=bits,precision=precision,packet_groups=count,
                     requested_rows=[first,last],certified_intervals=intervals,threshold=threshold,
                     union_log2_upper=str(log2(union)) if accepted else None,

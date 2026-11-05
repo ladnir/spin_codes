@@ -104,7 +104,11 @@ def coefficients(logs,alpha,right=None):
     with np.errstate(divide='ignore'):return np.log2(coeff)
 
 
-def optimize(rows,state=4,iterations=80,regional=False,mixer=True,alternate=False,feedback=True,refresh_alternate=False,width=64,packet_source=None,pair_source=None,outer_length=256):
+def optimize(rows,state=4,iterations=80,regional=False,mixer=True,alternate=False,feedback=True,refresh_alternate=False,width=64,packet_source=None,pair_source=None,outer_length=256,forbidden_weight=838860,coefficient_width=None):
+    if not isinstance(forbidden_weight,int) or not 0<=forbidden_weight<2**21:
+        raise ValueError('Invalid forbidden output weight')
+    if coefficient_width is not None and not pair_source:
+        raise ValueError('Explicit composition width requires a coefficient source')
     if width not in (8,16,32,64,128,256) or not 1<=state<=min(32,width//2):
         raise ValueError('Unsupported self-orthogonal RS screening dimensions')
     if (alternate or refresh_alternate) and not regional:
@@ -125,15 +129,15 @@ def optimize(rows,state=4,iterations=80,regional=False,mixer=True,alternate=Fals
             if refresh_alternate:cached['right']=packet_logs(z,state,True,True,True,width)
         if regional or pair_source or outer_length!=256:
             evaluator=exact_region_screen if regional else paired_marker_screen
-            try:result=evaluator(rows,z,alpha,pair_source(z,alpha,state,width) if pair_source else coefficients(cached[z],alpha,cached.get('right')),width=2*width,outer_length=outer_length)
+            try:result=evaluator(rows,z,alpha,pair_source(z,alpha,state,width) if pair_source else coefficients(cached[z],alpha,cached.get('right')),width=coefficient_width or 2*width,outer_length=outer_length,forbidden_weight=forbidden_weight)
             except ArithmeticError:return 1e12
             value=result['log2_upper_screen'];odds=result['marker_log_odds']
         else:
-            result=minimize_scalar(lambda p:bound(rows,z,alpha,p,alpha*cached[z],tiles=width//8),bounds=(-24,20),method='bounded')
+            result=minimize_scalar(lambda p:bound(rows,z,alpha,p,alpha*cached[z],tiles=width//8,forbidden_weight=forbidden_weight),bounds=(-24,20),method='bounded')
             value=float(result.fun);odds=float(result.x)
         if not np.isfinite(value):return 1e12
         if best is None or value<best['log2_upper_screen']:
-            best=dict(active_rows=rows,state=state,packet_width=width,outer_length=outer_length,mark=z,alpha=alpha,
+            best=dict(active_rows=rows,state=state,packet_width=width,outer_length=outer_length,forbidden_weight=forbidden_weight,mark=z,alpha=alpha,
                       marker_log_odds=odds,log2_upper_screen=value,regional=regional,
                       construction='systematic-global-MDS',state_mixer=mixer,mix_alternate=alternate,
                       feedback_refresh=feedback,refresh_alternate=refresh_alternate,directed=False,whole_code_certificate=False)

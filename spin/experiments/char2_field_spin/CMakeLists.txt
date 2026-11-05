@@ -392,3 +392,27 @@ else()
 endif()
 add_test(NAME char2_hd_wide_mds_forward COMMAND spin_char2_hd_wide_mds_forward --check)
 set_tests_properties(char2_hd_wide_mds_forward PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+
+# 35%-distance co-design candidate, isolated from the frozen 40% controls.
+add_executable(spin_char2_hd35_forward hd35_forward.cpp)
+target_link_libraries(spin_char2_hd35_forward PRIVATE spin_char2_field)
+if(MSVC)
+  target_compile_options(spin_char2_hd35_forward PRIVATE /arch:AVX512 /O2)
+else()
+  target_compile_options(spin_char2_hd35_forward PRIVATE -O3 -mavx2 -mavx512f -mavx512bw
+    -mavx512vl -mavx512dq -mgfni -mtune=znver4 -fno-lto)
+endif()
+add_test(NAME char2_hd35_forward COMMAND spin_char2_hd35_forward --check)
+set_tests_properties(char2_hd35_forward PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+
+# Grouped small RS rows with independent cross-row column randomizers.
+add_executable(spin_char2_hd_grouped_forward hd_grouped_forward.cpp)
+target_link_libraries(spin_char2_hd_grouped_forward PRIVATE spin_char2_field)
+if(MSVC)
+  target_compile_options(spin_char2_hd_grouped_forward PRIVATE /arch:AVX512 /O2)
+else()
+  target_compile_options(spin_char2_hd_grouped_forward PRIVATE -O3 -mavx2 -mavx512f -mavx512bw
+    -mavx512vl -mavx512dq -mgfni -mtune=znver4 -fno-lto)
+endif()
+add_test(NAME char2_hd_grouped_forward COMMAND spin_char2_hd_grouped_forward --check)
+set_tests_properties(char2_hd_grouped_forward PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
