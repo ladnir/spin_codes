@@ -46,12 +46,13 @@ occupation one at 11% distance under the paper's `39/4` schedule.
 The [two-block transfer note](Q2_PACKET_TRANSFER.md) derives the
 continuum two-packet kernel, gives a finite collision comparison, and
 records an outward-rounded two-position exponent certificate. The
-other occupation classes still need proofs; these results do not yet
+same transfer method closes occupation three over all 5,984 packet
+band triples. Higher occupation classes still need proofs; these results do not yet
 establish a scalable distance theorem.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Audit the one- and two-block transfer certificates, then test fixed
-`Q>=3`, growing sparse occupation, and positive occupation. The finite
+Audit the one-, two-, and three-block transfer certificates, then test fixed
+`Q>=4`, growing sparse occupation, and positive occupation. The finite
 K=2^22/2^24 certificate sweep is independent of that asymptotic proof.
 
 ## Baseline and gaps

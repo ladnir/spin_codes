@@ -184,3 +184,41 @@ Occupation two is no longer the exponent obstruction. The full
 minimum-distance theorem still requires fixed `Q>=3`, growing sparse
 occupation, and positive occupation. The finite-step comparison above
 must also receive a separate proof audit before paper migration.
+
+## Occupation three
+
+The same continuum method closes `Q=3`. For three packets in one
+region, let `k` be the number of live spacings among the four ordered
+spacings. Their total live-time fraction has the `Beta(k,4-k)` law,
+with endpoint interpretations for `k=0,4`. Enumerating the four-state
+paths yields a positive two-by-two `K_3`; `verify_packet_q3_envelope.py`
+evaluates its closed Laplace integrals with outward interval arithmetic.
+For packet fugacities `u_1,u_2,u_3`, the region polynomial is
+
+```
+T_3 = K_0 + (u_1+u_2+u_3)K_1
+          + (u_1u_2+u_1u_3+u_2u_3)K_2 + u_1u_2u_3 K_3.
+```
+
+The checker combines this matrix with the same 32-band selected-outer
+packet envelope and enumerates all 5,984 unordered triples of bands.
+Its largest outward upper for the complete three-position exponent is
+`-0.0480973770` nats per outer bit. The fixed-Q collision comparison
+extends to three positions: sampling distinct physical slots differs
+from independent slots by a factor `L^3/(L)_3=1+O(1/L)`, and step
+collisions have probability `O(1/L)`. The `K_3` entries are positive,
+so an all-ones collision transfer incurs an entrywise `1+O(1/L)`
+factor. Together with the marked-step correction this is `exp(o(1))`
+over `R=O(log L)` regions. Thus occupation three has the same
+asymptotic first-moment conclusion as occupation two.
+
+```
+python research/workstreams/turbo_spin_migration/verify_packet_q3_envelope.py research/workstreams/turbo_spin_migration/packet_envelope_32.json
+```
+
+The earlier product-norm attempt for all fixed `Q>=3` does not close:
+it replaces the exact multi-packet kernels by a coarse per-row factor.
+`fixed_q_product_screen.py` records a positive worst-band diagnostic
+even though the exact `Q=3` transfer closes. It should not be used as
+evidence against the construction. Fixed `Q>=4` and both growing
+occupation regimes remain open.
