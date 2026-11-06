@@ -52,7 +52,7 @@ def inner_upper(rho1, rho2, y1, y2, gamma) -> float:
     a = 1+yi*zi*r*H
     b = (yi+zi)*J+yi*zi*(1-r)*G
     c = (yi+zi)*r*J+yi*zi*r*(1-r)*G
-    d = E+(yi+zi)*(1-r)*E+yi*zi*(r*H+(1-r)**2*E)
+    d = E+(yi+zi)*(1-r)*E+yi*zi*(r*G+(1-r)**2*E)
     root = perron_2x2(a, b, c, d)
     p = interval(*rho1)
     q = interval(*rho2)

@@ -44,16 +44,15 @@ outward-rounded dense certificate. The
 [one-block schedule certificate](Q1_SCHEDULE_CERTIFICATE.md) closes
 occupation one at 11% distance under the paper's `39/4` schedule.
 The [two-block transfer note](Q2_PACKET_TRANSFER.md) derives the
-continuum two-packet kernel and isolates the finite collision and
-shared-outer spectrum obligations.
-The other occupation classes still need proofs;
-the numerical screen does not establish a scalable distance theorem.
+continuum two-packet kernel, gives a finite collision comparison, and
+records an outward-rounded two-position exponent certificate. The
+other occupation classes still need proofs; these results do not yet
+establish a scalable distance theorem.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Audit the one-block certificate and certify occupation two with the
-selected shared outer and finite packet collisions. Then test the
-remaining occupation classes. The finite K=2^22/2^24 certificate sweep is
-independent of that asymptotic proof.
+Audit the one- and two-block transfer certificates, then test fixed
+`Q>=3`, growing sparse occupation, and positive occupation. The finite
+K=2^22/2^24 certificate sweep is independent of that asymptotic proof.
 
 ## Baseline and gaps
 
@@ -124,3 +123,4 @@ the appendix or research record when removing them from the main story.
 Each gate should leave a compact source pin, exact claim, proof/benchmark
 protocol, and result summary here. Keep raw timing logs, large receipts,
 build products, and generated plots outside version control.
+

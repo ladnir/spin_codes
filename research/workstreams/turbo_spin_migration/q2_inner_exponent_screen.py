@@ -19,7 +19,7 @@ def kernels(gamma: float):
     k0 = np.array([[1.0, 0.0], [0.0, E]])
     k1 = np.array([[0.0, J], [r*J, (1-r)*E]])
     k2 = np.array([[r*H, (1-r)*G],
-                   [r*(1-r)*G, r*H+(1-r)**2*E]])
+                   [r*(1-r)*G, r*G+(1-r)**2*E]])
     return k0, k1, k2
 
 

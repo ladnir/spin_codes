@@ -15,7 +15,7 @@ Keep `M=2^22-1`, `r=1/M`, `E=e^(-gamma)`, and
 `J=(1-E)/gamma`. Let `P=[[0,1],[r,1-r]]` be the zero/live transition at
 one isolated active packet, and `D(t)=diag(1,e^(-gamma t))` the Laplace
 factor for an empty fraction `t` of a region. Conditional on two
-packets reaching a region, their independent uniform slots become two
+packets reaching a region, their distinct uniform slots become two
 independent uniform points as `L->infinity`. In order-statistic form,
 
 ```
@@ -33,7 +33,7 @@ Direct integration gives
 
 ```
 K_2 = [[r H,       (1-r) G],
-       [r(1-r) G,  r H+(1-r)^2 E]].
+       [r(1-r) G,  r G+(1-r)^2 E]].
 ```
 
 At `gamma=0` by continuity, `H=G=1` and `K_2=P^2`.
@@ -52,23 +52,54 @@ This formula conditions on the two realized packet counts. Packet
 labels do not enter its limiting transition because every isolated
 nonzero packet has nonzero feedback in every physical slot.
 
-## Finite-step collisions
+## Finite-step collision comparison
 
-Within a region, two independently shuffled packet slots fall in the
-same 64-bit step with probability `16/L`. On that event their combined
-feedback may vanish, so the isolated-packet transition `P^2` cannot be
-used. A finite-step upper transfer can charge the collision with a
-matrix whose entries are at most one. Every entry of `K_2` is strictly
-positive for a fixed positive `gamma`, and its smallest entries are
-proportional to `1/M`. Thus, for fixed witnesses, the collision changes
-the two-packet region matrix by a relative `O(M/L)` entrywise factor.
-The packet-step output and one-step state transients admit the same
-bounded-weight correction as in occupation one. Over
-`R=O(log L)` regions the logarithmic correction is `o(1)`.
+Write `L=16n` and use the exact s22 output spectrum to define the
+empty-step Laplace factor `q(theta)` in the occupation-one note. Take
+`theta=gamma/(4Lp_0)`, `D_n=diag(1,q(theta))`, and
+`P=[[0,1],[1/M,1-1/M]]`. An active packet at physical step `i`, counted
+from zero, has the proxy transfer `D_n^i (D_n P) D_n^(n-i-1)`.
+Conditional on two packets reaching a region, the common regional
+permutation puts them in two distinct uniform slots among the `L`
+packet slots. Their step pair is sampled without replacement. For
+every nonnegative transfer entry, its expectation under this law is
+at most `L/(L-1)` times the expectation under two independent uniform
+slots. Under the latter law the physical steps are independent uniform
+elements of `[n]`. If the steps differ, the proxy
+transfer is the ordered product with two `D_n P` factors. If they
+coincide, their combined feedback may be zero, including complete
+cancellation. Upper-bound that step's zero/live transition by the
+all-ones matrix `U`; the colliding proxy transfer is
+`D_n^i (D_n U) D_n^(n-i-1)`.
 
-This is the route to a finite-step lemma, not yet a written full
-certificate: the collision matrix, boundary-state handling, and uniform
-entrywise constants must be made explicit before relying on it.
+Let `K_{2,n}^+` be the average of these `n^2` transfers, with the
+factor `L/(L-1)` for the actual slot law. The collision
+part has coefficient exactly `1/n=16/L`. It is entrywise at most
+`1/n` times an all-ones matrix because every `D_n` entry is at most
+one. For a fixed `gamma>0`, `q(theta)=1-gamma/n+O(n^-2)` from the exact
+finite output spectrum. The noncollision Riemann sum therefore differs
+entrywise from the integral defining `K_2` by `O_gamma(1/n)`. All four
+entries of `K_2` are positive for fixed `gamma>0` and fixed `M`; hence
+
+```
+K_{2,n}^+ <= (1+C_gamma,M/n) K_2       entrywise.
+```
+
+The same comparison holds for `K_{0,n}` and `K_{1,n}`, preserving their
+exact zero entries. Mark every active physical step and its immediate
+successor. There are at most four marked steps per region, including a
+collision. Every unmarked live pre-state is uniform nonzero after the
+intervening uniform `GL(22,2)` update, conditional on its zero/live
+history. Replacing the true weighted output on marked steps by the
+proxy weight changes the upper moment by at most `exp(64 theta)` per
+marked step. For two outer words with packet counts `v_1,v_2`, the full
+finite moment is consequently bounded by the coefficient transfer
+with `K_{a,n}^+`, multiplied by
+`exp(128 theta(v_1+v_2))`. Since `R=O(log L)`, both the matrix comparison
+and exceptional-step factor contribute `exp(O(b/L))` for each fixed
+set of positive witnesses. This gives the required continuum exponent
+in the `L->infinity` limit. The collision event is included in the
+upper bound; no noncancellation assumption is made there.
 
 ## Shared-outer selection and first screen
 
@@ -110,3 +141,46 @@ of a bad code. The next approach should first certify a one-dimensional
 packet-spectrum envelope for the selected BAA outer and then verify
 the remaining two packet fractions jointly. The direct verifier is
 preserved as a control and diagnostic.
+
+## Closed occupation-two exponent
+
+`verify_packet_spectrum_envelope.py` partitions the allowed packet
+fraction `[0.19,1]` into 32 rational bands. For each band it branches
+over the Golay source-weight and first-accumulator-weight fractions.
+Every leaf evaluates `g(alpha)+pi(alpha,beta)` and the final packet
+Chernoff transfer with fixed positive rational witnesses, using the
+paper's outward-rounded interval bounds. Taking the largest live leaf
+upper after 1,000 splits is valid regardless of whether the refinement
+budget has converged. The generated `packet_envelope_32.json` records
+the 32 certified upper bounds on
+`b^-1 ln E[B_O(v)]` for every `v/R` in each band. Polynomial coefficient
+and summation factors vanish after division by `b`.
+
+`verify_packet_q2_envelope.py` then checks every unordered pair of
+bands, 528 pairs in total. It uses a positive rational witness for
+each pair in the two-packet Perron coefficient bound, with outward
+interval arithmetic over both packet fractions. Every pair closes
+without subdivision. The largest certified upper for the complete
+Q2 exponent, including two active-position choices, both outer word
+counts, and the 11% low-output Chernoff charge, is
+`-0.0320290481` nats per outer bit. Thus the selected ideal setup law
+satisfies `E[Z_{floor(0.11N),2} 1[G_b]]=o(1)` under the same
+`b >= (39/4) log2 N` schedule as Q1. This is an asymptotic result;
+the one-time selected-outer failure remains `o(1)`.
+
+The first derivation of `K_2` had `rH` in its live-to-live entry. Direct
+integration shows the correct term is `rG`. An independent numerical
+quadrature of all four entries at `gamma=2` agrees with the corrected
+matrix within `3e-23`; the certificate was rerun after this correction.
+
+Reproduce the two exponent gates from the repository root:
+
+```
+python research/workstreams/turbo_spin_migration/verify_packet_spectrum_envelope.py --bands 32 --max-boxes-per-band 1000 --output research/workstreams/turbo_spin_migration/packet_envelope_32.json
+python research/workstreams/turbo_spin_migration/verify_packet_q2_envelope.py research/workstreams/turbo_spin_migration/packet_envelope_32.json
+```
+
+Occupation two is no longer the exponent obstruction. The full
+minimum-distance theorem still requires fixed `Q>=3`, growing sparse
+occupation, and positive occupation. The finite-step comparison above
+must also receive a separate proof audit before paper migration.
