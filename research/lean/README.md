@@ -78,11 +78,13 @@ inserts this bound into the actual finite regional envelope, with its
 proved multiplicative error factor. The
 [averaged continuum comparison](SpinCodes/UniformMixer/RegionalAverageContinuum.lean)
 then sums over the exact uniform shuffle law and gives a finite bound
-for every fixed active-support size. Taking its limit and composing it
-with the outer/routing bound remain open.
-The routing/outer bounds,
-finite Turbo certificates, and final distance theorems remain open.
-The older native theorem below does not verify those revised constructions.
+for every fixed active-support size. The
+[regional limit](SpinCodes/UniformMixer/RegionalLimit.lean) proves the
+uniform asymptotic upper bound for the actual shuffled setup law.
+Composing that bound with the outer/routing analysis and verifying the
+finite Turbo certificates remain open.
+The final Scalable and Turbo distance theorems remain open. The older
+native theorem below does not verify those revised constructions.
 
 The native Structured SPIN distance and rate result is complete. Under the
 actual setup distribution, the probability that minimum distance is at most
