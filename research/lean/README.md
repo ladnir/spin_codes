@@ -32,9 +32,15 @@ The [placement bound](SpinCodes/UniformMixer/RegionalPlacement.lean)
 uses the verified uniform shuffle law to bound boundary and close-pair
 events and proves that their complement has separated, interior steps.
 Its exclusion event is stronger than the one in the paper and still has
-probability `O(a²/L)` for fixed occupation `a`. Converting each support
-into a marked region product, averaging it, and coupling the result to
-the continuum kernel remain open. The routing/outer bounds,
+probability `O(a²/L)` for fixed occupation `a`. The
+[support conversion](SpinCodes/UniformMixer/RegionalSupport.lean) sorts
+each good support into local coordinates and positive gaps, then applies
+the two-state bound to its marked kernel. The
+[stepwise encoder](SpinCodes/UniformMixer/RegionalEncoder.lean) defines
+`Y=Aq+x` and feedback `Aᵀx`; its empty and occupied steps equal the
+kernels used by that bound. Equality of the complete stepwise and marked
+regional kernels, placement averaging, and continuum coupling remain
+open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
