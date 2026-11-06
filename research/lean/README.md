@@ -1,4 +1,14 @@
-# SpinCodes — Lean formalization of Structured SPIN
+# SpinCodes — Lean formalizations
+
+The public native theorem below verifies the earlier Structured SPIN
+construction. It does not verify the revised Scalable SPIN or finite Turbo
+SPIN results in the current paper.
+
+The new [uniform-mixer kernel](SpinCodes/UniformMixer/Kernel.lean) checks a
+first part of the Scalable SPIN proof: the exact state transition under a
+uniform invertible linear map and the full-state formula for an empty gap.
+The regional comparison, routing/outer bounds, finite certificates, and
+final distance theorem still require formalization.
 
 The native Structured SPIN distance and rate result is complete. Under the
 actual setup distribution, the probability that minimum distance is at most

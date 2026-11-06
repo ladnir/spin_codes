@@ -63,11 +63,16 @@ No gap was found in these six steps under the stated setup law. The
 comparison does not by itself prove the distance theorem; it is combined
 with the selected outer, routing, and fixed-occupation inequalities.
 
-## Later Lean work
+## Lean status
 
-A formalization would need the uniform action of `GL(22,2)` on nonzero
-states, the exact empty-gap kernel, the one-bit impulse quotient, a
-coupling between distinct discrete slots and continuous order statistics,
-the support/positivity argument, and the full-state product inequality.
-The finite numerical gates are separate obligations. No current Lean
-artifact verifies this lemma or the revised Scalable theorem.
+`research/lean/SpinCodes/UniformMixer/Kernel.lean` now verifies the uniform
+action law for finite-dimensional invertible linear maps and the exact
+full-state empty-gap kernel, including the absorbing zero state. The proof
+is generic in the finite vector space; it does not enumerate the enormous
+group `GL(22,2)`.
+
+The one-bit impulse quotient, the discrete-to-continuous slot coupling,
+the support/positivity argument, and the regional product inequality remain
+to be formalized. The finite numerical gates are separate obligations.
+The revised Scalable theorem and the finite Turbo certificates are not yet
+Lean-verified.
