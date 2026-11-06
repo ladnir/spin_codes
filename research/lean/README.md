@@ -52,7 +52,12 @@ discarded placements by their `O(a²/L)` probability, and averages the
 good-placement two-state envelope under the verified uniform shuffle law.
 The [site-sum bridge](SpinCodes/UniformMixer/RegionalSiteSum.lean) rewrites
 that average as an exact fixed-cardinality support sum, ready for the
-discrete-to-continuum comparison. The comparison itself remains open. The routing/outer bounds,
+discrete-to-continuum comparison. The
+[grid-limit theorem](SpinCodes/UniformMixer/RegionalGridLimit.lean) proves
+convergence of that uniform support sum for any continuous function of
+the normalized sorted bit positions. A uniform comparison between the
+discrete two-state product and its continuous integrand remains open.
+The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
