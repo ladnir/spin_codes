@@ -20,8 +20,12 @@ when the gap fits in one region. The complete regional comparison, including
 active-step placement, is still open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
-nonzero, and checks its weighted bounds and zero/live quotient.
-The placement coupling,
+nonzero, and checks its weighted bounds and zero/live quotient. The
+[regional product](SpinCodes/UniformMixer/RegionalProduct.lean) composes
+these bounds for any fixed placement with separated active steps. It
+retains arbitrary full-state boundaries and an explicit finite-length
+factor. Averaging over placements and reducing the envelope to its
+two-state product remain open. The placement coupling,
 routing/outer bounds, finite Turbo certificates, and final distance theorems
 also remain to be formalized. The older native theorem below does not
 verify those revised constructions.
