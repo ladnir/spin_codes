@@ -1,5 +1,10 @@
 # Occupation one at the paper's outer-growth schedule
 
+> **Later result:** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
+> proves that the full `>11%` theorem is false for four-bit packets at
+> this growth constant. The occupation-one certificate here remains
+> valid for its stated class.
+
 ## Result and probability space
 
 Use the growing Turbo member in [TURBO_FAMILY_BRIDGE.md](TURBO_FAMILY_BRIDGE.md):

@@ -27,12 +27,20 @@ def main():
     assert upper_float(divergence) < lower_float(route_entropy)
     c = as_interval(Fraction(39, 4))
     critical_window = (1-iv.sqrt(1-iv.power(2, -8/c)))/2
+    target_window = as_interval(Fraction(11, 50))
+    target_divergence = (iv.log(iv.mpf(1)/(4*target_window*(1-target_window))))/2
+    required_c = 4*iv.log(iv.mpf(2))/target_divergence
+    two_bit_window = (1-iv.sqrt(1-iv.power(2, -4/c)))/2
     print({"D(13/25 || 1/5) upper": upper_float(divergence),
            "(16/39) ln 2 lower": lower_float(route_entropy),
            "critical_window_enclosure": [lower_float(critical_window),
                                           upper_float(critical_window)],
            "distance_upper_enclosure": [lower_float(critical_window/2),
-                                        upper_float(critical_window/2)]})
+                                        upper_float(critical_window/2)],
+           "two_bit_distance_upper_enclosure": [lower_float(two_bit_window/2),
+                                                upper_float(two_bit_window/2)],
+           "four_bit_growth_threshold_enclosure": [lower_float(required_c),
+                                                   upper_float(required_c)]})
 
 
 if __name__ == "__main__":
