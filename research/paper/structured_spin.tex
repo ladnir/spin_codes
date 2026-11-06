@@ -2,27 +2,28 @@
 \label{sec:structured-spin}
 \label{sec:regional-spin}
 
-The two main constructions share a regional route and a linear state
-recurrence within $E=I\circ\Pi\circ O$. Each outer group supplies one packet
-to each region. Independent shuffles choose the region of every packet and its
-position within that region. A linear state recurrence then processes the
-serialized regions. Packet width, local outer distribution, and state-map
-distribution are construction choices. We define this common encoder before
-fixing them.
+We now specify the components of $E=I\circ\Pi\circ O$ from
+\eqref{eq:intro-spin-composition}. Split each outer output into packets.
+The route sends one packet from every outer group to each region, then
+shuffles the packets within each region. The inner processes the regions
+in order while carrying a state between them. Packet width, local outer
+maps, and inner maps remain parameters here. Sections~\ref{sec:structured-distance}
+and~\ref{sec:turbo-spin} fix them for the two distance guarantees.
 
 \subsection{Parameters and Dataflow}
 
-Choose a local input length $k$, a local output length $b$, a packet width
-$p\mid b$, a number $L$ of outer groups, an inner step width $t$, and a state
-dimension $s$. Require $t\mid pL$, so each region contains an integer number
-of inner steps. Put
+Choose $L$ outer groups, each with $k$ input bits and $b$ output bits.
+Split each output into packets of $p\mid b$ bits. The inner processes
+$t$ bits per step and holds $s$ state bits. Require $t\mid pL$, so a
+region contains whole steps. Put
 \begin{equation}
  B:=b/p,\qquad K:=Lk,\qquad N:=Lb,\qquad
  e:=pL/t,\qquad R:=N/t=Be.
  \label{eq:structured-parameters}
 \end{equation}
 Each of the $B$ regions contains one $p$-bit packet from every group and
-occupies $pL$ consecutive output coordinates. The encoder has the dataflow
+occupies $pL$ consecutive output coordinates. Refining
+\eqref{eq:intro-spin-composition}, the encoder has the dataflow
 \begin{equation}
  E=I\circ\Pi_{\mathrm{reg}}\circ T\circ\Pi_{\mathrm{blk}}\circ O
  :\F_2^{Lk}\longrightarrow\F_2^{Lb}.
@@ -36,19 +37,14 @@ routed array with $\F_2^N$ in region-major order; $T$ includes this change
 of serialization. The three middle maps compose to one permutation of the
 $N$ binary coordinates.
 
-The fixed data are $(L,k,b,p,t,s)$, linear maps
-$A:\F_2^s\to\F_2^t$ and $C:\F_2^t\to\F_2^s$, a joint distribution for
-injective linear local maps $G_j:\F_2^k\to\F_2^b$, and a distribution
-for linear state maps $M_i:\F_2^s\to\F_2^s$. Setup samples the local maps, uniform
-independent group and region permutations, and independent state maps.
-The local maps may be one fixed map, one shared sampled map, or
-independently sampled maps; this choice changes the outer-word counts.
-The outer setup is independent of routing and inner setup. After setup,
-all maps are fixed for every message.
-
-Scalable SPIN will take $p=1$ and grow $b$ with $N$. Turbo SPIN will
-take $p=4$ and fix $(k,b)=(128,256)$ at its certified lengths. The
-different local randomizers are included in their respective $G_j$.
+The setup consists of injective linear local maps
+$G_j:\F_2^k\to\F_2^b$, linear maps $A:\F_2^s\to\F_2^t$ and
+$C:\F_2^t\to\F_2^s$, linear state maps $M_i:\F_2^s\to\F_2^s$,
+and the route permutations below. An instantiation specifies which maps
+are fixed and the joint distribution of the sampled maps. It may reuse
+one sampled local map or sample independent maps across groups. Outer,
+route, and inner setup are independent in both instantiations. Once
+sampled, one setup is fixed for every message.
 
 \subsection{Block-Diagonal Outer}
 
@@ -62,14 +58,9 @@ $u_j\in\F_2^k$. The outer encoder is the direct sum
   \label{eq:structured-outer}
 \end{equation}
 Equivalently, a generator matrix for $O$ places the local generator matrices
-on the diagonal. The most basic instantiation repeats one constituent
-$G:\F_2^k\to\F_2^b$ in every position. The asymptotic construction in
-Section~\ref{sec:structured-scalable} uses a growing, Golay-based BAA
-constituent: extended Golay blocks followed by two permute--accumulate
-stages. The BCH--IMT instantiation in
-Appendix~\ref{sec:finite-certificates} instead repeats a fixed BCH constituent.
-Turbo SPIN in Section~\ref{sec:turbo-spin} uses short RS rows with randomized
-columns and packet routing.
+on the diagonal. The choice between one shared constituent and independent
+local maps affects the word counts in a distance proof. Sections~\ref{sec:structured-distance}
+and~\ref{sec:turbo-spin} specify those choices after defining the route.
 
 The first-moment proof needs counts of outer words in the classes relevant
 to the route and inner. For one-bit packets, these are row-weight classes;
@@ -129,10 +120,10 @@ $C:\F_2^t\to\F_2^s$, set
  \label{eq:structured-inner}
 \end{equation}
 The state continues across region boundaries; $Q_R$ is discarded.
-Scalable SPIN samples a transvection for each $M_i$ and uses separately
-specified fixed maps $A,C$. Turbo SPIN samples each $M_i$ uniformly from
-$\mathrm{GL}(s,2)$ and sets $C=A^\top$. Both choices fit the same
-recurrence, though their distance analyses use different state laws.
+The recurrence allows any specified distribution for the $M_i$ and any
+fixed pair $A,C$. The two main instantiations use $C=A^\top$ and
+independent uniform invertible $M_i$. Their choices of $A$ are given
+with their distance claims.
 
 The transpose processes input groups $U_i\in\F_2^t$ in reverse order.
 Starting from $r_R=0\in\F_2^s$, it emits
@@ -161,14 +152,10 @@ from every output sequence.
 
 \begin{definition}[Regional SPIN]
 \label{def:structured-spin}
-For admissible parameters indexed by $m$, each setup defines
-\begin{equation}
-  E_m
-  :=
-  I_m\circ\Pi_m\circ O_m
-  :\F_2^{K_m}\longrightarrow\F_2^{N_m}.
-  \label{eq:structured-spin-encoder}
-\end{equation}
+For admissible parameters and a setup sampled as specified above,
+Regional SPIN is the linear map in \eqref{eq:structured-dataflow}, from
+$\F_2^{K}$ to $\F_2^{N}$. A family of parameter choices indexed by $m$
+gives maps $E_m:\F_2^{K_m}\to\F_2^{N_m}$.
 \end{definition}
 
 Every realized local map is injective. The outer direct sum is therefore
@@ -186,6 +173,5 @@ gives an exact class map through the packet multiset of each group;
 the proofs may retain these classes or bound unions of them. Scalable SPIN
 uses bit-level row weights and an asymptotic envelope. Turbo SPIN retains
 packet information for sparse occupations and uses a pointwise outer
-comparison for larger ones. The supporting BCH--IMT
-instantiation in Appendix~\ref{sec:finite-certificates} uses the bit-level
-route with a fixed outer and tuned finite parameters.
+comparison for larger ones. The supporting BCH--IMT certificates in
+Appendix~\ref{sec:finite-certificates} concern the application backend.

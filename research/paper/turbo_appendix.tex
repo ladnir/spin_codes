@@ -55,18 +55,8 @@ $1,z_0,\ldots,z_5$ and the following eight functions, in order:
  z_1z_2+z_3z_5.
 \end{gathered}
 \]
-This is the paired $15$-state map. For $s=22$, the columns of $A$ are
-the following $64$-bit masks; bit $j$ is output coordinate $j$:
-\begin{center}\footnotesize\ttfamily
-\begin{tabular}{@{}llll@{}}
-ffffffffffffffff & aaaaaaaaaaaaaaaa & cccccccccccccccc & f0f0f0f0f0f0f0f0\\
-ff00ff00ff00ff00 & ffff0000ffff0000 & ffffffff00000000 & 3693af0a9cc6faa0\\
-d882d88272287228 & 666669960ff00000 & b874edded1e28448 & a5ffcc96cc965a00\\
-8e2b4de88ed4b2e8 & 2de14b78ddee4488 & cca5cc5a69009600 & 9556599a300cfcc0\\
-8888888888888888 & a0a0a0a0a0a0a0a0 & aa00aa00aa00aa00 & aaaa0000aaaa0000\\
-aaaaaaaa00000000 & cccc0000cccc0000 & &
-\end{tabular}
-\end{center}
+This is the paired $15$-state map. For $s=22$, use the map $A$
+specified in Appendix~\ref{app:shared-inner-map}.
 In both cases the feedback is $A^\top$. Each step uses an independent
 uniform invertible state map. These are separate certified maps, not
 instances of the paper's BCH--IMT transvection family.

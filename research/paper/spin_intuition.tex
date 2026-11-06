@@ -112,16 +112,15 @@ evaluates $m=\Theta(\log N)$ feedback taps at each position, adding another
 $\Theta(N\log N)$ term. The uniform permutation also requires irregular
 data movement.
 
-The two main constructions keep this outer--route--inner sequence but make
-different choices about where to spend work and randomness. Scalable SPIN
-uses a growing spectrum-controlled outer, routes individual bits, and mixes
-state with inexpensive transvections. This choice supports a distance theorem
-as the length grows. Turbo SPIN uses a short RS outer, randomizes its columns,
-routes four-bit packets, and uses uniform sampled state updates. It gives
-fast transposed encoding with certified guarantees at selected finite
-lengths. In each case, the proof counts the outer words that could cause
-failure and bounds what the route and inner do to each class of words.
+The next construction processes groups of bits with fixed expansion and
+feedback maps. Independent invertible state updates provide the remaining
+randomness. Scalable SPIN uses a growing outer and routes individual bits;
+this supports a distance theorem as the length grows. Turbo SPIN uses a
+short RS outer with randomized columns and routes four-bit packets; it has
+certified guarantees at selected finite lengths. Both use the same state
+recurrence and update law, with maps chosen for their parameters. Their
+proofs count outer words by the information preserved by each route.
 
-We first define this regional encoder for an arbitrary packet width.
-Scalable SPIN then fixes one-bit packets and proves an asymptotic theorem;
-Turbo SPIN fixes four-bit packets and proves finite-length guarantees.
+Section~\ref{sec:regional-spin} defines the common encoder with generic
+parameters. The following two sections fix its parameters and prove the
+scalable and finite guarantees.

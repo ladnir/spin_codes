@@ -1,13 +1,13 @@
 \section{Turbo SPIN: Fixed Outer and Four-Bit Packets}
 \label{sec:turbo-spin}
 
-The bit-level route and IMT inner above give an asymptotic guarantee.
-At selected finite lengths, we spend more randomness on each outer group
-and inner update while routing four-bit packets. This instantiates the
-regional encoder of Section~\ref{sec:regional-spin} as \emph{Turbo SPIN}.
-Its finite certificate uses packet-support classes in the same first-moment
-framework. The asymptotic theorem of Section~\ref{sec:structured-distance}
-does not apply to this packet route.
+Scalable SPIN uses one-bit packets and a growing shared outer to obtain
+an asymptotic guarantee. For selected finite lengths, \emph{Turbo SPIN}
+uses a short RS outer and routes four-bit packets. It retains the same
+recursive update law, with a smaller fixed state map at the shortest
+length. Its distance proof keeps packet support and values where the
+one-bit proof uses row weights. The asymptotic theorem of
+Section~\ref{sec:structured-distance} does not apply to this route.
 
 \paragraph{Construction.}
 Fix $K\in\{2^{16},2^{18},2^{20}\}$, set
@@ -31,11 +31,13 @@ packet slots of each region. Serialize in region-major order.
 The inner uses recurrence~\eqref{eq:structured-inner} with $C=A^\top$.
 The fixed map $A:\F_2^s\to\F_2^{64}$ and independently sampled uniform
 $M_i\in\mathrm{GL}(s,2)$ use $s=15$ at $K=2^{16}$ and $s=22$ at the two
-larger lengths. The state continues across region boundaries and is
-discarded after the last output. Outer coefficients, both sets of
+larger lengths. The $s=22$ map is the one used by Scalable SPIN.
+The state continues across region boundaries and is discarded after
+the last output. Outer coefficients, both sets of
 permutations, and state updates are mutually independent in the ideal
-setup distribution. Appendix~\ref{app:turbo-proof} specifies the two
-fixed maps and the finite proof calculation.
+setup distribution. Appendix~\ref{app:shared-inner-map} specifies the
+shared $s=22$ map; Appendix~\ref{app:turbo-proof} specifies the $s=15$
+map and the finite proof calculation.
 
 \begin{theorem}[Finite Turbo SPIN distance]
 \label{thm:turbo-spin}

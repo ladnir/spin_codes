@@ -8,8 +8,8 @@ blockwise outer encoder, one global interleaver, and a recursive inner.
 bit operations for ordinary and transposed encoding at its native output lengths
 $N$. With probability $1-o(1)$ over the random choice of the code, its minimum distance exceeds
 $0.11N$. The proof combines outer spectrum bounds with an analysis of
-structured support spreading and recursive state mixing.
-We formally verify these distance and rate guarantees in Lean.
+structured support spreading and recursive state mixing. The
+proof uses a three-state transfer bound and a full-state regional limit.
 
 \qquad Turbo SPIN is a finite binary construction with short RS rows,
 randomized columns, and four-bit packet routing. At $K=2^{16},2^{18},2^{20}$ it has rate

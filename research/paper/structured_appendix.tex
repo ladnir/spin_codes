@@ -9,15 +9,16 @@ Theorem~\ref{thm:structured-spin-scalable} in
 Section~\ref{sec:structured-distance}. The argument
 first selects one Golay BAA constituent whose realized spectrum obeys a
 certified envelope. It then reduces the structured route to occupation and
-mean row weight. The final first-moment bound separates four regimes:
-$Q=1,2$, fixed $Q\ge3$, growing sparse $Q$, and positive relative
-occupation. Finite IMT transfers handle the last two regimes. Continuum
-transfers handle $Q=1,2$ and fixed $Q\ge3$.
+mean row weight. The final first-moment bound separates fixed, growing
+sparse, and positive relative occupation. A three-state weighted transfer
+handles the latter two regimes. A full-state regional comparison handles
+fixed occupation and the state carried between regions.
 
 For $0\le d\le N$ and $1\le Q\le L$, let $Z_{d,Q}$ count nonzero messages
 with exactly $Q$ active outer blocks and encoded weight at most $d$. Unless a
 display states otherwise, expectations and probabilities include the shared
-BAA constituent, the route permutations, and the IMT transvections. The
+BAA constituent, the route permutations, and the independent uniform
+invertible state maps. The
 finite-length specialization is not part of this probability space.
 
 \subsubsection{The One-Sampled Golay BAA Outer}
@@ -246,26 +247,24 @@ lower envelope of rational affine supports. It proves
   \qquad(x\in\mathcal W).
   \label{eq:ba-spectrum-majorant}
 \end{equation}
-The majorant has $39$ affine segments. It contains the supports of the
-$31$-segment majorant of Appendix~\ref{app:imt-sparse} and five further
-left-half supports with slopes $0.09$, $0.07$, $0.05$, $0.03$, and $0.01$, together with
-their reflections. Each of these ten intercepts is an outward rational
-upper bound on $\ln(1+e^{-s})-(\ln2)/2+10^{-5}$ for its slope $s$.
+The majorant has $39$ affine segments. Its left-half supports include
+slopes $0.09$, $0.07$, $0.05$, $0.03$, and $0.01$, together with their
+reflections. Each of these ten intercepts is an outward rational upper
+bound on $\ln(1+e^{-s})-(\ln2)/2+10^{-5}$ for its slope $s$.
 This expression proposes the line; validity follows from outward checks of
 \eqref{eq:structured-ba-variational} over its entire active interval.
 The check of these supports accepts $5{,}363$ leaves after $10{,}721$ box checks, with
 largest upper residual below $-1.70\cdot10^{-9}$. Exact partition replay
 and higher working precision confirm every leaf. Reflection uses
 $\pi(c,x)=\pi(c,1-x)$, not a symmetry of each realized constituent.
-Adding supports only shrinks the active interval of each $31$-segment
-support, so its validity checks carry over. The central support is an outward rational
-rounding of the exact code-size bound $(\ln2)/2$. Taking the lower envelope
-preserves concavity.
+The central support is an outward rational rounding of the exact
+code-size bound $(\ln2)/2$. Taking the lower envelope preserves
+concavity. The fixed-occupation argument uses a separately verified
+$31$-segment majorant; its support list and endpoint checks are in
+the numerical certificate\repositorycite.
 Equations~\eqref{eq:structured-ba-asymptotic} and
 \eqref{eq:ba-spectrum-majorant} give the outer exponent used below. The
 certificate records all affine supports and box witnesses.
-
-\subsubsection{Routing and the Inner Estimates}
 
 Lemma~\ref{lem:structured-route-domination} and its proof are in
 Section~\ref{sec:structured-distance}. The estimates below use its notation:
@@ -273,4 +272,4 @@ $Q$ active rows, $\alpha=Q/L$, mean relative row weight $x$, and
 $q=\alpha x$. The concavity bound
 \eqref{eq:structured-ba-jensen} reduces the selected spectrum to that mean.
 
-\input{structured_imt_appendix}
+\input{structured_uniform_appendix}

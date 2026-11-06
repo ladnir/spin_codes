@@ -31,21 +31,16 @@ $0.11-o(1)$, and linear work.
 
 \subsubsection{Linear Work and Working State}
 
-\paragraph{Why the Structured Inner Takes Linear Time.}
-In the scalable family, the inner step width $t=128$ and state dimension
-$s=19$ are fixed independently of $N$. Each of the $N/t$ steps evaluates
-the fixed linear maps $A,C$, adds fixed-length vectors, and applies
-a sampled transvection as specified in
-\eqref{eq:structured-inner}. Even a direct bit implementation takes a
-constant number of operations per step, so the total inner work is
-$O(N)$. The sampled transvection changes with the step, but neither its
-width nor the arithmetic cost grows. The recursive state therefore has
-constant size. If the encoder also tracks its position to select the next
-transvection, its counter takes $O(\log N)$ bits, giving $O(\log N)$ total
-working state. If the position is supplied externally, the working state
-remains constant. This distinction does not change the linear encoding
-work. The stored transvection schedule and interleaver description are
-setup data, separate from this working state.
+\paragraph{Why the Recursive Inner Takes Linear Time.}
+In the scalable family, the inner step width $t=64$ and state dimension
+$s=22$ are fixed independently of $N$. Each of the $N/t$ steps evaluates
+fixed maps $A,C$, adds fixed-length vectors, and applies one sampled
+invertible state map as in \eqref{eq:structured-inner}. Even direct bit
+evaluation takes constant work per step, so total inner work is $O(N)$.
+The recursive state has constant size. An internal step counter takes
+$O(\log N)$ bits; an externally supplied position leaves constant
+working state. The sampled state-map schedule and interleaver are setup
+data, separate from working state.
 The full encoder also needs a linear-time outer, as accounted for in
 \eqref{eq:structured-cost} below.
 
@@ -92,7 +87,7 @@ where the last term covers routing and permutation work.
 
 For any fixed base constituent with a constant-size encoding circuit, tiling,
 two permutations, and two accumulators give
-$C_{\mathrm{out}}(b)=O(b)$. The fixed $(128,19)$ IMT step has constant cost.
+$C_{\mathrm{out}}(b)=O(b)$. The fixed $(64,22)$ state step has constant cost.
 Every term in \eqref{eq:structured-cost} is therefore $O(N)$. The asymptotic
 BAA constituent uses extended Golay base blocks, but the cost argument
 does not depend on their 24-bit length.

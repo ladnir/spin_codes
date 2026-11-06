@@ -1,0 +1,173 @@
+\subsubsection{The Selected IMT Maps}
+
+The state dimension is $s=19$ and the step width is $t=128$ throughout this
+appendix. Table~\ref{tab:imt-maps} specifies both maps in
+\eqref{eq:structured-inner}. Bit $i$ of each hexadecimal word is coordinate
+$i$, starting with the least significant bit. Write $M:=2^{19}-1$.
+The nonzero image weights of $A$ and their multiplicities are
+\[
+ (d_i)_{i=1}^5=(48,56,64,72,80),\qquad
+ (c_i)_{i=1}^5=(5166,110288,293455,110128,5250).
+\]
+Every coordinate of $A$ is a nonzero linear functional. The $128$ columns
+of $C$ are distinct nonzero vectors of weight five and span $\F_2^{19}$.
+The BCH certificate verifier checks these properties and both spectra
+by exact enumeration\repositorycite.
+
+\begin{table}[t]
+\centering
+\caption{Fixed IMT expansion and feedback maps. The words specify
+$A(e_j)$ and $C^\top(e_j)$ for the standard state basis.}
+\label{tab:imt-maps}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}rll@{}}
+\toprule
+$j$ & $A(e_j)$ & $C^\top(e_j)$ \\
+\midrule
+0 & \texttt{55555555555555555555555555555555} & \texttt{800003d868100423210234004341a004} \\
+1 & \texttt{33333333333333333333333333333333} & \texttt{010d0102568441441a6212120884488c} \\
+2 & \texttt{0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f} & \texttt{40482008104050000312449182000a43} \\
+3 & \texttt{ff00ff00ff00ff00ff00ff00ff00ff00} & \texttt{c60682141218101b9a382140d1011330} \\
+4 & \texttt{0000ffff0000ffff0000ffff0000ffff} & \texttt{02800a0201093ca2cc121a20200c0408} \\
+5 & \texttt{ffffffff00000000ffffffff00000000} & \texttt{81212844806ef00068055044102ee101} \\
+6 & \texttt{ffffffffffffffff0000000000000000} & \texttt{1e200091046309f08018083800400061} \\
+7 & \texttt{ca9ff6a3c56f06ac0653c590f65cca60} & \texttt{91750062141381019100a60c30a810aa} \\
+8 & \texttt{8e8e718e2bd4d4d4b2b24db217e8e8e8} & \texttt{01043040c08a882804068c12246500d0} \\
+9 & \texttt{b2b2b2b218e7e71842bdbd42e8e8e8e8} & \texttt{2089148c8300089c8504044184424100} \\
+10 & \texttt{a00a05af366393c6396c633650fa0aa0} & \texttt{044340810132201506e1012001322008} \\
+11 & \texttt{9350635fa063506c5f9c506c93509ca0} & \texttt{42001d281e80022101ec18224403cc12} \\
+12 & \texttt{12e2747b121d7484de2e4748212eb848} & \texttt{2834da0440600280021100010b9a9780} \\
+13 & \texttt{4411e14b11bb4b1e2d87772287d22288} & \texttt{2118a12209240f06640041cacb0884c5} \\
+14 & \texttt{59953003cffca66a0cc0655665560cc0} & \texttt{80122401c000804c00c9821294803a04} \\
+15 & \texttt{7447b88b74b8b874b7847b4848848448} & \texttt{6880cc1f224046004080818c3814003b} \\
+16 & \texttt{11ddd21e447787b42d1e112278b44488} & \texttt{1cf284802d0ca24a000820040c904700} \\
+17 & \texttt{72e48214e48deb82d8b1d7be4ed8be28} & \texttt{7c405360a885745070a0c0a122702002} \\
+18 & \texttt{4e824e82e428e4284e824e82e428e428} & \texttt{128a40312091018038456bcd40011874} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Finite IMT Transfers}
+\label{app:imt-finite-transfers}
+
+We represent a weighted state measure by seven nonnegative coordinates
+$(Z,D,S_1,\ldots,S_5)$. The $Z$ coordinate is mass at zero. The $D$
+coordinate bounds arbitrary mass on nonzero states. Coordinate $S_i$
+dominates $S_i$ times the uniform probability measure on
+$\{q:\wt(Aq)=d_i\}$. Terminal mass is bounded by the sum of coordinates.
+Rows of a transfer matrix index the entering coordinate, so weighted
+measures propagate as row vectors. Write $e_Z$ for the zero-state unit row
+vector and $\1$ for the all-ones column vector.
+
+First fix an input weight $j$. Let $n_j:=\binom{128}{j}$, let $k_j$ be the
+number of weight-$j$ vectors in $\ker C$, and put $\nu_j:=1-k_j/n_j$.
+For $z\in(0,1)$, the emitted moment at image weight $d$ is
+\[
+ m_{d,j}(z):=\frac1{n_j}\sum_h
+ \binom dh\binom{128-d}{j-h}z^{d+j-2h}.
+\]
+Set $m_{D,j}:=\max_i m_{d_i,j}$. For $q\ne0$, define the lazy
+cancellation moment
+\[
+ L_j(q;z):=\frac1{n_j}\sum_{\substack{\wt(X)=j\\CX=q}}
+ z^{\wt(X+Aq)}.
+\]
+Choose upper bounds $\ell_{D,j}\ge\max_{q\ne0}L_j(q;z)$ and
+$\ell_{i,j}\ge c_i^{-1}\sum_{\wt(Aq)=d_i}L_j(q;z)$.
+Let $f_j$ bound the size of every nonzero weight-$j$ syndrome fiber. Valid
+choices are the minima of the following bounds:
+\begin{align*}
+ \ell_{D,j}&:=
+ \min\left\{m_{D,j},\nu_j,
+ \frac{f_j}{n_j}z^{\min_i|d_i-j|}\right\},\\
+ \ell_{i,j}&:=
+ \min\left\{m_{d_i,j},
+ \frac{\min(n_j-k_j,c_i f_j)}{c_i n_j}z^{|d_i-j|}\right\}.
+\end{align*}
+For $j=1,2$ the verifier also uses the exact cancellation sums, enumerating
+the input supports and grouping them by $CX$ and $\wt(ACX)$. No relation
+between $A$ and $C^\top$ is assumed.
+
+The integer fiber bounds require only the spectrum of $C^\top$. Let $b_w$
+count its nonzero words of weight $w$, and let $\mathcal K_j(w)$ be the
+binary Krawtchouk polynomial. Fourier inversion and Parseval give
+\[
+ k_j=2^{-19}\left(n_j+\sum_w b_w\mathcal K_j(w)\right),\qquad
+ V_j=2^{-19}\left(n_j^2+\sum_w b_w\mathcal K_j(w)^2\right),
+\]
+where $V_j$ is the sum of squares of all syndrome fiber sizes. Put
+$a_j:=n_j-k_j$. A nonzero fiber is at most each of
+\begin{gather*}
+ a_j,\qquad
+ \left\lfloor2^{-19}\left(n_j+\sum_w b_w|\mathcal K_j(w)|\right)\right\rfloor,\\
+ \left\lfloor\frac{a_j+\lceil\sqrt{(M-1)(M(V_j-k_j^2)-a_j^2)}\rceil}{M}\right\rfloor.
+\end{gather*}
+The last bound follows by minimizing the other $M-1$ squares for a fixed
+maximum fiber. There is also a constant-weight packing bound. If $d_C$ is
+the kernel distance, set $r=\lfloor(d_C-1)/2\rfloor$ and $h=\min(j,128-j)$.
+The bound is $1$ for $h<r$ and
+$\lfloor\binom{128}{h-r}/\binom hr\rfloor$ otherwise: two words in one
+fiber cannot contain the same $(h-r)$-subset after complementing when needed.
+The verifier takes the minimum of these integer upper bounds.
+
+Define the fixed-weight transfer $T_j(z)$ by the following nonzero entries:
+\begin{align*}
+ (T_j)_{ZZ}&=(1-\nu_j)z^j,& (T_j)_{ZD}&=\nu_j z^j,\\
+ (T_j)_{DZ}&=\tfrac12\ell_{D,j}+\tfrac1{2M}\min(m_{D,j},\nu_j),&
+ (T_j)_{DD}&=\tfrac12m_{D,j},\\
+ (T_j)_{DS_i}&=\tfrac{c_i}{2M}m_{D,j},&
+ (T_j)_{S_iZ}&=\tfrac12\ell_{i,j}+\tfrac1{2M}\min(m_{d_i,j},\nu_j),\\
+ (T_j)_{S_iS_h}&=\tfrac{c_h}{2M}m_{d_i,j}.&&
+\end{align*}
+Additionally put mass $m_{d_i,j}/2$ in entry $S_iD$ when $\nu_j>0$, or
+add it to entry $S_iS_i$ when $\nu_j=0$.
+
+These entries dominate the weighted state measure. The zero row is exact.
+The lazy branch pays its cancellation bound and places the remaining mass
+in $D$; if all syndromes vanish, it preserves the entering shell.
+On the refresh branch, every specified target has probability at most $1/M$.
+Termination also requires a nonzero syndrome, giving the minimum in the
+zero column. Keeping the full surviving-mass upper bounds deliberately
+overcounts cancellation; it never subtracts an unproved lower bound.
+For iid Bernoulli-$\beta$ input, the occupation transfer is
+\[
+ T_{\rm occ}(\beta,z):=\sum_{j=0}^{128}
+ \binom{128}{j}\beta^j(1-\beta)^{128-j}T_j(z).
+\]
+
+A second envelope bounds every target by Fourier inversion of a tilted
+input law. Set
+\[
+ g_0:=1-\beta+\beta z,\quad g_1:=\beta+(1-\beta)z,\quad
+ F_d:=g_0^{128-d}g_1^d,
+\]
+\[
+ r_0:=|1-2\beta z/g_0|,\qquad
+ r_1:=|1-2(1-\beta)z/g_1|,
+\]
+and define
+\[
+ H_d:=2^{-19}\left(1+\sum_w b_w
+ \max_{\max(0,d+w-128)\le h\le\min(d,w)}r_0^{w-h}r_1^h\right).
+\]
+The maximum is attained at an endpoint. Tilting by $z^{\wt(X+Aq)}$ keeps
+the input coordinates independent. Fourier inversion bounds each syndrome
+point probability by $H_d$. Thus every target, including zero, receives
+weighted mass at most $F_d(H_d/2+1/(2M))$. Define $T_{\rm F}$ by placing
+this value in column $Z$ and $c_h$ times this value in column $S_h$ for an
+entering shell $S_i$ with $d=d_i$. For an entering $D$, maximize over $d_i$.
+The zero row of $T_{\rm F}$ is the exact binomial mixture of the zero rows of $T_j$.
+
+Finally the state-independent scalar envelope is
+\[
+ T_{\rm sc}(\beta,z):=\max_{d\in\{0,48,56,64,72,80\}}F_d.
+\]
+At $\beta=1/2$ it equals $((1+z)/2)^{128}$ exactly. For either matrix
+envelope, induction gives
+\begin{equation}
+ \E[z^{\wt(Y)}]\le e_Z T(\beta,z)^{N/128}\1.
+ \label{eq:imt-moment}
+\end{equation}
+The scalar bound gives $T_{\rm sc}^{N/128}$. A witness selects one complete
+envelope; the proof never takes an entrywise minimum of representations.

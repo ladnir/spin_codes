@@ -33,20 +33,20 @@ $\Pi_N$, but their composition is one global interleaver.
 Every realization of Scalable SPIN has rate $1/2$.
 Its minimum distance exceeds $0.11N$ with probability $1-o(1)$ over setup.
 Ordinary and transposed encoding require $O(N)$ bit operations at the family's
-native lengths. The distance and rate claims are formally verified in Lean,
-including the construction's random setup, the analytic estimates, and the
-required numerical certificates. Appendix~\ref{app:structured-lean} describes
-the formalization.
+native lengths. The distance proof selects one shared outer realization,
+bounds the routed inner at three occupation scales, and checks the
+numerical inequalities with outward arithmetic.
 Turbo SPIN is a finite, binary half-rate construction. It uses
 short RS rows, randomized $32$-bit columns, a four-bit packet route, and
 a separately certified recursive inner. At $K=2^{16},2^{18},2^{20}$,
 its relative distance exceeds $0.10$ with more than $51$ bits of
-setup-failure margin. This is a finite claim, distinct from the Scalable
-SPIN theorem.
+setup-failure margin. The $s=22$ Turbo profiles use the same fixed
+inner map and update law as Scalable SPIN; the shortest profile uses a
+smaller map.
 
 Both main constructions follow \eqref{eq:intro-spin-composition}. They use
-different outer codes, routing units, and state updates to trade encoding
-cost against the scope of the distance proof. The same first-moment
+different outer codes and routing units to trade encoding cost against
+the scope of the distance proof. The same first-moment
 framework asks how many outer words occur in each relevant class and how
 likely their routed images are to produce a low-weight output.
 
@@ -164,5 +164,3 @@ The artifact provides the core SPIN encoder implementation and build instruction
 The source repository~\cite{spinCodeRepository} includes the core SPIN
 encoder implementation and build instructions.
 \fi
-The accompanying Lean development includes proof sources, numerical
-certificates, and reproduction instructions.

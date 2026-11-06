@@ -1,23 +1,14 @@
-\section{Scalable SPIN: Growing Outer and IMT Inner}
+\section{Scalable SPIN: A Growing Outer and One-Bit Route}
 \label{sec:structured-distance}
 
-Set the packet width to $p=1$ in the regional encoder of
-Section~\ref{sec:regional-spin}. We instantiate its outer with a growing
-constituent and its inner with fixed IMT maps. We call its outer groups
-\emph{rows} in the proof below.
-The constituent length $b$ grows logarithmically, but the outer encoding
-work is linear.
-The proof must handle both messages concentrated in a few outer blocks
-and messages occupying a constant fraction of the blocks.
-
-This specialization replaces the expensive parts of Random SPIN in three
-ways. One sampled BAA constituent is reused across rows, with its realized
-weight spectrum controlled before the first-moment calculation
-\cite{cryptoeprint:2026/1903}. Bit-level packet routing sends distinct bits
-of a row to distinct regions, limiting concentration late in the stream.
-Fixed expansion and feedback maps process $128$ bits at a time; sampled
-transvections refresh the state once per step. The route and inner are
-analyzed jointly because their effects on a low-weight output are dependent.
+Set $p=1$ in the regional encoder of Section~\ref{sec:regional-spin}.
+We call its outer groups \emph{rows}. One sampled constituent is reused
+across all rows, and its length grows logarithmically. The route sends
+distinct bits of each row to distinct regions. A fixed-width recursive
+inner then mixes the routed stream. We will prove a distance guarantee
+over the sampled outer, route, and inner setup while retaining linear
+encoding work. The proof must account for both sparse and dense sets of
+active rows.
 
 \subsection{Scalable Constituent Family}
 \label{sec:structured-scalable}
@@ -48,49 +39,6 @@ fix a particular $H_a$, its spectrum, and an admissible schedule for $b$.
 Changing $a$ or $H_a$ changes the outer enumerator and may change the certified
 schedule. It does not change the route or the structured inner.
 
-For $p=1$, the outer proof interface is its local weight enumerator.
-For a realized local map $G_j$, define
-\begin{equation}
-  P_{G_j}(z)
-  :=
-  \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
-  \label{eq:local-constituent-enumerator}
-\end{equation}
-The variable $z$ records weight: the coefficient of $z^w$ counts the
-nonzero block messages whose encoded output has weight $w$.
-These coefficients are ordinary integer counts, not elements of $\F_2$.
-We write $[z^h]F(z)$ for the coefficient of $z^h$ in a polynomial $F(z)$.
-If one deterministic map $G$ is repeated, the number of messages with exactly
-$q$ active blocks and outer weight $h$ is
-\begin{equation}
-  \binom Lq [z^h]P_G(z)^q.
-  \label{eq:repeated-constituent-enumerator}
-\end{equation}
-Here $\binom Lq$ chooses the $q$ nonzero message-block positions.
-Expanding $P_G(z)^q$ chooses one nonzero message for each of these blocks;
-multiplication adds their output weights in the exponent of $z$.
-The coefficient $[z^h]$ therefore counts exactly the choices with total
-outer weight $h$. For example, if $P_G(z)=2z^2+z^4$, then
-$[z^6]P_G(z)^2=4$: either block can supply weight two, with two choices
-for its message, while the other supplies weight four.
-
-For independently sampled, identically distributed local maps, expectation
-replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
-$\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
-quantity is instead
-\begin{equation}
-  \binom Lq\E\bigl[[z^h]P_G(z)^q\bigr].
-  \label{eq:shared-constituent-enumerator}
-\end{equation}
-In particular, an expectation over one sampled constituent must not be moved
-inside the $q$th power.
-
-The distance proof need not know how the local encoder is implemented. It may
-consume an exact enumerator, an expected enumerator under the declared setup,
-or a coefficientwise certified envelope. Minimum distance alone is generally
-insufficient because nearby low-weight shells can have much larger
-multiplicity.
-
 \paragraph{The Asymptotic Instantiation.}
 For the theorem below, set $a:=24$ and let
 $H_{24}:\F_2^{12}\longrightarrow\F_2^{24}$ encode the extended binary Golay code. Fix a positive integer $m$ and set
@@ -110,39 +58,21 @@ Use $\mathcal O_{24,b_m}$ from \eqref{eq:ba3-outer} with local dimension
 $k_m=b_m/2$. Setup reuses this sampled
 map in all $L_m$ diagonal positions:
 $G_{m,1}=\cdots=G_{m,L_m}:=\mathcal O_{24,b_m}$.
-The expectation over $(\tau_1,\tau_2)$ remains outside the
-$q$th enumerator power, as in
-\eqref{eq:shared-constituent-enumerator}.
+The expectation over $(\tau_1,\tau_2)$ remains outside powers of the
+constituent enumerator; this matters when counting several active rows.
 
 Setup samples the bit-level group and region shuffles of
 Section~\ref{sec:regional-spin}, independently of $(\tau_1,\tau_2)$.
-The inner fixes $(t,s)=(128,19)$ and the IMT maps $A,C$ in
-Table~\ref{tab:imt-maps}.
-For each inner step, independently sample
-$u_i\gets\F_2^s\setminus\{0\}$ and
-$v_i\gets\{v\in\F_2^s:\langle u_i,v\rangle=0\}$, including zero, and set
-$M_i:=I+u_iv_i^\top$. Each $M_i$ is invertible because
-$(u_iv_i^\top)^2=0$. For every fixed nonzero state $q$,
-\[
- \mathcal L(M_iq)
- =\tfrac12\delta_q+
- \tfrac12\operatorname{Unif}(\F_2^s\setminus\{0\}).
-\]
-If $u_i=q$, the update fixes $q$; for other $u_i$, the bit
-$\langle v_i,q\rangle$ is fair. This gives the IMT state-update law used
-in the distance proof.
-
-The selected maps have a small, explicit weight structure. For nonzero
-states $q$, the only values of $\wt(Aq)$ are $48,56,64,72,80$.
-The transfer analysis tracks these five shells rather than all $2^{19}$
-states. The $128$ columns of $C$ are distinct nonzero weight-five vectors
-spanning $\F_2^{19}$, so each input coordinate contributes to only five
-state coordinates. This gives sparse feedback. The proof does not treat
-the feedback syndromes $C(X_i)$ as uniform: it uses the exact spectrum of $C^\top$ to
-bound cancellations. The appendix supplies the map bases, shell
-multiplicities, and transfer entries; Appendix~\ref{app:implementation}
-describes the circuits used to apply the maps in the finite BCH--IMT
-instantiation.
+Fix $(t,s)=(64,22)$ and the $s=22$ map
+$A:\F_2^{22}\to\F_2^{64}$ specified in Appendix~\ref{app:shared-inner-map}.
+Set $C=A^\top$. The map $A$ is injective, and every column of $C$ is
+nonzero. Its exact image spectrum and the spectrum of $\ker C$ enter
+the distance calculation. For each step, independently sample
+$M_i\gets\mathrm{GL}(22,2)$, independently of the outer and route.
+For every fixed nonzero state $q$, $M_iq$ is uniform over the nonzero
+states. All these choices belong to one setup fixed for every message.
+The same $s=22$ inner map and update law appear in the larger finite
+Turbo profiles of Section~\ref{sec:turbo-spin}.
 
 \begin{theorem}[Scalable SPIN]
 \label{thm:structured-spin-scalable}
@@ -156,12 +86,9 @@ For the setup above,
   \label{eq:structured-spin-distance}
 \end{equation}
 The probability is over the two BAA permutations, all route permutations,
-and all IMT transvections. Every realized code has rate $1/2$. Its ordinary
+and the independent uniform state maps. Every realized code has rate $1/2$. Its ordinary
 and transposed encoders use $O(N_m)$ bit operations.
 \end{theorem}
-
-The distance and rate claims of Theorem~\ref{thm:structured-spin-scalable}
-are formally verified in Lean; see Appendix~\ref{app:structured-lean}.
 
 The argument has three parts. First, control the realized spectrum of the
 one sampled outer. Next, bound the route--inner failure probability for
@@ -173,6 +100,49 @@ The block constant $39/4$ is the value certified here; a smaller certified
 constant would change the schedule, not the construction.
 
 \subsection{Selecting the Shared Outer}
+
+For $p=1$, the outer proof interface is its local weight enumerator.
+For a realized local map $G_j$, define
+\begin{equation}
+  P_{G_j}(z)
+  :=
+  \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
+  \label{eq:local-constituent-enumerator}
+\end{equation}
+The variable $z$ records weight: the coefficient of $z^w$ counts the
+nonzero block messages whose encoded output has weight $w$.
+These coefficients are ordinary integer counts, not elements of $\F_2$.
+We write $[z^h]F(z)$ for the coefficient of $z^h$ in a polynomial $F(z)$.
+If one deterministic map $G$ is repeated, the number of messages with exactly
+$Q$ active blocks and outer weight $h$ is
+\begin{equation}
+  \binom LQ [z^h]P_G(z)^Q.
+  \label{eq:repeated-constituent-enumerator}
+\end{equation}
+Here $\binom LQ$ chooses the $Q$ nonzero message-block positions.
+Expanding $P_G(z)^Q$ chooses one nonzero message for each of these blocks;
+multiplication adds their output weights in the exponent of $z$.
+The coefficient $[z^h]$ therefore counts exactly the choices with total
+outer weight $h$. For example, if $P_G(z)=2z^2+z^4$, then
+$[z^6]P_G(z)^2=4$: either block can supply weight two, with two choices
+for its message, while the other supplies weight four.
+
+For independently sampled, identically distributed local maps, expectation
+replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
+$\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
+quantity is instead
+\begin{equation}
+  \binom LQ\E\bigl[[z^h]P_G(z)^Q\bigr].
+  \label{eq:shared-constituent-enumerator}
+\end{equation}
+In particular, an expectation over one sampled constituent must not be moved
+inside the $Q$th power.
+
+The distance proof need not know how the local encoder is implemented. It may
+consume an exact enumerator, an expected enumerator under the declared setup,
+or a coefficientwise certified envelope. Minimum distance alone is generally
+insufficient because nearby low-weight shells can have much larger
+multiplicity.
 
 Suppress the family index $m$, and write $\mathcal O_b:=\mathcal O_{24,b}$.
 Let $A_{\mathcal O_b}(w)$ count its nonzero words of weight $w$, and let
@@ -224,7 +194,7 @@ at every outer position.
 
 Fix any realization satisfying $\mathcal G_b$. All subsequent bounds are
 uniform over this choice; the remaining randomness consists of the
-independent route permutations and IMT transvections.
+independent route permutations and uniform state maps.
 The spectrum calculation also gives a concave function
 $\widehat a_{\rm BA}$ on $\mathcal W$ such that
 \[
@@ -337,203 +307,165 @@ The region shuffles are essential for Lemma~\ref{lem:structured-route-domination
 The deterministic transpose alone spreads each row, but it does not erase
 the row's coordinate pattern.
 
-\subsection{IMT Moments at Positive Occupation}
+\subsection{Weighted Inner Bound and Positive Occupation}
 
-The iid comparison is useful because the inner has a finite-state
-description. For iid Bernoulli-$\beta$ input and $0<z<1$, weight each
-transition by $z$ to the emitted Hamming weight. Track mass at zero,
-arbitrary nonzero mass, and uniform mass on each of the five nonzero
-image-weight shells of $A$. This gives seven nonnegative coordinates.
-For a live state, the transvection law defined above
-is a mixture of two branches. The lazy branch, $M_iQ_i=Q_i$, can cancel
-through $CX=Q_i$; the refresh branch spreads a live state uniformly. Both effects enter the transfer bound.
-
-Appendix~\ref{app:imt-finite-transfers} constructs nonnegative matrices
-$T(\beta,z)$ that dominate these weighted measures step by step.
-The occupation envelope $T_{\rm occ}(\beta,z)$ averages the transfer bounds
-for uniform fixed-weight inputs with weights from $\operatorname{Bin}(128,\beta)$.
-Starting with the zero-state unit row vector $e_Z$, induction gives
+We first bound the inner for iid Bernoulli-$\beta$ input bits and a tilt
+$0<z<1$. Put $D:=2^{22}-1$ and
 \[
- \E[z^{\wt(Y)}]\le e_Z T(\beta,z)^{N/128}\1,
+ g_0:=1-\beta+\beta z,\qquad g_1:=\beta+(1-\beta)z,
+ \qquad f(q):=g_0^{64-\wt(Aq)}g_1^{\wt(Aq)}\quad(q\ne0).
 \]
-where $\1$ is the all-ones column vector.
-A positive column vector $\boldsymbol v$ satisfying
-$T\boldsymbol v\le\lambda\boldsymbol v$ therefore gives a bound
-$C_{\boldsymbol v}\lambda^{N/128}$, with
-$C_{\boldsymbol v}:=v_Z/\min_i v_i$.
-
-Fix $\alpha\ge10^{-4}$ and mean row weight $x\in\mathcal W$.
-Markov's inequality contributes $z^{-0.11N}$.
-The outer spectrum and concavity contribute
-$\exp\{N\alpha\widehat a_{\rm BA}(x)+o(N)\}$.
-The factors for choosing active positions, row weights, and routing are
-also $\exp(o(N))$, uniformly in this range.
-
-We may choose a reference density $\beta=py$ rather than $\alpha x$, where
-$p$ and $y$ are witness parameters in $(0,1)$ playing the roles of $\alpha$
-and $x$.
-Every routed array in the profile has weight $N\alpha x$.
-On that slice, changing the reference law costs
-$\exp\{ND_{\rm KL}(\alpha x\Vert py)\}$.
-The chain rule bounds this divergence by
-$D_{\rm KL}(\alpha\Vert p)+\alpha D_{\rm KL}(x\Vert y)$.
-The resulting exponent per output bit is
+Write $F:=\max_{q\ne0}f(q)$ and
+$U:=D^{-1}\sum_{q\ne0}f(q)$. Let
 \[
+ H:=\sum_{x:Cx=0}\Pr_\beta[X=x]z^{\wt(x)},
+ \qquad u:=\Pr_\beta[CX\ne0],
+\]
+where $X$ is one Bernoulli-$\beta$ step. The image spectrum of $A$
+and the kernel spectrum of $C$ determine these quantities.
+A weighted state measure is bounded by three coordinates: mass at zero,
+arbitrary live mass, and uniform live mass. The independent uniform
+mixer bounds their one-step evolution by
+\begin{equation}
+ T(\beta,z):=
+ \begin{pmatrix}
+ H&g_0^{64}-H&0\\
+ \min(F,u)/D&0&F\\
+ \min(U,u)/D&0&U
+ \end{pmatrix}.
+ \label{eq:shared-inner-transfer}
+\end{equation}
+For a live state $q$, the mixer sends $q$ uniformly to a nonzero state.
+A prescribed successor therefore receives weighted mass at most
+$f(q)/D$. Reaching zero additionally requires $CX\ne0$. These facts
+give the last two rows of \eqref{eq:shared-inner-transfer}; the first
+row separates inputs in $\ker C$. Induction gives
+\[
+ \E_\beta[z^{\wt(Y)}]\le e_0^\top T(\beta,z)^{N/64}\1_3.
+\]
+Appendix~\ref{app:shared-inner-proof} proves the envelope for the
+full state process; it does not assume uniform feedback syndromes.
+
+For $\alpha:=Q/L\ge10^{-4}$ and mean active-row weight $x\in\mathcal W$,
+Lemma~\ref{lem:structured-route-domination} compares the routed input
+with iid Bernoulli-$\alpha x$ input. Changing that reference density to
+$py$, with $p,y\in(0,1)$, costs at most
+$\exp\{N[D_{\rm KL}(\alpha\Vert p)+\alpha D_{\rm KL}(x\Vert y)]\}$.
+If $T(py,e^{-\lambda})\boldsymbol v\le\rho\boldsymbol v$ for a
+positive vector $\boldsymbol v$, the bad-message exponent per output
+bit is at most
+\begin{equation}
  \alpha\widehat a_{\rm BA}(x)
  +D_{\rm KL}(\alpha\Vert p)+\alpha D_{\rm KL}(x\Vert y)
- +\frac{\ln\lambda}{128}-0.11\ln z.
-\]
-The certificate fixes witnesses on finitely many boxes covering
-$[10^{-4},1]\times\mathcal W$. On each affine segment of the outer majorant,
-this expression is convex in $(\alpha,\alpha x)$; vertex bounds suffice.
-Outward-rounded interval arithmetic bounds this exponent above by
-$-4.10335\cdot10^{-7}$ on every box.
-The finite set of witnesses has bounded prefactors, so the total
-positive-occupation contribution is at most $L\exp(-\eta N+o(N))$
-for some $\eta>0$.
+ +\frac{\ln\rho}{64}+0.11\lambda+o(1).
+ \label{eq:shared-dense-exponent}
+\end{equation}
+For fixed $p,y,\lambda$ and one affine outer-majorant segment, the
+expression without $o(1)$ is convex in $(\alpha,\alpha x)$.
+The certificate partitions $[10^{-4},1]\times\mathcal W$ into rational
+boxes and checks their four transformed vertices with outward arithmetic.
+Its largest upper exponent is below $-1.00147\cdot10^{-7}$.
+The finite witness set has bounded moment prefactors. Thus this
+occupation range contributes at most
+$L\exp\{-10^{-7}N+o(N)\}=o(1)$.
 
-\subsection{Sparse Occupation without a Large Conditioning Loss}
+\subsection{Growing Sparse Occupation}
 
-The dense comparison loses a factor $(L+1)^b$.
-Although subexponential in $N$, this factor is too large when the useful
-decay is only exponential in $Qb$. Sparse inputs need a different reference
-measure.
+The factor $(L+1)^b$ in Lemma~\ref{lem:structured-route-domination} is
+too large when $Q/L$ tends to zero. Compare each active row with a fair
+$b$-bit row instead. The outer spectrum bounds the cost of this
+comparison by $\exp\{b((\ln2)/2+\ell+\epsilon_b)\}$ per row, where
+$\ell=0.01281$ and $\epsilon_b=O(\ln b/b)$.
+Generate Bernoulli marks at density $p=(8/5)\alpha$ and condition each
+region to have $Q$ marks. Before conditioning, the routed input bits
+are iid Bernoulli-$\beta$ with $\beta=(4/5)\alpha$. The inverse
+conditioning probability is at most
+$8\sqrt Q\exp\{L D_{\rm KL}(\alpha\Vert p)\}$ per region.
 
-Write $h(x):=-x\ln x-(1-x)\ln(1-x)$.
-The outer majorant satisfies
-$\widehat a_{\rm BA}(x)-h(x)+(\ln2)/2<\ell$ on $\mathcal W$,
-with $\ell:=0.01281$.
-After summing messages and shuffling each active row, comparison with
-a fair $b$-bit row thus costs at most
-$\exp\{b((\ln2)/2+\ell+\epsilon_b)\}$ per row,
-where $\epsilon_b=O(\ln b/b)$.
-This comparison concerns the message counting measure, not the law of a
-single fixed word.
-
-Under the fair-row reference, a region contains $Q$ uniformly placed
-marks carrying independent fair bits. Generate marks independently with
-probability $p=(8/5)\alpha$, then condition their count to equal $Q$.
-Before conditioning, the bits have density $\beta=(4/5)\alpha$.
-The inverse conditioning probability per region is at most
-$8\sqrt Q\,\exp\{LD_{\rm KL}(\alpha\Vert p)\}$.
-For this occupation envelope and $z=1-(8/5)\alpha$, an exact polynomial
-check gives
-\[
- T_{\rm occ}(\beta,z)\boldsymbol v(\alpha)
- \le(1-96\alpha)\boldsymbol v(\alpha)
- \qquad(0<\alpha\le10^{-4}),
-\]
-with moment prefactor at most $2048$.
-Multiplying the row-counting, conditioning, and moment bounds yields
-\[
- \begin{aligned}
+Set $z:=1-(8/5)\alpha$ and
+$\boldsymbol v(\alpha):=(1,(1+24\alpha)/1024,1/1024)^\top$.
+The exact rational spectrum check gives
+\begin{equation}
+ T(\beta,z)\boldsymbol v(\alpha)
+ \le(1-48\alpha)\boldsymbol v(\alpha)
+ \qquad(0<\alpha\le10^{-4}).
+ \label{eq:shared-sparse-collatz}
+\end{equation}
+The moment prefactor is at most $1024$. Combining this contraction,
+outer-word counts, mark conditioning, and the schedule
+\eqref{eq:structured-native-schedule} yields
+\begin{equation}
  \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
- \le{}&2048\binom LQ
- e^{Qb((\ln2)/2+\ell+\epsilon_b)}(8\sqrt Q)^b\\
- &{}\cdot e^{ND_{\rm KL}(\alpha\Vert p)}
- (1-96\alpha)^{N/128}z^{-0.11N}.
- \end{aligned}
-\]
-The schedule \eqref{eq:structured-native-schedule} gives
-$\ln L/b\le4(\ln2)/39$, which bounds the cost of choosing active positions. The leading coefficient per $Qb$ is below
-$-0.01340384$. When $Q\ge4096$, the remaining conditioning cost per $Qb$
-is below $0.002$.
-The other remainders vanish uniformly as $b$ grows.
-Consequently, for all sufficiently large lengths,
-\[
- \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
- \le e^{-0.006Qb},
- \qquad4096\le Q\le10^{-4}L.
-\]
-Appendix~\ref{app:imt-sparse} gives the polynomial witness and every remainder.
-The explicit cutoff makes the bound uniform, even when $Q$ grows slowly.
+ \le e^{-0.006Qb}
+ \qquad(4096\le Q\le10^{-4}L)
+ \label{eq:shared-sparse-final}
+\end{equation}
+The cutoff makes the remainder uniform even when $Q$ grows slowly.
+Appendix~\ref{app:shared-inner-proof} gives the exact contraction and
+all conditioning remainders.
 
-\subsection{Fixed Occupation: Mixing between Isolated Impulses}
+\subsection{Fixed Occupation}
 
-It remains to handle the finite set $Q<4096$.
-Each region then contains at most $Q$ active bits.
-As $L$ grows, those bits typically lie in distinct steps separated by
-long empty intervals. A live state mixes during an empty interval:
-after $g$ steps its law is
-$2^{-g}$ times its entering law plus $(1-2^{-g})$ times the uniform
-nonzero law. Mixing does not make the state zero.
+Fix $Q<4096$ while $L$ grows. A region then contains at most $Q$
+active bits. Its shuffle places them at distinct uniform slots.
+With probability $1-O_Q(1/L)$, their steps are separated by empty
+steps and avoid the region boundaries. From a live state, one empty
+step makes the successor exactly uniform nonzero. The output weight
+of that first step still depends on the entering state, so the proof
+compares the \emph{full-state} regional kernels before multiplying
+across regions.
 
-Put $M:=2^{19}-1$ and $p_0:=2^{18}/M$.
-Every row of $A$ is nonzero, so a uniform live state emits
-mean weight $128p_0$ per empty step.
-The geometric mixing law bounds the variance over $g$ empty steps by
-$3t^2g$. With the tilt $z_L=e^{-\theta/L}$, the weighted empty-interval
-kernel therefore converges to
-$D_\gamma(u):=\operatorname{diag}(1,e^{-\gamma u})$ on zero/live states,
-where $\gamma=p_0\theta$ and $u$ is the interval's fraction of a region.
+Let $p_0:=2^{21}/D$ and $z_L:=e^{-\theta/L}$. For an empty gap of
+$g\ge1$ steps, the live-to-live weighted kernel from $q$ to $q'$ is
+\[
+ \frac{z_L^{\wt(Aq)}}{D}
+ \left(D^{-1}\sum_{v\ne0}z_L^{\wt(Av)}\right)^{g-1}.
+\]
+An isolated input bit activates a zero state because every column of
+$C$ is nonzero. From a uniform live state it returns to zero with
+probability $1/D$. Thus the limiting zero/live impulse matrix is
+$P_0=\left(\begin{smallmatrix}0&1\\1/D&1-1/D\end{smallmatrix}\right)$.
+For $a$ bits placed in a region, let $F_{a,L}(z_L)$ be its full-state
+weighted kernel and $K_a(\theta)$ the limiting two-state kernel.
+Appendix~\ref{app:shared-inner-proof}
+defines $K_a$ by a simplex integral and proves the componentwise
+full-state comparison
+\[
+ F_{a,L}(z_L)\le(1+C_{Q,\theta}/L)J K_a(\theta)R
+ \qquad(0\le a\le Q).
+\]
+Here $J$ classifies the entering state and $R$ distributes an exiting
+live class uniformly over nonzero states. The comparison holds for
+every boundary state. Across $b=O(\log L)$ regions its total cost is
+$1+o(1)$, including when coefficient extraction fixes row weights.
 
-An isolated input bit moves a zero state to a live state because the columns of $C$
-are nonzero. From a uniform live state, it cancels with probability $1/M$.
-Its limiting transition is thus
-\[
- P_0=\begin{pmatrix}0&1\\1/M&1-1/M\end{pmatrix}.
-\]
-For $a$ uniformly placed impulses, the limiting weighted region kernel is
-\[
- K_a(\theta)=a!\int_{\substack{u_i\ge0\\\sum_{i=0}^a u_i=1}}
- D_\gamma(u_0)P_0D_\gamma(u_1)\cdots P_0D_\gamma(u_a)
- \,d\boldsymbol u.
-\]
-The integral uses $a$ independent coordinates.
-Collisions and short gaps have probability $O_Q(\log L/L)$.
-The empty-interval estimate makes the remaining error
-$O_Q(L^{-1/2}+\log L/L)$.
-Appendix~\ref{app:imt-fixed} proves a componentwise multiplicative comparison,
-including the entries that vanish exactly. Across $b=O(\log L)$ regions,
-its cost is $\exp(o(1))$.
-
-For $Q=1,2$, combine these two-state kernels with the fair-row comparison.
-The resulting exponents per $Qb$, including active-position choices,
-are below $-0.10918$ and $-0.10914$, respectively.
-For $Q\ge3$, retain each row weight: assign a positive variable $u_j$
-to row $j$ and form the matrix polynomial
-\[
- T_Q(\boldsymbol u,\theta)
- :=\sum_{\boldsymbol e\in\{0,1\}^Q}
- \left(\prod_j u_j^{e_j}\right)K^+_{\sum_j e_j}(\theta).
-\]
-Here $K_a^+$ replaces the live-to-live entry of $P_0$ by $1$, giving an
-entrywise upper bound. Nonnegative coefficient extraction bounds the
-fixed-row-weight moment by
-\[
- \left(\prod_j\binom b{w_j}^{-1}u_j^{-w_j}\right)
- e_0^\top T_Q(\boldsymbol u,\theta)^b\1_2\,\exp(o_Q(b)).
-\]
-A weighted matrix norm separates this expression into one factor per row;
-the outer majorant then bounds each factor.
-The appendix proves that separation and verifies its endpoint inequalities.
-For every fixed $3\le Q<4096$, it gives
+For $Q=1,2$, the resulting first-moment exponents per active-row bit
+are below $-0.109827$ and $-0.109812$. For fixed $3\le Q<4096$,
+retaining each row weight and applying a weighted matrix norm gives
 \[
  \E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
- \le\exp\{-0.0008679Qb+o_Q(b)\}.
+ \le\exp\{-0.0008685Qb+o_Q(b)\}.
 \]
-The remainder may depend on $Q$: only finitely many such bounds are needed.
+The finite set of fixed-$Q$ terms therefore tends to zero.
 
 \subsection{Completing the Argument}
 
 \begin{proof}[Proof of Theorem~\ref{thm:structured-spin-scalable}]
-Fix a shared outer realization in $\mathcal G_b$. The route--inner bounds
-hold uniformly over this realization. Averaging under the outer law
-conditioned on $\mathcal G_b$ gives the conditional first-moment bounds below.
-The fixed-occupation
-arguments give a vanishing sum over the finite set $1\le Q<4096$.
-Equation~\eqref{eq:imt-sparse-final} gives a uniform geometric sum for
-$4096\le Q\le10^{-4}L$. The positive-occupation certificate bounds the
-remaining sum by $L\exp(-\eta N+o(N))$ for some $\eta>0$.
-Thus $\sum_{Q=1}^L\E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]=o(1)$.
-Markov's inequality and
-$\Prob[\mathcal G_b^c]=o(1)$ prove the distance claim.
+Condition on an arbitrary shared outer realization in $\mathcal G_b$.
+All route and inner bounds above hold uniformly over that choice.
+The fixed-occupation terms vanish in a finite sum.
+Equation~\eqref{eq:shared-sparse-final} gives a geometric sum for
+$4096\le Q\le10^{-4}L$. The positive-occupation contribution is
+$L\exp\{-10^{-7}N+o(N)\}$. Hence
+$\sum_{Q=1}^L\E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]=o(1)$.
+Markov's inequality and $\Prob[\mathcal G_b^c]=o(1)$ prove the
+distance claim.
 
-Rate follows from injectivity. Every outer row costs $O(b)$ in either circuit
-direction: it uses fixed Golay circuits, two permutations, and two accumulators.
-The route costs $O(N)$, and the fixed-size binary IMT steps cost $O(1)$ each.
-The transposed recurrence \eqref{eq:structured-inner-transpose} gives the
-same bound for transposed encoding.
+The outer is injective, and Lemma~\ref{lem:structured-inner-bijective}
+proves inner bijectivity for every setup. The Golay base circuits,
+two accumulators, outer permutations, and route use $O(N)$ work.
+Each fixed-width state update has constant bit-operation cost, so the
+inner and its transpose also use $O(N)$ work.
 \end{proof}
 
 For any sufficiently large requested output length $n$, let $m(n)$ be the

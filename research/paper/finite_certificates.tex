@@ -13,8 +13,8 @@ difficulty is proof loss, not the design.
 A fixed algebraic constituent removes the additional outer-spectrum failure
 event. An exact spectrum is convenient, but rigorous spectrum inequalities
 can serve the same interface. This section instantiates that approach
-with fixed BCH constituents and the same IMT architecture. The rate-$1/2$
-construction uses the same fixed inner maps.
+with fixed BCH constituents and its own IMT inner. The rate-$1/2$
+construction uses one fixed pair of IMT maps.
 The finite proof replaces the growing-outer argument with bounds tailored
 to that selected constituent and inner.
 
@@ -48,7 +48,7 @@ For $K$ message bits, choose
 Use $\mathcal B$ in every outer row and the structured interleaver of
 Section~\ref{sec:structured-spin}. Use the IMT maps
 $A:\F_2^{19}\to\F_2^{128}$ and $C:\F_2^{128}\to\F_2^{19}$ in
-Table~\ref{tab:imt-maps}, also used by the asymptotic construction.
+Table~\ref{tab:imt-maps}.
 Setup $\theta$ consists of
 independent uniform row permutations, independent uniform region permutations,
 and independent transvections $M_i=I+u_iv_i^\top$: sample $u_i$ uniformly
@@ -62,9 +62,9 @@ groups $X_i$:
   Q_0=0,\qquad Y_i=X_i+A(Q_i),\qquad
   Q_{i+1}=M_iQ_i+C(X_i).
 \]
-The inner and the routing distribution are therefore those of
-Section~\ref{sec:structured-distance}; only the outer and the first-moment
-calculation differ.
+The routing distribution is the one-bit regional route of
+Section~\ref{sec:regional-spin}. This finite supporting construction
+has a different inner law from the Scalable and Turbo instantiations.
 
 \subsection{Finite Distance Guarantee}
 

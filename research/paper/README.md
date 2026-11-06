@@ -35,10 +35,11 @@ measurements, timing definitions, and the conditional security scope.
 Run `python -B research/paper/build_application_tables.py --check` from the repository
 root to check its tables without benchmarking.
 
-The asymptotic construction now uses [Independent-Map Transvection (IMT)](../workstreams/inner_design/IMT.md)
-at 11% relative distance, with the same shared Golay--BA-3 outer and 39/4
-growth constant. Its reviewed argument is in `structured_appendix.tex` and
-`structured_imt_appendix.tex`; the latter includes the exact two maps.
+The asymptotic construction uses the shared Golay--BA-3 outer, the 39/4
+growth constant, and the same 64-bit, 22-state uniform-mixer inner as the
+larger Turbo profiles. Its 11% distance proof is in `structured_proof.tex`
+and `structured_uniform_appendix.tex`. The earlier IMT asymptotic argument
+remains in `structured_imt_appendix.tex` as uncompiled research history.
 The selected finite results now use verified IMT certificates and matching
 timings: five half-rate lengths, plus two quarter-rate distance thresholds
 at K=2^20. See the [integration ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
@@ -47,7 +48,8 @@ BCH-256 central and smaller steps at short lengths. The two state-size plots
 retain the earlier 130-cell Q1 grid. The selected BCH-256 curve compares Q1 and full certificates at
 five exactly matching configurations. The diagnostic maps differ from those
 selected maps; no full-grid certificate is claimed.
-The manuscript presents IMT without a preceding-inner comparison. Historical
+The manuscript presents the uniform-mixer inner for its two main constructions
+and IMT for the supporting BCH implementation. Historical
 source and receipt names remain unchanged in the artifact; Reed--Muller
 expansion mathematics and the external RM-based BAA baseline remain in scope.
 No library default changes with this manuscript update.
@@ -62,7 +64,8 @@ The earlier multi-round study is retained as supporting research, not an
 active figure or an additional construction parameter in this section.
 
 Run `python -B research/paper/check_imt_integration.py` from the repository root to
-check all 38 shared map words and the retained 11% evidence bindings.
+check the historical IMT map and 11% evidence bindings; this check does not
+verify the current Scalable theorem.
 The finite checker authenticates the seven original certificate targets and
 the additional two-round small-length certificate, seven timing cells, and
 the selected maps. These checks need
