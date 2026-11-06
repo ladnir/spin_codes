@@ -14,9 +14,10 @@ scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
 [production map](SpinCodes/UniformMixer/Map22.lean), and
 [tilt bounds](SpinCodes/UniformMixer/Tilt.lean) prove the exact live-state
 mean for the paper's 22-by-64 matrix and a quadratic error bound for its
-empty-gap tilt. These bounds have not yet been assembled into the full
-regional comparison. The placement coupling, routing/outer bounds,
-finite Turbo certificates, and final Scalable and Turbo distance theorems
+empty-gap tilt. They also give a full-state empty-gap sandwich for an
+arbitrary entering state. The complete regional comparison, including
+active-step placement, is still open. The placement coupling,
+routing/outer bounds, finite Turbo certificates, and final distance theorems
 also remain to be formalized. The older native theorem below does not
 verify those revised constructions.
 
