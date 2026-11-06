@@ -55,8 +55,11 @@ that average as an exact fixed-cardinality support sum, ready for the
 discrete-to-continuum comparison. The
 [grid-limit theorem](SpinCodes/UniformMixer/RegionalGridLimit.lean) proves
 convergence of that uniform support sum for any continuous function of
-the normalized sorted bit positions. A uniform comparison between the
-discrete two-state product and its continuous integrand remains open.
+the normalized sorted bit positions. The
+[continuum product](SpinCodes/UniformMixer/RegionalContinuum.lean) defines
+the paper's zero/live gap-and-impulse integrand, proves its continuity,
+and verifies convergence of its ideal support sum. A uniform comparison
+between the discrete two-state product and that integrand remains open.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
