@@ -1,13 +1,15 @@
 # SPIN manuscript (LLNCS)
 
-Turbo SPIN is a separate finite RS-packet construction in the manuscript.
+The main text presents Scalable SPIN for the asymptotic theorem and Turbo
+SPIN for finite RS-packet certificates and fast transposed encoding.
 Its public binary encoder uses precomputed transposed encoding and has
 certificates at K=2^16, 2^18, and 2^20. The corresponding same-host
 public-API times are 0.099526, 0.461416, and 2.861814 ms; see
 [the RS8 profile](../../spin/RS8.md) for the complete timing protocol.
-The existing BCH--IMT comparison table and application measurements
-retain their original attribution. The Turbo results have a distinct
-proof appendix and are not covered by the asymptotic BCH--IMT theorem.
+The BCH--IMT certificates and comparison table are supporting appendices;
+the OT and PCS application measurements still use BCH--IMT. Turbo has a
+distinct finite proof appendix and is not covered by the Scalable SPIN
+asymptotic theorem.
 
 The updated half-rate encoder tables use the optimized precomputed campaign:
 0.340, 1.460, and 9.289 ms for transposed encoding at K=2^16, 2^18, and 2^20.
@@ -22,8 +24,7 @@ OTs/s; see [its timing ledger](STATIONARY_OT_PERFORMANCE.md).
 `precomputed_results.py` authenticates
 the six new forward/transpose cells from retained local measurements.
 
-Unless stated otherwise, run commands from the repository root. The current
-Windows checkout is `C:\Users\peter\repo\permute_conv-github-bch`.
+Unless stated otherwise, run commands from the repository root.
 
 The PCS application revision adds ordinary-encoder measurements, a standalone
 SPIN–Brakedown section, and the optimized Flock comparison. See
@@ -101,7 +102,7 @@ commitment measurements and opening calibration.
 TeX Live 2026 is installed natively on this Windows machine. From PowerShell:
 
 ```powershell
-Set-Location 'C:\Users\peter\repo\permute_conv-github-bch\research\paper'
+Set-Location research/paper
 latexmk -pdf -interaction=nonstopmode -halt-on-error '-outdir=../../output/pdf' '-jobname=spin_codes_draft' main.tex
 ```
 
@@ -145,9 +146,9 @@ checks retained evidence, then builds under `research/output/pdf/`. It requires
 local research inputs. Use the direct build above for the ePrint PDF under
 `output/pdf/`; that build has no numerical-evidence dependency.
 
-The current revision plan is [REVISION_PLAN.md](REVISION_PLAN.md). It covers
-the asymptotic/finite structured-SPIN narrative, BCH-256 certificates, and
-measured implementation. The root-level restructure plan is historical.
+The earlier [revision plan](REVISION_PLAN.md) is historical; it predates
+the Scalable SPIN and Turbo SPIN presentation. The root-level restructure
+plan is also historical.
 
 The pre-restart root-level TeX draft is preserved in
 `../old/paper_draft_pre_spin_2026-08-31/`. Its `ARCHIVE_MANIFEST.md` records

@@ -1,13 +1,11 @@
 \section{Turbo SPIN: A Finite RS-Packet Construction}
 \label{sec:turbo-spin}
 
-The BCH--IMT construction above has five certified half-rate lengths; its
-asymptotic family uses a growing outer. For transposed encoding at the
-three smaller finite lengths, we also give a binary
-construction with less outer work. We call this operating family
-\emph{Turbo SPIN}. Its guarantees below are finite-length statements; the
-asymptotic theorem of Section~\ref{sec:structured-distance} concerns the
-Structured SPIN family defined there.
+Scalable SPIN proves a distance guarantee as length grows. For three
+finite lengths, a different outer and route give substantially faster
+transposed encoding. We call this binary operating family \emph{Turbo SPIN}.
+Its guarantees below are finite-length statements; the asymptotic theorem
+of Section~\ref{sec:structured-distance} concerns Scalable SPIN.
 
 \paragraph{Construction.}
 Fix $K\in\{2^{16},2^{18},2^{20}\}$, put $N=2K$, and divide the message into
@@ -62,6 +60,10 @@ the few words with only five through eight active packets receive a
 separate union charge. Appendix~\ref{app:turbo-proof} gives the equations
 and the exact scope of the three numerical certificates.
 
+The fixed $128$-bit local outer and four-bit packet route give no
+asymptotic guarantee here. Scalable SPIN instead increases its outer
+length with $N$ and uses a bit-level route.
+
 Table~\ref{tab:turbo-performance} reports the corresponding precomputed
-transposed encoding times. These measurements do not transfer the
-BCH--IMT application results to Turbo SPIN.
+transposed encoding times. The application measurements below use the
+supporting BCH--IMT encoder instead.

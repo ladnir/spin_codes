@@ -4,28 +4,24 @@ distance, fast ordinary and transposed encoding, and regular memory access.
 We introduce Single-Permutation INterleaved (SPIN) codes, combining a
 blockwise outer encoder, one global interleaver, and a recursive inner.
 
-\qquad Our main result is a Structured SPIN family with rate $1/2$ and $O(N)$
+\qquad Scalable SPIN has rate $1/2$ and $O(N)$
 bit operations for ordinary and transposed encoding at its native output lengths
 $N$. With probability $1-o(1)$ over the random choice of the code, its minimum distance exceeds
 $0.11N$. The proof combines outer spectrum bounds with an analysis of
 structured support spreading and recursive state mixing.
 We formally verify these distance and rate guarantees in Lean.
 
-\qquad For finite lengths, a BCH-derived outer constituent and a fixed recursive
-inner give rate $1/2$ and relative distance greater than $0.10$, with setup-failure
-probability below $2^{-40}$. We certify this bound at message lengths
-$2^{16}$, $2^{18}$, $2^{20}$, $2^{22}$, and $2^{24}$ using rigorous spectrum inequalities,
-without assuming the constituent's exact weight spectrum.
-
-\qquad A second binary finite construction, Turbo SPIN, uses an RS-packet
-outer and randomized column maps. At $K=2^{16},2^{18},2^{20}$ it has rate
+\qquad Turbo SPIN is a finite binary construction with short RS rows,
+randomized columns, and four-bit packet routing. At $K=2^{16},2^{18},2^{20}$ it has rate
 $1/2$, relative distance greater than $0.10$, and setup-failure margins
 above $51$ bits.
 
 \qquad After precomputation, Turbo SPIN transposed encoding produces
 $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms
 on one Ryzen 9 7950X thread.
-With the separate BCH--IMT encoder, libOTe's regular-noise Silent OT sender
+The supporting BCH--IMT instantiation has certified distance above $0.10N$
+at five finite lengths through $K=2^{24}$. With this separate encoder,
+libOTe's regular-noise Silent OT sender
 achieves $89.0$ million hashed OTs per second on one core. This OT timing
 excludes initial setup, base-correlation generation, and network transport.
 

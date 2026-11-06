@@ -1,4 +1,4 @@
-\section{Structured SPIN}
+\section{Scalable SPIN}
 \label{sec:structured-spin}
 
 \subsection{From Random Mixing to Structured Mixing}
@@ -124,8 +124,8 @@ on the diagonal. The most basic instantiation repeats one constituent
 $G:\F_2^k\to\F_2^b$ in every position. The asymptotic construction in
 Section~\ref{sec:structured-scalable} uses a growing, Golay-based BAA
 constituent: extended Golay blocks followed by two permute--accumulate
-stages. The first finite-length construction in
-Section~\ref{sec:finite-certificates} instead repeats a fixed BCH constituent.
+stages. The BCH--IMT instantiation in
+Appendix~\ref{sec:finite-certificates} instead repeats a fixed BCH constituent.
 Turbo SPIN in Section~\ref{sec:turbo-spin} uses short RS rows with randomized
 columns and packet routing.
 
@@ -230,7 +230,8 @@ Here the right side denotes a mixture of probability measures. If $u_i=q$,
 then $\langle v_i,q\rangle=0$ and $M_iq=q$; for every other $u_i$, the bit
 $\langle v_i,q\rangle$ is fair. Thus any nonzero target other than $q$ has
 probability $1/(2(2^s-1))$.
-The finite constructions below use this same transvection law.
+The supporting BCH--IMT finite constructions in
+Appendix~\ref{sec:finite-certificates} use this transvection law.
 
 The transpose $I^\top$ processes input groups $U_i\in\F_2^t$ in reverse
 order. Starting from $r_R=0\in\F_2^s$, it emits groups $V_i\in\F_2^t$:
@@ -256,10 +257,9 @@ recovers exactly one input sequence from every output sequence.
 
 \subsection{Composition and Rate}
 
-\begin{definition}[Structured SPIN]
+\begin{definition}[Scalable SPIN architecture]
 \label{def:structured-spin}
-For a selector $\theta_m$ and one realization of its setup, the Structured
-SPIN encoder is
+For a selector $\theta_m$ and one realization of its setup, the encoder is
 \begin{equation}
   E_m
   :=
@@ -272,7 +272,7 @@ SPIN encoder is
 Every realized local map is injective. The outer direct sum is therefore
 injective. The interleaver is a permutation, and
 Lemma~\ref{lem:structured-inner-bijective} makes the inner bijective. Hence
-every realized Structured SPIN encoder is injective and has rate
+every realized encoder is injective and has rate
 \begin{equation}
   \frac{K_m}{N_m}=\frac{k_m}{b_m}.
   \label{eq:structured-spin-rate}
@@ -283,6 +283,6 @@ or envelope and a conditional failure envelope for the structured route
 classes used in Theorem~\ref{thm:class-first-moment}.
 
 The scalable family below lets the base constituent and $b_m$ vary while
-retaining the fixed IMT step and state dimensions. Finite-length
-instantiations may tune these choices at one target length. Both cases use
-Definition~\ref{def:structured-spin}.
+retaining the fixed IMT step and state dimensions. The BCH--IMT
+instantiation in Appendix~\ref{sec:finite-certificates} uses the same
+architecture with fixed outer length and tuned finite parameters.

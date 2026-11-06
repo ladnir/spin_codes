@@ -5,7 +5,7 @@ This appendix supports Section~\ref{sec:implementation}.
 It gives the full implementation description, memory accounting,
 measurement protocols, and ordinary-encoding comparison.
 We evaluate the transposed BCH--IMT encoders of
-Section~\ref{sec:implementation} on batches of $N$ input blocks, with
+Appendix~\ref{sec:finite-certificates} on batches of $N$ input blocks, with
 $N=2K$ at rate $1/2$ and $N=4K$ at rate $1/4$.
 
 \paragraph{Shared Implementation and Optimized Kernels.}
@@ -115,7 +115,8 @@ benchmark protocol are documented in the repository\repositorycite.
 \subsection{Ordinary Encoding}
 \label{sec:ordinary-encoding}
 
-Polynomial commitments require the ordinary encoder: $K$ input blocks
+The measured polynomial commitments use the BCH--IMT ordinary encoder:
+$K$ input blocks
 expand to $2K$ output blocks. We implement this direction for the same
 selected SPIN map and measure it separately. Each block again contains
 $128$ parallel binary instances. These measurements include the outer
@@ -201,13 +202,13 @@ The chosen-block BAA message lengths are $2^m-64$ for $m\in\{16,18,20\}$, allowi
 both constituents to tile the same input. All other rows use $K=2^m$.
 RAA processes $3K$ or $4K$ input blocks, versus $2K$ for the rate-$1/2$ rows.
 
-The combined results appear in the main comparison,
-Table~\ref{tab:transposed-comparison}. Its RAA footnote states the different
+The combined results appear in Table~\ref{tab:transposed-comparison} below.
+Its RAA footnote states the different
 reference length and the optional setup-testing guarantee.
 
 At the largest measured length, rate-$1/2$ SPIN with IMT takes $9.289$\,ms.
 The original rate-$1/2$ BAA implementation takes approximately $32$\,ms,
-giving the approximately $3.4\times$ speedup stated in the abstract.
+giving an approximately $3.4\times$ speedup over the original BAA baseline.
 The newer chosen-block implementations improve on that baseline:
 chosen Golay and RM BAA take $2.58$ and $2.98$ times as long as SPIN,
 respectively. The conservative EC profile takes $181.825$\,ms.
@@ -231,6 +232,8 @@ smaller timing sizes. Its relative distance is $0.19$, with an approximately
 $13$-bit margin; setup testing can improve this margin as noted in the table.
 We do not transfer this bound to $K=2^{20}$ or to repetition-$3$ RAA,
 nor extrapolate the BAA or EC margins to smaller lengths.
+
+\input{bch_benchmark_appendix}
 
 The repository documents the comparison methodology and provides the
 dependency revisions, correctness checks, actual lengths, and all $5454$
