@@ -127,6 +127,25 @@ their success cannot extend to a full 11% proof for this exact growing
 family. The missing occupation classes contain real low-weight words,
 not merely a loose transfer inequality.
 
+The dimension argument extends to packet width `p` when `b=pR` and
+the local outer still has input dimension `b/2`. A position with at
+least `aR` packet slots in a window retains at least
+`p(a-1/2)R` message dimensions. A fixed number
+`Q>s/[p(a-1/2)]` of such positions can force all `sR` boundary-state
+coordinates to zero. At outer-growth constant `c`, the critical
+window and distance upper bound are
+
+```
+f_*(p,c) = (1-sqrt(1-2^(-2p/c)))/2,
+delta_upper(p,c) = f_*(p,c)/2.
+```
+
+At `c=39/4`, this gives distance upper bounds of approximately
+`15.90%`, `12.56%`, `10.27%`, and `8.535%` for packet widths
+`p=1,2,3,4`, respectively. Width two is the largest integer packet
+width for which this argument leaves room for an 11% theorem at that
+growth constant. This is a necessary screen, not a distance proof.
+
 Two changes remove *this particular* obstruction without by
 themselves proving 11% distance:
 
