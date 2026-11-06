@@ -38,9 +38,15 @@ each good support into local coordinates and positive gaps, then applies
 the two-state bound to its marked kernel. The
 [stepwise encoder](SpinCodes/UniformMixer/RegionalEncoder.lean) defines
 `Y=Aq+x` and feedback `Aᵀx`; its empty and occupied steps equal the
-kernels used by that bound. Equality of the complete stepwise and marked
-regional kernels, placement averaging, and continuum coupling remain
-open. The routing/outer bounds,
+kernels used by that bound. The
+[chronological trace](SpinCodes/UniformMixer/RegionalTrace.lean) proves
+that a list expanded from marked gaps has exactly the marked-region
+kernel and that a good support expands to the correct number of steps.
+It verifies the empty-support case and transfers the regional upper bound
+to the actual step law conditional on the input-list equality.
+Equality between this expanded list and the encoder's chronological input
+list for the same support remains open. Placement averaging and continuum
+coupling remain open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
