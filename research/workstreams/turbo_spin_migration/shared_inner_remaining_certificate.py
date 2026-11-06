@@ -6,6 +6,7 @@ assembly still require a proof for the new inner distribution.
 
 from __future__ import annotations
 
+import argparse
 from fractions import Fraction as F
 import json
 from pathlib import Path
@@ -25,6 +26,8 @@ from research.workstreams.turbo_spin_migration.shared_inner_dense_screen import 
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIOR_FIXED = ROOT / "inner_design/imt_asymptotic/FIXED_LIMIT.json"
+OLD_OUTER = (ROOT / "paper_architecture/certificates/single_sampled_ba_rm2sub"
+             / "golay_ba3_concave_majorant.json")
 
 
 def sparse_outward():
@@ -88,26 +91,65 @@ def fixed_q_ge_three():
     saved = json.loads(PRIOR_FIXED.read_text(encoding="utf-8"))
     assert saved["status"] == "OUTWARD_CONDITIONAL_IMT_CONTINUUM_Q_GE_3_INEQUALITIES"
     assert saved["delta"] == "11/100" and saved["block_constant"] == "39/4"
-    old = F(1 << 18, (1 << 19) - 1)
-    new = F(1 << 21, M)
-    increase = F(11, 100) * F(133, 125) * (1 / new - 1 / old)
-    old_max = max(F(row["exponent_upper"]) for row in saved["checks"])
-    # In fixed_limit.py, the reset probability enters only through a
-    # positive term in the norm. The new probability is smaller. The
-    # live-density change affects only the delta*theta term above.
-    assert F(1, M) < F(1, (1 << 19) - 1)
-    bound = old_max + increase
-    assert bound < 0
-    return {"old_endpoint_upper": str(old_max),
-            "new_chernoff_increase": str(increase),
-            "new_endpoint_upper_by_monotonicity": str(bound),
-            "decimal": float(bound)}
+    payload = json.loads(OLD_OUTER.read_text(encoding="utf-8"))
+    left = [(F(row["weight"][0]), F(row["weight"][1]),
+             F(row["slope"]), F(row["intercept"]))
+            for row in payload["left_segments"]]
+    midpoint = left[-1][1]
+    center = [(midpoint, 1 - midpoint, F(0),
+               F(payload["central_constant_upper"]))]
+    right = [(1 - hi, 1 - lo, -slope, slope + intercept)
+             for lo, hi, slope, intercept in reversed(left)]
+    segments = left + center + right
+    assert len(saved["checks"]) == 2 * len(segments)
+    expected_endpoints = {(index, x) for index, (lo, hi, _, _) in
+                          enumerate(segments) for x in (lo, hi)}
+    actual_endpoints = {(row["segment"], F(row["x"]))
+                        for row in saved["checks"]}
+    assert actual_endpoints == expected_endpoints
+    assert all(len({row["u"] for row in saved["checks"]
+                    if row["segment"] == index}) == 1
+               for index in range(len(segments)))
+
+    sigma, tau, v = F(127, 250), F(133, 125), F(3, 1600)
+    reset, p0 = F(1, M), F(1 << 21, M)
+    d = (1 - sigma) / sigma
+    critical = F(4, 3) / tau - 1 / d
+    assert 0 < critical < 1
+    spacing = max(upper(-num(tau * y)
+                        + num(F(4, 3)) * (1 + num(d * y)).log())
+                  for y in (F(0), critical, F(1)))
+    support = num(2).log() / num(F(39, 4))
+    delta_term = num(F(11, 100) * tau / p0)
+    checks = []
+    for row in saved["checks"]:
+        lo, hi, slope, intercept = segments[row["segment"]]
+        x, u = F(row["x"]), F(row["u"])
+        assert x in (lo, hi) and u > 0
+        norm = max(1 + sigma * v * u,
+                   sigma + (reset / v + sigma) * u)
+        xx = num(x)
+        entropy = -xx * xx.log() - (1 - xx) * (1 - xx).log()
+        expression = (num(slope * x + intercept) - entropy
+                      - xx * num(u).log() + num(norm).log()
+                      + num(spacing) + delta_term + support)
+        bound = upper(expression)
+        assert bound < 0
+        checks.append(bound)
+    maximum = max(checks)
+    return {"recomputed_endpoints": len(checks),
+            "new_endpoint_upper": str(maximum),
+            "decimal": float(maximum)}
 
 
 def main():
     if not __debug__:
         raise RuntimeError("Certificate checks require Python assertions")
-    ctx.prec = 256
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--precision", type=int, default=256)
+    args = parser.parse_args()
+    assert args.precision >= 128
+    ctx.prec = args.precision
     print(json.dumps({"status": "outward_local_inequalities",
                       "precision_bits": ctx.prec,
                       "sparse": sparse_outward(),

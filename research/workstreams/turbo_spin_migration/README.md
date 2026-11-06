@@ -129,6 +129,8 @@ state law. The [shared-inner feasibility study](SHARED_INNER_FEASIBILITY.md)
 derives a three-state transfer, closes a rational sparse contraction,
 and gives an outward-checked positive-occupation cover. The candidate has no
 complete asymptotic distance certificate yet.
+The [shared-inner proof draft](SHARED_INNER_PROOF_DRAFT.md) audits the
+transfer, fixed-row limit, and first-moment assembly before manuscript edits.
 
 If Turbo SPIN closes the scalable theorem and the finite, forward, and
 application gates, make it the main construction and retain only older

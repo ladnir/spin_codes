@@ -120,12 +120,11 @@ its certified interval is invalid.
   probability. The copied one- and two-row continuum formulas give
   outward exponents below `-0.109827` and `-0.109812` per active-row bit
   (`shared_inner_remaining_certificate.py`). For fixed `Q>=3`,
-  the current witness has a `-0.0008679` endpoint margin. Replacing the
-  old reset probability by `1/M` only reduces its positive reset term;
-  changing the live density from `2^18/(2^19-1)` to `2^21/M` increases
-  its Chernoff term by less than `4e-7`. Its endpoint inequalities
-  therefore remain negative, with an upper bound below `-0.00086758`
-  per active-row bit. These are continuum inequalities; the
+  `shared_inner_remaining_certificate.py` now recomputes all 62
+  inherited fugacity endpoints directly with the Turbo reset
+  probability and live density. Their largest outward upper bound is
+  below `-0.00086852` per active-row bit. These are continuum
+  inequalities; the
   finite-region reduction must still be written for the new inner.
 
 The fixed-row finite-region reduction is favorable here. An empty step
