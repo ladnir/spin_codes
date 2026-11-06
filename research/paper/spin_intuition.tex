@@ -122,6 +122,6 @@ fast transposed encoding with certified guarantees at selected finite
 lengths. In each case, the proof counts the outer words that could cause
 failure and bounds what the route and inner do to each class of words.
 
-We first develop the bit-level design and its asymptotic proof. We then
-change the outer, routing unit, and state update together for Turbo's
-finite-length operating points.
+We first define this regional encoder for an arbitrary packet width.
+Scalable SPIN then fixes one-bit packets and proves an asymptotic theorem;
+Turbo SPIN fixes four-bit packets and proves finite-length guarantees.

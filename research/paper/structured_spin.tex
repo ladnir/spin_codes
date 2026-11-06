@@ -1,114 +1,54 @@
-\section{Scalable SPIN: A Bit-Level Route}
+\section{A Regional SPIN Architecture}
 \label{sec:structured-spin}
-\label{sec:structured-distance}
+\label{sec:regional-spin}
 
-\subsection{From Random Mixing to Structured Mixing}
+The two main constructions share a regional route and a linear state
+recurrence within $E=I\circ\Pi\circ O$. Each outer group supplies one packet
+to each region. Independent shuffles choose the region of every packet and its
+position within that region. A linear state recurrence then processes the
+serialized regions. Packet width, local outer distribution, and state-map
+distribution are construction choices. We define this common encoder before
+fixing them.
 
-The examples in Section~\ref{sec:spin-intuition} motivate three choices
-for this bit-level realization:
-use a fast outer constituent with a certified spectrum, control how the outer
-support reaches the inner, and amortize random mixing over groups of coordinates.
-A sparse message illustrates the design; the proof must also control
-larger supports because their multiplicities can dominate the first moment.
+\subsection{Parameters and Dataflow}
 
-First, change the outer. Following chosen-block BAA~\cite{cryptoeprint:2026/1903},
-replace the outer's independently sampled dense maps with repeated copies of a
-chosen constituent code. We can select this code for both efficient
-encoding and a favorable weight distribution, then reuse its encoding
-circuit across blocks. The proof needs more than its minimum distance:
-we must also bound how many codewords occur at each low weight.
-Equal-weight words can still have different coordinate
-patterns. Independently permuting the coordinates of each block removes
-this pattern: for each fixed message, each block's support is uniform
-given its weight, even when all positions share one constituent.
-
-Second, replace the uniform global interleaver. It can concentrate an
-active block near the end of the recursion, leaving too little time to
-spread its support. Requiring heavier outer words can reduce that risk
-but may increase encoding cost. Instead, transpose the independently
-shuffled blocks into regions and shuffle each region independently.
-This structure also speeds up encoding: the transpose admits tiled data
-movement, and each regional shuffle accesses only part of the full vector.
-We call an outer block a row. A row of weight $w$ then reaches exactly $w$ distinct regions, with at
-most one bit per region. This constrains late activation without
-excluding it; the shuffles randomize the remaining alignment.
-
-Third, process the inner in steps that each consume a group of
-coordinates, rather than one coordinate at a time.
-With $m$-bit memory, the random convolution uses $\Theta(m^2)$ operations
-to produce $m$ output bits. Grouping lets us replace these dense inner
-products with fast fixed circuits: for example, an $O(m\log m)$ transform
-can process $m$ coordinates together. The work is shared across the group
-rather than repeated at every coordinate.
-
-Grouping also lets us reduce randomness, which is expensive to apply.
-Ideally, the inner would use only fixed maps, but we do not have a
-tractable distance proof for that choice. Our compromise keeps the
-expansion and feedback maps fixed and introduces random state mixing once
-per step. The Independent-Map Transvection (IMT) inner implements this
-mixing with a cheap transvection sampled at setup for each step. This
-retains the randomness needed by the proof without paying for dense random
-feedback at every coordinate. The following construction specifies these
-maps and their setup distributions.
-
-\subsection{Construction at a Glance}
-
-We first define one native-length member of the family. Choose a constituent length
-$b$, a constituent dimension $k\le b$, a number $L$ of outer-block
-positions, an inner step width $t$, and a state dimension $s$, with $t\mid L$.
-Set
+Choose a local input length $k$, a local output length $b$, a packet width
+$p\mid b$, a number $L$ of outer groups, an inner step width $t$, and a state
+dimension $s$. Require $t\mid pL$, so each region contains an integer number
+of inner steps. Put
 \begin{equation}
-  N:=Lb,
-  \qquad
-  K:=Lk,
-  \qquad
-  e:=L/t,
-  \qquad
-  R:=N/t=be.
-  \label{eq:structured-parameters}
+ B:=b/p,\qquad K:=Lk,\qquad N:=Lb,\qquad
+ e:=pL/t,\qquad R:=N/t=Be.
+ \label{eq:structured-parameters}
 \end{equation}
-Thus the interleaver will have $b$ regions, each region will contain $L$
-coordinates, and the inner will process each region in $e$ steps.
-
-The encoder has the following dataflow:
+Each of the $B$ regions contains one $p$-bit packet from every group and
+occupies $pL$ consecutive output coordinates. The encoder has the dataflow
 \begin{equation}
-\F_2^{Lk}
-  \xrightarrow{\ O\ }
-(\F_2^b)^L
-  \xrightarrow{\ \Pi_{\mathrm{blk}}\ }
-(\F_2^b)^L
-  \xrightarrow{\ T\ }
-(\F_2^L)^b
-  \xrightarrow{\ \Pi_{\mathrm{reg}}\ }
-(\F_2^L)^b
-  \xrightarrow{\ \mathrm{serialize}\ }
-\F_2^N
-  \xrightarrow{\ I\ }
-\F_2^N.
-\label{eq:structured-dataflow}
+ E=I\circ\Pi_{\mathrm{reg}}\circ T\circ\Pi_{\mathrm{blk}}\circ O
+ :\F_2^{Lk}\longrightarrow\F_2^{Lb}.
+ \label{eq:structured-dataflow}
 \end{equation}
-Here $O$ applies the constituent encoders, $\Pi_{\mathrm{blk}}$ shuffles
-within blocks, $T$ transposes, and $\Pi_{\mathrm{reg}}$ shuffles within
-regions. The inner $I$ processes the serialized regions in $t$-bit steps.
-The next three subsections define these arrows.
+Here $O$ is a direct sum of local encoders, $\Pi_{\mathrm{blk}}$ shuffles
+whole packets within each group, $T$ transposes the group and region
+indices, and $\Pi_{\mathrm{reg}}$ shuffles packet slots within each region.
+We identify the outer array with $\F_2^N$ in group-major order and the
+routed array with $\F_2^N$ in region-major order; $T$ includes this change
+of serialization. The three middle maps compose to one permutation of the
+$N$ binary coordinates.
 
-There are two kinds of construction data. The fixed data are the integers
-$(L,b,k,t,s)$, two linear maps $A:\F_2^s\to\F_2^t$ and
-$C:\F_2^t\to\F_2^s$, a sampling distribution for invertible state maps
-$M_i:\F_2^s\to\F_2^s$, and a joint sampling distribution for
-injective constituent maps $G_j:\F_2^k\to\F_2^b$ for $j\in[L]$.
-The construction must specify whether the positions use one fixed constituent, one
-shared sampled constituent, or independently sampled constituents. The
-distinction changes the expected outer enumerator.
+The fixed data are $(L,k,b,p,t,s)$, linear maps
+$A:\F_2^s\to\F_2^t$ and $C:\F_2^t\to\F_2^s$, a joint distribution for
+injective linear local maps $G_j:\F_2^k\to\F_2^b$, and a distribution
+for linear state maps $M_i:\F_2^s\to\F_2^s$. Setup samples the local maps, uniform
+independent group and region permutations, and independent state maps.
+The local maps may be one fixed map, one shared sampled map, or
+independently sampled maps; this choice changes the outer-word counts.
+The outer setup is independent of routing and inner setup. After setup,
+all maps are fixed for every message.
 
-Setup samples the constituent maps from this joint distribution. Independently, it
-samples one uniform coordinate permutation for every outer block, one uniform
-permutation for every region, and one state map for
-every inner step. All routing permutations and state maps are mutually
-independent. After setup, every arrow in
-\eqref{eq:structured-dataflow} is fixed. A family selector is a sequence
-$(\theta_m)_m$ of these parameter choices and sampling distributions; we suppress $m$ until the
-scalable instantiation in Section~\ref{sec:structured-scalable}.
+Scalable SPIN will take $p=1$ and grow $b$ with $N$. Turbo SPIN will
+take $p=4$ and fix $(k,b)=(128,256)$ at its certified lengths. The
+different local randomizers are included in their respective $G_j$.
 
 \subsection{Block-Diagonal Outer}
 
@@ -131,137 +71,97 @@ Appendix~\ref{sec:finite-certificates} instead repeats a fixed BCH constituent.
 Turbo SPIN in Section~\ref{sec:turbo-spin} uses short RS rows with randomized
 columns and packet routing.
 
-The outer proof interface is its local weight enumerator. For a realized local
-map $G_j$, define
+The first-moment proof needs counts of outer words in the classes relevant
+to the route and inner. For one-bit packets, these are row-weight classes;
+for four-bit packets, they retain packet support and labels. The two
+specializations give their respective counting bounds below.
+\subsection{Packet Routing}
+
+Index the outer packets by $(j,r)\in[L]\times[B]$, with packet bit
+$\ell\in[p]$. For each group $j$, sample $\sigma_j\gets S_B$ and send
+packet $(j,r)$ to region $\sigma_j(r)$ without changing its $p$ bits.
+The transpose exchanges the group and region indices. For each region
+$r$, independently sample $\pi_r\gets S_L$ and move the packet from
+group $j$ to slot $\pi_r(j)$. Thus
 \begin{equation}
-  P_{G_j}(z)
-  :=
-  \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
-  \label{eq:local-constituent-enumerator}
+ \Pi:=\Pi_{\mathrm{reg}}\circ T\circ\Pi_{\mathrm{blk}}.
+ \label{eq:structured-interleaver}
 \end{equation}
-The variable $z$ records weight: the coefficient of $z^w$ counts the
-nonzero block messages whose encoded output has weight $w$.
-These coefficients are ordinary integer counts, not elements of $\F_2$.
-We write $[z^h]F(z)$ for the coefficient of $z^h$ in a polynomial $F(z)$.
-If one deterministic map $G$ is repeated, the number of messages with exactly
-$q$ active blocks and outer weight $h$ is
+Serialize the result in region-major, then slot-major order, retaining
+the bit order within each packet. Region $r$ occupies coordinates
+$(r-1)pL+1,\ldots,rpL$.
+
+Every outer group contributes exactly one packet to every region. Given
+the set of its nonzero packets, its group shuffle makes their destination
+regions a uniform subset of the $B$ regions. Given the packet values
+arriving in one region, its regional shuffle gives uniform slot positions.
+The route preserves all within-packet structure. At $p=1$, a group of
+bit weight $w$ reaches exactly $w$ distinct regions, with one bit per
+region. At $p=4$, the same statement concerns nonzero packets, and the
+proof must also account for their four-bit values.
+
+\begin{lemma}[Packet-route symmetry]
+\label{lem:packet-route-symmetry}
+Fix two outer words whose $p$-bit packet multisets agree in every group.
+Their routed words have the same distribution. Consequently their
+conditional failure probabilities $q_d$ from
+\eqref{eq:conditional-inner-failure} agree for every $d$.
+\end{lemma}
+
+\begin{proof}
+Within each group, one word is a packet permutation of the other.
+Composing that permutation with an independent uniform $\sigma_j$ leaves
+the group shuffle uniform. The region shuffles and inner setup have the
+same independent distributions in both cases.
+\end{proof}
+
+\subsection{Recursive Inner and Transpose}
+
+The inner processes the serialized vector in $R$ steps of $t$ bits.
+Step inputs $X_i$, outputs $Y_i$, and states $Q_i$ are column vectors.
+For fixed maps $A:\F_2^s\to\F_2^t$ and
+$C:\F_2^t\to\F_2^s$, set
 \begin{equation}
-  \binom Lq [z^h]P_G(z)^q.
-  \label{eq:repeated-constituent-enumerator}
+ Q_0:=0,\qquad
+ Y_i:=X_i+A Q_i,\qquad
+ Q_{i+1}:=M_iQ_i+C X_i
+ \quad(0\le i<R).
+ \label{eq:structured-inner}
 \end{equation}
-Here $\binom Lq$ chooses the $q$ nonzero message-block positions.
-Expanding $P_G(z)^q$ chooses one nonzero message for each of these blocks;
-multiplication adds their output weights in the exponent of $z$.
-The coefficient $[z^h]$ therefore counts exactly the choices with total
-outer weight $h$. For example, if $P_G(z)=2z^2+z^4$, then
-$[z^6]P_G(z)^2=4$: either block can supply weight two, with two choices
-for its message, while the other supplies weight four.
+The state continues across region boundaries; $Q_R$ is discarded.
+Scalable SPIN samples a transvection for each $M_i$ and uses separately
+specified fixed maps $A,C$. Turbo SPIN samples each $M_i$ uniformly from
+$\mathrm{GL}(s,2)$ and sets $C=A^\top$. Both choices fit the same
+recurrence, though their distance analyses use different state laws.
 
-For independently sampled, identically distributed local maps, expectation
-replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
-$\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
-quantity is instead
-\begin{equation}
-  \binom Lq\E\bigl[[z^h]P_G(z)^q\bigr].
-  \label{eq:shared-constituent-enumerator}
-\end{equation}
-In particular, an expectation over one sampled constituent must not be moved
-inside the $q$th power.
-
-The distance proof need not know how the local encoder is implemented. It may
-consume an exact enumerator, an expected enumerator under the declared setup,
-or a coefficientwise certified envelope. Minimum distance alone is generally
-insufficient because nearby low-weight shells can have much larger
-multiplicity.
-
-\subsection{Structured Interleaver}
-
-Index the outer coordinates by pairs $(j,r)\in[L]\times[b]$, where $j$ is
-the outer-block position. For every $j\in[L]$, setup samples
-$\sigma_j\gets S_b$ and defines
-$\Pi_{\mathrm{blk}}(j,r):=(j,\sigma_j(r))$.
-The deterministic transpose changes the coordinate view by
-$T(j,r):=(r,j)\in[b]\times[L]$.
-For every region $r\in[b]$, setup samples $\pi_r\gets S_L$ and defines
-$\Pi_{\mathrm{reg}}(r,j):=(r,\pi_r(j))$.
-The complete interleaver is
-\begin{equation}
-  \Pi
-  :=
-  \Pi_{\mathrm{reg}}\circ T\circ\Pi_{\mathrm{blk}}.
-  \label{eq:structured-interleaver}
-\end{equation}
-We serialize the output of \eqref{eq:structured-interleaver} in region-major
-order. Thus region $r$ occupies the consecutive coordinates
-$(r-1)L+1,\ldots,rL$.
-
-Each outer block contributes exactly one coordinate to each of the $b$
-regions. Conditional on the local output weight, $\sigma_j$ makes its active
-coordinates a uniform subset of the regions. Conditional on every region
-weight, $\pi_r$ makes the support uniform within that region. These two
-symmetries remove the original coordinate pattern while preserving the
-deterministic spreading supplied by the transpose.
-
-\subsection{Structured Recursive Inner}
-
-The inner processes the serialized interleaver output
-$X=(X_0,\ldots,X_{R-1})$ in $t$-bit steps, with $X_i\in\F_2^t$.
-For the IMT recurrences, step inputs, step outputs, and state-space vectors
-are columns. The state space is $\F_2^s$.
-The matrices of $A$ and $C$ have dimensions $t\times s$ and $s\times t$,
-respectively. They need not satisfy $C=A^\top$ or $CA=0$.
-For IMT, setup samples $u_i\gets\F_2^s\setminus\{0\}$ and then
-$v_i\gets\{v\in\F_2^s:\langle u_i,v\rangle=0\}$, including zero, and sets
-$M_i:=I+u_iv_i^\top$. The pairs are independent over $0\le i<R$.
-Since $(u_iv_i^\top)^2=0$, each $M_i$ is invertible.
-Starting from $Q_0:=0$, the inner computes
-\begin{equation}
-  Y_i:=X_i+A(Q_i),
-  \qquad
-  Q_{i+1}:=M_iQ_i+C(X_i)
-  \quad(0\le i<R).
-  \label{eq:structured-inner}
-\end{equation}
-It outputs $I(X):=(Y_0,\ldots,Y_{R-1})$ and discards $Q_R$ without a flush.
-State persists across region boundaries. For each fixed $q\ne0$,
-\[
-  \mathcal L(M_iq)=
-  \tfrac12\delta_q+\tfrac12\operatorname{Unif}(\F_2^s\setminus\{0\}).
-\]
-Here the right side denotes a mixture of probability measures. If $u_i=q$,
-then $\langle v_i,q\rangle=0$ and $M_iq=q$; for every other $u_i$, the bit
-$\langle v_i,q\rangle$ is fair. Thus any nonzero target other than $q$ has
-probability $1/(2(2^s-1))$.
-The supporting BCH--IMT finite constructions in
-Appendix~\ref{sec:finite-certificates} use this transvection law.
-
-The transpose $I^\top$ processes input groups $U_i\in\F_2^t$ in reverse
-order. Starting from $r_R=0\in\F_2^s$, it emits groups $V_i\in\F_2^t$:
+The transpose processes input groups $U_i\in\F_2^t$ in reverse order.
+Starting from $r_R=0\in\F_2^s$, it emits
 \begin{equation}
  V_i=U_i+C^\top r_{i+1},\qquad
  r_i=A^\top U_i+M_i^\top r_{i+1}.
  \label{eq:structured-inner-transpose}
 \end{equation}
-Both feedback computations consume the raw input, not the emitted output.
+The feedback computations consume the raw input, not the emitted output.
 
 \begin{lemma}[Inner bijectivity]
 \label{lem:structured-inner-bijective}
-For every fixed state-map schedule and every fixed pair of linear maps
-$A,C$, the map $I:(\F_2^t)^R\to(\F_2^t)^R$ defined in
+For every fixed state-map schedule and fixed pair $A,C$, the map
+$I:(\F_2^t)^R\to(\F_2^t)^R$ defined in
 \eqref{eq:structured-inner} is bijective.
 \end{lemma}
 
 \begin{proof}
-Fix $Y_0,\ldots,Y_{R-1}$. The initial state is known. At step $i$, recover
-$X_i=Y_i+A(Q_i)$ and then compute $Q_{i+1}$ from \eqref{eq:structured-inner}. This procedure
-recovers exactly one input sequence from every output sequence.
+Fix $Y_0,\ldots,Y_{R-1}$. The initial state is known. At step $i$,
+recover $X_i=Y_i+A Q_i$ and then compute $Q_{i+1}$ from
+\eqref{eq:structured-inner}. This recovers exactly one input sequence
+from every output sequence.
 \end{proof}
 
 \subsection{Composition and Rate}
 
-\begin{definition}[Scalable SPIN architecture]
+\begin{definition}[Regional SPIN]
 \label{def:structured-spin}
-For a selector $\theta_m$ and one realization of its setup, the encoder is
+For admissible parameters indexed by $m$, each setup defines
 \begin{equation}
   E_m
   :=
@@ -279,12 +179,13 @@ every realized encoder is injective and has rate
   \frac{K_m}{N_m}=\frac{k_m}{b_m}.
   \label{eq:structured-spin-rate}
 \end{equation}
-The distance analysis can now vary the constituent family without changing
-the routing or inner definitions. It must supply a certified outer spectrum
-or envelope and a conditional failure envelope for the structured route
-classes used in Theorem~\ref{thm:class-first-moment}.
-
-The scalable family below lets the base constituent and $b_m$ vary while
-retaining the fixed IMT step and state dimensions. The BCH--IMT
-instantiation in Appendix~\ref{sec:finite-certificates} uses the same
-architecture with fixed outer length and tuned finite parameters.
+A distance bound additionally requires outer-class multiplicities and
+conditional route--inner failure envelopes as inputs to
+Theorem~\ref{thm:class-first-moment}. Lemma~\ref{lem:packet-route-symmetry}
+gives an exact class map through the packet multiset of each group;
+the proofs may retain these classes or bound unions of them. Scalable SPIN
+uses bit-level row weights and an asymptotic envelope. Turbo SPIN retains
+packet information for sparse occupations and uses a pointwise outer
+comparison for larger ones. The supporting BCH--IMT
+instantiation in Appendix~\ref{sec:finite-certificates} uses the bit-level
+route with a fixed outer and tuned finite parameters.

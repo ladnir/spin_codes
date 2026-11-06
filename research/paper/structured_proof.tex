@@ -1,8 +1,23 @@
-We now instantiate Scalable SPIN with a growing outer and fixed IMT maps.
+\section{Scalable SPIN: Growing Outer and IMT Inner}
+\label{sec:structured-distance}
+
+Set the packet width to $p=1$ in the regional encoder of
+Section~\ref{sec:regional-spin}. We instantiate its outer with a growing
+constituent and its inner with fixed IMT maps. We call its outer groups
+\emph{rows} in the proof below.
 The constituent length $b$ grows logarithmically, but the outer encoding
 work is linear.
 The proof must handle both messages concentrated in a few outer blocks
 and messages occupying a constant fraction of the blocks.
+
+This specialization replaces the expensive parts of Random SPIN in three
+ways. One sampled BAA constituent is reused across rows, with its realized
+weight spectrum controlled before the first-moment calculation
+\cite{cryptoeprint:2026/1903}. Bit-level packet routing sends distinct bits
+of a row to distinct regions, limiting concentration late in the stream.
+Fixed expansion and feedback maps process $128$ bits at a time; sampled
+transvections refresh the state once per step. The route and inner are
+analyzed jointly because their effects on a low-weight output are dependent.
 
 \subsection{Scalable Constituent Family}
 \label{sec:structured-scalable}
@@ -33,6 +48,49 @@ fix a particular $H_a$, its spectrum, and an admissible schedule for $b$.
 Changing $a$ or $H_a$ changes the outer enumerator and may change the certified
 schedule. It does not change the route or the structured inner.
 
+For $p=1$, the outer proof interface is its local weight enumerator.
+For a realized local map $G_j$, define
+\begin{equation}
+  P_{G_j}(z)
+  :=
+  \sum_{v\in\F_2^k\setminus\{0\}}z^{\wt(G_j(v))}.
+  \label{eq:local-constituent-enumerator}
+\end{equation}
+The variable $z$ records weight: the coefficient of $z^w$ counts the
+nonzero block messages whose encoded output has weight $w$.
+These coefficients are ordinary integer counts, not elements of $\F_2$.
+We write $[z^h]F(z)$ for the coefficient of $z^h$ in a polynomial $F(z)$.
+If one deterministic map $G$ is repeated, the number of messages with exactly
+$q$ active blocks and outer weight $h$ is
+\begin{equation}
+  \binom Lq [z^h]P_G(z)^q.
+  \label{eq:repeated-constituent-enumerator}
+\end{equation}
+Here $\binom Lq$ chooses the $q$ nonzero message-block positions.
+Expanding $P_G(z)^q$ chooses one nonzero message for each of these blocks;
+multiplication adds their output weights in the exponent of $z$.
+The coefficient $[z^h]$ therefore counts exactly the choices with total
+outer weight $h$. For example, if $P_G(z)=2z^2+z^4$, then
+$[z^6]P_G(z)^2=4$: either block can supply weight two, with two choices
+for its message, while the other supplies weight four.
+
+For independently sampled, identically distributed local maps, expectation
+replaces $P_G$ in \eqref{eq:repeated-constituent-enumerator} by
+$\E[P_{G_1}]$. If one sampled map is reused in all positions, the correct
+quantity is instead
+\begin{equation}
+  \binom Lq\E\bigl[[z^h]P_G(z)^q\bigr].
+  \label{eq:shared-constituent-enumerator}
+\end{equation}
+In particular, an expectation over one sampled constituent must not be moved
+inside the $q$th power.
+
+The distance proof need not know how the local encoder is implemented. It may
+consume an exact enumerator, an expected enumerator under the declared setup,
+or a coefficientwise certified envelope. Minimum distance alone is generally
+insufficient because nearby low-weight shells can have much larger
+multiplicity.
+
 \paragraph{The Asymptotic Instantiation.}
 For the theorem below, set $a:=24$ and let
 $H_{24}:\F_2^{12}\longrightarrow\F_2^{24}$ encode the extended binary Golay code. Fix a positive integer $m$ and set
@@ -48,17 +106,31 @@ $L_m:=128m$. Let $b_m$ be the least positive multiple of $24$ satisfying
 Then $b_m=\frac{39}{4}\log_2N_m+O(1)$, and consecutive native lengths have relative
 gap $o(1)$.
 
-Use $\mathcal O_{24,b_m}$ from \eqref{eq:ba3-outer}. Setup reuses this sampled
+Use $\mathcal O_{24,b_m}$ from \eqref{eq:ba3-outer} with local dimension
+$k_m=b_m/2$. Setup reuses this sampled
 map in all $L_m$ diagonal positions:
 $G_{m,1}=\cdots=G_{m,L_m}:=\mathcal O_{24,b_m}$.
 The expectation over $(\tau_1,\tau_2)$ remains outside the
 $q$th enumerator power, as in
 \eqref{eq:shared-constituent-enumerator}.
 
-Setup then samples the block shuffles, region shuffles, and transvections
-as in Section~\ref{sec:structured-spin}, independently of $(\tau_1,\tau_2)$.
+Setup samples the bit-level group and region shuffles of
+Section~\ref{sec:regional-spin}, independently of $(\tau_1,\tau_2)$.
 The inner fixes $(t,s)=(128,19)$ and the IMT maps $A,C$ in
 Table~\ref{tab:imt-maps}.
+For each inner step, independently sample
+$u_i\gets\F_2^s\setminus\{0\}$ and
+$v_i\gets\{v\in\F_2^s:\langle u_i,v\rangle=0\}$, including zero, and set
+$M_i:=I+u_iv_i^\top$. Each $M_i$ is invertible because
+$(u_iv_i^\top)^2=0$. For every fixed nonzero state $q$,
+\[
+ \mathcal L(M_iq)
+ =\tfrac12\delta_q+
+ \tfrac12\operatorname{Unif}(\F_2^s\setminus\{0\}).
+\]
+If $u_i=q$, the update fixes $q$; for other $u_i$, the bit
+$\langle v_i,q\rangle$ is fair. This gives the IMT state-update law used
+in the distance proof.
 
 The selected maps have a small, explicit weight structure. For nonzero
 states $q$, the only values of $\wt(Aq)$ are $48,56,64,72,80$.
@@ -68,8 +140,9 @@ spanning $\F_2^{19}$, so each input coordinate contributes to only five
 state coordinates. This gives sparse feedback. The proof does not treat
 the feedback syndromes $C(X_i)$ as uniform: it uses the exact spectrum of $C^\top$ to
 bound cancellations. The appendix supplies the map bases, shell
-multiplicities, and transfer entries; Section~\ref{sec:implementation}
-describes the circuits used to apply the maps.
+multiplicities, and transfer entries; Appendix~\ref{app:implementation}
+describes the circuits used to apply the maps in the finite BCH--IMT
+instantiation.
 
 \begin{theorem}[Scalable SPIN]
 \label{thm:structured-spin-scalable}
@@ -203,7 +276,8 @@ with the usual continuous endpoint conventions.
 \label{lem:structured-route-domination}
 Let $F$ be any nonnegative function of the routed word, viewed as $b$
 regions of $L$ bits.
-Conditioned on the row weights $w_1,\ldots,w_Q$, the structured route
+Conditioned on the row weights $w_1,\ldots,w_Q$, Lemma~\ref{lem:packet-route-symmetry}
+reduces the bit-level route to uniform supports. The route then
 satisfies
 \begin{equation}
   \E_{\rm route}[F]
@@ -270,7 +344,7 @@ description. For iid Bernoulli-$\beta$ input and $0<z<1$, weight each
 transition by $z$ to the emitted Hamming weight. Track mass at zero,
 arbitrary nonzero mass, and uniform mass on each of the five nonzero
 image-weight shells of $A$. This gives seven nonnegative coordinates.
-For a live state, the transvection law of Section~\ref{sec:structured-spin}
+For a live state, the transvection law defined above
 is a mixture of two branches. The lazy branch, $M_iQ_i=Q_i$, can cancel
 through $CX=Q_i$; the refresh branch spreads a live state uniformly. Both effects enter the transfer bound.
 

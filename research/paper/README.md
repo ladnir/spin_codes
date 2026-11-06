@@ -1,7 +1,9 @@
 # SPIN manuscript (LLNCS)
 
-The main text presents Scalable SPIN for the asymptotic theorem and Turbo
-SPIN for finite RS-packet certificates and fast transposed encoding.
+The main text defines a regional SPIN encoder with packet width $p$, then
+specializes it to Scalable SPIN ($p=1$) for the asymptotic theorem and
+Turbo SPIN ($p=4$) for finite RS-packet certificates and fast transposed
+encoding.
 Its public binary encoder uses precomputed transposed encoding and has
 certificates at K=2^16, 2^18, and 2^20. The corresponding same-host
 public-API times are 0.099526, 0.461416, and 2.861814 ms; see

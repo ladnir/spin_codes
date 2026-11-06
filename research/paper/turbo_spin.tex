@@ -1,17 +1,18 @@
-\section{Turbo SPIN: A Four-Bit Packet Route}
+\section{Turbo SPIN: Fixed Outer and Four-Bit Packets}
 \label{sec:turbo-spin}
 
 The bit-level route and IMT inner above give an asymptotic guarantee.
-At selected finite lengths, we can spend more randomness on each outer
-group and inner update while moving data in four-bit packets. This gives
-the binary transposed encoder \emph{Turbo SPIN}. It retains the
-outer--route--inner sequence and the first-moment proof interface, but its
-finite certificate uses different support classes. The asymptotic theorem
-of Section~\ref{sec:structured-distance} does not apply to this packet route.
+At selected finite lengths, we spend more randomness on each outer group
+and inner update while routing four-bit packets. This instantiates the
+regional encoder of Section~\ref{sec:regional-spin} as \emph{Turbo SPIN}.
+Its finite certificate uses packet-support classes in the same first-moment
+framework. The asymptotic theorem of Section~\ref{sec:structured-distance}
+does not apply to this packet route.
 
 \paragraph{Construction.}
-Fix $K\in\{2^{16},2^{18},2^{20}\}$, put $N=2K$, and divide the message into
-$L=K/128$ groups of $128$ bits. Interpret each group as eight rows of four
+Fix $K\in\{2^{16},2^{18},2^{20}\}$, set
+$(k,b,p,t)=(128,256,4,64)$, $L=K/128$, and $N=2K$. Interpret each local
+input group as eight rows of four
 symbols over $\F_{16}$. Encode each row by the same systematic MDS
 RS$[8,4]$ code. The eight symbols at one code position form a $32$-bit
 column. For each group and each of its eight columns, independently sample
@@ -19,16 +20,15 @@ a nonzero element of $\F_{2^{32}}$ and apply the binary adjoint of
 multiplication by that element. This orientation makes the transposed
 encoder apply field multiplication directly. The column maps are part of
 the sampled code and remain fixed for every message.
+The RS rows and column maps together form the sampled local map $G_j$
+in Definition~\ref{def:structured-spin}; these maps are independent
+across groups.
 
-Split each randomized column into eight four-bit packets. Independently
-shuffle the $64$ packets of each group into $64$ regions, one packet per
-region. In every region, independently permute the $L$ group slots.
-The composition is one permutation of the $N$ binary coordinates.
-Serialize the regions and process them in $64$-bit steps. For step input
-$X_i\in\F_2^{64}$ and state $Q_i\in\F_2^s$, set
-\[
-  Q_0=0,\qquad Y_i=X_i+A Q_i,\qquad Q_{i+1}=M_iQ_i+A^\top X_i.
-\]
+Split each randomized column into eight four-bit packets. Apply the
+packet route of Section~\ref{sec:regional-spin}: shuffle each group's
+$B=64$ packets into distinct regions, then independently shuffle the $L$
+packet slots of each region. Serialize in region-major order.
+The inner uses recurrence~\eqref{eq:structured-inner} with $C=A^\top$.
 The fixed map $A:\F_2^s\to\F_2^{64}$ and independently sampled uniform
 $M_i\in\mathrm{GL}(s,2)$ use $s=15$ at $K=2^{16}$ and $s=22$ at the two
 larger lengths. The state continues across region boundaries and is
@@ -51,10 +51,12 @@ as $(61.88,58.24,51.82)$ bits, respectively. In particular, the minimum
 distance exceeds $N/10$ except with setup probability below $2^{-40}$.
 \end{theorem}
 
-The outer is injective, and the inner is triangular with identity diagonal,
-so the rate holds for every setup. For distance, independent column
+The outer is injective, and Lemma~\ref{lem:structured-inner-bijective}
+gives the rate for every setup. For distance, independent column
 randomization makes every fixed nonzero column uniform over the nonzero
 $32$-bit vectors. This gives an exact expected packet-weight enumerator.
+Lemma~\ref{lem:packet-route-symmetry} then removes dependence on the
+original packet positions while retaining their four-bit values.
 The first-moment calculation treats one and two active groups with their
 support information intact. For three or more, a pointwise bound on the
 outer measure transfers the existing regional inner bounds. At $K=2^{20}$,
