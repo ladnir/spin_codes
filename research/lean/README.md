@@ -73,8 +73,13 @@ identifies the ideal recursive product with the continuum integrand at
 the normalized sorted bit positions. The
 [boundary error](SpinCodes/UniformMixer/RegionalBoundaryError.lean)
 transfers the good-support row bound to every full-state endpoint entry.
-The remaining regional comparison inserts this pointwise estimate into
-the actual shuffle average and takes its uniform support-grid limit.
+The [production envelope comparison](SpinCodes/UniformMixer/RegionalEnvelopeComparison.lean)
+inserts this bound into the actual finite regional envelope, with its
+proved multiplicative error factor. The
+[averaged continuum comparison](SpinCodes/UniformMixer/RegionalAverageContinuum.lean)
+then sums over the exact uniform shuffle law and gives a finite bound
+for every fixed active-support size. Taking its limit and composing it
+with the outer/routing bound remain open.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
