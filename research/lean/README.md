@@ -16,7 +16,11 @@ scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
 mean for the paper's 22-by-64 matrix and a quadratic error bound for its
 empty-gap tilt. They also give a full-state empty-gap sandwich for an
 arbitrary entering state. The complete regional comparison, including
-active-step placement, is still open. The placement coupling,
+active-step placement, is still open. The
+[production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
+the actual one-bit output and feedback maps, proves each feedback column
+nonzero, and checks its weighted bounds and zero/live quotient.
+The placement coupling,
 routing/outer bounds, finite Turbo certificates, and final distance theorems
 also remain to be formalized. The older native theorem below does not
 verify those revised constructions.
