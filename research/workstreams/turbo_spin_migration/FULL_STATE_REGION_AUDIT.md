@@ -68,11 +68,19 @@ with the selected outer, routing, and fixed-occupation inequalities.
 `research/lean/SpinCodes/UniformMixer/Kernel.lean` now verifies the uniform
 action law for finite-dimensional invertible linear maps, the exact
 full-state empty-gap kernel, and the one-bit impulse quotient. The proof
-is generic in the finite vector space; it does not enumerate the enormous
-group `GL(22,2)`.
+also gives a 22-bit theorem parameterized by a finite enumeration of
+`GL(22,2)`; a separate theorem proves that such an enumeration exists.
+No group elements are materialized. The value `D=2^22-1` is checked.
 
-The discrete-to-continuous slot coupling, the support/positivity argument,
-and the regional product inequality remain
-to be formalized. The finite numerical gates are separate obligations.
+`research/lean/SpinCodes/UniformMixer/Regional.lean` verifies kernel
+composition, `RJ=I_2`, the exact nonempty-gap factorization, the literal
+matrix product `RV_c(1)J=P_0`, and the weighted impulse sandwich. It
+proves both directions of the full-state gap comparison conditional on
+the scalar live-weight estimate. Entrywise scalar bounds compose through
+nonnegative kernels.
+
+The scalar estimate (including the live mean and Hoeffding bound), the
+discrete-to-continuous slot coupling, and the support/positivity argument
+remain to be formalized. The finite numerical gates are separate obligations.
 The revised Scalable theorem and the finite Turbo certificates are not yet
 Lean-verified.

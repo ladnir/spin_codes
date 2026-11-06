@@ -7,9 +7,12 @@ SPIN results in the current paper.
 The new [uniform-mixer kernel](SpinCodes/UniformMixer/Kernel.lean) checks a
 first part of the Scalable SPIN proof: the exact state transition under a
 uniform invertible linear map, the full-state formula for an empty gap,
-and the one-bit impulse quotient.
-The regional comparison, routing/outer bounds, finite certificates, and
-final distance theorem still require formalization.
+and the one-bit impulse quotient. The [regional algebra](SpinCodes/UniformMixer/Regional.lean)
+checks full-state kernel composition, the zero/live lift and projection,
+the weighted impulse bound, and both gap comparisons conditional on a
+scalar live-weight estimate. The estimate, placement coupling,
+routing/outer bounds, finite certificates, and final distance theorem
+still require formalization.
 
 The native Structured SPIN distance and rate result is complete. Under the
 actual setup distribution, the probability that minimum distance is at most

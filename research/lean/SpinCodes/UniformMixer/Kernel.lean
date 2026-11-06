@@ -5,6 +5,8 @@ import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Algebra.Field.ZMod
 import Mathlib.Basic.Real.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
@@ -452,5 +454,41 @@ theorem linearEquiv_groupUpdate_eq_update (c q r : V) :
     exact map_zero g
   · intro a b ha hb
     exact linearEquiv_transitive_live a b ha hb
+
+end Spin.UniformMixer
+
+namespace Spin.UniformMixer
+
+abbrev State22 := Fin 22 → ZMod 2
+
+theorem card_binary_vector (m : ℕ) :
+    Fintype.card (Fin m → ZMod 2) = 2 ^ m := by
+  classical
+  rw [Fintype.card_fun, ZMod.card]
+  simp
+
+theorem liveCount_binary_vector (m : ℕ) :
+    liveCount (Fin m → ZMod 2) = 2 ^ m - 1 := by
+  unfold liveCount
+  rw [card_binary_vector]
+
+theorem state22_liveCount : liveCount State22 = 2 ^ 22 - 1 :=
+  liveCount_binary_vector 22
+
+/-- Finiteness follows by embedding every automorphism in the finite set
+of all functions on the state space. -/
+theorem state22GL_finite : Finite (State22 ≃ₗ[ZMod 2] State22) :=
+  Finite.of_injective
+    (fun g : State22 ≃ₗ[ZMod 2] State22 => (g : State22 → State22))
+    (fun _ _ h => LinearEquiv.ext (congrFun h))
+
+theorem state22_uniform_gl_kernel
+    [Fintype (State22 ≃ₗ[ZMod 2] State22)] (c q r : State22) :
+    groupUpdate (G := State22 ≃ₗ[ZMod 2] State22) c q r = update c q r := by
+  apply groupUpdate_eq_update c q r
+  · intro g
+    exact map_zero g
+  · intro a b ha hb
+    exact linearEquiv_transitive_live (F := ZMod 2) a b ha hb
 
 end Spin.UniformMixer
