@@ -36,10 +36,12 @@ pages; the larger runs request huge pages for data and scratch. The
 operating system may decline that request. All runs are serial.
 Appendix~\ref{app:implementation} gives the implementation scope.
 
-The BCH--IMT comparison in Appendix~\ref{sec:transposed-comparison}
-uses a different measurement campaign
-and memory policy. We have no matched BAA or ordinary-encoding timing
-for Turbo SPIN, so we report no corresponding speedup or direction
-comparison. Appendix~\ref{app:implementation} also documents the BCH--IMT
-ordinary encoder. The OT and PCS application results in
-Section~\ref{sec:applications} use BCH--IMT.
+The measured applications instantiate the bit-level design with a fixed
+BCH outer and the IMT inner. This BCH--IMT instantiation has
+five finite half-rate certificates and optimized ordinary and transposed
+encoders. Its $K=2^{20}$ transposed time is $9.289$\,ms, measured in a
+separate campaign with a different memory policy. Appendix~\ref{app:implementation}
+gives the BCH--IMT implementation and its comparison with other encoders.
+We have no matched BAA or ordinary-encoding timing for Turbo SPIN, so we
+report no corresponding speedup or direction comparison. The OT and PCS
+application results in Section~\ref{sec:applications} use BCH--IMT.

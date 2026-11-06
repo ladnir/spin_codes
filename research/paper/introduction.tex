@@ -42,10 +42,13 @@ short RS rows, randomized $32$-bit columns, a four-bit packet route, and
 a separately certified recursive inner. At $K=2^{16},2^{18},2^{20}$,
 its relative distance exceeds $0.10$ with more than $51$ bits of
 setup-failure margin. This is a finite claim, distinct from the Scalable
-SPIN theorem. A supporting BCH--IMT instantiation gives distance above
-$0.10N$ at five lengths through $K=2^{24}$, using rigorous BCH spectrum
-inequalities. Appendix~\ref{sec:finite-certificates} also gives two
-rate-$1/4$ operating points.
+SPIN theorem.
+
+Both main constructions follow \eqref{eq:intro-spin-composition}. They use
+different outer codes, routing units, and state updates to trade encoding
+cost against the scope of the distance proof. The same first-moment
+framework asks how many outer words occur in each relevant class and how
+likely their routed images are to produce a low-weight output.
 
 \paragraph{Analysis and Structure.}
 For this class of encoder, sparse messages typically cause low minimum
@@ -77,8 +80,12 @@ terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 \paragraph{Implementation and Applications.}
 On one Ryzen 9 7950X thread, Turbo SPIN's precomputed transposed encoder
 produces $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms.
-The supporting BCH--IMT encoder takes about $9.3$\,ms at the same length
-in a separate campaign. Appendix~\ref{app:implementation} compares it
+The application backend uses the bit-level route with a fixed BCH outer
+and IMT inner. It has certified distance above $0.10N$ at five lengths
+through $K=2^{24}$, using rigorous BCH spectrum inequalities; two
+rate-$1/4$ bounds are also given in Appendix~\ref{sec:finite-certificates}.
+Its transposed encoder takes about $9.3$\,ms at $K=2^{20}$ in a separate
+campaign. Appendix~\ref{app:implementation} compares it
 with original and chosen-block BAA~\cite{KolesnikovEtAl2026BA,cryptoeprint:2026/1903};
 Turbo has no matched BAA timing.
 In libOTe's regular-noise Silent OT path, the sender produces $2^{18}$ hashed
@@ -145,7 +152,7 @@ Bolt uses sketched codes to reduce commitment cost~\cite{bolt26}.
 \paragraph{Organization and Artifact.}
 Sections~\ref{sec:preliminaries}--\ref{sec:framework} give the common framework;
 Section~\ref{sec:spin-intuition} builds intuition before the Scalable SPIN
-construction and proof in Sections~\ref{sec:structured-spin}--\ref{sec:structured-distance},
+construction and proof in Section~\ref{sec:structured-spin},
 followed by the finite Turbo SPIN construction in Section~\ref{sec:turbo-spin}.
 Sections~\ref{sec:implementation} and~\ref{sec:applications} evaluate the encoder
 and applications. The appendices contain the complete supporting proofs,

@@ -19,9 +19,8 @@ above $51$ bits.
 \qquad After precomputation, Turbo SPIN transposed encoding produces
 $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms
 on one Ryzen 9 7950X thread.
-The supporting BCH--IMT instantiation has certified distance above $0.10N$
-at five finite lengths through $K=2^{24}$. With this separate encoder,
-libOTe's regular-noise Silent OT sender
+A separately certified BCH--IMT implementation supports our application
+measurements. With this encoder, libOTe's regular-noise Silent OT sender
 achieves $89.0$ million hashed OTs per second on one core. This OT timing
 excludes initial setup, base-correlation generation, and network transport.
 

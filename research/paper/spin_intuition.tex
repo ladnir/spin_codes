@@ -112,5 +112,16 @@ evaluates $m=\Theta(\log N)$ feedback taps at each position, adding another
 $\Theta(N\log N)$ term. The uniform permutation also requires irregular
 data movement.
 
-Section~\ref{sec:structured-spin} develops Scalable SPIN by replacing each costly component with a
-structured alternative of linear work.
+The two main constructions keep this outer--route--inner sequence but make
+different choices about where to spend work and randomness. Scalable SPIN
+uses a growing spectrum-controlled outer, routes individual bits, and mixes
+state with inexpensive transvections. This choice supports a distance theorem
+as the length grows. Turbo SPIN uses a short RS outer, randomizes its columns,
+routes four-bit packets, and uses uniform sampled state updates. It gives
+fast transposed encoding with certified guarantees at selected finite
+lengths. In each case, the proof counts the outer words that could cause
+failure and bounds what the route and inner do to each class of words.
+
+We first develop the bit-level design and its asymptotic proof. We then
+change the outer, routing unit, and state update together for Turbo's
+finite-length operating points.

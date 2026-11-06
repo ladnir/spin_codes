@@ -1,11 +1,13 @@
-\section{Turbo SPIN: A Finite RS-Packet Construction}
+\section{Turbo SPIN: A Four-Bit Packet Route}
 \label{sec:turbo-spin}
 
-Scalable SPIN proves a distance guarantee as length grows. For three
-finite lengths, a different outer and route give substantially faster
-transposed encoding. We call this binary operating family \emph{Turbo SPIN}.
-Its guarantees below are finite-length statements; the asymptotic theorem
-of Section~\ref{sec:structured-distance} concerns Scalable SPIN.
+The bit-level route and IMT inner above give an asymptotic guarantee.
+At selected finite lengths, we can spend more randomness on each outer
+group and inner update while moving data in four-bit packets. This gives
+the binary transposed encoder \emph{Turbo SPIN}. It retains the
+outer--route--inner sequence and the first-moment proof interface, but its
+finite certificate uses different support classes. The asymptotic theorem
+of Section~\ref{sec:structured-distance} does not apply to this packet route.
 
 \paragraph{Construction.}
 Fix $K\in\{2^{16},2^{18},2^{20}\}$, put $N=2K$, and divide the message into
