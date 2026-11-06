@@ -28,7 +28,13 @@ factor. The
 [matrix bridge](SpinCodes/UniformMixer/RegionalMatrix.lean) now proves
 the reduction to the two-state product for every fixed separated
 placement, with the full-state boundary lift and projection intact.
-The placement average, continuum coupling, routing/outer bounds,
+The [placement bound](SpinCodes/UniformMixer/RegionalPlacement.lean)
+uses the verified uniform shuffle law to bound boundary and close-pair
+events and proves that their complement has separated, interior steps.
+Its exclusion event is stronger than the one in the paper and still has
+probability `O(a²/L)` for fixed occupation `a`. Converting each support
+into a marked region product, averaging it, and coupling the result to
+the continuum kernel remain open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
@@ -77,6 +83,11 @@ The build command creates missing or stale project dependencies. On a fresh
 checkout, this includes substantial numerical certificate checking. It is
 not a quick smoke check. The final command imports the built public result
 and prints its statements and axiom dependencies.
+
+The new `UniformMixer` modules were checked with the pinned toolchain
+and cached dependency objects. Their final declarations report only
+`propext`, `Classical.choice`, and `Quot.sound`. A clean replay of the
+revised proof is still required after its remaining modules are complete.
 
 Bare `lake build` still selects the historical `SpinCodes` default target.
 That target and `scripts/check.sh` check the earlier abstract framework;
