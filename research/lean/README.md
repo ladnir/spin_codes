@@ -16,8 +16,7 @@ scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
 mean for the paper's 22-by-64 matrix and a quadratic error bound for its
 empty-gap tilt. They also give a full-state empty-gap sandwich for an
 arbitrary entering state, with an explicit `1±C/L` factor at tilt `θ/L`
-when the gap fits in one region. The averaged regional comparison is
-still open. The
+when the gap fits in one region. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
@@ -64,8 +63,16 @@ shows that its two-state rows change by at most `γ` times the `ℓ₁` change
 in gap lengths. The [rounding bound](SpinCodes/UniformMixer/RegionalRounding.lean)
 shows that every good support with `a` active bits has total normalized
 gap error at most `3(a+1)/R`, where the region has `R` encoder steps.
-The remaining bridge identifies these recursive gap lists with the two
-matrix products before applying the row-error estimate.
+The [recursive product comparison](SpinCodes/UniformMixer/RegionalProductError.lean)
+applies this error to the actual rounded and ideal two-state products.
+The [product bridge](SpinCodes/UniformMixer/RegionalProductBridge.lean)
+identifies the rounded product exactly with the marked regional envelope
+and gives a uniform good-support row error of `3γ(a+1)/R`.
+The [site-product bridge](SpinCodes/UniformMixer/RegionalSiteProduct.lean)
+identifies the ideal recursive product with the continuum integrand at
+the normalized sorted bit positions. The remaining comparison transfers
+the row-error bound through the full-state boundary matrices and the
+shuffle average.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
