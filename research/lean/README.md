@@ -16,19 +16,21 @@ scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
 mean for the paper's 22-by-64 matrix and a quadratic error bound for its
 empty-gap tilt. They also give a full-state empty-gap sandwich for an
 arbitrary entering state, with an explicit `1±C/L` factor at tilt `θ/L`
-when the gap fits in one region. The complete regional comparison, including
-active-step placement, is still open. The
+when the gap fits in one region. The averaged regional comparison is
+still open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
 [regional product](SpinCodes/UniformMixer/RegionalProduct.lean) composes
 these bounds for any fixed placement with separated active steps. It
 retains arbitrary full-state boundaries and an explicit finite-length
-factor. Averaging over placements and reducing the envelope to its
-two-state product remain open. The placement coupling,
-routing/outer bounds, finite Turbo certificates, and final distance theorems
-also remain to be formalized. The older native theorem below does not
-verify those revised constructions.
+factor. The
+[matrix bridge](SpinCodes/UniformMixer/RegionalMatrix.lean) now proves
+the reduction to the two-state product for every fixed separated
+placement, with the full-state boundary lift and projection intact.
+The placement average, continuum coupling, routing/outer bounds,
+finite Turbo certificates, and final distance theorems remain open.
+The older native theorem below does not verify those revised constructions.
 
 The native Structured SPIN distance and rate result is complete. Under the
 actual setup distribution, the probability that minimum distance is at most
