@@ -1,18 +1,18 @@
 # A packet-support floor for the shared Golay--BAA outer
 
-## Claim under investigation
+## Result and scope
 
 Let `b` grow through multiples of 24 and let `R=b/4`. Sample one
 Golay--BAA constituent `O_b=Acc_b o tau_2 o Acc_b o tau_1 o H_{24,b}`
 using independent uniform permutations. Let `B_O(v)` count its nonzero
-words with `v` active four-bit output packets. We seek
+words with `v` active four-bit output packets. We prove
 
 ```
 E[ sum_{1 <= v < (4/25)R} B_O(v) ] = o(1).             (1)
 ```
 
 Rounding the strict inequality to the integer packet floor is understood.
-Markov would then show that one sampled, shared outer has packet support
+Markov then shows that one sampled, shared outer has packet support
 at least `ceil((4/25)R)` for every nonzero word with probability `1-o(1)`.
 This condition improves Turbo's one-active-block bound without changing
 the encoder. The exact finite packet enumerator is in
@@ -20,8 +20,10 @@ the encoder. The exact finite packet enumerator is in
 
 We split messages by `j`, the number of active 24-bit Golay source
 blocks, as the paper does for its binary-weight tail. The sparse part
-below closes by adapting that proof. The dense part has a negative
-numerical exponent screen but still needs a uniform certified bound.
+below closes by adapting that proof. The dense part uses an
+outward-rounded interval certificate for the packet-aware exponent.
+This result concerns the selected outer only; it does not prove Turbo's
+global distance.
 
 ## Sparse source blocks: an analytic bound
 
@@ -60,8 +62,10 @@ zeta^(-1) sum_{1<=j<=eta b} [C_* (j/b)^3]^j,
 C_* = (4095 e/24) (4 kappa/(1-8eta))^4.
 ```
 
-Using `e<2.72`, `kappa<28`, and `eta=1/5000` gives
-`C_* eta^3<0.59`. Split the sum at `sqrt(b)`. For smaller `j` it is
+Here `zeta<7/8` follows by squaring rational numbers, so `kappa<28`.
+Using `e<68/25` and `eta=1/5000` gives `C_* eta^3<0.59`;
+`verify_packet_tail_sparse.py` checks these rational inequalities.
+Split the sum at `sqrt(b)`. For smaller `j` it is
 bounded by a geometric series with ratio `O(b^(-3/2))`; for larger `j`
 it is bounded by a geometric tail with ratio below `0.59`. Therefore
 the sparse contribution to (1) is `O(b^(-3/2))`. This argument needs
@@ -100,16 +104,22 @@ For each feasible `(alpha,beta)`, we may minimize (2) over `x,u`.
 A strictly negative *uniform* supremum over
 `alpha in [0.0016,1]` and
 `beta in [alpha/2,1-alpha/2]` would make the dense contribution
-`exp(-Omega(b))`, up to polynomial coefficient factors. The finite
-endpoint and prefactor treatment belongs in that certificate.
+`exp(-Omega(b))`, up to polynomial coefficient factors. The paper's
+uniform coefficient and Stirling bounds handle the endpoints; each
+accepted box uses a fixed positive matrix with a finite Perron prefactor.
 
-`packet_tail_exponent.py` evaluates (2) on a binary64 grid. With
-`rho=0.16`, 24 samples on each axis, and `alpha>=0.0016`, its largest
-sampled value is about `-0.00305` nats per outer bit, at the sparse/dense
-boundary `(alpha,beta)=(0.0016,0.0008)`. This is encouraging but does
-**not** bound the unsampled domain. The next proof task is interval
-branch-and-bound or an analytic envelope for (2), including small
-`alpha` and feasibility boundaries.
+`verify_packet_tail_interval.py` certifies the uniform strict inequality.
+It covers the full rectangle `alpha in [1/625,1]`, `beta in [0,1]`,
+discarding only boxes disjoint from the accumulator feasibility region.
+For each remaining box it chooses fixed positive rational `x,u` and
+upper-bounds (2) with outward-rounded interval arithmetic. The verifier
+reuses the paper's certified Golay and first-accumulator interval bounds.
+Its completed run processes 995 boxes, accepts 996 leaves, reaches depth
+24, and has maximum accepted upper bound below `-3.26e-7` nats per
+outer bit. Thus the dense contribution is `exp(-Omega(b))`, since the
+coefficient and Stirling remainders are polynomial in `b` as in the
+paper's outer-tail proof. `packet_tail_exponent.py` remains a faster
+binary64 diagnostic; it is not the certificate.
 
 ## Finite diagnostic and next gate
 
@@ -120,7 +130,7 @@ contributes `0.001441` of `0.001552`; at `b=864`, it contributes
 `0.000327` of `0.000338`. These numbers accord with the sparse bound.
 They are binary64 evaluations, not outward-rounded certificates.
 
-Closing (2) would establish the packet-floor selection event (1).
-It would still leave multi-block packet collisions and inner-state
-cancellations to prove before replacing Structured SPIN's asymptotic
-theorem.
+The sparse and dense bounds together establish (1), hence the shared
+outer's 16% packet-support floor with probability `1-o(1)`. Multi-block
+packet collisions and inner-state cancellations still require proofs
+before replacing Structured SPIN's asymptotic theorem.

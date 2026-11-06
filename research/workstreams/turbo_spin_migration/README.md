@@ -38,14 +38,15 @@ The [one-active-block packet transfer](Q1_PACKET_TRANSFER.md) derives an
 exact BAA packet-support enumerator and an s22 finite-step upper transfer.
 A preliminary screen using a selected 16% packet-support floor leaves
 room for the old `39/4` outer-growth schedule in the one-block class.
-The [packet-floor analysis](PACKET_FLOOR_TAIL.md) closes the sparse-source
-part; its dense-source exponent still needs a uniform certificate.
-The other occupation classes still need proofs;
+The [packet-floor analysis](PACKET_FLOOR_TAIL.md) proves the 16% floor
+for the shared growing outer using an analytic sparse bound and an
+outward-rounded dense certificate. The one-block schedule inequality and
+other occupation classes still need proofs;
 the numerical screen does not establish a scalable distance theorem.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Certify the dense-source packet-tail exponent for the shared BAA outer
-and audit the finite-step one-block transfer.
+Certify the one-block schedule inequality under the selected packet floor
+and audit the finite-step transfer.
 Then test the other occupation classes. The finite K=2^22/2^24 certificate sweep is
 independent of that asymptotic proof.
 

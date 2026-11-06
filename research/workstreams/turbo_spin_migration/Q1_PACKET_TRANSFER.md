@@ -236,23 +236,22 @@ also control the sparse source classes, as the existing BAA binary-tail
 proof does. The numerical decrease is consistent with a vanishing
 failure probability but is not itself a proof of `o(1)`.
 The [packet-floor tail note](PACKET_FLOOR_TAIL.md) proves the sparse-source
-contribution is `O(b^(-3/2))` at this floor and gives an explicit
-two-variable dense-source exponent. A sampled grid finds a negative
-exponent, but uniform certification of that exponent is still open.
+contribution is `O(b^(-3/2))` and certifies a strictly negative
+dense-source exponent with outward-rounded interval arithmetic. Thus
+the additional packet-floor setup event has probability `1-o(1)`.
 
-This packet selection is the first plausible way to retain the paper's
+This packet selection makes it plausible to retain the paper's
 `39/4` schedule with Turbo's route and inner. It changes only which
 sampled outer realizations the proof accepts; it does not alter the
-encoder or add setup work. The full sparse/dense packet-tail proof and
-all `Q>=2` message classes remain open.
+encoder or add setup work. The one-block schedule inequality and all
+`Q>=2` message classes remain open.
 
 ## Proof gates before paper migration
 
 1. Audit and formalize the finite-step one-block transfer above. It
    uses the exact s22 output spectrum and a factor for exceptional steps.
-2. Certify the dense Golay-source exponent in the packet-floor tail note;
-   the sparse contribution is already bounded. Select a realized
-   packet-spectrum majorant for later multi-block bounds.
+2. Certify the one-block schedule inequality using the selected 16%
+   packet floor and a realized packet-spectrum majorant.
 3. Extend from one block to fixed, sparse growing, and positive block
    occupation, including packet collisions between blocks. Reuse the
    selected outer across positions; never replace
