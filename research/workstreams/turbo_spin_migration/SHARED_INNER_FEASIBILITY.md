@@ -1,5 +1,11 @@
 # Feasibility of one Turbo-style inner in Scalable SPIN
 
+The proof gap identified here was closed in
+[SHARED_INNER_PROOF_DRAFT.md](SHARED_INNER_PROOF_DRAFT.md); the new
+full-state region lemma is also in
+[shared_inner_paper_proof.tex](shared_inner_paper_proof.tex). This file
+records the earlier feasibility audit and its numerical evidence.
+
 ## Construction held fixed
 
 This investigation retains the paper's one-bit regional route, one shared

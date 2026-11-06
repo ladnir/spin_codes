@@ -1,7 +1,8 @@
 """Outward sparse and fixed-row continuum gates for the shared Turbo inner.
 
-These are local inequalities. The finite-region limit and first-moment
-assembly still require a proof for the new inner distribution.
+These are the local numerical inequalities used by the conventional
+proof in SHARED_INNER_PROOF_DRAFT.md. This script does not check that
+proof's analytic region comparison or first-moment assembly.
 """
 
 from __future__ import annotations

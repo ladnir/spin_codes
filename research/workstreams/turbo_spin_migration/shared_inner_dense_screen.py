@@ -1,7 +1,7 @@
 """Binary64 diagnostic for the scalable one-bit route with Turbo's s22 inner.
 
 This checks points of the positive-occupation exponent, not a certificate.
-The 2-state transfer is an entrywise upper bound for every entering state.
+The 3-state transfer is an envelope for every entering state measure.
 """
 
 from __future__ import annotations

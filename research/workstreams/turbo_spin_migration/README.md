@@ -127,10 +127,12 @@ isolates an alternative path to a common inner. It keeps the proven
 scalable route and growing outer, but replaces IMT by the Turbo t64/s22
 state law. The [shared-inner feasibility study](SHARED_INNER_FEASIBILITY.md)
 derives a three-state transfer, closes a rational sparse contraction,
-and gives an outward-checked positive-occupation cover. The candidate has no
-complete asymptotic distance certificate yet.
-The [shared-inner proof draft](SHARED_INNER_PROOF_DRAFT.md) audits the
-transfer, fixed-row limit, and first-moment assembly before manuscript edits.
+and gives an outward-checked positive-occupation cover. The
+[shared-inner proof](SHARED_INNER_PROOF_DRAFT.md) closes the full-state
+fixed-row limit and first-moment assembly for the 11% scalable theorem;
+its [LaTeX proof](shared_inner_paper_proof.tex) is staged outside the
+manuscript. The numerical checks pass at 256 and 512 bits. This is a
+conventional proof, not a Lean formalization of the new inner.
 
 If Turbo SPIN closes the scalable theorem and the finite, forward, and
 application gates, make it the main construction and retain only older

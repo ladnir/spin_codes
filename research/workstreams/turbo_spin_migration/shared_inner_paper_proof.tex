@@ -1,0 +1,377 @@
+% Research-stage proof for the scalable bit route with the Turbo inner.
+% This file is not included in the submitted manuscript. Its outer and
+% routing inputs are the proved lemmas in structured_proof.tex.
+
+\paragraph{The shared inner.}
+Fix $t=64$, $s=22$, and the maps $A:\F_2^s\to\F_2^t$ and
+$C=A^\top:\F_2^t\to\F_2^s$ used by Turbo SPIN. At step $i$, sample
+$M_i$ independently and uniformly from $\mathrm{GL}(s,2)$ and set
+\[
+ Y_i=X_i+Aq_i,\qquad q_{i+1}=M_iq_i+CX_i,\qquad q_0=0.
+\]
+Put $D=2^s-1$. The map $A$ is injective, every column of $C$ is
+nonzero, and the image and kernel weight enumerators are those in the
+accompanying exact-spectrum certificate. The group and region shuffles and
+all $M_i$ are independent of the sampled shared BAA constituent. All
+these choices belong to one setup and are then fixed for every message.
+
+\begin{theorem}[Scalable SPIN with the Turbo inner]
+\label{thm:shared-inner-scalable}
+Let $L_m=128m$, and let $b_m$ be the least multiple of $24$ for which
+$b_m\ge(39/4)\log_2(L_mb_m)$. Reuse one sampled Golay--BAA
+constituent of length $b_m$ in all $L_m$ outer positions. Apply the
+one-bit group and region shuffles of Scalable SPIN, followed by the
+inner above. The resulting encoder $E_m$ has length $N_m=L_mb_m$ and
+dimension $N_m/2$ for every setup. Over its full setup distribution,
+\[
+ \Pr\bigl[d_{\min}(E_m)\le\lfloor0.11N_m\rfloor\bigr]=o(1).
+\]
+Ordinary and transposed encoding each take $O(N_m)$ bit operations.
+\end{theorem}
+
+\begin{lemma}[Weighted state envelope]
+\label{lem:shared-inner-weighted-envelope}
+For independent Bernoulli-$\beta$ input bits and $0<z\le1$, define
+\[
+ g_0=1-\beta+\beta z,\qquad g_1=\beta+(1-\beta)z,\qquad
+ f(q)=g_0^{t-\wt(Aq)}g_1^{\wt(Aq)}\quad(q\ne0),
+\]
+\[
+ F=\max_{q\ne0}f(q),\qquad U=D^{-1}\sum_{q\ne0}f(q),
+\]
+\[
+ H=\sum_{x:Cx=0}\Pr_\beta[X=x]z^{\wt(x)},\qquad
+ u=\Pr_\beta[CX\ne0],
+\]
+and
+\[
+ T(\beta,z)=
+ \begin{pmatrix}
+ H&g_0^t-H&0\\
+ \min(F,u)/D&0&F\\
+ \min(U,u)/D&0&U
+ \end{pmatrix}.
+\]
+For $n$ inner steps starting at zero,
+\[
+ \mathbb E[z^{\wt(Y_0\Vert\cdots\Vert Y_{n-1})}]
+ \le e_0^\top T(\beta,z)^n\mathbf1.
+ \tag{A}
+\]
+The values $F,U,H,u$ are computed from the exact image spectrum of
+$A$ and the exact weight enumerator of $\ker C$.
+\end{lemma}
+
+\begin{proof}
+Represent an unnormalized measure $\mu$ on the states by a triple
+$(a,f_*,u_*)$ if $\mu(0)\le a$ and there is a nonnegative measure
+$\nu$ on the nonzero states satisfying
+$\sum_{q\ne0}\nu(q)\le f_*$ and
+$\mu(q)\le\nu(q)+u_*/D$ for every $q\ne0$.
+From state zero, the weighted mass remaining at zero is $H$ and the
+total fresh live mass is $g_0^t-H$. For a fixed live entering state
+$q$, the uniform mixer sends it to any prescribed nonzero state with
+probability $1/D$, independently of its output. Its weighted
+probability of reaching a prescribed live state is at most $f(q)/D$.
+It reaches zero only if $CX\ne0$ and the mixer chooses the unique
+canceling nonzero state. Its weighted zero-return probability is
+therefore at most $\min(f(q),u)/D$. Applying these bounds to the
+arbitrary measure $\nu$ gives the second row of $T$. Applying them
+to the uniform envelope $u_*/D$ and averaging over $q$ gives its
+third row. Thus one weighted step takes any measure with envelope
+$(a,f_*,u_*)$ to one with envelope bounded by
+$(a,f_*,u_*)T$. The initial point mass at zero has envelope $e_0$;
+induction and summing the final state masses prove (A).
+\end{proof}
+
+\begin{lemma}[Full-state limit for a fixed number of routed bits]
+\label{lem:shared-inner-fixed-region}
+Let $Q$ and $\theta>0$ be fixed. A region contains $L$ bit slots, with
+$64\mid L$. Conditional on any $a\le Q$ rows contributing one bit each,
+place their distinguishable bits at uniformly chosen distinct slots.
+Write $F_{a,L}(z)$ for the full $(D+1)$-state weighted region kernel,
+averaged over those slots and the independent mixers, where an output
+word $y$ has weight $z^{\wt(y)}$. Put $z_L=e^{-\theta/L}$,
+$p_0=2^{s-1}/D$, and $\gamma=p_0\theta$. Define
+\[
+ P_0=\begin{pmatrix}0&1\\D^{-1}&1-D^{-1}\end{pmatrix},\qquad
+ D_\gamma(u)=\operatorname{diag}(1,e^{-\gamma u}),
+\]
+and, for $a\ge0$,
+\[
+ K_a(\theta)=a!\int_{\substack{u_0,\ldots,u_a\ge0\\
+                                  \sum_i u_i=1}}
+ D_\gamma(u_0)P_0D_\gamma(u_1)\cdots P_0D_\gamma(u_a)
+ \,du_0\cdots du_{a-1}.
+\]
+Let $J(q,0)=\1_{q=0}$, $J(q,1)=\1_{q\ne0}$, and let
+$R(0,q)=\1_{q=0}$, $R(1,q)=\1_{q\ne0}/D$. There is a finite constant
+$C_{Q,\theta}$ such that, for all sufficiently large $L$ and all
+$0\le a\le Q$,
+\[
+ F_{a,L}(z_L)\le
+ \left(1+\frac{C_{Q,\theta}}L\right)J K_a(\theta)R
+ \tag{1}
+\]
+entrywise. The comparison is uniform in both boundary states, the
+contributing row identities, and the region index.
+\end{lemma}
+
+\begin{proof}
+Let $W_0(z)$ be the weighted kernel of an empty step and let
+$B_g=W_0(z_L)^g$. If the entering state is zero, an empty gap stays at
+zero and emits zero. If it is a nonzero $q$, its first output has weight
+$\wt(Aq)$; the first uniform mixer makes the successor uniform over the
+$D$ nonzero states, independently of that output. Thus, for $g\ge1$
+and nonzero $q,q'$,
+\[
+ B_g(q,q')=\frac{z_L^{\wt(Aq)}}D\phi_L^{g-1},\qquad
+ \phi_L=\frac1D\sum_{v\ne0}z_L^{\wt(Av)}.
+ \tag{2}
+\]
+All cross-class entries vanish. Each output coordinate of $Av$ is
+nonzero as a linear functional of $v$, so the uniform-live mean weight
+is $t p_0$. Hoeffding's lemma applied to $\wt(Av)\in[0,t]$ gives
+\[
+ 0\le\ln\phi_L+\frac{\theta tp_0}{L}
+ \le\frac{\theta^2t^2}{8L^2}.
+\]
+Since $1\le g\le L/t$ and $0\le\wt(Aq)\le t$, equation (2) is
+bounded above and below on its nonzero entries by
+$e^{\pm c_\theta/L}JD_\gamma(tg/L)R$, where
+$c_\theta=\theta t+\theta^2t/8$. In particular this estimate holds
+for a one-step gap and for every entering live state.
+
+For a single bit in coordinate $j$ of an input step, let $V_j(z_L)$
+be its weighted kernel. Its emitted weight is at most $t$, whence
+\[
+ e^{-\theta t/L}V_j(1)\le V_j(z_L)\le V_j(1)
+ \tag{3}
+\]
+entrywise. As $Ce_j\ne0$, a zero state becomes live. Starting with a
+uniform live state, the independent uniform mixer makes $M_iq$
+uniform nonzero. Exactly one of its $D$ values equals $Ce_j$ and
+causes a return to zero. Therefore
+$RV_j(1)J=P_0$ for every $j$.
+
+Call a placement good if its impulse steps are separated by at least
+one empty step and neither boundary step contains an impulse. A union
+bound gives
+\[
+ \Pr[\mathrm{bad}]
+ \le\frac{2at}{L}+\frac{3t\binom a2}{L-1}.
+ \tag{4}
+\]
+On a good placement, write $g_0,\ldots,g_a\ge1$ for the empty-gap
+lengths; their sum is $L/t-a$. Applying (2) and (3) to the nonnegative
+product of the gap and impulse kernels bounds that full-state product,
+above and below, by a factor
+$\exp(\pm((a+1)c_\theta+a\theta t)/L)$ times
+\[
+ J D_\gamma(tg_0/L)P_0D_\gamma(tg_1/L)
+   \cdots P_0D_\gamma(tg_a/L)R.
+ \tag{5}
+\]
+This calculation preserves arbitrary boundary states; the uniform
+lift is justified by each nonempty gap, including the final gap.
+
+To compare (5) with the integral, draw $a$ independent uniform points
+of $[0,1]$, sort them, and quantize them into $L$ slots. With
+probability at least $1-\binom a2/L$, no two quantized points agree;
+conditional on that event, their ordered slots have exactly the
+uniform-without-replacement law. Quantization changes each sorted
+position by at most $1/L$. Replacing an impulse step by its slot
+position changes the spacing vector by at most
+$2t(a+1)/L$ in $\ell_1$; quantization contributes another
+$2(a+1)/L$. Every entry of the integrand is Lipschitz in its spacing
+vector, with constant at most $\gamma$ in $\ell_1$: the derivative of
+$D_\gamma$ is at most $\gamma$, and $P_0$ is stochastic. Bad placements
+and quantization collisions contribute $O_Q(1/L)$ to every entry,
+since their weighted kernels are substochastic. Consequently
+\[
+ \max_{a\le Q,q,q'}
+ \bigl|F_{a,L}(z_L)(q,q')-(JK_a(\theta)R)(q,q')\bigr|
+ \le\frac{C'_{Q,\theta}}L.
+ \tag{6}
+\]
+
+The cross-class entries at $a=0$ vanish in both kernels. At $a=1$,
+the zero-to-zero entry also vanishes in both: the bit activates the
+state and every later empty mixer preserves nonzeroness. All other
+class entries are positive; for $a\ge2$ all four are positive because
+$D^{-1}$, $1-D^{-1}$, and the diagonal gap factors are positive.
+The minimum positive entry among the finitely many matrices
+$JK_a(\theta)R$, $a\le Q$, is therefore positive. Dividing (6) by
+this minimum proves (1) on the positive entries; the exact zero
+entries satisfy it directly.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:shared-inner-scalable}]
+Let $\mathcal G_b$ be the good event for the single shared Golay--BAA
+outer established by the scalable outer-selection lemma. Conditional
+on any constituent in $\mathcal G_b$, its realized weight counts are
+bounded by the concave majorant $\widehat a_{\rm BA}$, and all nonzero
+constituent words have relative weight in
+$\mathcal W=[0.104,0.896]$. The event has probability $1-o(1)$ and is
+charged only once. Write $Q$ for the number of active outer positions,
+$\alpha=Q/L$, $x$ for their mean relative outer weight, and
+$N=Lb$ for the output length.
+
+For $\alpha\ge10^{-4}$, the bit-route domination lemma compares the
+conditional routed word to iid Bernoulli-$\alpha x$ input at a
+subexponential cost. Changing that reference density to $py$ incurs
+the two divergence terms below. For any witness $p,y\in(0,1)$ and
+$\lambda>0$, Lemma
+\ref{lem:shared-inner-weighted-envelope} therefore bounds the
+first-moment exponent per output bit by
+\[
+ \alpha\widehat a_{\rm BA}(x)
+ +D_{\rm KL}(\alpha\Vert p)+\alpha D_{\rm KL}(x\Vert y)
+ +\frac{\ln\rho(T(py,e^{-\lambda}))}{64}+0.11\lambda+o(1).
+ \tag{B}
+\]
+Here $D_{\rm KL}$ is binary relative entropy. For a fixed witness and
+an affine segment of $\widehat a_{\rm BA}$, (B) without $o(1)$ is
+convex in $(\alpha,\alpha x)$: its first term is affine, its second
+term is convex, and its third is a convex perspective. The domain of
+each rational rectangle in $(\alpha,x)$ is a quadrilateral in these
+variables, so four vertex checks suffice. The exact rational
+partition and outward Arb checks cover
+$[10^{-4},1]\times\mathcal W$ in $46{,}317$ accepted boxes. The
+largest outward upper bound is below $-1.00147\cdot10^{-7}$ at both
+256- and 512-bit precision. The finite set of positive Collatz
+witnesses has a finite prefactor. Thus the sum over this occupation
+range is at most $L\exp(-10^{-7}N+o(N))$.
+
+For $4096\le Q\le10^{-4}L$, use the fair-row route comparison and
+condition a Bernoulli mark process to have $Q$ marks in every region,
+as in the existing scalable proof. Put $\beta=4\alpha/5$ and
+$z=1-8\alpha/5$. The exact rational inequalities for the spectrum
+of $A$ and $\ker C$ give the positive-vector witness
+\[
+ \begin{aligned}
+ v(\alpha)&=\left(1,\frac{1+24\alpha}{1024},
+                       \frac1{1024}\right)^\top,\\
+ T(\beta,z)v(\alpha)&\le(1-48\alpha)v(\alpha)
+ \qquad(0<\alpha\le10^{-4}).
+ \end{aligned}
+ \tag{C}
+\]
+The moment prefactor is at most $1024$. Combining (C) with the
+outer fair-row bound, mark-count conditioning, and the schedule
+$b\ge(39/4)\log_2N$ gives a leading exponent below
+$-0.0134042Qb$. The explicit conditioning cost is below $0.002Qb$
+for $Q\ge4096$; all remaining uniform remainders are eventually
+below $0.004Qb$. Hence, for sufficiently large native lengths,
+\[
+ \mathbb E[Z_{\lfloor0.11N\rfloor,Q}\mid\mathcal G_b]
+ \le e^{-0.006Qb}
+ \qquad(4096\le Q\le10^{-4}L).
+ \tag{D}
+\]
+
+For each fixed $Q<4096$, apply (1) to each of the $b$ independent
+regional kernels conditional on its contributing rows. Since
+$b=O(\log L)$, their product costs
+$(1+C_{Q,\theta}/L)^b=1+o(1)$, uniformly over all row-weight
+coefficient selections. Replacing the live-to-live entry of $P_0$ by
+$1$ yields the nonnegative envelope
+$P_+=\left(\begin{smallmatrix}0&1\\r&1\end{smallmatrix}\right)$,
+$r=1/D$, and corresponding $K_a^+$.
+
+For $Q=1,2$, compare each selected outer row with a fair bit row.
+One region has the two-state reference matrix $2^{-Q}T_Q$, where
+$T_Q=\sum_{a=0}^Q\binom Qa K_a^+$. Put
+$\gamma=Q\ln2$, $\theta=\gamma/p_0$,
+$a_0=e^{-\gamma}$,
+$f=(1-a_0)/\gamma$,
+$g=2(\gamma-1+a_0)/\gamma^2$, and
+$e=2(1-(1+\gamma)a_0)/\gamma^2$. Direct integration gives
+\[
+ K_0^+=\begin{pmatrix}1&0\\0&a_0\end{pmatrix},\quad
+ K_1^+=\begin{pmatrix}0&f\\rf&a_0\end{pmatrix},\quad
+ K_2^+=\begin{pmatrix}rg&e\\re&re+a_0\end{pmatrix}.
+\]
+The first-moment exponent per active-row bit is at most
+\[
+ \frac1Q\left(\ln\rho(T_Q)+0.11\theta
+ -\frac{Q\ln2}{2}+Q\ell+\frac{Q\ln2}{39/4}\right),
+ \qquad \ell=0.01281.
+\]
+The outward upper bounds are $-0.109827$ and $-0.109812$ for
+$Q=1$ and $Q=2$, respectively.
+
+For fixed $Q\ge3$, keep each outer row weight $w_j$. With positive
+fugacities $u_j$, set
+\[
+ T_Q(\boldsymbol u,\theta)
+ =\sum_{\boldsymbol e\in\{0,1\}^Q}
+   \left(\prod_{j=1}^Q u_j^{e_j}\right)
+   K_{\sum_j e_j}^+(\theta).
+\]
+Nonnegative coefficient extraction bounds the reference-row moment by
+\[
+ \left(\prod_{j=1}^Q\binom b{w_j}^{-1}u_j^{-w_j}\right)
+ e_0^\top T_Q(\boldsymbol u,\theta)^b\mathbf1\,(1+o(1)).
+ \tag{E}
+\]
+Choose $\sigma=127/250$, $\tau=133/125$,
+$v_1=3/1600$, $\theta=Q\tau/p_0$, and $v=(1,v_1)^\top$. Define
+\[
+ G_Q=\sup_{0\le y\le1}
+  \{-\tau y+(1+1/Q)\ln(1-y+y/\sigma)\},
+\]
+\[
+ m_v(u)=\max\{1+u\sigma v_1,\;ur/v_1+\sigma(1+u)\}.
+\]
+The weighted row norm satisfies
+\[
+ \|T_Q(\boldsymbol u,Q\tau/p_0)\|_v
+ \le e^{QG_Q}\prod_{j=1}^Qm_v(u_j),\qquad G_Q\le G_3.
+ \tag{F}
+\]
+To see the first inequality, insert all $Q$ possible impulse sites,
+using $I$ for an unused site and $P_+$ for a used one. For a fixed
+zero/live class path with $l$ live spacings, their total duration $Y$
+has the $\operatorname{Beta}(l,Q+1-l)$ law, including the deterministic
+endpoint cases. A change of variables in the beta integral gives
+$\mathbb E[(1-Y+Y/\sigma)^{-(Q+1)}]=\sigma^l$. The definition of
+$G_Q$ then bounds the integrated path weight by
+$e^{QG_Q}\sigma^l$. Summing paths yields an average of products
+$D_\sigma(I+u_{\pi(1)}P_+)D_\sigma\cdots
+ (I+u_{\pi(Q)}P_+)D_\sigma$, where $\pi$ ranges over the impulse
+orders and $D_\sigma=\operatorname{diag}(1,\sigma)$.
+The weighted row norm of each $(I+u_jP_+)D_\sigma$ is $m_v(u_j)$;
+$\|D_\sigma\|_v\le1$. This proves (F). The second inequality follows
+from $1+1/Q\le4/3$ and the nonnegative logarithm in the definition
+of $G_Q$.
+
+Let $h(x)=-x\ln x-(1-x)\ln(1-x)$. On each of the $31$ affine
+segments of the outer majorant, select one positive rational $u$.
+Convexity reduces the row inequality to the segment endpoints. All
+$62$ outward checks, recomputed with the new $r$ and $p_0$, verify
+\[
+ \widehat a_{31}(x)-h(x)-x\ln u+\ln m_v(u)
+ +G_3+0.11\tau/p_0+\ln2/(39/4)<-0.00086852.
+ \tag{G}
+\]
+The finite coefficient and outer-spectrum remainders are $o_Q(b)$.
+Equations (E)--(G) imply a negative exponent per $Qb$ for every
+fixed $3\le Q<4096$. Thus each of the finitely many fixed-occupation
+first-moment terms tends to zero as $b\to\infty$.
+
+Summing the fixed, sparse, and positive occupation ranges, then
+applying Markov's inequality and $\Pr[\mathcal G_b^c]=o(1)$, proves
+\[
+ \Pr[d_{\min}(E_m)\le\lfloor0.11N_m\rfloor]=o(1)
+\]
+for the scalable route with the Turbo inner. The probability is over
+the shared outer, route shuffles, and independent uniform mixers. The
+claim is a conventional mathematical proof with machine-checked
+outward numerical inequalities; it is not a Lean formalization.
+Injectivity follows by recovering $X_i=Y_i+Aq_i$ and then $q_{i+1}$
+sequentially, and by injectivity of the outer constituent. The
+Golay--BAA constituent, one-bit route, and fixed-width inner each have
+linear ordinary and transposed circuits; thus both directions use
+$O(N_m)$ bit operations.
+\end{proof}

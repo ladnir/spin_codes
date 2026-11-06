@@ -1,7 +1,9 @@
-# Scalable bit-route SPIN with the Turbo inner: proof draft
+# Scalable bit-route SPIN with the Turbo inner: conventional proof
 
 This document assembles the distance argument before changing the
-manuscript. It uses the paper's one-bit regional route and shared growing
+manuscript. A LaTeX version of the new full-state lemma and theorem
+assembly is in [shared_inner_paper_proof.tex](shared_inner_paper_proof.tex).
+The argument uses the paper's one-bit regional route and shared growing
 Golay--BAA outer. The inner is the actual Turbo `t=64,s=22` expansion,
 transpose feedback, and independent uniform `GL(22,2)` update at every
 step. All setup is sampled once and reused across messages. Probability
@@ -171,67 +173,141 @@ throughout this range, and the geometric sum tends to zero.
 
 ## Every fixed occupation
 
-Fix `Q<4096` independently of `L`. Each region receives at most `Q`
-one-bit impulses. Conditional on their originating rows and on their
-number `a`, the independent regional shuffle places them at a uniform
-`a`-subset of the `L` bit slots. Put `n=L/64` steps per region and
-`z_L=exp(-theta/L)` for fixed `theta>0`.
+Fix `Q<4096` independently of `L`. Write `t=64`, `n=L/t`, and
+`z_L=exp(-theta/L)` for a fixed `theta>0`. Conditional on which `a<=Q`
+active rows send a bit to a region, its independent shuffle puts their
+distinguishable bits at uniformly chosen distinct slots among the `L`
+slots. Let `F_{a,L}(z_L)` be the resulting `(M+1)`-state weighted region
+kernel, with the averaging over those slots and all step mixers included.
+It does not average the entering state: that state is whatever the
+previous region left behind.
 
-For an empty step starting from a live state `q`, the successor is
-exactly uniform nonzero, independent of its emitted weight. Let
-`phi_L=(1/M)sum_{q!=0} z_L^wt(Aq)` and
-`p0=2^21/M`. An empty gap of `g>=1` steps has exact live-to-live
-kernel
-
-```
-z_L^wt(Aq) phi_L^(g-1) / M
-```
-
-for every entering live `q` and exiting live `q'`. Its zero-to-zero
-entry is one and both cross-class entries are zero. Since
-`log(phi_L)=-theta*64*p0/L+O(theta^2/L^2)`, uniformly for
-`1<=g<=n` this kernel differs multiplicatively by `1+O(theta/L)`
-from the live component of
-`D_gamma(64g/L)`, where `gamma=theta*p0` and
-`D_gamma(u)=diag(1,exp(-gamma*u))`.
-
-For a fixed `a<=Q`, the probability that two impulses fall in one or
-adjacent steps, or that the first or last impulse touches a region
-boundary, is `O_Q(1/L)`. On the complementary event, every gap has at
-least one empty step, so it refreshes a live state before the next
-impulse or the region boundary. An impulse's emitted-weight factor
-lies in `[exp(-64 theta/L),1]`. For the unweighted impulse, a zero
-state becomes live because every feedback column is nonzero; a
-uniform live state returns to zero with probability `r=1/M`. Thus
-the limiting zero/live impulse matrix is
-
-```
-P0 = [[0,1],[r,1-r]].
-```
-
-Ordered uniform impulse positions converge by a Riemann sum to the
-simplex of spacings. For each fixed `a<=Q`, the full-state regional
-weighted kernel therefore converges entrywise, uniformly over all
-entering and exiting states, to the lift of
+**Lemma (uniform full-state region comparison).** Define
+`p0=2^21/M`, `gamma=theta*p0`,
+`D_gamma(u)=diag(1,exp(-gamma*u))`, and
+`P0=[[0,1],[1/M,1-1/M]]`. Let `J(q,c)` indicate whether state `q` is
+zero or live, and let `R(c,q)` put the zero class at zero and distribute
+the live class uniformly over the `M` nonzero states. Thus `RJ=I_2`.
+Set
 
 ```
 K_a(theta) = a! integral_{u_i>=0, sum_i u_i=1}
   D_gamma(u_0) P0 D_gamma(u_1) ... P0 D_gamma(u_a) du.
 ```
 
-The error is `O_{Q,theta,M}(1/L)`: bad placements have that
-probability and weighted kernels have row sums at most one; on good
-placements, each finite gap and impulse differs by `1+O(1/L)`, and
-the integrand has bounded derivatives. This is a *full-state* bound,
-so it handles the state carried across regions. Entries that vanish
-in the limit vanish identically in the finite kernel: for `a=0` the
-class cannot change, and for `a=1` zero cannot return to zero. Every
-other coarse entry is positive at fixed `Q,theta`. Dividing the
-additive error by the positive limiting entries gives an entrywise
-comparison `F_{a,L} <= (1+C_{Q,theta,M}/L) J K_a R` for all `a<=Q`,
-where `J` classifies the entering state and `R` lifts a live exiting
-class uniformly over its `M` states. Across `b=O(log L)` regions the
-loss is `exp(O_Q(b/L))=1+o(1)`.
+For every fixed `Q` and `theta`, there is a finite constant
+`C_{Q,theta,M}` such that, for all sufficiently large multiples `L` of
+64, every `0<=a<=Q`, and all entering and exiting states,
+
+```
+F_{a,L}(z_L) <= (1+C_{Q,theta,M}/L) J K_a(theta) R
+```
+
+entrywise. The constant is independent of the active-row identities,
+the region index, and the entering state.
+
+*Proof.* Let `B_g=W_0(z_L)^g` be the empty-step kernel. An empty step
+leaves zero at zero. From a live state `q`, the uniform `GL(22,2)` mixer
+sends the next state uniformly to a nonzero state, independently of the
+current output `Aq`. Consequently, for every `g>=1` and live `q,q'`,
+
+```
+B_g(q,q') = z_L^wt(Aq) phi_L^(g-1)/M,
+phi_L = (1/M) sum_{v!=0} z_L^wt(Av).
+```
+
+The other entries of `B_g` are zero except `B_g(0,0)=1`. The uniform
+live mean weight is `t*p0`. Hoeffding's lemma, applied to a random
+variable in `[0,t]`, gives
+
+```
+0 <= log(phi_L) + theta*t*p0/L <= theta^2*t^2/(8L^2).
+```
+
+Since `g<=n=L/t` and `0<=wt(Aq)<=t`, put
+`c_theta=theta*t+theta^2*t/8`. Then `B_g` is bounded above and below,
+entrywise on its nonzero entries, by `exp(+-c_theta/L)` times
+`J D_gamma(t*g/L) R`. This also covers `g=1` and arbitrary entering
+live states; no stationary-state premise is needed.
+
+Let `V_j(z_L)` be the full-state kernel of a step with one bit in local
+coordinate `j`. Its output has weight at most `t`, so, entrywise,
+
+```
+exp(-theta*t/L) V_j(1) <= V_j(z_L) <= V_j(1).
+```
+
+Every column `A^T e_j` is nonzero. A zero entering state therefore
+becomes live under `V_j(1)`. A uniform live entering state becomes zero
+with probability exactly `1/M`: the uniform mixer maps each nonzero
+state uniformly over the `M` nonzero states, and exactly one such state
+cancels `A^T e_j`. Therefore `R V_j(1) J=P0` for **every** `j`.
+
+Call a placement good when its impulse steps are pairwise separated by
+at least one empty step and neither the first nor the last step is an
+impulse step. A union bound gives, for `L>1`,
+
+```
+Pr[bad] <= 2*a*t/L + 3*t*binom(a,2)/(L-1).
+```
+
+Indeed, an impulse hits either boundary step with probability `2t/L`;
+conditional on one slot, at most `3t` slots are in its step or an
+adjacent step. On a good placement there are `a+1` empty gaps, each
+of length at least one. Replacing each gap by its full-state lifted
+matrix, each impulse by `V_j(1)`, and using nonnegative matrix
+multiplication gives a componentwise two-sided factor
+`exp(+-[(a+1)c_theta+a*theta*t]/L)` around
+
+```
+J D_gamma(t*g_0/L) P0 D_gamma(t*g_1/L)
+    ... P0 D_gamma(t*g_a/L) R.
+```
+
+This factorization is valid for arbitrary entering and exiting states.
+In particular it retains the state carried between regions. The slot
+coordinates within an impulse step have disappeared because
+`R V_j(1) J=P0` holds for every coordinate.
+
+To compare the discrete gaps to the integral, take `a` independent
+uniform points on `[0,1]`, sort them, and quantize them to the `L`
+slots. The probability of a repeated slot is at most
+`binom(a,2)/L`. Conditional on no repeat, the ordered slots have
+exactly the required uniform-without-replacement law. Sorting and
+quantization change every ordered normalized position by at most
+`1/L`; converting positions to spacings changes their total absolute
+error by at most `2(a+1)/L`. Replacing each impulse step by its slot
+position changes the spacing vector by at most `2t(a+1)/L` more.
+The integrand above is Lipschitz in spacings with entrywise difference
+at most `gamma` times their total absolute difference: each `D_gamma`
+has derivative at most `gamma`, while `P0` is stochastic. The bad
+placements, including repeated quantized slots, contribute at most
+their `O_Q(1/L)` probability to any entry, because every weighted
+full-state kernel is substochastic. It follows that
+
+```
+max_{a<=Q,q,q'} |F_{a,L}(q,q')-(J K_a(theta) R)(q,q')|
+    <= C'_{Q,theta,t}/L.
+```
+
+For `a=0`, both cross-class entries are identically zero in both
+kernels. For `a=1`, the zero-to-zero entry is identically zero:
+one impulse activates the state and all subsequent empty mixers are
+invertible. The other coarse entries of `K_1` are positive. For
+`a>=2`, all four coarse entries are positive since `1/M>0`,
+`1-1/M>0`, and all diagonal gap factors are positive. Thus the
+minimum positive entry of the finite collection
+`{J K_a(theta)R : 0<=a<=Q}` is positive. Dividing the additive bound
+by this minimum proves the claimed componentwise multiplicative bound;
+the exactly zero entries require no division. This proves the lemma.
+
+The regional shuffles and mixers are independent between regions.
+Conditional on each region's contributing rows, apply the lemma to
+each full-state kernel and multiply the entrywise inequalities. The
+loss is `(1+C_{Q,theta,M}/L)^b=exp(O_Q(b/L))=1+o(1)` because
+`b=O(log L)`. It remains valid when coefficient extraction later
+fixes each row's total weight: the inequality holds for each
+contribution pattern before those nonnegative terms are summed.
 
 Replacing the live-to-live entry of `P0` by one gives the same
 conservative `P_plus` used in the current fixed-occupation proof.
@@ -265,9 +341,12 @@ realized encoder has rate one half. The shared outer uses `O(N)` work
 at this schedule, and the fixed-width route and inner use `O(N)`
 ordinary and transposed work.
 
-This is a **proof draft**, not a replacement for the current theorem.
-The new analytical steps are the three-state domination and the
-fixed-region comparison. They have been derived above and their
-numerical gates are outward checked, but they still need independent
-mathematical review and a formal replay or Lean integration before the
-manuscript should present this as its proved scalable instantiation.
+The conventional mathematical argument closes the 11% asymptotic
+claim for this setup law, using the already proved outer-selection and
+bit-route lemmas. The new analytical steps are the three-state
+domination and the full-state fixed-region comparison above. The
+numerical gates pass with outward arithmetic at both 256 and 512 bits.
+This proof has not been translated into Lean, so the manuscript's
+existing Lean-verification sentence cannot be carried over when the
+instantiation is changed. The current manuscript still states its
+older IMT theorem; this research proof does not silently replace it.
