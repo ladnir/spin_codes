@@ -45,8 +45,12 @@ kernel and that a good support expands to the correct number of steps.
 It verifies the empty-support case and transfers the regional upper bound
 to the actual step law. For every good support, it proves the expanded
 list equals the encoder's chronological input list, so the regional bound
-now applies directly to the encoder. Placement averaging and continuum
-coupling remain open. The routing/outer bounds,
+now applies directly to the encoder. The
+[regional average](SpinCodes/UniformMixer/RegionalAverage.lean) proves that
+the actual shuffled kernel is nonnegative and substochastic, charges the
+discarded placements by their `O(a²/L)` probability, and averages the
+good-placement two-state envelope under the verified uniform shuffle law.
+The discrete-to-continuum comparison remains open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
