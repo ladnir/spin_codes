@@ -50,7 +50,9 @@ now applies directly to the encoder. The
 the actual shuffled kernel is nonnegative and substochastic, charges the
 discarded placements by their `O(a²/L)` probability, and averages the
 good-placement two-state envelope under the verified uniform shuffle law.
-The discrete-to-continuum comparison remains open. The routing/outer bounds,
+The [site-sum bridge](SpinCodes/UniformMixer/RegionalSiteSum.lean) rewrites
+that average as an exact fixed-cardinality support sum, ready for the
+discrete-to-continuum comparison. The comparison itself remains open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
 
