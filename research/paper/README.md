@@ -40,6 +40,8 @@ growth constant, and the same 64-bit, 22-state uniform-mixer inner as the
 larger Turbo profiles. Its 11% distance proof is in `structured_proof.tex`
 and `structured_uniform_appendix.tex`. The earlier IMT asymptotic argument
 remains in `structured_imt_appendix.tex` as uncompiled research history.
+The [reproduction guide](../artifact/REPRODUCING.md#current-scalable-spin-theorem)
+gives the separate numerical replay commands and states their analytic scope.
 The selected finite results now use verified IMT certificates and matching
 timings: five half-rate lengths, plus two quarter-rate distance thresholds
 at K=2^20. See the [integration ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).

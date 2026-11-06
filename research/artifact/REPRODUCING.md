@@ -48,9 +48,11 @@ an IMT inventory. Neither command performs parameter search, interval replay,
 or a timing experiment. The current finite check also authenticates the 130-cell
 IMT Q1 grid and checks its three figures plus five matched Q1/full anchors.
 
-Check the current asymptotic IMT theorem separately with
-`python -B paper/check_imt_integration.py`; this requires the numerical
-dependencies below and the separate local asymptotic IMT receipts.
+The current Scalable theorem uses the uniform-mixer inner. Replay its tracked
+numerical inputs as described in Section 4 below. The older IMT asymptotic
+argument can still be checked with `python -B paper/check_imt_integration.py`;
+that command does not verify the theorem in the current manuscript and
+requires separate local IMT receipts.
 
 The asymptotic checker uses the original manifest and one explicit relocation:
 the historical `receipts/min_state/s19_rm2sub_selection.json` input is retained
@@ -150,11 +152,54 @@ finite-proof environment uses Python 3.14, python-flint 0.9.0, NumPy 2.4.4,
 SciPy 1.18.0, and mpmath 1.3.0. These are recorded working-environment versions,
 not a claim that every replay command has been retested in a fresh environment.
 
-For current IMT replay, start with the
-[finite results ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md)
-and [asymptotic IMT guide](../workstreams/inner_design/imt_asymptotic/README.md).
-They identify the accepted inputs and separate authentication from arithmetic
-replay. The procedures in the next paragraphs describe historical RM2Sub proofs.
+### Current Scalable SPIN theorem
+
+The current 11% theorem uses the shared Golay--BAA outer, one-bit regional
+route, and the 64-bit, 22-state uniform-mixer inner. Its numerical inputs and
+scripts are tracked. From `research/`, with Python assertions enabled and
+`python-flint`, NumPy, and SciPy installed, run:
+
+```sh
+python -B workstreams/turbo_spin_migration/verify_pair_return_map.py --spectrum
+python -B -m unittest workstreams.turbo_spin_migration.test_shared_inner_transfer
+python -B workstreams/turbo_spin_migration/shared_inner_dense_certificate.py --max-boxes 150000 --precision 256
+python -B workstreams/turbo_spin_migration/shared_inner_remaining_certificate.py --precision 256
+```
+
+The map check compares the manuscript's 22 masks with the production map,
+enumerates its expansion spectrum, and checks its feedback columns. The exact
+toy test checks the orientation of the
+three-state envelope. The dense checker uses floating-point optimization to
+propose witnesses, then accepts boxes only after rational-witness,
+outward-rounded Arb checks; it covers the positive-occupation domain. The
+remaining checker proves the sparse Collatz and outer-endpoint inequalities,
+the one- and two-row bounds, and the 62 fixed-row endpoint inequalities.
+The dense command should report `proved_dense_exponent` with 46,317
+accepted boxes; the remaining command should report
+`outward_local_inequalities`. Its `full_asymptotic_theorem: false` field
+marks the boundary between these numerical gates and the analytic proof.
+Repeat the last two commands with `--precision 512` for a higher-precision
+cross-check. Neither numerical checker proves the full theorem by itself:
+the outer-selection and routing lemmas, full-state regional comparison, and
+first-moment assembly are analytic arguments in
+[the proof](../paper/structured_proof.tex) and
+[appendix](../paper/structured_uniform_appendix.tex).
+
+The outer-spectrum inputs are the tracked `OUTER_REFINED.json` and the
+separately verified 31-support majorant in
+`workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/`.
+The supporting outer-tail checks are listed in
+[PAPER_MAP.md](PAPER_MAP.md#shared-outer-tail-replay). The 31 supports are
+not a subset of the 39 supports used by the dense checker.
+
+### Earlier proofs
+
+For the supporting finite IMT results, start with the
+[finite results ledger](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md).
+The [asymptotic IMT guide](../workstreams/inner_design/imt_asymptotic/README.md)
+describes the earlier, uncompiled Scalable instantiation. These guides
+separate authentication from arithmetic replay. The procedures in the next
+paragraphs describe historical RM2Sub proofs.
 
 For historical asymptotic Structured SPIN, start with the [certificate README](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/README.md).
 It lists the outward-arithmetic producers and their order. Use new output

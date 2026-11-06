@@ -16,8 +16,10 @@ transposed-encoder comparison, and standalone PCS comparison.
 The main [Applications section](../paper/applications.tex) summarizes
 PCG, PCS, and Flock results; detailed Flock and Bolt tables are supplementary.
 
-- [Central structured proof](../paper/structured_proof.tex): main argument;
-  the existing structured appendices retain its complete supporting estimates.
+- [Scalable proof](../paper/structured_proof.tex): main argument;
+  [its appendix](../paper/structured_uniform_appendix.tex) gives the
+  uniform-mixer estimates. The outer-selection proof remains in
+  [structured_appendix.tex](../paper/structured_appendix.tex).
 - [Finite appendix](../paper/finite_appendix.tex): spectrum bounds, proof
   details, and the complete half- and quarter-rate margin tables.
 - [Engineering appendix](../paper/engineering_appendix.tex): all four
@@ -39,8 +41,9 @@ bindings are unchanged; moving a result does not change its evidence scope.
 |---|---|---|
 | Common first-moment framework | [framework.tex](../paper/framework.tex) | Analytic argument. |
 | Accumulator and Random SPIN | [accumulator_spin.tex](../paper/accumulator_spin.tex), [random_spin.tex](../paper/random_spin.tex), [proof_appendix.tex](../paper/proof_appendix.tex) | Analytic proofs. |
-| Scalable Structured SPIN, IMT at 11% (`thm:structured-spin-scalable`) | [IMT proof guide](../workstreams/inner_design/imt_asymptotic/README.md), [11% refinement](../workstreams/inner_design/imt_asymptotic/d11/PROOF_UPDATE.md) | `python -B paper/check_imt_integration.py`; guide supplies numerical replay commands. |
+| Scalable SPIN, uniform-mixer inner at 11% (`thm:structured-spin-scalable`) | [Main proof](../paper/structured_proof.tex), [complete inner appendix](../paper/structured_uniform_appendix.tex), [research derivation](../workstreams/turbo_spin_migration/SHARED_INNER_PROOF_DRAFT.md) | The map, three-state envelope, positive-occupation cover, and sparse/fixed-occupation numerical gates have separate replay commands in [REPRODUCING.md](REPRODUCING.md). The analytic region comparison and first-moment assembly are in the paper; this is not a Lean theorem. |
 | Shared BA outer tails (`lem:structured-ba-tails`) | [Appendix proof](../paper/structured_appendix.tex), [original outer certificate](../workstreams/paper_architecture/certificates/single_sampled_ba_rm2sub/linear_time_audit/LINEAR_OUTER_CERTIFICATE.md) | See the outer-tail replay commands below; exact finite regression checks are supplementary. |
+| Finite Turbo SPIN at K=2^16, 2^18, 2^20 (`thm:turbo-spin`) | [Finite proof appendix](../paper/turbo_appendix.tex), [RS8 profile and proof records](../../spin/RS8.md) | The profile links each size's certificate record and the map/API checks. Those checks are distinct from the Scalable numerical replay and do not regenerate the complete finite search. |
 | BCH-256 finite theorem and engineering curve (`thm:finite-bch-spin`, `fig:finite-bch-curve`) | [selected finite IMT results](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md), [finite appendix](../paper/finite_appendix.tex) | `python -B paper/check_finite_integration.py` authenticates accepted evidence and checks exact unions, maps, and transcription. No interval replay. |
 | Quarter-rate operating points (`thm:finite-quarter-spin`) | Same ledger; [independent-map transfer argument](../workstreams/inner_design/asymmetric/TRANSFER_ARGUMENT.md), [outer construction](../workstreams/rate_quarter_bch/SMALLER_OUTER.md) | Same checker; current margins come from IMT receipts, not the older RM2Sub outer study. |
 | Selected transpose performance (`tab:finite-bch-performance`) | [timing and proof bindings](../workstreams/inner_design/finite_migration/PAPER_RESULTS.md) | Same checker; 3 half-rate sizes and 1 certified quarter-rate size. New benchmarks must run serially. |
@@ -49,14 +52,15 @@ bindings are unchanged; moving a result does not change its evidence scope.
 
 ## IMT notation and adjoint check
 
-The IMT step inputs, outputs, and state vectors use columns; the full
+The step inputs, outputs, and state vectors use columns; the full
 message/codeword generator convention remains row-oriented. Thus the local
 map matrices have shapes `A: t x s` and `C: s x t`. The reverse recurrence
 uses `C^T` for output feedback and `A^T` for state feedback.
 Weighted transfer measures propagate as rows, with `e_Z` the zero-state unit
-row in both the finite and asymptotic arguments. Collatz witnesses and the
-terminal all-ones vector are columns. The occupation envelope is introduced
-as the binomial mixture of transfer bounds for uniform fixed-weight inputs.
+row in the finite IMT and Scalable uniform-mixer arguments. Collatz witnesses
+and the terminal all-ones vector are columns. The finite IMT occupation
+envelope is a binomial mixture of transfer bounds for uniform fixed-weight
+inputs; the Scalable uniform-mixer proof uses its three-state envelope.
 
 Run `python -B -m unittest discover -s paper -p test_imt_adjoint.py` to compare
 the reverse recurrence against the transpose of an independently assembled
@@ -123,7 +127,8 @@ checks the Merkle expectation against exhaustive small-tree enumeration.
 | BCH-128 / 1/4 | 20 | .165 | 41.048168 |
 | BCH-128 / 1/4 | 20 | .19 | 30.033491 |
 
-The half-rate lengths share both IMT maps with the asymptotic construction.
+The half-rate lengths share their IMT maps with each other, not with the
+current Scalable construction.
 The quarter-rate code shares the expansion but uses weight-three feedback.
 Theorems use exact rational upper bounds, not rounded display values.
 The certified curve is not an estimate of the true BCH-256 spectrum.

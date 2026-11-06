@@ -7,6 +7,7 @@ import re
 
 
 SOURCE = Path(__file__).resolve().parents[3] / "spin/src/certified22/productionMap.h"
+PAPER = Path(__file__).resolve().parents[3] / "research/paper/structured_uniform_appendix.tex"
 
 
 def literal_array(source: str, name: str, expected: int) -> list[int]:
@@ -38,6 +39,11 @@ def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     rows = literal_array(source, "oldRows", 22)
     columns = literal_array(source, "oldColumns", 64)
+    paper = PAPER.read_text(encoding="utf-8")
+    table = paper.split(r"\begin{tabular}{@{}llll@{}}", 1)[1].split(
+        r"\end{tabular}", 1)[0]
+    paper_rows = [int(word, 16) for word in re.findall(r"\b[0-9a-f]{16}\b", table)]
+    assert paper_rows == rows, "the manuscript's s22 map differs from production"
     reconstructed = [
         sum(((row >> bit) & 1) << index for index, row in enumerate(rows))
         for bit in range(64)
@@ -45,7 +51,7 @@ def main() -> None:
     assert reconstructed == columns, "feedback columns differ from map rows"
     ranks = [binary_rank(columns[4 * slot:4 * slot + 4]) for slot in range(16)]
     assert ranks == [4] * 16, ranks
-    print("s22 feedback: 64 columns match rows; all 16 packet slots have rank four")
+    print("s22 map: manuscript matches production; 64 feedback columns match rows; all 16 packet slots have rank four")
     if args.spectrum:
         output = 0
         weights: Counter[int] = Counter()

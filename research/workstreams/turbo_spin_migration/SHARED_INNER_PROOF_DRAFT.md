@@ -346,7 +346,8 @@ claim for this setup law, using the already proved outer-selection and
 bit-route lemmas. The new analytical steps are the three-state
 domination and the full-state fixed-region comparison above. The
 numerical gates pass with outward arithmetic at both 256 and 512 bits.
-This proof has not been translated into Lean, so the manuscript's
-existing Lean-verification sentence cannot be carried over when the
-instantiation is changed. The current manuscript still states its
-older IMT theorem; this research proof does not silently replace it.
+This proof has not been translated into Lean. The revised manuscript
+states the uniform-mixer Scalable theorem and gives its full argument in
+`research/paper/structured_proof.tex` and
+`research/paper/structured_uniform_appendix.tex`. The earlier IMT proof
+remains archived outside the compiled paper.

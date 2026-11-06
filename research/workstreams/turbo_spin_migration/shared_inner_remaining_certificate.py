@@ -43,6 +43,8 @@ def sparse_outward():
                     + xx * xx.log() + (1 - xx) * (1 - xx).log())
             row_values.append((upper(cost), x))
     row_bound, worst_x = max(row_values)
+    outer_surplus = upper(num(row_bound) - num(2).log() / 2)
+    assert outer_surplus < F(1281, 100000)
     expression = (
         num(row_bound) - num(F(8, 5)).log()
         + num(F(3, 5) / (1 - F(8, 5) * amax))
@@ -53,6 +55,7 @@ def sparse_outward():
     bound = upper(expression)
     assert bound < 0
     return {"worst_outer_endpoint": str(worst_x),
+            "outer_surplus_upper": str(outer_surplus),
             "sparse_exponent_per_alpha_upper": str(bound),
             "sparse_exponent_per_alpha_decimal": float(bound),
             "collatz_residuals_exact": sparse["collatz_residual_upper_over_alpha"]}

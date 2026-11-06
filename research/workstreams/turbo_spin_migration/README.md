@@ -1,5 +1,12 @@
 # Turbo SPIN results before manuscript revision
 
+The manuscript has since adopted a common regional architecture with a
+Scalable one-bit route and a finite Turbo four-bit route. Both use the s22
+uniform-mixer inner at the larger parameters. The current proof and replay
+instructions are in [the paper](../../paper/structured_proof.tex) and
+[reproduction guide](../../artifact/REPRODUCING.md#current-scalable-spin-theorem).
+The notes below preserve the research sequence and its earlier decision gates.
+
 This workstream asks whether Turbo's packet-route/s22 architecture can
 carry the finite, asymptotic, encoding, and application results now
 attributed to Structured SPIN. Its finite outer is RS8; its asymptotic
@@ -130,8 +137,9 @@ derives a three-state transfer, closes a rational sparse contraction,
 and gives an outward-checked positive-occupation cover. The
 [shared-inner proof](SHARED_INNER_PROOF_DRAFT.md) closes the full-state
 fixed-row limit and first-moment assembly for the 11% scalable theorem;
-its [LaTeX proof](shared_inner_paper_proof.tex) is staged outside the
-manuscript. The numerical checks pass at 256 and 512 bits. This is a
+its [LaTeX derivation](shared_inner_paper_proof.tex) is preserved here, and
+the revised proof is in the manuscript. The numerical checks pass at 256
+and 512 bits. This is a
 conventional proof, not a Lean formalization of the new inner.
 
 If Turbo SPIN closes the scalable theorem and the finite, forward, and
