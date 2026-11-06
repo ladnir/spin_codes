@@ -35,15 +35,18 @@ finite RS8 and growing Golay--BAA outers with Turbo's packet route and
 s22 inner. The [growing RS8 base](SCALABLE_RS8_BRIDGE.md) is a later
 outer-performance option, not a prerequisite for the asymptotic proof.
 The [one-active-block packet transfer](Q1_PACKET_TRANSFER.md) derives an
-exact BAA packet-support enumerator and an s22 continuum transfer.
-Its conditional numerical screen improves as the outer grows, but does
-not establish a scalable distance theorem. The old `39/4` growth
-constant does not close this preliminary bound.
+exact BAA packet-support enumerator and an s22 finite-step upper transfer.
+A preliminary screen using a selected 16% packet-support floor leaves
+room for the old `39/4` outer-growth schedule in the one-block class.
+The [packet-floor analysis](PACKET_FLOOR_TAIL.md) closes the sparse-source
+part; its dense-source exponent still needs a uniform certificate.
+The other occupation classes still need proofs;
+the numerical screen does not establish a scalable distance theorem.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Sharpen the one-active-block result with a joint binary-weight/packet-
-support envelope and a finite-step inner bound. Then test sparse and
-dense first moments. The finite K=2^22/2^24 certificate sweep is
+Certify the dense-source packet-tail exponent for the shared BAA outer
+and audit the finite-step one-block transfer.
+Then test the other occupation classes. The finite K=2^22/2^24 certificate sweep is
 independent of that asymptotic proof.
 
 ## Baseline and gaps

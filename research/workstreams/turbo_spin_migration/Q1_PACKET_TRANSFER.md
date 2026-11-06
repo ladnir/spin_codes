@@ -92,6 +92,64 @@ conditional on packet count `v`. It is not yet a finite-`L` bound. To use
 it in a theorem we need a uniform approximation or direct finite-step
 transfer, including packets that share or abut physical steps.
 
+### A finite-step upper transfer
+
+The direct transfer is available for this one-block class. Let `L=16n`
+and set `theta=gamma/(4Lp_0)`. Enumerating the chosen s22 expansion map
+over all `2^22-1` nonzero states gives its exact 64-bit output-weight
+spectrum:
+
+| Weight | 16 | 24 | 28 | 32 | 36 | 40 | 48 | 64 |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Count | 2,604 | 291,648 | 888,832 | 1,828,134 | 888,832 | 291,648 | 2,604 | 1 |
+
+The script `verify_pair_return_map.py --spectrum` reproduces the count
+from `productionMap.h`. Define
+
+```
+q(theta) = sum_{a != 0} exp(-theta wt(Aa))/(2^22-1),
+Q = q(theta)^n,
+J_n = (1/n) sum_{h=0}^{n-1} q(theta)^h.
+```
+
+If every step with a live *pre-step* state were charged its mean Laplace
+factor `q`, the empty- and active-region transfers would be exactly
+
+```
+K_0^(n) = [[1, 0], [0, Q]],
+K_1^(n) = [[0, J_n], [q J_n/M, (1-1/M)Q]].
+```
+
+The active packet occupies a uniform one of the `n` physical steps in
+its region. The `q` in the live-to-zero entry charges its active step;
+the zero-to-live entry does not, because that step starts in state zero.
+GL updates give the zero/live transition probabilities exactly even
+when the incoming live state is not uniform.
+
+To relate this transfer to actual output weight, mark every active step
+and its immediate successor. There are at most `2v` marked steps. At
+every unmarked live step the pre-state is independent uniform nonzero:
+an empty update after a nonzero state refreshes it, and a later packet's
+return event is independent of that earlier state. Conditional on the
+zero/live trajectory, unmarked live-step output weights therefore have
+factor `q`; other unmarked steps have zero output. Each marked step has
+at most 64 output bits. Replacing its true factor by the `q` factor
+changes the moment by at most `exp(64 theta)` in the upper direction.
+Consequently, for fixed packet labels and `v` active packets,
+
+```
+E[exp(-theta W) | v]
+  <= exp(128 theta v)
+     [u^v] (1,0)(K_0^(n)+u K_1^(n))^R(1,1)^T / C(R,v).
+```
+
+The expectation includes packet and region shuffles and uniform GL
+updates. The inequality is for the ideal sampled setup law, not the
+seeded implementation. It needs a written lemma-level audit before use
+in a paper; the numerical implementation uses binary64, not outward
+rounding. As `L -> infinity` with `b=O(log L)`, its entrywise transfer
+converges to `K_0,K_1` above and the correction is `exp(O(b/L))`.
+
 For relative output distance `delta`, the corresponding one-block
 Chernoff first-moment expression is
 
@@ -131,7 +189,7 @@ an integer native size. They are diagnostic values, **not certificates**.
 
 The decreasing per-position charge is encouraging: growing the outer
 attacks the fixed-width obstruction while leaving the packet route and
-inner intact. However, the paper's present schedule
+inner intact. With *only* the paper's binary-weight selection, its present schedule
 `b=(39/4) log2 N+O(1)` would make `log2 L` grow at rate about `b/9.75`.
 These finite screens show only about `0.05--0.07` bits of per-position
 decay per additional outer bit, while that schedule requires more than
@@ -139,19 +197,65 @@ decay per additional outer bit, while that schedule requires more than
 roughly 15--21 in these finite screens. This is neither a proved
 asymptotic threshold nor evidence that the actual construction fails at
 `39/4`: the coarse good-outer cutoff admits bad binary-weight words with
-packet support above the cutoff, and the high-packet-count terms remain
-large. A joint binary-weight/packet-support envelope is the next useful
-refinement.
+packet support above the cutoff. An exact joint binary-weight/packet-
+support count improves the screen, but the lowest allowed packet count
+still dominates. For example, at `b=432`, counting binary weight exactly
+through `v=20` changes `log2 Q1` from `-13.61` to `-18.29`, while `v=12`
+still contributes most of the bound.
+
+## Selecting packet support once
+
+A more effective selection condition is that every nonzero word of the
+one shared BAA outer occupy at least `ceil(rho R)` packets. Markov bounds
+the one-time setup failure probability by the exact expected number
+`sum_{1<=v<ceil(rho R)} E[B_O(v)]`. Unlike the one-block first moment,
+this event is **not multiplied by `L`**. The following binary64 screens
+use `rho=0.16` and the unconditioned exact packet enumerator:
+
+| `b` | packet floor | expected bad outer words | `log2` conditional continuum Q1 | indicative `b/log2 L` threshold |
+| ---: | ---: | ---: | ---: | ---: |
+| 216 | 9 | 0.003759 | -14.04 | 7.92 |
+| 432 | 18 | 0.001552 | -41.55 | 8.03 |
+| 648 | 26 | 0.000589 | -63.23 | 8.65 |
+| 864 | 35 | 0.000338 | -89.15 | 8.61 |
+
+The threshold column divides `b` by the magnitude of the computed
+per-position log2 charge. It is a diagnostic finite-size ratio, not a
+proved asymptotic constant. At native `L=4864` and `b=432`, the
+finite-step upper formula gives conditional `log2 Q1=-40.57`; its
+separate packet-floor setup-failure expectation is still `0.001552`.
+Neither number certifies the complete code distance.
+
+Splitting the `rho=0.16` bad-word expectation by the number of active
+Golay source blocks identifies the asymptotic proof split. At `b=432`,
+one active Golay block contributes `0.001441` of the total `0.001552`;
+two contribute `0.0000998`, three `0.0000101`, and the rest less. At
+`b=864`, one block contributes `0.000327` of `0.000338`. A dense-only
+large-deviation exponent cannot establish this selection event: it must
+also control the sparse source classes, as the existing BAA binary-tail
+proof does. The numerical decrease is consistent with a vanishing
+failure probability but is not itself a proof of `o(1)`.
+The [packet-floor tail note](PACKET_FLOOR_TAIL.md) proves the sparse-source
+contribution is `O(b^(-3/2))` at this floor and gives an explicit
+two-variable dense-source exponent. A sampled grid finds a negative
+exponent, but uniform certification of that exponent is still open.
+
+This packet selection is the first plausible way to retain the paper's
+`39/4` schedule with Turbo's route and inner. It changes only which
+sampled outer realizations the proof accepts; it does not alter the
+encoder or add setup work. The full sparse/dense packet-tail proof and
+all `Q>=2` message classes remain open.
 
 ## Proof gates before paper migration
 
-1. Bound the finite-`L` packet-route/inner transfer uniformly in growing
-   `b`, retaining packet collisions and the actual s22 output spectrum.
-2. Select a joint binary-weight/packet-support envelope for the shared BAA
-   outer. Determine the true one-block decay and a sufficient schedule
-   `b=c log2 N` with a certified margin over `log2 L`.
+1. Audit and formalize the finite-step one-block transfer above. It
+   uses the exact s22 output spectrum and a factor for exceptional steps.
+2. Certify the dense Golay-source exponent in the packet-floor tail note;
+   the sparse contribution is already bounded. Select a realized
+   packet-spectrum majorant for later multi-block bounds.
 3. Extend from one block to fixed, sparse growing, and positive block
-   occupation. Reuse the selected outer across positions; never replace
+   occupation, including packet collisions between blocks. Reuse the
+   selected outer across positions; never replace
    the expectation of a power by a power of the mean.
 4. Certify all numerical inequalities with outward interval bounds and
    retain the finite RS8 certificates independently.

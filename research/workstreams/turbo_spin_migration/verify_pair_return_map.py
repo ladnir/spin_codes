@@ -1,6 +1,8 @@
 """Check the exact s22 feedback interface used in the pair-return proof."""
 
 from pathlib import Path
+from collections import Counter
+import argparse
 import re
 
 
@@ -29,6 +31,10 @@ def binary_rank(columns: list[int]) -> int:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--spectrum", action="store_true",
+                        help="enumerate all nonzero s22 state output weights")
+    args = parser.parse_args()
     source = SOURCE.read_text(encoding="utf-8")
     rows = literal_array(source, "oldRows", 22)
     columns = literal_array(source, "oldColumns", 64)
@@ -40,6 +46,16 @@ def main() -> None:
     ranks = [binary_rank(columns[4 * slot:4 * slot + 4]) for slot in range(16)]
     assert ranks == [4] * 16, ranks
     print("s22 feedback: 64 columns match rows; all 16 packet slots have rank four")
+    if args.spectrum:
+        output = 0
+        weights: Counter[int] = Counter()
+        for gray_index in range(1, 1 << 22):
+            output ^= rows[(gray_index & -gray_index).bit_length() - 1]
+            weights[output.bit_count()] += 1
+        assert sum(weights.values()) == (1 << 22) - 1
+        assert 0 not in weights
+        assert sum(weight * count for weight, count in weights.items()) == 64 * (1 << 21)
+        print("nonzero-state output spectrum:", sorted(weights.items()))
 
 
 if __name__ == "__main__":
