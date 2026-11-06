@@ -43,9 +43,9 @@ kernels used by that bound. The
 that a list expanded from marked gaps has exactly the marked-region
 kernel and that a good support expands to the correct number of steps.
 It verifies the empty-support case and transfers the regional upper bound
-to the actual step law conditional on the input-list equality.
-Equality between this expanded list and the encoder's chronological input
-list for the same support remains open. Placement averaging and continuum
+to the actual step law. For every good support, it proves the expanded
+list equals the encoder's chronological input list, so the regional bound
+now applies directly to the encoder. Placement averaging and continuum
 coupling remain open. The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.

@@ -121,7 +121,7 @@ theorem goodRegionalSites_mark_gaps {R : ℕ} (hR : 0 < R)
   validSupport_mark_gaps (goodRegionalSites_validSupport hR T hgood)
 
 /-- The kernel indexed by a support after sorting its active positions.
-Its equality to the chronological encoder kernel remains to be proved. -/
+Its equality to the chronological encoder kernel is proved in `RegionalTrace`. -/
 def supportRegionKernel {R : ℕ} (z : ℝ)
     (T : Finset (Fin (64 * R))) : State22 → State22 → ℝ :=
   markedRegionKernel z (supportMarks R (T.sort (· ≤ ·)) 0)
