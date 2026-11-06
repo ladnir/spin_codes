@@ -12,8 +12,8 @@ certificate and implementation result.
 
 **Decisive asymptotic finding.** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
 shows that the four-bit route at the paper's `39/4` outer-growth constant
-has relative distance at most `10%+o(1)` with high probability, for
-every rate-half linear outer and every fixed inner setup. Its limiting
+has relative distance at most `10%+o(1)` for **every** one-packet-per-region
+route, rate-half linear outer, and fixed inner setup. Its limiting
 bound is about `8.535%`. The proposed `>11%` replacement theorem is
 false for that exact growing family. Finite Turbo certificates are
 unaffected.
