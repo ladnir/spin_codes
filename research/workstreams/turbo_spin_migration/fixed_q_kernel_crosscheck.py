@@ -5,10 +5,8 @@ path polynomial rather than exponentiating a block matrix.
 """
 
 import argparse
-import math
 
 import mpmath as mp
-import numpy as np
 
 from fixed_q_transfer_screen import kernels as block_exponential_kernels
 
