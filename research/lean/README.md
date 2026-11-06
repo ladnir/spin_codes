@@ -61,8 +61,11 @@ the paper's zero/live gap-and-impulse integrand, proves its continuity,
 and verifies convergence of its ideal support sum. The
 [product stability bound](SpinCodes/UniformMixer/RegionalContinuumError.lean)
 shows that its two-state rows change by at most `γ` times the `ℓ₁` change
-in gap lengths. The remaining comparison must bound that gap change for
-the routed bit positions uniformly over good supports.
+in gap lengths. The [rounding bound](SpinCodes/UniformMixer/RegionalRounding.lean)
+shows that every good support with `a` active bits has total normalized
+gap error at most `3(a+1)/R`, where the region has `R` encoder steps.
+The remaining bridge identifies these recursive gap lists with the two
+matrix products before applying the row-error estimate.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
