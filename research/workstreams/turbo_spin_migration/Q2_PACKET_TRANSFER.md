@@ -1,5 +1,9 @@
 # Two active outer positions: packet-region transfer
 
+> **Later result:** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
+> rules out the full `>11%` theorem for this four-bit growing family at
+> the paper's `39/4` schedule, despite the closed Q2 and Q3 bounds below.
+
 ## Why this class differs
 
 The [occupation-one proof](Q1_SCHEDULE_CERTIFICATE.md) uses one active

@@ -1,5 +1,10 @@
 # One Turbo architecture at finite and growing lengths
 
+> **Later result:** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
+> disproves the `>11%` asymptotic target below for four-bit packets at
+> the paper's `39/4` growth constant. This file records the original
+> design question and finite-family interface.
+
 ## Replacement criterion
 
 To replace Structured SPIN in the paper, Turbo should be presented as

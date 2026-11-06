@@ -62,7 +62,11 @@ def screen(q, rho, outer):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--q", type=int, nargs="+", default=[3, 4, 8])
+    parser.add_argument("--state-bits", type=int, default=22)
     args = parser.parse_args()
+    global M, P0
+    M = (1 << args.state_bits)-1
+    P0 = (1 << (args.state_bits-1))/M
     bands = json.loads(Path(__file__).with_name("packet_envelope_32.json").read_text())["bands"]
     for q in args.q:
         for index in (0, 8, 16, 24, 31):

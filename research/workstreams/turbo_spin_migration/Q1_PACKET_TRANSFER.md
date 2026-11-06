@@ -1,5 +1,9 @@
 # One active block in a growing Turbo family
 
+> **Later result:** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
+> rules out the full `>11%` theorem for the four-bit growing family at
+> the paper's `39/4` schedule, despite the closed one-block bound below.
+
 ## Question and construction
 
 The finite Turbo encoder uses a 256-bit RS8 outer, a four-bit packet route,

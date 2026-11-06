@@ -10,6 +10,14 @@ The provisional paper draft is frozen at `0f3f0c4a` on
 Neither the draft's new claims nor a timing ratio substitutes for a matched
 certificate and implementation result.
 
+**Decisive asymptotic finding.** The [packet-window obstruction](PACKET_WINDOW_OBSTRUCTION.md)
+shows that the four-bit route at the paper's `39/4` outer-growth constant
+has relative distance at most `10%+o(1)` with high probability, for
+every rate-half linear outer and every fixed inner setup. Its limiting
+bound is about `8.535%`. The proposed `>11%` replacement theorem is
+false for that exact growing family. Finite Turbo certificates are
+unaffected.
+
 **First result.** The [setup audit](SETUP_AUDIT.md) found no algebraic
 map or sampling-interface mismatch in the RS8 profile, while preserving
 the ideal-setup versus seeded-implementation distinction. The
@@ -30,7 +38,7 @@ and uniform-GL inner: a fixed one-group message has a small but
 length-independent probability of pairwise state returns and output
 weight at most `N/16`. The shared-profile candidate remains relevant
 only to finite-size or redesigned-inner questions.
-The [family bridge](TURBO_FAMILY_BRIDGE.md) fixes the replacement target:
+The [family bridge](TURBO_FAMILY_BRIDGE.md) records the original replacement target:
 finite RS8 and growing Golay--BAA outers with Turbo's packet route and
 s22 inner. The [growing RS8 base](SCALABLE_RS8_BRIDGE.md) is a later
 outer-performance option, not a prerequisite for the asymptotic proof.
@@ -47,13 +55,15 @@ The [two-block transfer note](Q2_PACKET_TRANSFER.md) derives the
 continuum two-packet kernel, gives a finite collision comparison, and
 records an outward-rounded two-position exponent certificate. The
 same transfer method closes occupation three over all 5,984 packet
-band triples. Higher occupation classes still need proofs; these results do not yet
-establish a scalable distance theorem.
+band triples. Higher occupation classes cannot close at 11% for this
+growing family because the window obstruction gives actual low-weight
+words.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Audit the one-, two-, and three-block transfer certificates, then test fixed
-`Q>=4`, growing sparse occupation, and positive occupation. The finite
-K=2^22/2^24 certificate sweep is independent of that asymptotic proof.
+For a growing Turbo member, test either two-bit packets or a growth
+constant above the window threshold; both need new full occupation
+proofs. The finite K=2^22/2^24 certificate sweep is independent of
+that asymptotic proof.
 
 ## Baseline and gaps
 
@@ -61,7 +71,7 @@ K=2^22/2^24 certificate sweep is independent of that asymptotic proof.
 |---|---|---|
 | Half-rate finite distance | RS8 packet code has >10% distance with 61.884, 58.246, and 51.822 bits of setup-failure margin at K=2^16, 2^18, and 2^20 | K=2^22 and 2^24, plus any intermediate lengths we claim |
 | Transposed 128-bit encoding | Public RS8 profile: 0.099526, 0.461416, and 2.861814 ms at those three lengths | A matched BCH/IMT and BAA campaign; scaling at larger lengths |
-| Scalable distance | Growing Golay--BAA outer with bit route and IMT: rate 1/2, >11% distance with probability 1-o(1), O(N) ordinary and transposed work, Lean proof | Keep the growing outer as control; certify it with Turbo's packet route and s22 inner |
+| Scalable distance | Growing Golay--BAA outer with bit route and IMT: rate 1/2, >11% distance with probability 1-o(1), O(N) ordinary and transposed work, Lean proof | Four-bit Turbo route at `39/4` is ruled out; evaluate two-bit packets or a larger growth constant |
 | Quarter-rate distance | Older BCH/IMT profile at K=2^20: >16.5% with 40 bits and >19% with 30 bits | A binary RS-packet quarter-rate construction, certificate, and timing |
 | Ordinary and wide encoding | Older profile has tuned forward and wide kernels; RS8 forward is a scalar fallback | Optimized Turbo forward kernels and matched measurements |
 | Applications | Existing Silent OT, PCS, and Flock results use BCH/IMT | Re-run with the exact certified Turbo profile and report complete workload boundaries |
