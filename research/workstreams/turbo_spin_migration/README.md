@@ -34,12 +34,17 @@ The [family bridge](TURBO_FAMILY_BRIDGE.md) fixes the replacement target:
 finite RS8 and growing Golay--BAA outers with Turbo's packet route and
 s22 inner. The [growing RS8 base](SCALABLE_RS8_BRIDGE.md) is a later
 outer-performance option, not a prerequisite for the asymptotic proof.
+The [one-active-block packet transfer](Q1_PACKET_TRANSFER.md) derives an
+exact BAA packet-support enumerator and an s22 continuum transfer.
+Its conditional numerical screen improves as the outer grows, but does
+not establish a scalable distance theorem. The old `39/4` growth
+constant does not close this preliminary bound.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Test the known growing Golay--BAA outer under Turbo's packet route and
-s22 inner. First check the one-active-block packet/label law, then the
-sparse and dense first moments. The finite K=2^22/2^24 certificate
-sweep is independent of that asymptotic proof.
+Sharpen the one-active-block result with a joint binary-weight/packet-
+support envelope and a finite-step inner bound. Then test sparse and
+dense first moments. The finite K=2^22/2^24 certificate sweep is
+independent of that asymptotic proof.
 
 ## Baseline and gaps
 
