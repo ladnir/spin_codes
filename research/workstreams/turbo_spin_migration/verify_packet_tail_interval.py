@@ -1,4 +1,4 @@
-"""Outward-rounded 2D branch check for the 16% BAA packet-tail exponent.
+"""Outward-rounded 2D branch check for BAA packet-tail exponents.
 
 Reuses the paper's Golay and first-accumulator interval bounds. A fixed
 rational (x,u) witness is selected for each box and evaluated with mpmath
@@ -96,11 +96,18 @@ class Box:
 
 
 def main() -> None:
+    global RHO, ALPHA_LOWER
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--rho", type=Fraction, default=RHO)
+    parser.add_argument("--eta", type=Fraction, default=Fraction(1, 5000))
     parser.add_argument("--max-boxes", type=int, default=100_000)
     parser.add_argument("--max-depth", type=int, default=80)
     parser.add_argument("--progress-every", type=int, default=10_000)
     args = parser.parse_args()
+    RHO = args.rho
+    ALPHA_LOWER = 8 * args.eta
+    if not (ZERO < RHO < ONE and ZERO < ALPHA_LOWER < ONE):
+        raise ValueError("invalid packet floor or source split")
 
     root = Box(ALPHA_LOWER, ONE, ZERO, ONE)
     heap = [(-root.upper(), 0, 0, root)]
@@ -139,6 +146,7 @@ def main() -> None:
         unresolved = {"upper": -upper, "depth": depth,
                       "box": box.as_json()}
     print(json.dumps({"result": "closed" if not heap and unresolved is None else "open",
+                      "rho": str(RHO), "eta": str(args.eta),
                       "processed": processed, "accepted": accepted,
                       "deepest": deepest,
                       "max_accepted_upper": largest_accepted,

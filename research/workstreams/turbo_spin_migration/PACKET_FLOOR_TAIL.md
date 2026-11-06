@@ -134,3 +134,24 @@ The sparse and dense bounds together establish (1), hence the shared
 outer's 16% packet-support floor with probability `1-o(1)`. Multi-block
 packet collisions and inner-state cancellations still require proofs
 before replacing Structured SPIN's asymptotic theorem.
+
+## Stronger selected floors
+
+The same argument certifies packet-support floors of 17%, 18%, and 19%.
+For each row, `verify_packet_tail_sparse.py` checks the rational sparse
+constants and `verify_packet_tail_interval.py` checks (2) over the
+entire feasible dense domain with outward-rounded interval arithmetic.
+
+| `rho` | sparse split `eta` | dense accepted leaves | maximum dense upper (nats per bit) |
+| ---: | ---: | ---: | ---: |
+| 0.16 | 1/5,000 | 996 | below -3.26e-7 |
+| 0.17 | 1/10,000 | 1,332 | below -1.36e-6 |
+| 0.18 | 1/20,000 | 1,734 | below -3.34e-7 |
+| 0.19 | 1/50,000 | 2,296 | below -2.27e-7 |
+
+Thus the strongest currently certified statement replaces `4/25` in
+(1) by `19/100`: the one sampled Golay--BAA outer has packet support
+at least `ceil(0.19R)` for every nonzero word with probability `1-o(1)`.
+The proof accepts a more restrictive outer event; setup and encoding
+algorithms are unchanged. This improves the one-block inner bound, but
+does not by itself prove the full Turbo distance theorem.

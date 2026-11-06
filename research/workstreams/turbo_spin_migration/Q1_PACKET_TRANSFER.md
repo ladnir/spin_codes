@@ -239,6 +239,23 @@ The [packet-floor tail note](PACKET_FLOOR_TAIL.md) proves the sparse-source
 contribution is `O(b^(-3/2))` and certifies a strictly negative
 dense-source exponent with outward-rounded interval arithmetic. Thus
 the additional packet-floor setup event has probability `1-o(1)`.
+The same method now certifies a **19%** packet floor, with a smaller
+sparse-source split. The 16% data above remain useful diagnostics of
+how the bound changes with the floor.
+
+The first screen used one Chernoff tilt for all packet counts. A union
+bound permits a different tilt for each `v`. The diagnostic
+`packet_baa_q1_tilt_grid.py` applies that choice. With the certified
+19% floor at `K=2^20` comparison scale, it gives continuum `log2 Q1`
+of `-56.20` at `b=432` and `-124.31` at `b=864`, compared with
+`-45.16` and `-96.38` for the 16% floor. These are binary64 screens,
+not schedule certificates. The selected floor is an asymptotic
+high-probability event, not a 40-bit finite setup guarantee at these
+specific `b` values.
+The [occupation-one certificate](Q1_SCHEDULE_CERTIFICATE.md) now closes
+the asymptotic `Q=1` bound at 11% distance with the paper's `39/4`
+outer-growth schedule. It uses a sparse Golay-source count and a
+three-variable outward-rounded dense exponent bound.
 
 This packet selection makes it plausible to retain the paper's
 `39/4` schedule with Turbo's route and inner. It changes only which
@@ -250,8 +267,8 @@ encoder or add setup work. The one-block schedule inequality and all
 
 1. Audit and formalize the finite-step one-block transfer above. It
    uses the exact s22 output spectrum and a factor for exceptional steps.
-2. Certify the one-block schedule inequality using the selected 16%
-   packet floor and a realized packet-spectrum majorant.
+2. Audit the occupation-one interval certificate and its finite-step
+   transfer lemma.
 3. Extend from one block to fixed, sparse growing, and positive block
    occupation, including packet collisions between blocks. Reuse the
    selected outer across positions; never replace

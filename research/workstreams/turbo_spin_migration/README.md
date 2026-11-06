@@ -36,18 +36,23 @@ s22 inner. The [growing RS8 base](SCALABLE_RS8_BRIDGE.md) is a later
 outer-performance option, not a prerequisite for the asymptotic proof.
 The [one-active-block packet transfer](Q1_PACKET_TRANSFER.md) derives an
 exact BAA packet-support enumerator and an s22 finite-step upper transfer.
-A preliminary screen using a selected 16% packet-support floor leaves
+A preliminary screen using a selected 19% packet-support floor leaves
 room for the old `39/4` outer-growth schedule in the one-block class.
-The [packet-floor analysis](PACKET_FLOOR_TAIL.md) proves the 16% floor
+The [packet-floor analysis](PACKET_FLOOR_TAIL.md) proves the 19% floor
 for the shared growing outer using an analytic sparse bound and an
-outward-rounded dense certificate. The one-block schedule inequality and
-other occupation classes still need proofs;
+outward-rounded dense certificate. The
+[one-block schedule certificate](Q1_SCHEDULE_CERTIFICATE.md) closes
+occupation one at 11% distance under the paper's `39/4` schedule.
+The [two-block transfer note](Q2_PACKET_TRANSFER.md) derives the
+continuum two-packet kernel and isolates the finite collision and
+shared-outer spectrum obligations.
+The other occupation classes still need proofs;
 the numerical screen does not establish a scalable distance theorem.
 
 **Next decision.** Keep the existing Structured theorem as the control.
-Certify the one-block schedule inequality under the selected packet floor
-and audit the finite-step transfer.
-Then test the other occupation classes. The finite K=2^22/2^24 certificate sweep is
+Audit the one-block certificate and certify occupation two with the
+selected shared outer and finite packet collisions. Then test the
+remaining occupation classes. The finite K=2^22/2^24 certificate sweep is
 independent of that asymptotic proof.
 
 ## Baseline and gaps
