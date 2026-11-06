@@ -6,7 +6,8 @@ SPIN results in the current paper.
 
 The new [uniform-mixer kernel](SpinCodes/UniformMixer/Kernel.lean) checks a
 first part of the Scalable SPIN proof: the exact state transition under a
-uniform invertible linear map and the full-state formula for an empty gap.
+uniform invertible linear map, the full-state formula for an empty gap,
+and the one-bit impulse quotient.
 The regional comparison, routing/outer bounds, finite certificates, and
 final distance theorem still require formalization.
 

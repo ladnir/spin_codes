@@ -66,13 +66,13 @@ with the selected outer, routing, and fixed-occupation inequalities.
 ## Lean status
 
 `research/lean/SpinCodes/UniformMixer/Kernel.lean` now verifies the uniform
-action law for finite-dimensional invertible linear maps and the exact
-full-state empty-gap kernel, including the absorbing zero state. The proof
+action law for finite-dimensional invertible linear maps, the exact
+full-state empty-gap kernel, and the one-bit impulse quotient. The proof
 is generic in the finite vector space; it does not enumerate the enormous
 group `GL(22,2)`.
 
-The one-bit impulse quotient, the discrete-to-continuous slot coupling,
-the support/positivity argument, and the regional product inequality remain
+The discrete-to-continuous slot coupling, the support/positivity argument,
+and the regional product inequality remain
 to be formalized. The finite numerical gates are separate obligations.
 The revised Scalable theorem and the finite Turbo certificates are not yet
 Lean-verified.

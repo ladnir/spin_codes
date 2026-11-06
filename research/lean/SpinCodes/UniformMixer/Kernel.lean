@@ -118,6 +118,17 @@ theorem live_to_live [Nontrivial S] (c q : S) (hq : q ≠ 0)
     liveMass c q = 1 - 1 / (liveCount S : ℝ) := by
   rw [liveMass_eq, live_to_zero_probability c q hq hc]
 
+/-- The one-bit impulse quotient. The first row enters at zero; the
+second enters at any nonzero state. Output columns are zero and live. -/
+theorem impulse_quotient [Nontrivial S] (c q : S)
+    (hc : c ≠ 0) (hq : q ≠ 0) :
+    ((update c 0 0, liveMass c 0),
+      (update c q 0, liveMass c q)) =
+      (((0 : ℝ), 1),
+        (1 / (liveCount S : ℝ), 1 - 1 / (liveCount S : ℝ))) := by
+  simp [update_zero, hc, eq_comm, zero_to_live,
+    live_to_live, hq]
+
 /-- An empty input emits the expansion of the entering state and then
 refreshes that state. `w` is the Hamming weight of the expansion. -/
 def emptyStep (z : ℝ) (w : S → ℕ) (q r : S) : ℝ :=
