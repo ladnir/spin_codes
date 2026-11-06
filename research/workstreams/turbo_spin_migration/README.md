@@ -125,7 +125,10 @@ structured permutation.
 The [Turbo inner with the one-bit route](SHARED_INNER_BIT_ROUTE.md)
 isolates an alternative path to a common inner. It keeps the proven
 scalable route and growing outer, but replaces IMT by the Turbo t64/s22
-state law. The candidate has no asymptotic distance certificate yet.
+state law. The [shared-inner feasibility study](SHARED_INNER_FEASIBILITY.md)
+derives a three-state transfer, closes a rational sparse contraction,
+and gives an outward-checked positive-occupation cover. The candidate has no
+complete asymptotic distance certificate yet.
 
 If Turbo SPIN closes the scalable theorem and the finite, forward, and
 application gates, make it the main construction and retain only older
