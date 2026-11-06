@@ -58,8 +58,11 @@ convergence of that uniform support sum for any continuous function of
 the normalized sorted bit positions. The
 [continuum product](SpinCodes/UniformMixer/RegionalContinuum.lean) defines
 the paper's zero/live gap-and-impulse integrand, proves its continuity,
-and verifies convergence of its ideal support sum. A uniform comparison
-between the discrete two-state product and that integrand remains open.
+and verifies convergence of its ideal support sum. The
+[product stability bound](SpinCodes/UniformMixer/RegionalContinuumError.lean)
+shows that its two-state rows change by at most `γ` times the `ℓ₁` change
+in gap lengths. The remaining comparison must bound that gap change for
+the routed bit positions uniformly over good supports.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
