@@ -10,9 +10,15 @@ uniform invertible linear map, the full-state formula for an empty gap,
 and the one-bit impulse quotient. The [regional algebra](SpinCodes/UniformMixer/Regional.lean)
 checks full-state kernel composition, the zero/live lift and projection,
 the weighted impulse bound, and both gap comparisons conditional on a
-scalar live-weight estimate. The estimate, placement coupling,
-routing/outer bounds, finite certificates, and final distance theorem
-still require formalization.
+scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
+[production map](SpinCodes/UniformMixer/Map22.lean), and
+[tilt bounds](SpinCodes/UniformMixer/Tilt.lean) prove the exact live-state
+mean for the paper's 22-by-64 matrix and a quadratic error bound for its
+empty-gap tilt. These bounds have not yet been assembled into the full
+regional comparison. The placement coupling, routing/outer bounds,
+finite Turbo certificates, and final Scalable and Turbo distance theorems
+also remain to be formalized. The older native theorem below does not
+verify those revised constructions.
 
 The native Structured SPIN distance and rate result is complete. Under the
 actual setup distribution, the probability that minimum distance is at most
