@@ -70,9 +70,11 @@ identifies the rounded product exactly with the marked regional envelope
 and gives a uniform good-support row error of `3γ(a+1)/R`.
 The [site-product bridge](SpinCodes/UniformMixer/RegionalSiteProduct.lean)
 identifies the ideal recursive product with the continuum integrand at
-the normalized sorted bit positions. The remaining comparison transfers
-the row-error bound through the full-state boundary matrices and the
-shuffle average.
+the normalized sorted bit positions. The
+[boundary error](SpinCodes/UniformMixer/RegionalBoundaryError.lean)
+transfers the good-support row bound to every full-state endpoint entry.
+The remaining regional comparison inserts this pointwise estimate into
+the actual shuffle average and takes its uniform support-grid limit.
 The routing/outer bounds,
 finite Turbo certificates, and final distance theorems remain open.
 The older native theorem below does not verify those revised constructions.
