@@ -90,7 +90,23 @@ preserves the fact that one outer realization is reused in all positions.
 the continuum kernel. At `v_1/R=v_2/R=0.19`, distance `0.11`, and the
 paper's `39/4` schedule, **two position choices plus the inner** have
 exponent about `-0.05636` nats per outer bit, before paying for the
-outer words. This is a binary64 diagnostic, not a proof for all
-packet-count pairs. The next gate is a uniform outer-spectrum/inner
-exponent certificate over both packet fractions, followed by the
-finite-step collision lemma.
+outer words. A second screen folds the exact finite BAA packet spectrum
+into both outer words. On sampled packet-count pairs, the worst
+normalized exponent is about `-0.0932` at `b=432` and `-0.0836` at
+`b=864`, both at the packet-floor pair. The latter screen is in
+`q2_spectrum_screen.py`. These are binary64 diagnostics, not proofs for
+all packet-count pairs. The next gate is a uniform
+outer-spectrum/inner exponent certificate over both packet fractions,
+followed by the finite-step collision lemma.
+
+An initial six-variable outward-rounded branch verifier is in
+`verify_packet_q2_interval.py`. It combines two copies of the Golay,
+first-accumulator, and packet-spectrum exponent with the two-packet
+inner transfer. After 10,000 boxes its largest unresolved upper is
+`+1.37` nats per outer bit, despite the negative sampled objective.
+The broad boxes lose cancellations between each outer's weight and
+packet fraction. This is a **bound-resolution problem**, not evidence
+of a bad code. The next approach should first certify a one-dimensional
+packet-spectrum envelope for the selected BAA outer and then verify
+the remaining two packet fractions jointly. The direct verifier is
+preserved as a control and diagnostic.

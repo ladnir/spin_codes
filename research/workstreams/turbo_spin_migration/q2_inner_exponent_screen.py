@@ -1,7 +1,7 @@
 """Continuum two-block Turbo inner exponent diagnostic, not a certificate."""
 
 import argparse
-from math import exp, log, log1p
+from math import exp, log
 
 import numpy as np
 from scipy.optimize import minimize
