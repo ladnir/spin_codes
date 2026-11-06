@@ -15,7 +15,8 @@ scalar live-weight estimate. The [mean](SpinCodes/UniformMixer/Mean.lean),
 [tilt bounds](SpinCodes/UniformMixer/Tilt.lean) prove the exact live-state
 mean for the paper's 22-by-64 matrix and a quadratic error bound for its
 empty-gap tilt. They also give a full-state empty-gap sandwich for an
-arbitrary entering state. The complete regional comparison, including
+arbitrary entering state, with an explicit `1±C/L` factor at tilt `θ/L`
+when the gap fits in one region. The complete regional comparison, including
 active-step placement, is still open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column

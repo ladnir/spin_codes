@@ -319,4 +319,113 @@ theorem production_emptyGap_sandwich (c : ℝ) (hc : 0 ≤ c)
       (coordinateWeight coordMap) (coordinateWeight_zero coordMap)
       g α (1 + ε / α) ha hupper q r
 
+/-- With `g` at most the number of steps in one region, the absolute
+empty-gap factor error is `O(1/L)` with an explicit constant. -/
+theorem production_gap_error_scaled (θ L : ℝ) (g : ℕ)
+    (hL : 0 < L) (hg : (g : ℝ) ≤ L / 64) :
+    (θ / L) * 64 + (g : ℝ) * ((θ / L) * 64) ^ 2 ≤
+      (64 * θ + 64 * θ ^ 2) / L := by
+  have hnonneg : 0 ≤ ((θ / L) * 64) ^ 2 := sq_nonneg _
+  have hstep := mul_le_mul_of_nonneg_right hg hnonneg
+  have hident : (L / 64) * ((θ / L) * 64) ^ 2 =
+      64 * θ ^ 2 / L := by
+    field_simp
+  rw [hident] at hstep
+  have hsum : (64 * θ + 64 * θ ^ 2) / L =
+      (θ / L) * 64 + 64 * θ ^ 2 / L := by ring
+  rw [hsum]
+  linarith
+
+/-- An empty gap occupies at most one region. Its reference live factor
+therefore stays bounded away from zero independently of the region length. -/
+theorem production_gap_reference_lower (θ L : ℝ) (g : ℕ)
+    (hθ : 0 ≤ θ) (hL : 0 < L)
+    (hg : ((g + 1 : ℕ) : ℝ) ≤ L / 64) :
+    Real.exp (-θ) ≤
+      Real.exp (-((θ / L) * liveWeightAverage coordMap)) ^ (g + 1) := by
+  have hμ0 : 0 ≤ liveWeightAverage coordMap := by
+    rw [production_liveWeightAverage]
+    norm_num
+  have hμt : liveWeightAverage coordMap ≤ 64 := by
+    rw [production_liveWeightAverage]
+    norm_num
+  have hc : 0 ≤ θ / L := div_nonneg hθ hL.le
+  have hprod := mul_le_mul_of_nonneg_right hg (mul_nonneg hc hμ0)
+  have hident : (L / 64) * ((θ / L) * liveWeightAverage coordMap) =
+      θ * liveWeightAverage coordMap / 64 := by
+    field_simp
+  rw [hident] at hprod
+  have hsmall : θ * liveWeightAverage coordMap / 64 ≤ θ := by
+    have h := mul_le_mul_of_nonneg_left hμt hθ
+    linarith
+  rw [← Real.exp_nat_mul]
+  apply Real.exp_le_exp.mpr
+  nlinarith [hprod, hsmall]
+
+theorem production_gap_relative_error_scaled (θ L : ℝ) (g : ℕ)
+    (hθ : 0 ≤ θ) (hL : 0 < L)
+    (hg : ((g + 1 : ℕ) : ℝ) ≤ L / 64) :
+    let α := Real.exp (-((θ / L) * liveWeightAverage coordMap)) ^ (g + 1)
+    let ε := (θ / L) * 64 + (g : ℝ) * ((θ / L) * 64) ^ 2
+    ε / α ≤ ((64 * θ + 64 * θ ^ 2) / L) / Real.exp (-θ) := by
+  dsimp
+  let α := Real.exp (-((θ / L) * liveWeightAverage coordMap)) ^ (g + 1)
+  let ε := (θ / L) * 64 + (g : ℝ) * ((θ / L) * 64) ^ 2
+  let B := (64 * θ + 64 * θ ^ 2) / L
+  have hα : 0 < α := pow_pos (Real.exp_pos _) _
+  have he : 0 < Real.exp (-θ) := Real.exp_pos _
+  have hlow : Real.exp (-θ) ≤ α :=
+    production_gap_reference_lower θ L g hθ hL hg
+  have hgn : (g : ℝ) ≤ L / 64 := by
+    have : (g : ℝ) ≤ ((g + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.le_succ g
+    linarith
+  have herr : ε ≤ B := production_gap_error_scaled θ L g hL hgn
+  have hB : 0 ≤ B := by
+    dsimp [B]
+    positivity
+  apply (div_le_div_iff₀ hα he).mpr
+  calc
+    ε * Real.exp (-θ) ≤ B * Real.exp (-θ) :=
+      mul_le_mul_of_nonneg_right herr he.le
+    _ ≤ B * α := mul_le_mul_of_nonneg_left hlow hB
+
+/-- Full-state empty-gap comparison at the paper's `θ/L` scale. Its
+constant is explicit and independent of the entering and exiting states. -/
+theorem production_emptyGap_scaled_sandwich (θ L : ℝ) (g : ℕ)
+    (hθ : 0 ≤ θ) (hL : 0 < L)
+    (hg : ((g + 1 : ℕ) : ℝ) ≤ L / 64)
+    (q r : State22) :
+    let α := Real.exp (-((θ / L) * liveWeightAverage coordMap)) ^ (g + 1)
+    let C := ((64 * θ + 64 * θ ^ 2) / L) / Real.exp (-θ)
+    (1 - C) * liftedGap α q r ≤
+      emptyGap (Real.exp (-(θ / L))) (coordinateWeight coordMap)
+        (g + 1) q r ∧
+    emptyGap (Real.exp (-(θ / L))) (coordinateWeight coordMap)
+        (g + 1) q r ≤ (1 + C) * liftedGap α q r := by
+  dsimp
+  let α := Real.exp (-((θ / L) * liveWeightAverage coordMap)) ^ (g + 1)
+  let ε := (θ / L) * 64 + (g : ℝ) * ((θ / L) * 64) ^ 2
+  let C := ((64 * θ + 64 * θ ^ 2) / L) / Real.exp (-θ)
+  have hraw := production_emptyGap_sandwich (θ / L)
+    (div_nonneg hθ hL.le) g q r
+  have hrel : ε / α ≤ C :=
+    production_gap_relative_error_scaled θ L g hθ hL hg
+  have hgap : 0 ≤ liftedGap α q r :=
+    liftedGap_nonneg α (pow_nonneg (Real.exp_pos _).le _) q r
+  constructor
+  · calc
+      (1 - C) * liftedGap α q r ≤
+          (1 - ε / α) * liftedGap α q r := by
+            apply mul_le_mul_of_nonneg_right _ hgap
+            linarith
+      _ ≤ emptyGap (Real.exp (-(θ / L)))
+          (coordinateWeight coordMap) (g + 1) q r := hraw.1
+  · calc
+      emptyGap (Real.exp (-(θ / L)))
+          (coordinateWeight coordMap) (g + 1) q r ≤
+          (1 + ε / α) * liftedGap α q r := hraw.2
+      _ ≤ (1 + C) * liftedGap α q r := by
+            apply mul_le_mul_of_nonneg_right _ hgap
+            linarith
+
 end Spin.UniformMixer

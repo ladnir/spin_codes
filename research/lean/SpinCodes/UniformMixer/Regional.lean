@@ -271,6 +271,11 @@ def liftedGap (α : ℝ) (q r : S) : ℝ :=
   if q = 0 then (if r = 0 then 1 else 0)
   else if r = 0 then 0 else α / (liveCount S : ℝ)
 
+theorem liftedGap_nonneg (α : ℝ) (hα : 0 ≤ α) (q r : S) :
+    0 ≤ liftedGap α q r := by
+  by_cases hq : q = 0 <;> by_cases hr : r = 0 <;>
+    simp [liftedGap, hq, hr, div_nonneg hα (Nat.cast_nonneg _)]
+
 theorem liftedGap_as_JDR (α : ℝ) (q r : S) :
     liftedGap α q r =
       ∑ b : Bool, classLift q b * (if b then α else 1) * classProject b r := by
