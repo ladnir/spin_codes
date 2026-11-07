@@ -145,7 +145,10 @@ polynomial. The production map's spectrum and kernel distance, numerical
 witnesses, the outer-word sum, and distance gates remain open.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
-Identifying its full rank and deriving the RM(2,6) weight facts remain open.
+The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
+proves the production expansion has full rank 22. Formally connecting its
+ANF coefficients to RM(2,6) and deriving the image spectrum and dual
+kernel distance remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
