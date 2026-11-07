@@ -149,6 +149,10 @@ The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
 proves the production expansion has full rank 22. Formally connecting its
 ANF coefficients to RM(2,6) and deriving the image spectrum and dual
 kernel distance remain open.
+The [Boolean-lattice parity lemma](SpinCodes/UniformMixer/Map22SetParity.lean)
+proves the combinatorial cancellation needed for ANF inversion. The
+index-to-subset equivalence and the resulting truth-table reconstruction
+are not yet formalized.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
