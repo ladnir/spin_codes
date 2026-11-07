@@ -113,7 +113,10 @@ their ordered product. The
 applies the checked uniform-permutation comparison to that exact
 nonnegative moment. Under the selected shared Golay–BAA outer event,
 every nonzero message has the weight range needed by this comparison.
-The iid inner estimate, outer-word summation, numerical first-moment
+The [iid Bernoulli step](SpinCodes/UniformMixer/ScalableBernoulliStep.lean)
+defines the exact 64-bit reference input law and proves that its independent
+step kernel is a matrix power. Relating the route's iid reference to this
+step law, the inner estimate, outer-word summation, numerical first-moment
 gates, and finite Turbo certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
