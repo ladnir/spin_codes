@@ -26,7 +26,8 @@ first and a high-offset 256-state block. The
 reuses the prior certificate method on two 1,024-state blocks, including
 the block with the highest input bit set. Its untrusted witness generator
 is [here](scripts/map22_spectrum_data.py). The full production spectrum is
-not yet checked. The [Walsh lemmas](SpinCodes/UniformMixer/QuadraticWalsh.lean)
+now checked by the quadratic route below. The
+[Walsh lemmas](SpinCodes/UniformMixer/QuadraticWalsh.lean)
 prove six-variable character orthogonality, Parseval, and the exact
 conversion between Walsh values and Hamming weight. The
 [quadratic weight bridge](SpinCodes/UniformMixer/QuadraticSpectrumBridge.lean)
@@ -73,11 +74,15 @@ proves that the four measured classes exhaust all 32,768 quadratic parts.
 The [class counts](SpinCodes/UniformMixer/QuadraticSpectrumClassCount.lean),
 [aggregate counts](SpinCodes/UniformMixer/QuadraticSpectrumAggregate.lean),
 and [production transfer](SpinCodes/UniformMixer/QuadraticProductionSpectrum.lean)
-prove exact multiplicities at weights 0, 16, 24, 28, 36, 40, 48, and 64.
-The [spectrum pin](SpinCodes/UniformMixer/QuadraticSpectrumPin.lean) prints
-their statements and axiom dependencies. The weight-32 count and complete
-spectrum identity remain open. Each radical class's weight-32 count is
-checked, but the current global aggregation exhausts Lean's kernel memory.
+prove the eight off-center multiplicities. The
+[support and mass proof](SpinCodes/UniformMixer/QuadraticSpectrumSupport.lean)
+establishes that these and weight 32 are the only possible weights, that
+their counts sum to all `2^22` production states, and that weight 32 has
+multiplicity 1,828,134. It proves the complete exact multiplicity function
+of the actual production map, minimum nonzero output weight 16, and the
+existence of weight-16 words. The
+[spectrum pin](SpinCodes/UniformMixer/QuadraticSpectrumPin.lean) prints
+the final statement and axiom dependencies.
 The
 [Walsh class lemmas](SpinCodes/UniformMixer/QuadraticRankWalshClasses.lean)
 already derive the number, magnitude, and possible weights of the
@@ -206,8 +211,9 @@ on the full-state moment and applies it to an actual selected message.
 The [Bernoulli row identity](SpinCodes/UniformMixer/ScalableMomentSpectrum.lean)
 expresses each live row exactly in terms of the production expansion
 weight and expresses zero return as the actual feedback-kernel weight
-polynomial. The production map's spectrum and kernel distance, numerical
-witnesses, the outer-word sum, and distance gates remain open.
+polynomial. The production image spectrum and its minimum nonzero weight
+are now checked. The dual feedback-kernel distance, numerical witnesses,
+the outer-word sum, and distance gates remain open.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
 The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
@@ -220,13 +226,15 @@ The [production polynomial theorem](SpinCodes/UniformMixer/Map22Polynomial.lean)
 then proves that each actual output coordinate evaluates an ANF of degree
 at most two. The [quadratic code-space equivalence](SpinCodes/UniformMixer/Map22QuadraticSpace.lean)
 counts the 22 allowed monomials and proves that every such polynomial is
-realized by the production expansion. Its image spectrum, minimum live
-weight, and the dual feedback-kernel distance remain open.
+realized by the production expansion. Its image spectrum and minimum
+nonzero output weight are now certified by the quadratic spectrum proof
+above. The dual
+feedback-kernel distance remains open.
 The [packed spectrum pilot](SpinCodes/UniformMixer/Map22Packed.lean) pins the
 old blockwise checker to the production row masks, proves agreement on each
 input basis vector, and checks two 256-state blocks at opposite ends of the
-22-bit input range. It does not yet connect arbitrary packed inputs to
-`coordMap` or certify the complete image spectrum.
+22-bit input range. The later quadratic proof supersedes this pilot and
+certifies the complete image spectrum.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
