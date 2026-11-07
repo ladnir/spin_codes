@@ -288,7 +288,12 @@ identify each actual regional kernel as the fugacity kernel divided by
 `2^Q`, compose the independently sampled regions, and prove low-output
 probability bounds for one and two active outer rows after averaging the
 state maps. Their per-region factors are `1011/2000` and `1011/4000`.
-Counting all outer words and checking the resulting exponents remain open.
+Counting all outer words remains open. The
+[one- and two-row exponent comparison](SpinCodes/UniformMixer/ScalableFixedSmallExponentPin.lean)
+verifies that the resulting candidate bounds inherit the negative gaps from
+the native proof, because the scalable tilts are no larger than the native
+tilts. These candidate bounds are not yet bounds on the full scalable first
+moment; that requires the outer counting bridge.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The

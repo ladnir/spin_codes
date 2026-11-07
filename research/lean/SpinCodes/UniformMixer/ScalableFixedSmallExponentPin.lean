@@ -1,0 +1,11 @@
+import SpinCodes.UniformMixer.ScalableFixedSmallExponent
+
+#check Spin.UniformMixer.scalable_fixed_one_log_gap
+#check Spin.UniformMixer.scalable_fixed_two_log_gap
+#check Spin.UniformMixer.scalableFixedOneBound_eventually
+#check Spin.UniformMixer.scalableFixedTwoBound_eventually
+
+#print axioms Spin.UniformMixer.scalable_fixed_one_log_gap
+#print axioms Spin.UniformMixer.scalable_fixed_two_log_gap
+#print axioms Spin.UniformMixer.scalableFixedOneBound_eventually
+#print axioms Spin.UniformMixer.scalableFixedTwoBound_eventually
