@@ -564,11 +564,21 @@ generated. Port the separate K16 15-state map after that interface works.
   expected packet measure: model the 32-bit field coordinates and
   binary adjoint multiplication, then combine independent column laws
   with this deterministic message count.
+- 2026-11-07: Audited the old `ScalableStepLaw.uniform_state_map_update`
+  transitive-action proof before adding the column-coordinate bridge.
+  `Turbo/ColumnCoordinates.lean` now proves that any zero-preserving
+  bijection from the field to a finite coordinate type transports the
+  uniform nonzero scalar output to a uniform nonzero coordinate word.
+  This theorem has only standard Lean axioms. It is conditional on the
+  coordinate bijection and treats forward multiplication; the actual
+  GF(2^32) tower basis, its binary adjoint map in the transposed kernel,
+  and the count of four-bit packet supports are still open. Do not use
+  this conditional law as the finished sampled outer measure.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--50 at
+  checkpointed build is currently running and had checked Parts 0--51 at
   the last inspection; do not restart it merely to check status. In
   parallel, prove the independent-column expected packet measure and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
