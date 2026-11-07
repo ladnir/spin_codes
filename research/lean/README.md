@@ -256,7 +256,12 @@ The [fixed-row fugacity bridge](SpinCodes/UniformMixer/ScalableFixedFugacityPin.
 sums every subset of marked rows entering a region, proves an upper
 continuum comparison for the actual Scalable regional kernel, and composes
 a conditional weighted bound through any number of regions. Its numerical
-continuum margin and coefficient-extraction step remain open.
+continuum margin remains open.
+The [fixed-row profile bridge](SpinCodes/UniformMixer/ScalableFixedProfilePin.lean)
+expands that fugacity product, identifies each term with the actual regional
+encoder moment, and extracts a prescribed row-weight profile using the
+existing generic coefficient lemma. Its bound still assumes the continuum
+weighted margin; the numerical certificate and outer profile sum remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
