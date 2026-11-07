@@ -268,6 +268,11 @@ the exact weighted action, and reduces that margin to two scalar row
 inequalities. It also checks the zero- and one-active-row continuum formulas.
 The two-row numerical bounds, including the higher-occupation cover, remain
 open.
+The [one-active-row numeric gate](SpinCodes/UniformMixer/ScalableFixedOneNumericPin.lean)
+uses a rational tilt with `regionGamma = 1` to prove a two-state row bound
+and an eventual full-state profile bound under the actual Scalable shuffle.
+Its outer exponent is not yet assembled; the occupation-two and higher
+numeric gates also remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
