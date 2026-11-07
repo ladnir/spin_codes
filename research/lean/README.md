@@ -146,13 +146,15 @@ witnesses, the outer-word sum, and distance gates remain open.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
 The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
-proves the production expansion has full rank 22. Formally connecting its
-ANF coefficients to RM(2,6) and deriving the image spectrum and dual
-kernel distance remain open.
+proves the production expansion has full rank 22.
 The [Boolean-lattice parity lemma](SpinCodes/UniformMixer/Map22SetParity.lean)
-proves the combinatorial cancellation needed for ANF inversion. The
-index-to-subset equivalence and the resulting truth-table reconstruction
-are not yet formalized.
+and [six-bit subset equivalence](SpinCodes/UniformMixer/Map22SubsetEquiv.lean)
+give the [submask parity](SpinCodes/UniformMixer/Map22SubmaskParity.lean)
+used in [ANF reconstruction](SpinCodes/UniformMixer/Map22ANFReconstruct.lean).
+The [production polynomial theorem](SpinCodes/UniformMixer/Map22Polynomial.lean)
+then proves that each actual output coordinate evaluates an ANF of degree
+at most two. A formal RM(2,6) code equivalence, its image spectrum, and
+the dual kernel-distance theorem remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
