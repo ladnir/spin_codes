@@ -43,9 +43,14 @@ proves that fifteen-bit integers enumerate all quadratic parts once and
 that their direct radical count equals the mathematical count. The
 [Boolean polar bridge](SpinCodes/UniformMixer/QuadraticRadicalBoolBridge.lean)
 proves that its six Boolean equations and solution count equal the actual
-quadratic radical for every coefficient vector. A faster six-row rank
-evaluator has a kernel-checked pilot, but its equivalence to this radical
-count is not yet proved. The radical-size distribution, decomposition of
+quadratic radical for every coefficient vector. The
+[packed-row bridge](SpinCodes/UniformMixer/QuadraticRankMatrixBridge.lean)
+identifies every fast evaluator row with a formal polar equation, and the
+[row-operation proof](SpinCodes/UniformMixer/QuadraticRankSoundness.lean)
+shows that one elimination step preserves its zero equations. The six-row
+rank evaluator has a kernel-checked pilot, but the theorem equating its
+pivot count with radical size is not yet proved. The radical-size
+distribution, decomposition of
 every production word into quadratic and affine parts, and full production
 spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
