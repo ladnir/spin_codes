@@ -6,8 +6,8 @@ import SpinCodes.UniformMixer.QuadraticRadicalBoolBridge
 
 The compact rank evaluator uses XOR row elimination. These lemmas give
 its semantic invariant: XORing a pivot into a row preserves that row's
-zero equation whenever the pivot equation holds. The full elimination
-rank theorem remains to be proved.
+zero equation whenever the pivot equation holds. `QuadraticRankActual`
+uses these lemmas in the complete six-column rank proof.
 -/
 
 namespace Spin.UniformMixer

@@ -4,9 +4,8 @@ import SpinCodes.UniformMixer.QuadraticRadicalPacked
 # Fast six-row radical calculation
 
 This is a compact finite evaluator for the rank distribution of the
-quadratic polar forms. It is not yet used as a theorem about the
-production map: the row-mask and elimination correctness bridges to
-`quadraticRadical` are separate obligations.
+quadratic polar forms. `QuadraticRankActual` proves that its result is
+the cardinality of the mathematical quadratic radical.
 -/
 
 namespace Spin.UniformMixer

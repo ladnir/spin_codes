@@ -50,8 +50,11 @@ identifies every fast evaluator row with a formal polar equation, and the
 shows that one elimination step preserves its zero equations. The
 [pivot halving proof](SpinCodes/UniformMixer/QuadraticRankHalving.lean)
 shows that a successful step exactly doubles the residual solution count.
-The six-row rank evaluator has a kernel-checked pilot, but the global
-theorem equating its pivot count with radical size is not yet proved. The
+The [six-step rank proof](SpinCodes/UniformMixer/QuadraticRankActual.lean)
+now equates the fast evaluator with the actual quadratic radical for
+all 32,768 quadratic parts; it includes the descending elimination,
+cleared-column invariant, and final solution count. The evaluator also
+has a kernel-checked pilot. The full
 radical-size distribution, decomposition of every production word into
 quadratic and affine parts, and full production spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
