@@ -283,6 +283,12 @@ also averages over the actual independent outer-row and regional shuffles,
 then over the independently sampled state maps. It turns any two-state
 row gate into a low-output-weight probability bound for a prescribed outer
 row profile. The sum over outer words and its exponent remain open.
+The [fair-row fixed-occupation bounds](SpinCodes/UniformMixer/ScalableFixedFairPin.lean)
+identify each actual regional kernel as the fugacity kernel divided by
+`2^Q`, compose the independently sampled regions, and prove low-output
+probability bounds for one and two active outer rows after averaging the
+state maps. Their per-region factors are `1011/2000` and `1011/4000`.
+Counting all outer words and checking the resulting exponents remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
