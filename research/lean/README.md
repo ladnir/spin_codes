@@ -298,6 +298,13 @@ sampled 22-bit maps. The expected numbers of bad messages with exactly one
 or two active outer rows tend to zero. Higher fixed occupations and the
 sparse and dense regimes remain open; the full scalable minimum-distance
 theorem is not yet closed.
+The [higher-row insertion bridge](SpinCodes/UniformMixer/ScalableFixedLargeGatePin.lean)
+now identifies the Scalable continuum fugacity kernel with a full-site
+insertion average for every fixed occupation. Its impulse is bounded by the
+enlarged impulse used by the Structured SPIN spacing proof. Consequently the
+same spacing estimate proves the Scalable two-state norm gate for every fixed
+occupation at least three. The outer profile count and its slightly different
+tilt exponent still need to be assembled with this gate.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The

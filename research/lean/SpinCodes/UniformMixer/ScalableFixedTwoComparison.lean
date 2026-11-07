@@ -11,33 +11,33 @@ namespace Spin.UniformMixer
 
 open Spin.Structured.Placement MeasureTheory
 
-private def toFinTwo : Matrix Bool Bool ℝ → Matrix (Fin 2) (Fin 2) ℝ :=
+def toFinTwo : Matrix Bool Bool ℝ → Matrix (Fin 2) (Fin 2) ℝ :=
   Matrix.reindexAlgEquiv ℝ ℝ finTwoEquiv.symm
 
-private theorem toFinTwo_mul (A B : Matrix Bool Bool ℝ) :
+theorem toFinTwo_mul (A B : Matrix Bool Bool ℝ) :
     toFinTwo (A * B) = toFinTwo A * toFinTwo B :=
   map_mul (Matrix.reindexAlgEquiv ℝ ℝ finTwoEquiv.symm) A B
 
-private theorem toFinTwo_apply (A : Matrix Bool Bool ℝ)
+theorem toFinTwo_apply (A : Matrix Bool Bool ℝ)
     (i j : Fin 2) :
     toFinTwo A i j = A (finTwoEquiv i) (finTwoEquiv j) := by
   rfl
 
-private theorem toFinTwo_gap (γ u : ℝ) :
+theorem toFinTwo_gap (γ u : ℝ) :
     toFinTwo (timeRegionGap γ u) = timeEmpty γ u := by
   ext i j
   fin_cases i <;> fin_cases j <;>
     norm_num [toFinTwo_apply, finTwoEquiv,
       timeRegionGap, coarseD, timeEmpty]
 
-private theorem toFinTwo_impulse :
+theorem toFinTwo_impulse :
     toFinTwo coarseP =
       !![0, 1; 1 / (liveCount State22 : ℝ),
         1 - 1 / (liveCount State22 : ℝ)] := by
   ext i j
   fin_cases i <;> fin_cases j <;> rfl
 
-private theorem finMatrix_mul_nonneg
+theorem finMatrix_mul_nonneg
     (A B : Matrix (Fin 2) (Fin 2) ℝ)
     (hA : ∀ i j, 0 ≤ A i j) (hB : ∀ i j, 0 ≤ B i j) :
     ∀ i j, 0 ≤ (A * B) i j := by
@@ -45,7 +45,7 @@ private theorem finMatrix_mul_nonneg
   rw [Matrix.mul_apply]
   exact Finset.sum_nonneg (fun k _ => mul_nonneg (hA i k) (hB k j))
 
-private theorem finMatrix_mul_mono
+theorem finMatrix_mul_mono
     (A A' B B' : Matrix (Fin 2) (Fin 2) ℝ)
     (hA : ∀ i j, A i j ≤ A' i j)
     (hB : ∀ i j, B i j ≤ B' i j)
@@ -58,20 +58,20 @@ private theorem finMatrix_mul_mono
   intro k _
   exact mul_le_mul (hA i k) (hB k j) (hB0 k j) (hA' i k)
 
-private theorem scalable_impulse_nonneg :
+theorem scalable_impulse_nonneg :
     ∀ i j, 0 ≤ toFinTwo coarseP i j := by
   rw [toFinTwo_impulse]
   intro i j
   fin_cases i <;> fin_cases j <;>
     norm_num [state22_liveCount]
 
-private theorem plus_impulse_nonneg :
+theorem plus_impulse_nonneg :
     ∀ i j, 0 ≤ Spin.Pplus (1 / 524287) i j := by
   intro i j
   fin_cases i <;> fin_cases j <;>
     norm_num [Spin.Pplus]
 
-private theorem scalable_impulse_le_plus :
+theorem scalable_impulse_le_plus :
     ∀ i j, toFinTwo coarseP i j ≤
       Spin.Pplus (1 / 524287) i j := by
   rw [toFinTwo_impulse]

@@ -1,0 +1,13 @@
+import SpinCodes.UniformMixer.ScalableFixedLargeGate
+
+#check Spin.UniformMixer.scalableSiteProduct_eq
+#check Spin.UniformMixer.scalableFiniteInsertionAverage_eq
+#check Spin.UniformMixer.scalableFugacityTwo_eq_insertion
+#check Spin.UniformMixer.scalableLargeFugacity_le_enlarged
+#check Spin.UniformMixer.scalableLargeNorm_proved
+
+#print axioms Spin.UniformMixer.scalableSiteProduct_eq
+#print axioms Spin.UniformMixer.scalableFiniteInsertionAverage_eq
+#print axioms Spin.UniformMixer.scalableFugacityTwo_eq_insertion
+#print axioms Spin.UniformMixer.scalableLargeFugacity_le_enlarged
+#print axioms Spin.UniformMixer.scalableLargeNorm_proved
