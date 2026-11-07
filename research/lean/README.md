@@ -47,12 +47,13 @@ quadratic radical for every coefficient vector. The
 [packed-row bridge](SpinCodes/UniformMixer/QuadraticRankMatrixBridge.lean)
 identifies every fast evaluator row with a formal polar equation, and the
 [row-operation proof](SpinCodes/UniformMixer/QuadraticRankSoundness.lean)
-shows that one elimination step preserves its zero equations. The six-row
-rank evaluator has a kernel-checked pilot, but the theorem equating its
-pivot count with radical size is not yet proved. The radical-size
-distribution, decomposition of
-every production word into quadratic and affine parts, and full production
-spectrum remain open. The
+shows that one elimination step preserves its zero equations. The
+[pivot halving proof](SpinCodes/UniformMixer/QuadraticRankHalving.lean)
+shows that a successful step exactly doubles the residual solution count.
+The six-row rank evaluator has a kernel-checked pilot, but the global
+theorem equating its pivot count with radical size is not yet proved. The
+radical-size distribution, decomposition of every production word into
+quadratic and affine parts, and full production spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
