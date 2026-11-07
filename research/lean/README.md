@@ -125,8 +125,11 @@ certificates remain open.
 The [weighted-row formulas](SpinCodes/UniformMixer/ScalableWeightedRows.lean)
 identify the zero-state event and bound a live state's individual target
 atoms and return probability under the actual production maps. The
-three-coordinate envelope and its spectrum-based numerical bounds are
-still to be formalized.
+[three-coordinate envelope](SpinCodes/UniformMixer/ScalableEnvelope.lean)
+proves one-step domination for any nonnegative kernel satisfying the
+listed zero, atom, and averaged-row bounds. Its instantiation with the
+Bernoulli step kernel, matrix iteration, and spectrum-based numerical
+bounds remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
