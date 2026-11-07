@@ -143,6 +143,9 @@ expresses each live row exactly in terms of the production expansion
 weight and expresses zero return as the actual feedback-kernel weight
 polynomial. The production map's spectrum and kernel distance, numerical
 witnesses, the outer-word sum, and distance gates remain open.
+The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
+kernel-checks that every production row has Boolean degree at most two.
+Identifying its full rank and deriving the RM(2,6) weight facts remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
