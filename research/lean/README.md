@@ -309,6 +309,11 @@ tilt exponent still need to be assembled with this gate. The
 already transfers the norm gate to the actual sampled route and maps. Its
 tilt exceeds the Structured profile tilt by less than (Q/250000); this
 explicit excess must be charged in the remaining outer count.
+The [profile-count bridge and tilt charge](SpinCodes/UniformMixer/ScalableFixedLargeProfileCountPin.lean)
+prove that every selected outer weight profile contributes its exact
+spectrum multiplicity times one Scalable routed probability. The tilt excess
+costs at most \(\exp(Qb/2000000)\) at the paper's threshold. Summing and
+optimizing those profiles is the next fixed-occupation step.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
