@@ -21,15 +21,20 @@ def scalableRouteFactor (m : ℕ)
   ((bsched m : ℝ) + 1) ^ activeRows rows *
     ((Lsched m : ℝ) + 1) ^ bsched m
 
-def scalableTransferMoment (β z : ℝ)
-    (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) (n : ℕ) : ℝ :=
+def scalableThreeTransfer (β z : ℝ)
+    (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) :
+    Matrix (Fin 3) (Fin 3) ℝ :=
   let H := scalableZeroHold β z hβ0 hβ1
   let G := scalableLiveMoment β z hβ0 hβ1 0 - H
   let F := scalableMaxLiveMoment β z hβ0 hβ1
   let U := scalableMeanLiveMoment β z hβ0 hβ1
   let u := scalableFeedbackActive β hβ0 hβ1
+  weightedTransfer H G F U (min F u) (min U u)
+
+def scalableTransferMoment (β z : ℝ)
+    (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) (n : ℕ) : ℝ :=
   ∑ i : Fin 3,
-    (((weightedTransfer H G F U (min F u) (min U u)) ^ n).mulVec
+    (((scalableThreeTransfer β z hβ0 hβ1) ^ n).mulVec
       ![1, 0, 0]) i
 
 theorem scalable_selected_transfer_moment_bound (m : ℕ)

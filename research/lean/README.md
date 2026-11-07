@@ -135,8 +135,10 @@ both minimum bounds on zero returns. The
 proves the full-state moment bound by the corresponding three-by-three
 matrix power. The [transfer first moment](SpinCodes/UniformMixer/ScalableTransferFirstMoment.lean)
 applies this bound to every nonzero message under a selected shared outer.
-Spectrum-based evaluation, the outer-word sum, and numerical distance
-gates remain open.
+The [positive-vector lemma](SpinCodes/UniformMixer/ScalableTransferCollatz.lean)
+turns any checked Collatz witness for that matrix into a geometric bound
+on the full-state moment. Spectrum-based evaluation, numerical witnesses,
+the outer-word sum, and distance gates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
