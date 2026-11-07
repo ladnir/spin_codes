@@ -54,7 +54,11 @@ The [six-step rank proof](SpinCodes/UniformMixer/QuadraticRankActual.lean)
 now equates the fast evaluator with the actual quadratic radical for
 all 32,768 quadratic parts; it includes the descending elimination,
 cleared-column invariant, and final solution count. The evaluator also
-has a kernel-checked pilot. The full
+has kernel-checked 256-form pilots. The
+[block decomposition](SpinCodes/UniformMixer/QuadraticRankBlocks.lean)
+proves that adjoining histogram blocks sum exactly. A direct 1,024-form
+`decide +kernel` check exceeded the kernel's memory limit, so the full
+histogram still needs bounded-block certificates. The full
 radical-size distribution, decomposition of every production word into
 quadratic and affine parts, and full production spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
