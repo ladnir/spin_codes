@@ -81,8 +81,27 @@ then sums over the exact uniform shuffle law and gives a finite bound
 for every fixed active-support size. The
 [regional limit](SpinCodes/UniformMixer/RegionalLimit.lean) proves the
 uniform asymptotic upper bound for the actual shuffled setup law.
-Composing that bound with the outer/routing analysis and verifying the
-finite Turbo certificates remain open.
+The [Scalable setup](SpinCodes/UniformMixer/ScalableSetup.lean) packages
+the already verified shared Golay–BAA outer and one-bit route with
+independent uniform GL(22,2) state maps. It proves the outer and route
+marginals, the selected-outer failure limit, and an expectation identity
+for routing outer words under the joint law. The
+[one-step law](SpinCodes/UniformMixer/ScalableStepLaw.lean) proves that a
+sampled state map has exactly the transition probability used by the
+regional kernel. The [realized encoder moment](SpinCodes/UniformMixer/ScalableEncoderMoment.lean)
+defines the sampled 64-bit-step encoder and proves its moment recurrence.
+The [encoder–kernel identity](SpinCodes/UniformMixer/ScalableEncoderKernel.lean)
+identifies that moment with the chronological regional kernel for every
+fixed routed support. The
+[full realization](SpinCodes/UniformMixer/ScalableRealization.lean) defines
+the routed encoder weight under the joint setup, with state carried across
+region boundaries. The [flattened-map law](SpinCodes/UniformMixer/ScalableMapLaw.lean)
+shows that the region-by-step map array becomes independent uniform maps
+in encoder order. The [full moment identity](SpinCodes/UniformMixer/ScalableFullMoment.lean)
+integrates the realized output weight over the actual outer, route, and
+inner setup and identifies its moment with the chronological kernel.
+The region-wise kernel comparison, outer/routing bounds, numerical
+first-moment gates, and finite Turbo certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
