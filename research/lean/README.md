@@ -38,8 +38,15 @@ that each quadratic Walsh square is a character sum over its radical.
 The [radical character](SpinCodes/UniformMixer/QuadraticRadical.lean)
 proves the remaining sum is either zero or the radical size and uses
 Parseval to count the nonzero affine Walsh coefficients for each
-quadratic part. The radical-size distribution, decomposition of every
-production word into quadratic and affine parts, and full production
+quadratic part. The [packed quadratic bridge](SpinCodes/UniformMixer/QuadraticRadicalPacked.lean)
+proves that fifteen-bit integers enumerate all quadratic parts once and
+that their direct radical count equals the mathematical count. The
+[Boolean polar bridge](SpinCodes/UniformMixer/QuadraticRadicalBoolBridge.lean)
+proves that its six Boolean equations and solution count equal the actual
+quadratic radical for every coefficient vector. A faster six-row rank
+evaluator has a kernel-checked pilot, but its equivalence to this radical
+count is not yet proved. The radical-size distribution, decomposition of
+every production word into quadratic and affine parts, and full production
 spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column

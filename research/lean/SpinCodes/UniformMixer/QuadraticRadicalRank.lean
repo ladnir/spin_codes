@@ -11,13 +11,16 @@ production map: the row-mask and elimination correctness bridges to
 
 namespace Spin.UniformMixer
 
+def polarRowContribution (q : Nat) (i : Fin 6) (p : Fin 15) : Nat :=
+  if q.testBit p.val then
+    Nat.xor
+      (if pairLeft p = i then 2 ^ (pairRight p).val else 0)
+      (if pairRight p = i then 2 ^ (pairLeft p).val else 0)
+  else 0
+
 def polarRowMask (q : Nat) (i : Fin 6) : Nat :=
-  ∑ p : Fin 15,
-    if q.testBit p.val then
-      if pairLeft p = i then 2 ^ (pairRight p).val
-      else if pairRight p = i then 2 ^ (pairLeft p).val
-      else 0
-    else 0
+  (List.ofFn (fun p : Fin 15 => polarRowContribution q i p)).foldl
+    Nat.xor 0
 
 def polarRows (q : Nat) : List Nat :=
   List.ofFn (fun i : Fin 6 => polarRowMask q i)
