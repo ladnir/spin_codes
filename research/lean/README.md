@@ -157,6 +157,11 @@ at most two. The [quadratic code-space equivalence](SpinCodes/UniformMixer/Map22
 counts the 22 allowed monomials and proves that every such polynomial is
 realized by the production expansion. Its image spectrum, minimum live
 weight, and the dual feedback-kernel distance remain open.
+The [packed spectrum pilot](SpinCodes/UniformMixer/Map22Packed.lean) pins the
+old blockwise checker to the production row masks, proves agreement on each
+input basis vector, and checks two 256-state blocks at opposite ends of the
+22-bit input range. It does not yet connect arbitrary packed inputs to
+`coordMap` or certify the complete image spectrum.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
