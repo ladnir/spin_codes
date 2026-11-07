@@ -48,6 +48,14 @@ but no theorem covers the full 46,317-box domain. The final unconditioned
 distance, rate, and finite Turbo theorems remain open in this revised
 development.
 
+For Turbo SPIN, Lean now checks the value-carrying packet route, its
+22-state inner moment identity, the generic field-scalar action, and the
+RS8 information-set and shortening counts. In particular, zeroing `m ≤ 4`
+selected columns leaves `|F|^(8*(4-m))` outer groups, and the nonzero
+three-zero survivors all have five active columns. These statements do
+not yet identify the concrete GF16/GF(2^32) implementation, establish the
+complete expected packet measure, or close any finite numerical endpoint.
+
 ## Audit of the completed proof
 
 | Previous component | Checked method and lesson | Revised counterpart |
@@ -510,13 +518,25 @@ generated. Port the separate K16 15-state map after that interface works.
   every three-position selection admits one over the concrete eight
   positions, and connecting to the actual GF16 implementation, remain
   separate gates. All new declarations have only standard Lean axioms.
+- 2026-11-07: Generalized the shortening pilot in
+  `Turbo/RS8ShorteningGeneral.lean`. For any `m ≤ 4` distinct selected
+  zero columns, the surviving group messages are in bijection with the
+  `4-m` free 32-bit columns; their count is
+  `|F|^(8*(4-m))`. This gives the exact inclusive counts needed for
+  supports of sizes four through eight. The generic proof and its
+  recursive axiom audit pass. It still stops short of the *exact*
+  `A_5,...,A_8` spectrum: we must formalize extension of arbitrary
+  zero-column sets to four distinct positions and use checked
+  inclusion--exclusion to require the remaining columns to be nonzero.
+  The present proof is the algebraic side of the old enumerator interface;
+  the expected packet measure and first-moment bridge are not yet proved.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--25 at
+  checkpointed build is currently running and had checked Parts 0--29 at
   the last inspection; do not restart it merely to check status. In
-  parallel, derive RS8 shortened-code and support-count identities, pin the
+  parallel, finish RS8 support counts by inclusion--exclusion, pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
   finite audit above before choosing numerical checker data structures.
 
