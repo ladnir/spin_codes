@@ -233,8 +233,12 @@ the full-state Bernoulli moment. The production image spectrum and its minimum
 nonzero weight are checked. The
 [sparse-witness interface](SpinCodes/UniformMixer/ScalableSparseWitness.lean)
 fixes the paper's rational parameters and derives its moment bound from the
-three componentwise numerical inequalities. Those inequalities, the outer-word
-sum, and distance gates remain open.
+three componentwise numerical inequalities. The
+[sparse analytic bounds](SpinCodes/UniformMixer/ScalableSparseBoundsPin.lean)
+check the quadratic zero-to-zero estimate, the zero-to-live and feedback-active
+union bounds, and the fresh-live bound from minimum production weight 16.
+The uniform-live mean bound and final three scalar inequalities remain open,
+as do the outer-word sum and distance gates.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
