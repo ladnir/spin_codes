@@ -270,6 +270,13 @@ coordinates reusable for the fixed expansion. The Scalable image-weight
 spectrum is for Bernoulli bit inputs; it does not itself prove the 17
 packet-activity operators or their 11-state quotient. Those quotient and
 birth-class transitions need an explicit soundness proof.
+`SpinCodes/Turbo/PacketRoute.lean` now carries complete packet values under
+the old independently sampled row and regional permutations. Lean proves
+that taking nonzero-packet support after routing gives exactly
+`ConcreteRoute.routeEval` on the original support, hence the old checked
+`ConcreteRoute.law` applies. It also proves preservation of active-packet
+count. These results use only the standard Lean axioms. They establish the
+route interface, not the RS8 outer measure or finite distance bound.
 (4) Formalize complete-measure domination and a theorem transferring
 reference endpoints only under explicit numerical and route/inner premises.
 (5) Use the old checker pattern: untrusted code emits rational/dyadic data;
@@ -434,6 +441,13 @@ generated. Port the separate K16 15-state map after that interface works.
   difference between authenticated Python receipts and Lean-checked
   endpoints are recorded in the finite gate above. The retained receipts
   are present in the canonical checkout but not in this worktree.
+- 2026-11-07: Added and checked the value-carrying Turbo packet route and
+  its support-law and count bridges. Audited the K18/K20 endpoint producers:
+  their outward physical operators are 17 `11×11` matrices originating in
+  a `2^22` state census, and the independent Python audit authenticates
+  rather than recomputes these inequalities. The finite Lean pilot must
+  therefore prove a local operator bound before checking endpoint sums.
+  The Scalable bulk build remains active and has reached at least Part 12.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
