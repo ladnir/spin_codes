@@ -26,7 +26,12 @@ first and a high-offset 256-state block. The
 reuses the prior certificate method on two 1,024-state blocks, including
 the block with the highest input bit set. Its untrusted witness generator
 is [here](scripts/map22_spectrum_data.py). The full production spectrum is
-not yet checked. The
+not yet checked. The [Walsh lemmas](SpinCodes/UniformMixer/QuadraticWalsh.lean)
+prove six-variable character orthogonality, Parseval, and the exact
+conversion between Walsh values and Hamming weight. The
+[quadratic weight bridge](SpinCodes/UniformMixer/QuadraticSpectrumBridge.lean)
+identifies that weight with the production map. The quadratic-part rank
+counts and resulting full spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
