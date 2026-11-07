@@ -262,6 +262,12 @@ expands that fugacity product, identifies each term with the actual regional
 encoder moment, and extracts a prescribed row-weight profile using the
 existing generic coefficient lemma. Its bound still assumes the continuum
 weighted margin; the numerical certificate and outer profile sum remain open.
+The [two-state fixed-profile bridge](SpinCodes/UniformMixer/ScalableFixedTwoStatePin.lean)
+factors the full-state continuum kernel through zero/live classes, proves
+the exact weighted action, and reduces that margin to two scalar row
+inequalities. It also checks the zero- and one-active-row continuum formulas.
+The two-row numerical bounds, including the higher-occupation cover, remain
+open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
