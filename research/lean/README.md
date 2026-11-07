@@ -252,6 +252,11 @@ regional occupations transfers to all sufficiently large Scalable regions
 and composes across an arbitrary number of them. Its continuum margin is
 still an explicit premise; the fixed-occupation coefficient sum and
 numerical exponent check are not yet discharged.
+The [fixed-row fugacity bridge](SpinCodes/UniformMixer/ScalableFixedFugacityPin.lean)
+sums every subset of marked rows entering a region, proves an upper
+continuum comparison for the actual Scalable regional kernel, and composes
+a conditional weighted bound through any number of regions. Its numerical
+continuum margin and coefficient-extraction step remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The

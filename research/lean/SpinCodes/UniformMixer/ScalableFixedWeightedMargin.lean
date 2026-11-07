@@ -10,7 +10,7 @@ namespace Spin.UniformMixer
 
 open Spin.Structured Spin.Structured.FiniteKernel Filter
 
-private theorem finite_positive_sum {ι : Type*} [Fintype ι]
+theorem finite_positive_sum {ι : Type*} [Fintype ι]
     [Nonempty ι] (w : ι → ℝ) (hw : ∀ i, 0 < w i) :
     0 < ∑ i, w i := by
   classical
