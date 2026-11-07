@@ -244,8 +244,14 @@ and distance gates remain open.
 The [fixed-occupation region bridge](SpinCodes/UniformMixer/ScalableFixedRegionLimitPin.lean)
 transfers the checked full-state continuum limit to the actual Scalable
 region length and shuffle for every fixed support size and arbitrary state
-boundaries. Composing these limits across regions and checking their
-outer-weight exponents remain open.
+boundaries. The continuum weight margins and outer-weight exponents remain
+open.
+The [weighted composition bridge](SpinCodes/UniformMixer/ScalableFixedWeightedMarginPin.lean)
+now proves that any uniform continuum weighted margin for finitely many
+regional occupations transfers to all sufficiently large Scalable regions
+and composes across an arbitrary number of them. Its continuum margin is
+still an explicit premise; the fixed-occupation coefficient sum and
+numerical exponent check are not yet discharged.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
