@@ -221,7 +221,15 @@ the same nine weights. The [live maximum](SpinCodes/UniformMixer/ScalableLiveMax
 is exactly the maximum over the eight realized nonzero weights. The
 [transfer spectrum pin](SpinCodes/UniformMixer/ScalableTransferSpectrumPin.lean)
 checks the statements and axiom dependencies for all four inputs
-`F`, `U`, `H`, and `u`. The production image spectrum and its minimum
+`F`, `U`, `H`, and `u`. The
+[transfer spectrum model](SpinCodes/UniformMixer/ScalableTransferSpectrumModel.lean)
+identifies the actual three-coordinate transfer with these expressions.
+The [spectrum polynomial](SpinCodes/UniformMixer/ScalableSpectrumPolynomial.lean)
+replaces each weight sum with nine explicit terms.
+The [paper orientation bridge](SpinCodes/UniformMixer/ScalableTransferPaperOrientation.lean)
+proves that the paper's displayed transfer is the transpose of the Lean
+column-state transfer and makes its positive-vector witness applicable to
+the full-state Bernoulli moment. The production image spectrum and its minimum
 nonzero weight are checked. Numerical witnesses, the outer-word sum, and
 distance gates remain open; the dual feedback-kernel distance is not yet
 separately certified.
