@@ -356,8 +356,11 @@ occupation range are checked. The new dense modules prove the exact
 fixed-weight density tilt for the sampled 64-bit inner, the finite exponent
 bound, convex reduction to four box vertices, selected-outer profile and
 occupation-layer counts, and decay of the dense sum **conditional on**
-`ScalableDenseRates`. A sound 64-bit fixed-point vertex checker is available,
-but the dense numerical box cover has not yet been imported and verified in
+`ScalableDenseRates`. A sound 64-bit fixed-point vertex checker is available.
+The [dense pilot](SpinCodes/UniformMixer/ScalableDensePilot.lean) checks a
+transfer witness and all four vertices of one rectangle, then proves that
+rectangle reaches the selected-outer rate interface without extra axioms.
+The full dense numerical box cover has not yet been imported and verified in
 Lean. The conditional dense theorem is not the paper's final distance theorem.
 
 The native Structured SPIN distance and rate result is complete. Under the
