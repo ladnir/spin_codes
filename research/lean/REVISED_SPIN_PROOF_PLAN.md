@@ -50,7 +50,7 @@ and finite Turbo theorems remain open in this revised development.
 | --- | --- | --- |
 | `SpinCodes/Cover/` and `scripts/emit_cover.py` | An untrusted search emits an exact split tree and rational data. Lean proves the checker sound and checks every leaf. A monolithic 13,513-leaf check exhausted 16 GB; 44 independent parts worked. | Use chunked checked data for the 46,317-box Scalable dense cover. Never emit one giant term or one theorem per vertex without a resource trial. |
 | `SpinCodes/Structured/DenseOccupationGeometry*.lean` | Rational rectangles and a split tree are checked independently of the numerical family. `global_cover` proves coverage of all real parameters. | Reuse the `Rect`/`Tree` definitions and soundness argument if their performance scales; partition into independently checked subtrees if needed. |
-| `SpinCodes/Structured/DenseFourierExactW*` and `DenseFourierExactB*` | Generated rational Collatz witnesses, four fixed-point vertex checks, support membership, and a per-box rate theorem. Witnesses are shared across boxes; a uniform prefactor is established before assembly. | Use the three-state `paperSpectrumTransfer` and its actual production spectrum. The old seven-coordinate IMT matrix and divisor 128 do not apply; the new exponent has divisor 64. |
+| `SpinCodes/Structured/DenseFourierExactW*`, `DenseFourierExactCheck.lean`, and `DenseFourierExactB*` | The transfer/Collatz inequalities use exact integer cross multiplication with rational parameters and integer vectors; only the logarithm/KL vertices use fixed-point intervals. Witnesses are shared across boxes; a uniform prefactor is established before assembly. | Use the three-state `paperSpectrumTransfer` and its actual production spectrum. Preserve exact transfer checking, rather than forcing tiny matrix entries onto the `10^30` fixed-point grid. The old seven-coordinate IMT matrix and divisor 128 do not apply; the new exponent has divisor 64. |
 | `SpinCodes/Structured/DenseGeometryRate.lean` and `DenseOccupationMixedCertified.lean` | Checked boxes, exact geometry, and per-family bounds become a full `DenseRates` theorem. | Prove `ScalableDenseRates η C` with a positive uniform `C` and a checked `η`, then feed the existing conditional dense assembly. |
 | `SpinCodes/Structured/ConcreteNativeTheorem.lean` and `SpinCodes.Native` | The proof pays the selected-outer failure once and connects first moments to the original product setup law and minimum distance. Final declarations are audited for recursive axioms. | Adapt the generic first-moment and selection argument to `scalableSetupLaw`; do not import the old IMT encoder conclusion as the revised result. |
 
@@ -112,6 +112,29 @@ an estimate for the full cover. The generator should cache transfer checks
 by witness and vertex checks by the full witness/coordinate tuple; adjacent
 boxes can share corners. Test a larger chunk before fixing module sizes.
 
+**Correction after a mixed-witness test:** the first fixed-point transfer
+checker works on the hard and first shared-bank witnesses, but a fallback
+witness has a coordinate about `8.6e9`. Rounding a tiny transfer entry at
+`10^30` creates a row error about `5.2e-21`, too large for this box's
+`1e-7` exponent margin. All four exponent vertices still pass. A closer
+inspection of `DenseFourierExactCheck.lean` showed that the old completed
+proof avoided this issue by exact integer cross multiplication for Collatz.
+The initial audit recorded rational witnesses but missed the importance of
+that *exact* arithmetic. The next checker should copy that separation of
+responsibilities: exact rational transfer, fixed-point transcendental
+vertices. Do not compensate for this failure by widening `ρ` until the
+exponent fails.
+
+**Exact replacement proved:** `ScalableDenseTransferExactDefs.lean` evaluates
+the production three-state matrix in `ℚ`, and
+`ScalableDenseTransferExact.lean` proves its three-row Boolean check sound
+against `paperSpectrumTransfer`. The generic `ScalableDenseLeaf.lean` now
+uses this checker, while leaving KL/log vertex checks on the old fixed-point
+path. `ScalableDenseMixedPilot.lean` checks a fallback witness with the large
+coordinate and reaches `ScalableDensePointRate` with the actual outer support.
+The hard pilot also passes through the exact generic leaf. Both point-rate
+theorems list only standard Lean axioms.
+
 ### Gate 3: complete geometry and resource control
 
 Have the generator retain the exact split decisions and accepted boxes.
@@ -166,11 +189,18 @@ Turbo margin.
   transfer and eight vertices pass Lean. A small timing control showed about
   four seconds beyond module import. The 98 initial witness-bank radii range
   from about `1e-16` to `1`, within the `10^30` fixed-point resolution.
-- Next action: emit a larger mixed-witness sample and invoke the generic
-  leaf theorem for each box, with transfer and vertex checks shared. Measure
-  time, memory, and `.olean` size; then adapt the old exact split-tree
-  coverage method and choose independently compiled chunk sizes. Keep the
-  final sampled-setup theorem and finite Turbo certificate as separate gates.
+- 2026-11-07: A second, locally optimized witness exposed a fixed-point
+  transfer failure from a large Collatz coordinate despite passing vertices.
+  Re-audited the old exact Fourier checker and found its integer
+  cross-multiplication strategy. This is now the preferred transfer path.
+- 2026-11-07: The new exact rational checker and its soundness theorem
+  compile. The mixed witness now gives a fully checked point-rate rectangle;
+  the generic leaf and hard pilot also compile against the exact predicate.
+- Next action: make the untrusted generator emit shared exact witnesses,
+  vertex data, and the exact split tree; compile a larger mixed-witness
+  chunk to choose resource limits. Then assemble the full Scalable dense
+  cover and final sampled-setup theorem. Keep finite Turbo as its separate
+  gate.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

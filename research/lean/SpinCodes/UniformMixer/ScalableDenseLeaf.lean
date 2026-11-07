@@ -1,4 +1,4 @@
-import SpinCodes.UniformMixer.ScalableDenseTransferEval
+import SpinCodes.UniformMixer.ScalableDenseTransferExact
 import SpinCodes.UniformMixer.ScalableDenseVertex
 import SpinCodes.UniformMixer.ScalableDenseRateDefs
 
@@ -14,8 +14,6 @@ theorem scalable_dense_checked_leaf
     (s c p y ρ z a₀ a₁ x₀ x₁ : QInput)
     (v : Fin 3 → QInput) (C : ℝ)
     (hs : 0 < s.den) (hc : 0 < c.den)
-    (hp : 0 < p.den) (hy : 0 < y.den)
-    (hρd : 0 < ρ.den) (hzd : 0 < z.den)
     (ha₀ : 0 < a₀.den) (ha₁ : 0 < a₁.den)
     (hx₀ : 0 < x₀.den) (hx₁ : 0 < x₁.den)
     (hp0 : 0 < p.num) (hp1 : p.num < p.den)
@@ -25,10 +23,11 @@ theorem scalable_dense_checked_leaf
     (hρ0 : 0 < ρ.real) (hz0 : 0 < z.real) (hz1 : z.real ≤ 1)
     (ha0 : 0 < a₀.real) (ha1 : a₁.real ≤ 1)
     (hx0 : 0 < x₀.real) (hx1 : x₁.real ≤ 1)
-    (hvd : ∀ i, 0 < (v i).den)
     (hC : 0 ≤ C) (hones : ∀ i, (1 : ℝ) ≤ C * (v i).real)
-    (ht : transferCheck (Fix.mul p.interval y.interval)
-      z.interval ρ.interval (fun i => (v i).interval) = true)
+    (ht : transferRatCheck
+      (transferQInputRat p * transferQInputRat y)
+      (transferQInputRat z) (transferQInputRat ρ)
+      (fun i => transferQInputRat (v i)) = true)
     (h00 : scalableVertexCheck s c p y ρ z a₀ x₀ 50
       (-100000000000000000000000) = true)
     (h01 : scalableVertexCheck s c p y ρ z a₀ x₁ 50
@@ -45,20 +44,21 @@ theorem scalable_dense_checked_leaf
   have htransfer : ∀ i,
       (paperSpectrumTransfer (p.real * y.real) z.real).mulVec
         (fun j => (v j).real) i ≤ ρ.real * (v i).real := by
-    apply transferCheck_sound (v := fun i => (v i).interval)
-      (w := fun i => (v i).real)
-      (Fix.mul_mem (p.interval_mem hp) (y.interval_mem hy))
-      (z.interval_mem hzd) (ρ.interval_mem hρd)
-    · exact mul_nonneg hpr0.le hyr0.le
-    · calc
+    have hb0 : 0 ≤ p.real * y.real := mul_nonneg hpr0.le hyr0.le
+    have hb1 : p.real * y.real ≤ 1 := by
+      calc
         p.real * y.real ≤ 1 * y.real :=
           mul_le_mul_of_nonneg_right hpr1.le hyr0.le
         _ = y.real := one_mul _
         _ ≤ 1 := hyr1.le
-    · exact hz0.le
-    · intro i
-      exact (v i).interval_mem (hvd i)
-    · exact ht
+    have h := transferRatCheck_sound
+      (transferQInputRat p * transferQInputRat y)
+      (transferQInputRat z) (transferQInputRat ρ)
+      (fun i => transferQInputRat (v i))
+      (by simpa [transferQInputRat_cast] using hb0)
+      (by simpa [transferQInputRat_cast] using hb1)
+      (by simpa [transferQInputRat_cast] using hz0.le) ht
+    simpa [transferQInputRat_cast] using h
   have corner (a x : QInput) (had : 0 < a.den) (hxd : 0 < x.den)
       (h : scalableVertexCheck s c p y ρ z a x 50
         (-100000000000000000000000) = true) :

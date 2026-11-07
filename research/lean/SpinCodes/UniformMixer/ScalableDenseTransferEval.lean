@@ -181,7 +181,7 @@ theorem transferMin_mem {a b : Fix} {x y : ℝ}
   · rw [← min_div_div_right (le_of_lt scaleR_pos)]
     exact min_le_min ha.2 hb.2
 
-private theorem paperSpectrumTransfer_components (b z : ℝ)
+theorem paperSpectrumTransfer_components (b z : ℝ)
     (w : Fin 3 → ℝ) (i : Fin 3) :
     (paperSpectrumTransfer b z).mulVec w i =
       if i = 0 then spectrumH b z * w 0 + spectrumG b z * w 1

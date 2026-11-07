@@ -217,6 +217,8 @@ def main():
                         help="include the tightest accepted box and its proposal")
     parser.add_argument("--sample-accepted", type=int, default=0,
                         help="report this many initial accepted boxes for Lean pilots")
+    parser.add_argument("--sample-witnesses", type=int, default=0,
+                        help="report initial accepted boxes with distinct witnesses")
     args = parser.parse_args()
     assert args.precision >= 128
     ctx.prec = args.precision
@@ -228,6 +230,7 @@ def main():
     largest_upper = None
     hard_box = None
     samples = []
+    distinct_samples = {}
     unresolved = None
     while pending and processed < args.max_boxes:
         box = pending.pop()
@@ -241,6 +244,8 @@ def main():
                 accepted += 1
                 if len(samples) < args.sample_accepted:
                     samples.append((box, witnesses[index], index))
+                if len(distinct_samples) < args.sample_witnesses:
+                    distinct_samples.setdefault(index, (box, witnesses[index], index))
                 if largest_upper is None or bound > largest_upper:
                     largest_upper = bound
                     hard_box = (box, witnesses[index], index)
@@ -257,6 +262,9 @@ def main():
                 accepted += 1
                 if len(samples) < args.sample_accepted:
                     samples.append((box, witness, len(witnesses)))
+                if len(distinct_samples) < args.sample_witnesses:
+                    distinct_samples.setdefault(len(witnesses),
+                                                (box, witness, len(witnesses)))
                 if largest_upper is None or bound > largest_upper:
                     largest_upper = bound
                     hard_box = (box, witness, len(witnesses))
@@ -292,15 +300,22 @@ def main():
             "proposal_p_y_lambda": [str(value) for value in witness],
             "rational_pilot": rational_hard_witness(box, witness),
         }
-    if samples:
-        report["sampled_boxes"] = [{
+    def report_sample(sample):
+        box, witness, index = sample
+        return {
             "alpha": [str(box.alo), str(box.ahi)],
             "row_density": [str(box.xlo), str(box.xhi)],
             "outer_line": [str(box.slope), str(box.intercept)],
             "witness_index": index,
             "proposal_p_y_lambda": [str(value) for value in witness],
             "rational_pilot": rational_hard_witness(box, witness),
-        } for box, witness, index in samples]
+        }
+    if samples:
+        report["sampled_boxes"] = [report_sample(sample)
+                                   for sample in samples]
+    if distinct_samples:
+        report["distinct_witness_boxes"] = [report_sample(sample)
+            for sample in distinct_samples.values()]
     print(json.dumps(report))
     if pending or unresolved is not None:
         raise SystemExit(1)

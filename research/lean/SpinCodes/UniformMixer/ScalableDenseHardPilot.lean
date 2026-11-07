@@ -29,6 +29,13 @@ private theorem hard_transfer_check :
       hardZ.interval hardRadius.interval hardVectorFix = true := by
   decide +kernel
 
+private theorem hard_transfer_exact :
+    transferRatCheck
+      (transferQInputRat hardP * transferQInputRat hardY)
+      (transferQInputRat hardZ) (transferQInputRat hardRadius)
+      (fun i => transferQInputRat (hardVector i)) = true := by
+  decide +kernel
+
 #print axioms hard_transfer_check
 
 private theorem hard_transfer :
@@ -162,7 +169,6 @@ private theorem hard_pointRate_via_leaf {α x : ℝ}
     hardP hardY hardRadius hardZ hardA0 hardA1 hardX0 hardX1
     hardVector 1
     (by decide) (by decide) (by decide) (by decide)
-    (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
     (by norm_num [hardP, QInput.real])
@@ -176,11 +182,10 @@ private theorem hard_pointRate_via_leaf {α x : ℝ}
     (by norm_num [hardA1, QInput.real])
     (by norm_num [hardX0, QInput.real])
     (by norm_num [hardX1, QInput.real])
-    (by intro i; fin_cases i <;> decide)
     (by norm_num : (0 : ℝ) ≤ 1)
     (by intro i; fin_cases i <;> norm_num
       [hardVector, hardV0, hardV1, hardV2, QInput.real])
-    (by exact hard_transfer_check)
+    (by exact hard_transfer_exact)
     hard_vertex00 hard_vertex01 hard_vertex10 hard_vertex11 hα hx
   simpa [hardVector, hardV0, QInput.real] using h
 
@@ -198,6 +203,7 @@ theorem scalable_dense_hard_pilot_coverage {α x : ℝ}
     (hard_pointRate_via_leaf hα hx)
 
 #print axioms hard_pointRate
+#print axioms hard_transfer_exact
 #print axioms hard_pointRate_via_leaf
 #print axioms scalable_dense_hard_pilot_coverage
 
