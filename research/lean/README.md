@@ -137,8 +137,12 @@ matrix power. The [transfer first moment](SpinCodes/UniformMixer/ScalableTransfe
 applies this bound to every nonzero message under a selected shared outer.
 The [positive-vector lemma](SpinCodes/UniformMixer/ScalableTransferCollatz.lean)
 turns any checked Collatz witness for that matrix into a geometric bound
-on the full-state moment. Spectrum-based evaluation, numerical witnesses,
-the outer-word sum, and distance gates remain open.
+on the full-state moment and applies it to an actual selected message.
+The [Bernoulli row identity](SpinCodes/UniformMixer/ScalableMomentSpectrum.lean)
+expresses each live row exactly in terms of the production expansion
+weight and expresses zero return as the actual feedback-kernel weight
+polynomial. The production map's spectrum and kernel distance, numerical
+witnesses, the outer-word sum, and distance gates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 

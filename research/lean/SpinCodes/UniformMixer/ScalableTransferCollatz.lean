@@ -12,6 +12,9 @@ noncomputable section
 
 namespace Spin.UniformMixer
 
+open Spin.Structured Spin.Structured.ConcreteOuter
+  Spin.Structured.ConcreteNativeFamily Spin.Structured.ConcreteRoute
+
 theorem nonnegative_mulVec_mono
     (T : Matrix (Fin 3) (Fin 3) ℝ)
     (hT : ∀ i j, 0 ≤ T i j)
@@ -109,6 +112,45 @@ theorem scalable_bernoulli_collatz_bound (β z : ℝ)
     _ ≤ scalableTransferMoment β z hβ0 hβ1 n :=
       scalable_bernoulli_transfer_bound β z hβ0 hβ1 hz0 hz1 n
     _ ≤ c * ρ ^ n * ∑ i : Fin 3, v i := by
+      exact transfer_collatz_total _
+        (scalableThreeTransfer_nonneg β z hβ0 hβ1 hz0 hz1)
+        v ![1, 0, 0] c ρ hc hρ he hv n
+
+/-- A positive witness for the actual three-coordinate transfer bounds
+the routed moment of each message under the selected shared outer. -/
+theorem scalable_selected_collatz_moment_bound (m : ℕ)
+    {z : ℝ} (hz0 : 0 ≤ z) (hz1 : z ≤ 1)
+    {out : NativeSeed m} (hg : nativeGood m out)
+    {message : Fin (Nsched m / 2) → Bool} (hm : message ≠ 0)
+    (v : Fin 3 → ℝ) (c ρ : ℝ)
+    (hc : 0 ≤ c) (hρ : 0 ≤ ρ)
+    (he : ∀ i, (![1, 0, 0] : Fin 3 → ℝ) i ≤ c * v i)
+    (hv : ∀ i,
+      (scalableThreeTransfer
+        (density (nativeRows m out message)) z
+        (density_nonneg (nativeRows m out message))
+        (density_le_one (Lsched_pos m) (bsched_pos m)
+          (nativeRows m out message))).mulVec v i ≤ ρ * v i) :
+    (law (nativeRows m out message)).expect
+      (scalableRoutedMoment m z) ≤
+    scalableRouteFactor m (nativeRows m out message) *
+      (c * ρ ^ (bsched m * scalableStepsPerRegion m) *
+        ∑ i : Fin 3, v i) := by
+  let rows := nativeRows m out message
+  let β := density rows
+  let hβ0 := density_nonneg rows
+  let hβ1 := density_le_one (Lsched_pos m) (bsched_pos m) rows
+  let n := bsched m * scalableStepsPerRegion m
+  have hfactor : 0 ≤ scalableRouteFactor m rows := by
+    unfold scalableRouteFactor
+    positivity
+  calc
+    _ ≤ scalableRouteFactor m rows *
+        scalableTransferMoment β z hβ0 hβ1 n :=
+      scalable_selected_transfer_moment_bound m hz0 hz1 hg hm
+    _ ≤ scalableRouteFactor m rows *
+        (c * ρ ^ n * ∑ i : Fin 3, v i) := by
+      apply mul_le_mul_of_nonneg_left _ hfactor
       exact transfer_collatz_total _
         (scalableThreeTransfer_nonneg β z hβ0 hβ1 hz0 hz1)
         v ![1, 0, 0] c ρ hc hρ he hv n
