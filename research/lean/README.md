@@ -314,8 +314,13 @@ costs at most \(\exp(Qb/2000000)\) at the paper's threshold. The
 reuses the selected outer's shell count to sum every profile and occupation
 layer. Its expected number of bad messages tends to zero for each fixed
 positive number of active outer rows under the actual Scalable setup. This
-is a pointwise-in-\(Q\) result; the growing sparse and dense occupation
-ranges remain open.
+is a pointwise-in-\(Q\) result. The
+[growing sparse endpoint](SpinCodes/UniformMixer/ScalableSparseFinalPin.lean)
+compares the selected outer's message count with fair active rows, removes
+the mark-count conditioning, and applies the certified 64-bit sparse
+transfer contraction. Uniformly for \(4096\le Q\le L/10000\), the expected
+bad-message count is at most \(e^{-0.006Qb}\); the sum over this growing
+interval tends to zero. The dense occupation range remains open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
