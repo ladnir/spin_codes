@@ -211,8 +211,11 @@ on the full-state moment and applies it to an actual selected message.
 The [Bernoulli row identity](SpinCodes/UniformMixer/ScalableMomentSpectrum.lean)
 expresses each live row exactly in terms of the production expansion
 weight and expresses zero return as the actual feedback-kernel weight
-polynomial. The production image spectrum and its minimum nonzero weight
-are now checked. The dual feedback-kernel distance, numerical witnesses,
+polynomial. The [exact spectrum summation](SpinCodes/UniformMixer/ScalableMomentSpectrumExact.lean)
+now converts any production weight function into the nine checked
+multiplicities and gives the exact mean live-row moment. The production
+image spectrum and its minimum nonzero weight are checked. The dual
+feedback-kernel distance, numerical witnesses,
 the outer-word sum, and distance gates remain open.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
