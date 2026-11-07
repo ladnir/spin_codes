@@ -295,25 +295,27 @@ the native proof, because the scalable tilts are no larger than the native
 tilts. The [selected-outer counting bridge](SpinCodes/UniformMixer/ScalableFixedSelectedPin.lean)
 then applies the existing Golay–BAA spectrum lemma to the actual route and
 sampled 22-bit maps. The expected numbers of bad messages with exactly one
-or two active outer rows tend to zero. Higher fixed occupations and the
-sparse and dense regimes remain open; the full scalable minimum-distance
-theorem is not yet closed.
+or two active outer rows tend to zero.
 The [higher-row insertion bridge](SpinCodes/UniformMixer/ScalableFixedLargeGatePin.lean)
 now identifies the Scalable continuum fugacity kernel with a full-site
 insertion average for every fixed occupation. Its impulse is bounded by the
 enlarged impulse used by the Structured SPIN spacing proof. Consequently the
 same spacing estimate proves the Scalable two-state norm gate for every fixed
-occupation at least three. The outer profile count and its slightly different
-tilt exponent still need to be assembled with this gate. The
+occupation at least three. The
 [routed higher-row profile bound](SpinCodes/UniformMixer/ScalableFixedLargeRoutePin.lean)
 already transfers the norm gate to the actual sampled route and maps. Its
 tilt exceeds the Structured profile tilt by less than (Q/250000); this
-explicit excess must be charged in the remaining outer count.
+explicit excess is charged in the outer count.
 The [profile-count bridge and tilt charge](SpinCodes/UniformMixer/ScalableFixedLargeProfileCountPin.lean)
 prove that every selected outer weight profile contributes its exact
 spectrum multiplicity times one Scalable routed probability. The tilt excess
-costs at most \(\exp(Qb/2000000)\) at the paper's threshold. Summing and
-optimizing those profiles is the next fixed-occupation step.
+costs at most \(\exp(Qb/2000000)\) at the paper's threshold. The
+[fixed-occupation endpoint](SpinCodes/UniformMixer/ScalableFixedLargeFinalPin.lean)
+reuses the selected outer's shell count to sum every profile and occupation
+layer. Its expected number of bad messages tends to zero for each fixed
+positive number of active outer rows under the actual Scalable setup. This
+is a pointwise-in-\(Q\) result; the growing sparse and dense occupation
+ranges remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
