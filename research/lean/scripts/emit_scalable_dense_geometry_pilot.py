@@ -1,0 +1,405 @@
+"""Emit one bounded Lean geometry subtree from the Scalable candidate.
+
+The generated `by decide +kernel` proof checks the source data again in Lean.
+This is a resource pilot, not the full cover.
+"""
+
+from __future__ import annotations
+
+import argparse
+from fractions import Fraction as Q
+import json
+from pathlib import Path
+
+import fixmirror as F
+
+
+def rat(value: str) -> str:
+    x = Q(value)
+    return f"({x.numerator} / {x.denominator} : ℚ)"
+
+
+def qinput(value: str) -> str:
+    x = Q(value)
+    return f"⟨{x.numerator}, {x.denominator}⟩"
+
+
+def fixed(value: tuple[int, int]) -> str:
+    return f"⟨{value[0]}, {value[1]}⟩"
+
+
+def kl_interval(u: str, v: str) -> tuple[int, int]:
+    un, ud = Q(u).as_integer_ratio()
+    vn, vd = Q(v).as_integer_ratio()
+
+    def term(a: int, b: int) -> tuple[int, int]:
+        if a == 0:
+            return F.ZERO
+        lg = F.flogQ(a * vd, ud * b, 50)
+        assert lg is not None
+        return F.mul(F.ofFrac(a, ud), lg)
+
+    return F.add(term(un, vn), term(ud - un, vd - vn))
+
+
+def emit(candidate: Path, destination: Path, max_leaves: int,
+         numeric_destination: Path | None = None,
+         full_claim: bool = False,
+         selected_node: int | None = None,
+         cached: bool = False,
+         selected_box: int | None = None) -> dict:
+    payload = json.loads(candidate.read_text(encoding="utf-8"))
+    assert payload["status"] == "candidate_complete"
+    nodes = payload["nodes"]
+    boxes = payload["boxes"]
+    counts = [None] * len(nodes)
+
+    def count(index: int) -> int:
+        if counts[index] is not None:
+            return counts[index]
+        node = nodes[index]
+        result = (1 if node["kind"] == "leaf" else
+                  count(node["left"]) + count(node["right"]))
+        counts[index] = result
+        return result
+
+    if selected_box is not None:
+        assert selected_node is None
+        parents = {}
+        box_nodes = {}
+        for index, node in enumerate(nodes):
+            if node["kind"] == "leaf":
+                box_nodes[node["box"]] = index
+            else:
+                parents[node["left"]] = index
+                parents[node["right"]] = index
+        selected_node = box_nodes[selected_box]
+        while (selected_node in parents and
+               count(parents[selected_node]) <= max_leaves):
+            selected_node = parents[selected_node]
+
+    best = None
+
+    def consider(index: int, rect: tuple[Q, ...]) -> None:
+        nonlocal best
+        size = count(index)
+        if size <= max_leaves:
+            if best is None or size > best[0]:
+                best = (size, index, rect)
+            return
+        node = nodes[index]
+        alo, ahi, xlo, xhi = rect
+        cut = Q(node["cut"])
+        if node["kind"] == "alpha":
+            consider(node["left"], (alo, cut, xlo, xhi))
+            consider(node["right"], (cut, ahi, xlo, xhi))
+        else:
+            consider(node["left"], (alo, ahi, xlo, cut))
+            consider(node["right"], (alo, ahi, cut, xhi))
+
+    alo, ahi = map(Q, payload["domain"]["alpha"])
+    if selected_node is None:
+        for root in payload["roots"]:
+            consider(root["node"], (alo, ahi, Q(root["xlo"]), Q(root["xhi"])))
+    else:
+        def locate(index: int, rect: tuple[Q, ...]) -> None:
+            nonlocal best
+            if index == selected_node:
+                best = (count(index), index, rect)
+                return
+            node = nodes[index]
+            if node["kind"] == "leaf":
+                return
+            a0, a1, x0, x1 = rect
+            cut = Q(node["cut"])
+            if node["kind"] == "alpha":
+                locate(node["left"], (a0, cut, x0, x1))
+                locate(node["right"], (cut, a1, x0, x1))
+            else:
+                locate(node["left"], (a0, a1, x0, cut))
+                locate(node["right"], (a0, a1, cut, x1))
+        for root in payload["roots"]:
+            locate(root["node"],
+                   (alo, ahi, Q(root["xlo"]), Q(root["xhi"])))
+    assert best is not None
+    size, root_index, rect = best
+    assert size <= max_leaves
+    local_boxes = []
+    leaf_local_index = {}
+
+    def tree(index: int) -> str:
+        node = nodes[index]
+        if node["kind"] == "leaf":
+            local_boxes.append(boxes[node["box"]])
+            leaf_local_index[index] = len(local_boxes) - 1
+            return f"(.leaf {leaf_local_index[index]})"
+        constructor = ".alpha" if node["kind"] == "alpha" else ".density"
+        left = tree(node["left"])
+        right = tree(node["right"])
+        return f"({constructor} {rat(node['cut'])} {left} {right})"
+
+    tree_text = tree(root_index)
+    assert len(local_boxes) == size
+    rect_text = ", ".join(rat(str(x)) for x in rect)
+    box_text = ",\n".join("  ⟨" + ", ".join(
+        rat(v) for v in (*box["alpha"], *box["row_density"])) + "⟩"
+        for box in local_boxes)
+    source = f"""import SpinCodes.Structured.DenseOccupationGeometry
+
+/-! Generated by `emit_scalable_dense_geometry_pilot.py` from a candidate.
+    The root has {size} leaves. The data are checked below by Lean. -/
+
+namespace Spin.UniformMixer.ScalableDenseGeometryPilot
+
+open Spin.Structured.DenseGeometry
+
+set_option maxRecDepth 8192
+set_option maxHeartbeats 1000000
+
+def root : Rect := ⟨{rect_text}⟩
+
+def boxes : List Rect := [
+{box_text}
+]
+
+def tree : Tree := {tree_text}
+
+theorem checked : check boxes tree root = true := by decide +kernel
+
+theorem covers {{α x : ℝ}} (h : root.Contains α x) :
+    ∃ i, i < boxes.length ∧ (boxes.getD i zeroRect).Contains α x :=
+  check_sound boxes tree checked h
+
+#print axioms checked
+#print axioms covers
+
+end Spin.UniformMixer.ScalableDenseGeometryPilot
+"""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(source.encode("utf-8"))
+    report = {"leaves": size, "root_node": root_index,
+              "source_bytes": destination.stat().st_size,
+              "witnesses": len({b["witness"] for b in local_boxes}),
+              "destination": str(destination)}
+    if numeric_destination is not None:
+        numeric_namespace = (numeric_destination.stem if full_claim
+                             else "ScalableDenseNumericPilot")
+        line = tuple(local_boxes[0]["outer_line"])
+        assert all(tuple(box["outer_line"]) == line for box in local_boxes)
+        used = sorted({box["witness"] for box in local_boxes})
+        numeric = ["import SpinCodes.UniformMixer.ScalableDenseLeaf" if full_claim
+                   else "import SpinCodes.UniformMixer.ScalableDenseTransferExactDefs",
+                   "import SpinCodes.UniformMixer.ScalableDenseCoverCore" if full_claim
+                   else "import SpinCodes.UniformMixer.ScalableDenseVertex",
+                   "import SpinCodes.UniformMixer.ScalableDenseVertexCached" if cached
+                   else "", "",
+                   "/-! Generated numerical resource pilot; Lean checks every proposition. -/",
+                   "", f"namespace Spin.UniformMixer.{numeric_namespace}", "",
+                   "open Spin.Numeric",
+                   "open Spin.Structured.DenseOccupationFixed",
+                   "open Spin.Structured.DenseGeometry", "",
+                   "set_option maxRecDepth 8192",
+                   "set_option maxHeartbeats 1000000", "",
+                   f"private def slope : QInput := {qinput(line[0])}",
+                   f"private def intercept : QInput := {qinput(line[1])}", ""]
+        for wid in used:
+            witness = payload["witnesses"][str(wid)]
+            for field, key in (("P", "p"), ("Y", "y"),
+                               ("Z", "z"), ("Radius", "rho")):
+                numeric.append(f"private def w{wid}{field} : QInput := "
+                               f"{qinput(witness[key])}")
+            vector = ", ".join(qinput(v) for v in witness["vector"])
+            numeric.extend([
+                f"private def w{wid}Vector : Fin 3 → QInput := ![{vector}]",
+                f"private theorem w{wid}Transfer :",
+                "    transferRatCheck",
+                f"      (transferQInputRat w{wid}P * transferQInputRat w{wid}Y)",
+                f"      (transferQInputRat w{wid}Z) "
+                f"(transferQInputRat w{wid}Radius)",
+                f"      (fun i => transferQInputRat (w{wid}Vector i)) = true := by",
+                "  decide +kernel", ""])
+        vertices = sorted({(box["witness"], alpha, x)
+            for box in local_boxes for alpha in box["alpha"]
+            for x in box["row_density"]})
+        vertex_number = {vertex: i for i, vertex in enumerate(vertices)}
+        if cached:
+            alpha_terms = sorted({(wid, alpha) for wid, alpha, _ in vertices})
+            density_terms = sorted({(wid, x) for wid, _, x in vertices})
+            alpha_number = {key: i for i, key in enumerate(alpha_terms)}
+            density_number = {key: i for i, key in enumerate(density_terms)}
+            for wid in used:
+                witness = payload["witnesses"][str(wid)]
+                for suffix, field in (("Radius", "rho"), ("Z", "z")):
+                    value = Q(witness[field])
+                    interval = F.flogQ(value.numerator, value.denominator, 50)
+                    assert interval is not None
+                    numeric.extend([
+                        f"private def w{wid}{suffix}Log : Fix := {fixed(interval)}",
+                        f"private theorem w{wid}{suffix}Log_ok :",
+                        f"    Fix.flogQ w{wid}{suffix}.num w{wid}{suffix}.den 50 =",
+                        f"      some w{wid}{suffix}Log := by decide +kernel", ""])
+            for i, (wid, alpha) in enumerate(alpha_terms):
+                p = payload["witnesses"][str(wid)]["p"]
+                numeric.extend([
+                    f"private def alpha{i}KL : Fix := {fixed(kl_interval(alpha, p))}",
+                    f"private theorem alpha{i}KL_ok :",
+                    f"    klEval {Q(alpha).numerator} {Q(alpha).denominator}",
+                    f"      w{wid}P.num w{wid}P.den 50 = some alpha{i}KL := by",
+                    "  decide +kernel", ""])
+            for i, (wid, x) in enumerate(density_terms):
+                y = payload["witnesses"][str(wid)]["y"]
+                numeric.extend([
+                    f"private def density{i}KL : Fix := {fixed(kl_interval(x, y))}",
+                    f"private theorem density{i}KL_ok :",
+                    f"    klEval {Q(x).numerator} {Q(x).denominator}",
+                    f"      w{wid}Y.num w{wid}Y.den 50 = some density{i}KL := by",
+                    "  decide +kernel", ""])
+        for i, (wid, alpha, x) in enumerate(vertices):
+            if cached:
+                ai = alpha_number[(wid, alpha)]
+                xi = density_number[(wid, x)]
+                numeric.extend([
+                    f"private theorem vertex{i}Cached :",
+                    f"    scalableVertexCachedCheck slope intercept",
+                    f"      {qinput(alpha)} {qinput(x)}",
+                    f"      alpha{ai}KL density{xi}KL w{wid}RadiusLog w{wid}ZLog",
+                    "      (-100000000000000000000000) = true := by",
+                    "  decide +kernel", "",
+                    f"private theorem vertex{i} :",
+                    f"    scalableVertexCheck slope intercept w{wid}P w{wid}Y",
+                    f"      w{wid}Radius w{wid}Z {qinput(alpha)} {qinput(x)} 50",
+                    "      (-100000000000000000000000) = true := by",
+                    "  exact scalableVertexCachedCheck_to_full",
+                    f"    slope intercept w{wid}P w{wid}Y w{wid}Radius w{wid}Z",
+                    f"    {qinput(alpha)} {qinput(x)}",
+                    f"    alpha{ai}KL density{xi}KL w{wid}RadiusLog w{wid}ZLog",
+                    f"    alpha{ai}KL_ok density{xi}KL_ok",
+                    f"    w{wid}RadiusLog_ok w{wid}ZLog_ok vertex{i}Cached", ""])
+            else:
+                numeric.extend([
+                    f"private theorem vertex{i} :",
+                    f"    scalableVertexCheck slope intercept w{wid}P w{wid}Y",
+                    f"      w{wid}Radius w{wid}Z {qinput(alpha)} {qinput(x)} 50",
+                    "      (-100000000000000000000000) = true := by",
+                    "  decide +kernel", ""])
+        if full_claim:
+            numeric.extend([
+                f"private def supportLine : ℚ × ℚ := ({rat(line[0])}, {rat(line[1])})",
+                "private theorem support_mem :",
+                "    supportLine ∈ Spin.Majorant.refined.supports := by",
+                "  decide +kernel", "",
+                "private abbrev target : ℝ → ℝ → Prop :=",
+                "  DenseTarget (1 / 10000000) 10000000",
+                ""])
+            for i, box in enumerate(local_boxes):
+                wid = box["witness"]
+                alo, ahi = box["alpha"]
+                xlo, xhi = box["row_density"]
+                names = ((alo, xlo), (alo, xhi), (ahi, xlo), (ahi, xhi))
+                checks = [f"vertex{vertex_number[(wid, a, x)]}"
+                          for a, x in names]
+                for field, value in (("A0", alo), ("A1", ahi),
+                                     ("X0", xlo), ("X1", xhi)):
+                    numeric.append(f"private def leaf{i}{field} : QInput := "
+                                   f"{qinput(value)}")
+                numeric.extend([
+                    f"private theorem leaf{i}_rate {{α x : ℝ}}",
+                    f"    (hα : α ∈ Set.Icc leaf{i}A0.real leaf{i}A1.real)",
+                    f"    (hx : x ∈ Set.Icc leaf{i}X0.real leaf{i}X1.real) :",
+                    "    ScalableDensePointRate α x slope.real intercept.real",
+                    "      (1 / 10000000) 10000000 := by",
+                    f"  have h := scalable_dense_checked_leaf slope intercept",
+                    f"    w{wid}P w{wid}Y w{wid}Radius w{wid}Z",
+                    f"    leaf{i}A0 leaf{i}A1 leaf{i}X0 leaf{i}X1",
+                    f"    w{wid}Vector (10000000 : ℝ)",
+                    "    (by decide) (by decide) (by decide) (by decide)",
+                    "    (by decide) (by decide)",
+                    "    (by decide) (by decide) (by decide) (by decide)",
+                    f"    (by norm_num [w{wid}P, QInput.real])",
+                    f"    (by norm_num [w{wid}P, QInput.real])",
+                    f"    (by norm_num [w{wid}Y, QInput.real])",
+                    f"    (by norm_num [w{wid}Y, QInput.real])",
+                    f"    (by norm_num [w{wid}Radius, QInput.real])",
+                    f"    (by norm_num [w{wid}Z, QInput.real])",
+                    f"    (by norm_num [w{wid}Z, QInput.real])",
+                    f"    (by norm_num [leaf{i}A0, QInput.real])",
+                    f"    (by norm_num [leaf{i}A1, QInput.real])",
+                    f"    (by norm_num [leaf{i}X0, QInput.real])",
+                    f"    (by norm_num [leaf{i}X1, QInput.real])",
+                    "    (by norm_num : (0 : ℝ) ≤ 10000000)",
+                    f"    (by intro j; fin_cases j <;> norm_num [w{wid}Vector, QInput.real])",
+                    f"    w{wid}Transfer {' '.join(checks)} hα hx",
+                    f"  simpa [w{wid}Vector, QInput.real] using h", "",
+                    f"private theorem leaf{i}_claim : DenseClaim target",
+                    "    ⟨" + ", ".join(rat(v) for v in
+                      (alo, ahi, xlo, xhi)) + "⟩ := by",
+                    "  intro α x hr",
+                    f"  have hα : α ∈ Set.Icc leaf{i}A0.real leaf{i}A1.real := by",
+                    f"    norm_num [Rect.Contains, leaf{i}A0, leaf{i}A1, QInput.real] at hr ⊢",
+                    "    exact ⟨hr.1, hr.2.1⟩",
+                    f"  have hx : x ∈ Set.Icc leaf{i}X0.real leaf{i}X1.real := by",
+                    f"    norm_num [Rect.Contains, leaf{i}X0, leaf{i}X1, QInput.real] at hr ⊢",
+                    "    exact ⟨hr.2.2.1, hr.2.2.2⟩",
+                    "  refine ⟨supportLine, support_mem, ?_⟩",
+                    "  simpa [target, supportLine, slope, intercept, QInput.real] using",
+                    f"    (leaf{i}_rate hα hx)", ""])
+
+            def claim_tree(index: int, bounds: tuple[Q, ...]) -> str:
+                node = nodes[index]
+                if node["kind"] == "leaf":
+                    return f"leaf{leaf_local_index[index]}_claim"
+                alo, ahi, xlo, xhi = bounds
+                cut = Q(node["cut"])
+                if node["kind"] == "alpha":
+                    left_bounds = (alo, cut, xlo, xhi)
+                    right_bounds = (cut, ahi, xlo, xhi)
+                    combine = "denseClaim_alpha"
+                else:
+                    left_bounds = (alo, ahi, xlo, cut)
+                    right_bounds = (alo, ahi, cut, xhi)
+                    combine = "denseClaim_density"
+                rect_term = "⟨" + ", ".join(rat(str(v)) for v in bounds) + "⟩"
+                return (f"({combine} target {rect_term} {rat(node['cut'])} "
+                        f"({claim_tree(node['left'], left_bounds)}) "
+                        f"({claim_tree(node['right'], right_bounds)}))")
+
+            numeric.extend([
+                "def root : Rect := ⟨" + rect_text + "⟩", "",
+                "theorem root_claim : DenseClaim target root := by",
+                "  exact " + claim_tree(root_index, rect), "",
+                "theorem root_claim_global :",
+                "    DenseClaim (DenseTarget (1 / 10000000) 10000000) root := by",
+                "  exact root_claim", "",
+                "#print axioms root_claim", ""])
+        numeric.extend([f"#print axioms w{used[0]}Transfer",
+                        "#print axioms vertex0",
+                        f"#print axioms vertex{len(vertices) - 1}", "",
+                        f"end Spin.UniformMixer.{numeric_namespace}", ""])
+        numeric_destination.parent.mkdir(parents=True, exist_ok=True)
+        numeric_destination.write_bytes("\n".join(numeric).encode("utf-8"))
+        report.update(numeric_destination=str(numeric_destination),
+                      numeric_source_bytes=numeric_destination.stat().st_size,
+                      unique_vertices=len(vertices),
+                      cached=cached)
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("candidate", type=Path)
+    parser.add_argument("destination", type=Path)
+    parser.add_argument("--max-leaves", type=int, default=32)
+    parser.add_argument("--numeric-output", type=Path)
+    parser.add_argument("--full-claim", action="store_true")
+    parser.add_argument("--node-id", type=int)
+    parser.add_argument("--box-id", type=int)
+    parser.add_argument("--cached", action="store_true")
+    args = parser.parse_args()
+    assert args.max_leaves > 0
+    print(json.dumps(emit(args.candidate, args.destination, args.max_leaves,
+                          args.numeric_output, args.full_claim,
+                          args.node_id, args.cached, args.box_id)))
+
+
+if __name__ == "__main__":
+    main()

@@ -41,14 +41,18 @@ conditional on `ScalableDenseRates` in
 fixed-point vertex checker is in `ScalableDenseVertex.lean`. The
 `ScalableDensePilot.lean` theorem checks one rectangle, including its transfer
 witness, four vertices, outer support, and pointwise rate conclusion. It does
-not establish the full dense cover. The final unconditioned distance, rate,
-and finite Turbo theorems remain open in this revised development.
+not establish the full dense cover. `ScalableDenseLeaf.lean` supplies the
+general leaf theorem; `ScalableDenseCoverCore.lean` supplies exact rectangle
+composition. Generated 8-, 32-, 64-, and 128-leaf research chunks compile,
+but no theorem covers the full 46,317-box domain. The final unconditioned
+distance, rate, and finite Turbo theorems remain open in this revised
+development.
 
 ## Audit of the completed proof
 
 | Previous component | Checked method and lesson | Revised counterpart |
 | --- | --- | --- |
-| `SpinCodes/Cover/` and `scripts/emit_cover.py` | An untrusted search emits an exact split tree and rational data. Lean proves the checker sound and checks every leaf. A monolithic 13,513-leaf check exhausted 16 GB; 44 independent parts worked. | Use chunked checked data for the 46,317-box Scalable dense cover. Never emit one giant term or one theorem per vertex without a resource trial. |
+| `SpinCodes/Cover/`, `SpinCodes/Numeric/BAEvalDefs.lean`, `SpinCodes/Numeric/BAEval.lean`, and `scripts/emit_cover.py` | An untrusted search emits an exact split tree and rational data. Lean proves the checker sound and checks every leaf. A monolithic 13,513-leaf check exhausted 16 GB; 44 independent parts worked. The old `LogTree.check` verifies each fixed-point logarithm once; `treeLog_oracle` proves lookup sound even if the search tree is unordered (a bad tree only fails to find a key). | Use chunked checked data for the 46,317-box Scalable dense cover. Share expensive KL and log evaluations before choosing a bulk module size. The old table has one integer key because all its logarithm denominators equal `scale`; the new checker needs rational pairs or, more simply, cached KL terms and witness logs. A new cache must carry its own soundness theorem. |
 | `SpinCodes/Structured/DenseOccupationGeometry*.lean` | Rational rectangles and a split tree are checked independently of the numerical family. `global_cover` proves coverage of all real parameters. | Reuse the `Rect`/`Tree` definitions and soundness argument if their performance scales; partition into independently checked subtrees if needed. |
 | `SpinCodes/Structured/DenseFourierExactW*`, `DenseFourierExactCheck.lean`, and `DenseFourierExactB*` | The transfer/Collatz inequalities use exact integer cross multiplication with rational parameters and integer vectors; only the logarithm/KL vertices use fixed-point intervals. Witnesses are shared across boxes; a uniform prefactor is established before assembly. | Use the three-state `paperSpectrumTransfer` and its actual production spectrum. Preserve exact transfer checking, rather than forcing tiny matrix entries onto the `10^30` fixed-point grid. The old seven-coordinate IMT matrix and divisor 128 do not apply; the new exponent has divisor 64. |
 | `SpinCodes/Structured/DenseGeometryRate.lean` and `DenseOccupationMixedCertified.lean` | Checked boxes, exact geometry, and per-family bounds become a full `DenseRates` theorem. | Prove `ScalableDenseRates η C` with a positive uniform `C` and a checked `η`, then feed the existing conditional dense assembly. |
@@ -64,7 +68,8 @@ The current external source is
 It reports 46,317 accepted rational boxes over
 `[1/10000,1] × [13/125,112/125]`, using the paper's refined outer
 supports. It can report its hardest box and a rational candidate with
-`--report-hard-box`; it does not yet emit the complete certificate. Its
+`--report-hard-box`; `--cover-output` now emits the full proposed split tree,
+boxes, and witnesses. Its
 floating-point optimizer only proposes witnesses; its Arb arithmetic checks
 them externally. Neither result is a Lean proof.
 
@@ -203,11 +208,84 @@ Turbo margin.
   The generated global table/tree and assembly must be new; split-tree
   subclaims should be compiled independently, following the old generator's
   response to its 16 GB monolithic-check failure.
-- Next action: make the untrusted generator emit shared exact witnesses,
-  vertex data, and the exact split tree; compile a larger mixed-witness
-  chunk to choose resource limits. Then assemble the full Scalable dense
-  cover and final sampled-setup theorem. Keep finite Turbo as its separate
-  gate.
+- 2026-11-07: The untrusted search now emits a 22.7 MB candidate containing
+  the exact split tree, 46,317 rectangles, and 113 shared rational witnesses.
+  Independent diagnostic scripts checked its tree bookkeeping and all
+  proposed rational transfer, prefactor, and four-corner exponent bounds.
+  There are 81,660 distinct witness/vertex checks after deduplication.
+  These diagnostics do not establish Lean coverage.
+- 2026-11-07: Reused the old `check_sound` interface in
+  `ScalableDenseCoverCore.lean`. Lean checked a generated 32-leaf subtree and
+  a 256-leaf geometry subtree. The 256-leaf geometry build took about 25 s,
+  largely import time. A numerical module with 24 distinct vertices passed
+  in about 55 s; one with 85 vertices hit kernel memory limits. Numerical
+  chunks need to be much smaller than geometric chunks. Lowering the search
+  margin from `1e-7` to `1e-8` reduced the box count only to 45,706 and is
+  not a useful shortcut.
+- 2026-11-07: A generated 8-leaf module checks 3 shared transfer witnesses,
+  24 distinct vertices, all leaf point rates, and its root `DenseClaim` in
+  about 63 s at a 4 GB Lean limit. A 12-leaf full claim failed at 4 GB but
+  passed at 8 GB. A 32-leaf full claim with 85 distinct vertices passed at
+  12 GB in about 116 s. All final claim audits list only standard axioms.
+  The 32-leaf size is a provisional resource ceiling, not yet validated
+  across regions with harder arithmetic. Generated bulk sources remain in
+  ignored `.lake` storage until the complete proof and artifact layout are
+  decided.
+- 2026-11-07: Two separately checked 8-leaf numerical chunks compose across
+  their actual split into a 16-leaf `DenseClaim`; the assembly theorem has
+  only standard Lean axioms. The cover candidate has 39 top-level segments.
+  A simple 32-leaf cut would produce 3,891 modules; 32-leaf full claims
+  compile at a 12 GB Lean limit but may vary by region. This is a resource
+  pilot, not a full-cover theorem.
+- 2026-11-07: Re-audited the old cover's `LogTree`, `treeLog_oracle`, and
+  generator before changing the revised numerical checker. The old checker
+  stores `flogQ key scale n` values and proves every lookup sound; its
+  single-integer key is insufficient for the revised KL arguments with
+  varying denominators. The new cover's 81,660 distinct witness/vertex
+  checks use only 1,291 distinct `(witness, α)` KL terms, 32,056 distinct
+  `(witness, x)` KL terms, and 113 witness pairs `(ρ,z)`. These counts suggest
+  a factorized checked vertex: prove each KL/log interval once per chunk,
+  then check each vertex with cheap fixed-point arithmetic. Cross-chunk
+  duplication remains; compare actual compile time and memory before
+  considering a general rational-key log table.
+- 2026-11-07: `ScalableDenseVertexCached.lean` now proves a factorized vertex
+  check sound by reducing it to the existing checked vertex theorem; the
+  resulting theorem has only standard axioms. The generator emits and Lean
+  checks the distinct KL intervals and witness logarithms, then reuses them
+  at each vertex. On the same 32-leaf, 85-vertex subtree, its complete root
+  claim compiled in about 83 s at a 12 GB Lean limit, versus about 116 s for
+  direct checks. Cached 64-leaf / 157-vertex and 128-leaf / 235-vertex chunks
+  also passed at that limit, in about 125 s and 189 s respectively; the
+  latter `.olean` is 13.1 MB. The 128-leaf check used roughly 4.5 GB working
+  memory during its run. All three root claims have only standard axioms.
+  These are build-resource measurements, not evidence that the entire cover
+  has been checked. Before bulk generation, test a hard region of comparable
+  size and choose a chunk cap by both distinct vertices and leaves.
+- 2026-11-07: The 101-leaf region containing the hardest candidate box
+  (index 16606) also passed the cached Lean checker at a 12 GB limit, in
+  about 156 s, with four distinct witnesses and 192 vertices. Its root
+  theorem has only standard axioms. The full candidate JSON is retained in
+  ignored `.lake` storage and can be regenerated with
+  `shared_inner_dense_certificate.py --max-boxes 100000 --precision 256
+  --cover-output PATH`; it is proposed data, not a certificate.
+- 2026-11-07: Revisited the old `checkTree`/`checkTree_sound`/`leafOK_sound`
+  chain after the larger pilots. The old certificate encodes each chunk as
+  a compact tree and data table, then proves one Boolean checker sound.
+  The current generated pilots instead emit a theorem for every KL interval,
+  vertex, and leaf. They validate the arithmetic and assembly, but copying
+  that format across 46,317 leaves would create excessive proof source and
+  repeated elaboration. Before bulk generation, define a compact revised
+  leaf record and checker whose success implies `DenseTarget` over its box;
+  combine it with the existing geometry `check_sound` and bounded chunk
+  assembly. The checker must fail on a missing witness or support index and
+  must check positivity, exact transfer, four vertices, and uniform prefactor.
+- Next action: implement and compile the compact leaf-checker soundness
+  theorem on a small chunk, comparing its resources and exact statement to
+  the checked pilot. Retain cached KL/log intervals where they help; do not
+  assume the old single-integer `LogTree` handles rational arguments. Then
+  choose bounded chunks, build and assemble the complete domain into
+  `ScalableDenseRates`, finish the sampled-setup theorem, and separately
+  handle finite Turbo.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

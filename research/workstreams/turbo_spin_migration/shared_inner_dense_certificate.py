@@ -219,13 +219,26 @@ def main():
                         help="report this many initial accepted boxes for Lean pilots")
     parser.add_argument("--sample-witnesses", type=int, default=0,
                         help="report initial accepted boxes with distinct witnesses")
+    parser.add_argument("--cover-output", type=Path,
+                        help="write the exact search tree and shared rational proposals")
     args = parser.parse_args()
     assert args.precision >= 128
     ctx.prec = args.precision
     floating, witnesses = witness_bank()
     rate_bank = [outward_rate(w) for w in witnesses]
-    pending = [ExactBox(F(1, 10_000), F(1), lo, hi, slope, intercept)
-               for lo, hi, slope, intercept in exact_segments()]
+    segments = exact_segments()
+    nodes = [None for _ in segments]
+    roots = []
+    pending = []
+    for root, (lo, hi, slope, intercept) in enumerate(segments):
+        roots.append({"xlo": str(lo), "xhi": str(hi), "node": root})
+        pending.append((ExactBox(F(1, 10_000), F(1), lo, hi,
+                                 slope, intercept), root))
+    accepted_boxes = []
+
+    def accept_node(box: ExactBox, node: int, witness_index: int):
+        nodes[node] = {"kind": "leaf", "box": len(accepted_boxes)}
+        accepted_boxes.append((box, witness_index))
     processed = accepted = deepest = 0
     largest_upper = None
     hard_box = None
@@ -233,7 +246,7 @@ def main():
     distinct_samples = {}
     unresolved = None
     while pending and processed < args.max_boxes:
-        box = pending.pop()
+        box, node = pending.pop()
         processed += 1
         deepest = max(deepest, box.depth)
         guess, index = upper_for_bank(box.floating(), floating)
@@ -242,6 +255,7 @@ def main():
             bound = outward_box(box, rate, lam, witnesses[index])
             if bound < 0:
                 accepted += 1
+                accept_node(box, node, index)
                 if len(samples) < args.sample_accepted:
                     samples.append((box, witnesses[index], index))
                 if len(distinct_samples) < args.sample_witnesses:
@@ -260,6 +274,7 @@ def main():
             bound = outward_box(box, rate, lam, witness)
             if bound < 0:
                 accepted += 1
+                accept_node(box, node, len(witnesses))
                 if len(samples) < args.sample_accepted:
                     samples.append((box, witness, len(witnesses)))
                 if len(distinct_samples) < args.sample_witnesses:
@@ -280,7 +295,17 @@ def main():
                           "proposal": guess, "midpoint": proposal["exponent"],
                           "outward": str(bound)}
             break
-        pending.extend(box.split())
+        left, right = box.split()
+        left_node = len(nodes)
+        right_node = left_node + 1
+        nodes.extend((None, None))
+        if left.ahi != box.ahi:
+            nodes[node] = {"kind": "alpha", "cut": str(left.ahi),
+                           "left": left_node, "right": right_node}
+        else:
+            nodes[node] = {"kind": "density", "cut": str(left.xhi),
+                           "left": left_node, "right": right_node}
+        pending.extend(((left, left_node), (right, right_node)))
         if processed % 10_000 == 0:
             print(json.dumps({"processed": processed, "accepted": accepted,
                               "pending": len(pending)}), flush=True)
@@ -316,6 +341,33 @@ def main():
     if distinct_samples:
         report["distinct_witness_boxes"] = [report_sample(sample)
             for sample in distinct_samples.values()]
+    if args.cover_output is not None:
+        used = {}
+        for box, witness_index in accepted_boxes:
+            if witness_index not in used:
+                used[witness_index] = rational_hard_witness(
+                    box, witnesses[witness_index])
+        cover = {
+            "status": "candidate_complete" if not pending and
+                      unresolved is None else "candidate_incomplete",
+            "domain": {"alpha": ["1/10000", "1"],
+                       "row_density": ["13/125", "112/125"]},
+            "roots": roots,
+            "nodes": nodes,
+            "boxes": [{"alpha": [str(box.alo), str(box.ahi)],
+                       "row_density": [str(box.xlo), str(box.xhi)],
+                       "outer_line": [str(box.slope), str(box.intercept)],
+                       "witness": witness_index}
+                      for box, witness_index in accepted_boxes],
+            "witnesses": {str(index): {"p": str(witnesses[index][0]),
+                                       "y": str(witnesses[index][1]),
+                                       **candidate}
+                          for index, candidate in used.items()},
+        }
+        args.cover_output.parent.mkdir(parents=True, exist_ok=True)
+        args.cover_output.write_text(json.dumps(cover, separators=(",", ":")),
+                                     encoding="utf-8")
+        report["cover_output"] = str(args.cover_output)
     print(json.dumps(report))
     if pending or unresolved is not None:
         raise SystemExit(1)
