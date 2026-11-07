@@ -230,9 +230,16 @@ The [paper orientation bridge](SpinCodes/UniformMixer/ScalableTransferPaperOrien
 proves that the paper's displayed transfer is the transpose of the Lean
 column-state transfer and makes its positive-vector witness applicable to
 the full-state Bernoulli moment. The production image spectrum and its minimum
-nonzero weight are checked. Numerical witnesses, the outer-word sum, and
+nonzero weight are checked. The
+[sparse-witness interface](SpinCodes/UniformMixer/ScalableSparseWitness.lean)
+fixes the paper's rational parameters and derives its moment bound from the
+three componentwise numerical inequalities. Those inequalities, the outer-word sum, and
 distance gates remain open; the dual feedback-kernel distance is not yet
 separately certified.
+The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
+shows that the MacWilliams transform of the certified production spectrum
+has no weights one through seven. Identifying these coefficients with the
+actual feedback-kernel weight counts is the next formal step.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
 The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)

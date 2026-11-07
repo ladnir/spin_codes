@@ -1,4 +1,5 @@
-import SpinCodes.UniformMixer.ScalableTransferPaperOrientation
+import SpinCodes.UniformMixer.ScalableSparseWitness
+import SpinCodes.UniformMixer.ScalableDualLowCoefficient
 
 /-!
 # Spectrum interface for the actual three-coordinate transfer
@@ -19,6 +20,8 @@ do not assert the numerical Collatz or distance gates.
 #check Spin.UniformMixer.spectrumu_polynomial
 #check Spin.UniformMixer.transfer_total_eq_paper_first
 #check Spin.UniformMixer.scalable_bernoulli_paper_collatz_bound
+#check Spin.UniformMixer.scalable_sparse_collatz_from_numeric_gate
+#check Spin.UniformMixer.dualSpectrumNumerator_low
 #print axioms Spin.UniformMixer.scalableMaxLiveMoment_eq_spectrum
 #print axioms Spin.UniformMixer.scalableMeanLiveMoment_exact_spectrum
 #print axioms Spin.UniformMixer.scalableZeroHold_exact_spectrum
@@ -30,3 +33,5 @@ do not assert the numerical Collatz or distance gates.
 #print axioms Spin.UniformMixer.spectrumu_polynomial
 #print axioms Spin.UniformMixer.transfer_total_eq_paper_first
 #print axioms Spin.UniformMixer.scalable_bernoulli_paper_collatz_bound
+#print axioms Spin.UniformMixer.scalable_sparse_collatz_from_numeric_gate
+#print axioms Spin.UniformMixer.dualSpectrumNumerator_low
