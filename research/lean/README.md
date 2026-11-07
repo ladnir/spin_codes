@@ -130,8 +130,13 @@ proves one-step domination for any nonnegative kernel satisfying the
 listed zero, atom, and averaged-row bounds. The
 [row instantiation](SpinCodes/UniformMixer/ScalableEnvelopeRows.lean)
 verifies those conditions for the actual Bernoulli step kernel, including
-both minimum bounds on zero returns. Matrix iteration and spectrum-based
-numerical bounds remain open.
+both minimum bounds on zero returns. The
+[iteration](SpinCodes/UniformMixer/ScalableEnvelopeIterate.lean)
+proves the full-state moment bound by the corresponding three-by-three
+matrix power. The [transfer first moment](SpinCodes/UniformMixer/ScalableTransferFirstMoment.lean)
+applies this bound to every nonzero message under a selected shared outer.
+Spectrum-based evaluation, the outer-word sum, and numerical distance
+gates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
