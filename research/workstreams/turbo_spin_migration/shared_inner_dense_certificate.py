@@ -159,6 +159,52 @@ def outward_box(box: ExactBox, rate, lam, witness):
     return max(values)
 
 
+def rational_hard_witness(box: ExactBox, witness):
+    """Propose rational z, radius, and vector for the Lean hard-box pilot."""
+    p, y, lam = witness
+    decimal = 10**30
+    z = F(round(upper((-num(lam)).exp()) * decimal), decimal)
+    beta, zz = num(p * y), num(z)
+    g0 = 1 - beta + beta * zz
+    g1 = beta + (1 - beta) * zz
+    moments = {w: g0 ** (WIDTH - w) * g1**w for w in SPECTRUM if w}
+    fresh = max(upper(v) for v in moments.values())
+    uniform = upper(sum((count * moments[w] for w, count in SPECTRUM.items()
+                         if w), arb(0)) / M)
+    kernel = sum((int(DUAL[j]) * beta**j * (1-beta)**(WIDTH-j)
+                  for j in range(WIDTH + 1)), arb(0))
+    zero_zero_raw = sum((int(DUAL[j]) * (beta*zz)**j
+                         * (1-beta)**(WIDTH-j)
+                         for j in range(WIDTH + 1)), arb(0))
+    zero_zero = upper(zero_zero_raw)
+    zero_fresh = upper(g0**WIDTH - zero_zero_raw)
+    active = max(F(0), upper(1 - kernel))
+    matrix = [[zero_zero, max(F(0), zero_fresh), F(0)],
+              [min(fresh, active) / M, F(0), fresh],
+              [min(uniform, active) / M, F(0), uniform]]
+    approx = np.asarray([[float(v) for v in row] for row in matrix])
+    values, vectors = np.linalg.eig(approx)
+    index = int(np.argmax(values.real))
+    vector = np.abs(vectors[:, index].real)
+    vector /= vector[0]
+    rational_vector = [F(format(float(v), ".16g")) for v in vector]
+    assert all(v > 0 for v in rational_vector)
+    radius = max(sum(row[j] * rational_vector[j] for j in range(3))
+                 / rational_vector[i] for i, row in enumerate(matrix))
+    rho = F(-(-radius.numerator * decimal // radius.denominator), decimal)
+    assert rho >= radius > 0
+    bound = max(upper(num(alpha * (box.slope * x + box.intercept))
+                      + kl(alpha, p) + num(alpha) * kl(x, y)
+                      + num(rho).log() / WIDTH
+                      - num(F(11, 100)) * num(z).log())
+                for alpha in (box.alo, box.ahi)
+                for x in (box.xlo, box.xhi))
+    return {"z": str(z), "rho": str(rho),
+            "vector": [str(v) for v in rational_vector],
+            "outward_upper": str(bound),
+            "passes_eta_1e_7": bound <= -F(1, 10**7)}
+
+
 def main():
     if not __debug__:
         raise RuntimeError("Certificate checks require Python assertions")
@@ -167,6 +213,10 @@ def main():
     parser.add_argument("--max-depth", type=int, default=36)
     parser.add_argument("--proposal-margin", type=float, default=1e-7)
     parser.add_argument("--precision", type=int, default=256)
+    parser.add_argument("--report-hard-box", action="store_true",
+                        help="include the tightest accepted box and its proposal")
+    parser.add_argument("--sample-accepted", type=int, default=0,
+                        help="report this many initial accepted boxes for Lean pilots")
     args = parser.parse_args()
     assert args.precision >= 128
     ctx.prec = args.precision
@@ -176,6 +226,8 @@ def main():
                for lo, hi, slope, intercept in exact_segments()]
     processed = accepted = deepest = 0
     largest_upper = None
+    hard_box = None
+    samples = []
     unresolved = None
     while pending and processed < args.max_boxes:
         box = pending.pop()
@@ -187,7 +239,11 @@ def main():
             bound = outward_box(box, rate, lam, witnesses[index])
             if bound < 0:
                 accepted += 1
-                largest_upper = bound if largest_upper is None else max(largest_upper, bound)
+                if len(samples) < args.sample_accepted:
+                    samples.append((box, witnesses[index], index))
+                if largest_upper is None or bound > largest_upper:
+                    largest_upper = bound
+                    hard_box = (box, witnesses[index], index)
                 continue
         if box.depth >= args.max_depth:
             midpoint = ((float(box.alo) + float(box.ahi)) / 2,
@@ -199,7 +255,11 @@ def main():
             bound = outward_box(box, rate, lam, witness)
             if bound < 0:
                 accepted += 1
-                largest_upper = bound if largest_upper is None else max(largest_upper, bound)
+                if len(samples) < args.sample_accepted:
+                    samples.append((box, witness, len(witnesses)))
+                if largest_upper is None or bound > largest_upper:
+                    largest_upper = bound
+                    hard_box = (box, witness, len(witnesses))
                 witnesses.append(witness)
                 rate_bank.append((rate, lam))
                 item = (proposal["p"], proposal["y"], proposal["lam"],
@@ -216,12 +276,32 @@ def main():
         if processed % 10_000 == 0:
             print(json.dumps({"processed": processed, "accepted": accepted,
                               "pending": len(pending)}), flush=True)
-    print(json.dumps({"status": "proved_dense_exponent" if not pending and
+    report = {"status": "proved_dense_exponent" if not pending and
                       unresolved is None else "open",
                       "precision_bits": ctx.prec, "processed": processed,
                       "accepted": accepted, "deepest": deepest,
                       "largest_outward_upper": str(largest_upper),
-                      "unresolved": unresolved, "pending": len(pending)}))
+                       "unresolved": unresolved, "pending": len(pending)}
+    if args.report_hard_box and hard_box is not None:
+        box, witness, index = hard_box
+        report["hard_box"] = {
+            "alpha": [str(box.alo), str(box.ahi)],
+            "row_density": [str(box.xlo), str(box.xhi)],
+            "outer_line": [str(box.slope), str(box.intercept)],
+            "witness_index": index,
+            "proposal_p_y_lambda": [str(value) for value in witness],
+            "rational_pilot": rational_hard_witness(box, witness),
+        }
+    if samples:
+        report["sampled_boxes"] = [{
+            "alpha": [str(box.alo), str(box.ahi)],
+            "row_density": [str(box.xlo), str(box.xhi)],
+            "outer_line": [str(box.slope), str(box.intercept)],
+            "witness_index": index,
+            "proposal_p_y_lambda": [str(value) for value in witness],
+            "rational_pilot": rational_hard_witness(box, witness),
+        } for box, witness, index in samples]
+    print(json.dumps(report))
     if pending or unresolved is not None:
         raise SystemExit(1)
 

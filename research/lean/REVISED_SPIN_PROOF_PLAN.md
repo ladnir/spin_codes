@@ -63,7 +63,8 @@ The current external source is
 `../workstreams/turbo_spin_migration/shared_inner_dense_certificate.py`.
 It reports 46,317 accepted rational boxes over
 `[1/10000,1] × [13/125,112/125]`, using the paper's refined outer
-supports. It currently prints a summary, not the certificate data. Its
+supports. It can report its hardest box and a rational candidate with
+`--report-hard-box`; it does not yet emit the complete certificate. Its
 floating-point optimizer only proposes witnesses; its Arb arithmetic checks
 them externally. Neither result is a Lean proof.
 
@@ -77,6 +78,14 @@ recompute all bounds. Check this hard box in Lean at target exponent
 `η = 1e-7`, including support membership and the actual transfer. If
 rational rounding erases the margin, increase precision or refine that box.
 
+**Closed locally:** `ScalableDenseHardPilot.lean` checks the reported hardest
+box at `η = 1e-7`. The first rational radius failed the fixed-point transfer
+check by two units at scale `10^30`. Raising its numerator by three units
+passes all three rows and all four exponent vertices. The box also reaches
+the selected-outer point-rate interface with the actual support line. The
+recursive axiom audit lists only Lean's `propext`, `Classical.choice`, and
+`Quot.sound` for that theorem.
+
 ### Gate 2: reusable sound leaf checker
 
 Generalize the pilot's proof into one leaf interface. The Boolean checks
@@ -87,6 +96,21 @@ majorant; and (d) the vector gives a specified finite moment prefactor.
 Use the existing fixed-point log and KL soundness theorems. Test a shared
 witness on several boxes before generating all leaves. The generator is
 untrusted: Lean must check every numerical and semantic condition.
+
+**Soundness bridge proved:** `ScalableDenseTransferEvalDefs.lean` computes
+outward intervals for the exact production-spectrum three-state matrix;
+`ScalableDenseTransferEval.lean` proves each interval and Boolean row check
+sound; `ScalableDenseLeaf.lean` combines the transfer, four vertices, and
+uniform prefactor into a parameterized box theorem. The hardest box has been
+instantiated through this generic theorem. Support membership is checked
+separately against `Majorant.refined.supports`, as in the old proof. A second
+pilot with two adjacent boxes from the same witness bank now checks its
+shared transfer and eight vertices in `ScalableDenseSamplePilot.lean`.
+That module takes about 37 seconds to compile, versus about 33 seconds for
+an import-only module on this machine. This is a small resource trial, not
+an estimate for the full cover. The generator should cache transfer checks
+by witness and vertex checks by the full witness/coordinate tuple; adjacent
+boxes can share corners. Test a larger chunk before fixing module sizes.
 
 ### Gate 3: complete geometry and resource control
 
@@ -128,9 +152,25 @@ Turbo margin.
   failure recorded by `emit_cover.py`. The revised dense pilot compiles
   without `sorry` or custom axioms. The complete cover and final theorem do
   not yet compile because they have not been constructed.
-- Next action: check a worst-margin dense box with rational `z`, `ρ`, and a
-  generated Collatz vector. Do not generate the full cover until this gate
-  passes and a representative chunk has acceptable resource use.
+- 2026-11-07: Added an optional hard-box report to the existing Arb search.
+  The 256-bit replay retained its 46,317 accepted boxes and original worst
+  bound. It located a box near `α = 1`, `x = 0.5035`. A rational `z`, `ρ`,
+  and positive three-state vector still give an outward Arb exponent below
+  `-1e-7` for its four corners. This is candidate data, not yet a Lean check.
+- 2026-11-07: Built and compiled the exact transfer evaluator, its soundness
+  theorem, a generic leaf theorem, and the hard-box instance. The external
+  candidate was adjusted by `3e-30` in spectral radius to account for
+  directed fixed-point rounding. The hard box is Lean-checked with the
+  `1e-7` exponent margin and reaches `ScalableDensePointRate`.
+- 2026-11-07: The first two accepted boxes use one shared witness; their
+  transfer and eight vertices pass Lean. A small timing control showed about
+  four seconds beyond module import. The 98 initial witness-bank radii range
+  from about `1e-16` to `1`, within the `10^30` fixed-point resolution.
+- Next action: emit a larger mixed-witness sample and invoke the generic
+  leaf theorem for each box, with transfer and vertex checks shared. Measure
+  time, memory, and `.olean` size; then adapt the old exact split-tree
+  coverage method and choose independently compiled chunk sizes. Keep the
+  final sampled-setup theorem and finite Turbo certificate as separate gates.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
