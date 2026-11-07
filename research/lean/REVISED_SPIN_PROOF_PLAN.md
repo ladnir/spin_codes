@@ -173,6 +173,80 @@ three length-specific certificates. The Scalable dense checker may supply
 fixed-point primitives, but its asymptotic cover does not establish a finite
 Turbo margin.
 
+### Audit of the finite proof and correspondence to the old development
+
+The old **Lean** `SpinCodes/Framework.lean` proves the first-moment identity
+for a product setup law and Markov's bound for the event that some nonzero
+message has low output weight. `SpinCodes/FiniteMoment.lean` also gives the
+generating-function tail inequality. The completed Structured SPIN theorem
+shows how to connect a checked numerical bound to an actual sampled encoder,
+not merely to an abstract matrix. Reuse these probability and conclusion
+interfaces, while defining the Turbo outer, packet route, and state maps
+anew. The old Structured BA/Golay enumerator and BCH--IMT finite appendix
+describe different distributions; neither is a Turbo certificate. The
+retained **Turbo reference** certificates for the RS[16,8] outer are external
+Python/Arb receipts and independent audits, not Lean proofs. Authentication
+of their source hashes and exact dyadic sums does not by itself prove their
+numeric endpoints or link them to Lean's sampled setup.
+
+The target is the ideal setup in `research/paper/turbo_spin.tex` and
+`turbo_appendix.tex`: independent nonzero GF(2^32) column multipliers,
+uniform packet and regional permutations, and independent uniform GL state
+updates, sampled once per code. `spin/RS8.md` and
+`research/workstreams/turbo_spin_migration/SETUP_AUDIT.md` compare this law
+with the executable seed expansion. The executable's SplitMix choices are
+not literally the independent uniform law, so the information-theoretic
+theorem must not be stated for those finite seeds without another premise.
+
+The local expected packet counts are coefficients of
+`Σ_(h=5)^8 A_h (((1+15z)^8-1)/(2^32-1))^h`, with `A_h` from the eight
+parallel GF16 RS[8,4] rows. These are expected **message counts**. Each
+group has 128 message bits, 256 output bits, and 64 four-bit packets. A
+group shuffle makes a support of size `v` uniform over 64 positions, with
+uniform nonzero packet labels. The eight random columns are independent;
+different messages sharing a setup need not be. Prove this measure and its
+normalization in Lean before importing its numerical coefficients.
+
+| Length | Sparse part | Larger occupations | Receipt source |
+| --- | --- | --- | --- |
+| `K=2^16`, paired 15-state map | Fresh one- and two-group support/label folds, including all `v=5..64` and all support pairs | For each `q=3..512`, transfer the authenticated RS16 endpoint by the exact factor `((65535/65537)^4)^q` | `k16_outer_routing/certify_rs8x8_s15.py`, retained `paired-s15-drop10-whole-p256.json` |
+| `K=2^18`, exact 22-state map | Full 65 one-group endpoints and 2,145 triangular two-group endpoints, with off-diagonal multiplicity two | Retain every RS16 endpoint for `q=3..2048` using the no-worse complete atom envelope | `rs8_sizes/k18_rs8_certificate.py`, retained `k18-margin60-fractional-whole-p256-v2.json` and sparse receipts |
+| `K=2^20`, exact 22-state map | Full one-group fold; globally charge the event that **any** group has a local word of packet support 5..8; compare the remaining two-group measure with the RS16 measure using the exact maximum shell ratio squared | Retain every RS16 endpoint for `q=3..8192` using the no-worse complete atom envelope | `k20_two_ms/rs8_transfer.py`, retained `k20-small-outer-whole-v1.json` and sparse receipt |
+
+For the K20 exceptional event, the two-group comparison is an
+**unconditional truncated first moment**, not a setup law conditioned on
+its complement. This keeps the direction of the union bound. For all three
+lengths, the complete atom bound is `1/(2^32-1)^4`; comparing it with the
+RS16 bound `1/(2^16-1)^8` is a pointwise statement about the whole group
+measure. Matching only single-column marginals would not transfer the
+regional or fractional-moment endpoints. The reference route, inner map,
+state continuity, output cutoff, and ordering of the active-group union
+must be authenticated in the mathematical bridge, not only in metadata.
+
+The exact bad cutoffs are 13107, 52428, and 209715; the respective
+minimum-distance lower bounds outside failure are 13108, 52429, and
+209716. The advertised decimal margins 61.884, 58.245, and 51.822 bits
+are displays of exact upward dyadic unions. Lean should check a rational
+threshold (initially `< 2^-40` at each length), not reason from the
+displayed logarithms. The original receipts exist in the canonical
+checkout but are ignored and absent in this worktree. Import only the
+needed proof data into ignored research build storage, recording hashes;
+do not commit raw receipts or treat Python replay as a Lean theorem.
+
+**Finite implementation order.** (1) Pin Lean's actual Turbo setup and
+bad event, then prove the RS8 expected outer measure and packet-route
+symmetry. (2) Prove a finite first-moment decomposition by active group
+count, with the exact one/two-group folds and K20 exceptional event.
+(3) Formalize complete-measure domination and a theorem transferring
+reference endpoints only under explicit numerical and route/inner premises.
+(4) Use the old checker pattern: untrusted code emits rational/dyadic data;
+Lean checks soundness of each endpoint, complete occupation coverage, and
+the exact positive sum in bounded modules. Hashes remain provenance, never
+the proof. (5) Connect the sum to the sampled encoder, prove injectivity
+for every setup, and audit the final theorem's recursive axioms. A first
+pilot should check one sparse support and one `q>=3` transfer for K16;
+this tests semantics before thousands of endpoints are generated.
+
 ## Progress and decision log
 
 - 2026-11-07: Audited the old split-tree cover, generated Fourier witnesses,
@@ -316,12 +390,22 @@ Turbo margin.
   compiled Part 0 and checked its axiom output. The manifest's
   `source_emitted` status does **not** claim a full certificate; most parts,
   segments, and the global theorem have not been compiled.
+- 2026-11-07: Began the sequential checkpointed build of the full Scalable
+  cover at an 8 GB Lean limit and below-normal process priority. The build
+  has checked Parts 0--2 and continues; 611 parts, 39 segment assemblies,
+  and the global rate theorem are still required. Separately audited the
+  finite Turbo proof against the old Lean first-moment framework and the
+  three RS8 transfer scripts. The length-dependent proof split and the
+  difference between authenticated Python receipts and Lean-checked
+  endpoints are recorded in the finite gate above. The retained receipts
+  are present in the canonical checkout but not in this worktree.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. In
-  parallel with build planning, audit the old finite proof before designing
-  the separate Turbo certificate checker.
+  parallel, pin the actual Turbo setup/event and prove the RS8 expected
+  outer measure, beginning with the single-support semantic pilot. Use the
+  finite audit above before choosing numerical checker data structures.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
