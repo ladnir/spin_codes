@@ -266,13 +266,17 @@ The [two-state fixed-profile bridge](SpinCodes/UniformMixer/ScalableFixedTwoStat
 factors the full-state continuum kernel through zero/live classes, proves
 the exact weighted action, and reduces that margin to two scalar row
 inequalities. It also checks the zero- and one-active-row continuum formulas.
-The two-row numerical bounds, including the higher-occupation cover, remain
-open.
+The higher-occupation numerical cover remains open.
 The [one-active-row numeric gate](SpinCodes/UniformMixer/ScalableFixedOneNumericPin.lean)
 uses a rational tilt with `regionGamma = 1` to prove a two-state row bound
 and an eventual full-state profile bound under the actual Scalable shuffle.
-Its outer exponent is not yet assembled; the occupation-two and higher
-numeric gates also remain open.
+The [two-active-row numeric gate](SpinCodes/UniformMixer/ScalableFixedTwoNumericPin.lean)
+uses an exact `Bool`-to-`Fin 2` reindexing and entrywise kernel comparison
+to reuse the earlier generic two-site integrals at the scalable state size.
+With a rational tilt giving `regionGamma = 2`, it proves the two-state row
+bound and the corresponding actual sampled-profile bound. Neither fixed-row
+gate has yet been combined with the outer exponent; higher occupations
+remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
