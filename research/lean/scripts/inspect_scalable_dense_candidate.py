@@ -140,6 +140,21 @@ def inspect(path: Path, max_chunk_leaves: int = 32,
     for root in roots:
         vertex_chunks.extend(vertex_cut(root["node"])[1])
     vertex_chunk_sizes = [len(chunk_vertices(index)) for index in vertex_chunks]
+
+    def dual_cut(index: int) -> tuple[set[tuple], list[int]]:
+        node = nodes[index]
+        if node["kind"] == "leaf":
+            return chunk_vertices(index), [index]
+        left_set, left_chunks = dual_cut(node["left"])
+        right_set, right_chunks = dual_cut(node["right"])
+        combined = left_set | right_set
+        if count(index) <= max_chunk_leaves and len(combined) <= max_chunk_vertices:
+            return combined, [index]
+        return combined, left_chunks + right_chunks
+
+    dual_chunks = []
+    for root in roots:
+        dual_chunks.extend(dual_cut(root["node"])[1])
     return {"roots": len(roots), "nodes": len(nodes),
             "boxes": len(boxes), "witnesses": len(witnesses),
             "unique_vertices": len(unique_vertices), "max_tree_depth": depth,
@@ -153,7 +168,12 @@ def inspect(path: Path, max_chunk_leaves: int = 32,
             "chunk_vertices_limit": max_chunk_vertices,
             "vertex_chunks": len(vertex_chunks),
             "median_vertices_in_vertex_chunk": median(vertex_chunk_sizes),
-            "max_leaves_in_vertex_chunk": max(count(i) for i in vertex_chunks)}
+            "max_leaves_in_vertex_chunk": max(count(i) for i in vertex_chunks),
+            "dual_chunks": len(dual_chunks),
+            "max_vertices_in_dual_chunk": max(len(chunk_vertices(i))
+                                               for i in dual_chunks),
+            "heaviest_dual_node": max(dual_chunks,
+                                       key=lambda i: len(chunk_vertices(i)))}
 
 
 def main() -> None:

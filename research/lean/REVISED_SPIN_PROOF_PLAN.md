@@ -279,13 +279,49 @@ Turbo margin.
   combine it with the existing geometry `check_sound` and bounded chunk
   assembly. The checker must fail on a missing witness or support index and
   must check positivity, exact transfer, four vertices, and uniform prefactor.
-- Next action: implement and compile the compact leaf-checker soundness
-  theorem on a small chunk, comparing its resources and exact statement to
-  the checked pilot. Retain cached KL/log intervals where they help; do not
-  assume the old single-integer `LogTree` handles rational arguments. Then
-  choose bounded chunks, build and assemble the complete domain into
-  `ScalableDenseRates`, finish the sampled-setup theorem, and separately
-  handle finite Turbo.
+- 2026-11-07: `ScalableDensePackedLeaf.lean` now has a compact, decidable
+  line/witness/box checker and a soundness theorem that reaches the actual
+  `DenseTarget` through `scalable_dense_checked_leaf`. Its indexed witness
+  lookup returns `false` on a missing entry. The chunk checker combines
+  numerical checks with the old rational-rectangle `check_sound`; no generated
+  assertion of coverage is trusted. A one-leaf pilot and 8-, 32-, 128-leaf
+  chunks compiled with only standard axioms. A single `decide` over the whole
+  numerical list did not reduce, but each leaf check did; combining the
+  independently checked leaf equalities with `List.all` fixed this without
+  weakening the theorem. The 128-leaf compact source was about 94 KB versus
+  about 621 KB for the earlier theorem-per-vertex pilot.
+- 2026-11-07: A second compact checker verifies the line and each witness
+  transfer once per chunk, then verifies only box conditions at each leaf.
+  Its soundness theorem also has only standard axioms. The 128-leaf chunk
+  passed at an 8 GB Lean limit in about 150 s, versus about 198 s when those
+  checks were repeated per leaf. A 101-leaf region containing the hardest
+  candidate box passed in about 133 s with four witnesses. This shared
+  compact format is the current preferred bulk format; it still recomputes
+  KL/log terms at shared vertices, so a rational-key log table remains a
+  possible later optimization if bulk resources demand it.
+- 2026-11-07: A 256-leaf, 21-witness compact chunk passed at an 8 GB Lean
+  limit in about 238 s. A second chunk at the selected vertex cap (200 leaves,
+  400 distinct vertices, 20 witnesses) passed in about 194 s. The 256-leaf
+  and 400-vertex cut yields 611 chunks over the 46,317 candidate leaves.
+  This budget has two distinct stress tests; it is still possible that a
+  later chunk needs a smaller cut.
+- 2026-11-07: `emit_scalable_dense_packed_cover.py` emitted a complete
+  proposed source tree into ignored `.lake/fullcover`: 611 part files (about
+  34 MB), 39 segment assembly modules, and a global `ScalableDenseRates`
+  module. Its manifest records candidate SHA-256
+  `164e3a944752a4a38003bfd5bca3917a3b69c79249375b678d3ead667de6f694`.
+  All part bounds and split choices are checked in Lean when compiled. Parts
+  17 and 18 passed independently, and their generated Segment 9 assembly
+  passed with only standard axioms. A sequential, resumable build script
+  compiled Part 0 and checked its axiom output. The manifest's
+  `source_emitted` status does **not** claim a full certificate; most parts,
+  segments, and the global theorem have not been compiled.
+- Next action: run the checkpointed part build, adapting any resource-heavy
+  chunk by a finer cut rather than weakening the target. Compile all 39
+  segment claims and the global `ScalableDenseRates` declaration, audit its
+  recursive axioms, then complete the actual sampled-setup theorem. In
+  parallel with build planning, audit the old finite proof before designing
+  the separate Turbo certificate checker.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
