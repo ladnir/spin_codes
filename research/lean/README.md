@@ -30,8 +30,13 @@ not yet checked. The [Walsh lemmas](SpinCodes/UniformMixer/QuadraticWalsh.lean)
 prove six-variable character orthogonality, Parseval, and the exact
 conversion between Walsh values and Hamming weight. The
 [quadratic weight bridge](SpinCodes/UniformMixer/QuadraticSpectrumBridge.lean)
-identifies that weight with the production map. The quadratic-part rank
-counts and resulting full spectrum remain open. The
+identifies that weight with the production map. The
+[Walsh square](SpinCodes/UniformMixer/QuadraticWalshSquare.lean) proves an
+autocorrelation identity for every six-variable Boolean function, and the
+[quadratic polar map](SpinCodes/UniformMixer/QuadraticPolar.lean) proves
+that each quadratic Walsh square is a character sum over its radical.
+The radical-size count, affine-character evaluation, and full production
+spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
