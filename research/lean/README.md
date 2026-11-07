@@ -1,5 +1,9 @@
 # SpinCodes — Lean formalizations
 
+The [revised proof plan](REVISED_SPIN_PROOF_PLAN.md) is the working plan for
+Scalable and Turbo SPIN verification. It records the required audit of the
+completed Structured proof before each new component and tracks the open gates.
+
 The public native theorem below verifies the earlier Structured SPIN
 construction. It does not verify the revised Scalable SPIN or finite Turbo
 SPIN results in the current paper.
