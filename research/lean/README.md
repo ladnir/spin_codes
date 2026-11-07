@@ -153,8 +153,10 @@ give the [submask parity](SpinCodes/UniformMixer/Map22SubmaskParity.lean)
 used in [ANF reconstruction](SpinCodes/UniformMixer/Map22ANFReconstruct.lean).
 The [production polynomial theorem](SpinCodes/UniformMixer/Map22Polynomial.lean)
 then proves that each actual output coordinate evaluates an ANF of degree
-at most two. A formal RM(2,6) code equivalence, its image spectrum, and
-the dual kernel-distance theorem remain open.
+at most two. The [quadratic code-space equivalence](SpinCodes/UniformMixer/Map22QuadraticSpace.lean)
+counts the 22 allowed monomials and proves that every such polynomial is
+realized by the production expansion. Its image spectrum, minimum live
+weight, and the dual feedback-kernel distance remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
