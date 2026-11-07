@@ -277,6 +277,15 @@ that taking nonzero-packet support after routing gives exactly
 `ConcreteRoute.law` applies. It also proves preservation of active-packet
 count. These results use only the standard Lean axioms. They establish the
 route interface, not the RS8 outer measure or finite distance bound.
+`SpinCodes/Turbo/PacketInner22.lean` serializes 16 four-bit packets per
+64-bit step and 64 regions in chronological order. Its ideal law is the
+product of the checked packet-route seed law and independent uniform
+GL(22,2) updates. `routeInnerMoment22` applies the old
+`ScalableEncoderKernel.sampledInputMoment_kernel` to the **entire** stream,
+with one initial zero state and no regional reset. Lean checked this
+route-and-inner moment identity with only standard axioms. The outer
+sampler and its expected measure still need formalization; this theorem
+does not establish any finite distance margin.
 (4) Formalize complete-measure domination and a theorem transferring
 reference endpoints only under explicit numerical and route/inner premises.
 (5) Use the old checker pattern: untrusted code emits rational/dyadic data;
@@ -448,6 +457,11 @@ generated. Port the separate K16 15-state map after that interface works.
   rather than recomputes these inequalities. The finite Lean pilot must
   therefore prove a local operator bound before checking endpoint sums.
   The Scalable bulk build remains active and has reached at least Part 12.
+- 2026-11-07: Added the actual four-bit packet serialization and uniform
+  22-state sampled inner law. The full route-and-inner moment identity
+  compiles with only standard axioms. This reuses the old step-kernel proof
+  after auditing its input and state-continuity semantics; the next finite
+  gate is the RS8 outer measure and its product setup with this law.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
