@@ -188,6 +188,18 @@ retained **Turbo reference** certificates for the RS[16,8] outer are external
 Python/Arb receipts and independent audits, not Lean proofs. Authentication
 of their source hashes and exact dyadic sums does not by itself prove their
 numeric endpoints or link them to Lean's sampled setup.
+The K20 independent audit explicitly says it authenticates the full-state
+census and matrix endpoints without regenerating them. Its local receipts
+contain 17 outward physical operators, each `11×11`, derived from all
+`2^22` states. K18's `replay_fractional.py` thins these operators, takes
+entrywise fractional powers only after the chronological two-step product,
+then raises a regional operator to 64 regions. K16's fresh sparse producer
+similarly computes state operators and route averages with Arb. Therefore
+checking only receipt hashes, `C_v`, and the final dyadic union would leave
+the main finite probability inequality as an unsupported premise. A Lean
+endpoint checker needs a sound path from the actual map/update law to
+outward local operators, then through placement and matrix powers. This
+is a distinct gate from exact arithmetic on imported endpoints.
 
 The target is the ideal setup in `research/paper/turbo_spin.tex` and
 `turbo_appendix.tex`: independent nonzero GF(2^32) column multipliers,
@@ -247,15 +259,28 @@ do not commit raw receipts or treat Python replay as a Lean theorem.
 bad event, then prove the RS8 expected outer measure and packet-route
 symmetry. (2) Prove a finite first-moment decomposition by active group
 count, with the exact one/two-group folds and K20 exceptional event.
-(3) Formalize complete-measure domination and a theorem transferring
+(3) Prove the physical 64-bit state operator bound for one selected
+`s=22` packet profile before bulk data generation. Audit whether the
+existing Scalable 22-state map spectrum/census proofs can supply its
+entries; if not, use a checked integer census in the style of the old
+Structured `ConcreteCounts` and `FiberCertificate` developments.
+The initial inspection finds `ScalableStepLaw.uniform_state_map_update`
+reusable for the uniform GL(22,2) transition and the checked `Map22`
+coordinates reusable for the fixed expansion. The Scalable image-weight
+spectrum is for Bernoulli bit inputs; it does not itself prove the 17
+packet-activity operators or their 11-state quotient. Those quotient and
+birth-class transitions need an explicit soundness proof.
+(4) Formalize complete-measure domination and a theorem transferring
 reference endpoints only under explicit numerical and route/inner premises.
-(4) Use the old checker pattern: untrusted code emits rational/dyadic data;
-Lean checks soundness of each endpoint, complete occupation coverage, and
-the exact positive sum in bounded modules. Hashes remain provenance, never
-the proof. (5) Connect the sum to the sampled encoder, prove injectivity
-for every setup, and audit the final theorem's recursive axioms. A first
-pilot should check one sparse support and one `q>=3` transfer for K16;
-this tests semantics before thousands of endpoints are generated.
+(5) Use the old checker pattern: untrusted code emits rational/dyadic data;
+Lean checks soundness from local operators through placement and powers,
+then complete occupation coverage and the exact positive sum in bounded
+modules. Hashes remain provenance, never the proof. (6) Connect the sum
+to the sampled encoder, prove injectivity for every setup, and audit the
+final theorem's recursive axioms. A first pilot should check one sparse
+support and one `q>=3` transfer for K18, where the existing 22-state map
+can be reused; this tests semantics before thousands of endpoints are
+generated. Port the separate K16 15-state map after that interface works.
 
 ## Progress and decision log
 
