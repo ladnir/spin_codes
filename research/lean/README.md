@@ -102,9 +102,14 @@ integrates the realized output weight over the actual outer, route, and
 inner setup and identifies its moment with the chronological kernel.
 The [region composition](SpinCodes/UniformMixer/ScalableRegionComposition.lean)
 identifies that kernel with the ordered product of regional full-state
-kernels, preserving the state across boundaries. The expectation of
-that product under the route law, outer/routing bounds, numerical
-first-moment gates, and finite Turbo certificates remain open.
+kernels, preserving the state across boundaries. The
+[independent shuffle product](SpinCodes/UniformMixer/ScalableRouteAverage.lean)
+and [casted shuffle law](SpinCodes/UniformMixer/ScalableCastShuffle.lean)
+show that the actual region shuffles average to the previously defined
+regional kernels. The [routed moment](SpinCodes/UniformMixer/ScalableRoutedMoment.lean)
+expresses the full setup moment as an expectation over row shuffles of
+their ordered product. Outer/routing bounds, numerical first-moment
+gates, and finite Turbo certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
