@@ -213,10 +213,18 @@ expresses each live row exactly in terms of the production expansion
 weight and expresses zero return as the actual feedback-kernel weight
 polynomial. The [exact spectrum summation](SpinCodes/UniformMixer/ScalableMomentSpectrumExact.lean)
 now converts any production weight function into the nine checked
-multiplicities and gives the exact mean live-row moment. The production
-image spectrum and its minimum nonzero weight are checked. The dual
-feedback-kernel distance, numerical witnesses,
-the outer-word sum, and distance gates remain open.
+multiplicities and gives the exact mean live-row moment. The
+[feedback Fourier proof](SpinCodes/UniformMixer/ScalableFeedbackFourier.lean)
+and [zero-feedback moment](SpinCodes/UniformMixer/ScalableFeedbackMomentExact.lean)
+express the weighted zero-return term and feedback-active probability in
+the same nine weights. The [live maximum](SpinCodes/UniformMixer/ScalableLiveMaxSpectrum.lean)
+is exactly the maximum over the eight realized nonzero weights. The
+[transfer spectrum pin](SpinCodes/UniformMixer/ScalableTransferSpectrumPin.lean)
+checks the statements and axiom dependencies for all four inputs
+`F`, `U`, `H`, and `u`. The production image spectrum and its minimum
+nonzero weight are checked. Numerical witnesses, the outer-word sum, and
+distance gates remain open; the dual feedback-kernel distance is not yet
+separately certified.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
 The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
