@@ -127,9 +127,11 @@ identify the zero-state event and bound a live state's individual target
 atoms and return probability under the actual production maps. The
 [three-coordinate envelope](SpinCodes/UniformMixer/ScalableEnvelope.lean)
 proves one-step domination for any nonnegative kernel satisfying the
-listed zero, atom, and averaged-row bounds. Its instantiation with the
-Bernoulli step kernel, matrix iteration, and spectrum-based numerical
-bounds remain open.
+listed zero, atom, and averaged-row bounds. The
+[row instantiation](SpinCodes/UniformMixer/ScalableEnvelopeRows.lean)
+verifies those conditions for the actual Bernoulli step kernel, including
+both minimum bounds on zero returns. Matrix iteration and spectrum-based
+numerical bounds remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 

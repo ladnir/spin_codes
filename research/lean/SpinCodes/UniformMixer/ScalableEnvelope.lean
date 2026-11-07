@@ -16,6 +16,14 @@ namespace Spin.UniformMixer
 def liveStateSet : Finset State22 :=
   (Finset.univ : Finset State22).erase 0
 
+theorem liveStateSet_nonempty : liveStateSet.Nonempty := by
+  have hb : basisVector 0 ≠ (0 : State22) := by
+    intro h
+    have h0 := congrFun h (0 : Fin 22)
+    simp [basisVector] at h0
+  exact ⟨basisVector 0,
+    Finset.mem_erase.mpr ⟨hb, Finset.mem_univ _⟩⟩
+
 def WeightedEnvelope (μ : State22 → ℝ) (a f u : ℝ) : Prop :=
   ∃ ν : State22 → ℝ,
     (∀ q, 0 ≤ ν q) ∧
