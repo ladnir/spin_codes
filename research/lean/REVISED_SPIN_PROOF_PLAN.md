@@ -476,12 +476,48 @@ generated. Port the separate K16 15-state map after that interface works.
   All new Turbo route, inner, and scalar-law declarations have only the
   standard Lean axioms; the full RS8 enumerator and finite endpoints
   remain open.
+- 2026-11-07: Audited the old `Structured/BASpectrum.lean` outer argument
+  before starting the Turbo RS8 outer. Its local-code injectivity and
+  weight-enumerator interface are the relevant pattern; the Golay--BAA
+  polynomial and its numerical bounds cannot be reused for an RS row.
+  `Turbo/RSRow.lean`, `Turbo/RSRowCode.lean`, and `Turbo/RS8Code.lean` now
+  prove that four distinct evaluations determine a degree-below-four row,
+  that the row message space has cardinality `|F|^4`, and that eight such
+  rows form `|F|^32` messages with at least five active columns for every
+  nonzero group. All these declarations compile with only standard Lean
+  axioms. The argument is currently generic over a field and an injective
+  eight-point evaluation map. It has not yet identified the concrete GF16
+  basis (modulus `0x13`) and evaluation points `0..7` used by the encoder.
+  The support floor is only a first semantic gate: it does not provide the
+  exact RS8 support enumerator needed by the finite first moment. Next prove
+  the shortened-code cardinality from the four-position information-set
+  property, derive the exact support counts by inclusion--exclusion, and
+  connect those counts to the old first-moment framework. Keep the actual
+  field representation and binary adjoint law as separate explicit gates.
+- 2026-11-07: Closed the next RS8 algebraic gate without importing a
+  numerical receipt. Evaluation at any four distinct points is now a
+  bijection from an RS row to four symbols, and evaluation at any four
+  distinct columns is a bijection from the eight-row group to four
+  32-bit columns (`RSRowCode.lean`, `RS8Code.lean`).
+  `RS8Shortening.lean` proves that zeroing any three selected columns
+  leaves exactly `|F|^8` groups, of which `|F|^8-1` are nonzero; every
+  nonzero survivor has exactly five active columns. At `|F|=16`, this is
+  `2^32-1` words for each specified five-column support. These are the
+  semantic ingredients of the `A_5` term, though the theorem summing over
+  all 56 supports is not yet stated. The `A_6,A_7,A_8` terms still require
+  shorter zero constraints and inclusion--exclusion. The three-zero
+  theorem assumes an injective four-position extension; proving that
+  every three-position selection admits one over the concrete eight
+  positions, and connecting to the actual GF16 implementation, remain
+  separate gates. All new declarations have only standard Lean axioms.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
-  recursive axioms, then complete the actual sampled-setup theorem. In
-  parallel, pin the actual Turbo setup/event and prove the RS8 expected
-  outer measure, beginning with the single-support semantic pilot. Use the
+  recursive axioms, then complete the actual sampled-setup theorem. The
+  checkpointed build is currently running and had checked Parts 0--25 at
+  the last inspection; do not restart it merely to check status. In
+  parallel, derive RS8 shortened-code and support-count identities, pin the
+  actual Turbo setup/event, and prove its expected outer measure. Use the
   finite audit above before choosing numerical checker data structures.
 
 At each future checkpoint, update the status and next action here before
