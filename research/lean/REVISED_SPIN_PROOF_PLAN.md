@@ -286,6 +286,14 @@ with one initial zero state and no regional reset. Lean checked this
 route-and-inner moment identity with only standard axioms. The outer
 sampler and its expected measure still need formalization; this theorem
 does not establish any finite distance margin.
+`SpinCodes/Turbo/ColumnMixer.lean` proves that a uniform nonzero field
+scalar sends each fixed nonzero column uniformly over nonzero values,
+that independently sampled column maps have the corresponding product
+law, and that they preserve the exact nonzero-column support. This is
+the first part of the outer-measure argument. The remaining work is to
+instantiate `F` as the 32-bit field, identify the binary adjoint action,
+prove the eight-row RS[8,4] column-support enumerator, and then derive
+the expected packet counts `C_v` under the actual local setup law.
 (4) Formalize complete-measure domination and a theorem transferring
 reference endpoints only under explicit numerical and route/inner premises.
 (5) Use the old checker pattern: untrusted code emits rational/dyadic data;
@@ -462,6 +470,12 @@ generated. Port the separate K16 15-state map after that interface works.
   compiles with only standard axioms. This reuses the old step-kernel proof
   after auditing its input and state-continuity semantics; the next finite
   gate is the RS8 outer measure and its product setup with this law.
+- 2026-11-07: Checked the generic nonzero field-scalar action and the
+  product law across independently randomized columns. The output
+  support agrees with the pre-randomization support for every setup.
+  All new Turbo route, inner, and scalar-law declarations have only the
+  standard Lean axioms; the full RS8 enumerator and finite endpoints
+  remain open.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
