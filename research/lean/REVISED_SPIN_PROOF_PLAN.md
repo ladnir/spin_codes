@@ -206,6 +206,16 @@ group shuffle makes a support of size `v` uniform over 64 positions, with
 uniform nonzero packet labels. The eight random columns are independent;
 different messages sharing a setup need not be. Prove this measure and its
 normalization in Lean before importing its numerical coefficients.
+The existing `UniformMixer/ScalableSetup.lean`, `ScalableRealization.lean`,
+and `ScalableFullMoment.lean` already define the uniform 22-state map law,
+chronological encoder, and moment bridge. Their one-bit route and shared
+Golay--BAA outer cannot be reused for Turbo. No paired 15-state map or
+GF(2^32) RS8 outer is currently modeled in Lean. Start the new outer with
+an abstract 32-bit field action and an explicit additive-coordinate
+equivalence; Mathlib has `GaloisField 2 32`, but the proof must relate this
+model to the paper's chosen binary adjoint map. The 22-state Turbo profiles
+can reuse the checked state-map law after their 64-bit packet stream is
+defined. K16 needs a separate 15-state map and law.
 
 | Length | Sparse part | Larger occupations | Receipt source |
 | --- | --- | --- | --- |
