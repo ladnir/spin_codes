@@ -57,10 +57,18 @@ cleared-column invariant, and final solution count. The evaluator also
 has kernel-checked 256-form pilots. The
 [block decomposition](SpinCodes/UniformMixer/QuadraticRankBlocks.lean)
 proves that adjoining histogram blocks sum exactly. A direct 1,024-form
-`decide +kernel` check exceeded the kernel's memory limit, so the full
-histogram still needs bounded-block certificates. The full
-radical-size distribution, decomposition of every production word into
-quadratic and affine parts, and full production spectrum remain open. The
+`decide +kernel` check exceeded the kernel's memory limit. The
+[one-pass histogram](SpinCodes/UniformMixer/QuadraticRankHistogram.lean),
+eight [bounded data pages](SpinCodes/UniformMixer/QuadraticRankHistogramPage0.lean),
+and [aggregation](SpinCodes/UniformMixer/QuadraticRankHistogramSum.lean)
+now kernel-check all 32,768 quadratic forms in 512-form blocks. Their
+actual radical sizes have multiplicities 1, 651, 18,228, and 13,888
+for sizes 64, 16, 4, and 1, respectively. The full production weight
+spectrum still needs the decomposition of every production word into
+quadratic and affine parts. The
+[Walsh class lemmas](SpinCodes/UniformMixer/QuadraticRankWalshClasses.lean)
+already derive the number, magnitude, and possible weights of the
+nonzero affine Walsh coefficients for each radical size. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
