@@ -100,7 +100,10 @@ shows that the region-by-step map array becomes independent uniform maps
 in encoder order. The [full moment identity](SpinCodes/UniformMixer/ScalableFullMoment.lean)
 integrates the realized output weight over the actual outer, route, and
 inner setup and identifies its moment with the chronological kernel.
-The region-wise kernel comparison, outer/routing bounds, numerical
+The [region composition](SpinCodes/UniformMixer/ScalableRegionComposition.lean)
+identifies that kernel with the ordered product of regional full-state
+kernels, preserving the state across boundaries. The expectation of
+that product under the route law, outer/routing bounds, numerical
 first-moment gates, and finite Turbo certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
