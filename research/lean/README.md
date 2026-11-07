@@ -63,9 +63,22 @@ eight [bounded data pages](SpinCodes/UniformMixer/QuadraticRankHistogramPage0.le
 and [aggregation](SpinCodes/UniformMixer/QuadraticRankHistogramSum.lean)
 now kernel-check all 32,768 quadratic forms in 512-form blocks. Their
 actual radical sizes have multiplicities 1, 651, 18,228, and 13,888
-for sizes 64, 16, 4, and 1, respectively. The full production weight
-spectrum still needs the decomposition of every production word into
-quadratic and affine parts. The
+for sizes 64, 16, 4, and 1, respectively. The
+[canonical coefficient triple](SpinCodes/UniformMixer/QuadraticCoefficientTriple.lean)
+and [production-state bridge](SpinCodes/UniformMixer/QuadraticProductionTriple.lean)
+now identify every production word bijectively with one constant bit, six
+linear coefficients, and fifteen quadratic coefficients, preserving its
+output weight. The [radical partition](SpinCodes/UniformMixer/QuadraticRadicalPartition.lean)
+proves that the four measured classes exhaust all 32,768 quadratic parts.
+The [class counts](SpinCodes/UniformMixer/QuadraticSpectrumClassCount.lean),
+[aggregate counts](SpinCodes/UniformMixer/QuadraticSpectrumAggregate.lean),
+and [production transfer](SpinCodes/UniformMixer/QuadraticProductionSpectrum.lean)
+prove exact multiplicities at weights 0, 16, 24, 28, 36, 40, 48, and 64.
+The [spectrum pin](SpinCodes/UniformMixer/QuadraticSpectrumPin.lean) prints
+their statements and axiom dependencies. The weight-32 count and complete
+spectrum identity remain open. Each radical class's weight-32 count is
+checked, but the current global aggregation exhausts Lean's kernel memory.
+The
 [Walsh class lemmas](SpinCodes/UniformMixer/QuadraticRankWalshClasses.lean)
 already derive the number, magnitude, and possible weights of the
 nonzero affine Walsh coefficients for each radical size. The
