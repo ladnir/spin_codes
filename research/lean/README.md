@@ -21,7 +21,11 @@ when the gap fits in one region. The
 that the old blockwise spectrum checker enumerates every production
 22-bit state once and measures its actual 64-coordinate output weight.
 The [packed-map pilot](SpinCodes/UniformMixer/Map22Packed.lean) checks the
-first and a high-offset 256-state block. The full production spectrum is
+first and a high-offset 256-state block. The
+[blockwise pilot](SpinCodes/UniformMixer/Map22SpectrumData/Basis.lean)
+reuses the prior certificate method on two 1,024-state blocks, including
+the block with the highest input bit set. Its untrusted witness generator
+is [here](scripts/map22_spectrum_data.py). The full production spectrum is
 not yet checked. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
