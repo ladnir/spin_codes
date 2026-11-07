@@ -237,8 +237,10 @@ three componentwise numerical inequalities. The
 [sparse analytic bounds](SpinCodes/UniformMixer/ScalableSparseBoundsPin.lean)
 check the quadratic zero-to-zero estimate, the zero-to-live and feedback-active
 union bounds, and the fresh-live bound from minimum production weight 16.
-The uniform-live mean bound and final three scalar inequalities remain open,
-as do the outer-word sum and distance gates.
+They also check the uniform-live mean bound and all three scalar inequalities
+for the rational sparse witness on `0 ≤ α ≤ 1/10000`, giving an unconditional
+Bernoulli moment bound for that interval. The outer-word sum, dense interval,
+and distance gates remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
