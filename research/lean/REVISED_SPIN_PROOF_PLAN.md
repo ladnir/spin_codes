@@ -53,10 +53,13 @@ For Turbo SPIN, Lean now checks the value-carrying packet route, its
 RS8 information-set, shortening, and exact-support identities. In
 particular, zeroing `m ≤ 4` selected columns leaves
 `|F|^(8*(4-m))` outer groups, and inclusion--exclusion now gives a
-checked exact count for every specified output-column support. These
-statements do not yet identify the concrete GF16/GF(2^32)
-implementation, simplify the count to the paper's `A_h`, establish the
-complete expected packet measure, or close any finite numerical endpoint.
+checked exact count for every specified output-column support. Lean also
+checks the paper's closed `A_h` expression for the actual number of
+messages with `h ≥ 5` active columns, assuming the base field has 16
+elements and eight distinct evaluation points. The proof handles the
+zero message's empty support separately. It does not yet identify the
+concrete GF16/GF(2^32) implementation, establish the complete expected
+packet measure, or close any finite numerical endpoint.
 
 ## Audit of the completed proof
 
@@ -548,14 +551,26 @@ generated. Port the separate K16 15-state map after that interface works.
   expected packet-weight polynomial still need to be derived from this
   checked formula; in particular, this formula is not yet the full
   sampled-setup first moment.
+- 2026-11-07: `Turbo/RS8SpectrumNumeric.lean` now kernel-checks the
+  simplification of the exact-support finite sum on all 256 subsets of
+  the eight positions. The first attempted equality failed at the empty
+  support; this is the unique zero message and contributes one, whereas
+  the paper's `A_h` applies only at `h ≥ 5`. With that case explicit,
+  Lean verifies the per-support alternating binomial sum, sums over
+  `binom(8,h)` supports, and proves the result equals the actual count
+  of eight-row messages of column weight `h`. The final `A_h` theorem
+  has only standard Lean axioms and assumes `|F|=16` plus distinct
+  evaluation points. The remaining outer gate is the *randomized*
+  expected packet measure: model the 32-bit field coordinates and
+  binary adjoint multiplication, then combine independent column laws
+  with this deterministic message count.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--43 at
+  checkpointed build is currently running and had checked Parts 0--50 at
   the last inspection; do not restart it merely to check status. In
-  parallel, simplify the checked RS8 support count to `A_h`, prove the
-  independent-column expected packet measure, and pin the
+  parallel, prove the independent-column expected packet measure and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
   finite audit above before choosing numerical checker data structures.
 
