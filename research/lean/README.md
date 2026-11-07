@@ -108,7 +108,12 @@ and [casted shuffle law](SpinCodes/UniformMixer/ScalableCastShuffle.lean)
 show that the actual region shuffles average to the previously defined
 regional kernels. The [routed moment](SpinCodes/UniformMixer/ScalableRoutedMoment.lean)
 expresses the full setup moment as an expectation over row shuffles of
-their ordered product. Outer/routing bounds, numerical first-moment
+their ordered product. The
+[route domination bridge](SpinCodes/UniformMixer/ScalableRouteDomination.lean)
+applies the checked uniform-permutation comparison to that exact
+nonnegative moment. Under the selected shared Golay–BAA outer event,
+every nonzero message has the weight range needed by this comparison.
+The iid inner estimate, outer-word summation, numerical first-moment
 gates, and finite Turbo certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
