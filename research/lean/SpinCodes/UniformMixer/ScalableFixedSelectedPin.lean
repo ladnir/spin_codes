@@ -1,0 +1,15 @@
+import SpinCodes.UniformMixer.ScalableFixedSelected
+
+#check Spin.UniformMixer.scalable_activeMessages_route_expect_le
+#check Spin.UniformMixer.scalable_occupation_failure_le_fair
+#check Spin.UniformMixer.scalable_native_one_tuple_bound
+#check Spin.UniformMixer.scalable_native_two_tuple_bound
+#check Spin.UniformMixer.scalableSelectedLayer_eq_route
+#check Spin.UniformMixer.scalableGoodLayer_one_tendsto
+#check Spin.UniformMixer.scalableGoodLayer_two_tendsto
+
+#print axioms Spin.UniformMixer.scalable_native_one_tuple_bound
+#print axioms Spin.UniformMixer.scalable_native_two_tuple_bound
+#print axioms Spin.UniformMixer.scalableSelectedLayer_eq_route
+#print axioms Spin.UniformMixer.scalableGoodLayer_one_tendsto
+#print axioms Spin.UniformMixer.scalableGoodLayer_two_tendsto
