@@ -35,7 +35,11 @@ identifies that weight with the production map. The
 autocorrelation identity for every six-variable Boolean function, and the
 [quadratic polar map](SpinCodes/UniformMixer/QuadraticPolar.lean) proves
 that each quadratic Walsh square is a character sum over its radical.
-The radical-size count, affine-character evaluation, and full production
+The [radical character](SpinCodes/UniformMixer/QuadraticRadical.lean)
+proves the remaining sum is either zero or the radical size and uses
+Parseval to count the nonzero affine Walsh coefficients for each
+quadratic part. The radical-size distribution, decomposition of every
+production word into quadratic and affine parts, and full production
 spectrum remain open. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
