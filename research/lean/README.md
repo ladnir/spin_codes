@@ -241,6 +241,11 @@ They also check the uniform-live mean bound and all three scalar inequalities
 for the rational sparse witness on `0 ≤ α ≤ 1/10000`, giving an unconditional
 Bernoulli moment bound for that interval. The outer-word sum, dense interval,
 and distance gates remain open.
+The [fixed-occupation region bridge](SpinCodes/UniformMixer/ScalableFixedRegionLimitPin.lean)
+transfers the checked full-state continuum limit to the actual Scalable
+region length and shuffle for every fixed support size and arbitrary state
+boundaries. Composing these limits across regions and checking their
+outer-weight exponents remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
