@@ -196,6 +196,13 @@ Turbo margin.
 - 2026-11-07: The new exact rational checker and its soundness theorem
   compile. The mixed witness now gives a fully checked point-rate rectangle;
   the generic leaf and hard pilot also compile against the exact predicate.
+- 2026-11-07: Re-audited `DenseOccupationGeometryDefs.lean`,
+  `DenseOccupationGeometry.lean`, `DenseOccupationGeometryCover.lean`, and
+  `scripts/emit_cover.py` before designing the full cover. The existing
+  two-coordinate `Rect`/`Tree` and `check_sound` match the revised domain.
+  The generated global table/tree and assembly must be new; split-tree
+  subclaims should be compiled independently, following the old generator's
+  response to its 16 GB monolithic-check failure.
 - Next action: make the untrusted generator emit shared exact witnesses,
   vertex data, and the exact split tree; compile a larger mixed-witness
   chunk to choose resource limits. Then assemble the full Scalable dense
