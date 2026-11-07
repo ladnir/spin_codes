@@ -17,6 +17,12 @@ mean for the paper's 22-by-64 matrix and a quadratic error bound for its
 empty-gap tilt. They also give a full-state empty-gap sandwich for an
 arbitrary entering state, with an explicit `1±C/L` factor at tilt `θ/L`
 when the gap fits in one region. The
+[packed-map bridge](SpinCodes/UniformMixer/Map22PackedBridge.lean) proves
+that the old blockwise spectrum checker enumerates every production
+22-bit state once and measures its actual 64-coordinate output weight.
+The [packed-map pilot](SpinCodes/UniformMixer/Map22Packed.lean) checks the
+first and a high-offset 256-state block. The full production spectrum is
+not yet checked. The
 [production impulse](SpinCodes/UniformMixer/Regional22.lean) identifies
 the actual one-bit output and feedback maps, proves each feedback column
 nonzero, and checks its weighted bounds and zero/live quotient. The
