@@ -115,9 +115,13 @@ nonnegative moment. Under the selected shared Golay–BAA outer event,
 every nonzero message has the weight range needed by this comparison.
 The [iid Bernoulli step](SpinCodes/UniformMixer/ScalableBernoulliStep.lean)
 defines the exact 64-bit reference input law and proves that its independent
-step kernel is a matrix power. Relating the route's iid reference to this
-step law, the inner estimate, outer-word summation, numerical first-moment
-gates, and finite Turbo certificates remain open.
+step kernel is a matrix power. The [iid wiring](SpinCodes/UniformMixer/ScalableIidWiring.lean)
+shows that the route's iid region bits become these independent step inputs.
+The [selected-outer moment bound](SpinCodes/UniformMixer/ScalableFirstMomentBound.lean)
+then compares the actual route-and-inner moment of every nonzero message to
+the row sum of that matrix power. The quantitative matrix estimate,
+outer-word summation, numerical first-moment gates, and finite Turbo
+certificates remain open.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
