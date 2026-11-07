@@ -233,13 +233,15 @@ the full-state Bernoulli moment. The production image spectrum and its minimum
 nonzero weight are checked. The
 [sparse-witness interface](SpinCodes/UniformMixer/ScalableSparseWitness.lean)
 fixes the paper's rational parameters and derives its moment bound from the
-three componentwise numerical inequalities. Those inequalities, the outer-word sum, and
-distance gates remain open; the dual feedback-kernel distance is not yet
-separately certified.
+three componentwise numerical inequalities. Those inequalities, the outer-word
+sum, and distance gates remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
-has no weights one through seven. Identifying these coefficients with the
-actual feedback-kernel weight counts is the next formal step.
+has no weights one through seven. The
+[dual kernel-distance bridge](SpinCodes/UniformMixer/ScalableDualKernelDistance.lean)
+uses the existing Krawtchouk character-sum theorem to identify those
+coefficients with the actual feedback-kernel counts and proves that every
+nonempty feedback-kernel word has weight at least eight.
 The [row-mask ANF check](SpinCodes/UniformMixer/Map22Quadratic.lean)
 kernel-checks that every production row has Boolean degree at most two.
 The [pivot inverse certificate](SpinCodes/UniformMixer/Map22Rank.lean)
@@ -254,8 +256,7 @@ at most two. The [quadratic code-space equivalence](SpinCodes/UniformMixer/Map22
 counts the 22 allowed monomials and proves that every such polynomial is
 realized by the production expansion. Its image spectrum and minimum
 nonzero output weight are now certified by the quadratic spectrum proof
-above. The dual
-feedback-kernel distance remains open.
+above. The dual feedback-kernel distance is certified by the Fourier bridge.
 The [packed spectrum pilot](SpinCodes/UniformMixer/Map22Packed.lean) pins the
 old blockwise checker to the production row masks, proves agreement on each
 input basis vector, and checks two 256-state blocks at opposite ends of the
