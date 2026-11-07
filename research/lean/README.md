@@ -304,7 +304,11 @@ insertion average for every fixed occupation. Its impulse is bounded by the
 enlarged impulse used by the Structured SPIN spacing proof. Consequently the
 same spacing estimate proves the Scalable two-state norm gate for every fixed
 occupation at least three. The outer profile count and its slightly different
-tilt exponent still need to be assembled with this gate.
+tilt exponent still need to be assembled with this gate. The
+[routed higher-row profile bound](SpinCodes/UniformMixer/ScalableFixedLargeRoutePin.lean)
+already transfers the norm gate to the actual sampled route and maps. Its
+tilt exceeds the Structured profile tilt by less than (Q/250000); this
+explicit excess must be charged in the remaining outer count.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The

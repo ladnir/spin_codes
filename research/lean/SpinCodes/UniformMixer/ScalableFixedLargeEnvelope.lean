@@ -59,6 +59,20 @@ theorem scalableLargeTheta_gamma (Q : ℕ) :
     scalableThetaOne, epochMean]
   ring
 
+theorem scalableLargeTheta_diff (Q : ℕ) :
+    scalableLargeTheta Q = paperLargeTheta Q +
+      (Q : ℝ) * (133 / 125) * (7 / 2097152) := by
+  unfold scalableLargeTheta paperLargeTheta scalableThetaOne
+  ring
+
+theorem scalableLargeTheta_excess (Q : ℕ) :
+    0 ≤ scalableLargeTheta Q - paperLargeTheta Q ∧
+      scalableLargeTheta Q - paperLargeTheta Q ≤
+        (Q : ℝ) / 250000 := by
+  rw [scalableLargeTheta_diff]
+  have hQ : (0 : ℝ) ≤ (Q : ℝ) := Nat.cast_nonneg Q
+  constructor <;> nlinarith only [hQ]
+
 theorem scalableLargeFugacity_le_enlarged {Q : ℕ}
     (u : Fin Q → ℝ) (hu : ∀ k, 0 ≤ u k)
     (i j : Fin 2) :
