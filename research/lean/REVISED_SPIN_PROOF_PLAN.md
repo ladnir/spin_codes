@@ -589,11 +589,23 @@ generated. Port the separate K16 15-state map after that interface works.
   arithmetic. Next derive the local generating polynomial and its
   independent product across active RS columns. The field-coordinate
   and binary-adjoint bridges remain open.
+- 2026-11-07: Reused the old `FiniteProductLaw.prod_sum_eq_sum_prod`
+  identity in `Turbo/PacketProductMoment.lean` to prove a general
+  product-expectation theorem for independently sampled columns.
+  `Turbo/PacketLocalMoment.lean` now proves the exact local generating
+  function `((1+15z)^8-1)/(2^32-1)` under a uniform nonzero 32-bit
+  column and its `h`th power for `h` independent active columns. These
+  moment theorems compile with only standard Lean axioms. This closes
+  the probability calculation **after** active columns have been
+  identified. The sampled RS8 outer still needs a proof that its
+  independent field multipliers (including the transposed adjoints)
+  induce this product law, followed by summing these moments over the
+  checked `A_h` classes. No finite distance endpoint follows yet.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--56 at
+  checkpointed build is currently running and had checked Parts 0--64 at
   the last inspection; do not restart it merely to check status. In
   parallel, prove the independent-column expected packet measure and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
