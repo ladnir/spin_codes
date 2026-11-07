@@ -50,10 +50,12 @@ development.
 
 For Turbo SPIN, Lean now checks the value-carrying packet route, its
 22-state inner moment identity, the generic field-scalar action, and the
-RS8 information-set and shortening counts. In particular, zeroing `m ≤ 4`
-selected columns leaves `|F|^(8*(4-m))` outer groups, and the nonzero
-three-zero survivors all have five active columns. These statements do
-not yet identify the concrete GF16/GF(2^32) implementation, establish the
+RS8 information-set, shortening, and exact-support identities. In
+particular, zeroing `m ≤ 4` selected columns leaves
+`|F|^(8*(4-m))` outer groups, and inclusion--exclusion now gives a
+checked exact count for every specified output-column support. These
+statements do not yet identify the concrete GF16/GF(2^32)
+implementation, simplify the count to the paper's `A_h`, establish the
 complete expected packet measure, or close any finite numerical endpoint.
 
 ## Audit of the completed proof
@@ -530,13 +532,30 @@ generated. Port the separate K16 15-state map after that interface works.
   inclusion--exclusion to require the remaining columns to be nonzero.
   The present proof is the algebraic side of the old enumerator interface;
   the expected packet measure and first-moment bridge are not yet proved.
+- 2026-11-07: Following the old `BASpectrum` weight-class bookkeeping,
+  used Mathlib's checked inclusion--exclusion theorem to count RS8 words
+  with **exactly** a specified set of active columns
+  (`Turbo/RS8Spectrum.lean`). The intersection in each term is a
+  zero-column constraint. `Turbo/RS8PositionSets.lean` builds a bijective
+  ordering with any chosen zero set first and proves the shortening
+  cardinality for arbitrary sets of size at most four.
+  `Turbo/RS8SpectrumCount.lean` proves that larger zero sets leave only
+  the zero group, identifies every intersection with the corresponding
+  zero-set subtype, and combines the cases into an exact finite-set-sum
+  formula for each support. No codeword enumeration or external receipt
+  is trusted in this derivation. The new declarations compile with only
+  standard Lean axioms. The paper's closed binomial `A_h` and its
+  expected packet-weight polynomial still need to be derived from this
+  checked formula; in particular, this formula is not yet the full
+  sampled-setup first moment.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--29 at
+  checkpointed build is currently running and had checked Parts 0--43 at
   the last inspection; do not restart it merely to check status. In
-  parallel, finish RS8 support counts by inclusion--exclusion, pin the
+  parallel, simplify the checked RS8 support count to `A_h`, prove the
+  independent-column expected packet measure, and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
   finite audit above before choosing numerical checker data structures.
 
