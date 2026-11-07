@@ -122,4 +122,34 @@ theorem bernoulliStepKernel_live_return_le (β z : ℝ)
       · simp only [hx, ne_eq, not_false_eq_true, ite_true, ite_false,
           one_mul, mul_one]
 
+theorem bernoulliStepKernel_row_sum (β z : ℝ)
+    (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) (q : State22) :
+    ∑ r : State22, bernoulliStepKernel β z hβ0 hβ1 q r =
+      scalableLiveMoment β z hβ0 hβ1 q := by
+  calc
+    _ = (bernoulliInputLaw β hβ0 hβ1).expect
+        (fun x => ∑ r : State22, stepKernel z x q r) := by
+      rw [FinPMF.expect_sum]
+      rfl
+    _ = _ := by
+      unfold scalableLiveMoment
+      have hfun :
+          (fun x : Input64 => ∑ r : State22, stepKernel z x q r) =
+          (fun x : Input64 => z ^ stepWeight x q) := by
+        funext x
+        simp only [stepKernel, ← Finset.mul_sum, update_sum, mul_one]
+      exact congrArg (bernoulliInputLaw β hβ0 hβ1).expect hfun
+
+theorem bernoulliStepKernel_zero_live_mass (β z : ℝ)
+    (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) :
+    ∑ r ∈ (Finset.univ : Finset State22).erase 0,
+      bernoulliStepKernel β z hβ0 hβ1 0 r =
+      scalableLiveMoment β z hβ0 hβ1 0 -
+        scalableZeroHold β z hβ0 hβ1 := by
+  have h := Finset.add_sum_erase (Finset.univ : Finset State22)
+    (fun r => bernoulliStepKernel β z hβ0 hβ1 0 r)
+    (Finset.mem_univ (0 : State22))
+  rw [bernoulliStepKernel_row_sum, bernoulliStepKernel_zero_zero] at h
+  linarith
+
 end Spin.UniformMixer
