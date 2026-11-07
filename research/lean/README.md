@@ -244,8 +244,8 @@ and distance gates remain open.
 The [fixed-occupation region bridge](SpinCodes/UniformMixer/ScalableFixedRegionLimitPin.lean)
 transfers the checked full-state continuum limit to the actual Scalable
 region length and shuffle for every fixed support size and arbitrary state
-boundaries. The continuum weight margins and outer-weight exponents remain
-open.
+boundaries. Continuum weight margins are checked below for one and two
+active rows; higher occupations and outer-weight exponents remain open.
 The [weighted composition bridge](SpinCodes/UniformMixer/ScalableFixedWeightedMarginPin.lean)
 now proves that any uniform continuum weighted margin for finitely many
 regional occupations transfers to all sufficiently large Scalable regions
@@ -255,13 +255,14 @@ numerical exponent check are not yet discharged.
 The [fixed-row fugacity bridge](SpinCodes/UniformMixer/ScalableFixedFugacityPin.lean)
 sums every subset of marked rows entering a region, proves an upper
 continuum comparison for the actual Scalable regional kernel, and composes
-a conditional weighted bound through any number of regions. Its numerical
-continuum margin remains open.
+a conditional weighted bound through any number of regions. The numerical
+premise is discharged below for one and two active rows.
 The [fixed-row profile bridge](SpinCodes/UniformMixer/ScalableFixedProfilePin.lean)
 expands that fugacity product, identifies each term with the actual regional
 encoder moment, and extracts a prescribed row-weight profile using the
-existing generic coefficient lemma. Its bound still assumes the continuum
-weighted margin; the numerical certificate and outer profile sum remain open.
+existing generic coefficient lemma. Its generic bound assumes a continuum
+weighted margin; the one- and two-row cases are discharged below. The
+outer profile sum remains open.
 The [two-state fixed-profile bridge](SpinCodes/UniformMixer/ScalableFixedTwoStatePin.lean)
 factors the full-state continuum kernel through zero/live classes, proves
 the exact weighted action, and reduces that margin to two scalar row
