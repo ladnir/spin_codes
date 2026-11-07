@@ -574,11 +574,26 @@ generated. Port the separate K16 15-state map after that interface works.
   GF(2^32) tower basis, its binary adjoint map in the transposed kernel,
   and the count of four-bit packet supports are still open. Do not use
   this conditional law as the finished sampled outer measure.
+- 2026-11-07: `Turbo/PacketSupportCount.lean` now proves that a specified
+  support of `v` four-bit packets inside a 32-bit column has exactly
+  `15^v` possible labels. Summing over supports gives
+  `binom(8,v)·15^v` binary columns, and under the uniform nonzero-column
+  law the packet-weight probability for `v ≥ 1` is exactly
+  `binom(8,v)·15^v/(2^32-1)`. The zero column is handled separately.
+  These theorems compile with only standard Lean axioms. A direct
+  specialization of the nonzero-cardinality proof to the concrete
+  32-bit function type exhausted the 6 GB Lean kernel limit; proving
+  that cardinal identity for an abstract finite type first avoids
+  expanding the `2^32`-element fintype. This mirrors the old proof's
+  practice of keeping symbolic counting separate from checked finite
+  arithmetic. Next derive the local generating polynomial and its
+  independent product across active RS columns. The field-coordinate
+  and binary-adjoint bridges remain open.
 - Next action: run the checkpointed part build, adapting any resource-heavy
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--51 at
+  checkpointed build is currently running and had checked Parts 0--56 at
   the last inspection; do not restart it merely to check status. In
   parallel, prove the independent-column expected packet measure and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
