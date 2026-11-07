@@ -278,6 +278,11 @@ With a rational tilt giving `regionGamma = 2`, it proves the two-state row
 bound and the corresponding actual sampled-profile bound. Neither fixed-row
 gate has yet been combined with the outer exponent; higher occupations
 remain open.
+The [routed fixed-profile bridge](SpinCodes/UniformMixer/ScalableFixedRoutedProfilePin.lean)
+also averages over the actual independent outer-row and regional shuffles,
+then over the independently sampled state maps. It turns any two-state
+row gate into a low-output-weight probability bound for a prescribed outer
+row profile. The sum over outer words and its exponent remain open.
 The [low dual coefficient check](SpinCodes/UniformMixer/ScalableDualLowCoefficient.lean)
 shows that the MacWilliams transform of the certified production spectrum
 has no weights one through seven. The
