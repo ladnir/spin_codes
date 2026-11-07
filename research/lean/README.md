@@ -122,6 +122,11 @@ then compares the actual route-and-inner moment of every nonzero message to
 the row sum of that matrix power. The quantitative matrix estimate,
 outer-word summation, numerical first-moment gates, and finite Turbo
 certificates remain open.
+The [weighted-row formulas](SpinCodes/UniformMixer/ScalableWeightedRows.lean)
+identify the zero-state event and bound a live state's individual target
+atoms and return probability under the actual production maps. The
+three-coordinate envelope and its spectrum-based numerical bounds are
+still to be formalized.
 The final Scalable and Turbo distance theorems remain open. The older
 native theorem below does not verify those revised constructions.
 
