@@ -824,6 +824,21 @@ generated. Port the separate K16 15-state map after that interface works.
   independent column laws with the conditional label theorem. This
   restriction/product bridge is new for the Turbo RS8 outer; inspect the
   old finite product and route pushforwards before implementing it.
+- 2026-11-07: `Turbo/SampledRS8PacketLaw.lean` now gives the complete
+  eight-column law for an actual fixed RS8 group message and one sampled
+  coefficient tuple. It reuses `FiniteProductLaw.piPMF_map` exactly as
+  the old route and outer product proofs do. The point formula says each
+  inactive RS column is zero with probability one and each active column
+  outputs any specified nonzero 32-bit packet value with probability
+  `1/(2^32-1)`; it also proves equal mass for any two outputs with the
+  same packet support in every column. This is stronger than the earlier
+  moment calculation, is admission-free, and has only the standard Lean
+  axioms. The next gate is to flatten columns to one 64-packet row,
+  transfer support and weight through that exact bijection, and combine
+  this value-level fiber symmetry with the old uniform row permutation
+  count. The group coefficient tuple remains shared across all messages.
+  This establishes the paper's single-group placement law only after the
+  row-shuffle composition itself has been checked.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
