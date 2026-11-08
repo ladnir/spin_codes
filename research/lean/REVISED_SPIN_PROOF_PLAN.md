@@ -414,6 +414,7 @@ that taking nonzero-packet support after routing gives exactly
 `ConcreteRoute.law` applies. It also proves preservation of active-packet
 count. These results use only the standard Lean axioms. They establish the
 route interface, not the RS8 outer measure or finite distance bound.
+
 `SpinCodes/Turbo/PacketInner22.lean` serializes 16 four-bit packets per
 64-bit step and 64 regions in chronological order. Its ideal law is the
 product of the checked packet-route seed law and independent uniform
@@ -443,6 +444,54 @@ support and one `q>=3` transfer for K18, where the existing 22-state map
 can be reused; this tests semantics before thousands of endpoints are
 generated. Port the separate K16 15-state map after that interface works.
 
+### Audit before the Turbo physical-operator pilot
+
+The old `Structured/ConcreteFixedRegionComposition.lean` proves that
+chronological state kernels compose as matrix products and that
+independently shuffled regions can be averaged one at a time. Its state
+and input are binary support sets, so its *matrix entries* do not apply
+to Turbo's four-bit packet labels. Reuse its composition pattern and
+finite-product argument after proving a new packet-valued local operator.
+`Structured/ConcreteCounts.lean` identifies frozen tables with the
+actual expansion/feedback maps through `MapSpectrumBridge` and
+`FiberNumericsAll`; `FiberCertificate.lean` proves an integer quadratic
+cap check. They illustrate checked data attached to explicit maps, but
+neither proves the Turbo GL(22,2) operator or its 11-coordinate quotient.
+
+The retained K18 producer is
+`permutation_locality/packed_mixing/s16_closure/sparse_kernel.py` plus
+`kernel_birth_density.py`, invoked by `k18_margin60/tune.py` and then
+`replay_fractional.py`. Its 17 outward physical matrices are `11×11`:
+coordinate 0 is zero-state mass, coordinates 1 and 2 are arbitrary and
+uniform-dominated nonzero mass, and the remaining eight coordinates
+retain expansion-weight classes. `sparse_kernel.outward_at_z` uses
+weighted first and second moments, a Cauchy bound on returning to zero,
+and uniform-GL refresh of any nonzero state. The optional capped-density
+row uses an exact Walsh inversion of the weighted feedback law, a
+uniform-density cap, and nonnegative residual mass by expansion class.
+Its floating continuation potential only *selects one complete candidate
+row*; taking entrywise minima is invalid. `replay_fractional.py` thins
+for zero packet labels, composes two physical steps chronologically,
+then takes outward fractional powers and regional products. The receipt
+verifier authenticates the resulting numbers and their union but does
+not prove any matrix majorizes the actual encoder kernel.
+
+The next proof interface must define a sound representation cone from
+exact nonnegative measures on `State22` to these eleven coordinates,
+prove that each local matrix preserves this representation for one
+physical step with `j=0..16` active packet slots, and identify the
+weight-class and feedback records with the explicit 22-state map.
+`UniformMixer/ScalableStepLaw.uniform_state_map_update` proves the
+uniform-GL refresh law and is reusable; its Bernoulli-bit input spectrum
+does not prove the packet/feedback moments. For a first K18 pilot, check
+one complete local occupancy matrix and its effect on an entering
+state representation, including the capped newborn row only if the
+baseline operator is too weak. Then check one sparse endpoint and its
+placement average against `turboRemainingFailure22`. Use rational or
+dyadic outward intervals for the `exp(-tilt)` weight. The old checked
+numeric-table design (small sound checker plus generated chunks) is the
+model for scaling the 17 operators and all endpoint data. A source hash
+is provenance and cannot replace the local operator inequality.
 ## Progress and decision log
 
 - 2026-11-07: Audited the old split-tree cover, generated Fourier witnesses,
