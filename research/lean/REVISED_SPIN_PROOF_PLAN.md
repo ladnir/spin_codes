@@ -839,6 +839,20 @@ generated. Port the separate K16 15-state map after that interface works.
   count. The group coefficient tuple remains shared across all messages.
   This establishes the paper's single-group placement law only after the
   row-shuffle composition itself has been checked.
+- 2026-11-07: `Turbo/SampledRS8Row.lean` now provides the exact
+  eight-columns-to-64-packets equivalence. It proves that the sampled
+  row's packet support has the `rs8SampledPacketWeight` used by the
+  previously checked `C_v`, and transfers equal mass within every
+  fixed packet-support fiber to the 64-packet row. The old
+  `Structured/BASpectrum.wtF_concatBlocks` supplied the appropriate
+  `Fintype.sum_equiv` pattern for the weight proof; the group law is new.
+  No independent per-message setup has been introduced. Next prove the
+  independent row-shuffle pushforward as a mixture over packet weights:
+  after shuffling, each complete target word of weight `v` has mass
+  `Pr[source weight=v]/(binom(64,v) 15^v)`. The already-proved
+  `packetShuffleLaw_apply` is the fixed-support case. Connect that exact
+  placement law to the `C_v` expected message counts, then add regional
+  routing and the inner event.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
