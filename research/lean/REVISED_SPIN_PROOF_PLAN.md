@@ -801,6 +801,18 @@ generated. Port the separate K16 15-state map after that interface works.
   state it for one RS8 group. The subsequent theorem must retain shared
   setup across messages and independent row/regional seeds. The Scalable
   cover was live through Part103 with an empty error log at inspection.
+- 2026-11-07: `Turbo/PacketLabelConditioning.lean` now checks the missing
+  local conditional law: a uniform nonzero eight-packet column has support
+  `s` with probability `15^|s|/(2^32-1)`, and, for nonempty `s`, every
+  compatible value has conditional probability `15^(-|s|)`. The support
+  fiber is proved equivalent to the previously counted unrestricted fiber;
+  the new field-adjoint pushforward supplies the actual sampled source.
+  Recursive axioms are only Lean's standard three. Next combine the
+  value-level field pushforward and this conditioning theorem for the eight
+  independent RS8 columns, giving a group-level uniform-label law. Then
+  compose with the complete-word packet shuffle theorem; keep the
+  coefficient seed shared between different messages in the first-moment
+  count.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
