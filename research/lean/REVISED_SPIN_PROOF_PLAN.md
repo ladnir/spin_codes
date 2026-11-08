@@ -73,6 +73,9 @@ The checked full-state kernel and lower-tail inequality bound the actual
 shared-outer active-set first moment by a chronological product of 64
 averaged reference-region kernels. This is a semantic bound, not yet a
 finite numeric certificate.
+An 11-coordinate state-measure cone and its generic complete-row
+transfer theorem are checked, but none of the retained local numerical
+rows has been proved sound for the physical kernel.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -1392,6 +1395,30 @@ is provenance and cannot replace the local operator inequality.
   certified 11-coordinate operator. Only then formalize the producer's
   two-step fractional inequality and check the finite endpoints and
   whole-code occupation union.
+- 2026-11-08: Audited the actual `s16_closure/sparse_kernel.py` row
+  semantics and `kernel_birth_density.py` capped-density split before
+  defining a Lean representation. Coordinates 0, 1, and 2 represent
+  zero-state mass, arbitrary nonzero mass, and nonzero mass dominated
+  pointwise by uniform density; coordinates 3..10 represent arbitrary
+  measures supported in the eight positive expansion-weight classes.
+  The producer's selected newborn row must be checked as a *complete*
+  decomposition; entrywise minima across different candidate rows are
+  not justified. `Turbo/PhysicalCone22.lean` formalizes this exact
+  measure cone, checks that the eight class indices cover every nonzero
+  state under the production map, and proves nonnegativity and the
+  terminal total-mass bound. It defines a local complete-row soundness
+  condition and proves that any matrix meeting it propagates the cone
+  through the full `2^22`-state kernel. The initial zero state has a
+  checked cone representation, and full-state and envelope actions
+  both compose in chronological matrix order. All printed theorems use
+  only standard Lean axioms. **No retained numerical row has yet been
+  shown to satisfy the soundness condition.** Next derive symbolic row
+  witnesses from the exact physical input law: first the zero-state
+  birth row and a coarse arbitrary-nonzero row, then the uniform and
+  weight-class rows using the checked uniform-GL refresh law. Compare
+  each bound with `sparse_kernel.outward_at_z`; only after the symbolic
+  inequalities close should a finite checker authenticate its Arb
+  endpoints or capped-density candidates.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
