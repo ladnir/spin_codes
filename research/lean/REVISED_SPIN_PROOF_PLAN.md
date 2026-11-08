@@ -61,6 +61,8 @@ the actual 22-state setup. Its first moment is now partitioned by active
 groups and expressed exactly as a sum of packet-array counts multiplied
 by one joint regional-route and continuous-inner failure probability.
 The symbolic bridge currently covers the 22-state K18/K20 construction.
+The exact 16-slot physical input law and full-state weighted step kernel
+are also checked; their 11-coordinate numerical envelope is still open.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -1017,6 +1019,36 @@ is provenance and cannot replace the local operator inequality.
   the first K18 sparse operator pilot. Check whether the producer's
   11-state quotient retains packet labels and chronological state; if
   not, fix its mathematical interface before importing any endpoint.
+
+- 2026-11-07: Before a new Turbo physical-step component, inspected the
+  completed `UniformMixer/ScalableStepLaw.uniform_state_map_update` and
+  `RegionalEncoder.stepKernel`, the old structured region matrix product,
+  and the retained `sparse_kernel.py` physical producer. The uniform
+  GL(22,2) transition for each fixed input and entering state is already
+  proved in Lean. The missing component is the **packet-valued local input
+  law**: exactly `j` of sixteen four-bit slots are active, with uniform
+  support and independent uniform nonzero labels, followed by one sampled
+  GL map. Define that finite law and its exact weighted full-state kernel
+  first. Only then introduce an 11-coordinate cone and a checked outward
+  operator. This separates a semantic identity from the numerical upper
+  bound and makes the old `stepKernel` reusable without misusing its
+  Bernoulli-bit input distribution.
+- 2026-11-07: `Turbo/PhysicalStep22.lean` now defines the exact local
+  input law for `j=0..16` active four-bit packet slots. A checked
+  support-fiber equivalence proves `15^j` labelings for each `j`-subset;
+  the full layer has `choose(16,j)*15^j` words, and its point mass is
+  exactly the reciprocal of that count. The 16 slots are definitionally
+  the actual `PacketInner22.stepInput` slots. The new full-state
+  weighted kernel equals sampling a fresh uniform `GL(22,2)` map for
+  that step, is nonnegative when `z≥0`, and sums to one at `z=1`.
+  Lean checked the printed theorems with only standard axioms. This
+  fixes the semantic target for the retained 17 physical operators;
+  it is not yet an 11-coordinate upper bound or a proof that the
+  regional routing conditioned on slot counts has this product law.
+  Next prove that conditional route law and define the sound
+  11-coordinate measure representation, reusing the already proved
+  `QuadraticSpectrumSupport` weight classes and the old finite checker
+  only after matching their exact map and law.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
