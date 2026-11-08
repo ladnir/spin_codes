@@ -225,6 +225,21 @@ field-tower and transpose bridge is the next semantic gate. The old
 `ConcretePairing` basis-incidence proof is the model for that check. The C++
 scalar tests are implementation checks, not a Lean proof of this bridge.
 
+**Ideal GF(2^32) gate closed:** `Turbo/ColumnAdjointField.lean` instantiates
+the abstract theorem with Mathlib's `GaloisField 2 32` and a binary linear
+basis. It defines multiplication as a linear map, takes the actual matrix
+transpose as its adjoint, and proves the dot-product pairing identity using
+`Matrix.dotProduct_transpose_mulVec`. This is the precise counterpart of the
+old `ConcretePairing` incidence argument. It then regroups the 32
+coordinates into eight four-bit packets and proves both the sampled
+one-column generating function and its product over `h` independent active
+columns. These declarations have only the standard Lean axioms. The chosen
+basis is abstract; the probability law is basis-independent. The file does
+not verify that the C++ tower arithmetic in `Field.h` realizes a field or
+that its generated reverse columns implement this particular matrix
+transpose. That implementation bridge remains separate from the paper's
+ideal sampled-law proof and must not be conflated with it.
+
 After this gate, combine the checked `A_h` count with the independent-column
 packet generating function to derive the full expected group measure. Then
 prove packet-route support symmetry and connect that measure to the existing
@@ -672,8 +687,16 @@ generated. Port the separate K16 15-state map after that interface works.
   39240, `research/lean/.lake/fullcover/resume.out` and `resume.err`).
   Inspect this handle and these files before any further restart. This is
   still a partial cover; no `ScalableDenseRates` theorem has been claimed.
-  The next Turbo action is the concrete GF(2^32) adjoint bridge, followed
-  by deriving the expected group measure from the checked `A_h` classes.
+  The next Turbo action at this checkpoint was the ideal GF(2^32) adjoint
+  bridge; the subsequent entry records its result.
+- 2026-11-07: The ideal GF(2^32) matrix-adjoint bridge and exact sampled
+  packet generating functions now compile in `Turbo/ColumnAdjointField.lean`.
+  The next proof step is to identify the eight RS8 output columns with
+  `Bits32` under the eight-row coordinate transpose, then sum the
+  independently sampled `h`-column law over the checked `A_h` classes.
+  Only after that should the packet-route and inner first moments be
+  combined. At last inspection the resumed Scalable cover process was
+  live and had checked Parts 0--72; its error file was empty.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
