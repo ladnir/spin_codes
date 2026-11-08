@@ -1535,6 +1535,19 @@ is provenance and cannot replace the local operator inequality.
   For the pilot use one nontrivial occupancy, such as `j=1`, and a
   rational tilt. This is a scope correction, not evidence of a false
   finite certificate.
+- 2026-11-08: Audited the old expectation and chronological product
+  interface in `UniformMixer/ScalableRouteAverage.lean` before proving
+  the Turbo thinning bridge. `Turbo/PhysicalThinningRows22.lean` now
+  checks that nonnegative weighted sums preserve complete-row
+  soundness, including support and the capped-density constraint.
+  Combining this with the already checked full-state identity
+  `turboSelectedKernel22_mixture` proves that sound exact-nonzero
+  occupancy rows thin to a sound selected-slot row. This matches the
+  retained replay's order and uses only standard Lean axioms. The
+  premise that the retained 17 exact-nonzero numeric matrices are sound
+  remains open; the existing selected symbolic row is a cross-check,
+  not a substitute for that premise. Next derive exact-nonzero symbolic
+  rows from `packetStepLaw22`, then test one nontrivial numerical row.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
