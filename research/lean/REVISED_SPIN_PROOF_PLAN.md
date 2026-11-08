@@ -1148,6 +1148,33 @@ is provenance and cannot replace the local operator inequality.
   inactive zero words, and connect the resulting uniform-value
   reference to the conditional regional-slot law and full inner
   moment. The 11-coordinate operator and finite endpoints remain open.
+- 2026-11-08: Before the active-group product and expectation bridge,
+  rechecked the completed `Structured/ConcreteOuterCountingProduct.lean`:
+  `tupleCount_le_fairRows` multiplies local pointwise count bounds, then
+  `activeMessages_expect_le` multiplies by the same nonnegative conditional
+  route failure and sums complete row arrays. Also rechecked
+  `Structured/Domination.Dominates.expect_le`, which transfers a pointwise
+  measure comparison to any nonnegative test. The Turbo counterpart uses
+  complete four-bit packet values and the shared regional route plus
+  continuous inner state, so only this algebraic structure transfers.
+  An initial monolithic Turbo theorem exhausted Lean's kernel memory
+  limit at `-M 6000`. Splitting it into local nonnegativity and comparison
+  lemmas, a generic finite-product lemma, and a separate weighted-sum
+  lemma resolved that resource failure without changing the statement.
+  `Turbo/RS8UniformReference22.lean` now proves the active-set product
+  bound by `beta_old^|S|` times the reference product density.
+  `Turbo/RS8ReferenceMoment22.lean` transfers it through the actual
+  `turboRemainingFailure22` event and back to the original shared-outer
+  setup expectation. Both modules compile admission-free and their final
+  theorems have only Lean's standard axioms. The current reference is an
+  explicit atom density: active groups use uniform values on all 256
+  bits; inactive groups retain the exact zero-message law.
+  Next identify this product density with a normalized reference law and
+  derive the conditional regional-slot distribution that justifies the
+  producer's `selectedStepLaw22` and `15/16` thinning. Audit the completed
+  `ConcretePlacementLaw` and `ConcreteFixedRegionComposition` at that
+  interface. The checked thinning identity alone is not yet a bound on
+  the original regional route or the 11-coordinate operator.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
