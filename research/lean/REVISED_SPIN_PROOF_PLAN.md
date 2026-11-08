@@ -1175,6 +1175,30 @@ is provenance and cannot replace the local operator inequality.
   `ConcretePlacementLaw` and `ConcreteFixedRegionComposition` at that
   interface. The checked thinning identity alone is not yet a bound on
   the original regional route or the 11-coordinate operator.
+- 2026-11-08: `Turbo/RS8ReferenceLaw22.lean` normalizes that explicit
+  density. Lean proves the complete packet-word cardinality is `2^256`,
+  defines a uniform-value law for each active group and the actual
+  zero-message law for each inactive group, and proves the independent
+  product has exactly the density in the pointwise comparison. It then
+  rewrites the actual active-set first-moment bound as `beta_old^|S|`
+  times the reference law's expectation of the *same* remaining failure
+  event. The theorem is checked with only Lean's standard axioms.
+  For the next route component, audited the old
+  `Structured/ConcretePlacementLaw` and
+  `ConcreteFixedRegionComposition`: the former derives uniform shuffled
+  support from the actual uniform permutation and gives exact inclusion
+  probabilities; the latter composes independent regional kernels while
+  retaining chronological state. Turbo must additionally retain four-bit
+  labels and values that can be zero. Prove first that inactive reference
+  rows are identically zero and that an active uniform packet row has
+  independent uniform four-bit coordinates. Then establish, for a fixed
+  active set and one regional permutation, the uniform selected-set and
+  value law on complete regional rows. Restrict to a 16-slot physical
+  step, condition on the number of selected slots, and identify its law
+  with `selectedStepLaw22`; only then apply the checked thinning identity
+  and begin the 11-coordinate operator soundness proof. Check that the
+  regional shuffles remain independent across the 64 regions while the
+  state is continuous across their chronological composition.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
