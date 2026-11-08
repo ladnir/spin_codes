@@ -853,6 +853,25 @@ generated. Port the separate K16 15-state map after that interface works.
   `packetShuffleLaw_apply` is the fixed-support case. Connect that exact
   placement law to the `C_v` expected message counts, then add regional
   routing and the inner event.
+- 2026-11-07: Closed that single-group placement bridge in
+  `Turbo/PacketShuffleMixture.lean` and
+  `Turbo/RS8ShuffledPlacement.lean`. The former proves a generic exact
+  disintegration of any finite packet-word law uniform on fixed support
+  fibers, using the old `FiniteLaw.map_prob`/`Prob.prob` interface; it
+  composes this law with an independent row permutation and obtains
+  `Pr[source packet weight=v]/(binom(64,v) 15^v)` for every complete target
+  word of weight `v`. The latter pins the source weight event to the
+  previously proved `rs8SampledPacketWeight` and sums over nonzero RS8
+  messages, yielding exactly `C_v/(binom(64,v) 15^v)` as an expected
+  complete-word count. All stated theorems compile without admissions and
+  have only the three standard Lean axioms. This proves the paper's
+  one-group value placement **before regional shuffling and the inner**;
+  it does not yet certify a distance endpoint. Next audit the old
+  `ConcreteRoutePermutation` and `ConcreteFixedRegionComposition`
+  product/transpose steps, then lift the actual value-carrying route and
+  inner event for one and two active groups. The finite numerical
+  operators and complete occupation coverage remain open. The Scalable
+  dense full-cover build remains an independent checkpointed process.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
