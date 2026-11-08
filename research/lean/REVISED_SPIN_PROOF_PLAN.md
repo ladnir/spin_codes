@@ -899,6 +899,31 @@ generated. Port the separate K16 15-state map after that interface works.
   the 22-state value kernel and build the 15-state analog only after
   auditing the shared inner proof infrastructure and implementation map.
 
+- 2026-11-07: Before the Turbo occupation component, audited the old
+  `Framework.Setup.Z_eq_sum_ZQ` and `expect_Z_eq_sum_expect_ZQ`,
+  `FiniteMoment.expect_ZQ_eq`, and `Structured/ConcreteOuter.occupation_pos`
+  / `occupation_le`. The generic first-moment partition is reusable;
+  the old local-message and Bernoulli support counting are not. The
+  Turbo occupation must count nonzero RS8 group inputs, prove it lies in
+  `1..L` for every nonzero full message, and instantiate the actual
+  setup's `ZQ` identity before any numerical occupation sum is claimed.
+- 2026-11-07: `Turbo/Occupation22.lean` now proves that nonzero Turbo
+  messages have occupation in `1..R*16`, partitions the actual bad-message
+  count and its expectation by occupation, identifies each occupation
+  term with the shared-outer-setup first moment, and partitions that term
+  by its exact active group set. The proof reuses the old generic `ZQ`
+  and `expect_ZQ_eq` statements; no finite numerical bound is inferred.
+  All printed theorems have only Lean's standard axioms. Before a sparse
+  fold, audited `Structured/ConcreteOuterCountingProduct.tupleCount_eq_prod`
+  and `ConcreteOuterCountingProbability.sum_occupation_eq_activeSets`:
+  the product factorization is valid only after fixing one active set and
+  summing local messages under independent *group* setup coordinates.
+  The old Bernoulli support measure cannot replace Turbo's complete
+  packet values. Next prove the marginal of `turboOuterLaw22` for a fixed
+  active set and push it through the complete `sampledRS8RowLaw`; then
+  incorporate the common regional route and inner law for the `U₁/U₂`
+  folds. Keep the local physical operator soundness gate separate.
+
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
 their reason in research notes when they inform a later decision.
