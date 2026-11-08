@@ -23,6 +23,13 @@ when a new obstacle appears. A faster-looking standalone check is not a
 substitute for a connection to the sampled encoder or complete parameter
 coverage.
 
+Treat this file as the decision log for the active proof. At each completed
+lemma, failed strategy, or change of interface, update the relevant gate and
+the next action. Before starting a new component, identify its old-proof
+counterpart by declaration and check its assumptions and conclusion in the
+source. If no counterpart exists, record that fact and the new obligation.
+The audit is a design input, not a requirement to copy the old code.
+
 ## Target and present status
 
 The Scalable target is the paper's one-bit route, shared growing Golay--BAA
@@ -175,6 +182,54 @@ full theorem statement and recursive axioms; only `propext`,
 `Classical.choice`, and `Quot.sound` may remain.
 
 ## Finite Turbo gate
+
+### Current gate: sampled column adjoint
+
+The immediate task is to justify the packet law for the *transposed* encoder.
+For a fixed nonzero 32-bit column `x`, the paper samples a uniform nonzero
+field coefficient `c` and applies the binary adjoint of multiplication by
+`c`. We need a checked theorem that this image is uniform over all nonzero
+32-bit columns. The forward multiplication theorem in `Turbo/ColumnMixer.lean`
+does not establish this: its output has the wrong orientation.
+
+Old-proof audit: `UniformMixer/ScalableStepLaw.uniform_state_map_update`
+turns a uniform sampled `GL(22,2)` state map into an exact transition law by
+counting the event fiber; `uniform_state_map_expect` then transports the law
+to observables. `Structured/ConcretePairing.chi_adjoint_of_basis` proves a
+concrete binary transpose identity from basis incidences. The first supplies
+the probability-space and observable pattern; the second supplies the
+implementation-identity pattern. Neither proves the Turbo field adjoint
+action, so the new algebraic bridge is necessary.
+
+First prove a field-generic lemma under an explicit nondegenerate binary
+pairing and an additive field-to-column equivalence. Its adjoint identity
+must imply that, for fixed nonzero `x`, the map from nonzero coefficients to
+nonzero adjoint images is a bijection: a zero image would annihilate the
+pairing against every field element, and equal images for two coefficients
+would do the same for their nonzero difference. Transport the uniform law
+through that bijection and then through the product sampler for independent
+columns. This abstract lemma is an intermediate theorem. A separate checked
+bridge must show that the concrete GF(2^32) multiplication, binary basis,
+and transposed kernel satisfy its pairing identity and nondegeneracy. Only
+then may the local packet generating function be attached to the actual
+sampled Turbo setup.
+
+**Algebraic gate closed:** `Turbo/ColumnAdjoint.lean` proves the nonzero
+image, coefficient injectivity, resulting nonzero-column equivalence,
+uniform image law, and product law for independently sampled coefficients.
+Its recursive axiom audit reports only `propext`, `Classical.choice`, and
+`Quot.sound`. Its hypotheses include a nondegenerate pairing, an additive
+coordinate equivalence, and the adjoint identity. These hypotheses are not
+yet proved for `spin/src/rs8/Field.h` and `SetupScalar.cpp`; the concrete
+field-tower and transpose bridge is the next semantic gate. The old
+`ConcretePairing` basis-incidence proof is the model for that check. The C++
+scalar tests are implementation checks, not a Lean proof of this bridge.
+
+After this gate, combine the checked `A_h` count with the independent-column
+packet generating function to derive the full expected group measure. Then
+prove packet-route support symmetry and connect that measure to the existing
+route/inner moment law. The finite numerical endpoint checker remains a
+separate gate; no present local lemma implies a distance margin.
 
 Before designing its Lean checker, audit the old finite certificate and
 the current Turbo replay code against the actual RS8 outer, packet route,
@@ -605,11 +660,20 @@ generated. Port the separate K16 15-state map after that interface works.
   chunk by a finer cut rather than weakening the target. Compile all 39
   segment claims and the global `ScalableDenseRates` declaration, audit its
   recursive axioms, then complete the actual sampled-setup theorem. The
-  checkpointed build is currently running and had checked Parts 0--64 at
-  the last inspection; do not restart it merely to check status. In
+  resumed checkpointed build had checked Parts 0--65 at the last
+  inspection; do not restart it merely to check status. In
   parallel, prove the independent-column expected packet measure and pin the
   actual Turbo setup/event, and prove its expected outer measure. Use the
   finite audit above before choosing numerical checker data structures.
+- 2026-11-07: The first full-cover process stopped after checking Part65;
+  its PID was absent, no Lean process was running, and the output/error
+  files had not changed for hours. All 66 part `.olean`s remained present.
+  Resumed the same manifest with the checkpoint-aware build script (PID
+  39240, `research/lean/.lake/fullcover/resume.out` and `resume.err`).
+  Inspect this handle and these files before any further restart. This is
+  still a partial cover; no `ScalableDenseRates` theorem has been claimed.
+  The next Turbo action is the concrete GF(2^32) adjoint bridge, followed
+  by deriving the expected group measure from the checked `A_h` classes.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
