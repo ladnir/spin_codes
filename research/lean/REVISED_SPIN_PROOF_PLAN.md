@@ -1203,11 +1203,13 @@ is provenance and cannot replace the local operator inequality.
   It proves directly from the RS8 evaluation and sampled adjoint map that
   the zero group produces the zero complete packet word for *every*
   sampled column-multiplier tuple, and that any row permutation preserves
-  this word. Lean checks the theorem with only standard axioms. This is
-  a pointwise physical fact, not yet a statement about the reference
-  law's regional shuffle or conditional physical steps. Next lift it to
-  the zero-row probability law, then combine it with the independent
-  uniform active rows before conditioning on regional slot counts.
+  this word. It lifts the fact through both sampled probability maps:
+  the zero-message row law, before and after its row shuffle, has atom
+  one at the zero complete word and atom zero everywhere else. All three
+  printed theorems have only standard Lean axioms. Next combine this
+  deterministic inactive row with the independent uniform active rows
+  under the actual regional permutation, retaining all four-bit values,
+  before conditioning on the physical-step slot counts.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
