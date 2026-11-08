@@ -246,6 +246,26 @@ prove packet-route support symmetry and connect that measure to the existing
 route/inner moment law. The finite numerical endpoint checker remains a
 separate gate; no present local lemma implies a distance margin.
 
+**Expected group measure closed:** `Turbo/RS8FieldMoment.lean` takes eight
+actual RS[8,4] polynomial rows over `GaloisField 2 4`, evaluates their
+eight output columns, identifies each column with 32 binary coordinates,
+and samples eight independent nonzero `GaloisField 2 32` coefficients.
+`rs8_fixed_group_packet_gf` proves the exact moment for each fixed group,
+including zero columns. `rs8_nonzero_group_packet_gf_closed` sums over
+every nonzero group message and rewrites the result using the checked
+`A_h` MDS formula. This follows the old `Framework.expect_Z_eq` and
+`FiniteProductLaw.prod_sum_eq_sum_prod` separation: one sampled setup is
+shared by all messages; independence is invoked only among its eight
+column coefficients, and linearity of expectation handles the message
+sum. The theorem assumes eight distinct evaluation points. Its arbitrary
+binary coordinate basis is sufficient for the ideal distributional law,
+whose value is basis-independent; it has not yet checked the exact C++
+GF16 polynomial basis and point encoding. Recursive axioms are the three
+standard Lean axioms. This is a generating-function identity, not yet a
+coefficientwise `C_v` theorem, routed support law, or finite distance
+certificate. Next prove the packet-weight support range and identify its
+coefficients, then compose with the packet route and inner moment.
+
 Before designing its Lean checker, audit the old finite certificate and
 the current Turbo replay code against the actual RS8 outer, packet route,
 and uniform state-map law. Record the exact first-moment summands, one- and
@@ -697,6 +717,15 @@ generated. Port the separate K16 15-state map after that interface works.
   Only after that should the packet-route and inner first moments be
   combined. At last inspection the resumed Scalable cover process was
   live and had checked Parts 0--72; its error file was empty.
+- 2026-11-07: `Turbo/RS8FieldMoment.lean` now closes the ideal sampled
+  RS8 expected packet polynomial through the exact `A_h` classes.
+  The old `Framework` and `FiniteProductLaw` interfaces were inspected
+  before the group-sum proof. No coefficient receipt or independent
+  per-message setup assumption was used. At last inspection the resumed
+  full-cover process remained live through Part82 with an empty error
+  file. The next finite gate is coefficientwise `C_v` and its uniform
+  support/label placement after packet shuffling; the numerical finite
+  operator checks remain open.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
