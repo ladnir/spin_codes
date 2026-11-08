@@ -67,6 +67,12 @@ identity justifies the producer's `15/16` mixture at the complete-word level;
 it does not yet justify its 11-coordinate numerical envelope. The revised
 RS8 active-group expected count is now pointwise bounded by the retained
 uniform-reference atom factor, before and after the sampled row shuffle.
+The exact reference route is now disintegrated into hypergeometric
+physical-step count profiles, with complete four-bit values retained.
+The checked full-state kernel and lower-tail inequality bound the actual
+shared-outer active-set first moment by a chronological product of 64
+averaged reference-region kernels. This is a semantic bound, not yet a
+finite numeric certificate.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -1356,6 +1362,36 @@ is provenance and cannot replace the local operator inequality.
   particular, do not multiply stepwise scalar failure probabilities:
   matrix products must retain the shared state, and the producer's
   two-step fractional inequality needs its own soundness theorem.
+- 2026-11-08: Audited the completed Scalable implementation of the old
+  region-composition idea in `UniformMixer/ScalableRegionComposition` and
+  `ScalableRouteAverage`. Its `inputListKernel_flatten`,
+  `kernelListProduct_matrix`, and `matrixExpect22_pi_product` are already
+  checked for the same 22-state space and preserve chronological state.
+  Also audited `FiniteMoment.prob_weight_le_of_moment` and the retained
+  Turbo producer `workstreams/k18_margin60/replay_fractional.py`: the
+  producer thins before taking fractional powers of chronological
+  two-step products, averages with exact 32-slot hypergeometric weights,
+  and powers the regional operator 64 times. These are further proof
+  obligations, not consequences of the local input-law identity.
+  `Turbo/RS8ReferenceKernel22.lean` now checks the complete semantic
+  bridge: the actual flat input is a concatenation of region streams;
+  each region stream is an ordered product of full-state physical step
+  kernels; conditioning on the regional count profile gives a product
+  of `turboSelectedKernel22` matrices; and averaging the 64 independent
+  regions gives their chronological matrix product. It then integrates
+  the sampled state maps, applies the lower-tail moment inequality, and
+  bounds the actual shared-outer active-set first moment by this
+  reference kernel with the existing RS8 outer factor. All printed
+  theorems compile without admissions and use only standard Lean axioms.
+  This identifies the exact finite-certificate target, but the full
+  `2^22` matrix is not a practical numeric checker. Next inspect the
+  retained 11-coordinate map and its source invariants, compare its
+  domination proof with the old Structured/Scalable quotient or
+  Collatz arguments, and prove a sound compression from each full-state
+  `turboSelectedKernel22` (including selected zero labels) to the
+  certified 11-coordinate operator. Only then formalize the producer's
+  two-step fractional inequality and check the finite endpoints and
+  whole-code occupation union.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
