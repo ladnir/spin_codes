@@ -261,14 +261,20 @@ sum. The theorem assumes eight distinct evaluation points. Its arbitrary
 binary coordinate basis is sufficient for the ideal distributional law,
 whose value is basis-independent; it has not yet checked the exact C++
 GF16 polynomial basis and point encoding. Recursive axioms are the three
-standard Lean axioms. This is a generating-function identity, not yet a
-coefficientwise `C_v` theorem, routed support law, or finite distance
-certificate. `rs8_sampled_packet_weight_range` now proves that every
+standard Lean axioms. `rs8_sampled_packet_weight_range` now proves that every
 nonzero message has between 5 and 64 active packets under every sampled
 nonzero coefficient tuple, so the generating function has exactly the
 paper's claimed degree range. This uses the old support floor and the new
-adjoint nonzero theorem. Next identify the coefficientwise `C_v`, then
-compose with the packet route and inner moment.
+adjoint nonzero theorem. `rs8ExpectedPacketCount` now defines each `C_v`
+as the expected number of nonzero messages of packet weight `v`.
+`rs8_expected_packet_count_gf` proves the paper's coefficientwise
+generating-function equation, and
+`rs8_expected_packet_count_total_numeric` checks that their sum is
+`2^128-1`. These use the old `Prob.expect_comp` fiber decomposition,
+with the every-setup `5..64` range as its coverage premise. No routed
+support/label law or finite distance certificate follows yet. The next
+gate is the value-carrying packet shuffle and its placement law, then
+composition with the inner moment.
 
 Before designing its Lean checker, audit the old finite certificate and
 the current Turbo replay code against the actual RS8 outer, packet route,
@@ -736,6 +742,14 @@ generated. Port the separate K16 15-state map after that interface works.
   field adjoint. The full-cover process remained live through Part86 with
   an empty error file. The next finite step remains coefficientwise
   extraction of the expected `C_v` and the value-carrying shuffle law.
+- 2026-11-07: Defined `C_v` as actual expected message counts and checked
+  both its generating-function identity and `Σ_{v=5}^{64} C_v=2^128-1`
+  in `Turbo/RS8FieldMoment.lean`. This reuses the old finite-valued
+  expectation decomposition instead of trusting coefficients emitted by
+  Python. The Scalable cover process was live through Part87 with an
+  empty error file. Next audit the old uniform-shuffle fiber count and
+  extend it to complete four-bit packet values before deriving Turbo's
+  routed local measure.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

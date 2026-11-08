@@ -349,6 +349,101 @@ theorem rs8_sampled_packet_weight_range
             (Finset.univ : Finset (Fin 8)))
       _ = 64 := by norm_num
 
+/-- `C_v`: the expected number of nonzero RS8 group messages producing
+exactly `v` active packets under the ideal independently sampled column
+adjoints. Different messages share the same sampled setup. -/
+def rs8ExpectedPacketCount (points : Fin 8 → Field16) (v : ℕ) : ℝ :=
+  ∑ rows ∈ nonzeroMsgs (RS8Group Field16),
+    (piPMF (fun _ : Fin 8 =>
+      FinPMF.uniform {c : Field32 // c ≠ 0})).prob
+      (fun coeff => rs8SampledPacketWeight points rows coeff = v)
+
+/-- The coefficientwise expected counts `C_v` have exactly the paper's
+generating polynomial. The left side is the expected message count, not
+the packet-weight law of one fixed message or a realized code. -/
+theorem rs8_expected_packet_count_gf
+    (points : Fin 8 → Field16) (hpoints : Function.Injective points)
+    (z : ℝ) :
+    (∑ v ∈ Finset.Icc 5 64, rs8ExpectedPacketCount points v * z ^ v) =
+      ∑ h ∈ Finset.Icc 5 8,
+        (((Nat.choose 8 h : ℤ) *
+          ∑ j ∈ Finset.range (h-4),
+            (-1 : ℤ) ^ j * (h.choose j : ℤ) *
+              (((2^32 : ℕ) ^ (h-4-j) - 1 : ℕ) : ℤ) : ℤ) : ℝ) *
+          (((1 + 15 * z) ^ 8 - 1) / (2 ^ 32 - 1 : ℝ)) ^ h := by
+  rw [← rs8_nonzero_group_packet_gf_closed points hpoints z]
+  unfold rs8ExpectedPacketCount
+  calc
+    _ = ∑ v ∈ Finset.Icc 5 64,
+        ∑ rows ∈ nonzeroMsgs (RS8Group Field16),
+          (piPMF (fun _ : Fin 8 =>
+            FinPMF.uniform {c : Field32 // c ≠ 0})).prob
+              (fun coeff => rs8SampledPacketWeight points rows coeff = v) *
+                z ^ v := by
+      apply Finset.sum_congr rfl
+      intro v _
+      rw [Finset.sum_mul]
+    _ = ∑ rows ∈ nonzeroMsgs (RS8Group Field16),
+        ∑ v ∈ Finset.Icc 5 64,
+          (piPMF (fun _ : Fin 8 =>
+            FinPMF.uniform {c : Field32 // c ≠ 0})).prob
+              (fun coeff => rs8SampledPacketWeight points rows coeff = v) *
+                z ^ v := by rw [Finset.sum_comm]
+    _ = _ := by
+      apply Finset.sum_congr rfl
+      intro rows hr
+      have hn : rows ≠ 0 := (Finset.mem_filter.mp hr).2
+      exact (FinPMF.expect_comp
+        (piPMF (fun _ : Fin 8 =>
+          FinPMF.uniform {c : Field32 // c ≠ 0}))
+        (rs8SampledPacketWeight points rows) (Finset.Icc 5 64)
+        (fun coeff => Finset.mem_Icc.mpr
+          (rs8_sampled_packet_weight_range points hpoints rows hn coeff))
+        (fun v => z ^ v)).symm
+
+/-- Summing the expected packet counts returns exactly one contribution
+from each nonzero RS8 message. -/
+theorem rs8_expected_packet_count_total
+    (points : Fin 8 → Field16) (hpoints : Function.Injective points) :
+    (∑ v ∈ Finset.Icc 5 64, rs8ExpectedPacketCount points v) =
+      ((nonzeroMsgs (RS8Group Field16)).card : ℝ) := by
+  unfold rs8ExpectedPacketCount
+  calc
+    _ = ∑ rows ∈ nonzeroMsgs (RS8Group Field16),
+        ∑ v ∈ Finset.Icc 5 64,
+          (piPMF (fun _ : Fin 8 =>
+            FinPMF.uniform {c : Field32 // c ≠ 0})).prob
+              (fun coeff => rs8SampledPacketWeight points rows coeff = v) := by
+      rw [Finset.sum_comm]
+    _ = ∑ _rows ∈ nonzeroMsgs (RS8Group Field16), (1 : ℝ) := by
+      apply Finset.sum_congr rfl
+      intro rows hr
+      have hn : rows ≠ 0 := (Finset.mem_filter.mp hr).2
+      have h := FinPMF.expect_comp
+        (piPMF (fun _ : Fin 8 =>
+          FinPMF.uniform {c : Field32 // c ≠ 0}))
+        (rs8SampledPacketWeight points rows) (Finset.Icc 5 64)
+        (fun coeff => Finset.mem_Icc.mpr
+          (rs8_sampled_packet_weight_range points hpoints rows hn coeff))
+        (fun _ => (1 : ℝ))
+      simpa only [FinPMF.expect_const, mul_one] using h.symm
+    _ = _ := by simp
+
+/-- The normalization in the paper: one group has `2^128-1` nonzero
+messages, so the expected packet counts sum to that integer. -/
+theorem rs8_expected_packet_count_total_numeric
+    (points : Fin 8 → Field16) (hpoints : Function.Injective points) :
+    (∑ v ∈ Finset.Icc 5 64, rs8ExpectedPacketCount points v) =
+      (2 ^ 128 - 1 : ℝ) := by
+  rw [rs8_expected_packet_count_total points hpoints]
+  have hnonzero : nonzeroMsgs (RS8Group Field16) =
+      (Finset.univ : Finset (RS8Group Field16)).erase 0 := by
+    ext rows
+    simp [nonzeroMsgs]
+  rw [hnonzero, Finset.card_erase_of_mem (Finset.mem_univ _),
+    Finset.card_univ, rs8Group_card, field16_card]
+  norm_num
+
 #print axioms rs8ColumnBits_ne_zero
 #print axioms rs8Bits_ne_zero_iff
 #print axioms rs8_fixed_group_packet_gf
@@ -356,5 +451,7 @@ theorem rs8_sampled_packet_weight_range
 #print axioms rs8_nonzero_group_packet_gf
 #print axioms rs8_nonzero_group_packet_gf_closed
 #print axioms rs8_sampled_packet_weight_range
+#print axioms rs8_expected_packet_count_gf
+#print axioms rs8_expected_packet_count_total_numeric
 
 end Spin.Turbo
