@@ -63,3 +63,68 @@ Do not restart completed lanes merely to inspect status. They may regenerate sou
 Remote helpers contain machine-specific PuTTY paths and prepared Peach locations. The final invariant controller contains a Windows Git Bash path. The closure replay's local backend is the alternative when these are unavailable; pinned installed external dependencies are still required.
 
 Use one controller owner per manifest. Never rebuild a dependency while another compiler consumes it. Keep memory headroom: the one-module helper permits 20,000 MB per compiler, and older drivers may default to multiple workers. Do not run benchmarks concurrently. Python reports describe orchestration evidence; Lean declarations and recursive axiom audits establish the proof.
+
+## Revised Scalable dense full cover
+
+The generated checked cover is separate from the historical native theorem.
+From `research/lean`, with the pinned toolchain and mathlib dependencies ready:
+
+```powershell
+python ../workstreams/turbo_spin_migration/shared_inner_dense_certificate.py --max-boxes 100000 --precision 256 --cover-output .lake/scalable_dense_full_candidate.json
+python scripts/emit_scalable_dense_packed_cover.py .lake/scalable_dense_full_candidate.json .lake/fullcover --emit-parts
+powershell -NoProfile -File scripts/build_scalable_dense_packed_cover.ps1 -Manifest .lake/fullcover/manifest.json -BuildAssemblies -RefreshCheckerDependencies
+```
+
+The first command regenerates the ignored candidate JSON from tracked
+`../workstreams/inner_design/imt_asymptotic/d11/OUTER_REFINED.json` and tracked
+search scripts. It requires NumPy, SciPy, and python-flint; the source emitter
+uses the tracked `fixmirror.py`. Search uses fixed optimizer starts, but its
+floating-point proposals depend on numerical library/runtime versions. A fresh
+regeneration must be checked in Lean; matching the historical candidate bytes
+has not been established. The recorded candidate SHA-256 is
+`164e3a944752a4a38003bfd5bca3917a3b69c79249375b678d3ead667de6f694`
+(22,705,873 bytes; gzip approximately 1.61 MB). An immutable compressed release
+artifact is an optional way to replay those exact proposals without rerunning
+search; generated sources and object files need not be committed.
+The default limits yield 611 parts and 39 segments (46,317 leaves). Lean checks
+the proposed data; the input hash identifies a candidate, not a proof.
+
+The build is sequential and resumable; `-MaxParts N` limits newly compiled
+parts, and a later run without that limit completes assembly. The explicit
+`-RefreshCheckerDependencies` flag builds the tracked checker dependencies
+through Lake. Without it, checker objects must already be current; resuming
+a cover does not automatically provision Lake packages or rebuild the checker.
+Shared-dependency worktrees can use `-DependencyLeanRoot` with prebuilt local
+checker objects. Generated assemblies are invalidated when their input objects
+change. Timestamp admission assumes ordinary local
+edits/builds; copied objects with preserved or future timestamps require a fresh
+replay. Do not run another writer against the same generated object directory.
+
+After assembly, the normal Lean import is
+`SpinCodes.UniformMixer.Generated.FullCover.ScalableDenseFullCover`, exposing
+`Spin.UniformMixer.ScalableDenseFullCover.rates`. Sources are under ignored
+`.lake/fullcover/sources`, and objects are placed under the corresponding
+`.lake/build/lib/lean` module path. Lake alone cannot regenerate these sources.
+The checked cover is the selected-outer dense rate interface; it does not by
+itself prove the original-setup distance theorem. The recorded global axiom
+log contains only `propext`, `Classical.choice`, and `Quot.sound`.
+
+The native-length distance, rate, schedule, and circuit-size assembly is in
+`SpinCodes/UniformMixer/ScalableCertified.lean`. After the cover is built,
+in a checkout with local Lake dependencies ready, build its tracked
+dependencies and check the final module:
+
+```powershell
+lake build SpinCodes.UniformMixer.ScalableDistance SpinCodes.UniformMixer.ScalableComplexity SpinCodes.Structured.ScheduleUpper
+lake env lean -j1 -M 8000 -R . -o .lake/build/lib/lean/SpinCodes/UniformMixer/ScalableCertified.olean SpinCodes/UniformMixer/ScalableCertified.lean
+```
+
+The direct final check uses the generated cover objects at the import path
+above; a plain `lake build` does not generate the cover for you. The final
+module prints the axiom dependencies of the original-setup probability
+bound, actual minimum-distance conclusion, exact-rate theorem, actual primitive
+encoder and transpose circuit bounds, and schedule rounding bound. Each encoder
+direction uses at most `272*N` coefficient-AND/XOR gates for fixed sampled setup;
+permutations are free wiring. This conservative constant is not a benchmark.
+Setup generation, arbitrary requested lengths, and C++ implementation
+equivalence are outside these claims.

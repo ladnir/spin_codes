@@ -40,24 +40,38 @@ setup. The finite Turbo target is the separate four-bit packet construction
 at the lengths and setup-failure margins claimed in the paper. Do not transfer
 the old BCH/IMT theorem or the Scalable theorem to Turbo by name similarity.
 
-For Scalable SPIN, the fixed-occupation and growing-sparse results have Lean
-proofs. The dense analytic and selected-outer first-moment bridges are proved
-conditional on `ScalableDenseRates` in
-`SpinCodes/UniformMixer/ScalableDenseRateDefs.lean` and
-`SpinCodes/UniformMixer/ScalableDenseConditionalFinal.lean`. The sound
-fixed-point vertex checker is in `ScalableDenseVertex.lean`. The
-`ScalableDensePilot.lean` theorem checks one rectangle, including its transfer
-witness, four vertices, outer support, and pointwise rate conclusion. It does
-not establish the full dense cover. `ScalableDenseLeaf.lean` supplies the
-general leaf theorem; `ScalableDenseCoverCore.lean` supplies exact rectangle
-composition. Generated 8-, 32-, 64-, and 128-leaf research chunks compile,
-but no theorem covers the full 46,317-box domain. The final unconditioned
-distance, rate, and finite Turbo theorems remain open in this revised
-development.
+For Scalable SPIN, the native-length distance, exact-rate, schedule, and
+ordinary/transposed linear circuit-size claims are now
+checked in `SpinCodes/UniformMixer/ScalableCertified.lean`. The complete
+generated cover proves
+`ScalableDenseFullCover.rates : ScalableDenseRates (1/10000000) 10000000`.
+It discharges the numerical hypothesis in the fixed/sparse/dense assembly;
+the original-setup theorem charges bad outer selection once. The final
+theorem proves that the actual realized code's probability of minimum
+binary Hamming distance at most `floor(0.11*Nsched m)` tends to zero under
+`scalableSetupLaw`. Every realized encoder is linear and injective, has
+exactly `Nsched m` output coordinates, dimension `Nsched m/2`, and rate 1/2.
+The final aggregate compiled successfully and all eight printed declarations
+depend only on `propext`, `Classical.choice`, and `Quot.sound`.
+
+The actual encoder and its adjoint have explicit coefficient-AND/XOR circuits
+using at most `272*Nsched m` gates. The constant is a conservative formal bound,
+not an implementation timing estimate. This covers fixed sampled setup and
+free permutation wiring; setup generation and C++ refinement are not covered.
+The schedule additionally satisfies the eventual rounding bound
+`0 <= bsched m - (39/4)*log2(Nsched m) < 24`.
+The user accepts natural lengths and has removed the
+requested-length wrapper from the current scope. A clean dependency
+replay remains a delivery check; this pass reused existing checked objects
+and the completed generated cover. Finite Turbo remains open as described
+below. The earlier status entries are retained as historical checkpoints.
 
 For Turbo SPIN, Lean checks the RS8 support spectrum, exact expected
 packet measure, complete value law after the sampled row shuffle, and
-the actual 22-state setup. Its first moment is now partitioned by active
+the actual 22-state setup. The vector encoder is connected to that setup's
+weight experiment and is proved binary linear, injective, and exactly
+rate 1/2 at every positive natural length in this 22-state model.
+Its first moment is now partitioned by active
 groups and expressed exactly as a sum of packet-array counts multiplied
 by one joint regional-route and continuous-inner failure probability.
 The symbolic bridge currently covers the 22-state K18/K20 construction.
@@ -73,9 +87,16 @@ The checked full-state kernel and lower-tail inequality bound the actual
 shared-outer active-set first moment by a chronological product of 64
 averaged reference-region kernels. This is a semantic bound, not yet a
 finite numeric certificate.
-An 11-coordinate state-measure cone and its generic complete-row
-transfer theorem are checked, but none of the retained local numerical
-rows has been proved sound for the physical kernel.
+An 11-coordinate state-measure cone, a complete symbolic selected-slot
+operator, and preservation of complete-row soundness under exact binomial
+thinning are checked. None of the retained local numerical rows has been
+proved sound for the exact-nonzero physical kernel. The fractional-moment
+route composition is also a mathematical obligation, not just a numerical
+check. Conditional probability capping and chronological paired-matrix
+fractional subadditivity are checked; their concrete routing hypotheses
+remain to be established. In particular, the current unconditional reference first-moment
+theorem does not by itself justify moving the fractional power inside
+the route average.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -1549,6 +1570,438 @@ is provenance and cannot replace the local operator inequality.
   not a substitute for that premise. Next derive exact-nonzero symbolic
   rows from `packetStepLaw22`, then test one nontrivial numerical row.
 
+## Review checkpoint: next work in dependency order
+
+The 2026-11-08 review found no contradiction in the new local row
+statements. It did find that the progress reports understated the remaining
+mathematical work by calling it only numerical. The checked selected-slot
+row is useful, but the retained producer starts with exact-nonzero
+occupancy; the late discovery of this distinction caused avoidable work.
+The old-proof audit must trace the actual producer and consumer together
+before choosing the next theorem interface.
+
+1. Pin the retained fractional certificate's conditional inequality on
+   paper before extending the numeric checker. `replay_fractional.py`
+   thins exact-nonzero rows, multiplies two chronological steps, takes
+   entrywise powers, averages placements, and composes 64 regions. The
+   justification must condition on the appropriate routing information,
+   cap the fixed-active-set bad-event probability at one before applying
+   a fractional power, and keep the active-set union factor outside that
+   power. An unconditional first-moment bound alone is insufficient.
+   Audit the old route-conditioned/fractional proof for this exact order.
+   The reviewed source is `research/workstreams/k18_margin60/SLACK_REVIEW.md`
+   (conditional count through the regional coefficient formula), with
+   witness scope in that directory's `README.md`. It already gives the
+   argument: independence permits outer domination after fixing routing;
+   conditional Markov and `min(1,x) <= x^alpha` cap each active-set event;
+   subadditivity on scalar matrix paths permits entrywise powers after
+   chronological two-step multiplication. Hypergeometric averaging and
+   the active-set union stay outside those powers. Inspection agrees
+   with `replay_fractional.py`; the Lean connection remains to be built.
+2. Reuse the local row proof through a generic finite packet input law,
+   then instantiate the exact-nonzero and selected-slot laws. Avoid
+   duplicating the live/birth/cone proofs merely to replace one sampler.
+   Preserve the checked selected theorem as a regression check.
+3. Prove the capped-density birth decomposition and the Cauchy return
+   bound used by the retained matrices. Check a small nontrivial pilot
+   against the actual map census. The symbolic class-only birth row does
+   not authenticate a chosen capped-density row by entrywise comparison.
+4. Complete numerical authentication and composition for K18/K20, then
+   sparse one/two-group coverage, the K20 exceptional event, and the final
+   positive occupation sum. K16's 15-state map is a separate remaining
+   formalization. Do not describe the full finite theorem as nearly
+   closed merely because the generic local matrix interface compiles.
+
+The paper currently states the finite margins using externally checked
+certificates; the Lean work has not refuted them. Neither compilation of
+the local lemmas nor this review is an independent validation of those
+external numerical certificates. Closure confidence should be reported
+separately for the analytic reductions, census authentication, composition,
+and endpoint checks.
+No reviewed derivation currently forces weaker bounds or a changed
+construction. Proving the retained inequalities should retain their bounds;
+possible margin loss is a contingency if an actual defect or a changed
+numeric representation demands it, not a finding of this review.
+
+### Retained K18 argument audit (2026-11-08)
+
+Scope: read `k18_margin60/SLACK_REVIEW.md`, the actual
+`replay_fractional.py`, `verify_fractional.py`,
+`k16_design/packet_regional_power.py`, and the shared `sparse_kernel.py`,
+`kernel_birth_density.py`, and `occupancy_birth_classes.py` producers.
+Compared them with the current cone, symbolic row, and thinning interfaces.
+This audit did not regenerate the 22-bit census or all retained endpoints,
+and does not cover all K16/K20 sparse producers.
+
+- **Routing conditioning:** fixing an active-group set and its potential
+  step counts leaves the outer field maps and independent GL updates
+  unchanged. Under the dominating uniform reference, packet labels are
+  independent uniform four-bit values, including zero. Conditional on
+  step counts, support subsets are independent across disjoint steps;
+  the counts themselves have the exact fixed-population law. This
+  supports the conditional count `beta^q z^-D e0 product(P_J) 1`.
+  The proof must condition the event for one fixed active set; the
+  number of active sets remains outside the fractional power.
+- **Fractional composition:** expanding the nonnegative matrix product
+  into scalar paths and using `(sum a)^alpha <= sum(a^alpha)` for
+  `0<alpha<=1` gives the stated entrywise-power bound. No disjointness
+  of the eleven envelope coordinates is required. Replay multiplies
+  each chronological pair first, then powers, then averages its exact
+  hypergeometric split. Its ordered matrix-polynomial coefficient and
+  64-region product match the notes. Truncation cannot alter lower
+  coefficients since all polynomial degrees are nonnegative.
+- **Live return rows:** for each entering state the exact return is
+  `E[z^weight 1{Cx != 0}]/(2^22-1)`. Cauchy bounds its numerator by
+  `sqrt(E[z^(2 weight)] Pr[Cx != 0])`; the first moment is another bound.
+  Class maxima and the uniform-source mean in the producer are valid.
+  For the mean row, apply Cauchy jointly over a uniform nonzero state and
+  input (or Jensen after the statewise inequality). No independence
+  between feedback and output weight is assumed.
+- **Capped birth row:** write the exact nonzero birth mass as
+  `min(m_s,d) + max(m_s-d,0)`. The first term is uniformly dominated
+  with coefficient `(2^22-1)d`; the residual stays in its expansion
+  class. If `U_s >= m_s`, its class mass is bounded both by the baseline
+  class mass and by `sum max(U_s-d,0)`. Therefore the per-class `min`
+  inside `outward_rows` is valid for this *same* decomposition. It is
+  not the invalid operation of mixing entries from different cap choices.
+  The signed Walsh transform's common error allowance bounds either
+  sign of every coefficient error before the nonnegative clipping.
+- **Numerical trust boundary:** `verify_fractional.py` checks receipt
+  identities, geometry, source hashes, coverage, and exact endpoint sums;
+  it does not independently derive local census data or recompute all
+  fractional endpoints. Those remain actual obligations for Lean.
+  The paper's finite appendix currently describes transferred endpoints
+  without spelling out the conditional fractional calculation; include
+  that argument in the later paper-completeness pass.
+
+No invalid inequality was found in these inspected paths. Ran the existing
+`test_replay_fractional.py` (6 tests), `test_sparse_kernel.py` (4 tests), and
+`test_kernel_birth_density.py` (3 tests): all 13 passed. They check exact
+rational comparisons, chronology, tiny positive values, small-state rows,
+and capped-density decompositions. They are implementation evidence, not
+a replacement for the full-state certificate. The next proof work should
+follow these exact interfaces; there is no audit finding requiring new
+parameters, weaker distance, or new numerical optimization.
+
+### Lean architecture audit (2026-11-08)
+
+This review inspected the Lean statements and definitions, not only the
+retained Python argument. Scope included actual sampled setup, reference
+kernel, physical cone and complete rows, thinning, dense leaf/cover
+soundness, and the selected-outer asymptotic conclusion. It is not a fresh
+clean rebuild of every module or a completed check of all finite margins.
+
+Assessment: **7/10 overall direction**, with **8/10 for the reviewed proof
+architecture** and **5/10 for execution order and efficiency**. These are
+engineering judgments, not percentages complete or correctness probabilities.
+Keep the architecture; change the order of completion.
+
+1. **Substantial checked progress:** the full generated Scalable dense
+   domain now compiles. `ScalableDenseFullCover.rates` prints only the
+   standard `propext`, `Classical.choice`, and `Quot.sound` dependencies.
+   The exact rational leaf and rectangle-gluing approach follows the old
+   hybrid proof: external search proposes data and Lean checks it.
+   An audit wrapper applying it to the existing total-layer theorem also
+   compiled successfully, with only those same standard axioms. This
+   proves convergence of the complete selected-good-outer first moment;
+   it does not yet establish the original-setup distance/rate theorem.
+2. **Good Turbo semantics:** the sampled code is shared across messages;
+   complete full-state kernels retain actual input/state correlations.
+   The eleven-coordinate cone describes a decomposition of measures,
+   including a uniformly capped nonzero component. Its coordinates need
+   not be disjoint events. Complete-row soundness composes without
+   inventing independence. The full-state matrix is a semantic object,
+   not a matrix to materialize in the numeric checker.
+3. **High-priority missing connection:** the retained finite certificate
+   needs route-conditioned probability capping, chronological pair
+   multiplication, fractional powers, and exact regional averaging.
+   `turboSetup22_activeSet_le_reference_kernel` alone bounds an
+   unconditional first moment. It does not prove that fractional
+   calculation. Formalize the already audited retained argument and
+   expose its remaining obligations in a conditional final theorem.
+4. **Avoidable interface detour:** the symbolic complete row currently
+   treats selected slots including zero, whereas the retained numerical
+   producer starts with exactly j nonzero slots and then thins. The
+   thinning theorem is sound but still assumes those physical rows.
+   Generalize the existing row reasoning over its input law and reuse
+   it; do not build a second parallel collection of local lemmas.
+5. **Numerical authentication still matters:** symbolic maxima and
+   moments do not certify the retained matrix entries. The capped birth
+   decomposition must be proved directly; entrywise domination of a
+   different, class-only birth decomposition is not a substitute.
+   Authenticate the census and outward bounds, then the endpoints and
+   complete occupation coverage. K16's separate state map remains a
+   separate obligation.
+6. **Delivery is unfinished:** the generated full cover and audit wrapper
+   currently live under ignored `.lake`. Preserve reproducible generation
+   inputs/instructions and a normal named final theorem before declaring
+   the development delivered. This audit used existing dependency builds;
+   a clean replay remains a final release check.
+
+No reviewed Lean statement revealed a construction counterexample or a
+reason to weaken the claimed parameters. Nor does this audit establish
+all finite numerical claims. The strongest next action is to finish the
+Scalable original-setup assembly, then close one K18 certificate from the
+actual setup through the final failure bound. Expand to other profiles
+only after that complete path is checked.
+
+Audit execution: `.lake/fullcover/AuditClosure.lean` imports the full
+cover, the conditional Scalable conclusion, and the Turbo thinning and
+reference-kernel modules. Its final run exited successfully and printed
+only the three standard axioms for `audited_scalable_total`,
+`turboSymbolicRow22_sound`, `turboThinnedRow22_sound`, and
+`turboSetup22_activeSet_le_reference_kernel`. The first wrapper attempt
+had an unresolved `Lsched` namespace; the corrected wrapper opens
+`Spin.Structured`. Only the successful corrected run counts as evidence.
+
+### Scalable closure delegation (2026-11-08)
+
+The user requested Sol subagents for separable proof work, with the primary
+agent retaining strategy, integration, and audit. Scalable is the immediate
+focus; Turbo is deferred until this assembly is settled. Three Sol workers
+are assigned non-overlapping ownership:
+
+- `scalable_final`: audit the old conditioning/final-probability argument
+  and assemble the revised original-setup failure theorem, conditional on
+  the already checked dense-rate interface during local iterations.
+- `scalable_rate`: audit the old code/rate connection against the actual
+  revised encoder; establish necessary code properties without importing
+  the old IMT encoder by accident.
+- `scalable_delivery`: audit generation inputs and build reproducibility,
+  and prepare minimal delivery fixes without rebuilding the dense cover.
+
+The primary agent reviews theorem scopes against the paper and joins the
+results to the checked dense cover. Each worker must identify the old
+counterpart before a new component, preserve complete proofs and standard
+axiom dependencies, and avoid editing this shared plan. No construction,
+parameter, or paper changes are part of this pass.
+
+Checked progress in this delegation pass:
+
+- `ScalableOriginalSetupFinal.lean` compiled. Its original-law failure
+  convergence theorem has only `ScalableDenseRates eta C`, `eta>0`, and
+  `C>0` as numerical hypotheses. It reuses the old
+  `Setup.prob_bad_le_cond_sum` and selected outer tail, charging outer
+  selection failure once. Independent read-only review found the joint
+  setup and shared-message semantics match the revised construction.
+- `ScalableCodeProperties.lean` compiled. The actual output vector has
+  the existing weight recurrence, is additive, and is causally injective
+  for each fixed entering state. The old `ConcreteNativeCodeword` pattern
+  is reused, but no IMT-specific encoder theorem is transferred.
+- `ScalableInputEmbedding.lean` compiled. It reuses old outer/route
+  injectivity and proves the revised 64-bit reshape injective and additive
+  under support symmetric difference.
+- The above printed proof dependencies contain only `propext`,
+  `Classical.choice`, and `Quot.sound`. Full linear-code/rate assembly,
+  minimum-distance identification, and instantiation with the complete
+  dense cover are the next checks. Circuit-cost claims are not implied
+  by these algebraic statements.
+- Delivery audit found a tracked search recipe for regenerating the
+  ignored candidate. Exact historical bytes are not guaranteed across
+  unpinned numerical-library versions; every regenerated proposal still
+  requires Lean checking. The builder supports explicit checker refresh
+  and accounts for generated dependencies in incremental assembly. Root
+  review caught and the worker fixed absolute-path handling in the manifest
+  consumer. Root made checker refresh opt-in: a resumed shared-dependency
+  worktree must not unexpectedly fetch local Lake packages or rebuild old
+  proofs. Existing-object mode requires current checker dependencies.
+  No full rebuild or raw-data commit was made.
+
+Final closure checkpoint:
+
+- `ScalableLinearCode.lean` compiled and establishes the actual complete
+  encoder's vector/weight agreement, linearity, injectivity, output
+  dimension, code dimension, and exact rate. The proof follows old
+  `ConcreteNativeLinearCode`, reusing only the unchanged outer and route.
+- `ScalableDistance.lean` follows old `ConcreteNativeLinearCodeDistance`:
+  it constructs the actual finite codeword set, equates low nonzero weight
+  with close distinct codewords, defines the attained minimum distance,
+  and identifies its failure event with `scalableBad`.
+- `ScalableCertified.lean` compiled successfully and emitted its normal
+  `.olean`. It instantiates the original-law and minimum-distance theorems
+  with the complete checked cover, expressing the threshold as
+  `floor(0.11*Nsched m)`. Its three axiom prints (original-law failure,
+  minimum-distance failure, and exact rate) are all exactly
+  `[propext, Classical.choice, Quot.sound]`. The successful log is
+  `.lake/scalable_certified_audit.log`; failed preliminary compiles do not
+  count as evidence.
+- Independent scope review confirms native-length distance/rate closure.
+  Ordinary/transposed circuit costs, the requested-length wrapper, C++
+  equivalence, and finite Turbo certificates remain separate. Next:
+  finish the remaining natural-length claims and prepare a controlled clean
+  replay, without reopening completed numerical search or changing the
+  construction. The later user instruction drops wrapper formalization.
+
+### Remaining-claims audit and circuit plan (2026-11-08)
+
+User instruction: audit and finish Scalable's remaining claims, including
+linear ordinary/transposed work, then proceed to Turbo. Natural lengths
+alone are sufficient; do not build the arbitrary-length wrapper.
+
+Three Sol audits found no existing formal encoder-cost model or circuit
+transposition theorem in the old development. Existing route transposition
+and Fourier adjoints are not encoder complexity proofs. Reusable old
+components are the concrete Golay fold, accumulator recurrence, outer
+linearity, native reshaping, and the already checked revised encoder.
+The missing cost proof therefore requires a small new circuit layer.
+
+Chosen approach: finite-coordinate binary linear circuits with explicit
+dense dot-product macros, permutation wiring, composition, disjoint parallel
+composition, and tiled products. A dense macro is charged at least twice its
+input/output dimension product, accounting for coefficient bit products and
+XORs; arbitrary large linear maps are never assumed free. Wiring is free in
+the arithmetic circuit model. A structural transpose must preserve the cost
+and satisfy the actual dot-product adjoint identity. Build a chronological
+state scan from those constructors, with summed local step costs, and use
+it both for prefix accumulators and the fixed-width recursive inner.
+Tie the composed circuit's evaluation to `scalableEncoderLinearMap`.
+Do not substitute a disconnected arithmetic cost formula for this witness.
+
+Assignments: `scalable_rate` owns generic circuit/transpose infrastructure;
+root owns the shared scan and actual inner assembly; `scalable_delivery`
+owns Golay/outer circuit agreement; `scalable_final` closes the missing
+schedule upper error bound. Existing `Schedule` already supplies growth,
+admissibility and vanishing relative gaps. Minimality should additionally
+give eventual `0 <= b - (39/4) log2 N < 24`.
+
+Complexity scope: the theorem concerns fixed sampled/precomputed setup and
+linear arithmetic circuits (plus linear indexed bit movement). It does not
+claim linear setup generation or bit-addressed Turing-machine complexity:
+the random route itself requires order `N log N` seed bits. Seed cardinality
+must not be confused with distinct encoder cardinality. C++ equivalence and
+measured performance are separate from this mathematical circuit witness.
+
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
 their reason in research notes when they inform a later decision.
+
+### Completed native-length claims and Turbo handoff (2026-11-08)
+
+The final aggregate `ScalableCertified.lean` compiled after all component
+checks. Its eight printed declarations have only the three standard axioms;
+the aggregate log is `.lake/scalable_certified_audit.log`. This closes the
+native Scalable main-theorem claims under the stated circuit model.
+
+- `LinearCircuit.lean` gives explicit matrix, wiring, parallel, tiled, and
+  composition constructors, with a cost-preserving adjoint.
+- `LinearCircuitPrimitive.lean` expands matrix macros into scalar
+  coefficient-AND/XOR expressions and proves Boolean semantics and exact
+  gate counts. This closes the audit gap between an assigned macro charge
+  and actual primitive operations.
+- `LinearCircuitScan.lean` constructs a chronological state scan from those
+  constructors, proving its semantics and sum of step costs. Composed stages
+  share wires; no expression-tree substitution is charged as a circuit.
+- `ScalableOuterAlgebra` and `ScalableOuterCircuit` connect the actual
+  Golay--BAA outer to a `40*N` circuit. The route is an explicit permutation
+  of wires. `ScalableInnerCircuit` connects the actual fixed-width update
+  to a 14,792-gate step.
+- `ScalableComplexity.lean` connects the composite circuit to the actual
+  `scalableCodeword`, proves a conservative `272*N` bound, and proves the
+  lowered transpose computes its adjoint at the same bound.
+- `ScheduleUpper.lean` uses the old schedule's minimality to close the
+  eventual upper rounding bound; the old schedule already proves growth
+  and vanishing relative gaps.
+
+Independent review checked the actual encoder connections and cost algebra.
+The paper now states native lengths and fixed-setup circuit work. No numerical
+cover was regenerated, and no claim about C++ or setup time was added. A fresh
+dependency replay remains a release/reproducibility check, distinct from the
+successful aggregate check using the existing checked objects.
+
+Next is one complete K18 Turbo certificate. Before new lemmas, consult the
+retained `k18_margin60/SLACK_REVIEW.md` and `replay_fractional.py` alongside
+the existing Turbo modules. Two separable tasks are the conditional fractional
+route argument and exact-nonzero physical-row soundness. Keep the capped-birth
+decomposition joint, and retain explicit unproved numerical hypotheses until
+they are authenticated. Expand to K20 and the separate K16 inner only after
+this first complete path is checked.
+
+### Turbo continuation after Scalable closure (2026-11-08)
+
+History was re-audited before these components. `ConcreteNativeLinearCode`
+supplies the actual-vector/linearity/rate architecture. The retained
+`k18_margin60/SLACK_REVIEW.md` supplies the fractional argument, but describes
+the earlier RS[16,8] outer: only its probability algebra and unchanged inner
+analysis transfer. The current RS[8,4] atom bounds and current certificate
+inputs must be used explicitly. The earlier Scalable proof has no fractional
+route theorem to reuse by name.
+
+Checked progress:
+
+- `CodeProperties22.lean` identifies the actual emitted vector with
+  `ActualSetup22`'s output weight, proves injectivity for every fixed setup
+  with distinct RS evaluation points, and constructs its binary linear map.
+  It reuses the continuous inner's checked recurrence, the old RS
+  information-set lemma, and actual packet permutations. It does not claim
+  equivalence with a concrete C++ field basis.
+- `CodeRate22.lean` follows the old range-finrank proof: each RS group
+  contains 128 binary message dimensions; the complete encoder has
+  `2048*R` input dimensions and `4096*R` output dimensions. Its actual
+  injective linear range has exact rate 1/2 for every `R>0`. This covers
+  the 22-state K18/K20 model, not the separate K16 inner.
+- `ConditionalFractionalMoment.lean` proves probability capping and
+  fractional powers within conditional fibers and keeps the active-set union
+  outside the power. Its whole-encoder theorem explicitly assumes the
+  original-law disintegration and fiberwise bad-count estimates. Those are
+  not consequences of the unconditional reference first moment.
+  The final checked `turboSetup22_bad_prob_le_activeSet_conditional_fractional`
+  permits a separate `P(S)` and `Q(S,j)` for every active set, as required
+  by the retained routing-count argument.
+- `ConditionalFractionalMatrix.lean` proves finite-sum fractional
+  subadditivity and its chronological matrix-path version. In the paired
+  specialization, the physical pair is multiplied before the entrywise
+  fractional power. The summed terminal row keeps the state across all
+  pairs. No routing average or group union is moved inside that power.
+- `PhysicalCappedBirth22.lean` proves one joint decomposition into zero
+  mass, `min(mu,d)` uniform mass, and `max(mu-d,0)` residual class masses.
+  Both class bounds concern that same residual, so their minimum is sound.
+  It connects the decomposition to `packetStepLaw22`, the actual exactly-j-
+  nonzero input distribution, and the physical kernel's zero-source row.
+  The pointwise upper census and numerical sums remain explicit obligations.
+- `PhysicalGenericLive22.lean` reuses the law-independent cone reasoning
+  for an arbitrary complete packet-input distribution and specializes it to
+  the exact-nonzero physical kernel. Weighted first-moment and feedback-
+  conditioned return caps `b*M` and `b*R` give one complete row with budgets
+  `b*M` in the uniform-live coordinate and `b*R/(2^22-1)` at zero.
+  This assumes no independence between output weight and feedback. It does
+  not yet authenticate those caps. The old
+  `ConcreteEpochVarianceBounds.expect_abs_le_sqrt_square` supplies the
+  centered-square method for a later Cauchy argument, but lacks the retained
+  feedback-event factor, which still needs its own proof.
+
+These completed modules compiled with standard axioms only. Independent
+read-only review found no mathematical mismatch. Review additionally caught
+an application-interface issue: potential-slot counts depend on the active
+group set S, so the retained application needs S-specific disintegrations.
+Conditioning jointly on every S could reveal slot positions and invalidate
+the intended conditional uniformity. The initial common-law lemma is valid;
+the separate S-indexed endpoint is now checked as well.
+
+Remaining tasks are precise: derive the actual routing
+fibers and their conditional first-moment domination; authenticate the
+exact-nonzero physical rows, then thin them using the existing checked
+theorem; finally check all numerical occupations and sum the endpoint.
+No new distance margin is claimed by these symbolic lemmas.
+
+All six new Turbo modules above compiled successfully and emitted normal
+objects, with the audited declarations depending only on the standard three
+axioms. The final conditional endpoint includes separate disintegrations for
+each active set. No proof compiler or benchmark remains running for this
+checkpoint. The author paper rebuilt successfully with no undefined references
+or citations; the changes describe Scalable's completed scope and do not
+upgrade Turbo's numerical verification claim.
+
+### Active goal: K18 and K20 closure (2026-11-08)
+
+The user requested a committed checkpoint and continued Sol delegation until
+both finite Turbo endpoints are checked. Close K18 first, then K20, for the
+actual ideal setup at 10% distance and the paper's reported margins. A
+conditional theorem or an externally reported numeric success is not the
+completion criterion. Keep K16 outside this goal and preserve Scalable's
+completed theorem. If a claimed margin fails audit, report the discrepancy
+explicitly rather than silently weakening it.
+
+The pre-commit review found a UTF-8 corruption in the cover emitter's Lean
+tuple delimiters. Restored the intended characters and checked the emitter's
+import and delimiter code points. This affected regeneration source, not the
+already compiled cover; no cover search was restarted.

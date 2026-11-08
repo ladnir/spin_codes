@@ -3,12 +3,18 @@ param(
     [string]$DependencyLeanRoot,
     [int]$MaxParts = 0,
     [int]$MemoryMB = 8000,
-    [switch]$BuildAssemblies
+    [switch]$BuildAssemblies,
+    [switch]$RefreshCheckerDependencies
 )
 
 $ErrorActionPreference = 'Stop'
 $leanRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+function Resolve-ManifestSource([string]$Source) {
+    if ([System.IO.Path]::IsPathRooted($Source)) { return $Source }
+    return Join-Path $repoRoot $Source
+}
+
 $manifestPath = (Resolve-Path $Manifest).Path
 $data = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 if ($data.status -ne 'source_emitted') {
@@ -24,16 +30,39 @@ $outDir = Join-Path $buildLib 'SpinCodes/UniformMixer/Generated/FullCover'
 $logDir = Join-Path (Split-Path -Parent $manifestPath) 'logs'
 New-Item -ItemType Directory -Path $outDir,$logDir -Force | Out-Null
 $baseOlean = Join-Path $buildLib 'SpinCodes/UniformMixer/ScalableDensePackedLeaf.olean'
-if (-not (Test-Path -LiteralPath $baseOlean)) { throw "Missing base checker: $baseOlean" }
 
-function Invoke-LeanSource([string]$Name, [string]$Source, [int]$Limit) {
+# Refresh explicitly: shared-dependency worktrees may not have local Lake
+# packages, and merely resuming a completed cover must not provision them.
+if ($RefreshCheckerDependencies) {
+    Push-Location -LiteralPath $leanRoot
+    try {
+        & lake build SpinCodes.UniformMixer.ScalableDensePackedLeaf SpinCodes.UniformMixer.ScalableDenseCoverCore
+        if ($LASTEXITCODE -ne 0) { throw 'Cannot build dense checker dependencies' }
+    } finally { Pop-Location }
+}
+$baseDependencies = @(
+    $baseOlean,
+    (Join-Path $buildLib 'SpinCodes/UniformMixer/ScalableDenseCoverCore.olean')
+)
+foreach ($dependency in $baseDependencies) {
+    if (-not (Test-Path -LiteralPath $dependency)) {
+        throw "Missing checker object: $dependency. Build checker dependencies or pass -RefreshCheckerDependencies with local Lake dependencies ready."
+    }
+}
+
+function Invoke-LeanSource([string]$Name, [string]$Source, [int]$Limit, [string[]]$Dependencies = @()) {
     $output = Join-Path $outDir "$Name.olean"
     $sourceInfo = Get-Item -LiteralPath $Source
-    $baseInfo = Get-Item -LiteralPath $baseOlean
+    $newestInput = $sourceInfo.LastWriteTimeUtc
+    foreach ($dependency in ($baseDependencies + $Dependencies)) {
+        $dependencyInfo = Get-Item -LiteralPath $dependency
+        if ($dependencyInfo.LastWriteTimeUtc -gt $newestInput) {
+            $newestInput = $dependencyInfo.LastWriteTimeUtc
+        }
+    }
     if (Test-Path -LiteralPath $output) {
         $outputInfo = Get-Item -LiteralPath $output
-        if ($outputInfo.LastWriteTimeUtc -ge $sourceInfo.LastWriteTimeUtc -and
-            $outputInfo.LastWriteTimeUtc -ge $baseInfo.LastWriteTimeUtc) {
+        if ($outputInfo.LastWriteTimeUtc -ge $newestInput) {
             return 'skipped'
         }
     }
@@ -56,13 +85,16 @@ function Invoke-LeanSource([string]$Name, [string]$Source, [int]$Limit) {
 $built = 0
 foreach ($part in $data.parts) {
     $name = "Part$($part.id)"
-    $source = Join-Path $repoRoot $part.source
+    $source = Resolve-ManifestSource $part.source
     if (-not (Test-Path -LiteralPath $source)) { throw "Missing source: $source" }
     $status = Invoke-LeanSource $name $source $MemoryMB
     if ($status -eq 'compiled') {
         $built++
         Write-Output "$name checked ($built new this run)"
-        if ($MaxParts -gt 0 -and $built -ge $MaxParts) { break }
+        if ($MaxParts -gt 0 -and $built -ge $MaxParts) {
+            if ($BuildAssemblies) { throw 'Part build limit reached; resume without -MaxParts before assembling' }
+            break
+        }
     }
 }
 
@@ -75,11 +107,18 @@ if ($BuildAssemblies) {
     }
     foreach ($n in 0..($data.segments - 1)) {
         $name = "Segment$n"
-        $source = Join-Path $repoRoot $data.assembly_sources[$n]
-        $status = Invoke-LeanSource $name $source $MemoryMB
+        $source = Resolve-ManifestSource $data.assembly_sources[$n]
+        # Conservatively depend on every part; segments import subsets.
+        $partDependencies = @($data.parts | ForEach-Object {
+            Join-Path $outDir "Part$($_.id).olean"
+        })
+        $status = Invoke-LeanSource $name $source $MemoryMB $partDependencies
         Write-Output "$name $status"
     }
-    $source = Join-Path $repoRoot $data.global_source
-    $status = Invoke-LeanSource 'ScalableDenseFullCover' $source $MemoryMB
+    $source = Resolve-ManifestSource $data.global_source
+    $segmentDependencies = @(0..($data.segments - 1) | ForEach-Object {
+        Join-Path $outDir "Segment$_.olean"
+    })
+    $status = Invoke-LeanSource 'ScalableDenseFullCover' $source $MemoryMB $segmentDependencies
     Write-Output "ScalableDenseFullCover $status"
 }

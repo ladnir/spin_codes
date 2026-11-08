@@ -467,17 +467,3 @@ two accumulators, outer permutations, and route use $O(N)$ work.
 Each fixed-width state update has constant bit-operation cost, so the
 inner and its transpose also use $O(N)$ work.
 \end{proof}
-
-For any sufficiently large requested output length $n$, let $m(n)$ be the
-largest index satisfying $N_{m(n)}\le n$. Define
-\begin{equation}
-  \widetilde E_n(x)
-  :=
-  E_{m(n)}(x)\Vert 0^{n-N_{m(n)}}.
-  \label{eq:structured-requested-length-wrapper}
-\end{equation}
-This zero extension preserves injectivity and minimum distance. Consecutive
-native lengths have relative gap $o(1)$, so
-$N_{m(n)}/n=1-o(1)$. The wrapped family therefore has rate
-$1/2-o(1)$, relative distance greater than $0.11-o(1)$ with high probability,
-and $O(n)$ ordinary and transposed work.

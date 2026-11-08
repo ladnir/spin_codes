@@ -27,6 +27,9 @@ def rect_term(bounds: tuple[Q, ...]) -> str:
 def generate(candidate: Path, output: Path, leaf_limit: int,
              vertex_limit: int, emit_parts: bool,
              selected_parts: set[int] | None = None) -> dict:
+    # Manifest paths must remain usable when the build runs from another cwd.
+    candidate = candidate.resolve()
+    output = output.resolve()
     raw = candidate.read_bytes()
     payload = json.loads(raw)
     assert payload["status"] == "candidate_complete"
@@ -194,6 +197,7 @@ end Spin.UniformMixer.ScalableDenseFullCover
     (source_dir / "ScalableDenseFullCover.lean").write_bytes(
         global_source.encode("utf-8"))
     manifest = {"candidate_sha256": hashlib.sha256(raw).hexdigest(),
+                "candidate_source": str(candidate),
                 "status": "source_emitted" if emit_parts else
                           "selected_sources_emitted" if selected_parts else "plan_only",
                 "leaf_limit": leaf_limit, "vertex_limit": vertex_limit,

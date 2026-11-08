@@ -4,15 +4,11 @@
 We state finite validity, asymptotic distance, and encoding complexity
 separately for each SPIN family.
 
-\subsubsection{Native and Requested Lengths}
+\subsubsection{Native Lengths}
 
 The direct constructions apply at native lengths for which their block
 dimensions are integral. Their logarithmic schedules permit admissible lengths
-with relative gaps \(o(1)\). For Scalable SPIN, the zero extension in
-\eqref{eq:structured-requested-length-wrapper} maps the largest native member
-below any sufficiently large requested length into that output length. This wrapper preserves
-injectivity and absolute minimum distance. It changes rate and relative
-distance by only $o(1)$ and preserves linear work.
+with relative gaps \(o(1)\). Scalable SPIN is stated along its native lengths.
 
 \subsubsection{Asymptotic Statements}
 
@@ -26,8 +22,6 @@ uses memory constant \(51/50\).
 Theorem~\ref{thm:structured-spin-scalable} uses direct lengths
 $N_m=L_mb_m$, where $L_m=128m$ and $b_m$ is the least multiple of $24$
 satisfying $b_m\ge\frac{39}{4}\log_2N_m$. These lengths have relative gaps $o(1)$.
-The requested-length wrapper gives rate $1/2-o(1)$, relative distance
-$0.11-o(1)$, and linear work.
 
 \subsubsection{Linear Work and Working State}
 
@@ -70,6 +64,10 @@ tested lengths, shows that useful finite coverage need not require
 retuning at every message length.
 
 \subsubsection{Cost Model}
+
+Scalable SPIN's work bound counts Boolean circuit operations for a fixed setup.
+The sampled maps determine constant coefficients, and permutations specify
+wires with no gate cost. Routing also requires $O(N)$ indexed bit movements.
 
 Let $C_{\mathrm{out}}(b)$ be the work to encode one outer block, and let
 $C_{\mathrm{in}}(t,s)$ be the work for one structured inner step. A
