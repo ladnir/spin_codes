@@ -55,18 +55,15 @@ but no theorem covers the full 46,317-box domain. The final unconditioned
 distance, rate, and finite Turbo theorems remain open in this revised
 development.
 
-For Turbo SPIN, Lean now checks the value-carrying packet route, its
-22-state inner moment identity, the generic field-scalar action, and the
-RS8 information-set, shortening, and exact-support identities. In
-particular, zeroing `m ≤ 4` selected columns leaves
-`|F|^(8*(4-m))` outer groups, and inclusion--exclusion now gives a
-checked exact count for every specified output-column support. Lean also
-checks the paper's closed `A_h` expression for the actual number of
-messages with `h ≥ 5` active columns, assuming the base field has 16
-elements and eight distinct evaluation points. The proof handles the
-zero message's empty support separately. It does not yet identify the
-concrete GF16/GF(2^32) implementation, establish the complete expected
-packet measure, or close any finite numerical endpoint.
+For Turbo SPIN, Lean checks the RS8 support spectrum, exact expected
+packet measure, complete value law after the sampled row shuffle, and
+the actual 22-state setup. Its first moment is now partitioned by active
+groups and expressed exactly as a sum of packet-array counts multiplied
+by one joint regional-route and continuous-inner failure probability.
+The symbolic bridge currently covers the 22-state K18/K20 construction.
+It does not yet identify the concrete GF16/GF(2^32) implementation,
+certify the required numerical endpoints, transfer the larger-occupation
+reference bounds, or model the separate 15-state K16 inner.
 
 ## Audit of the completed proof
 
@@ -951,6 +948,26 @@ generated. Port the separate K16 15-state map after that interface works.
   22-state inner event, keeping that latter event as a single nonnegative
   test function. Then derive exact `U₁/U₂` expectation formulas before
   importing any numerical endpoint bounds.
+
+- 2026-11-07: `Turbo/RemainingRoute22.lean` connects the row-shuffled
+  complete-value counts to the actual `routeInnerLaw22`. It proves the
+  route is exactly row shuffle followed by regional shuffle, disintegrates
+  `qd` over row permutations, and keeps the regional permutations plus
+  all 22-state map updates in one `turboRemainingFailure22` event. The
+  resulting `turboSetup22_occupation_complete_formula` is an exact
+  identity under the sampled setup for every positive occupation; its
+  local factors include the proved `C_v` law. All printed theorems compile
+  with only standard Lean axioms. This closes the symbolic first-moment
+  bridge for K18/K20. It does **not** establish a finite distance bound:
+  no checked local operator majorizes `turboRemainingFailure22`, no
+  one/two-group numerical endpoints or full larger-occupation transfer
+  have been proved in Lean, and K16 still needs its separate 15-state
+  inner. Next audit the old `ConcreteFixedRegionComposition` and checked
+  `ConcreteCounts`/`FiberCertificate` numerical soundness in detail,
+  together with the retained Turbo operator producer, before selecting
+  the first K18 sparse operator pilot. Check whether the producer's
+  11-state quotient retains packet labels and chronological state; if
+  not, fix its mathematical interface before importing any endpoint.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
