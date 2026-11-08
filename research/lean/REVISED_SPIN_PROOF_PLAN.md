@@ -813,6 +813,17 @@ generated. Port the separate K16 15-state map after that interface works.
   compose with the complete-word packet shuffle theorem; keep the
   coefficient seed shared between different messages in the first-moment
   count.
+- 2026-11-07: Reused the old `FiniteProductLaw.piPMF_map` (the same product
+  pushforward interface used by `ColumnAdjoint.uniform_active_adjoint_columns`)
+  to prove `field32_uniform_active_packet_columns`: independently sampled
+  coefficients on any fixed family of nonzero columns yield independent
+  uniform nonzero packet columns. The theorem compiles without admissions
+  and has only the standard three Lean axioms. The remaining RS8 group step
+  must restrict the eight coefficient coordinates to the actual active
+  column support, show zero columns stay zero, and then combine these
+  independent column laws with the conditional label theorem. This
+  restriction/product bridge is new for the Turbo RS8 outer; inspect the
+  old finite product and route pushforwards before implementing it.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

@@ -156,6 +156,24 @@ theorem field32_uniform_packet_column (x : Bits32) (hx : x ≠ 0) :
     1 / (Fintype.card {y : PacketColumn // y ≠ 0} : ℝ)
   rw [Fintype.card_congr e]
 
+/-- The value-level law also factors across any fixed family of active
+columns. The coefficient tuple is one shared setup for all messages; the
+independence used here is only across its column coordinates. -/
+theorem field32_uniform_active_packet_columns {n : ℕ}
+    (x : Fin n → Bits32) (hx : ∀ i, x i ≠ 0) :
+    (piPMF (fun _ : Fin n =>
+      FinPMF.uniform {c : Field32 // c ≠ 0})).map
+        (fun coeff i =>
+          ((nonzeroAdjointEquiv field32Coordinates.toAddEquiv binaryPair
+            binaryPair_nondegenerate binaryPair_zero_left
+            (coordinateAdjoint field32Coordinates)
+            (coordinateAdjoint_pairing field32Coordinates)
+            (x i) (hx i)).trans nonzeroBits32PacketEquiv) (coeff i)) =
+      piPMF (fun _ : Fin n =>
+        FinPMF.uniform {y : PacketColumn // y ≠ 0}) := by
+  rw [piPMF_map]
+  simp_rw [field32_uniform_packet_column]
+
 /-- The mathematical sampled adjoint column has the exact packet-weight
 generating function used by the finite Turbo certificate. -/
 theorem field32_adjoint_packet_gf (x : Bits32) (hx : x ≠ 0) (z : ℝ) :
@@ -224,6 +242,7 @@ theorem field32_active_columns_gf (h : ℕ)
 #print axioms coordinateAdjoint_pairing
 #print axioms field32_uniform_adjoint
 #print axioms field32_uniform_packet_column
+#print axioms field32_uniform_active_packet_columns
 #print axioms field32_adjoint_packet_gf
 #print axioms field32_active_columns_gf
 
