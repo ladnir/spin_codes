@@ -276,6 +276,33 @@ support/label law or finite distance certificate follows yet. The next
 gate is the value-carrying packet shuffle and its placement law, then
 composition with the inner moment.
 
+### Next gate: value-carrying packet shuffle
+
+The old `Structured/ConcreteShufflePermutation.lean` proves
+`uniform_permutation_shuffleLaw` by first identifying a Boolean support
+fiber and then proving `shuffle_fiber_total`: for fixed source support
+`S` and target support `T` of the same size, every `T` has the same
+number of uniform permutations. `Turbo/PacketRoute.lean` already proves
+that routing packet values induces this same support action. What the old
+proof does **not** establish is the law of the nonzero four-bit labels.
+
+Extend the old fiber count rather than replacing it. For a fixed source
+support `S`, choose a uniform labeling of its active positions, then a
+uniform packet permutation. For a fixed target packet word `y`, each
+permutation sending `S` to `support(y)` determines exactly one source
+labeling, namely the pullback of `y`. The resulting fiber is therefore
+equivalent to the old support-permutation fiber. Count source labelings
+as `15^|S|` and use `shuffle_fiber_total` to obtain a uniform target
+law among all 64-packet words of weight `|S|`. First prove the
+deterministic support identity and the fiber equivalence; then the
+finite probability formula. Finally connect this law to the sampled
+RS8 outer: independent column adjoints make labels uniform conditional
+on a fixed pre-shuffle support, and summing these support classes with
+the checked `C_v` gives the required local atom probabilities. Keep the
+actual group and regional permutations sampled independently as in
+`ConcreteRoute.seedLaw`. The support-only theorem and a labeled-word
+theorem have different scopes and must remain distinct.
+
 Before designing its Lean checker, audit the old finite certificate and
 the current Turbo replay code against the actual RS8 outer, packet route,
 and uniform state-map law. Record the exact first-moment summands, one- and
@@ -750,6 +777,19 @@ generated. Port the separate K16 15-state map after that interface works.
   empty error file. Next audit the old uniform-shuffle fiber count and
   extend it to complete four-bit packet values before deriving Turbo's
   routed local measure.
+- 2026-11-07: `Turbo/PacketShuffleValues.lean` now proves the exact
+  value-carrying shuffle law. A labeled source support has `15^|S|`
+  possible words, and `packetShuffleFiberEquiv` identifies the complete-word
+  shuffle fiber with the support-permutation fiber of the old
+  `Structured/ConcreteShufflePermutation.lean`. Its `shuffle_fiber_total`
+  yields probability `1/(binom(64,|S|) 15^|S|)` for every target word of
+  packet weight `|S|`, zero otherwise. This is an admission-free theorem
+  whose recursive axioms are only Lean's standard three. It assumes a
+  uniform labeling conditional on source support. Next derive that
+  conditional labeling law from the independently sampled RS8 column
+  adjoints, then compose the row shuffle, transpose, and regional shuffle
+  with the actual inner event. The Scalable cover build was live through
+  Part102 with an empty error log at this checkpoint.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
