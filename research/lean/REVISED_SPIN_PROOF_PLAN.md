@@ -1297,6 +1297,29 @@ is provenance and cannot replace the local operator inequality.
   factor the selected four-bit values across the same steps and identify
   the resulting conditional complete-word law with the existing
   `selectedStepLaw22`.
+- 2026-11-08: Audited the old `ConcreteMarkedConditioning` and
+  `SpinCodes/FiniteProductLaw.piPMF_bind` for the next disintegration.
+  The old proof conditions independent binary marks on their total count;
+  Turbo instead starts from an exactly uniform regional selected set and
+  keeps its four-bit labels. `Turbo/RS8StepCounts22.lean` gives the exact
+  independent uniform subset law at a specified vector of 16-slot counts.
+  `Turbo/RS8StepProfileMixture22.lean` proves the actual global uniform
+  selected set is the hypergeometric mixture of those product laws, with
+  weight `prod_step choose(16,j_step)/choose(16R,q)` at total count `q`.
+  Normalization is derived from the equality of the two finite laws,
+  rather than postulated. `Turbo/RS8StepValueFactor22.lean` proves that,
+  conditional on the full selected set, complete four-bit regional values
+  factor across the physical 16-slot steps. The proof uses the actual
+  step indexing and retains selected positions whose value is zero.
+  These checked theorems use only Lean's standard axioms. The first
+  attempt to simplify the reciprocal product in the value factor left a
+  goal; applying the explicit product-of-powers and product-of-inverses
+  lemmas closed it. Next assemble the set-profile and value-factor
+  identities into a law of complete physical step words conditional on
+  their counts, identifying each factor with `selectedStepLaw22`.
+  Continue to carry one inner state chronologically across steps and
+  regions. The existing 11-coordinate numerical envelope and finite
+  endpoint certificates have not yet been connected to this law.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
