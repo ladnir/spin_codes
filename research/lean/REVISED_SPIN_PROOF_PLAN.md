@@ -61,8 +61,10 @@ the actual 22-state setup. Its first moment is now partitioned by active
 groups and expressed exactly as a sum of packet-array counts multiplied
 by one joint regional-route and continuous-inner failure probability.
 The symbolic bridge currently covers the 22-state K18/K20 construction.
-The exact 16-slot physical input law and full-state weighted step kernel
-are also checked; their 11-coordinate numerical envelope is still open.
+The exact 16-slot physical input law, full-state weighted step kernel, and
+zero-inclusive selected-slot thinning identity are also checked. The last
+identity justifies the producer's `15/16` mixture at the complete-word level;
+it does not yet justify its 11-coordinate numerical envelope.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -182,7 +184,7 @@ full theorem statement and recursive axioms; only `propext`,
 
 ## Finite Turbo gate
 
-### Current gate: sampled column adjoint
+### Sampled column adjoint and physical input law
 
 The immediate task is to justify the packet law for the *transposed* encoder.
 For a fixed nonzero 32-bit column `x`, the paper samples a uniform nonzero
@@ -1049,6 +1051,43 @@ is provenance and cannot replace the local operator inequality.
   11-coordinate measure representation, reusing the already proved
   `QuadraticSpectrumSupport` weight classes and the old finite checker
   only after matching their exact map and law.
+
+- 2026-11-07: Before modeling the producer's zero-label thinning,
+  rechecked `Turbo/PacketLabelConditioning.lean`,
+  `Structured/ConcreteShufflePermutation.uniform_permutation_shuffleLaw`,
+  and `k18_margin60/replay_fractional.py::thin`. The old support theorem
+  establishes the uniform selected-position law, and the Turbo label
+  theorem establishes uniform nonzero labels after conditioning on
+  support. The producer's `15/16` thinning is another exact law: start
+  with `j` selected slots whose four-bit values are uniform *including*
+  zero, then condition on the number `k` of nonzero values. The selected
+  set and packet values must remain one finite experiment. This audit
+  established the complete-word mass and binomial-mixture obligations
+  closed in the following checkpoint; a numerical `thin` matrix cannot
+  stand in for that identity.
+
+- 2026-11-07: `Turbo/PhysicalThinning22.lean` now proves that experiment.
+  `selectedStepLaw22 j` samples a uniform `j`-subset of sixteen slots and
+  independent uniform four-bit values, including zero, on the selected
+  slots. For a complete word `x` with `k` nonzero slots, Lean proves its
+  point mass is
+  `choose(16-k,j-k)/(choose(16,j)*16^j)` when `k≤j`, and zero otherwise.
+  `selectedStepLaw22_mixture` then proves the equality of complete-word
+  laws with the sum of `choose(j,k)*15^k/16^j` times the exact-occupancy
+  laws from `PhysicalStep22.lean`. `turboSelectedKernel22_mixture` lifts
+  that equality to every entry of the full `2^22`-state weighted kernel.
+  This matches the producer's `thin` weights, including their
+  zero-label semantics. The recursive axiom audit reports only Lean's
+  standard axioms.
+  **Old-proof correspondence:** `Structured/ConcretePlacementLaw` supplies
+  the uniform selected-set inclusion count; `Turbo/PacketLabelConditioning`
+  supplies the support/label separation pattern. Neither old theorem
+  models selected values that may vanish, so this finite experiment and
+  mixture proof are new. The next gate is to prove that the actual
+  regional route, conditioned on its count profile, produces the
+  selected-slot law needed here, and to prove that the 11-coordinate
+  outward operator bounds the exact full-state kernel. A matching matrix
+  shape alone will not discharge either obligation.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
