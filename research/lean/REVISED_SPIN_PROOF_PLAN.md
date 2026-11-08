@@ -1275,6 +1275,28 @@ is provenance and cannot replace the local operator inequality.
   11-coordinate numerical envelopes. The outer reference factor and
   one-region product are already checked; do not reintroduce separate
   inner states at region boundaries.
+- 2026-11-08: Before partitioning the selected set into steps, rechecked
+  the old `ConcretePlacementSimplexLaw`/`ConcretePlacementCoordinates`
+  finite-fiber arguments and the physical `PacketInner22.stepInput`
+  indexing. The actual step order uses
+  `finProdFinEquiv : Fin R × Fin 16 ≃ Fin (16R)`.
+  `Turbo/RS8StepGeometry22.lean` now checks the equivalence between a
+  global selected set and its ordered array of 16-slot subsets. It
+  proves the global cardinality equals the sum of step cardinalities,
+  and that the actual uniform regional selected-set law gives equal
+  mass `1/choose(16R,|S|)` to every step-subset array with that total
+  count, zero otherwise. All printed theorems have only standard axioms.
+  An initial symbolic `Fintype.sum_equiv` cardinality proof timed out
+  even after increasing Lean's heartbeat limit. The checked replacement
+  uses the old `Finset.card_eq_sum_card_fiberwise` pattern and a separate
+  explicit equivalence of each step fiber; it compiles at the normal
+  resource limit. Next disintegrate this uniform array by its vector of
+  step counts: each count profile receives the product-of-binomial
+  hypergeometric weight, and conditional on that profile the step
+  subsets are independent uniform subsets of their stated sizes. Then
+  factor the selected four-bit values across the same steps and identify
+  the resulting conditional complete-word law with the existing
+  `selectedStepLaw22`.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
