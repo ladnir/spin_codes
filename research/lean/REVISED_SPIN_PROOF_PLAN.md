@@ -1419,6 +1419,21 @@ is provenance and cannot replace the local operator inequality.
   each bound with `sparse_kernel.outward_at_z`; only after the symbolic
   inequalities close should a finite checker authenticate its Arb
   endpoints or capped-density candidates.
+- 2026-11-08: Before the first local row, rechecked the completed
+  `UniformMixer/ScalableWeightedRows.bernoulliStepKernel_zero_entry` and
+  `Kernel.update_zero`: a zero entering state is never refreshed by
+  uniform GL, so its next state is exactly the feedback of the input.
+  `Turbo/PhysicalBirth22.lean` identifies the corresponding exact
+  zero-inclusive selected-packet birth measure. It proves that the
+  zero-source row of `turboSelectedKernel22` equals this feedback law,
+  that every birth mass is nonnegative for `z≥0`, and that its total is
+  the expected tilted output weight. The theorems compile with only
+  standard axioms. Next split this exact birth measure into the
+  producer's zero, uniform-density, and eight weight-class pieces;
+  prove that *one complete selected row* bounds the resulting pieces.
+  A coarse arbitrary-nonzero row may be a pilot, but the retained
+  numeric certificate needs the sharper complete row and its source
+  arithmetic checked.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
