@@ -1514,6 +1514,27 @@ is provenance and cannot replace the local operator inequality.
   exact birth masses, first/second live moments, and feedback-return
   bounds at one packet occupancy and one rational tilt, using the
   actual production maps and selected input law.
+- 2026-11-08: Corrected the numeric interface after tracing the retained
+  K18 replay through `k18_margin60/tune.py`,
+  `k16_design/packet_inner_quadratic_extension.py`,
+  `s16_closure/sparse_kernel.py`, and
+  `k18_margin60/replay_fractional.py`. `sparse_kernel.outward_at_z`
+  produces 17 local matrices conditioned on **exactly j nonzero
+  packets** (`packetStepLaw22 j`); the replay thins them with weights
+  `choose(j,k) 15^k / 16^j` to model selected slots that can be zero.
+  Our checked `turboSymbolicRow22_sound` concerns the latter selected
+  law (`selectedStepLaw22 j`), so comparing its entries directly with
+  the unthinned retained rows would be invalid. The checked
+  `turboSelectedKernel22_mixture` already supplies the full-state
+  probabilistic identity. For the numerical bridge, first establish a
+  symbolic complete row for the exact-nonzero law and compare its
+  entries with each retained physical matrix. Then prove that
+  nonnegative convex thinning preserves complete-row soundness and
+  connects those matrices to `turboSelectedKernel22`. The existing
+  selected symbolic row remains an independent semantic cross-check.
+  For the pilot use one nontrivial occupancy, such as `j=1`, and a
+  rational tilt. This is a scope correction, not evidence of a false
+  finite certificate.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
