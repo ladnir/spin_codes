@@ -1,4 +1,5 @@
 import SpinCodes.Turbo.PacketRoute
+import SpinCodes.Turbo.PacketSupportCount
 import SpinCodes.UniformMixer.ScalableEncoderKernel
 
 /-!
@@ -15,8 +16,6 @@ noncomputable section
 namespace Spin.Turbo
 
 open Spin.Structured Spin.Structured.ConcreteRoute Spin.UniformMixer
-
-abbrev Packet4 := Fin 4 → ZMod 2
 
 /-- The 16 packet slots belonging to one physical 64-bit step. -/
 def stepInput {R : ℕ}

@@ -872,6 +872,32 @@ generated. Port the separate K16 15-state map after that interface works.
   inner event for one and two active groups. The finite numerical
   operators and complete occupation coverage remain open. The Scalable
   dense full-cover build remains an independent checkpointed process.
+- 2026-11-07: Audited the next old-proof component before creating the
+  Turbo setup. `Structured/ConcreteRoutePermutation.permutation_law_eq`
+  uses independent row and region permutation products and matches the
+  support projection of `Turbo/PacketRoute.routePackets_support_law`.
+  `Structured/ConcreteFixedRegionComposition` factors region endpoint
+  matrices under an independent product law; its binary support-only
+  kernels cannot simply be reused for four-bit packet values. The new
+  `Turbo/PacketInner22.routeInnerMoment22` already gives the exact
+  value-carrying route and shared-state kernel for the 22-state inner,
+  without a per-region reset. `Framework.Setup.expect_Z_eq` and
+  `FiniteMoment.prob_weight_le` provide the correct actual-setup first
+  moment and lower-tail interfaces.
+- 2026-11-07: `Turbo/ActualSetup22.lean` now instantiates that framework
+  with one sampled RS8 multiplier tuple per group shared across all
+  messages, independently sampled route permutations, and independent
+  GL(22,2) state maps. It checks the exact expected bad-message count,
+  Markov step, and a lower-tail bound by the actual route/inner kernel
+  moment. Importing this module exposed two independent declarations of
+  `Packet4`; `PacketInner22` now imports the existing packet type instead.
+  Both modules compile admission-free with only standard Lean axioms.
+  This establishes the 22-state probability-space bridge, not the
+  numerical upper bound or finite distance endpoint. The 15-state
+  K=2^16 packet inner has no corresponding Lean module yet and needs a
+  separate actual-setup connection. Next check the finite checker against
+  the 22-state value kernel and build the 15-state analog only after
+  auditing the shared inner proof infrastructure and implementation map.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
