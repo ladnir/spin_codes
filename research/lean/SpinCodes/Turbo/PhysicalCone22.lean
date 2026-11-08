@@ -60,6 +60,12 @@ theorem physicalClass22_covers_nonzero (q : State22)
   · exact ⟨10, by norm_num,
       by simpa [physicalClassAllows22, physicalClassWeight22] using h⟩
 
+theorem physicalClassAllows22_zero_iff (i : Fin 11) :
+    physicalClassAllows22 i 0 ↔ i = 0 := by
+  fin_cases i <;>
+    simp [physicalClassAllows22, physicalClassWeight22,
+      coordinateWeight_zero]
+
 /-- A piece of state mass represented by one envelope coordinate.
 Coordinate 2 additionally has pointwise density at most `b/(2^22-1)`
 on each nonzero state. Keeping the mass cap as well makes the abstract
@@ -87,6 +93,13 @@ theorem physicalPiece22_nonneg {i : Fin 11} {b : ℝ}
 theorem physicalPiece22_mass_le {i : Fin 11} {b : ℝ}
     {μ : State22 → ℝ} (h : physicalPiece22 i b μ) :
     (∑ q : State22, μ q) ≤ b := h.2.2.1
+
+theorem physicalPiece22_live_zero {i : Fin 11} {b : ℝ}
+    {μ : State22 → ℝ} (hi : i ≠ 0)
+    (h : physicalPiece22 i b μ) : μ 0 = 0 := by
+  by_contra hn
+  exact hi ((physicalClassAllows22_zero_iff i).mp
+    (h.2.1 0 hn))
 
 theorem physicalCone22_nonneg {v : Fin 11 → ℝ}
     {μ : State22 → ℝ} (h : physicalCone22 v μ) :
@@ -279,6 +292,7 @@ theorem physicalInitialCone22 :
 
 #print axioms physicalCone22_nonneg
 #print axioms physicalClass22_covers_nonzero
+#print axioms physicalClassAllows22_zero_iff
 #print axioms physicalCone22_mass_le
 #print axioms physicalRowSound22_transfer
 #print axioms physicalKernelAction22_mul

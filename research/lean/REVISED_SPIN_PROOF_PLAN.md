@@ -1452,6 +1452,69 @@ is provenance and cannot replace the local operator inequality.
   all symbolic row expressions to the producer's histogram/Walsh data
   through a checker, including any selected capped-density birth row.
 
+- 2026-11-08: Audited `UniformMixer/ScalableWeightedRows` and
+  `ScalableEnvelopeRows` before defining the Turbo live rows. The old
+  Bernoulli-input law cannot be reused: `Turbo/PhysicalLive22.lean` instead
+  retains the exact selected four-bit packet input in both the tilted
+  output moment and the feedback-conditioned return-to-zero moment.
+  Lean checks the uniform-GL live entry, its exact zero return, the
+  pointwise live-atom upper bound, and exact row sum. It also checks the
+  weighted source bound for each of the eight expansion classes and the
+  arbitrary-nonzero coordinate by a finite class maximum, while the
+  uniform-density coordinate uses the live-state average. These lemmas
+  use only standard Lean axioms.
+- 2026-11-08: `Turbo/PhysicalLiveRow22.lean` now checks the full live-source
+  output measure, including its zero atom, total mass, and pointwise
+  atom bound. It splits the output into the exact zero atom and a
+  uniformly dominated nonzero remainder. The complete row witness is
+  sound for every nonzero source coordinate. `PhysicalSymbolicRow22.lean`
+  combines this with the earlier zero-source birth row and proves
+  `turboSymbolicRow22_sound`, a complete 11-coordinate domination of the
+  actual selected full-state physical kernel. Its axiom audit lists only
+  `propext`, `Classical.choice`, and `Quot.sound`. This closes the
+  **symbolic local operator**, not the finite numerical certificate.
+  Before adding the next checker component, audit the old numerical
+  row/census bridge and the exact coefficient definitions in the Turbo
+  producer. Determine which retained rows dominate the symbolic row
+  entrywise, and which use a different complete decomposition. In
+  particular, the producer's feedback-return upper bound and the
+  selected capped-density birth row require separate sound proofs.
+  Check only complete rows, then connect the resulting operator to the
+  chronological two-step and 64-region bound and numeric endpoints.
+- 2026-11-08: Audited the completed Structured numerical bridge before
+  designing the Turbo checker. `Structured/FiberNumericsBridge.lean`
+  derives actual kernel/fiber counts from a concrete map spectrum and
+  checked integer Fourier sums; `ConcreteCounts.lean` replaces those
+  premises with the exhaustive map-spectrum replay and frozen data.
+  `ConcreteFixedNumericSound.lean` separately proves fixed-point interval
+  checks imply real rate inequalities. The producer remains untrusted;
+  Lean checks its exact arithmetic and the semantic bridge. For Turbo,
+  `s16_closure/sparse_kernel.py:outward_at_z` sets the birth row from
+  complete class masses and live rows from histogram moments. The live
+  return entry is the minimum of the first moment and a Cauchy bound
+  using the second moment and feedback-nonzero probability; the uniform
+  source uses histogram multiplicities divided by `2^22-1`. The existing
+  symbolic row bounds the exact return expectation, so the Cauchy
+  inequality and a checked identification of all producer histograms
+  are necessary before asserting domination by the retained row.
+  `kernel_birth_density.py` supplies a different complete birth-row
+  decomposition with a capped uniform-density piece; it cannot be
+  justified by entrywise minima of unrelated rows. Next prove a generic
+  monotone-row transfer from `turboSymbolicRow22_sound`, then construct a
+  small checked numeric pilot from exact selected-law data. Do not treat
+  receipt hashes or Arb outputs as proof premises.
+- 2026-11-08: `Turbo/PhysicalRowDominance22.lean` checks the generic
+  numeric interface: if every entry of one outward matrix dominates
+  the corresponding entry of the complete symbolic row, then that
+  matrix satisfies `physicalRowSound22` for the actual full-state
+  selected kernel. Both componentwise cone monotonicity and row
+  transfer use only standard Lean axioms. This interface covers one
+  complete row choice at a time; a capped-density birth row requires
+  its own symbolic decomposition. Next build a pilot that authenticates
+  exact birth masses, first/second live moments, and feedback-return
+  bounds at one packet occupancy and one rational tilt, using the
+  actual production maps and selected input law.
+
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
 their reason in research notes when they inform a later decision.
