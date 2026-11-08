@@ -1199,6 +1199,15 @@ is provenance and cannot replace the local operator inequality.
   and begin the 11-coordinate operator soundness proof. Check that the
   regional shuffles remain independent across the 64 regions while the
   state is continuous across their chronological composition.
+- 2026-11-08: `Turbo/RS8ReferenceRoute22.lean` starts that route bridge.
+  It proves directly from the RS8 evaluation and sampled adjoint map that
+  the zero group produces the zero complete packet word for *every*
+  sampled column-multiplier tuple, and that any row permutation preserves
+  this word. Lean checks the theorem with only standard axioms. This is
+  a pointwise physical fact, not yet a statement about the reference
+  law's regional shuffle or conditional physical steps. Next lift it to
+  the zero-row probability law, then combine it with the independent
+  uniform active rows before conditioning on regional slot counts.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
