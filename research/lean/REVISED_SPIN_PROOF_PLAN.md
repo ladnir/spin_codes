@@ -937,6 +937,20 @@ generated. Port the separate K16 15-state map after that interface works.
   group. The regional permutations and one continuous inner state then
   enter one common nonnegative test function; do not multiply their
   event probabilities across groups or regions.
+- 2026-11-07: `Turbo/RowShuffledArray22.lean` now incorporates the *actual*
+  independent row permutations. The fixed-message pushforward is the
+  product of the independently shuffled RS8 complete-word laws; its
+  active-set expected count again factors by group. The active local
+  factor is exactly `C_v/(choose(64,v)*15^v)` by the earlier
+  `rs8_expected_shuffled_word_count` theorem. The generic pairing lemma
+  proves that products of finite setup arrays can be paired without
+  replacing the shared setup by per-message randomness. Lean checks
+  these facts with only standard axioms. This closes the outer and row
+  shuffle part of the sparse fold. Next connect the row-shuffled array
+  law to the remaining sampled *regional* permutation and continuous
+  22-state inner event, keeping that latter event as a single nonnegative
+  test function. Then derive exact `U₁/U₂` expectation formulas before
+  importing any numerical endpoint bounds.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
