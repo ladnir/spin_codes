@@ -1342,6 +1342,20 @@ is provenance and cannot replace the local operator inequality.
   transfer-matrix expectation before attempting the 11-coordinate
   numerical compression or fractional two-step bounds. Audit the old
   kernel soundness and checked numerical producer at that boundary.
+- 2026-11-08: `Turbo/RS8ReferenceStepArray22.lean` now checks the full
+  64-region input law: independent regional profile mixtures, with
+  independent complete physical-step words conditional on each region's
+  count vector. It applies the already checked independent-region route
+  factorization via `FiniteProductLaw.piPMF_map`. The same file proves
+  `stepInput` and `flatInput` consume precisely these words in the
+  encoder's region-major chronological order. Both printed statements
+  use only standard Lean axioms. No step or region resets the 22-bit
+  state. Next audit the old `ConcreteFixedRegionComposition` kernel
+  product and the retained Turbo 32-slot fractional producer, then
+  build the exact full-state weighted moment using this law. In
+  particular, do not multiply stepwise scalar failure probabilities:
+  matrix products must retain the shared state, and the producer's
+  two-step fractional inequality needs its own soundness theorem.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
