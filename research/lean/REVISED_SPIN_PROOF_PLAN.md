@@ -64,7 +64,9 @@ The symbolic bridge currently covers the 22-state K18/K20 construction.
 The exact 16-slot physical input law, full-state weighted step kernel, and
 zero-inclusive selected-slot thinning identity are also checked. The last
 identity justifies the producer's `15/16` mixture at the complete-word level;
-it does not yet justify its 11-coordinate numerical envelope.
+it does not yet justify its 11-coordinate numerical envelope. The revised
+RS8 active-group expected count is now pointwise bounded by the retained
+uniform-reference atom factor, before and after the sampled row shuffle.
 It does not yet identify the concrete GF16/GF(2^32) implementation,
 certify the required numerical endpoints, transfer the larger-occupation
 reference bounds, or model the separate 15-state K16 inner.
@@ -1103,6 +1105,49 @@ is provenance and cannot replace the local operator inequality.
   factor cannot be imported by name. After this bridge, prove that the
   11-coordinate outward operator bounds the full-state kernel. A
   matching matrix shape alone does not discharge either obligation.
+- 2026-11-08: Before coding the RS8 outer comparison, audited
+  `Structured/Domination.Dominates.expect_le` and
+  `ConcreteScalarRouted.routed_scalar_moment`: their setup law is a finite
+  PMF, the comparison is pointwise on each complete outer word, and the
+  same route-and-inner observable is then carried through expectation.
+  The search data enter only after that symbolic reduction. Audited
+  `Turbo/RS8ShorteningGeneral.rs8ShorteningEquiv`,
+  `RS8PositionSets.rs8ZeroOnSet_card`,
+  `RS8SpectrumNumeric.rs8_exact_support_card_closed`, and
+  `SampledRS8PacketLaw.sampledRS8PacketColumnsLaw_apply` against the
+  revised group sampler. A target atom with `h` nonzero 32-bit columns
+  can arise only from messages with that exact column support; each such
+  message contributes `(2^32-1)^(-h)`. The shortened-code theorem bounds
+  their count by `(2^32)^(h-4)` for `h≥5`. This is slightly weaker than
+  the retained `(2^32-1)^(h-4)` count but may still suffice for the
+  required comparison with the much larger RS16 reference factor.
+  First prove the exact atom formula and this support-count bound in
+  Lean. Then verify the factor inequality with exact integers and lift
+  the bound through the independent row shuffle and active-group product.
+  Do not start the numerical operator import until that reference-law
+  connection is checked.
+- 2026-11-08: `Turbo/RS8AtomEnvelope.lean` now closes the complete-atom
+  comparison for one active RS8 group, including the actual independent
+  sampled GF(2^32) column multipliers and the sampled row permutation.
+  `sampledRS8PacketColumnsLaw_apply_support` gives exact mass
+  `(2^32-1)^(-h)` when the message and target have the same nonzero
+  column support, and zero otherwise. `rs8_all_messages_atom_sum`
+  identifies the expected atom count with the exact support-fiber count
+  divided by `(2^32-1)^h`. `rs8_exact_support_count_le` uses the old
+  shortening equivalence to bound the fiber by `2^(32(h-4))` for `h≥5`;
+  the RS8 distance floor kills nonzero-message atoms with `h<5`.
+  Lean checks that this weaker fiber bound still gives at most
+  `1/65535^8 = beta_old/2^256` at every complete 256-bit atom.
+  `rs8ExpectedShuffledWordCount_le_old_uniform_atom` carries the
+  inequality through the *actual* sampled row shuffle by averaging
+  inverse images of its bijective permutations. No numerical receipt
+  or admitted fact enters these theorems; the recursive axiom audit
+  lists only standard axioms. The old `Dominates.expect_le` pattern is
+  now available at the complete group-word boundary. Next multiply
+  this pointwise bound over independent active groups, identify the
+  inactive zero words, and connect the resulting uniform-value
+  reference to the conditional regional-slot law and full inner
+  moment. The 11-coordinate operator and finite endpoints remain open.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
