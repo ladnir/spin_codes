@@ -790,6 +790,17 @@ generated. Port the separate K16 15-state map after that interface works.
   adjoints, then compose the row shuffle, transpose, and regional shuffle
   with the actual inner event. The Scalable cover build was live through
   Part102 with an empty error log at this checkpoint.
+- 2026-11-07: Extracted `field32_uniform_packet_column` from the existing
+  sampled-adjoint moment proof. It proves an exact **value-level**
+  pushforward: a uniform nonzero GF(2^32) multiplier acting on any fixed
+  nonzero 32-bit column gives a uniform nonzero eight-packet column. The
+  old support-only route had no counterpart for this coefficient-to-label
+  statement; it is the missing hypothesis for the new value-carrying
+  shuffle. Next prove the uniform labeling conditional on each nonempty
+  pre-shuffle packet support, then use the independent column product to
+  state it for one RS8 group. The subsequent theorem must retain shared
+  setup across messages and independent row/regional seeds. The Scalable
+  cover was live through Part103 with an empty error log at inspection.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

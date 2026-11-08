@@ -132,6 +132,30 @@ def nonzeroBits32PacketEquiv :
   left_inv x := Subtype.ext (bits32PacketEquiv.symm_apply_apply _)
   right_inv y := Subtype.ext (bits32PacketEquiv.apply_symm_apply _)
 
+/-- For any fixed nonzero column, the sampled field multiplier produces a
+uniform nonzero eight-packet column. This is the value-level distribution
+needed before conditioning on a packet support. -/
+theorem field32_uniform_packet_column (x : Bits32) (hx : x ≠ 0) :
+    (FinPMF.uniform {c : Field32 // c ≠ 0}).map
+      ((nonzeroAdjointEquiv field32Coordinates.toAddEquiv binaryPair
+        binaryPair_nondegenerate binaryPair_zero_left
+        (coordinateAdjoint field32Coordinates)
+        (coordinateAdjoint_pairing field32Coordinates) x hx).trans
+          nonzeroBits32PacketEquiv) =
+      FinPMF.uniform {y : PacketColumn // y ≠ 0} := by
+  let e := (nonzeroAdjointEquiv field32Coordinates.toAddEquiv binaryPair
+    binaryPair_nondegenerate binaryPair_zero_left
+    (coordinateAdjoint field32Coordinates)
+    (coordinateAdjoint_pairing field32Coordinates) x hx).trans
+      nonzeroBits32PacketEquiv
+  change (FinPMF.uniform {c : Field32 // c ≠ 0}).map e = _
+  apply FinPMF.ext
+  funext y
+  rw [FinPMF.map_equiv_apply]
+  change 1 / (Fintype.card {c : Field32 // c ≠ 0} : ℝ) =
+    1 / (Fintype.card {y : PacketColumn // y ≠ 0} : ℝ)
+  rw [Fintype.card_congr e]
+
 /-- The mathematical sampled adjoint column has the exact packet-weight
 generating function used by the finite Turbo certificate. -/
 theorem field32_adjoint_packet_gf (x : Bits32) (hx : x ≠ 0) (z : ℝ) :
@@ -145,13 +169,8 @@ theorem field32_adjoint_packet_gf (x : Bits32) (hx : x ≠ 0) (z : ℝ) :
     (coordinateAdjoint_pairing field32Coordinates) x hx
   let g := nonzeroBits32PacketEquiv
   have hdist : (FinPMF.uniform {c : Field32 // c ≠ 0}).map (f.trans g) =
-      FinPMF.uniform {y : PacketColumn // y ≠ 0} := by
-    apply FinPMF.ext
-    funext y
-    rw [FinPMF.map_equiv_apply]
-    change 1 / (Fintype.card {c : Field32 // c ≠ 0} : ℝ) =
-      1 / (Fintype.card {y : PacketColumn // y ≠ 0} : ℝ)
-    rw [Fintype.card_congr (f.trans g)]
+      FinPMF.uniform {y : PacketColumn // y ≠ 0} :=
+    field32_uniform_packet_column x hx
   have hmap : (FinPMF.uniform {c : Field32 // c ≠ 0}).expect
       (fun c => z ^ (packetColumnSupport ((f.trans g c).val)).card) =
       ((FinPMF.uniform {c : Field32 // c ≠ 0}).map (f.trans g)).expect
@@ -204,6 +223,7 @@ theorem field32_active_columns_gf (h : ℕ)
 
 #print axioms coordinateAdjoint_pairing
 #print axioms field32_uniform_adjoint
+#print axioms field32_uniform_packet_column
 #print axioms field32_adjoint_packet_gf
 #print axioms field32_active_columns_gf
 
