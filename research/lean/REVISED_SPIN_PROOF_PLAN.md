@@ -1210,6 +1210,26 @@ is provenance and cannot replace the local operator inequality.
   deterministic inactive row with the independent uniform active rows
   under the actual regional permutation, retaining all four-bit values,
   before conditioning on the physical-step slot counts.
+- 2026-11-08: Before transposing Turbo's reference product, inspected the
+  completed `Structured/ConcreteRouteTranspose.transpose_density` and the
+  existing `Turbo/RowShuffledArray22.piPMF_prod_pair`/
+  `FiniteProductLaw.piPMF_map` proofs. The old transpose merely commutes
+  a finite product of independent cells; it is valid for four-bit values
+  once both the active and inactive cell laws are identified. The new
+  `Turbo/RS8ReferenceRegion22.lean` proves an active reference row is a
+  product of 64 independent uniform four-bit packets and an inactive row
+  is a product of 64 point masses at zero. It then proves the exact
+  transposed array law and the law after the *actual independent regional
+  permutations* is a product of 64 complete regional-value laws. The
+  theorem retains one shared permutation within each region and all
+  packet labels. All printed theorems compile with standard Lean axioms.
+  Next derive the one-region law as a uniform selected group-position
+  set of size `|S|` with independent uniform four-bit values on that set.
+  Use the old `ConcretePlacementLaw` permutation-fiber theorem and the
+  generalized version of `PhysicalThinning22.selectedGiven22`; then
+  condition on the number of selected positions in each physical step.
+  The independent-region law is checked, but independence across physical
+  steps still requires that conditioning argument and must not be assumed.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
