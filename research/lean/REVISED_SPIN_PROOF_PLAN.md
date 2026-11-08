@@ -1320,6 +1320,28 @@ is provenance and cannot replace the local operator inequality.
   Continue to carry one inner state chronologically across steps and
   regions. The existing 11-coordinate numerical envelope and finite
   endpoint certificates have not yet been connected to this law.
+- 2026-11-08: Checked `Turbo/RS8ReferenceStepLaw22.lean`. Its theorem
+  identifies the exact normalized-reference one-region route, after the
+  actual physical-step coordinate change, with a hypergeometric mixture
+  of independent `selectedStepLaw22` inputs. It assembles the checked
+  global selected-set law, conditional value factor, and the old
+  `FiniteProductLaw.piPMF_bind` theorem; the 16-slot factor agrees with
+  the preexisting `PhysicalThinning22.selectedStepLaw22` definition.
+  The printed theorem uses only standard Lean axioms. Conditional on the
+  count vector, physical-step words are independent; the common count
+  vector is still integrated at the region level. Before the next
+  component, audited old `ConcreteFixedRegionComposition`:
+  `matrixExpect_pi_product` composes independent region kernels while
+  retaining one state, and `pathKernel_regionStream` identifies the
+  chronological stream with the matrix product. Turbo's `PacketInner22`
+  likewise serializes region then step and uses one 22-bit state, but
+  the new inner step law includes full four-bit packet values and a
+  shared regional count profile. Next prove the array-level route
+  identity across all 64 independent regions and connect its ordered
+  word stream to `stepInput`/`flatInput`. Then state the exact full-state
+  transfer-matrix expectation before attempting the 11-coordinate
+  numerical compression or fractional two-step bounds. Audit the old
+  kernel soundness and checked numerical producer at that boundary.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
