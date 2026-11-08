@@ -1434,6 +1434,23 @@ is provenance and cannot replace the local operator inequality.
   A coarse arbitrary-nonzero row may be a pilot, but the retained
   numeric certificate needs the sharper complete row and its source
   arithmetic checked.
+- 2026-11-08: Extended `Turbo/PhysicalBirth22.lean` from the pointwise
+  birth law to a complete symbolic zero-source row. A deterministic
+  class index uses the exact production-map weight spectrum; Lean proves
+  that every state receives one class, that the arbitrary and uniform
+  coordinates (1 and 2) receive zero birth mass, and that the class
+  masses sum to the exact tilted birth moment. For every nonnegative
+  tilt and every zero-supported source piece, the exact full-state
+  `turboSelectedKernel22` output has a checked decomposition into the
+  eleven cone coordinates, with the complete row of exact class masses
+  as its bound. This is admission-free and uses only standard axioms.
+  It matches the structural form of `sparse_kernel.outward_at_z`'s
+  source row; it does **not** authenticate the producer's reported
+  numerical values. Next prove sound symbolic live-state rows (arbitrary,
+  uniform-dominated, and each weight class), using the checked
+  uniform-GL refresh and exact tilted feedback moments. Then connect
+  all symbolic row expressions to the producer's histogram/Walsh data
+  through a checker, including any selected capped-density birth row.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
