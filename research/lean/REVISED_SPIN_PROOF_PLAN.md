@@ -1230,6 +1230,27 @@ is provenance and cannot replace the local operator inequality.
   condition on the number of selected positions in each physical step.
   The independent-region law is checked, but independence across physical
   steps still requires that conditioning argument and must not be assumed.
+- 2026-11-08: Before the one-region placement component, rechecked the old
+  `Structured/ConcretePlacementLaw.shuffle_prob_subset` and
+  `ConcreteShufflePermutation.uniform_permutation_shuffleLaw`, together
+  with the existing `Turbo/PhysicalThinning22.selectedGiven22_apply`.
+  `Turbo/RS8ReferencePlacement22.lean` now proves the complete pre-shuffle
+  regional word has point mass `16^{-|S|}` exactly when all its nonzero
+  packets lie in the active set. It rewrites the actual one-region law as
+  an average over inverse images of the uniform permutation, then proves
+  its point mass is the uniform selected-set inclusion probability times
+  `16^{-|S|}`. The resulting closed formula is
+  `choose(L-k, |S|-k)/(choose(L, |S|) 16^{|S|})` for a target word with
+  `k≤|S|` nonzero packets and zero otherwise, where `L=16R`. Thus zero
+  values at selected slots remain accounted for. Theorems compile
+  admission-free with standard Lean axioms. This is the exact complete
+  regional law produced by the reference and actual uniform route.
+  Next identify its conditional distribution on a partition into 16-slot
+  physical steps: given all selected-slot counts, each step must have a
+  uniform selected subset and independent uniform four-bit values, with
+  the selected subsets independent across steps. Use the old finite
+  product-conditioning machinery only after matching this exact law;
+  do not infer step independence from the unconditional one-region mass.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
