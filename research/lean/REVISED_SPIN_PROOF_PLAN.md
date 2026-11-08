@@ -923,6 +923,20 @@ generated. Port the separate K16 15-state map after that interface works.
   active set and push it through the complete `sampledRS8RowLaw`; then
   incorporate the common regional route and inner law for the `U₁/U₂`
   folds. Keep the local physical operator soundness gate separate.
+- 2026-11-07: `Turbo/GroupArrayLaw22.lean` closes the first complete-value
+  product bridge. For each fixed full message, the actual independent
+  outer setup maps to the product of its sampled RS8 row laws. Summing
+  over all messages with a *fixed* active group set gives an exact
+  product of local expected complete-row counts. This matches the old
+  `tupleCount_eq_prod` algebra while using four-bit packet values and
+  the true RS8 setup. It makes no independence claim across different
+  messages sharing a seed. The proof compiles with standard Lean axioms.
+  The next sparse gate is to incorporate the *actual independent row
+  permutations* in this product law, so the previously proved
+  `rs8_expected_shuffled_word_count` supplies `C_v` at each active
+  group. The regional permutations and one continuous inner state then
+  enter one common nonnegative test function; do not multiply their
+  event probabilities across groups or regions.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
