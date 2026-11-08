@@ -1251,6 +1251,30 @@ is provenance and cannot replace the local operator inequality.
   the selected subsets independent across steps. Use the old finite
   product-conditioning machinery only after matching this exact law;
   do not infer step independence from the unconditional one-region mass.
+- 2026-11-08: Audited `Turbo/PhysicalThinning22.selectedGiven22_apply` and
+  the old `Structured/ConcreteMarkedConditioning`/
+  `FiniteProductLaw.piPMF_bind` before introducing the latent selected set.
+  `Turbo/RS8SelectedValues22.lean` generalizes the checked 16-slot
+  selected-value experiment to an arbitrary finite region length. It
+  proves that, given a selected set `T`, every complete word supported
+  inside `T` has mass `16^{-|T|}`, including words with zeros at selected
+  positions. A fixed regional permutation maps this law exactly to the
+  same law on its permuted selected set. Combined with the old checked
+  uniform-permutation support theorem, this proves the actual one-region
+  reference law equals: first choose a uniform `|S|`-subset, then sample
+  independent uniform four-bit values on that subset. The printed Lean
+  theorems have only standard axioms. `Turbo/RS8ReferencePhysical22.lean`
+  pins the generic selected-value law at length 16 definitionally to
+  `PhysicalThinning22.selectedGiven22`.
+  The remaining placement gate is the joint conditional law of the
+  selected sets across ordered physical steps or 32-slot macro blocks.
+  The producer conditions on their counts, uses within-step uniform
+  subsets and values, and averages count profiles with exact
+  hypergeometric weights. Prove that disintegration from the uniform
+  global selected set before applying the existing thinning identity or
+  11-coordinate numerical envelopes. The outer reference factor and
+  one-region product are already checked; do not reintroduce separate
+  inner states at region boundaries.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
