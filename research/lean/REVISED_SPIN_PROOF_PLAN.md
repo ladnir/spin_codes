@@ -1083,11 +1083,26 @@ is provenance and cannot replace the local operator inequality.
   the uniform selected-set inclusion count; `Turbo/PacketLabelConditioning`
   supplies the support/label separation pattern. Neither old theorem
   models selected values that may vanish, so this finite experiment and
-  mixture proof are new. The next gate is to prove that the actual
-  regional route, conditioned on its count profile, produces the
-  selected-slot law needed here, and to prove that the 11-coordinate
-  outward operator bounds the exact full-state kernel. A matching matrix
-  shape alone will not discharge either obligation.
+  mixture proof are new.
+- 2026-11-07: Rechecked the *interface* of this thinning identity against
+  `Turbo/RowShuffledArray22.lean` and the retained K18
+  `SLACK_REVIEW.md`. The actual RS8 group law has uniform **nonzero**
+  packet labels conditional on its support; it is not itself the
+  zero-inclusive `selectedStepLaw22`. The retained fractional calculation
+  first compares its outer measure pointwise with a uniform-value
+  reference, charging an outer factor, and only then conditions on the
+  number of routed group slots and thins zero labels. The new Lean
+  mixture proves the latter operation *within that reference model*.
+  The next gate must identify the exact reference measure and prove the
+  complete-word domination with its correct factor for the revised RS8
+  construction, then prove the reference route's conditional slot law.
+  `Structured/Domination.Dominates.expect_le` and
+  `ConcreteScalarRouted.routed_scalar_moment` are the old checked pattern:
+  transfer any nonnegative route-and-inner test through a pointwise
+  measure bound, preserving the same sampled route. The retained RS16
+  factor cannot be imported by name. After this bridge, prove that the
+  11-coordinate outward operator bounds the full-state kernel. A
+  matching matrix shape alone does not discharge either obligation.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and
