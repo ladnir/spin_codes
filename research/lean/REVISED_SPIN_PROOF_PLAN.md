@@ -263,8 +263,12 @@ whose value is basis-independent; it has not yet checked the exact C++
 GF16 polynomial basis and point encoding. Recursive axioms are the three
 standard Lean axioms. This is a generating-function identity, not yet a
 coefficientwise `C_v` theorem, routed support law, or finite distance
-certificate. Next prove the packet-weight support range and identify its
-coefficients, then compose with the packet route and inner moment.
+certificate. `rs8_sampled_packet_weight_range` now proves that every
+nonzero message has between 5 and 64 active packets under every sampled
+nonzero coefficient tuple, so the generating function has exactly the
+paper's claimed degree range. This uses the old support floor and the new
+adjoint nonzero theorem. Next identify the coefficientwise `C_v`, then
+compose with the packet route and inner moment.
 
 Before designing its Lean checker, audit the old finite certificate and
 the current Turbo replay code against the actual RS8 outer, packet route,
@@ -726,6 +730,12 @@ generated. Port the separate K16 15-state map after that interface works.
   file. The next finite gate is coefficientwise `C_v` and its uniform
   support/label placement after packet shuffling; the numerical finite
   operator checks remain open.
+- 2026-11-07: Added an every-setup packet-weight range proof for each
+  nonzero RS8 group message: 5 through 64 packets. It depends on the
+  checked MDS support floor and the proved nonzero action of each sampled
+  field adjoint. The full-cover process remained live through Part86 with
+  an empty error file. The next finite step remains coefficientwise
+  extraction of the expected `C_v` and the value-carrying shuffle law.
 
 At each future checkpoint, update the status and next action here before
 reporting completion or changing strategy. Preserve failed candidates and

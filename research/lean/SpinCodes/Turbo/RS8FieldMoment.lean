@@ -279,11 +279,82 @@ theorem rs8_nonzero_group_packet_gf_closed
   rw [rs8ColumnWeightCount_MDS field16_card points hpoints h
     (Finset.mem_Icc.mp hh).1]
 
+private theorem packet_support_pos {p : PacketColumn} (hp : p ≠ 0) :
+    1 ≤ (packetColumnSupport p).card := by
+  have hex : ∃ i : Fin 8, p i ≠ 0 := by
+    by_contra hn
+    apply hp
+    funext i
+    by_contra hi
+    exact hn ⟨i, hi⟩
+  obtain ⟨i, hi⟩ := hex
+  exact Finset.card_pos.mpr
+    ⟨i, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩⟩
+
+/-- Every active RS output column remains nonzero after its sampled
+adjoint, and therefore contributes at least one active packet. -/
+theorem rs8_sampled_packet_weight_ge_support
+    (points : Fin 8 → Field16) (rows : RS8Group Field16)
+    (coeff : Fin 8 → {c : Field32 // c ≠ 0}) :
+    (rs8Support points rows).card ≤
+      rs8SampledPacketWeight points rows coeff := by
+  have hlocal (j : Fin 8) :
+      (if j ∈ rs8Support points rows then 1 else 0) ≤
+        (packetColumnSupport (bits32PacketEquiv
+          (coordinateAdjoint field32Coordinates (coeff j).val
+            (rs8Bits points rows j)))).card := by
+    by_cases hj : j ∈ rs8Support points rows
+    · have hx := (rs8Bits_ne_zero_iff points rows j).mpr hj
+      have ha : coordinateAdjoint field32Coordinates (coeff j).val
+          (rs8Bits points rows j) ≠ 0 :=
+        adjoint_ne_zero field32Coordinates.toAddEquiv binaryPair
+          binaryPair_nondegenerate binaryPair_zero_left
+          (coordinateAdjoint field32Coordinates)
+          (coordinateAdjoint_pairing field32Coordinates) (coeff j).2 hx
+      have hp : bits32PacketEquiv
+          (coordinateAdjoint field32Coordinates (coeff j).val
+            (rs8Bits points rows j)) ≠ 0 := by
+        intro hz
+        apply ha
+        exact bits32PacketEquiv.injective
+          (hz.trans bits32PacketEquiv_zero.symm)
+      simpa only [hj, ↓reduceIte] using packet_support_pos hp
+    · simp only [hj, ↓reduceIte, Nat.zero_le]
+  have hsum := Finset.sum_le_sum
+    (fun j (_ : j ∈ (Finset.univ : Finset (Fin 8))) => hlocal j)
+  simpa only [Finset.sum_ite, Finset.sum_const_zero,
+    Finset.card_eq_sum_ones, rs8SampledPacketWeight,
+    Nat.add_zero, Finset.filter_univ_mem] using hsum
+
+/-- The sampled packet count of a nonzero group lies in the claimed
+range `5..64`, independently of the sampled nonzero coefficients. -/
+theorem rs8_sampled_packet_weight_range
+    (points : Fin 8 → Field16) (hpoints : Function.Injective points)
+    (rows : RS8Group Field16) (hrows : rows ≠ 0)
+    (coeff : Fin 8 → {c : Field32 // c ≠ 0}) :
+    5 ≤ rs8SampledPacketWeight points rows coeff ∧
+      rs8SampledPacketWeight points rows coeff ≤ 64 := by
+  constructor
+  · exact (rs8Support_ge_five points hpoints rows hrows).trans
+      (rs8_sampled_packet_weight_ge_support points rows coeff)
+  · unfold rs8SampledPacketWeight
+    calc
+      _ ≤ ∑ _j : Fin 8, (8 : ℕ) := by
+        apply Finset.sum_le_sum
+        intro j _
+        exact Finset.card_le_card (Finset.filter_subset
+          (p := fun i => bits32PacketEquiv
+            (coordinateAdjoint field32Coordinates (coeff j).val
+              (rs8Bits points rows j)) i ≠ 0)
+            (Finset.univ : Finset (Fin 8)))
+      _ = 64 := by norm_num
+
 #print axioms rs8ColumnBits_ne_zero
 #print axioms rs8Bits_ne_zero_iff
 #print axioms rs8_fixed_group_packet_gf
 #print axioms rs8_group_packet_gf_by_column_weight
 #print axioms rs8_nonzero_group_packet_gf
 #print axioms rs8_nonzero_group_packet_gf_closed
+#print axioms rs8_sampled_packet_weight_range
 
 end Spin.Turbo
