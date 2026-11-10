@@ -102,19 +102,48 @@ uniform-input and routing-conditioned bounds for $q\ge3$, with the same
 inner and route. The transfer is over the complete outer measure;
 one-column marginals alone would not justify it.
 
-At $K=2^{20}$ the old RS$[16,8]$ outer has no words with fewer than nine
-active packets, whereas Turbo SPIN can have five through eight. The
-certificate charges the event that any group has such a word by
-$\Delta=L\sum_{v=5}^8C_v$, and transfers the remaining two-group terms
-after restricting both supports to at least nine. The one-group sum above
-still includes all supports. At the two smaller lengths, the complete
-one- and two-group sums include those supports directly.
+The old RS$[16,8]$ outer has no words with fewer than nine active packets,
+whereas Turbo SPIN can have five through eight. This difference does not
+matter: the one- and two-group sums \eqref{eq:turbo-sparse-fold} are
+computed for Turbo SPIN itself and include those supports at every length.
 
-The checked occupation sets are $q=1,\ldots,L$ with $L=512,2048,8192$
-for the three lengths. Directed numerical upper bounds are summed as
-positive dyadic rationals. The resulting margins are
-$61.8840972765$, $58.245625332$, and $51.822466415$ bits, respectively.
-The exact cutoff weights are $13107$, $52428$, and $209715$; hence the
-integer minimum-distance lower bounds outside the failure event are
-$13108$, $52429$, and $209716$. The repository records the authenticated
-endpoints, source bindings, and replay procedures\repositorycite.
+\paragraph{Bounding one large occupation.}
+For $q\ge3$, the regional bound needs the coefficient of $x^q$ in a
+product of nonnegative two-step matrix polynomials, normalized by
+$\binom Lq$. When $q$ is small, we compute that coefficient exactly by
+repeated squaring, truncated at degree $q$. When $q$ is large, the exact
+coefficient is expensive, and we use a positive marker $t$. Every
+coefficient of a polynomial $P$ with nonnegative entries satisfies
+$[x^q]P(x)\le P(t)/t^q$, so one matrix power at $x=t$ replaces the
+coefficient. The routing-conditioned variant first raises each two-step
+operator entrywise to a power $\alpha\le1$; the witnesses use
+$\alpha\in\{1,4/5,7/10,3/5\}$ and switch from exact coefficients to
+markers above $q=279$ at $K=2^{18}$ and above $q=315$ at $K=2^{20}$.
+
+\paragraph{Margins.}
+The occupation sets are $q=1,\ldots,L$ with $L=512,2048,8192$ for the
+three lengths. Summing all occupations gives failure bounds of
+$2^{-61.884}$, $2^{-58.2408}$, and $2^{-56.2570}$. At the two larger
+lengths the one-group term dominates: it alone is about $2^{-58.2456}$
+and $2^{-56.2570}$. The exact cutoff weights are $13107$, $52428$, and
+$209715$; hence the integer minimum-distance lower bounds outside the
+failure event are $13108$, $52429$, and $209716$.
+
+\paragraph{Formal verification.}
+For $K=2^{18}$ and $K=2^{20}$, a Lean~4 development is the authority for
+Theorem~\ref{thm:turbo-spin}\repositorycite. It models the ideal setup
+distribution of Section~\ref{sec:turbo-spin}, with $s=22$, for every
+injective choice of the eight RS evaluation points. It proves
+\[
+ \Prob_\theta\bigl[\exists x\ne0:\wt(E_\theta(x))\le H\bigr]
+ \le 2^{-58.24083}
+ \quad\text{and}\quad
+ \le 2^{-56.25709},
+\]
+respectively. Lean checks every numerical certificate behind these bounds,
+for all occupations, including the integer rounding and scaling that this
+appendix omits. The proofs use only Lean's standard axioms: propositional
+extensionality, quotient soundness, and choice. The rate statement follows
+from Lemma~\ref{lem:structured-inner-bijective} and is outside the formal
+statement. The $K=2^{16}$ bound is not formalized; it rests on the
+outward-arithmetic replay recorded in the repository.

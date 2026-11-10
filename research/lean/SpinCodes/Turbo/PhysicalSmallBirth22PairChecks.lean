@@ -1,0 +1,15 @@
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks0
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks1
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks2
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks3
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks4
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks5
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks6
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks7
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks8
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks9
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks10
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks11
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks12
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks13
+import SpinCodes.Turbo.PhysicalSmallBirth22PairChecks14

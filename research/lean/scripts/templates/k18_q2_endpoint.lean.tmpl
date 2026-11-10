@@ -1,0 +1,188 @@
+import SpinCodes.Turbo.Generated.K18.Q1Endpoint
+import SpinCodes.Turbo.SparseFixed22
+import SpinCodes.Turbo.SparseOccupation22
+
+/-! Generated K18 q2 endpoint: complete ordered two-group shell sum through
+the common marker t = @TM@ on the tilt-3 regional kernels, a positive Collatz
+vector for the 11x11 marker matrix, and the exact outer weight sum. -/
+noncomputable section
+namespace Spin.Turbo.K18Q2
+open Spin.Turbo Spin.Turbo.K18Q1
+
+def mint : Array Int := @MINT@
+def vec : Array Int := @VEC@
+def rhoN : Int := @RHON@
+def rhoD : Int := @RHOD@
+def vmin : Int := @VMIN@
+def nterms : List Int := @NTERMS@
+def Wn : Int := @WN@
+def Wd : Int := M8 * (Nat.factorial 64 : Int) * @TM@ ^ 64
+def b2 : Int := @B2@
+def C2 : Int := 2096128
+
+theorem C2_eq : (C2 : ℝ) = (Nat.choose (@R@ * 16) 2 : ℝ) := by
+  rw [show @R@ * 16 = 2048 from rfl, Nat.choose_two_right]
+  norm_num [C2]
+
+theorem collatzOk : sparseIntCollatzCheck22 @T3@.Cert.s rhoN rhoD mint vec = true := by
+  decide +kernel
+
+theorem vminOk : sparseAll11Bool22 (fun i => decide (vmin ≤ vec.getD i 0)) = true := by
+  decide +kernel
+
+def dominCheck : Bool := sparseAll11Bool22 fun i => sparseAll11Bool22 fun j =>
+  decide (sparseLMat22 @T3@.Cert.res0 i j + 2 * @TM@ * sparseLMat22 @T3@.Cert.res1 i j +
+    @TM@ ^ 2 * sparseLMat22 @T3@.Cert.res2 i j ≤ sparseIntMatrixGet22 mint i j)
+
+theorem dominOk : dominCheck = true := by decide +kernel
+
+theorem ntermsOk : (Finset.range 65).sum (fun v => nterms.getD v 0) = Wn := by decide +kernel
+
+theorem ntermsDef : ∀ v, v < 65 →
+    nterms.getD v 0 = cnt v * ((Nat.factorial v * Nat.factorial (64 - v) : ℕ) : Int) *
+      @TM@ ^ (64 - v) := by
+  decide +kernel
+
+theorem finalOk : C2 * rhoN ^ 64 * vec.getD 0 0 * Wn ^ 2 * @T3@.Cert.s * 2 ^ @K@ ≤
+    b2 * (rhoD ^ 64 * vmin * Wd ^ 2 * lastT3) := by
+  decide +kernel
+
+abbrev B3 := @T3@.physicalRows
+abbrev M3 : Matrix (Fin 11) (Fin 11) ℝ :=
+  orderedMatrixMarker22 sparseTotalRegionDegree22 (sparseTwoRegionChoice22 B3 @R@) @TM@
+
+theorem hs3 : (0 : ℝ) < (@T3@.Cert.s : ℝ) := by
+  exact_mod_cast (show (0 : ℤ) < @T3@.Cert.s by decide +kernel)
+
+theorem M3_expand (i j : Fin 11) :
+    M3 i j = sparseRegionalDP22 B3 @R@ 0 i j + (2 * @TM@) * sparseRegionalDP22 B3 @R@ 1 i j +
+      (@TM@ ^ 2) * sparseRegionalDP22 B3 @R@ 2 i j := by
+  show orderedMatrixMarker22 sparseTotalRegionDegree22
+    (sparseJointRegionChoice22 (sparseRegionalDP22 B3 @R@ 0) (sparseRegionalDP22 B3 @R@ 1)
+      (sparseRegionalDP22 B3 @R@ 2)) @TM@ i j = _
+  rw [sparseJointRegionChoice22_marker]
+  simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
+
+theorem M3_nonneg (i j : Fin 11) : 0 ≤ M3 i j := by
+  rw [M3_expand]
+  have h := fun d => sparseRegionalDP22_nonneg B3 @T3@.physicalRows_nonneg @R@ d i j
+  exact add_nonneg (add_nonneg (h 0) (mul_nonneg (by norm_num) (h 1)))
+    (mul_nonneg (by norm_num) (h 2))
+
+theorem M3_upper (i j : Fin 11) : M3 i j ≤ (sparseIntMatrix22 mint i j : ℝ) / @T3@.Cert.s := by
+  rw [M3_expand]
+  have r0 : sparseRegionalDP22 B3 @R@ 0 i j ≤
+      (sparseLMat22 @T3@.Cert.res0 i j : ℝ) / @T3@.Cert.s :=
+    @T3@.Cert.regional.2 0 (by norm_num) i j
+  have r1 : sparseRegionalDP22 B3 @R@ 1 i j ≤
+      (sparseLMat22 @T3@.Cert.res1 i j : ℝ) / @T3@.Cert.s :=
+    @T3@.Cert.regional.2 1 (by norm_num) i j
+  have r2 : sparseRegionalDP22 B3 @R@ 2 i j ≤
+      (sparseLMat22 @T3@.Cert.res2 i j : ℝ) / @T3@.Cert.s :=
+    @T3@.Cert.regional.2 2 (by norm_num) i j
+  have hd := of_decide_eq_true
+    (SparseFixedSound22.all11 _ (SparseFixedSound22.all11 _ dominOk i) j)
+  have hdR : ((sparseLMat22 @T3@.Cert.res0 i j + 2 * @TM@ * sparseLMat22 @T3@.Cert.res1 i j +
+      @TM@ ^ 2 * sparseLMat22 @T3@.Cert.res2 i j : ℤ) : ℝ) ≤ (sparseIntMatrix22 mint i j : ℝ) := by
+    exact_mod_cast hd
+  calc _ ≤ (sparseLMat22 @T3@.Cert.res0 i j : ℝ) / @T3@.Cert.s +
+        (2 * @TM@) * ((sparseLMat22 @T3@.Cert.res1 i j : ℝ) / @T3@.Cert.s) +
+        (@TM@ ^ 2) * ((sparseLMat22 @T3@.Cert.res2 i j : ℝ) / @T3@.Cert.s) :=
+      add_le_add (add_le_add r0 (mul_le_mul_of_nonneg_left r1 (by norm_num)))
+        (mul_le_mul_of_nonneg_left r2 (by norm_num))
+    _ = ((sparseLMat22 @T3@.Cert.res0 i j + 2 * @TM@ * sparseLMat22 @T3@.Cert.res1 i j +
+        @TM@ ^ 2 * sparseLMat22 @T3@.Cert.res2 i j : ℤ) : ℝ) / @T3@.Cert.s := by
+      push_cast; ring
+    _ ≤ _ := div_le_div_of_nonneg_right hdR hs3.le
+
+theorem mass_le :
+    ∑ k : Fin 11, (M3 ^ 64) 0 k ≤ ((rhoN : ℝ) / rhoD) ^ 64 * (vec.getD 0 0 : ℝ) / vmin := by
+  have hv : ∀ i : Fin 11, vmin ≤ vec.getD i.val 0 := fun i =>
+    of_decide_eq_true (SparseFixedSound22.all11 _ vminOk i)
+  exact sparseIntCollatzCheck22_sound @T3@.Cert.s rhoN rhoD mint vec collatzOk M3 M3_nonneg
+    M3_upper vmin (by decide +kernel) hv 64 0
+
+theorem weight_eq (points : Fin 8 → Field16) (hp : Function.Injective points) :
+    (∑ v ∈ Finset.range 65, (rs8ExpectedPacketCount points v / (Nat.choose 64 v : ℝ)) /
+      (@TM@ : ℝ) ^ v) = (Wn : ℝ) / Wd := by
+  rw [← ntermsOk, Int.cast_sum, Finset.sum_div]
+  apply Finset.sum_congr rfl
+  intro v hv
+  have hv' : v ≤ 64 := by have := Finset.mem_range.mp hv; omega
+  rw [count_cast points hp v, ntermsDef v (Finset.mem_range.mp hv)]
+  have hc : (Nat.choose 64 v : ℝ) * (Nat.factorial v : ℝ) * (Nat.factorial (64 - v) : ℝ) =
+      (Nat.factorial 64 : ℝ) := by
+    exact_mod_cast Nat.choose_mul_factorial_mul_factorial hv'
+  have hpw : (@TM@ : ℝ) ^ v * (@TM@ : ℝ) ^ (64 - v) = (@TM@ : ℝ) ^ 64 := by
+    rw [← pow_add, Nat.add_sub_cancel' hv']
+  have hC : (0 : ℝ) < Nat.choose 64 v := by exact_mod_cast Nat.choose_pos hv'
+  have hf1 : (0 : ℝ) < Nat.factorial v := by exact_mod_cast Nat.factorial_pos v
+  have hf2 : (0 : ℝ) < Nat.factorial (64 - v) := by exact_mod_cast Nat.factorial_pos _
+  have hM : (0 : ℝ) < (M8 : ℝ) := by norm_num [M8]
+  have hWd : ((Wd : ℤ) : ℝ) = (M8 : ℝ) * (Nat.factorial 64 : ℝ) * (@TM@ : ℝ) ^ 64 := by
+    unfold Wd; push_cast; ring
+  rw [hWd, ← hc, ← hpw]
+  push_cast
+  field_simp
+
+theorem q2_term (mass W z : ℝ) (c2 rn rd v0 vm wn wd s last b : ℤ)
+    (hmass : mass ≤ ((rn : ℝ) / rd) ^ 64 * v0 / vm) (hmass0 : 0 ≤ mass)
+    (hW : W = (wn : ℝ) / wd) (hrd : (0 : ℝ) < rd) (hvm : (0 : ℝ) < vm) (hwd : (0 : ℝ) < wd)
+    (hs : (0 : ℝ) < s) (hl0 : 0 < (last : ℝ) / s) (hlz : (last : ℝ) / s ≤ z ^ @D@)
+    (hc2 : (0 : ℝ) ≤ c2) (hrn : (0 : ℝ) ≤ rn) (hv0 : (0 : ℝ) ≤ v0)
+    (hchk : c2 * rn ^ 64 * v0 * wn ^ 2 * s * 2 ^ @K@ ≤ b * (rd ^ 64 * vm * wd ^ 2 * last)) :
+    (c2 : ℝ) * ((mass * W ^ 2) / z ^ @D@) ≤ (b : ℝ) / 2 ^ @K@ := by
+  have hlast : (0 : ℝ) < last := by
+    have h := mul_pos hl0 hs
+    rwa [div_mul_cancel₀ _ hs.ne'] at h
+  have hzpos : 0 < z ^ @D@ := lt_of_lt_of_le hl0 hlz
+  have h1 : 1 / z ^ @D@ ≤ (s : ℝ) / last := by
+    rw [div_le_div_iff₀ hzpos hlast]
+    have := (div_le_iff₀ hs).mp hlz
+    linarith
+  have hA : (0 : ℝ) ≤ ((rn : ℝ) / rd) ^ 64 * v0 / vm :=
+    div_nonneg (mul_nonneg (pow_nonneg (div_nonneg hrn hrd.le) 64) hv0) hvm.le
+  calc (c2 : ℝ) * ((mass * W ^ 2) / z ^ @D@) = c2 * mass * W ^ 2 * (1 / z ^ @D@) := by ring
+    _ ≤ c2 * (((rn : ℝ) / rd) ^ 64 * v0 / vm) * W ^ 2 * ((s : ℝ) / last) :=
+        mul_le_mul (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hmass hc2)
+          (sq_nonneg W)) h1 (one_div_pos.mpr hzpos).le
+          (mul_nonneg (mul_nonneg hc2 hA) (sq_nonneg W))
+    _ = ((c2 : ℝ) * rn ^ 64 * v0 * wn ^ 2 * s) / (rd ^ 64 * vm * wd ^ 2 * last) := by
+        rw [hW]
+        field_simp
+    _ ≤ (b : ℝ) / 2 ^ @K@ := by
+        rw [div_le_div_iff₀
+          (mul_pos (mul_pos (mul_pos (pow_pos hrd 64) hvm) (pow_pos hwd 2)) hlast)
+          (pow_pos (by norm_num) _)]
+        have h2 : ((c2 * rn ^ 64 * v0 * wn ^ 2 * s * 2 ^ @K@ : ℤ) : ℝ) ≤
+            ((b * (rd ^ 64 * vm * wd ^ 2 * last) : ℤ) : ℝ) := by exact_mod_cast hchk
+        push_cast at h2
+        linarith
+
+/-- K18 occupation-two contribution under the actual sampled setup. -/
+theorem q2_le (points : Fin 8 → Field16) (hp : Function.Injective points) :
+    (turboSetup22 @R@ points).joint.expect
+      (fun ω => ((turboSetup22 @R@ points).ZQ @D@
+        (fun _ msg => turboOccupation22 msg) 2 ω : ℝ)) ≤ (b2 : ℝ) / 2 ^ @K@ := by
+  refine (turboSetup22_occupation_two_le_common_marker @R@ points @D@
+    @T3@.birthSmokeZ22 zpos3 zle3 @TM@ (by norm_num) B3 @T3@.physicalRows_sound
+    @T3@.physicalRows_nonneg).trans ?_
+  rw [← C2_eq]
+  unfold sparseTwoMarkerBound22
+  have hz := @T3@.Cert.zpow_lower
+  have hmass0 : 0 ≤ ∑ k : Fin 11, (M3 ^ 64) 0 k :=
+    Finset.sum_nonneg fun k _ => markerPowNonneg22 M3 M3_nonneg 64 0 k
+  exact q2_term _ _ _ C2 rhoN rhoD (vec.getD 0 0) vmin Wn Wd @T3@.Cert.s lastT3 b2
+    mass_le hmass0 (weight_eq points hp)
+    (by exact_mod_cast (show (0 : ℤ) < rhoD by decide +kernel))
+    (by exact_mod_cast (show (0 : ℤ) < vmin by decide +kernel))
+    (by exact_mod_cast (show (0 : ℤ) < Wd by decide +kernel))
+    hs3 hz.1 hz.2
+    (by exact_mod_cast (show (0 : ℤ) ≤ C2 by decide +kernel))
+    (by exact_mod_cast (show (0 : ℤ) ≤ rhoN by decide +kernel))
+    (by exact_mod_cast (show (0 : ℤ) ≤ vec.getD 0 0 by decide +kernel))
+    finalOk
+
+#print axioms q2_le
+
+end Spin.Turbo.K18Q2

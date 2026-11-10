@@ -1,0 +1,183 @@
+import SpinCodes.Turbo.Generated.K18.Tilt1Q1
+import SpinCodes.Turbo.Generated.K18.Tilt2Q1
+import SpinCodes.Turbo.Generated.K18.Tilt3Q1
+import SpinCodes.Turbo.SparseQ1Choice22
+import SpinCodes.Turbo.SparseRS8Counts22
+
+/-! Generated K18 q1 endpoint: the complete unconditional 65-shell first
+moment with the per-shell trivial/Chernoff choice of the retained replay
+(trivial 0..7, tilt 1 for 8..13, tilt 2 for 14, tilt 3 for 15..64). -/
+noncomputable section
+namespace Spin.Turbo.K18Q1
+open Spin.Turbo
+
+def M8 : Int := (2 ^ 32 - 1) ^ 8
+def cnt (v : ℕ) : Int := RS8CountList22.countLit.getD v 0
+def binom (v : ℕ) : Int := (Nat.factorial 64 / (Nat.factorial v * Nat.factorial (64 - v)) : ℕ)
+def aLit : List Int := @ALIT@
+def aNum (v : ℕ) : Int := aLit.getD v 0
+def aSum : Int := @ASUM@
+
+theorem aSum_eq : (Finset.range 65).sum aNum = aSum := by decide +kernel
+
+theorem binom_eq (v : ℕ) (hv : v ≤ 64) : (binom v : ℝ) = (Nat.choose 64 v : ℝ) := by
+  unfold binom
+  rw [← Nat.choose_eq_factorial_div_factorial hv]
+  simp
+
+theorem binom_pos (v : ℕ) (hv : v ≤ 64) : (0 : ℝ) < (Nat.choose 64 v : ℝ) := by
+  exact_mod_cast Nat.choose_pos hv
+
+theorem cnt_nonneg (v : ℕ) : (0 : ℝ) ≤ cnt v := by
+  have h : ∀ x ∈ RS8CountList22.countLit, 0 ≤ x := by decide +kernel
+  unfold cnt
+  by_cases hv : v < RS8CountList22.countLit.length
+  · rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hv]
+    exact_mod_cast h _ (List.getElem_mem hv)
+  · rw [List.getD_eq_getElem?_getD, List.getElem?_eq_none (by omega)]
+    simp
+
+theorem count_cast (points : Fin 8 → Field16) (hp : Function.Injective points) (v : ℕ) :
+    rs8ExpectedPacketCount points v = (cnt v : ℝ) / (M8 : ℝ) := by
+  rw [RS8CountList22.count_eq points hp v]
+  unfold cnt M8
+  norm_num
+
+theorem coef_nonneg (W : Bool → Matrix (Fin 11) (Fin 11) ℝ) (hW : ∀ b i j, 0 ≤ W b i j)
+    (v : ℕ) : 0 ≤ ∑ k : Fin 11, orderedMatrixCoefficient sparseBoolDegree22 W 64 v 0 k := by
+  apply Finset.sum_nonneg
+  intro k _
+  unfold orderedMatrixCoefficient
+  rw [Matrix.sum_apply]
+  apply Finset.sum_nonneg
+  intro xs _
+  split_ifs
+  · exact SparseFixedSound22.listNonneg _ (fun M hM => by
+      obtain ⟨step, rfl⟩ := List.mem_ofFn.mp hM
+      exact hW _) 0 k
+  · exact le_rfl
+
+/-- Generic Chernoff shell term: count, z^d lower bound, coefficient bound. -/
+theorem shell_term (rs Cr z coef : ℝ) (c sum B last s a : ℤ)
+    (hrs : rs = (c : ℝ) / (M8 : ℝ)) (hB : (B : ℝ) = Cr) (hCpos : 0 < Cr) (hc : 0 ≤ (c : ℝ))
+    (hs : (0 : ℝ) < s) (hl0 : 0 < (last : ℝ) / s) (hlz : (last : ℝ) / s ≤ z ^ @D@)
+    (hcoef0 : 0 ≤ coef) (hcoef : coef ≤ (sum : ℝ) / s)
+    (hchk : c * sum * 2 ^ @K@ ≤ a * (M8 * B * last)) :
+    (rs / Cr) / z ^ @D@ * coef ≤ (a : ℝ) / 2 ^ @K@ := by
+  have hM : (0 : ℝ) < M8 := by norm_num [M8]
+  have hBpos : (0 : ℝ) < B := hB ▸ hCpos
+  have hlast : (0 : ℝ) < last := by
+    have h := mul_pos hl0 hs
+    rwa [div_mul_cancel₀ _ hs.ne'] at h
+  have hzpos : 0 < z ^ @D@ := lt_of_lt_of_le hl0 hlz
+  have h1 : 1 / z ^ @D@ ≤ (s : ℝ) / last := by
+    rw [div_le_div_iff₀ hzpos hlast]
+    have := (div_le_iff₀ hs).mp hlz
+    linarith
+  have hrs0 : 0 ≤ rs / Cr := by rw [hrs]; positivity
+  calc (rs / Cr) / z ^ @D@ * coef = (rs / Cr) * (1 / z ^ @D@) * coef := by ring
+    _ ≤ (rs / Cr) * ((s : ℝ) / last) * ((sum : ℝ) / s) :=
+        mul_le_mul (mul_le_mul_of_nonneg_left h1 hrs0) hcoef hcoef0
+          (mul_nonneg hrs0 (div_nonneg hs.le hlast.le))
+    _ = ((c : ℝ) * sum) / (M8 * B * last) := by
+        rw [hrs, ← hB]
+        field_simp
+    _ ≤ (a : ℝ) / 2 ^ @K@ := by
+        rw [div_le_div_iff₀ (by positivity) (by positivity)]
+        have h2 : ((c * sum * 2 ^ @K@ : ℤ) : ℝ) ≤ ((a * (M8 * B * last) : ℤ) : ℝ) := by
+          exact_mod_cast hchk
+        push_cast at h2
+        linarith
+
+def checkTriv : Bool := (List.range 8).all fun v => decide (cnt v * 2 ^ @K@ ≤ aNum v * M8)
+
+theorem checkTriv_ok : checkTriv = true := by decide +kernel
+
+@CHECKS@
+
+@TILTS@
+
+def zK (v : ℕ) : ℝ :=
+  if v ≤ 13 then @T1@.birthSmokeZ22 else if v = 14 then @T2@.birthSmokeZ22
+  else @T3@.birthSmokeZ22
+
+def BK (v : ℕ) : Fin 17 → Matrix (Fin 11) (Fin 11) ℝ :=
+  if v ≤ 13 then @T1@.physicalRows else if v = 14 then @T2@.physicalRows
+  else @T3@.physicalRows
+
+def useC (v : ℕ) : Bool := decide (8 ≤ v)
+
+@ZPOS@
+
+theorem hz0 (v : ℕ) : 0 < zK v := by
+  unfold zK; split_ifs
+  · exact zpos1
+  · exact zpos2
+  · exact zpos3
+
+theorem hz1 (v : ℕ) : zK v ≤ 1 := by
+  unfold zK; split_ifs
+  · exact zle1
+  · exact zle2
+  · exact zle3
+
+theorem hBK (v : ℕ) (j : Fin 17) :
+    physicalRowSound22 (Matrix.of (turboPhysicalKernel22 j (zK v))) (BK v j) := by
+  unfold zK BK; split_ifs
+  · exact @T1@.physicalRows_sound j
+  · exact @T2@.physicalRows_sound j
+  · exact @T3@.physicalRows_sound j
+
+theorem chosen_le (points : Fin 8 → Field16) (hp : Function.Injective points) :
+    sparseOneChosenShellBound22 points BK @R@ @D@ zK useC ≤ (aSum : ℝ) / 2 ^ @K@ := by
+  unfold sparseOneChosenShellBound22
+  have hsum : (aSum : ℝ) / 2 ^ @K@ = ∑ v ∈ Finset.range 65, (aNum v : ℝ) / 2 ^ @K@ := by
+    rw [← Finset.sum_div, ← aSum_eq]
+    push_cast
+    rfl
+  rw [hsum]
+  apply Finset.sum_le_sum
+  intro v hv
+  have hv' := Finset.mem_range.mp hv
+  by_cases h8 : 8 ≤ v
+  · rw [if_pos (by simp [useC, h8])]
+    rcases (by omega : (8 ≤ v ∧ v ≤ 13) ∨ v = 14 ∨ 15 ≤ v) with ht | ht | ht
+    · have hz : zK v = @T1@.birthSmokeZ22 := by simp [zK, ht.2]
+      have hB : BK v = @T1@.physicalRows := by simp [BK, ht.2]
+      rw [hz, hB]
+      exact tiltTerm1 points hp v hv' ht
+    · subst ht
+      have hz : zK 14 = @T2@.birthSmokeZ22 := by simp [zK]
+      have hB : BK 14 = @T2@.physicalRows := by simp [BK]
+      rw [hz, hB]
+      exact tiltTerm2 points hp 14 hv' rfl
+    · have hz : zK v = @T3@.birthSmokeZ22 := by
+        simp [zK, show ¬ v ≤ 13 by omega, show v ≠ 14 by omega]
+      have hB : BK v = @T3@.physicalRows := by
+        simp [BK, show ¬ v ≤ 13 by omega, show v ≠ 14 by omega]
+      rw [hz, hB]
+      exact tiltTerm3 points hp v hv' ht
+  · rw [if_neg (by simp [useC, h8])]
+    have hchk := of_decide_eq_true
+      (List.all_eq_true.mp checkTriv_ok v (List.mem_range.mpr (by omega)))
+    rw [count_cast points hp v, div_le_div_iff₀ (by norm_num [M8]) (by positivity)]
+    have h2 : ((cnt v * 2 ^ @K@ : ℤ) : ℝ) ≤ ((aNum v * M8 : ℤ) : ℝ) := by exact_mod_cast hchk
+    push_cast at h2
+    linarith
+
+/-- K18 occupation-one contribution under the actual sampled setup. -/
+theorem q1_le (points : Fin 8 → Field16) (hp : Function.Injective points) :
+    (turboSetup22 @R@ points).joint.expect
+      (fun ω => ((turboSetup22 @R@ points).ZQ @D@
+        (fun _ msg => turboOccupation22 msg) 1 ω : ℝ)) ≤
+      2048 * ((aSum : ℝ) / 2 ^ @K@) := by
+  refine (turboSetup22_occupation_one_le_chosen_shells @R@ points @D@ zK hz0 hz1 BK hBK
+    useC).trans ?_
+  have h := chosen_le points hp
+  have h16 : ((@R@ * 16 : ℕ) : ℝ) = 2048 := by norm_num
+  rw [h16]
+  exact mul_le_mul_of_nonneg_left h (by norm_num)
+
+#print axioms q1_le
+
+end Spin.Turbo.K18Q1

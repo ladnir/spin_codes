@@ -78,7 +78,7 @@ The symbolic bridge currently covers the 22-state K18/K20 construction.
 The exact 16-slot physical input law, full-state weighted step kernel, and
 zero-inclusive selected-slot thinning identity are also checked. The last
 identity justifies the producer's `15/16` mixture at the complete-word level;
-it does not yet justify its 11-coordinate numerical envelope. The revised
+authentication of its 11-coordinate numerical entries remains open. The revised
 RS8 active-group expected count is now pointwise bounded by the retained
 uniform-reference atom factor, before and after the sampled row shuffle.
 The exact reference route is now disintegrated into hypergeometric
@@ -89,17 +89,45 @@ averaged reference-region kernels. This is a semantic bound, not yet a
 finite numeric certificate.
 An 11-coordinate state-measure cone, a complete symbolic selected-slot
 operator, and preservation of complete-row soundness under exact binomial
-thinning are checked. None of the retained local numerical rows has been
-proved sound for the exact-nonzero physical kernel. The fractional-moment
-route composition is also a mathematical obligation, not just a numerical
-check. Conditional probability capping and chronological paired-matrix
-fractional subadditivity are checked; their concrete routing hypotheses
-remain to be established. In particular, the current unconditional reference first-moment
-theorem does not by itself justify moving the fractional power inside
-the route average.
-It does not yet identify the concrete GF16/GF(2^32) implementation,
-certify the required numerical endpoints, transfer the larger-occupation
-reference bounds, or model the separate 15-state K16 inner.
+thinning are checked. One complete retained rational local family is now
+authenticated for the exact-nonzero physical kernel and its selected-step
+mixture; the other required families remain to be checked. Conditional probability
+capping, actual S-specific routing fibers, conditional reference domination,
+and chronological paired-matrix fractional subadditivity are checked.
+The conditional reference mean is now connected to the full-state product
+of selected-step kernels. Exact physical Cauchy rows, coarse birth rows,
+and chronological eleven-coordinate cone propagation are also checked,
+with their numerical hypotheses explicit. The paired hypergeometric
+coefficient identity, its ordered matrix DP, and the positive-marker bound
+are now checked. The fractional tail assembly retains the conditioning and
+the outer multiplicities in their correct order; an unconditional reference
+mean alone would not justify it.
+
+The actual expansion map's 25-profile census and the integer interval
+coefficient/aggregate checkers are checked. The exact one- and two-packet
+birth histograms are authenticated against the actual input layers, and
+their normalized birth cones (including the empty input) are checked.
+The exact packet character formula, zero-feedback character average, and
+the class-maximum/uniform-mean weighted adapter are also checked.
+The polynomial-to-actual-moment joins and sparse regional product joins
+are now checked. The sparse analysis also permits choosing a Chernoff
+parameter separately for each support before summing over supports.
+The first complete 17-row rational profile family passed its integer/Fix
+kernel checks and actual physical/selected-row soundness assembly in
+`PhysicalProfileFamilySmoke22`. All four exported soundness/nonnegativity
+theorems have only the standard axioms, with no remaining numerical or
+birth premises. This is one local family, not a finite distance certificate.
+Only successful complete-module replays count as delivery.
+
+No end-to-end Turbo finite certificate is closed yet. Complete external
+diagnostics retain 10% distance and total margins of 58.2408311085 bits at
+K18 and 51.8224664170 bits at K20. These diagnostics do not discharge the
+Lean numerical premises. The next gates are authenticated physical-row
+data, the remaining original-setup sparse composition, and exact numeric
+checks covering every required shell and occupation, followed by the final
+probability sum. Finish K18 at the paper's rounded 58.24 bits before K20 at
+51.82 bits. The separate K16 inner and a C++ refinement proof are outside
+this goal.
 
 ## Audit of the completed proof
 
@@ -2005,3 +2033,1465 @@ The pre-commit review found a UTF-8 corruption in the cover emitter's Lean
 tuple delimiters. Restored the intended characters and checked the emitter's
 import and delimiter code points. This affected regeneration source, not the
 already compiled cover; no cover search was restarted.
+
+The checkpoint was committed as `89b5418a`. Root now owns chronological
+physical-product integration; Sol workers own (1) actual routing fibers and
+conditional domination, (2) exact-input live/Cauchy rows, and (3) retained
+numerical provenance and exact arithmetic checkers. The first product module
+reuses `ScalableEnvelopeIterate`'s induction architecture, replacing its
+homogeneous three-coordinate power with the existing eleven-coordinate cone
+and a chronological list of complete physical rows.
+
+New numerical audit finding: current K18/K20 RS8 endpoints are the receipts
+`k18-rs8-gf32-s22-v1.json` and `k20-two-ms-rs8-transfer-v1.json` in the canonical
+checkout's ignored `tmp`, not the old RS16 60-bit union. Existing K18 physical
+exports contain outward matrix entries and row-choice indices, but omit the
+integer census values and syndrome-wise Walsh upper witnesses needed to
+authenticate capped birth rows. The compact profile/class census proves the
+baseline class masses; it does not by itself prove capped residual sums.
+The retained K18 witness selects capped candidates for occupancies 6 through
+16. A complete uncompressed set of eleven signed-Walsh upper arrays would be
+about 352 MiB, before intermediate certificates. Do not emit that blindly.
+
+Before engineering a large transform certificate, diagnose whether baseline
+birth rows suffice with suitable proof witnesses. This keeps the actual code
+fixed. Sparse one/two-group calculations use occupancies at most two, whereas
+the troublesome intermediate group counts rarely produce six active packets
+in one physical step. This is motivation for a bounded numerical diagnostic,
+not an established bound. Compare against the exact remaining union budget
+for the paper's rounded margins, and do not silently weaken the result.
+If caps are essential, investigate compressed exact transform evidence after
+auditing old `MapSpectrumBridge` split checks and `PolyPacked` identities.
+
+### Turbo routing and physical-row checkpoint (2026-11-08)
+
+The following new modules compiled with only the standard three axioms:
+`RoutingCountDisintegration22`, `RoutingCountFibers22`,
+`RoutingConditionedMean22`, `RoutingSelectedFiber22`,
+`RoutingFixedValues22`, `PhysicalCauchy22`, `PhysicalCoarseBirth22`,
+`PhysicalProduct22`, and `NumericRpow`.
+The actual original setup now disintegrates over each active set's own
+potential-slot count profile. Conditioning leaves the outer, row shuffle,
+and GL updates independent with their original laws. The normalized
+reference's fixed-route values and the conditional latent selected subsets
+have their exact product distributions. Joining these two statements and
+connecting the resulting conditional expectation to chronological physical
+kernels is the next routing step.
+
+The physical Cauchy proof retains the feedback event jointly with the first
+and second output moments. It supports both pointwise class caps and a
+uniform-live mean cap. The complete-row product theorem propagates the same
+state through all steps and applies fractional powers only after each
+chronological pair. The new coarse birth witness keeps the zero mass and
+bounds all other birth mass in the arbitrary-live coordinate. None of these
+lemmas authenticates a proposed numerical matrix.
+
+Numerical diagnostic decision: preserve the rounded paper margins, 58.24
+bits for K18 and 51.82 bits for K20. With the current K18 one/two-group
+endpoints, the remaining larger-occupation union budget is approximately
+2^(-66.24324), compared with the retained tail 2^(-75.61228).
+At K18's q=51 witness (tilt 0.04, exponent 1), replacing only capped birth
+rows costs 0.029 bits. Replacing all nonzero birth rows fails; retaining the
+exact one/two-active-packet class rows and using coarse birth rows for j>=3
+gives an outward diagnostic of 70.7132 bits for this one occupation. The
+same replacement of capped rows costs 1.46 bits at K20's q=615 witness.
+These are sampled diagnostics, not complete coverage or Lean certificates.
+
+The compact candidate data now contain 25 packet-weight profiles with
+multiplicities and exact birth polynomials from 240 one-packet and 27,000
+two-packet inputs. The retained physical row masks agree with `Map22`.
+The candidate is only about 6 KB and needs no syndrome-wise Walsh arrays.
+Next: test the coarse witness across every K18 occupation with its correct
+witness, authenticate the profile classification and small birth census,
+then check exact numerical row and coefficient bounds. A file hash or a
+successful outward Python replay is not that authentication.
+
+The coefficient lane audits `ConcreteFixedCoefficient` and the retained
+`packet_regional_power.py`. The old proof expands ordered products over
+finite inputs. Turbo additionally needs the exact selected-count constraint
+and paired factors with binomial weights outside the fractional power.
+The new recurrence will preserve these features and the single regional
+normalizer; binary powering must be checked as ordered convolution, not
+as a commutative matrix product.
+
+### Compact witness full numerical replay (2026-11-08)
+
+The coarse-birth alternative now passes complete outward numerical replays
+at both target sizes, retaining exact class births only for one or two
+active packets and using arbitrary-live birth bounds for three or more.
+K18 recomputes all q=3..2048 occupations and retains the existing current-RS8
+q=1,2 endpoints. Its new whole bound is 58.2408311085 bits and its tail is
+66.4739187234 bits. This preserves the paper's rounded 58.24 claim, not the
+old diagnostic's additional decimal digits.
+
+For K20, naively reusing all old witness boundaries fails near q=615.
+This is a proof-witness issue: the already available dense witness at
+tilt .15, fractional exponent .6, and marker 25/128 applies earlier.
+Its normalization was independently compared against the historical
+producer and matches the retained physical result at q=616. Using that
+same witness for q=507..615 gives a complete tail bound of 100.5938735669
+bits and a whole bound of 51.8224664170 bits, including the retained rare,
+one-group, and regular two-group components. The exact dyadic union is
+below a conservative rational lower bound for the paper's 51.82-bit target.
+No encoder or setup distribution changes. No large Walsh witness is needed
+by these successful numerical candidates.
+
+These are diagnostics, not Lean certificates. The compact packet-profile
+data still require their semantic census theorem; one/two-packet birth
+counts require checked evaluation; matrix entries and regional/dense
+arithmetic require sound checked upper endpoints. Existing q=1,2 numerical
+receipts are not axioms. The sparse lane must connect the exact shuffled
+row atoms to one/two-distinct-slot regional placement and the support-class
+coefficient calculation. K20's rare outer event must be charged once, with
+the regular two-group estimate bounded unconditionally after truncating
+the expected measure. It must not condition the setup and then assert
+unchanged independence.
+
+The actual routing and fractional tail endpoint lane now also includes
+checked `RoutingConditionalSteps22`, `RoutingConditionalKernel22`, and
+`RoutingPairedProfiles22`. Root's `MatrixCoefficient22` and
+`MatrixPolynomial22` identify the exact constrained ordered sum with its
+recurrence and with polynomial coefficients over the noncommutative matrix
+semiring. Their binary convolution identity preserves factor order.
+
+Profile-census strategy: the checked production map spans RM(2,6).
+Splitting two low variables gives one bit, two affine four-variable forms,
+and one quadratic four-variable form. The high-variable restrictions reduce
+the census to weight histograms over 2048, 128, and 16 quadratics. These
+three histograms are now kernel checked via packed coefficient equivalences.
+The production reindexing, uniform restriction fibers, and a small bank of
+basis-preserving permutations are being joined to the final 25-profile
+census. Do not call the census checked until that join is complete.
+
+### Actual routing fractional endpoint audit (2026-11-08)
+
+Historical proof audit before the new component: `ConcreteFixedCoefficient`
+expands ordered finite matrix products and moves only scalar placement weights;
+`ScalableEnvelopeIterate` retains the continuous state until the terminal sum.
+The Turbo adaptation uses actual potential-slot count fibers, then caps each
+fixed-active-set event before its fractional power. Chronological pairs are
+formed before entrywise powers, and exact regional binomial profile weights
+remain outside those powers.
+
+`RoutingPairedPhysical22` is kernel checked. Its complete physical rows transfer
+the full chronological conditional kernel to the eleven-coordinate paired
+product, without resetting the state at regional boundaries. Its axiom audit
+contains only propext, Classical.choice, and Quot.sound.
+
+`RoutingFractionalEndpoint22` is being checked: it joins the original-law
+count disintegration, the support-only conditional first-moment theorem,
+physical pairing, and the exact regional DP average. Row soundness and matrix
+nonnegativity remain explicit numerical premises. Neither this endpoint nor
+the pairing theorem authenticates numerical witnesses or the whole certificate.
+
+`RoutingFractionalEndpoint22` is now kernel checked, including its axiom audit
+(only propext, Classical.choice, Quot.sound). For each actual fixed active set S,
+its original setup probability is bounded by
+`(beta^|S| / z^d)^alpha * sum_k ((pairedRegionDP22 B alpha n |S|)^64 0 k)`.
+The denominator and outer domination factor are inside the power; the count
+profile average is outside. `RoutingFractionalTail22` is being compiled to sum
+these events by occupation, retaining `choose (32*n) q` outside each power and
+allowing independent z, alpha, and B per occupation. Its actual-message event
+bridge permits the q ≥ 3 tail via `Ico 3 (32*n+1)`.
+
+`RoutingFractionalTail22` is now kernel checked. The occupation union has
+binomial placement cardinality outside the fractional power and permits
+q-dependent witnesses. The actual-message tail event is dominated under the
+same original shared setup; no resampled encoder is introduced. The printed
+union theorem has only propext, Classical.choice, Quot.sound. The checked
+endpoint and tail still require numerical physical-row premises, coefficient
+endpoints, and the separate sparse q=1,2 contributions before a whole bound.
+Next routing integration: instantiate q ≥ 3 and feed the checked q-dependent
+row/DP witnesses, then add sparse and rare-event budgets exactly once.
+
+### Packet-profile semantic join (2026-11-08)
+
+Historical audit revisited `productionPacked_coordinate`, the small block
+checks in `Map22Packed`, and `Map22SpectrumData.Block0.block0_checked`:
+checked candidate tables are only used after a semantic evaluation/counting
+bridge. The new RM(2,6) route retains that discipline while replacing the
+full production-state enumeration with small quadratic histograms and
+basis-preserver witnesses. There is no historical affine-zero-set packet
+profile counterpart; its new obligation is a checked complete 1024-pair
+classification followed by uniform quadratic restriction fibers.
+
+Checked objects now include `Map22PacketProfileProduct` (affine-product
+closure and both nibble-weight cases), `Map22PacketProfileAffine` (packed
+coordinates and affine-pair sampling equivalence), `Map22PacketProfileBank`
+(171 independently checked basis-preserver witnesses), `Map22PacketProfileZero`
+(witness reindexing, zero-set cardinality, canonical restrictions and 128/16
+fiber-weighted sums), `Map22PacketProfileHistogram` (arbitrary additive
+observables of the three checked weight histograms), and
+`Map22PacketProfileJoin` (odd profile sum and the three nonempty even
+profile sums). These compiled to local oleans with standard axioms.
+
+A direct 1024-state classifier/count expression exceeded the 4GB compiler
+limit. Its replacement uses 32 blocks of 32 affine pairs, chunked lookup,
+and separately checked kind-list receipts; the class cardinality certificate
+is a linear list count. No new production-state experiment is introduced.
+`Map22PacketProfileClassifier`, `Classes`, and `Census` are the remaining
+join under compilation, so the actual 25-profile census is still open.
+Next close the affine-pair class aggregation, then use the production split
+equivalence to state the complete actual-map profile observable identity.
+
+### Exact one/two-packet physical birth census lane (2026-11-08)
+
+Historical audit before construction: `Map22PackedBridge` identifies every
+packed production-expansion coordinate and weight; `MapSpectrum.block_split_weights`
+separates reusable packed images from checked histogram arithmetic. The current
+`PhysicalStep22` law is uniform on the actual exact-nonzero packet layer, with
+support/label equivalence and cardinality `choose(16,j)*15^j`. The new lane uses
+these interfaces without a full-state census or a change to the encoder.
+
+`PhysicalSmallBirth22Packed`, `PhysicalSmallBirth22Inputs`,
+`PhysicalSmallBirth22Encoding`, `PhysicalSmallBirth22Data`, and
+`PhysicalSmallBirth22CensusDefs` are kernel checked. They establish packed
+`A^T x`, zero-state emitted weight, explicit 240/27000 input equivalences,
+and agreement of packed class/weight codes with actual `physicalBirthIndex22`.
+The data module authenticates 240 single-packet feedback-expansion images.
+Two-packet images are XORs of those authenticated images by checked linearity.
+The input-coordinate bridge uses a symbolic bit-shift proof, not a brute
+function-equality decision over ZMod coordinates.
+
+`PhysicalSmallBirth22Checks` is being compiled to authenticate the exact
+class/weight histograms in sixteen small first-support-slot shards. Candidate
+integers come from `emit_small_birth22.py`, which visits only 240+27000 inputs
+and cross-checks the retained compact candidate; that Python cross-check is
+not a proof. Census and exact-law polynomial wrappers are drafted, still
+awaiting compilation. Numerical row authentication remains separate.
+
+### Actual sparse rare-event audit (2026-11-08)
+
+Before this component, the sparse lane audited
+`ConcreteFixedOneMoment.actual_one_mark_moment`,
+`ConcreteFixedRoutedTwo.actual_two_fair_probability`, and
+`ScalableFixedSelected.scalableSelectedLayer_eq_route`. The old routed
+bounds retain a shared regional permutation for distinct selected marks;
+those continuum one/two-bit bounds do not certify Turbo's four-bit shell
+endpoints. The Scalable selected-law interface conditions the outer law;
+Turbo K20 instead needs an unconditional truncated expected measure.
+
+`Turbo/SparseRare22.lean` is kernel checked. Its rare event is the actual
+outer-setup event that some group contains some nonzero message with
+sampled packet weight 5..8. The checked bound is
+`Pr[rare] <= (16*R) * sum_{v=5}^8 C_v`; at K20 this is 8192 times the
+single-group sum. Its complement simultaneously forces packet weight at
+least nine for every nonzero group message under the same shared setup.
+The coordinate marginal, group bound, global bound, and complement lemma
+print only propext, Classical.choice, and Quot.sound.
+
+Elaboration lesson: an ambient `Classical.propDecidable` changes hidden
+finite subtype/equality instances and can force normalization of gigantic
+finite populations when comparing with `rs8ExpectedPacketCount`. Raising
+heartbeats or instance priority did not solve this, and higher priority
+also changed the `Pi.instFintype` population. The successful proof retains
+the original instances, parameterizes generic union bounds by their event
+decidability, and introduces classical decidability only for the precise
+bounded existential rare predicates. No finite population is enumerated.
+
+`SparseTruncated22` is being checked to connect this one-time budget to
+the actual bad-distance event and its unconditional truncated first moment.
+The one/two-group complete-word shell endpoint and checked numerical
+coverage remain open; the rare-event result alone closes neither sparse
+layer nor a complete K18/K20 certificate.
+
+The semantic packet census gate is now closed at
+`Map22PacketProfileCensus.productionPacketProfile_census` (checked 2026-11-08).
+For every additive profile observable, it equates the sum over actual
+22-bit production states to the complete affine-class/weight-histogram
+formula. `Classifier` and `Classes` authenticate all 1024 affine pairs,
+the 93/840/90/1 class multiplicities, the nonempty witness alignment and
+the empty-zero-set case. `Census` joins these to `productionProfileSplitEquiv`;
+its printed axioms are exactly propext, Classical.choice, and Quot.sound.
+The explicit 25-entry table from the retained numerical candidate is being
+checked against this identity for convenient numerical consumption. The
+profile census alone does not authenticate physical rows or final tails.
+
+`Turbo/SparseTruncated22.lean` is now kernel checked. The actual bad-distance
+probability is at most the one-time rare budget plus the original joint
+expectation of the rare-complement count. Its Fubini identity retains the
+outer indicator before summing conditional route/inner failure probabilities.
+The pointwise occupation truncation is bounded by the unconditioned sum over
+messages whose every active group has at least nine packets. In particular,
+this justifies the K20 q=2 heavy restriction without asserting independence
+under a conditioned outer setup. All three printed declarations use only
+propext, Classical.choice, and Quot.sound. Next sparse step: exact nonzero
+regional support/value laws under one common permutation, then chronological
+q=1/q=2 shell coefficients and their complete checked witness coverage.
+
+The explicit table gate is also closed at
+`Map22PacketProfileTable.productionPacketProfile_table_sum` and
+`productionPacketProfile_table_count`. The 25 retained candidate profiles
+and multiplicities are now connected to the actual production-state
+cardinalities, and their multiplicities sum to 2^22. Both endpoint theorems
+compiled with exactly propext, Classical.choice, and Quot.sound. Import
+this table for coarse-row numerical authentication; the arbitrary additive
+observable identity avoids re-enumerating the 22-bit state space.
+
+### Turbo physical-moment checkpoint (2026-11-08)
+
+The original `ScalableFeedbackFourier` and `ScalableFeedbackMomentExact`
+were inspected before extending the feedback proof. Their actual-map adjoint
+identity and 22-bit character orthogonality are reused unchanged. The new
+obligation is the exact nonzero-packet character factor and occupation
+coefficient; the Bernoulli bit factor from Scalable cannot be substituted.
+
+The packet-weight generating factor and the sixteen-slot occupation
+polynomial factorization have checked with standard axioms. The final
+exact-layer expectation/normalized-coefficient join still has a Lean kernel
+resource problem; it is not claimed checked. The complete production
+25-profile census is now checked in `Map22PacketProfileTable`, replacing
+that formerly explicit hypothesis. The small-birth, sparse-shell and numerical
+row connections remain separate obligations. No final K18/K20 endpoint is
+claimed by the symbolic tail theorem alone.
+
+### Exact sparse support and shared regional route (2026-11-08)
+
+The sparse lane audited `PacketShuffleMixture.uniformLabeledLaw_apply`,
+`RS8SelectedValues22`, `RS8ReferenceRegion22`'s transpose/product proofs,
+and `ConcreteFixedCoefficient.fugacity_product_expansion` before adding
+this component. `SparseExactRegion22` now checks complete nonzero label
+atoms with exact support (15 choices per active packet), their transport
+by one common regional permutation, and invariance of the averaged law
+under equal support cardinalities. `SparseExactCell22` checks its product
+of complete nonzero/zero cell laws. `SparseSupportArray22` checks exact
+support-array transposition and the product of independent regional laws,
+with one shared permutation acting on every active slot within a region.
+All printed declarations use only the standard three axioms.
+
+`SparseShellCoefficient22` also checks the no-carry encoding of the two
+support cardinalities into the existing univariate matrix coefficient
+checker. A regional Bool-pair has degree `b + 65*c`; across 64 regions its
+first coordinate sum is at most 64, so coefficient `u+65*v` (u<=64) is
+exactly the separate (u,v) support constraint. This preserves chronological
+matrix order and reuses `MatrixPolynomial22`'s checked binary convolution.
+It is a semantic encoding; the numerical producer may retain efficient
+2D storage. The actual Cv support-measure decomposition and continuous
+regional-kernel bridge are the next joins; checked 65/2145 shell witness
+coverage is still open.
+
+### Physical profile arithmetic checker design (2026-11-08)
+
+Before this component, audited `ScalableLiveMaxSpectrum` (support and
+positive counts turn state maxima into small spectrum maxima),
+`ScalableTransferSpectrumModel` (full sum minus the unique zero state,
+divided by the live count), and `ScalableSpectrumPolynomial` (checked
+multiplicities precede arithmetic expansion). `PhysicalProfile22` reuses
+that route with the authenticated 25 packet profiles and with the actual
+11 physical weight-class predicates.
+
+The numerical checker audit read `Numeric.FixedDefs`, `Numeric.Fixed`,
+and `ConcreteFixedNumeric.rowCheck_sound`. Historical evidence explicitly
+rejects reducing rational field arithmetic through kernel `decide` at
+scale; integer fixed-point endpoints are the established solution.
+`FixedDefs` remains import-light and `Fixed` proves every outward operation
+against reals. New `PhysicalProfileNumericDefs22` follows that split. Its
+stored coefficient list is updated once per linear factor, avoiding an
+exponential recursive coefficient evaluator. The once-proved semantic
+bridge uses list coefficient membership and a Horner polynomial.
+
+The retained coarse producer's moment factors are z^r and
+(((1+z)^4-z^r)/15), normalized by choose(16,j). The checker moves all 15^j
+to the final positive integer divisor, retaining the same polynomial and
+reducing intermediate rounding. Fourier factors can be signed; the existing
+four-corner interval multiplication handles their cancellations. Integer
+cross multiplication checks rational upper/lower targets. No floating logs,
+external interval assertions, or standalone candidate equalities become
+axioms. Fixed precision must preserve both existing rounded paper margins;
+long-tail rescaling/normalization is still a separate future audit.
+
+Small-birth checker resource correction: retain independent first-support-slot
+modules `PhysicalSmallBirth22PairChecks0` through `PairChecks14`, with fifteen
+down to one 225-input pair gates. Arithmetic candidate definitions now live in
+`PhysicalSmallBirth22NumericData` and `NumericCensusDefs`, importing only the
+packed map; semantic `Data` and `CensusDefs` retain the actual input/feedback
+bridges. This follows the historical Basis/block separation and avoids loading
+the unrelated old Majorant graph for each numeric shard. All public declaration
+names and input aliases are preserved. The aggregate, census, polynomial, and
+marker sources are drafts until their subsequent compile gates pass.
+
+After the import split, compile in this order through the shared gated helper:
+NumericData, NumericCensusDefs, PairChecks0..14, PairChecks, Checks, Encoding,
+Data, CensusDefs, Census, Polynomial, then MatrixMarker22. Each abbreviated
+SmallBirth name has the `PhysicalSmallBirth22` prefix. Rebuild PairChecks0
+once against the lightweight imports even though its prior heavy-import proof
+artifact exists. Subsequent successful independent shards persist across
+continuations. The physical packed/input modules do not need this rebuild.
+
+`PhysicalProfile22` is now fully checked, including generic commutative-monoid
+packet-product grouping, actual coordinate weight from the profile, complete
+table support, full/live sums and means, all eleven physical class sums and
+means, the authenticated class cardinalities, and finite-table class maximum
+bounds. The final class-count bridge needed explicit cast-of-sum and
+cast-of-list-sum lemmas: broad predicate rewriting across State22 hit a
+whnf timeout, and broad norm_cast reached recursion depth. The final proof
+reuses the already checked real class sum at the constant-one observable
+and casts only the two sums. No full State22 enumeration is performed.
+
+### Compiler resource and checkpoint discipline (2026-11-08)
+
+The source audit found that numeric-only small-birth checks imported the
+full semantic setup. The Sol lane is separating packed integer data/checks
+from the actual-feedback bridge, following the old checked-data/block design.
+Each first-slot pair census now has its own object checkpoint; a stopped
+compile no longer discards the whole 120-pair census.
+
+Host measurements showed about 12 GB private commitment per heavy Lean
+process, despite a roughly 4 GB working set. Concurrent imports intermittently
+failed to read existing object files when global commitment was nearly full.
+The local ignored compile helper now serializes these jobs through a named
+mutex that is released or abandoned by the operating system on termination.
+Source work remains parallel. Do not restart a queued compile as if it failed;
+inspect its handle and the actual Lean process. Do not touch unrelated user
+processes. A numeric-only pair shard measured about 4.4 GB private commitment,
+so it is still using the shared gate.
+
+`PhysicalProfileNumericDefs22` and `PhysicalProfileNumeric22` are checked.
+`profileFixCoefficients22_sound` proves each stored integer-interval
+coefficient encloses the corresponding coefficient of the real product of
+linear factors. Rational upper/lower endpoint checks are proved by exact
+integer cross multiplication against `Fix.Mem`. The core endpoint has only
+standard axioms. Factor-bank normalization, profile-table adapters and
+aggregate/maximum checkers remain under compilation; no numerical row or
+final margin is certified by this core theorem alone.
+
+### Exact layer normalization and sparse marker simplification
+
+`PhysicalLayerPolynomial22.packetStepLaw22_expect_layer` and
+`packetStepLaw22_expect_coefficient` compiled with only the standard axioms.
+A direct application of a generic expectation-to-coefficient identity caused
+deep definitional comparison on the 2^64-element packet input type. The checked
+replacement first derives the conditional finite sum from the actual pointwise
+law, separately rewrites a polynomial coefficient to the same conditional sum,
+and joins the equalities. No resource-limit increase or weakened law is used.
+The common `degreePolynomial22` definition is used by the output-moment and
+signed-character polynomials.
+
+The authorized bounded sparse diagnostics found a much smaller prospective
+q=2 witness: common positive marker 24 in both row supports and a single
+regional matrix bound. K18 uses tilt 1/625 and gives 105.3712 bits for q=2;
+K20 uses tilt 1/2500 and gives 106.4712 bits for the heavy q=2 term. Their
+whole numerical sums remain 58.2408311085 and 51.8224664170 bits. These are
+candidate calculations, not checked endpoints. The formal route discards
+separate support-count constraints using nonnegativity, bounds the total-degree
+coefficient by the existing positive-marker theorem, and retains every shell.
+K20 still pays the rare low-weight event once and uses the unconditional
+truncated heavy expectation. Exact arithmetic and the final joins remain open.
+
+`MatrixMarker22` is kernel checked with only propext, Classical.choice,
+Quot.sound. Its generic ordered marker expansion and coefficient inequality
+apply to any finite alphabet, including the Bool×Bool sparse common marker.
+The paired-region wrapper retains the exact binomial normalization and the
+complete matrix state through all64 regions. Matrix power monotonicity and
+scalar-power identities are public checked helpers. This authenticates the
+positive-marker argument, not any numerical witness or whole probability bound.
+
+Further numeric import reduction: the small-birth NumericData now imports only
+core MapSpectrumDefs/Init.List.OfFn, and pair gates use Lean's core kernel decide
+tactic. Numeric imports contain neither actual setup nor Mathlib's full tactic
+collection; actual Data/CensusDefs still perform the mandatory semantic join.
+
+### Sparse q2 common-marker numerical diagnostic (2026-11-08)
+
+Two authorized bounded proof-numeric diagnostics (not benchmarks) tested
+one common positive fugacity for both selected group supports. They used
+the current compact physical candidate, exact current RS8 Cv values, and
+the original chronological regional placement. No FWHT or new census was
+run, and these remain Python/Arb diagnostics rather than Lean certificates.
+The first check is `.lake/turbo/q2_common_marker_diagnostic.json`; the
+geometry-scaled K20 check is `q2_common_marker_k20_scaled_diagnostic.json`.
+
+At marker x=y=24, K18 tilt1/625 gives a 105.3712048-bit q2 contribution
+and whole58.2408311085 bits, retaining every shell including5..8. K20
+tilt1/2500 gives a 106.4712223-bit heavy-q2 contribution and whole
+51.8224664170 bits, retaining the rare outer budget exactly once and
+restricting the unconditioned regular expected measure to weights>=9.
+The whole calculations retain the q1 endpoints and the newer coarse-tail
+diagnostics. Both exact rounded target comparisons passed in Arb.
+
+The initial K20 use of the unscaled K18 tilt grid failed, as expected from
+the fourfold regional length; the separately authorized scaled grid passed.
+No numerical experiment is left running. These margins motivate replacing
+large q2 coefficient-table certificates by one positive common-marker and
+Collatz witness per geometry. The formal path is to discard the separate
+(u,v) constraints nonnegatively into total degree u+v, then reuse
+`MatrixMarker22.orderedMatrixCoefficient22_marker_le`. This uniformly
+covers all2145 shell pairs; it does not assert that any omitted numerical
+shell is zero. Checked rational regional rows, marker/Collatz arithmetic,
+current-Cv coefficient values and the actual sparse-shell normalization
+join are still required before claiming a q2 certificate or whole result.
+
+`SparseSupportMeasure22` is kernel checked: the exact actual Cv/choose(64,v)
+support-class weights times uniform15-label laws reproduce every original
+row-shuffled word atom and the full active-set array measure.
+`SparseRegionKernel22` then checks the exact continuous regional moment and
+its lower-tail bound. `SparseActualMoment22` joins these to the original
+actual active-set first moment. Their printed declarations use only the
+standard three axioms. `SparseSupportCoefficient22` checks exact one/two
+row-support sums against the ordered coefficient interfaces.
+
+`SparseExactStep22` is also checked: selected j-subsets with uniform
+nonzero labels are exactly `packetStepLaw22 j`; the sparse regional law is
+the existing ordered hypergeometric count-profile law mixed with exact
+physical-step input laws. These results preserve both distinct slots under
+one regional permutation. `SparseSupportPrune22` removes inactive supports
+using their exact empty-support atom. Its concrete statement fixes the
+canonical subtype Fintype explicitly: `Subtype.fintype` and
+`Finset.Subtype.fintype` are extensionally equal populations but are not
+definitionally equal, and comparing their large function populations caused
+kernel normalization costs. The checked proof does not enumerate them.
+
+Remaining current joins: the generic11/full-state matrix averaging lemma,
+regional profile→physical coefficient DP identity and whole-stream envelope
+comparison; one/two active-set reindexing and weighted65-shell folds; the
+nonnegative separate-constraint→total-degree marker bound; exact current Cv
+rational coefficients; and checked rational physical/regional/Collatz
+arithmetic for the saved markers. The successful Python markers remain
+candidate witnesses until these obligations are discharged.
+
+The pure numeric pair gates now use the helper's whitelisted `-Lightweight`
+mode (single light compiler, max2500MB) alongside the default heavy gate.
+The largest core-only slot0 shard passed with observed peak private memory
+1,164,455,936 bytes and RSS662,974,464 bytes. This is a resource diagnostic,
+not a numerical probability certificate. Remaining pair slots are independent
+checkpoint modules and do not reload the old Majorant graph.
+
+The polynomial wrapper also drafts the exact j=0 source row. Its audit uses
+`RegionalEncoder.stepKernel_empty`, `Kernel.emptyStep_zero`, and
+`PhysicalCone22.physicalInitialCone22`. Zero support forces the entire packet
+word to be zero, so its original uniform layer law evaluates every observable
+at that zero word. Its full kernel is the existing empty-step kernel; from an
+entering zero state the birth is exactly delta-zero, with envelope mass1 only
+at coordinate0. This avoids the coarse zero-plus-total overcount for j=0.
+
+### Complete q1 compact-family diagnostic (2026-11-08)
+
+The authorized bounded `diagnose_turbo_q1_complete65.py` replay recomputed
+all65 shell endpoints from the new compact CoarsePhysical family (exact
+j=1 birth and generic Cauchy live rows), rather than assuming that the
+retained q1 receipts remain valid after the physical-witness change. It
+used all five tilts from the actual K18 receipt and all four tilts from the
+actual K20 receipt; no new grid/search was introduced. The ignored checkpoint
+is `.lake/turbo/q1_coarse_complete65_diagnostic.json`.
+
+The recomputed q1 margins are58.2456338686490 bits (K18) and
+56.2570901999489 bits (K20), matching the retained endpoints to displayed
+precision. Combined with the new common-marker q2 candidates, one K20 rare
+budget and the newer coarse tail diagnostics, the whole margins are
+58.24083110851727 and51.82246641700886 bits; both exact rounded target
+comparisons passed. This closes the diagnostic risk that the proposed
+uncapped sparse physical witness family loses the requested paper margins.
+It remains numerical evidence pending Lean arithmetic authentication.
+
+An authorized exact recombination also replaced K20's heavy-only q2 sum by
+the full current-Cv sum over0..64, using the already saved marker witness.
+Its q2 margin is102.6824180241 bits and the whole margin remains
+51.82246641700886 bits. The unconditional full q2 mean dominates the
+rare-complement/truncated q2 mean by nonnegativity. The chosen formal path
+can therefore retain the rare budget once while using the same complete
+65-shell/2145-pair q2 endpoint family for both geometries; no separate
+heavy-row-shuffle transfer is required. The checkpoint is
+`q2_common_marker_k20_full_recombination.json`.
+
+`SparseMarker22` now kernel checks the separate-constraint→total-degree
+comparison, reuse of the existing positive marker theorem, and the explicit
+joint marker matrixR0+2tR1+t^2R2. Its printed declarations use only the
+standard three axioms. No numerical experiment remains running in this lane.
+
+`PhysicalProfileNumericFactors22`, `PhysicalProfileNumericAggregate22`,
+and `PhysicalProfileNumericTable22` are now checked with standard axioms.
+The factors cover first and second moments and signed packet Fourier
+coefficients, normalized by choose(16,j)*15^j. The table adapter authenticates
+the import-light 25-entry list, its class predicates/counts, the polynomial
+profile product, actual State22 class caps/means, and the complete-state
+Fourier coefficient average. Raw signed coefficients are aggregated before
+the common divisor to retain exact zero cancellations at z=1. Numerical
+candidate endpoints have not yet been submitted to these checkers.
+
+These 10^30-scale intervals are for local physical rows. Future regional
+DP/marker certificates must retain common choose/t scalars outside the
+64th power or use an audited rescaling witness. Rounding normalized tiny
+regional entries to absolute 10^-30 and later multiplying a huge z^-d/outer
+factor is not a valid route to the final rounded margins.
+
+All15 core pair checkpoint modules0..14 are now kernel checked and persisted:
+the240 one-packet inputs and all120 two-slot supports times225 label pairs
+(27,000 two-packet inputs). The separate actual-law join is still pending.
+The current heavy compile sequence is PairChecks (thin imports), Checks
+(finite arithmetic assembly), Encoding, Data (240 actual-image identities),
+CensusDefs (actual code bridges), Census (actual-layer counts), Polynomial
+(exact normalized class/zero formulas and j=0 source cone). MatrixMarker22
+has already passed its complete standard-axiom audit and need not wait for
+this remaining birth-law assembly.
+
+
+The small-birth numeric lane then removed the remaining Mathlib/tactic imports.
+All fifteen pure arithmetic shards are now checked. A representative shard
+uses about 1.1 GB private memory; the helper permits one such whitelisted
+`-Lightweight` job alongside the single heavy job. Semantic wrappers still use
+the heavy gate. This is a measured exception to the earlier serialization,
+not permission to run arbitrary heavy Lean processes concurrently.
+
+The complete q=1 numerical replay also confirmed the simplified physical-row
+family at every one of the 65 shells, using the existing five K18 / four K20
+tilts. It reproduces q=1 bounds of 58.245633868649 and 56.257090199949 bits.
+The K20 full unconditional q=2 marker bound is 102.6824180241 bits, so the
+truncated q=2 contribution can simply be bounded by this full nonnegative
+expectation. The whole candidate sums remain 58.2408311085 / 51.8224664170.
+No old q=1 receipt is being assumed unchanged without this replay. All these
+numerical replays still require the final exact-arithmetic certificates.
+
+The thin `PhysicalSmallBirth22PairChecks` imports and finite arithmetic
+`PhysicalSmallBirth22Checks` assembly are now GREEN after the core-only split.
+The current restart point is the semantic `Encoding` rebuild, then `Data`,
+`CensusDefs`, `Census`, and `Polynomial`. All 120 pair gates, each checking
+225 label pairs, remain opaque compiled lemmas; the assembly also checks
+the 99-bin sums.
+No numeric shard needs to be regenerated or rerun for a semantic-wrapper edit.
+
+### Input coefficient wrapper: finite-instance conversion obstacle
+
+The generic exact-layer coefficient identity is checked in
+`PhysicalLayerPolynomial22`. Its concrete `physicalInputMoment22` wrapper
+exposed a separate conversion problem. Full elaborated goal comparison
+confirmed canonical Pi Fintype instances on both sides, with one difference:
+the RHS polynomial definition contains a separately hoisted NeZero(2)
+proof inside the nested ZMod Fintype. Broad matching/conversion unfolds
+monomials and large function-space enumeration while trying to compare
+these representations. A scoped recursion depth 4096, borrowed from the
+historical RS8 numeric pattern, reached the 6GB kernel memory limit; it
+was removed. This is not a reason to increase resources further.
+
+The next checked interface transports the polynomial's Fintype argument
+explicitly using Subsingleton.elim, keeping the actual input law and all
+observable functions unchanged. Its helper is public in
+`PhysicalInputPolynomial22` so the signed-character polynomial can reuse
+it. This helper/wrapper replay is pending. The polynomial product
+factorization itself remains checked.
+
+The exact packet-character factor is now kernel checked in
+`PhysicalPacketFourier22`: summing all sixteen four-bit labels gives the
+signed weight polynomial, and removing zero gives the exact fifteen-label
+factor. Printed dependencies are only propext, Classical.choice, and
+Quot.sound. This reuses the historical adjoint/character argument rather
+than an independent-bit approximation.
+
+A common formalization bottleneck is now diagnosed precisely. Separately
+elaborated Fintype instances differ only in a hoisted NeZero proof for
+ZMod 2, but definitional comparison can unfold the enormous function-space
+enumerator. Scoped depth 4096 still exhausted memory in two joins, so that
+workaround was removed. The chosen repair is explicit transport using
+Subsingleton.elim on Fintype instances, following the existing proof
+irrelevance model; no finite-domain enumeration or trusted axiom is added.
+The actual-input polynomial and sparse product joins are being replayed
+with this repair. They are not yet counted as closed.
+
+The root's next row adapter preserves the historical split: pointwise
+class maxima for arbitrary supported mass, and the actual live-state mean
+for the uniformly capped coordinate. `PhysicalProfileWeighted22` and
+`PhysicalProfileRows22` are in verification, not certified endpoints.
+
+The semantic Encoding, Data, and CensusDefs rebuilds are now GREEN on the
+core-only data graph. Census is being rechecked after replacing a broad
+closed-histogram getD rewrite with a generic opaque-function lemma; its
+remaining support projections are resolved by scoped cases. Numeric shards
+and arithmetic assembly are unchanged and remain GREEN.
+
+The final Polynomial source now drafts hbirth interfaces for actual rows:
+`physicalSmallBirth22_zero_exact_cone`, `physicalSmallBirth22_one_cone`,
+`physicalSmallBirth22_two_cone`, and their one/two `cone_of_le` wrappers.
+The latter accept outward componentwise bounds on the exact normalized
+polynomial budget vectors. They partition the same actual birth measure,
+following the audited selected-law birth-parts proof. These interfaces are
+not GREEN until the pending Polynomial compile and axiom audit complete.
+
+`PhysicalProfileWeighted22` and `PhysicalFeedbackFourier22` are now GREEN
+with standard axioms. The latter derives the zero-feedback generating
+function and the feedback-active probability from the actual input law.
+A scalar Input64 kernel identity is proved before lifting through an
+expectation; this avoids deep conversion inside the complete packet-word
+sum. The weighted adapter similarly uses explicit congrArg rather than
+an unrestricted congr tactic over the full state-space sum.
+
+Endpoint audit: the diagnostic Chernoff cutoffs are integers, not rounded
+floating thresholds: 52428 for K18 (N=524288) and 209715 for K20
+(N=2097152). These are floor(N/10), and all q1, q2, and tail replays use
+these same cutoffs. The exact-arithmetic endpoint must retain them; changing
+to ceil(N/10) would spend margin that the rounded claims do not promise.
+
+`SparsePhysicalKernel22` is now GREEN at the default recursion depth.
+Its exported scalar, physical-product, exact-region, and normalized-DP
+identities use only propext, Classical.choice, and Quot.sound. The region
+law averages one shared permutation and exact nonzero packet labels.
+The DP divides by choose(16R,j) once, after the physical coefficient fold.
+
+The failed sparse join had a precise cause. The public expectation used
+Nat.instNeZeroSucc, whereas the fixed packet law stored its own NeZero
+proof inside the PacketStep16 Fintype. Depth 4096 exhausted kernel memory;
+that probe was removed. A regular implicit Fintype parameter now extracts
+the enumeration from the fixed law before constructing the expectation.
+An instance hole would allow eager typeclass search to restore the mismatch.
+A checked adapter then exposes the product identity in the public law's
+syntax. No enumerator normalization or additional axiom is required.
+The eleven-coordinate regional envelope and exact current-Cv coefficient
+interface are the next verification gates.
+
+The final q1 composition must retain a separate fugacity for each shell.
+The complete65-shell diagnostic chooses among retained tilts before adding
+shell contributions. Choosing one global tilt, or minimizing whole q1
+sums, does not justify that bound and can lose the K18 margin.
+`turboSetup22_activeSet_expect_eq_support_measure` already gives an exact
+sum over complete support profiles, with their unconditional expected
+weights and complete-valued support laws. The next bound fixes z and its
+physical row family separately inside each profile's expectation, before
+summing those weights. For one active group, z and the row family depend
+only on its support cardinality; grouping profiles then produces the
+retained shell-dependent coefficient bound. This composition is a required
+verification gate. The common-marker q2 bound uses one fugacity and is
+unaffected. No conditioning on the K20 rare-event complement is introduced.
+
+`SparseRegionalEnvelope22` is now GREEN with standard axioms. It applies
+physical_list_product_mass_le once to the entire ordered physical stream,
+then averages the joint regional count profiles. The continuous state is
+preserved across every region. The exact current-Cv coefficient interface
+is the pending gate before the remaining sparse shell assembly checks.
+
+A source audit confirmed that the completed q1 replay summed all 65 current
+Cv values for both geometries. K20's 56.25709-bit q1 diagnostic therefore
+supports the full unconditional q1 path. Together with the approved full
+q2 bound, this removes heavy-specific q1 and q2 transfers from the planned
+endpoint. The single rare-event charge is retained for the high-q tail.
+These numerical statements remain diagnostics until exact arithmetic is
+checked against the assembled actual-setup theorems.
+
+
+The clean `PhysicalInputPolynomial22` replay is now GREEN, as is the official
+`PhysicalCharacterPolynomial22` module. The successful coefficient join
+first rewrites an opaque equality at the polynomial level, then applies
+the already checked exact-layer coefficient theorem. It does not ask Lean
+to establish polynomial-enumerator definitional equality under `coeff`.
+The character module also factors scalar monomial identities before lifting
+them through products. No recursion or memory limits were increased.
+
+`PhysicalSmallBirth22Polynomial` is GREEN, including actual j=0,1,2 cone
+interfaces. `SparsePhysicalKernel22` and `SparseRegionalEnvelope22` are
+GREEN: the original shared-permutation regions are connected to ordered
+coefficient DPs, with cone propagation applied once across all 64 regions.
+The profile-to-numeric-bank joins and endpoint arithmetic are still open.
+
+`PhysicalSmallBirth22Polynomial` is GREEN, including its actual normalized
+class/zero formulas, exact j=0 kernel and raw-birth cone, and j=1/2 hbirth
+interfaces. All printed endpoints use only propext, Classical.choice, Quot.sound.
+The actual-row APIs are `physicalSmallBirth22_zero_exact_cone`,
+`physicalSmallBirth22_one_cone`, `physicalSmallBirth22_two_cone`, and the
+one/two `cone_of_le` adapters for outward polynomial budget vectors.
+
+The next numerical adapter audits `Numeric.Fixed` add/mul/divInt Mem soundness
+and reuses the historical Horner pattern and profileFixUpperCheck22. Core
+`PhysicalSmallBirth22BudgetDefs`, the shared `PhysicalProfileFamilySmoke22Data`,
+and `PhysicalSmallBirth22BudgetCheck` are GREEN. All three retained birth
+vectors pass kernel-only integer checks at the existing authorized tiny
+family (z=8607079764250578/10^16, endpoint denominator 2^80). Values and exact
+zero entries are unchanged. Semantic `Budget` and `BudgetSmoke` remain drafts
+until their heavy-gate compile and final actual-cone axiom audits pass.
+
+The sparse absolute512-bit lower-power trace is scoped strictly to the
+low-tilt q1/q2 witnesses. Across all retained tilts, lambda*d <168, hence
+the diagnostic Chernoff exponent is below243 bits. The sufficient first3
+K18 and first2 K20 tilts need fewer than122 bits. The eventual rational
+witness must pass the exact trace and its strictly positive final-value
+check. High-tilt tail witnesses, including z approximately0.8607, require
+explicit exponent/rescaling or a separate checked-log representation.
+They must not use the sparse absolute512-bit trace. Root will audit the
+historical tail representation before adding that numerical component.
+
+`SparseSpectrum22` is now GREEN with standard axioms. The historical MDS
+Ah and actual expected-count generating-function theorem imply the real
+polynomial identity. Coefficient extensionality authenticates every Cv,
+including shells 0..64 and zero outside 5..64. A checked polynomial map
+then identifies Cv with the real cast of its rational coefficient. This
+interface uses the current RS8 measure directly, without an RS16 ratio.
+The final arithmetic layer will use a common integer denominator rather
+than ask the kernel to decide rational arithmetic.
+
+### High-tilt arithmetic audit (after the sparse power-trace scope check)
+
+The absolute 512-bit sparse trace is only for retained q1/q2 parameters;
+its positive-final-lower-endpoint guard rejects underflow. It cannot be
+reused for the local profile pilot z=8607079764250578/10^16 at a K20 cutoff.
+
+Historical sources inspected: `Numeric/FixedLog.lean` (`flog_mem`,
+`flogI_mem`, range reduction and Horner remainder), `Numeric/FixedDefs.lean`,
+and `Structured/DenseFourierExactCheck.lean` (`checked_collatz`). The old
+proof checks rational transfer inequalities by integer cross products and
+uses verified logarithms for exponential conclusions, avoiding direct
+small-real powers. That separation should be retained.
+
+For the Turbo tail, an untested substitution of a Collatz bound for the
+retained finite matrix power could lose the tight K18 tail budget. Preserve
+the ordered coefficient/power calculation. The candidate arithmetic design
+is integer mantissas with an explicit shared binary exponent for each
+matrix/vector stage; check each rescaling by integer cross multiplication.
+Then use the old checked logarithm on bounded scalar mantissas/bases, adding
+exponent*log(2), for the large cutoff/exponent comparison. Do not evaluate a
+huge rational power or force a tiny tail value onto an absolute fixed grid.
+This is an audited next-component plan, not an implemented or checked tail
+certificate. Finish the local row family and sparse semantic gates first.
+
+`SparseActiveProfiles22` and `SparseActiveKernel22` are now GREEN with
+standard axioms. The actual support sum prunes inactive coordinates and
+reindexes the selected groups through an injective labelled embedding.
+Each region therefore uses occupancy 0, 1, or 2 of the same shared
+permutation. The resulting kernels are the normalized physical DPs,
+and their entries are nonnegative when the physical envelopes are.
+Verification now proceeds through the support-dependent Chernoff family
+and the original setup's occupation-1/occupation-2 assembly.
+
+### Local family authentication checkpoint
+
+`PhysicalProfileRows22` is GREEN, including the actual weighted first and
+second moments, coarse birth cone, and feedback-probability complement.
+The last conversion compared two decision procedures for the same event.
+Allowing definitional reduction expanded the finite probability filter;
+an explicit generic DecidablePred equality and an opaque probability
+constant avoided enumerating the packet space. No resource cap was raised.
+
+`PhysicalProfileFamilySmoke22Check` is GREEN for all 17 occupations of the
+retained rational family. `PhysicalProfileFamilyExtract22` is GREEN and
+extracts the individual checks without rerunning numeric arithmetic.
+`PhysicalSmallBirth22Budget` and `PhysicalSmallBirth22BudgetSmoke` are GREEN:
+the exact retained empty/one/two-packet birth vectors imply cones for the
+actual input laws. The whole actual-row family assembly remains in progress.
+Return caps already include division by 4194303; dividing twice would be
+unsound. The new assembly records that convention explicitly.
+
+### Handoff checkpoint — automated goal cleared
+
+The user requested a good stopping point and a handoff for another session.
+`PhysicalProfileAssembly22`, `PhysicalProfileCompleteRows22`,
+`PhysicalProfileBirthFamilySmoke22`, and the final
+`PhysicalProfileFamilySmoke22` now all pass complete-module checks. The
+last wrapper's four declarations use only propext, Classical.choice,
+Quot.sound. No task-owned Lean process remains after that check, and all
+three subagents stopped. No K18 numerical batch was launched.
+
+Read `TURBO_K18_K20_HANDOFF.md` before resuming. The next semantic blocker
+is `SparseShellFold22`, followed by its actual-shell/occupation/q1-choice
+dependents. Subsequent finite arithmetic is still open. The scaled-matrix
+sources and three-family K18 producer are preserved drafts, not checked
+endpoint evidence. The work after commit89b5418a remains uncommitted.
+
+### 2026-11-08 local profile family checkpoint
+- `PhysicalInputPolynomial22` now closes at default depth with standard axioms. The expensive boundary was avoided by proving the polynomial equality to its canonical typed `degreePolynomial22` first, then rewriting under the coefficient. No resource-cap increase is retained.
+- Integer coefficient caches and integer rational-power upper-bound soundness are kernel checked. The one authorized exact-rational local family at z=8607079764250578/10000000000000000 was generated once; its retained source is `PhysicalProfileFamilySmoke22Data` with common endpoint denominator 2^80.
+- `PhysicalProfileFamilySmoke22Check.familyChecked` passed all 17 rows by kernel reduction (axioms: propext only). This authenticates the Bool/Fix checks; the semantic family adapters remain under replay. Return caps are already divided by the live-state count 4194303.
+- Routing independently checked the retained exact birth j=0/1/2 vectors against authenticated census coefficients. No witness values changed and no numerical experiment was repeated.
+- This local family is not a completed K18/K20 failure bound. High-tilt tail arithmetic must preserve exponent scaling, rather than applying absolute fixed-point rounding to tiny normalized DP entries.
+
+A further q1 source audit found that the complete replay starts each shell
+at the trivial probability bound 1. Its saved choices retain that branch
+for shells 0..7 in both geometries. In particular, Cv for shells 5..7 are
+nonzero and must be charged. The final q1 assembly therefore selects a
+trivial or Chernoff bound inside each fixed support expectation, before
+summing. `SparseQ1Choice22` drafts this original-setup path; its scalar
+support count uses exactly choose(64,v). The final bound retains a separate
+current-Cv charge when the trivial branch is selected. The earlier pure
+Chernoff-family theorem remains valid but is not by itself the numerical
+q1 endpoint. The diagnosed probability budgets have not changed.
+- `PhysicalProfileFamilyExtract22` is kernel checked (core-only): the whole-family Bool result exposes each of the 17 canonical cached row checks, and each row exposes its sign, first/second moment, Fourier lower/upper, and return comparison premises. The extraction normalizes left-associated Boolean conjunctions explicitly.
+
+### Routing lane: authenticated small birth endpoint budgets (2026-11-08)
+Audited Numeric/FixedDefs and Numeric/Fixed outward arithmetic before adding Horner budget evaluation. PhysicalSmallBirth22BudgetDefs and BudgetCheck are pure checked-data modules; Budget proves Horner interval membership and Boolean-check-to-actual-birth-cone adapters. BudgetSmoke is GREEN for retained rational z=8607079764250578/10^16 and denominator 2^80: exact j0 initial envelope plus authenticated j1/j2 eleven-coordinate cones. All printed endpoints use only propext, Classical.choice, Quot.sound. No new numeric experiment or witness adjustment.
+Before whole-family birth assembly, audited PhysicalCoarseBirth22_parts and the existing PhysicalProfileRows22.turboExactBirthMass22_coarse_cone: they partition one actual measure into its zero atom and arbitrary-live remainder; the total bound is the actual q0 input moment. New PhysicalProfileBirthFamily22 only combines that audited constructor with checked first/Fourier family bounds and replaces j0/1/2 by supplied exact cones. Compilation pending dependencies.
+- `PhysicalProfileFamily22` now replays with exit 0 and standard axioms: cached first/second cap checks imply actual class maxima or class-2 uniform mean bounds; the integer return comparison implies min(M,sqrt(S F))/4194303 bounded by the supplied final return entry. Only ordinary left-associated Bool projection fixes were needed.
+
+### Next numerical transfer audit: finite scaled powers
+Read Numeric/FixedLog (Horner log-series, exact power-of-two reduction, positive endpoint checks) and Structured/DenseFourierExactCheck (exact Int cross-products mapped through positive denominators). Root clarified dense replay uses the finite 11-by-11 power M^8192, not a limiting spectral bound. Planned evaluator preserves that exact power via thirteen normalized squarings, keeping normalized interval matrices materialized and tracking rational scale logarithms separately. Normalization must support multiplication as well as division to prevent small positive powers underflowing the fixed denominator. No generator or numerical run started.
+- `PhysicalProfileFamilyFourier22` now exits 0 with standard axioms. Its cached signed coefficient sum equals the checked uncached evaluator and gives actual physical zeroHold upper/lower bounds. Thus every retained family Bool field now has a semantic adapter; parent Assembly and routing birth-family closure can consume these without numerical regeneration.
+
+### 2026-11-08 sparse fold checkpoint — SparseShellFold22 and dependents GREEN
+Audit before repair: the failing proofs only rearranged finite sums; no
+strategy change was needed. All failures were elaboration engineering:
+- Any term-mode unification against a membership in the concrete product
+  `range 65 ×ˢ range 65` makes the unifier evaluate `List.range 65` and hit
+  the default recursion limit (even `h x` for an identical type). The
+  two-coordinate layering is now proved over abstract `range n`
+  (`two_weighted_layers`) and instantiated at n=65.
+- Terminal-mass identities are proved once over abstract index sets
+  (`mass_sum`, `mass_smul`, `mass_weighted_eq`, `mass_weighted_eq₂`); no
+  `simp` with `Finset.sum_comm` runs over `Finset (Fin 64)` sums.
+- The per-shell choice uses explicit weight definitions and `calc`, not
+  `simp_rw` over `List.prod` matrix applications.
+- `SparseActualShell22`: `simp_rw [← mul_div_assoc]` had reassociated the
+  two-group weight (a/C₁)*(b/C₂); only the outer Chernoff division is
+  reassociated now.
+- `SparseMarkerFold22`: `rw [Finset.sum_mul_sum]` rewrote the wrong side
+  through the let-bound total; the reverse rewrite closes it.
+- `SparseQ1Choice22`: `?w #T` is not a higher-order pattern, so the choice
+  fold is instantiated explicitly.
+Complete-module exit 0 with only propext, Classical.choice, Quot.sound:
+`SparseShellFold22`, `SparseActualShell22`, `SparseMarkerFold22`,
+`SparseOccupation22`, `SparseQ1Choice22`. No resource limit was raised. No
+statement changed; shells 0..7 keep their trivial-branch charge
+rs8ExpectedPacketCount(v) = (Cv/choose(64,v))·choose(64,v).
+Still unchecked drafts: `SparseFixedDefs22`, `SparseFixed22`,
+`SparseSpectrumInteger22`, `MatrixScaledDefs22`, `MatrixScaled22`.
+
+### 2026-11-08 loop tick 1 — remaining sparse drafts GREEN; symbolic q1/q2 closed
+- `SparseSpectrumInteger22` GREEN (renamed `eq_div_iff₀` → `eq_div_iff`):
+  rs8ExpectedPacketCount v = coeff_v(integer polynomial)/(2^32-1)^8.
+- `SparseFixedDefs22` GREEN (core-only). `SparseFixed22` GREEN after adding
+  `Mathlib.Algebra.BigOperators.Field` and `open Matrix`: integer matrix
+  product upper check, positive Collatz check, and exact finite-power
+  Collatz total bound are sound.
+- Audit: the symbolic q2 assembly already exists in `SparseOccupation22`
+  (`sparseTwoShellBound22_le_common_marker`,
+  `turboSetup22_occupation_two_le_common_marker`), matching the diagnostic
+  (K18 tilt 1/625, K20 tilt 1/2500, marker t=24, Collatz on the 11x11
+  regional marker, power 64). The top-level identity
+  `turboSetup22_expected_bad_count_by_occupation` plus
+  `turboSetup22_bad_prob_le_mean` provide the occupation split.
+- Soundness lemmas still missing in `SparseFixed22` for checks already
+  defined in `SparseFixedDefs22`: polynomial product, region normalization,
+  q1 shell-step/initial, and the 512-bit lower power trace. These are the
+  next symbolic items, then the K18 numerical families.
+
+### 2026-11-08 loop tick 2 — SparseFixedSound22 GREEN
+Audit: same split as Numeric.Fixed / DenseFourierExactCheck (Mathlib-free
+integer checks, positive-denominator soundness). New `SparseFixedSound22`
+(exit 0, standard axioms) proves soundness of every remaining
+`SparseFixedDefs22` check:
+- `polyMul_sound`: degree-≤2 product check bounds Σ_{antidiagonal d}
+  F a * G b, the exact `orderedMatrixDP_add` convolution.
+- `normalize_sound`: `sparseRegionDenominator22 R d = choose(R*16,d)`
+  (d ≤ 2, R > 0), so the check bounds `(1/choose) • X d`, i.e. the shape of
+  `sparseRegionalDP22`.
+- `q1Rows_sound`/`q1Rows_terminal`: right-append recurrence
+  DP(n+1,v+1) = DP(n,v+1)W₀ + DP(n,v)W₁ derived from `orderedMatrixDP_add`
+  (no step reordering); bounds Σ_j orderedMatrixCoefficient … N v 0 j by the
+  materialized rows for all v < 65.
+- `powerCertificate_sound`: a passing trace gives
+  0 < last/scale ≤ (base/scale)^exponent (lower bound for z^d).
+Next symbolic item: a binary-powering chain theorem that composes
+`polyMul_sound` stages (materialized per stage, one-stage check plus
+induction, not a recursive kernel reduction) into a bound on
+orderedMatrixDP(Fin.val, C(16,j)•B j, R, d) for d ≤ 2, then
+`normalize_sound` into `sparseRegionalDP22` entry bounds. Then the K18
+numerical producer review/run.
+
+### 2026-11-08 loop tick 3 — regional power chain GREEN; K18 families generated
+- New core-only `SparseRegionalPowerDefs22` (GREEN) and
+  `SparseRegionalPower22` (GREEN, standard axioms). MSB-first trace with an
+  implicit leading one; each step stores its squared stage and, when the
+  bit is set, the stage times the base. One `polyMul` check per stored
+  stage; `chain_sound` is an induction over the trace (never a kernel
+  reduction of a recursive power). `certificate_sound` adds the exact
+  exponent check foldl = R and `normalize_sound`, giving entry bounds on
+  `sparseRegionalDP22 B R d` for d ≤ 2. `base_of_rows` reduces the base
+  stage to bounds on choose(16,d)·B_d.
+- Reviewed `emit_turbo_profile_k18_families22.py`: untrusted producer,
+  fail-closed precision gates (relative endpoint rounding < 2^-48), exact
+  0/1 boundaries, class-2 uniform mean. Ran it once (single process):
+  all three tilts (λ = 1/1250, 3/2500, 1/625; z = round(exp(-λ)·2^80)/2^80)
+  pass every gate. z numerators: 1207959065712058707140553,
+  1207475978709615532308063, 1206993084903331526962826.
+- Generated per-tilt Lean modules by namespace/module substitution from the
+  verified Smoke chain (Data, Check, BudgetCheck, BudgetSmoke,
+  BirthFamily, Family). Kernel checks queued serially; results pending.
+- RESULT: all 18 per-tilt modules exit 0 (each ≤ 45 s). For k = 1,2,3,
+  `Spin.Turbo.ProfileFamilyK18Tilt{k}22.physicalRows_sound`,
+  `selectedRows_sound`, both nonneg theorems, and `birthSmokeFamily22_sound`
+  use only propext/Classical.choice/Quot.sound; `familyChecked` uses only
+  propext. The three retained K18 local families are authenticated.
+- Next: integer adapters for the rows actually used by the sparse kernel.
+  Only physical rows j = 0,1,2 enter the occupancy-≤2 regional coefficient,
+  so `base_of_rows` needs integer upper bounds on choose(16,d)·physicalRows d
+  for d ≤ 2 (from the family data and birth cones), then a producer for the
+  regional trace, q1 rows (65 shells × 64 regions), q2 marker Collatz data,
+  and the power-trace endpoints; each certificate gets its own Data/Check
+  module and the semantic composition uses SparseRegionalPower22,
+  SparseFixedSound22, SparseFixed22, SparseQ1Choice22, SparseOccupation22.
+
+### 2026-11-08 loop tick 4 — row adapter GREEN; Array checks infeasible, switch to Lists
+- `SparseRowBaseDefs22` / `SparseRowBase22` GREEN: physical rows j ≤ 2 are
+  exact integers over endpointDen (row 0 = exact small-birth list; rows
+  i ≥ 1 carry return cap at k = 0 and first cap at k = 2), and
+  `base_check_sound` gives choose(16,d)·B_d ≤ base/(den·mult).
+- Diagnostic audit (q1_coarse_complete65): K18 L = 2048 groups (R = 128),
+  d = 52428; three tilts reproduce the five-tilt q1 (58.2456 bits); chosen
+  per shell: trivial 0..7, tilt1 8..13, tilt2 14, tilt3 ≥ 15. The whole
+  K18 bound has slack factor only 1.000576 against 2^-58.24, so q1 must
+  match the replay closely; shells ≥ 19 contribute < 1e-10 of q1.
+- Precision: q1/regional scale 2^256 suffices (tilt3 amplification
+  λd ≈ 121 bits; error budget ≪ 2^-71). Base mult = 2^176.
+- Kernel feasibility probe (single job): one 65-shell q1 step with the
+  flat-`Array` checker exhausts kernel memory (both `#[..]` and `Array.mk`
+  literals) — indexed access is not "direct" in the kernel. The same step
+  with list traversal (rows as List (List Int), vector×matrix by zipping
+  rows, lockstep (next, prev, shifted prev)) passes in ≈ 12 s. Audit: the
+  previously verified familyChecked data also used Lists.
+  Decision: all large-data checks are re-expressed over Lists
+  (new SparseListDefs22 / SparseListSound22). The Array checks stay sound
+  but are not used for endpoint data.
+- GREEN (standard axioms): `SparseListDefs22` (core-only),
+  `SparseListSound22` (vecMat/matMul/matAdd specs, list polyMul and
+  normalization soundness), `SparseListQ1Regional22`
+  (`certificate_sound`: base check from exact row integers + regional
+  chain + normalization ⇒ bounds on `sparseRegionalDP22 B R d`, d ≤ 2;
+  `q1Rows_sound`: list q1 rows bound orderedMatrixDP for all 65 shells).
+- Next tick: K18 certificate producer (per tilt: base at scale 2^256 with
+  mult 2^176, MSB-first trace for R = 128, normalized result, 64 q1 row
+  stages; one Data module and one or more `decide +kernel` Check modules
+  per tilt, splitting q1 steps across theorems), then the q1 assembly
+  theorem: occupation-1 ≤ 2048·Σ_v [trivial: rs8 count | Chernoff:
+  (count/choose)/z^d·rows], with z^d lower bounds from the power trace
+  and rs8 counts from `SparseSpectrumInteger22`. q2: list Collatz check
+  on the regional marker matrix (t = 24, tilt 3).
+
+### 2026-11-08 audit (user request): how the old proof handled kernel memory
+Read `scripts/README.md`, `emit_scalable_dense_packed_cover.py`,
+`emit_scalable_dense_packed_chunk.py`, `ScalableDensePackedLeaf.lean`.
+The old Scalable dense cover is a hybrid: an untrusted Python candidate
+(JSON, ~22 MB) is partitioned by an untrusted emitter into many small
+generated Lean modules (611 parts, 39 segments, 46,317 leaves). Each part
+proves one small `decide +kernel` theorem per item (`leaf{i}_checked`,
+`witness{i}_checked`), closes the part's `List.all` by
+`simp [refs, List.all, leaf_names]` from those per-item theorems (the kernel
+never evaluates one giant Bool), and exposes a sound claim. Segment and
+assembly modules combine parts with exact split lemmas. Sources/objects
+live in ignored `.lake/fullcover/sources` with a manifest; a sequential,
+resumable PowerShell driver compiles one module at a time. No Nat-packing
+trick: the memory fix is bounded per-decision size plus modular assembly.
+Reused for Turbo: untrusted producer → ignored generated sources + manifest
+→ per-item small kernel decisions (one per regional stage, one per q1 row
+step, one per power trace) → exact assembly theorem (`hstep` by
+`interval_cases` from per-step theorems) → sequential resumable builder.
+Different: our items are integer matrix/vector inequalities checked by
+list traversal (tick-4 probe), not rational interval leaves.
+
+### 2026-11-08 loop tick 5 — K18 certificate producer; generated modules building
+- `scripts/emit_turbo_k18_sparse_cert22.py` (untrusted) emits, per tilt,
+  ignored generated modules under `SpinCodes/Turbo/Generated/K18/`
+  (local `.gitignore`): `Tilt{k}Regional` (row function from the authenticated
+  family data, base, 7 squaring stages for R = 128, normalized result,
+  z^d power trace; theorems `regionalChecked`, `powerChecked`),
+  `Tilt{k}Rows{c}` (q1 rows, 8 stages per module), `Tilt{k}Steps{c}`
+  (one `decide +kernel` theorem per q1 step). Sequential resumable builder
+  `.lake/turbo/build_k18_cert.ps1`. Manifest in the same directory.
+- The producer asserts the integer RS8 counts equal the receipt's exact
+  expected shells for all 65 v.
+- Precision correction: scale 2^256 was insufficient — absolute row
+  rounding, amplified by 1/z^d ≈ 2^121 and counts up to C_64 ≈ 5·10^36,
+  inflated shells ≥ 22 (shell 64 contributed ≈ 2). Error ≈ 2^(264-S); now
+  S = 2^384 (mult 2^304). Producer's exact rational q1 = 2^-58.24563386865,
+  matching the diagnostic (58.245633868649) to 13 digits; all chosen shells
+  8..21 match the diagnostic per shell.
+- Tilt 1: `regionalChecked` (propext only, ~8 min kernel) and `powerChecked`
+  (no axioms) GREEN; first step module (8 steps) checked in 10 s. Full
+  three-tilt build running in background.
+- Next: Mathlib assembly per tilt (`rows` by match, `hstep` by
+  `interval_cases` from step theorems, `certificate_sound` with
+  `profileFamilyRows22_small_eq`, `q1Rows_sound`, `powerCertificate_sound`),
+  then the q1 sum theorem with exact rational comparison.
+- RESULT: all 54 generated certificate modules exit 0
+  (`regionalChecked` propext only; `powerChecked` no axioms; 192 q1 step
+  theorems). `scripts/emit_turbo_k18_q1_assembly22.py` emits
+  `Generated/K18/Tilt{k}Q1.lean` (k = 1,2,3), all exit 0 with standard
+  axioms (~2 min each): `rows` by match, `hstep` by `interval_cases`,
+  `regional` (certificate_sound + exact row integers), `q1`, and
+  `shell_le v`: Σ_j orderedMatrixCoefficient … (sparseOneRegionChoice22
+  physicalRows 128) 64 v 0 j ≤ (Σ_j rows64[v][j])/s for all v < 65, plus
+  `zpow_lower`: 0 < last/s ≤ z^52428 with the family's exact rational z.
+- Next: K18 q1 endpoint theorem. Instantiate
+  `turboSetup22_occupation_one_le_chosen_shells` (R = 128, d = 52428) with
+  z v / B v from the chosen tilt (trivial 0..7, tilt1 8..13, tilt2 14,
+  tilt3 ≥ 15), bound each Chernoff shell by
+  count_v/choose(64,v) · (s/last_k) · (Σ rows64[v])/s, counts from
+  `sparseRS8ExpectedPacketCount22_eq_integer_coeff`, then one exact
+  rational comparison against the producer's q1 value.
+
+### 2026-11-08 loop tick 7 — exact RS8 counts GREEN
+- `SparseRS8Counts22` (standard axioms): computable list mirror of integer
+  polynomial arithmetic (`lAdd`, `lMul`, `lPow`) with a proved
+  homomorphism `toPoly`; `countList_eq : toPoly countList =
+  sparseRS8IntegerPolynomial22`; one kernel decision fixes the 65
+  coefficients (`countList_lit`); `count_eq`: rs8ExpectedPacketCount
+  points v = countLit[v] / (2^32-1)^8 for injective points.
+- Next: `Generated/K18/Q1Endpoint.lean`: instantiate
+  `turboSetup22_occupation_one_le_chosen_shells` (R = 128, d = 52428, z and
+  B by the chosen tilt, useChernoff v := 8 ≤ v), bound each shell termwise
+  with `shell_le`, `zpow_lower`, `count_eq`, and close with integer per-shell
+  upper numerators a_v over 2^K (producer-supplied, kernel-checked by
+  cross-multiplication) and one integer comparison of 2048·Σ a_v.
+- **K18 q1 ENDPOINT CLOSED.** `Generated/K18/Q1Endpoint.lean` (template
+  `scripts/templates/k18_q1_endpoint.lean.tmpl`, emitter
+  `scripts/emit_turbo_k18_q1_endpoint22.py`): `Spin.Turbo.K18Q1.q1_le`:
+  for every injective `points`, the actual sampled-setup occupation-1
+  expectation (R = 128, d = 52428) ≤ 2048 · aSum / 2^256 = 2^-58.24563386865;
+  axioms propext, Classical.choice, Quot.sound. Per-shell integer checks
+  (one `decide +kernel` per tilt), binomials via factorials (kernel
+  `Nat.choose` recursion is exponential), counts via `SparseRS8Counts22`.
+- **K18 q2 ENDPOINT CLOSED.** `Generated/K18/Q2Endpoint.lean` (template
+  `scripts/templates/k18_q2_endpoint.lean.tmpl`, emitter
+  `scripts/emit_turbo_k18_q2_endpoint22.py`): `Spin.Turbo.K18Q2.q2_le`:
+  occupation-2 expectation ≤ b2/2^256 = 2^-104.18 (diagnostic 105.37; the
+  difference is Collatz rounding). Marker t = 24 on the authenticated tilt-3
+  regional kernels; Mint dominance, Collatz vector, exact outer weight sum
+  W = Wn/(M8·64!·24^64), z^d lower trace, one final integer check. Axioms
+  standard. (`positivity` hit recursion limits on 64th powers; explicit
+  terms used.)
+- K18 budget now: target 2^-58.24; q1 = 2^-58.24563, q2 = 2^-104.18 ⇒
+  the q ≥ 3 tail must be ≤ ≈ 2^-66.25 (diagnostic tail 2^-66.474).
+  Next: audit the tail replay and the old proof before building it.
+
+### 2026-11-08 K18 q ≥ 3 tail — audit and design
+Audited: `scripts/replay_turbo_coarse_k18.py`, `workstreams/k18_margin60/
+replay_fractional.py`, Lean `RoutingFractionalTail22`/`Endpoint22` (GREEN,
+untracked), `MatrixMarker22.pairedRegionDP22_marker_pow64_le` (GREEN).
+- Symbolic interface exists: `turboActiveBadCount22_prob_union_le_paired_dp`
+  (setup R = 2n; K18 n = 64) bounds P(∃ q ∈ qs, active set of size q bad) by
+  Σ_q C(32n,q)·(β^q / z_q^d)^{α_q}·Σ_k (pairedRegionDP22 B_q α_q n q ^ 64)_0k,
+  β = 2^256/65535^8, rows B_q sound for the *selected* kernel (family
+  `selectedRows_sound`), and `turboOccupationTail22_prob_le_active_union`
+  covers the actual-message tail with qs = Ico 3 (32n+1).
+- Replay witnesses: q = 3..384 exact regional (13 families; α = 4/5 at
+  tilt 17/200 for q = 62..143), q ≥ 385 "iid conditioning" with marker
+  probability p and M^8192 — this dense formula has NO Lean theorem yet.
+  Tightest per-q margins: 67.40 (q 144..157), 67.75 (52..61), 70.71 (35..51).
+  Tail budget: ≤ ≈ 2^-66.25 against replay 2^-66.474.
+- Design (to keep the kernel work bounded and avoid new theory where the
+  margin allows):
+  (a) q ≥ 225 (and the dense range): use the existing union theorem with
+      the GREEN marker bound `pairedRegionDP22_marker_pow64_le` plus a
+      Collatz/scaled power for M^(64n); margins there are ≥ 470 bits, so
+      the per-region Chernoff loss is affordable. Must be confirmed
+      numerically before building (one bounded diagnostic run).
+  (b) q = 3..224: exact coefficient q of the paired profile polynomial
+      power per family (degree ≤ family q_max), binary powering with
+      materialized stages and per-stage binary exponents (entries
+      underflow any absolute grid), then the 64-region matrix power with
+      exponent scaling, and the scalar prefactor via exact integer checks
+      (α = 4/5 handled by fifth-power checks y^5 ≥ x^4).
+  (c) z^d for high tilts: exponent-scaled power trace (mantissa, exponent),
+      not the absolute 2^384 grid.
+  Families needed: selected-row local families at each retained tilt
+  (producer gates may fail at high tilts; examine before running).
+- Numerical check (single bounded run; per-q optimum over 16 tilts × 999
+  values of p, t = p/(1-p)): the replay's dense "iid conditioning" formula
+  equals the marker bound `pairedRegionDP22_marker_pow64_le` with
+  t = p/(1-p) (verified to 2^-996.6289 at q = 385). So the dense range needs
+  NO new theory. Marker loses ≈ 500–700 bits vs exact coefficients for
+  q ≤ 384 (≈ 9 bits/region × 64), but still gives ≥ 340 bits at q = 280..384
+  and ≥ replay for q ≥ 385 (q → 2048 needs t → ∞; use very large t).
+  Decision: exact coefficient families for q = 3..279 (11 tilts: 3/1000,
+  3/500, 3/250, 3/125, 1/25, 11/200, 17/200 (α = 4/5, q 62..143), 7/50,
+  4/25, 1/5, 6/25); marker + scaled power for q = 280..2048.
+- Low-tilt substitution rejected (bounded replay): tilt 3/125 is negative
+  from q ≈ 39 (−1677 bits at q = 63); 3/250 negative from q ≈ 27. The tail
+  needs the high tilts.
+- Precision finding: the family checker evaluates in `Spin.Numeric.Fix`
+  (absolute scale 10^30 ≈ 2^-100). High-tilt row quantities reach 2^-207
+  (z^128 at tilt 1), so producer gates fail from tilt 1/25 upward with the
+  2^-80 grid, and an absolute 2^-100 rounding would inflate them by up to
+  2^100 — unaffordable for the dominant tail families (tilts 11/200, 7/50).
+  The dependency `Numeric.FixedDefs` is shared with the Scalable proof and
+  must not change. Decision: port.
+- `scripts/port_fix_hi22.py` copies `Numeric.FixedDefs`/`Fixed` to
+  `SpinCodes/Turbo/Hi/` (namespace `Spin.NumericHi`, prec 120, scale 10^120;
+  `Fixed.lean` is generic in `scale`, log soundness lives elsewhere) and the
+  21-module family chain to `SpinCodes/Turbo/Hi/` (namespace
+  `Spin.Turbo.Hi`; enclosing-namespace resolution keeps base references).
+  Build order `.lake/turbo/build_hi.ps1`; build running.
+- `scripts/emit_turbo_tail_families22.py`: 11 tail tilts (3/1000 … 6/25),
+  endpoint grid 2^-384 (same ≈ 2^14 ratio over Fix rounding as before),
+  all precision gates pass; six per-tilt modules each in ignored
+  `SpinCodes/Turbo/Generated/K18Tail/` (from the verified Smoke chain).
+- Also GREEN this tick: `SparseListSquare22` (scaled squaring chain with
+  integer exponent per stage, `chain_sound`).
+- Subagent result GREEN: `SparseRpowCert22` (core list check
+  `sparseRpow45CheckL22 sx sy X Y`: Y ≥ 0 and X^4·sy^5 ≤ Y^5·sx^4 entrywise;
+  `sparseRpow45CheckL22_sound`, `..._entrywiseRpow`, `rpow45_scalar_le`,
+  `rpow45_mono`, `rpow45_le_of_pow`; standard axioms). Apply with
+  M := B_a * B_b, then scale by C(16,a)·C(16,b) for `pairedProfileMatrix22`.
+- GREEN: high-precision port, all 23 `SpinCodes/Turbo/Hi/*` modules (no
+  errors, no sorryAx). `Hi/RowSelected22` (`rows_eq`: every physical row
+  entry, incl. coarse rows j ≥ 3, = integer/den; `selected_eq`: selected row
+  d = rowSel/(16^16·den) with a Pascal table pinned by one kernel decision).
+- Subagent result GREEN: `SparseScaledPower22` (`scaledPower_sound`:
+  m·2^(-E) ≤ (zNum/2^zBits)^d with ~600-bit mantissas; kernel examples incl.
+  λ ≈ 1, d = 209715 in 18 steps).
+- GREEN: `PairedSquare22.pairedRegionDP22_one_eq`: pairedRegionDP22 B 1 n q =
+  (1/C(32n,q)) • regionalCountDP22 B (2n) q (α = 1 paired polynomial is the
+  square of the single-step polynomial). Tail-family modules (66) building:
+  `.lake/turbo/build_k18_tail_families.ps1`.
+- Subagent result GREEN: `SparseListPolyD22` (degree-D list polynomial
+  product, `polyMulD_sound`, `PolyBoundD`, `chainD_sound`, `baseD_sound`).
+- `TailTerm22.tail_term_le` (hand-written generic per-q bound, α = 1):
+  chain bound → `pairedRegionDP22_one_eq` → U0 domination → 6 scaled
+  squarings → scaled z^d → one integer check (all powers of two folded into
+  T = 256q + Ez + E + Kt − S). Compile queued.
+- Exact tail producer `scripts/emit_turbo_k18_tail_exact22.py` (S = 704,
+  Kt = 256, flint products) and semantic emitter
+  `scripts/emit_turbo_k18_tail_term22.py`. Families 1..6 (q 3..61) generated
+  (42 MB); every reported q matches the replay to 3 decimals (e.g. q 52:
+  67.755, q 51: 70.713; values printed as 256.000 are the 2^-256 floor).
+  Builder `.lake/turbo/build_k18_tail_exact.ps1` running; family 8
+  (7/50, q 144..157) generating; families 9..11 next. Subagents: α = 4/5
+  paired chain/term (family 7, q 62..143) and marker-range term (q ≥ 280).
+- Families 8, 9 match the replay (q 144: 67.397; q 158: 90.482). Family 10
+  (q ≥ ~210) and 11 collapsed (q 225: −3136 bits): U0 = ceil(last_q/C(2048,q))
+  on the absolute 2^-704 grid rounds tiny normalized coefficients up to 1.
+  Fix: domination with its own binary shift, 2^down0·last_q ≤ C·2^up0·U0,
+  chain starting at E0 = up0 − down0 (`TailTerm22` patched; producer picks
+  the shift so max U0 ≈ 2^(S+8); stage cache `.lake/turbo/tail_stages_k.json`).
+  All α = 1 families regenerating; exact builder restarted afterwards.
+- Subagent result GREEN: `TailMarker22.tail_marker_le` (q ≥ 280 marker term,
+  α = 1; marker identity A_t·A_t, 13 scaled squarings, t = (tn0·2^kp)/(td0·2^kn)
+  with tn0, td0 ≤ 2^12; final check stress-tested at q = 2048 (~1.6·10^6-bit
+  integers)). Tilt set for q ≥ 280 being chosen by a bounded numerical run
+  (`.lake/turbo/marker_cover.json`).
+- Marker range tilt set (bounded run): segments 6/25 (q 280–281, family 11,
+  81/76 bits), 8/25 (282–344), 2/5 (345–427), 12/25 (428–546), 16/25
+  (547–769), 1 (770–1499), 7/4 (1500–2048, ≥ 8584 bits even at q = 2048;
+  the replay used 3/2 and 11/5 there, but z^128 at 11/5 ≈ 2^-406 is below
+  the 10^-120 Fix). New Hi families 12–17 generated (7/4 trips only the
+  diagnostic gate; marker-only, huge margin) and building.
+- `scripts/emit_turbo_k18_tail_marker22.py`: shared (family, t) chains on
+  the grid t = 2^(j/8) (base check + 13-stage chain once per t), per-q final
+  checks via `tail_marker_le`; modules Tail{k}MkRows / Mk{tag} / MkTerm.
+- Subagent result GREEN: `PairedFracChain22` (generic step-family chain
+  `chainW_sound`, rpow pair check `pairedRpowCheckL22`, base check,
+  `pairedChain_sound`) and `TailTermFrac22.tail_term_frac_le` (α = 4/5 per-q
+  bound; prefactor via 65535^(8q) and z^d scaled traces with G/yn split).
+  Note: its domination step has no binary shift; the family-7 producer
+  (`scripts/emit_turbo_k18_tail_frac22.py`, running) reports per q whether
+  that underflows (q ≤ 143 expected fine).
+- Marker producer fixed (2^(1/64) grid for families 11–15, wide t scan for
+  family 17, exact per-q choice): all q = 280..2048 at the 2^-256 floor.
+- Producer-side K18 total from manifests: q1 2^-58.245634, q2 2^-104.180,
+  tail (2046 occupations) 2^-66.4739, TOTAL 2^-58.240831 (< 2^-58.24;
+  replay 58.2408311085). Lean confirmation pending builds + final assembly.
+- Final K18 assembly design: `BadSplit22.turboSetup22_bad_prob_split`
+  (written, compile queued): P(Z ≥ 1) ≤ E[ZQ_1] + E[ZQ_2] + P(∃ msg with
+  occupation in Ico 3 (16R+1) bad). Then q1_le, q2_le, and for the tail
+  `turboOccupationTail22_prob_le_active_union` +
+  `turboActiveBadCount22_prob_union_le_paired_dp` (n = 64, qs = Ico 3 2049,
+  piecewise z/α/B by family) closed termwise by famTerm/frTerm/mkTerm, and
+  one integer check N^25·2^1456 ≤ 2^6400 for 2^-58.24.
+- Builders: tail families (`build_k18_tail_families.ps1` ×2), exact
+  families (`build_k18_tail_exact.ps1`), family 7 (`build_list.ps1`), marker
+  families 11–17 (detached `build_list.ps1`, logs `.lake/turbo/mk*_build.log`).
+- 2026-11-09: exact builder bug (PowerShell function output swallowed the
+  status, so failures did not stop it) fixed with a script-scoped flag.
+  `TailTerm22` had failed (ambiguous `zpow_neg` vs `Matrix.zpow_neg`,
+  `positivity` recursion on z^52428, fragile exponent identity): fixed,
+  recompiling. Throughput: memory pressure (12.8 GB committed vs ~4 GB
+  resident) made `Tail1ExChain` take ~9 h. Generated chain/marker modules
+  patched in place to use a literal row table `rowL`/`rowT` (one kernel
+  equality `rowT_eq` per family) instead of evaluating the Finset-based
+  `rowSel` inside every base check. TODO: fold the rowL patch into
+  `emit_turbo_k18_tail_exact22.py` / `emit_turbo_k18_tail_marker22.py`
+  emitters before any regeneration.
+- GREEN: `TailTerm22.tail_term_le` and `BadSplit22.turboSetup22_bad_prob_split`
+  (standard axioms). Exact builder relaunched (now fails fast).
+- MILESTONE: `Tail1ExTerm.famTerm` GREEN (standard axioms) — first tail family
+  closed end to end (authenticated high-precision family → selected rows →
+  rowT base → degree-D chain → paired coefficient → region power → z^d →
+  integer check). Generated-file tactic fix: hrow uses `unfold row; norm_num`.
+  Exact builder relaunched for families 2–6, 8–11.
+- 2026-11-09 Peach backend (user-approved): elan + Lean 4.34.0 on
+  peach48 (16 cores, 124 GB), Mathlib/packages via `lake exe cache get` at
+  the pinned manifest, dependency + worktree oleans uploaded (oleans are
+  platform-independent for one Lean version), Windows symlinks in the build
+  tree repointed (`fixlinks.sh`). Driver `~/turbo/pbuild.py` builds
+  dependency-ordered, 6 parallel jobs, per-module logs in `~/turbo/logs`.
+  Local builders stopped.
+- Scoped exception (audited): pure data modules (ExBase/ExSq*/ExQData,
+  FrR/FrY*/FrBase/FrSq*/FrQData) carry `set_option maxRecDepth 10000`
+  because elaborating nested list literals of degree up to 280 exceeds the
+  default depth; no proof search runs in these modules (same precedent as
+  the audited BudgetCheck modules). MkTerm statements now cast numerators
+  as ((N : ℤ) : ℝ) to match `tail_marker_le`.
+- Peach pass findings (fixed in generated files; TODO fold into emitters):
+  (1) large single list literals exceed recursion depth even at 10000 —
+  data defs split into one def per matrix (`name_partI`) plus the list of
+  names (kernel reduction unchanged); (2) the 730-case `interval_cases` in
+  `mkTerm` exceeds recursion depth — chunked aggregators `mkTermC*`
+  (≤ 100 q each) combined by `by_cases`/`omega`.
+- 2026-11-09 K18 assembly checkpoint:
+  * Earlier Peach failures on `Tail*Sq*` were a race with the patch upload
+    (the pass read pre-split sources); rebuilt cleanly, no limit changes.
+  * Marker aggregators `mkTerm` failed on late cases: `aMk` was a 730-arm
+    literal `match`, so `exact mterm_q` unfolded deep `Nat.decEq` chains.
+    All marker bounds are exactly 1, so `aMk` is now the constant 1
+    (emitter `emit_turbo_k18_tail_marker22.py` emits the constant whenever
+    every bound is 1).
+  * `SpinCodes/Turbo/EndpointBits22.lean` GREEN (standard axioms):
+    `int_div_two_pow_le_two_rpow_neg`: T ≥ 0, T^n·2^m ≤ 2^(s·n) ⇒
+    T/2^s ≤ 2^(-(m/n)). K18 uses s=256, m/n=1456/25=58.24; K20 will use
+    2591/50=51.82.
+  * `scripts/emit_turbo_k18_endpoint22.py` → `Generated/K18/Endpoint.lean`:
+    piecewise zq/αq/Bq/A over 18 pieces (17 families, family 11 split
+    Ex 225–279 / Mk 280–281), selector lemmas by `simp only` on breakpoint
+    facts, one dispatcher `piece_cases`, tail union with n=64, and a single
+    kernel check `(2048·aSum + b2 + Σ_{q∈[3,2048]} A q)^25·2^1456 ≤ 2^6400`.
+    Final statement: `K18Final.k18_endpoint`: for injective points,
+    P[(turboSetup22 128 points) has a nonzero message of weight ≤ 52428]
+    ≤ 2^(-58.24). Pending: build after all term modules are green.
+  * GREEN on Peach (standard axioms): `Tail{11..17}MkTerm.mkTerm` (all
+    marker families, q = 280..2048) after the constant-`aMk` fix; also
+    `Tail1ExTerm`. Remaining: ExChain/ExTerm families 2–6, 8–11 and
+    Tail7FrTerm, then `Generated/K18/Endpoint.lean`.
+- 2026-11-09 STRATEGY CHANGE (tail squaring chains → packed Kronecker checks).
+  Audit: the interpreted degree-D check `sparseRegionalPowerCheckDL22`
+  costs ~2 s kernel time per 11×11 matrix product and needs
+  (D+1)(D+2)/2 products per squaring. Family 1 (D=5) passed in 301 s; family 2
+  (D=10) hit kernel "excessive memory consumption" after 70 min; families up
+  to D=279 (and fractional family 7, D=143) were infeasible. The old
+  Structured proof never needed high-degree polynomial products, so there is
+  no old component to reuse; what IS reused from the old proof is its pattern
+  of small core-only kernel-check modules with Mathlib-level soundness proved
+  once.
+  New: `SparseListPackedDefs22` (core-only) + `SparseListPacked22` (GREEN,
+  standard axioms). Each entry (i,k) of a degree-D polynomial matrix is
+  packed as Σ_t P_t[i][k]·2^(w t). With all entries in [0,2^v) and
+  11(2D+1)4^v < 2^w, the base-2^w digits of Σ_k pack(A_ik)·pack(B_kj) are
+  exactly the convolution coefficients (no carries; proof via ℕ[X] evaluation
+  at 2^w and digit extraction). The product is truncated mod 2^(w(D+1)) and its
+  digits are walked against s·u_d. Soundness `chainPk_sound` yields the same
+  `PolyBoundD` interface, so term modules change only in the chain call.
+  Fractional family: `PairedFracPacked22` (`pairedChainPk_sound`) and
+  `TailTermFracPk22` (`tail_term_frac_pk_le`), mechanical copies of the green
+  proofs with the check swapped (GREEN locally).
+  Kernel memory: Lean's `-M` counts the ~8 GB Mathlib import, so step modules
+  import only the core defs; each squaring step is one module with a header
+  declaration plus 11 per-row declarations. Measured: D=279 step ≈ 83 s,
+  peak 8.9 GB; D=10 step ≈ 6 s. Limits unchanged (`-M 14000`).
+  Generator: `scripts/emit_turbo_k18_tail_packed22.py` (v,w per family in
+  `packed_manifest.json`).
+- 2026-11-09 K18 ENDPOINT GREEN on Peach: `K18Final.k18_endpoint`
+  (P[bad] ≤ 2^-58.24, standard axioms). Further fixes on the way:
+  * One process accumulates kernel memory across declarations, so the
+    packed steps are split into per-row modules (11 per-entry declarations
+    each); family-7 `rpowChecked`/`baseChecked` split into 17 + 12 modules
+    with generic assembly lemmas `rpowCheck_of`, `baseGo_append`
+    (`PairedFracPacked22`, GREEN).
+  * Endpoint selectors: `simp only`/`split_ifs`+`rfl` timed out (rfl unfolds
+    real-valued z); replaced by deterministic `unfold; rw [if_neg …, if_pos …]`.
+  * Closure audit: 1450 modules, sources identical to the local worktree
+    modulo CRLF; oleans being pulled back for a local `#print axioms` audit.
+  Next: K20 (R=512, cutoff 209715, 51.82 = 2591/50 bits) — producers for
+  q1/q2/tail at K20 tilts, then the same packed/marker pipeline.
+- 2026-11-09 K20 scoping (from `.lake/turbo/k20_coarse_full_diagnostic.json`,
+  `k20_coarse_extended_diagnostic.json`, `q2_common_marker_k20_full_recombination.json`).
+  Budget: rare ≈ 2^-51.9 (dominant), q1 2^-56.257, q2 2^-102.68, tail
+  2^-100.594, whole 2^-51.82247 — only 0.0025 bits above 51.82, so every
+  component must be certified close to its diagnostic value.
+  Lean shape: `turboSetup22_bad_prob_le_rare_truncated` (rare charged once,
+  GREEN) + truncated count ≤ q1 + q2 (full unconditional, as in K18) +
+  q≥3 tail; R = 512 (n = 256 pairs), 8192 groups, cutoff 209715.
+  New infrastructure required beyond K18:
+  1. Exact rare budget `(R·16)·Σ_{v=5..8} rs8ExpectedPacketCount points v`
+     as a checked rational (C_v closed form) — audit existing
+     `rs8ExpectedPacketCount` lemmas first.
+  2. Fractional exponents α ∈ {3/5, 7/10} (K18 had only 4/5): generalize
+     `sparseRpow45CheckL22`/`PairedFracChain22`/`TailTermFrac22` to α = a/b.
+  3. Exact family q∈[248,615] at α = 7/10, D = 615 (packed check; cost
+     estimate ~5× the D=279 steps).
+  4. q ≥ 616: `iid_fractional_conditioning` markers (fractional α with
+     marker probability) — K18's `TailMarker22` covers α = 1 only; needs a
+     fractional marker term theorem.
+  5. Check whether K20 tail rows rely on the heavy (weight ≥ 9) truncation
+     (`turboSparseHeavyMessage22`); if so, the tail union must run on the
+     truncated count, not on `turboOccupationTail22_prob_le_active_union`.
+  Generators to parameterize by geometry: emit_turbo_k18_{q1,q2}_endpoint22,
+  emit_turbo_tail_families22, emit_turbo_k18_tail_{exact,frac,marker,term,
+  packed}22, emit_turbo_k18_endpoint22.
+- 2026-11-09 K18 CLOSED: local audit (`K18Audit.lean`) of the pulled oleans
+  prints standard axioms only for `K18Final.k18_endpoint`.
+- 2026-11-09 K20 DESIGN DECISION (audit): the K20 tail replay
+  (`scripts/replay_turbo_coarse_k20.py`, q=3..615) and its extension
+  (q=616..8192, `k20_small_outer_screen/METHODS.md` "dense components")
+  use the same untruncated `CoarsePhysical` per-step model and the
+  routing-conditioned fractional first moment, exactly as K18. K18's Lean
+  tail families are sound for every message with no heavy (weight ≥ 9)
+  hypothesis, and K18 closed without a rare charge. So the K20 Lean endpoint
+  uses BadSplit22 (q1 + q2 + tail) WITHOUT the rare budget: strictly sound
+  (fewer terms) and it raises the K20 slack from 0.0025 bits to ≈ 4.4 bits
+  (q1 ≈ 2^-56.257 dominates; q2 2^-102.7, tail 2^-100.6). The rare-event
+  modules (`SparseRare22`, `SparseTruncated22`) remain green but unused.
+  Still required: general fractional exponent α = a/b (3/5, 7/10, 4/5) in
+  the rpow certificate, paired chain and tail-term theorem; a fractional
+  marker theorem for q ≥ 616 (K18's `TailMarker22` is α = 1); K20 q1 (4
+  tilts) and q2 (marker 24, tilt 1/2500) producers; geometry R = 512
+  (n = 256 two-step macros per region, 64 regions), 8192 groups,
+  cutoff 209715, target 2591/50 bits.
+- 2026-11-09 K20 infrastructure, GREEN locally (standard axioms):
+  * `SparseRpowABDefs22` (core) / `SparseRpowABCert22`: entrywise
+    x^(a/b) certificates `X^a·sy^b ≤ Y^b·sx^a`, any b ≠ 0.
+  * `PairedFracABDefs22` (core; per-row `pairedRpowABRowL22` +
+    `pairedRpowABCheck_of` for per-process splitting) / `PairedFracABChain22`:
+    `pairedChainABPk_sound` (paired fractional DP at α = a/b, packed chain).
+  * `TailTermFracAB22`: `tail_term_fracAB_le` — one exact tail term at any
+    α = a/b and geometry (n pairs/region, 64 regions, C(32n, q), cutoff d,
+    z = zNum/2^zb); α = 1 is a/b = 1/1, so all K20 exact families
+    (q = 3..615, α ∈ {1, 3/5, 4/5, 7/10}) use this one theorem.
+  Remaining for the K20 tail: fractional marker term (q ≥ 616): generalize
+  `TailMarker22.tail_marker_le` (single-step α=1 marker, 13 squarings) to the
+  paired marker `orderedMatrixMarker22 pairedProfileDegree22
+  (pairedProfileMatrix22 B (a/b)) t` with pair certificates Y_ab, using
+  `MatrixMarker22.pairedRegionDP22_marker_pow64_le` (already general in α, n),
+  log2(64n) = 14 squarings at K20.
+- 2026-11-09 `TailMarkerFracAB22.tail_marker_fracAB_le` GREEN locally
+  (standard axioms): dense tail term at α = a/b and general geometry via the
+  paired marker M_t = Σ t^(a+b) W(a,b), pair certificates Y_ab
+  (`tailMarkerPairBaseCheck22`), `pairedRegionDP22_marker_pow64_le`,
+  2^len = 64n squarings (`hlen`), `prefactorAB_le`, and one final check
+  `yn·sumU·td0^(64q)·2^T ≤ a·C^63·tn0^(64q)`.
+  All Lean theorems the K20 tail needs now exist. Next K20 steps (untrusted
+  producers + generated check modules, built on Peach):
+  1. K20 tail families: physical rows at the K20 tilts (8 exact pieces
+     q=3..615 with α ∈ {1,3/5,4/5,7/10}; 15 dense marker pieces q=616..8192,
+     tilts/markers from `k20_coarse_full_diagnostic.json` and the K20
+     receipts), pair certificates for every α, packed chains (n = 256 → 8
+     squarings to 256 pairs; markers 2^14 = 64·256), per-q term modules.
+  2. K20 q1 endpoint (4 tilts) and q2 endpoint (marker 24, tilt 1/2500):
+     port `emit_turbo_k18_q{1,2}_endpoint22.py` (R = 512, 8192 groups,
+     d = 209715).
+  3. K20 endpoint assembly: BadSplit22 at R = 512, tail union with n = 256,
+     final check `T^50·2^2591 ≤ 2^(256·50)` (51.82 = 2591/50 bits).
+- 2026-11-09 K20 progress:
+  * q1/q2 GREEN on Peach (standard axioms): `K20Q1.q1_le` (4 tilts 1/5000,
+    1/2500, 3/5000, 1/1250; scale raised to 2^704 because z^209715 ≈ 2^-242
+    made 2^384 rows hit the precision floor; total 2^-56.25709 = diagnostic)
+    and `K20Q2.q2_le` (marker 24 on tilt 1/2500, 2^-101.59). Producers:
+    `emit_turbo_profile_k20_families22.py`, `emit_turbo_k20_sparse_cert22.py`,
+    `emit_turbo_k20_q1_assembly22.py`, `emit_turbo_k20_q1_endpoint22.py`,
+    `emit_turbo_k20_q2_endpoint22.py` (+ templates k20_q{1,2}_endpoint).
+  * Tail producer `emit_turbo_k20_tail22.py` (13 families, 14 pair sets,
+    8 exact + 15 marker pieces) and emitter `emit_turbo_k20_tail_lean22.py`.
+    Exact pieces 1–7 reproduce the diagnostic per-q values exactly
+    (q=3: 2^-100.594); marker pieces have ≥ 6000 bits of margin (a = 1).
+    Bug fixed: marker base U0 was scaled to 2^8 instead of 2^(S+8).
+    Piece 8 (q=248..615, D=615, α=7/10) still computing; build of the other
+    22 pieces (1408 modules) running on Peach.
+  * `emit_turbo_k20_endpoint22.py` → `Generated/K20/Endpoint.lean`
+    (`K20Final.k20_endpoint`, ≤ 2^-51.82, check T^50·2^2591 ≤ 2^12800).
+- 2026-11-09 K20 tail replan (audit of the diagnostic): the full K20
+  diagnostic's exact witness for q=248..615 has only 20.36 bits of margin and
+  fails the 51.82 target; the extended diagnostic re-covers 507..615 with a
+  marker. Our degree-615 exact chain also hit a precision floor. New plan
+  (`emit_turbo_k20_tail22.py plan` → `.lake/turbo/k20tail/plan.json`):
+  exact 248..315 (tilt 17/200, α 7/10) + 9 greedy marker chunks over
+  316..615 (pair sets 17/200@7/10 and 3/20@3/5, per-chunk t). Exact pieces
+  now use `TailTermFrac22.tail_term_fracAB_shift_le` (GREEN; domination shift
+  2^down0/2^up0 as in K18's `TailTerm22`) because DP_q/C(8192,q) ≈ 2^-650
+  underflowed U0. Result: 32 pieces; exact pieces match the diagnostic
+  per-q values; every marker term ≤ 2^-256 with ≥ 1883 bits to spare.
+  Full K20 build (2714 modules incl. endpoint) running on Peach.
+- 2026-11-09 K20 CLOSED: `K20Final.k20_endpoint` (≤ 2^-51.82, certified
+  ≈ 2^-56.257) GREEN on Peach and in the local audit `K20Audit.lean`
+  (standard axioms; closure sources identical modulo CRLF). Both K18 and
+  K20 endpoints are closed and audited.
+- 2026-11-09 Tightened endpoints: K18 ≤ 2^-58.24083, K20 ≤ 2^-56.25709
+  (GREEN, locally audited). Paper updated to cite Lean as the authority.

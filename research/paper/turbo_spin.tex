@@ -49,7 +49,7 @@ distribution just defined,
   <2^{-\lambda_K},
 \]
 where $(\lambda_{2^{16}},\lambda_{2^{18}},\lambda_{2^{20}})$ may be taken
-as $(61.88,58.24,51.82)$ bits, respectively. In particular, the minimum
+as $(61.88,58.24,56.25)$ bits, respectively. In particular, the minimum
 distance exceeds $N/10$ except with setup probability below $2^{-40}$.
 \end{theorem}
 
@@ -61,10 +61,11 @@ Lemma~\ref{lem:packet-route-symmetry} then removes dependence on the
 original packet positions while retaining their four-bit values.
 The first-moment calculation treats one and two active groups with their
 support information intact. For three or more, a pointwise bound on the
-outer measure transfers the existing regional inner bounds. At $K=2^{20}$,
-the few words with only five through eight active packets receive a
-separate union charge. Appendix~\ref{app:turbo-proof} gives the equations
-and the exact scope of the three numerical certificates.
+outer measure transfers the existing regional inner bounds.
+Appendix~\ref{app:turbo-proof} explains the calculation. For $K=2^{18}$
+and $K=2^{20}$, a Lean development checks the complete distance bound,
+including every numerical certificate; it is the authority for those two
+lengths.
 
 The fixed $128$-bit local outer and four-bit packet route give no
 asymptotic guarantee here. Scalable SPIN instead increases its outer
