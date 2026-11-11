@@ -23,10 +23,16 @@ import emit_turbo_k20_tail22 as K
 
 OUT, CACHE = K.OUT, K.CACHE
 NL = chr(10)
-PRE = 'SpinCodes.Turbo.Generated.K20Tail.Tail'
+PRE = 'SpinCodes.Turbo.Generated.' + K.OUT.name + '.Tail'
 S, KT = K.S, K.KT
 DEN = '(16 ^ 16 * 2 ^ 384)'
-QCHUNK_EXACT, QCHUNK_MARK, BASE_CH = 30, 40, 12
+# Terms per term module. Lean keeps kernel memory across declarations, so large-L
+# rungs (G22+: one more regional squaring per term) need smaller chunks; override
+# with TURBO_QCHUNK_EXACT / TURBO_QCHUNK_MARK instead of raising memory limits.
+import os
+QCHUNK_EXACT = int(os.environ.get('TURBO_QCHUNK_EXACT', 30))
+QCHUNK_MARK = int(os.environ.get('TURBO_QCHUNK_MARK', 40))
+BASE_CH = 12
 
 
 def lm(M):
@@ -77,6 +83,7 @@ import {PRE}{base}Ys
 {NL.join(f'import {PRE}{base}Rp{a}' for a in range(17))}
 import SpinCodes.Turbo.Hi.RowSelected22
 import SpinCodes.Turbo.TailMarkerFracAB22
+import SpinCodes.Turbo.BinomFast22
 
 noncomputable section
 namespace {ns}
@@ -129,11 +136,12 @@ theorem hz : birthSmokeZ22 = (zNum : ℝ) / 2 ^ 80 := by
   unfold birthSmokeZ22
   norm_num [zDen]
 
-def binomQ (q : ℕ) : ℤ := (Nat.factorial {K.GROUPS} / (Nat.factorial q * Nat.factorial ({K.GROUPS} - q)) : ℕ)
+-- Kernel-cheap C(N, q) (BinomFast22): N! / (q! (N-q)!) costs ~18 GB per check at N = 2^17.
+def binomQ (q : ℕ) : ℤ := (binomFast {K.GROUPS} {K.GROUPS.bit_length()} q : ℕ)
 
 theorem binomQ_eq (q : ℕ) (hq : q ≤ {K.GROUPS}) : (binomQ q : ℝ) = (Nat.choose {K.GROUPS} q : ℝ) := by
   unfold binomQ
-  rw [← Nat.choose_eq_factorial_div_factorial hq]
+  rw [binomFast_eq {K.GROUPS} {K.GROUPS.bit_length()} q hq (by norm_num)]
   simp
 
 theorem binomQ_eq' (q : ℕ) (hq : q ≤ {K.GROUPS}) : (binomQ q : ℝ) = (Nat.choose (32 * {K.NPAIRS}) q : ℝ) :=
@@ -354,6 +362,8 @@ theorem eterm_{q} :
 # ---------------------------------------------------------------- marker pieces
 def emit_marker(p, pidx, key):
     mk = json.loads((CACHE / f'marker{pidx}.json').read_text())
+    if p.get('range'):
+        return emit_marker_range(p, pidx, key, mk)
     f, ea, eb = mk['f'], mk['ea'], mk['eb']
     t = ptag(key)
     pairns = f'{K.fam_ns(f)}.A{t}'
@@ -364,6 +374,9 @@ def emit_marker(p, pidx, key):
     ztr = '[' + ', '.join(f'({str(b).lower()}, {sh}, {mm})' for b, sh, mm in mk['ztr']) + ']'
     w(f'P{pidx}MBase', f'''import {PRE}{f}A{t}Pair
 
+-- Data defs are only consumed by `decide +kernel`; skip codegen, which hits
+-- maxRecDepth on the 18-stage chains at G24+ (no limit raised).
+noncomputable section
 namespace {ns}
 open {opens}
 
@@ -412,6 +425,100 @@ theorem mterm_{q} :
     emit_agg(p, pidx, ns, opens, termimps, ea, eb, {q: recs[q]['a'] for q in qs}, 'mterm_', QCHUNK_MARK)
 
 
+def emit_marker_range(p, pidx, key, mk):
+    """Marker range piece: two endpoint certificates of F (TailMarkerRange22.markerF_le)
+    at a common bound A, then term_le_endpoints for every q in [qlo, qhi]."""
+    f, ea, eb = mk['f'], mk['ea'], mk['eb']
+    t = ptag(key)
+    pairns = f'{K.fam_ns(f)}.A{t}'
+    ns = f'{K.fam_ns(f)}.P{pidx}'
+    opens = f'Spin.Turbo Spin.Turbo.Hi {K.fam_ns(f)} {pairns}'
+    tn0, td0, kp, kn, up, down = mk['tn0'], mk['td0'], mk['kp'], mk['kn'], mk['up'], mk['down']
+    st = '[' + ', '.join(f'({dn}, {u}, {lm(U)})' for dn, u, U in mk['st']) + ']'
+    ztr = '[' + ', '.join(f'({str(b).lower()}, {sh}, {mm})' for b, sh, mm in mk['ztr']) + ']'
+    recs = {int(q): r for q, r in mk['recs'].items()}
+    lo, hi = p['qlo'], p['qhi']
+    A = max(recs[lo]['a'], recs[hi]['a'])
+    tex = f'((({tn0} * 2 ^ {kp} : ℤ) : ℝ) / (({td0} * 2 ^ {kn} : ℤ) : ℝ))'
+    al = alpha_lean(ea, eb)
+    def cert(q, nm):
+        r = recs[q]
+        vt = '[' + ', '.join(f'({str(b).lower()}, {sh}, {mm})' for b, sh, mm in r['vtr']) + ']'
+        return f"""def vt_{q} : List (Bool × Nat × Int) := {vt}
+
+set_option maxHeartbeats 0 in
+theorem {nm} : TailMarkerRange22.markerF {ea} {eb} {K.NPAIRS} {K.DCUT} selectedRows birthSmokeZ22 {tex} {q} ≤
+    (({A} : ℤ) : ℝ) / 2 ^ {KT} :=
+  TailMarkerRange22.markerF_le {ea} {eb} (by norm_num) {K.NPAIRS} {K.DCUT} 80 selectedRows
+    selectedRows_nonneg {q} (binomQ {q}) (binomQ_eq' {q} (by norm_num)) (binomQ_pos {q} (by norm_num))
+    (16 ^ 16 * endpointDen) (2 ^ {S}) (by norm_num) R hR Ys rpowChecked {tn0} {td0} (by norm_num) (by norm_num)
+    {kp} {kn} (2 ^ {S}) {S} rfl {down} {up} U0 baseChecked stages (by decide) chainChecked birthSmokeZ22 zNum hz
+    ztrace zChecked vt_{q} (by decide +kernel) ({r["yn"]}) ({r["G"]}) (by decide +kernel) ({A}) {KT}
+    (by decide +kernel)
+"""
+    w(f'P{pidx}MBase', f"""import {PRE}{f}A{t}Pair
+import SpinCodes.Turbo.TailMarkerRange22
+
+-- Data defs are only consumed by `decide +kernel`; skip codegen, which hits
+-- maxRecDepth on the 18-stage chains at G24+ (no limit raised).
+noncomputable section
+namespace {ns}
+open {opens}
+
+def U0 : List (List Int) := {lm(mk['U0'])}
+def stages : List (Nat × Nat × List (List Int)) := {st}
+def ztrace : List (Bool × Nat × Int) := {ztr}
+
+set_option maxHeartbeats 0 in
+theorem baseChecked : tailMarkerPairBaseCheck22 Ys ({tn0} * 2 ^ {kp}) ({td0} * 2 ^ {kn}) (2 ^ {S}) (2 ^ {S})
+    {down} {up} U0 = true := by
+  decide +kernel
+
+set_option maxHeartbeats 0 in
+theorem chainChecked : sparseSquareChainCheckL22 (2 ^ {S}) U0 stages = true := by decide +kernel
+
+set_option maxHeartbeats 0 in
+theorem zChecked : sparseScaledPowerCheck22 zNum 80 {K.DCUT} ztrace = true := by decide +kernel
+
+end {ns}
+""")
+    w(f'P{pidx}MQ0', f"""import {PRE}P{pidx}MBase
+
+noncomputable section
+namespace {ns}
+open {opens}
+
+{cert(lo, 'Flo')}
+{cert(hi, 'Fhi') if hi != lo else ''}
+end {ns}
+""")
+    fhi = 'Fhi' if hi != lo else 'Flo'
+    w(f'P{pidx}Agg', f"""import {PRE}P{pidx}MQ0
+
+noncomputable section
+namespace {ns}
+open {opens}
+
+def aP (_q : ℕ) : Int := {A}
+
+theorem zpos : 0 < birthSmokeZ22 := by
+  unfold birthSmokeZ22
+  exact div_pos (by exact_mod_cast (show (0 : ℤ) < zNum by decide +kernel))
+    (by exact_mod_cast (show (0 : ℤ) < zDen by decide +kernel))
+
+theorem pieceTerm (q : ℕ) (hq : q ∈ Finset.Icc {lo} {hi}) :
+    (Nat.choose (32 * {K.NPAIRS}) q : ℝ) * ((turboOldUniformFactor22 ^ q / birthSmokeZ22 ^ {K.DCUT}) ^ ({al}) *
+      ∑ k : Fin 11, ((pairedRegionDP22 selectedRows ({al}) {K.NPAIRS} q) ^ 64) 0 k) ≤ (aP q : ℝ) / 2 ^ {KT} := by
+  obtain ⟨h1, h2⟩ := Finset.mem_Icc.mp hq
+  have ht : (0 : ℝ) < {tex} := by norm_num
+  exact (TailMarkerRange22.term_le_endpoints {ea} {eb} {K.NPAIRS} {K.DCUT} selectedRows selectedRows_nonneg
+    birthSmokeZ22 {tex} zpos ht {lo} {hi} (by norm_num) q h1 h2).trans (max_le Flo {fhi})
+
+#print axioms pieceTerm
+end {ns}
+""")
+
+
 def emit_all(ps):
     fidx = {t: i for i, t in enumerate(K.tilts(ps), start=1)}
     keys = []
@@ -431,7 +538,7 @@ def emit_all(ps):
             if (CACHE / f'marker{pidx}.json').exists():
                 emit_marker(p, pidx, key)
         ea, eb = K.alpha_ab(p['alpha'])
-        man.append(dict(piece=pidx, kind=p['kind'], f=fidx[p['tilt']], ea=ea, eb=eb, qlo=p['qlo'], qhi=p['qhi'],
+        man.append(dict(piece=pidx, kind=p['kind'], range=bool(p.get('range')), f=fidx[p['tilt']], ea=ea, eb=eb, qlo=p['qlo'], qhi=p['qhi'],
                         ns=f'{K.fam_ns(fidx[p["tilt"]])}.P{pidx}'))
     (OUT / 'pieces.json').write_text(json.dumps(man, indent=1) + NL)
     print('emitted', len(man), 'pieces')

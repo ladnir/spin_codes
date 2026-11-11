@@ -140,15 +140,28 @@ def main():
     for i, (a, b) in enumerate(zip(bounds, bounds[1:])):
         w(f'theorem chunkS_{i} : ∑ q ∈ Finset.Ico {a} {b}, A q = {vals[i]} := by decide +kernel')
         w('')
-    w(f'theorem sumA_eq : ∑ q ∈ Finset.Ico 3 {GROUPS + 1}, A q = {total} := by')
-    rws = []
-    for i, (a, b) in enumerate(zip(bounds, bounds[1:])):
-        if b != GROUPS + 1:
-            rws.append(f'← Finset.sum_Ico_consecutive _ (show {a} ≤ {b} by norm_num) (show {b} ≤ {GROUPS + 1} by norm_num)')
-        rws.append(f'chunkS_{i}')
-    w('  rw [' + (',' + chr(10) + '    ').join(rws) + ']')
-    w('  all_goals norm_num')
-    w('')
+    # Two-level assembly: one long rw chain over ~1000 chunks (K = 2^26) times out the
+    # elaborator, so join chunks in groups of SUPER, then join the groups.
+    SUPER = 50
+    def join_sum(name, lo, hi, parts):
+        """parts: list of (a, b, lemma) covering [lo, hi) in order."""
+        w(f'theorem {name} : ∑ q ∈ Finset.Ico {lo} {hi}, A q = {sum(v for _, _, _, v in parts)} := by')
+        rws = []
+        for a, b, lem, _ in parts:
+            if b != hi:
+                rws.append(f'← Finset.sum_Ico_consecutive _ (show {a} ≤ {b} by norm_num) (show {b} ≤ {hi} by norm_num)')
+            rws.append(lem)
+        w('  rw [' + (',' + chr(10) + '    ').join(rws) + ']')
+        w('  all_goals norm_num')
+        w('')
+    chunks = [(a, b, f'chunkS_{i}', vals[i]) for i, (a, b) in enumerate(zip(bounds, bounds[1:]))]
+    supers = []
+    for j in range(0, len(chunks), SUPER):
+        grp = chunks[j:j + SUPER]
+        lo, hi = grp[0][0], grp[-1][1]
+        join_sum(f'superS_{j // SUPER}', lo, hi, grp)
+        supers.append((lo, hi, f'superS_{j // SUPER}', sum(v for _, _, _, v in grp)))
+    join_sum('sumA_eq', 3, GROUPS + 1, supers)
     T = f'({GROUPS} * K20Q1.aSum + K20Q2.b2 + {total})'
     w(f'theorem total_nonneg : (0 : ℤ) ≤ {T} := by decide +kernel')
     w('')

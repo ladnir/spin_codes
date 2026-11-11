@@ -465,3 +465,43 @@ appendix explains exact-coefficient vs marker witnesses and cites the Lean
 development as the authority for K=2^18, 2^20 (K=2^16 remains numerical);
 implementation table 58.240 / 56.257; abstract and intro "above 56 bits";
 AI disclosure mentions the Turbo Lean development. Paper builds cleanly.
+
+## 2026-11-10: s22 ladder G14..G20 certified and audited
+
+`Spin.Turbo.G{14,16,18,20}Final.g{e}_endpoint` (turboSetup22 with L/16 =
+8/32/128/512, cutoff floor(N/10)) prove 2^-64.25152, 2^-62.34042,
+2^-60.36266, 2^-58.36785; local audit `SpinCodes/Turbo/LadderAudit.lean`
+prints standard axioms for all four. G18/G20 supersede the K18/K20 endpoints.
+Producers: `scripts/ladder22.py` (q1/q2) and `scripts/ladder_tail22.py`
+(plan/families/pairs/exact/marker/emit/endpoint), using the marker range lemma
+`TailMarkerRange22.lean`. G22 is planning; G24/G26 need compact certificates
+(see REVISED_SPIN_PROOF_PLAN.md). Nothing committed.
+
+## 2026-11-10: G22 certified and audited
+
+`Spin.Turbo.G22Final.g22_endpoint` (turboSetup22 2048, cutoff 838860) proves
+2^-56.3691; standard axioms on Peach and locally (`SpinCodes/Turbo/G22Audit.lean`,
+kept separate from `LadderAudit.lean` for memory). Tail: 13 exact pieces (q 3..545)
++ 9 marker ranges (546..32768); exact term modules emitted with
+`TURBO_QCHUNK_EXACT=6` (30 per module exhausts memory at G22). Generated trees
+(~0.6 GB source, 9.5 GB oleans) are git-ignored. Next: G24 (exact to 1299, markers
+from 1300) and G26 (exact to 4999, markers from 5000); see REVISED_SPIN_PROOF_PLAN.md.
+
+## 2026-11-10: G24 certified (Peach), audit pending
+
+`Spin.Turbo.G24Final.g24_endpoint` (turboSetup22 8192, cutoff 3355443) proves
+2^-54.36978, standard axioms. Key fixes for K = 2^24: planner marker normalizer
+(C^-63, was C^-62 — exact pieces now only to q 123), `BinomFast22.lean`
+(kernel-cheap C(N,q); N!/(q!(N-q)!) cost ~18 GB per term), marker MBase modules
+`noncomputable section`, exact term modules TURBO_QCHUNK_EXACT=4, top-band marker
+module with LEAN_NAT_MAX_SIZE=2^30 (≈134M-bit numerals; value/8 bits). Generated
+source 265 MB (git-ignored).
+
+## 2026-11-10: G26 certified — all seven rungs proven (s22)
+
+`Spin.Turbo.G26Final.g26_endpoint` (turboSetup22 32768, cutoff 13421772) proves
+2^-52.32161 with standard axioms. Ladder: 64.25152 / 62.34042 / 60.36266 / 58.36785 /
+56.3691 / 54.36978 / 52.32161 bits at K = 2^14..2^26. Scoped build limits beyond the
+standard -M 14000 are listed in REVISED_SPIN_PROOF_PLAN.md (G24 TailP15MQ0; G26
+TailP18-21MQ0). Remaining: Peach audit (leanchecker + fresh regeneration), regenerate
+entry points, paper update. Nothing committed.
