@@ -42,24 +42,14 @@ is $2^{128}-1$. Given $v$, the group shuffle makes the packet support
 uniform among $\binom{64}{v}$ choices, with uniform nonzero labels on the
 active packets.
 
-\paragraph{Fixed inner maps.}
-For $s=15$, index the $64$ output positions by
-$z=(z_0,\ldots,z_5)\in\F_2^6$, with coordinate number
-$\sum_i2^iz_i$. The columns of $A$ are the truth tables of
-$1,z_0,\ldots,z_5$ and the following eight functions, in order:
-\[
-\begin{gathered}
- z_0z_1,\quad z_0z_3,\quad z_4z_5,\quad
- z_0z_5+z_2z_3,\quad z_1z_3+z_2z_4,\\
- z_0z_4+z_2z_5,\quad z_1z_5+z_3z_4,\quad
- z_1z_2+z_3z_5.
-\end{gathered}
-\]
-This is the paired $15$-state map. For $s=22$, use the map $A$
-specified in Appendix~\ref{app:shared-inner-map}.
-In both cases the feedback is $A^\top$. Each step uses an independent
-uniform invertible state map. These are separate certified maps, not
-instances of the paper's BCH--IMT transvection family.
+\paragraph{Fixed inner map.}
+Every length uses the $s=22$ map $A$ specified in
+Appendix~\ref{app:shared-inner-map}, with feedback $A^\top$. Each step
+uses an independent uniform invertible state map. This is a separate
+certified map, not an instance of the paper's BCH--IMT transvection
+family. A smaller paired $15$-state map encodes about $13\%$ faster at
+$K\le2^{16}$, but its margin is only numerically checked, so we do not
+use it.
 
 \paragraph{First moment and occupation coverage.}
 Let $Z_H$ count nonzero messages with output weight at most $H$, and let
@@ -78,15 +68,8 @@ The factors count unordered group positions and both support assignments
 when $u\ne v$. The two-group computation keeps the common route and the
 inner state across every region.
 
-For larger occupations, the numerical calculation compares Turbo SPIN
-with a reference outer that maps each $128$-bit group through four
-RS$[16,8]$ rows over $\F_{16}$. Its $16$ aligned $16$-bit columns receive
-independent nonzero $\F_{2^{16}}$ scalar randomizers. It then uses the
-same $64$ four-bit packet positions, route, and fixed inner map as Turbo
-SPIN at the selected length. Complete numerical bounds for this reference
-outer were checked for every occupation; the following pointwise
-comparison transfers them without assuming identical outer spectra.
-
+For three or more active groups, we bound the outer measure pointwise
+and reuse the regional inner bounds for uniform input.
 For a fixed nonzero $256$-bit vector with $h$ nonzero columns, the
 number of RS words with that column support is at most $(Q-1)^{h-4}$.
 Independent column randomization therefore bounds its expected atom count
@@ -97,15 +80,14 @@ pointwise multiplier
  <\frac{2^{256}}{(2^{16}-1)^8}
  =\beta_{\rm RS16}.
 \]
-For each fixed active-group set, this domination transfers the retained
-uniform-input and routing-conditioned bounds for $q\ge3$, with the same
-inner and route. The transfer is over the complete outer measure;
-one-column marginals alone would not justify it.
-
-The old RS$[16,8]$ outer has no words with fewer than nine active packets,
-whereas Turbo SPIN can have five through eight. This difference does not
-matter: the one- and two-group sums \eqref{eq:turbo-sparse-fold} are
-computed for Turbo SPIN itself and include those supports at every length.
+For each fixed active-group set, this domination bounds the Turbo SPIN
+event for $q\ge3$ by the uniform-input and routing-conditioned regional
+bounds, with one factor $\beta_{\rm RS16}$ per active group and the same
+inner and route. The bound is over the complete outer measure; one-column
+marginals alone would not justify it. It needs no lower bound on the
+number of active packets in a group, so groups with five through eight
+active packets are covered. The one- and two-group sums
+\eqref{eq:turbo-sparse-fold} are computed for Turbo SPIN itself.
 
 \paragraph{Bounding one large occupation.}
 For $q\ge3$, the regional bound needs the coefficient of $x^q$ in a
@@ -117,33 +99,50 @@ coefficient of a polynomial $P$ with nonnegative entries satisfies
 $[x^q]P(x)\le P(t)/t^q$, so one matrix power at $x=t$ replaces the
 coefficient. The routing-conditioned variant first raises each two-step
 operator entrywise to a power $\alpha\le1$; the witnesses use
-$\alpha\in\{1,4/5,7/10,3/5\}$ and switch from exact coefficients to
-markers above $q=279$ at $K=2^{18}$ and above $q=315$ at $K=2^{20}$.
+$\alpha\in\{1,4/5,7/10,13/20,3/5,11/20\}$. Exact coefficients cover
+$3\le q\le q^*$, with $q^*$ between $40$ and $545$ depending on the length.
+
+Above $q^*$, a single marker certificate covers a whole range of
+occupations. For fixed $\alpha$, tilt, and $t$, the marker bound is
+$\binom Lq$ times $q$-th powers and fixed factors, and $\binom Lq$ is
+log-concave in $q$. The bound is therefore log-convex in $q$, so its
+maximum over an interval $[q_0,q_1]$ is attained at an endpoint. Checking
+the two endpoints bounds every occupation in the range. Between $3$ and
+$13$ ranges cover the markers at each length. At the largest occupations,
+$t$ is a power of two and $\alpha=1$, which keeps the certified integers
+within the size a proof checker can evaluate.
 
 \paragraph{Margins.}
-The occupation sets are $q=1,\ldots,L$ with $L=512,2048,8192$ for the
-three lengths. Summing all occupations gives failure bounds of
-$2^{-61.884}$, $2^{-58.2408}$, and $2^{-56.2570}$. At the two larger
-lengths the one-group term dominates: it alone is about $2^{-58.2456}$
-and $2^{-56.2570}$. The exact cutoff weights are $13107$, $52428$, and
-$209715$; hence the integer minimum-distance lower bounds outside the
-failure event are $13108$, $52429$, and $209716$.
+The occupation sets are $q=1,\ldots,L$, with $L=K/128$ from $128$ to
+$524288$. At every length the one-group term dominates, and the
+occupations $q\ge2$ together cost at most $0.03$ bits of margin.
+Table~\ref{tab:turbo-margins} lists the resulting margins. The cutoff is
+$H=\lfloor N/10\rfloor$, so the integer minimum-distance lower bound
+outside the failure event is $H+1$.
 
 \paragraph{Formal verification.}
-For $K=2^{18}$ and $K=2^{20}$, a Lean~4 development is the authority for
+At every listed length, a Lean~4 development is the authority for
 Theorem~\ref{thm:turbo-spin}\repositorycite. It models the ideal setup
-distribution of Section~\ref{sec:turbo-spin}, with $s=22$, for every
-injective choice of the eight RS evaluation points. It proves
+distribution of Section~\ref{sec:turbo-spin} for every injective choice of
+the eight RS evaluation points, and proves
 \[
  \Prob_\theta\bigl[\exists x\ne0:\wt(E_\theta(x))\le H\bigr]
- \le 2^{-58.24083}
- \quad\text{and}\quad
- \le 2^{-56.25709},
+ \le 2^{-\lambda^{\rm Lean}_K},
 \]
-respectively. Lean checks every numerical certificate behind these bounds,
-for all occupations, including the integer rounding and scaling that this
+with $\lambda^{\rm Lean}_K=64.25152$, $62.34042$, $60.36266$, $58.36785$,
+$56.3691$, $54.36978$, and $52.32161$ for $K=2^{14},\ldots,2^{26}$.
+Lean checks every numerical certificate behind these bounds, for all
+occupations, including the integer rounding and scaling that this
 appendix omits. The proofs use only Lean's standard axioms: propositional
 extensionality, quotient soundness, and choice. The rate statement follows
 from Lemma~\ref{lem:structured-inner-bijective} and is outside the formal
-statement. The $K=2^{16}$ bound is not formalized; it rests on the
-outward-arithmetic replay recorded in the repository.
+statement.
+
+The certificates are emitted by untrusted programs and checked by Lean's
+kernel; a wrong certificate fails to check but cannot prove a false bound.
+The generated certificate modules reach several hundred megabytes of Lean
+source per length and are not stored in the repository. The repository
+instead holds the generators, the per-length plans that fix every
+certificate parameter, and the hand-written lemmas, so the modules can
+be regenerated and rechecked\repositorycite. The kernel was rerun on all
+hand-written modules independently of the build.

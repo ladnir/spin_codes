@@ -29,10 +29,10 @@ over GF(16). Eight independently randomized 32-bit columns connect this outer
 to the four-bit packet route. The reverse column maps are multiplication by
 nonzero GF(2^32) elements; forward encoding applies their binary adjoints.
 
-The outer and routing structure are shared across sizes. The inner is
-paired-s15 for K <= 65,536, and the exact s22 map for larger K.
-The identifier and message size therefore determine the inner without another
-caller option. `route_seed` determines the route and outer maps in separate
+The outer, routing structure and inner are shared across sizes: the inner is
+the exact s22 map at every K (until 2026-11-11, K <= 65,536 used paired-s15,
+which was only numerically certified at K16; seeded maps at those sizes changed).
+The identifier therefore determines the inner without another caller option. `route_seed` determines the route and outer maps in separate
 sampling domains; `inner_seed` determines the inner updates.
 
 Accepted message sizes are positive multiples of 128 up to 132,152,832.
@@ -47,11 +47,19 @@ random-setup model. Margin lambda bounds the probability of sampling a bad
 code by 2^(-lambda). The implementation preserves the checked research maps
 and setup domains. Accepting another natural size does not certify it.
 
-| Message size | Inner | Distance lower bound | Margin (bits) | Proof record |
-|---|---|---:|---:|---|
-| 2^16 | Paired-s15 | 13,108 | 61.8841 | [K16](../research/workstreams/k16_outer_routing/RS8X8_CONSTRUCTION.md) |
-| 2^18 | Exact s22 | 52,429 | 58.2456 | [K18](../research/workstreams/rs8_sizes/K18_CERTIFICATE.md) |
-| 2^20 | Exact s22 | 209,716 | 51.8225 | [K20](../research/workstreams/k20_two_ms/RS8_TRANSFER.md) |
+| Message size | Inner | Distance lower bound | Margin (bits) |
+|---|---|---:|---:|
+| 2^14 | Exact s22 | 3,277 | 64.25152 |
+| 2^16 | Exact s22 | 13,108 | 62.34042 |
+| 2^18 | Exact s22 | 52,429 | 60.36266 |
+| 2^20 | Exact s22 | 209,716 | 58.36785 |
+| 2^22 | Exact s22 | 838,861 | 56.3691 |
+| 2^24 | Exact s22 | 3,355,444 | 54.36978 |
+| 2^26 | Exact s22 | 13,421,773 | 52.32161 |
+
+Every margin is a Lean theorem (`Spin.Turbo.G{e}Final.g{e}_endpoint` in
+`research/lean`; regeneration inputs in `research/lean/ladder_plans/`), using
+only Lean's standard axioms.
 
 Earlier profiles remain available with their original identifiers and seeded
 maps. In particular, RS8 does not inherit the larger margin of the RS16 s22

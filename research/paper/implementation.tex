@@ -13,27 +13,44 @@ setup, allocation, and input filling are excluded.
 \centering
 \caption{Precomputed Turbo SPIN transposed encoding on one Ryzen 9 7950X
 core, in milliseconds. The certified distance is greater than $0.10N$;
-$\lambda$ is the ideal-setup failure margin in bits.}
+$\lambda$ is the Lean-checked ideal-setup failure margin in bits.}
 \label{tab:turbo-performance}
 \setlength{\tabcolsep}{9pt}
-\begin{tabular}{@{}rrr@{}}
+\begin{tabular}{@{}rrrr@{}}
 \toprule
-$K$ & Margin $\lambda$ & Time (ms) \\
+$K$ & Margin $\lambda$ & Time (ms) & ns/record \\
 \midrule
-$2^{16}$ & 61.884 & 0.099526 \\
-$2^{18}$ & 58.240 & 0.461416 \\
-$2^{20}$ & 56.257 & 2.861814 \\
+$2^{14}$ & 64.25 & 0.0274 & 0.84 \\
+$2^{16}$ & 62.34 & 0.1139 & 0.87 \\
+$2^{18}$ & 60.36 & 0.4580 & 0.87 \\
+$2^{20}$ & 58.36 & 2.854 & 1.36 \\
+$2^{22}$ & 56.36 & 12.84 & 1.53 \\
+$2^{24}$ & 54.36 & 54.11 & 1.61 \\
+$2^{26}$ & 52.32 & 216.2 & 1.61 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The measurements use GCC~15.2 with Zen~4 tuning, one thread pinned to
-CPU~15, four setup seeds, and both comparison orders. Each process has
-five warmups, followed by $2001$, $1001$, or $301$ timed calls at the
-three respective lengths. The entries are medians of eight process
-medians. Input is not restored between calls. $K=2^{16}$ uses normal
-pages; the larger runs request huge pages for data and scratch. The
-operating system may decline that request. All runs are serial.
+CPU~15, and four setup seeds, each run twice in opposite seed order.
+Each process has five warmups, followed by $2001$ timed calls at
+$K\le2^{16}$ and $1001$, $301$, $101$, $31$, and $11$ at
+$K=2^{18},\ldots,2^{26}$. The entries are medians of eight process
+medians; every process median lies within $1\%$ of the entry. The
+last column divides the time by the $2K$ input records. Input is not
+restored between calls. $K\le2^{16}$ uses normal pages; the larger runs
+request huge pages for data and scratch, which the operating system may
+decline. Huge pages make no measurable difference at $K\le2^{18}$. All
+runs are serial.
+
+Up to $K=2^{18}$ the data fits in the $32$\,MiB last-level cache, and
+both the inner route and the outer are compute-bound. From $K=2^{20}$
+the cost per record rises by about $1.6$--$1.9\times$, because both
+stages then stream from main memory. The route sends each region's
+packets to every group, so a group's outer input is complete only after
+the last region, and the two stages cannot be fused without changing the
+code. A data-movement skeleton with the same access pattern bounds the
+remaining headroom at $9$--$16\%$ for $K=2^{20},\ldots,2^{24}$.
 Appendix~\ref{app:implementation} gives the implementation scope.
 
 The measured applications instantiate the bit-level design with a fixed

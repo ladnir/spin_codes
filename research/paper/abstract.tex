@@ -12,12 +12,13 @@ structured support spreading and recursive state mixing. The
 proof uses a three-state transfer bound and a full-state regional limit.
 
 \qquad Turbo SPIN is a finite binary construction with short RS rows,
-randomized columns, and four-bit packet routing. At $K=2^{16},2^{18},2^{20}$ it has rate
-$1/2$, relative distance greater than $0.10$, and setup-failure margins
-above $56$ bits.
+randomized columns, and four-bit packet routing. At each of the seven lengths
+$K=2^{14}$ to $2^{26}$ (even exponents), it has rate $1/2$, relative distance
+greater than $0.10$, and setup-failure margins above $52$ bits, all checked
+in Lean.
 
 \qquad After precomputation, Turbo SPIN transposed encoding produces
-$2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms
+$2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.85$\,ms
 on one Ryzen 9 7950X thread.
 A separately certified BCH--IMT implementation supports our application
 measurements. With this encoder, libOTe's regular-noise Silent OT sender

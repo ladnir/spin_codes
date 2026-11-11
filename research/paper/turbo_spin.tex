@@ -4,13 +4,13 @@
 Scalable SPIN uses one-bit packets and a growing shared outer to obtain
 an asymptotic guarantee. For selected finite lengths, \emph{Turbo SPIN}
 uses a short RS outer and routes four-bit packets. It retains the same
-recursive update law, with a smaller fixed state map at the shortest
-length. Its distance proof keeps packet support and values where the
-one-bit proof uses row weights. The asymptotic theorem of
-Section~\ref{sec:structured-distance} does not apply to this route.
+recursive update law and the same fixed state map. Its distance proof
+keeps packet support and values where the one-bit proof uses row
+weights. The asymptotic theorem of Section~\ref{sec:structured-distance}
+does not apply to this route.
 
 \paragraph{Construction.}
-Fix $K\in\{2^{16},2^{18},2^{20}\}$, set
+Fix $K=2^e$ with $e\in\{14,16,18,20,22,24,26\}$, set
 $(k,b,p,t)=(128,256,4,64)$, $L=K/128$, and $N=2K$. Interpret each local
 input group as eight rows of four
 symbols over $\F_{16}$. Encode each row by the same systematic MDS
@@ -29,15 +29,15 @@ packet route of Section~\ref{sec:regional-spin}: shuffle each group's
 $B=64$ packets into distinct regions, then independently shuffle the $L$
 packet slots of each region. Serialize in region-major order.
 The inner uses recurrence~\eqref{eq:structured-inner} with $C=A^\top$.
-The fixed map $A:\F_2^s\to\F_2^{64}$ and independently sampled uniform
-$M_i\in\mathrm{GL}(s,2)$ use $s=15$ at $K=2^{16}$ and $s=22$ at the two
-larger lengths. The $s=22$ map is the one used by Scalable SPIN.
+At every length, the fixed map $A:\F_2^{22}\to\F_2^{64}$ is the $s=22$
+map used by Scalable SPIN, and each step samples an independent uniform
+$M_i\in\mathrm{GL}(22,2)$.
 The state continues across region boundaries and is discarded after
 the last output. Outer coefficients, both sets of
 permutations, and state updates are mutually independent in the ideal
 setup distribution. Appendix~\ref{app:shared-inner-map} specifies the
-shared $s=22$ map; Appendix~\ref{app:turbo-proof} specifies the $s=15$
-map and the finite proof calculation.
+shared map; Appendix~\ref{app:turbo-proof} explains the finite proof
+calculation.
 
 \begin{theorem}[Finite Turbo SPIN distance]
 \label{thm:turbo-spin}
@@ -48,10 +48,32 @@ distribution just defined,
   \Prob_\theta\bigl[\exists x\ne0:\wt(E_\theta(x))\le H\bigr]
   <2^{-\lambda_K},
 \]
-where $(\lambda_{2^{16}},\lambda_{2^{18}},\lambda_{2^{20}})$ may be taken
-as $(61.88,58.24,56.25)$ bits, respectively. In particular, the minimum
-distance exceeds $N/10$ except with setup probability below $2^{-40}$.
+where $\lambda_K$ may be taken from Table~\ref{tab:turbo-margins}.
+In particular, at every listed length the minimum distance exceeds $N/10$
+except with setup probability below $2^{-52}$.
 \end{theorem}
+
+\begin{table}[tb]
+\centering
+\caption{Turbo SPIN setup-failure margins of Theorem~\ref{thm:turbo-spin},
+each checked in Lean. $H+1$ is the minimum-distance lower bound outside
+the failure event.}
+\label{tab:turbo-margins}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$K$ & $L$ & $H+1$ & $\lambda_K$ \\
+\midrule
+$2^{14}$ & $128$ & $3277$ & $64.25$ \\
+$2^{16}$ & $512$ & $13108$ & $62.34$ \\
+$2^{18}$ & $2048$ & $52429$ & $60.36$ \\
+$2^{20}$ & $8192$ & $209716$ & $58.36$ \\
+$2^{22}$ & $32768$ & $838861$ & $56.36$ \\
+$2^{24}$ & $131072$ & $3355444$ & $54.36$ \\
+$2^{26}$ & $524288$ & $13421773$ & $52.32$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The outer is injective, and Lemma~\ref{lem:structured-inner-bijective}
 gives the rate for every setup. For distance, independent column
@@ -62,10 +84,10 @@ original packet positions while retaining their four-bit values.
 The first-moment calculation treats one and two active groups with their
 support information intact. For three or more, a pointwise bound on the
 outer measure transfers the existing regional inner bounds.
-Appendix~\ref{app:turbo-proof} explains the calculation. For $K=2^{18}$
-and $K=2^{20}$, a Lean development checks the complete distance bound,
-including every numerical certificate; it is the authority for those two
-lengths.
+Appendix~\ref{app:turbo-proof} explains the calculation. At every listed
+length, a Lean development checks the complete distance bound, including
+every numerical certificate; it is the authority for
+Theorem~\ref{thm:turbo-spin}.
 
 The fixed $128$-bit local outer and four-bit packet route give no
 asymptotic guarantee here. Scalable SPIN instead increases its outer

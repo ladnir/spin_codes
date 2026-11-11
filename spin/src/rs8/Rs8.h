@@ -13,8 +13,8 @@ bool validMessageSize(std::size_t k) noexcept;
 
 // Eight systematic GF(16) RS[8,4] rows per 128-to-256-coordinate group,
 // independent nonzero GF(2^32) reverse symbol maps, and four-bit routing
-// through 64 regions. The paired t64/s15 inner is used through K16; larger
-// messages use the exact t64/s22 inner. State crosses region boundaries.
+// through 64 regions, with the exact t64/s22 inner at every size (the map
+// certified in Lean at K = 2^14..2^26). State crosses region boundaries.
 struct Plan {
     Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed);
     Plan(const Plan&) = delete;

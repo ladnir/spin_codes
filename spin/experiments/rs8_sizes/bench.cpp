@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "Kernels.h"
 #include "../k20_two_ms/rs8/Rs8.h"
 #include "../../src/certified22/productionMap.h"
@@ -165,7 +166,10 @@ static void verifyRs8Outer(const code::Plan& p,const rs8::Tables32& tables) {
 template<unsigned Phase,class Route,class Outer>
 static void measure(const char* mode,const code::Plan& p,std::uint64_t seed,unsigned calls,
                     Route&& route,Outer&& outer) {
-    const auto policy=p.k<=65536?spin::MemoryPolicy::Normal:spin::MemoryPolicy::PreferHugePages;
+    // SPIN_BENCH_MEMORY=huge|normal overrides the size-based default (research harness only).
+    const char* memoryEnv=std::getenv("SPIN_BENCH_MEMORY");
+    const bool huge=memoryEnv?std::string(memoryEnv)=="huge":p.k>65536;
+    const auto policy=huge?spin::MemoryPolicy::PreferHugePages:spin::MemoryPolicy::Normal;
     spin::Buffer input((p.n+12)*16,policy),scratch(p.scratchBlocks()*16,policy);
     fill(input);paint(scratch,std::byte{0});auto* x=blocks(input)+4;auto* w=blocks(scratch);
     route(x,w);
@@ -188,7 +192,7 @@ static void measure(const char* mode,const code::Plan& p,std::uint64_t seed,unsi
     }
     std::sort(all.begin(),all.end());std::sort(routes.begin(),routes.end());std::sort(outers.begin(),outers.end());
     std::cout<<"mode,K,seed,calls,phase,memory,total_us,p10_us,p90_us,route_us,outer_us,checksum\n"
-        <<mode<<','<<p.k<<','<<seed<<','<<calls<<','<<Phase<<','<<(p.k<=65536?"normal":"huge-preferred")<<','
+        <<mode<<','<<p.k<<','<<seed<<','<<calls<<','<<Phase<<','<<(huge?"huge-preferred":"normal")<<','
         <<std::fixed<<std::setprecision(4)<<all[calls/2]<<','<<all[calls/10]<<','<<all[9*calls/10]<<','
         <<routes[calls/2]<<','<<outers[calls/2]<<','<<std::hex
         <<hash(Phase==2?static_cast<void*>(w):static_cast<void*>(x),Phase==2?scratch.bytes().size():p.k*16)

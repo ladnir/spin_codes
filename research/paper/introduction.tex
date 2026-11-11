@@ -38,11 +38,10 @@ bounds the routed inner at three occupation scales, and checks the
 numerical inequalities with outward arithmetic.
 Turbo SPIN is a finite, binary half-rate construction. It uses
 short RS rows, randomized $32$-bit columns, a four-bit packet route, and
-a separately certified recursive inner. At $K=2^{16},2^{18},2^{20}$,
-its relative distance exceeds $0.10$ with more than $56$ bits of
-setup-failure margin; Lean checks the two larger lengths. The $s=22$ Turbo profiles use the same fixed
-inner map and update law as Scalable SPIN; the shortest profile uses a
-smaller map.
+a separately certified recursive inner. At every $K=2^{14},2^{16},\ldots,2^{26}$,
+its relative distance exceeds $0.10$ with more than $52$ bits of
+setup-failure margin, and Lean checks every one of these bounds. Turbo
+SPIN uses the same fixed $s=22$ inner map and update law as Scalable SPIN.
 
 Both main constructions follow \eqref{eq:intro-spin-composition}. They use
 different outer codes and routing units to trade encoding cost against
@@ -79,7 +78,8 @@ terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 
 \paragraph{Implementation and Applications.}
 On one Ryzen 9 7950X thread, Turbo SPIN's precomputed transposed encoder
-produces $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.86$\,ms.
+produces $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.85$\,ms,
+and $2^{26}$ blocks in $216$\,ms.
 The application backend uses the bit-level route with a fixed BCH outer
 and IMT inner. It has certified distance above $0.10N$ at five lengths
 through $K=2^{24}$, using rigorous BCH spectrum inequalities; two

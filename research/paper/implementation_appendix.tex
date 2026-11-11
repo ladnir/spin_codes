@@ -103,9 +103,9 @@ The Turbo SPIN transposed kernel uses the same public in-place encoder
 interface, with a separate RS-packet route and outer. Eight RS$[8,4]$
 rows are evaluated per group; field multiplication randomizes each
 $32$-bit column. The implementation reverses the $64$-region packet route
-and the chosen inner before applying the transposed outer. It selects the
-paired $15$-state map at $K=2^{16}$ and the exact $22$-state map at the
-larger lengths. The AVX-512/VBMI/GFNI kernel is selected at runtime;
+and the inner before applying the transposed outer. It uses the exact
+$22$-state map at every length, matching the certified construction.
+The AVX-512/VBMI/GFNI kernel is selected at runtime;
 a scalar fallback and independent adjoint checks cover the same map.
 The online call allocates no memory. Table~\ref{tab:turbo-performance}
 uses precomputed setup and records; it is not an end-to-end OT or PCS time.

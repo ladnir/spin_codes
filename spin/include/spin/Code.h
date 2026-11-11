@@ -30,7 +30,7 @@ struct CodeSpec {
     // GL22 updates. It accepts natural sizes returned by valid_message_size;
     // accepting a size does not imply a distance certificate for that size.
     // PacketRs8T64 uses eight RS[8,4] rows over GF(16), GF(2^32) column maps,
-    // and paired-s15 at K<=65536 or exact s22 above. Natural sizes are positive
+    // and the exact s22 inner at every size. Natural sizes are positive
     // multiples of 128; only explicitly documented sizes have certificates.
     std::uint64_t route_seed=1;
     std::uint64_t inner_seed=2;

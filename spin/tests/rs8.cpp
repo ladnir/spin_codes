@@ -91,11 +91,13 @@ std::uint64_t checksum(std::span<const std::byte> bytes) {
 void knownAnswer(std::size_t k,std::uint64_t route,std::uint64_t inner,
                  std::span<const std::byte> forward,std::span<const std::byte> transpose) {
     // Captured only after agreement with the independent frozen RS8 oracle.
+    // K <= 65536 entries re-captured after RS8 switched to the s22 inner at every
+    // size (2026-11-11); larger sizes are unchanged.
     // Keep seeded-map stability checked even when research tests are disabled.
     struct Answer {std::size_t k;std::uint64_t route,inner,forward,transpose;};
     constexpr Answer answers[]{
-        {2176,17,43,0xb45ddd9806470ed2ULL,0xad8306021ba3e75bULL},
-        {65536,17,43,0xd1f285bc44b457d6ULL,0xc13a542968944bc9ULL},
+        {2176,17,43,0x481a133e50d1b0feULL,0x11a3b5ade0d8e9e1ULL},
+        {65536,17,43,0x5fe61e43675ff13aULL,0x1cde7011f1c84d6fULL},
         {65664,17,43,0x15e592e1cd42252eULL,0xcb7f7e09d69af5baULL},
         {262144,17,43,0x6ba2298f22327d90ULL,0xcca5522d981204ffULL},
         {1048576,41,41,0xcec49afc83e022aeULL,0x0d05d97a7217c697ULL}};

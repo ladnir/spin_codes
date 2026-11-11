@@ -64,8 +64,9 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed) {
     k=size;
     n=2*size;
     groups=size/128;
-    if(k<=65536) paired15Plan.emplace(k,routeSeed,innerSeed,false);
-    else certified22Plan.emplace(k,routeSeed,innerSeed,false);
+    // The exact s22 inner at every size: it is the map the Lean development
+    // certifies at K = 2^14..2^26 (paired-s15 was only numerically checked at K16).
+    certified22Plan.emplace(k,routeSeed,innerSeed,false);
     prepareOuter(*this,routeSeed);
 }
 
