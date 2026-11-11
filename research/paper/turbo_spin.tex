@@ -89,6 +89,11 @@ length, a Lean development checks the complete distance bound, including
 every numerical certificate; it is the authority for
 Theorem~\ref{thm:turbo-spin}.
 
+A smaller state is also workable. A paired $15$-state map encodes about
+$14\%$ faster at $K\le2^{16}$, and a numerical check gives it a margin of
+$61.88$ bits at $K=2^{16}$, but we do not formalize it and use $s=22$
+throughout.
+
 The fixed $128$-bit local outer and four-bit packet route give no
 asymptotic guarantee here. Scalable SPIN instead increases its outer
 length with $N$ and uses a bit-level route.
