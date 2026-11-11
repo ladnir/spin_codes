@@ -145,3 +145,30 @@ instead holds the generators, the per-length plans that fix every
 certificate parameter, and the hand-written lemmas, so the modules can
 be regenerated and rechecked\repositorycite. The kernel was rerun on all
 hand-written modules independently of the build.
+
+\paragraph{Lean artifact.}
+The development lives in \nolinkurl{research/lean} of the
+repository\repositorycite. For each $e\in\{14,16,\ldots,26\}$, its final
+theorem is
+\[
+ \texttt{Spin.Turbo.G}e\texttt{Final.g}e\texttt{\_endpoint},
+\]
+which states the bound above for the setup \texttt{turboSetup22}. The setup
+is defined in \nolinkurl{SpinCodes/Turbo/ActualSetup22.lean}.
+The steps of this appendix correspond to hand-written modules in
+\nolinkurl{SpinCodes/Turbo}:
+\begin{itemize}
+\item the split into one, two, and three or more active groups:
+  \texttt{BadSplit22};
+\item the per-group outer bound $\beta_{\rm RS16}$:
+  \texttt{RS8UniformReference22};
+\item exact coefficients: \texttt{TailTermFracAB22};
+\item markers: \texttt{TailMarkerFracAB22};
+\item the range lemma: \texttt{TailMarkerRange22};
+\item binomial coefficients that the kernel can evaluate:
+  \texttt{BinomFast22}.
+\end{itemize}
+The directory \nolinkurl{ladder_plans} holds each length's certificate
+parameters and the commands that regenerate the certificate modules.
+The files \texttt{LadderAudit.lean} and \texttt{G22Audit.lean} restate the
+endpoint theorems and print their axioms.
