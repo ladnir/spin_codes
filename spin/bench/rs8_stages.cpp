@@ -44,6 +44,8 @@ int main(int argc,char** argv) {try {
         if(stage=="p15reverse") { spin::detail::paired15::reverseRouteFast(output,scratch,*p15); return; }
         if(stage=="p15transpose") { spin::detail::paired15::transposeFast(output,input,scratch,*p15); return; }
         if(stage=="g2outer") { rs8::outerForwardAvx2Gfni(input,scratch,plan,lanes); return; }
+        if(stage=="g2inner") { rs8::forwardInnerAvx2Gfni(scratch,output,plan,lanes); return; }
+        if(stage=="g2treverse") { rs8::reverseRouteAvx2Gfni(output,scratch,plan); return; }
         if(stage=="g2touter") { rs8::outerAvx2Gfni(scratch,input,plan); return; }
         if(stage=="g2transpose") { rs8::transposeAvx2Gfni(output,input,scratch,plan); return; }
         if(stage=="g2both") { rs8::forwardAvx2Gfni(input,output,scratch,plan,lanes,false); return; }

@@ -47,7 +47,7 @@ Implementations of the same seeded map are selected at runtime:
 | Backend | Runs on | Kernels |
 |---|---|---|
 | `Avx512` | x86-64 with AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
-| `Avx2Gfni` | x86-64 with AVX2 and GFNI (e.g. Intel 12th gen and later) | AVX2 kernels with GFNI byte maps and transposes; AVX2 setup |
+| `Avx2Gfni` | x86-64 with AVX2 and GFNI (e.g. Intel 12th gen and later) | AVX2 kernels with GFNI byte maps, transposes and one-lane GL22 update; AVX2 setup |
 | `Avx2` | x86-64 with AVX2 (no GFNI or AVX-512 needed) | Tuned transpose, forward, and setup |
 | `Neon` | AArch64 (NEON; EOR3 when built with the SHA3 extension) | Tuned transpose and forward; portable setup |
 | `Portable` | Any 64-bit CPU (plain C++) | Optimized transpose, forward, and setup |

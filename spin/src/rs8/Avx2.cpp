@@ -14,8 +14,9 @@
 // fixed affine byte maps are two nibble lookups (pshufb). Each 256-bit vector
 // carries two independent jobs in its 128-bit halves (two groups, or two
 // record lanes of one group); pshufb is lane-local, so each half has its own
-// tables. With GFNI (Avx2Gfni.cpp) every byte map is one affine instruction
-// and the transposes gather bytes and transpose each qword with one affine.
+// tables. With GFNI (Avx2Gfni.cpp) every byte map is one affine instruction,
+// the transposes gather bytes and transpose each qword with one affine, and
+// the one-lane GL22 update applies its 3x3 blocks as affine matrices.
 #include "Rs8.h"
 // Built twice: Avx2.cpp (SPIN_RS8_GFNI 0, AVX2 only) and Avx2Gfni.cpp
 // (SPIN_RS8_GFNI 1, AVX2 with GFNI), with distinct entry-point names.
@@ -33,6 +34,7 @@
 #include "OuterMaps.h"
 #include <bit>
 #include <cstddef>
+#include <type_traits>
 
 namespace spin::detail::rs8 {
 namespace {
@@ -418,8 +420,48 @@ static SPIN_FORCEINLINE void nibbleOffsets(const std::uint64_t* packed,std::uint
     _mm_storel_epi64(reinterpret_cast<__m128i*>(lo+64),_mm_slli_epi16(_mm_and_si128(x,m128),Shift));
     _mm_storel_epi64(reinterpret_cast<__m128i*>(hi+64),_mm_srli_epi16(_mm_andnot_si128(m128,x),4-Shift));
 }
+#if SPIN_RS8_GFNI
+// One-lane GL22 update with GFNI: the 22 coordinates as byte planes in two
+// vector sets, [groups 0 | 1] and [group 2 | zero] (group g = coordinates
+// 8g..8g+7, bit j of a byte = coordinate 8g+j). Block (o,i) of U maps group i
+// to group o as one affine matrix: packed qword 3o+i, byte j = row 8o+j's
+// mask over group i, is the GFNI matrix with its bytes reversed.
+static SPIN_FORCEINLINE V pair(std::uint64_t a,std::uint64_t b) {
+    return _mm256_setr_epi64x(std::int64_t(a),std::int64_t(a),std::int64_t(b),std::int64_t(b));
+}
+static SPIN_FORCEINLINE V affine(V x,V m) { return _mm256_gf2p8affine_epi64_epi8(x,m,0); }
+static SPIN_FORCEINLINE void updateGfni(__m128i* w,const __m128i* f,const std::uint64_t* packed) {
+    const auto zero=_mm_setzero_si128();
+    V b[8],c[8],s01[8],s2[8];
+    for(unsigned j=0;j<8;++j) { b[j]=join(w[j],w[8+j]);c[j]=join(j<6?w[16+j]:zero,zero); }
+    toPlanes(b,s01);toPlanes(c,s2);
+    std::uint64_t a[9];
+    for(unsigned q=0;q<9;++q) a[q]=__builtin_bswap64(packed[q]);
+    const auto m0011=pair(a[0],a[4]),m0110=pair(a[1],a[3]),m0212=pair(a[2],a[5]);
+    const auto m2021=pair(a[6],a[7]),m22=pair(a[8],0);
+    for(unsigned m=0;m<8;++m) {
+        const auto s=s01[m];
+        const auto swapped=_mm256_permute4x64_epi64(s,0x4e),g2=_mm256_permute4x64_epi64(s2[m],0x44);
+        // [y0 | y1] = [A00 g0 + A01 g1 + A02 g2 | A11 g1 + A10 g0 + A12 g2].
+        s01[m]=xor3(affine(s,m0011),affine(swapped,m0110),affine(g2,m0212));
+        // y2 = A20 g0 + A21 g1 + A22 g2, in the low half.
+        auto t=affine(s,m2021);
+        t=xor2(t,_mm256_permute4x64_epi64(t,0x4e));
+        s2[m]=xor2(t,affine(s2[m],m22));
+    }
+    fromPlanes(s01,b);fromPlanes(s2,c);
+    for(unsigned j=0;j<8;++j) {
+        w[j]=_mm_xor_si128(_mm256_castsi256_si128(b[j]),f[j]);
+        w[8+j]=_mm_xor_si128(_mm256_extracti128_si256(b[j],1),f[8+j]);
+        if(j<6) w[16+j]=_mm_xor_si128(_mm256_castsi256_si128(c[j]),f[16+j]);
+    }
+}
+#endif
 template<class W,class X>
 static SPIN_FORCEINLINE void update(W* w,const W* f,const std::uint64_t* packed) {
+#if SPIN_RS8_GFNI
+    if constexpr(std::is_same_v<W,__m128i>) { updateGfni(w,f,packed); return; }
+#endif
     using P=PairOf<W>;
     using E=typename P::E;
     using XE=typename P::XE;
