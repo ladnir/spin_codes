@@ -229,7 +229,7 @@ the paired-s15 and s22 profiles use four-row tiles (`tile_rows=0` or `4`).
 | `PacketRsT64S20` | Yes | Yes | 256/512 bits | No |
 | `PacketRsT64S15K16` | Yes | Yes | 256/512 bits | No |
 | `PacketRsT64S22` | Yes | Scalar fallback | 256/512 bits, scalar fallback | No |
-| `PacketRs8T64` | Yes | Scalar fallback | 256/512 bits, scalar fallback | No |
+| `PacketRs8T64` | Yes (AVX-512, AVX2) | Yes (AVX-512, AVX2) | 256/512 bits (AVX-512, AVX2) | No |
 
 Wide support also depends on the CPU and compiled backends.
 
@@ -371,7 +371,9 @@ The seed expansion does not certify every individual seed.
 
 `Backend::Automatic` selects the AVX-512F/VL/BW/DQ, VBMI, and GFNI kernel when
 available, otherwise the literal SSE2 fallback. `Portable` forces the fallback;
-`Avx512` requires the fast backend. Packet encoding rejects `Avx2`.
+`Avx512` requires the fast backend. Packet encoding rejects `Avx2`, except
+Turbo (`PacketRs8T64`), which also has AVX2 kernels and AVX2 setup; for Turbo,
+`Automatic` falls back to AVX2 before the SSE2 oracle (see RS8.md).
 `SPIN_ENABLE_AVX512=OFF` supports the fallback without compiling the fast kernel.
 The fallback is for compatibility and checking, not comparable performance.
 `PreparedEncoder` supports this family in `Full` mode only.

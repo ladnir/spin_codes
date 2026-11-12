@@ -44,6 +44,14 @@ void transposeFast(const Block*, Block*, Block* scratch, const Plan&);
 // output stores are used only when requested and output is 64-byte aligned.
 void forwardFast(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
 void outerForwardFast(const Block*, Block* scratch, const Plan&, unsigned lanes);
+// AVX2 kernels (Avx2.cpp; no AVX-512, VBMI or GFNI): same contracts as the
+// scalar entry points, require cpu_avx2().
+void transposeAvx2(const Block*, Block*, Block* scratch, const Plan&);
+void forwardAvx2(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
+void reverseRouteAvx2(const Block*, Block* scratch, const Plan&);
+void outerAvx2(const Block* scratch, Block*, const Plan&);
+void outerForwardAvx2(const Block*, Block* scratch, const Plan&, unsigned lanes);
+void forwardInnerAvx2(const Block* scratch, Block*, const Plan&, unsigned lanes);
 
 // Internal stage entry points and independent literal outer oracles. Fast
 // outer stores stream above K18 when output is 64-byte aligned.

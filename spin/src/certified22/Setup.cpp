@@ -159,18 +159,24 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool
     n=2*size;
     groups=size/128;
 #if SPIN_BCH_AVX512
-    if(path==SetupPath::Automatic && cpu_packet512()) {
+    const bool packet512=path==SetupPath::Automatic && cpu_packet512();
+#else
+    const bool packet512=false;
+#endif
+    const bool avx2=!packet512 && (path==SetupPath::Avx2 || (path==SetupPath::Automatic && cpu_avx2()));
+#if SPIN_BCH_AVX512
+    if(packet512) {
         BufferedWords words(routeSeed);
         prepareRoute(*this,words);
     } else
 #endif
     { Words words(routeSeed); prepareRoute(*this,words); }
 #if SPIN_BCH_AVX512
-    if(path==SetupPath::Automatic && cpu_packet512()) prepareInnerFast(*this,innerSeed);
+    if(packet512) prepareInnerFast(*this,innerSeed);
     else
 #endif
-    prepareInner(*this,innerSeed);
-    (void)path;
+    if(avx2) prepareInnerAvx2(*this,innerSeed);
+    else prepareInner(*this,innerSeed);
     if(withOuter) prepareOuter(*this,routeSeed);
 }
 std::size_t Plan::setupBytes() const noexcept {

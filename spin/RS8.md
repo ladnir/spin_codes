@@ -17,10 +17,11 @@ code.transpose_inplace_bytes(buffer.bytes(),work);
 
 Setup and allocation occur before encoding. The in-place call overwrites the
 first K records and preserves the remaining K. Separate-buffer transpose is
-also supported. Forward encoding supports 128/256/512-bit records through a
-scalar fallback; this promotion does not provide a tuned forward kernel.
-Generic XOR records, bit-packed forward encoding, and banked heuristic setup
-are not supported by this profile.
+also supported. Forward encoding supports 128/256/512-bit records.
+`PreparedEncoder` supports `Full` and `BankedHeuristic` setup; banked setup
+reuses one exact plan under a structured, correlated refresh that the
+certificate does not cover. Generic XOR records and bit-packed forward
+encoding are not supported by this profile.
 
 ## Construction and sizing
 
@@ -37,8 +38,42 @@ sampling domains; `inner_seed` determines the inner updates.
 
 Accepted message sizes are positive multiples of 128 up to 132,152,832.
 Call `valid_message_size` before allocating. `tile_rows` accepts 0 or 8.
-The AVX-512/VBMI/GFNI kernel is selected at runtime, with a baseline SSE2
-fallback. Owned buffers use the existing automatic large-page policy.
+Owned buffers use the existing automatic large-page policy.
+
+## Backends
+
+Three implementations of the same seeded map are selected at runtime:
+
+| Backend | ISA | Kernels |
+|---|---|---|
+| `Avx512` | AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
+| `Avx2` | AVX2 only (no GFNI, no AVX-512) | Tuned transpose, forward, and setup |
+| `Portable` | SSE2 | Literal scalar oracle |
+
+`Automatic` picks the first available of `Avx512`, `Avx2`, `Portable`.
+Selecting `Avx2` explicitly also uses the AVX2 setup, so it measures the
+AVX2-only machine class on any CPU. Every setup path produces bit-identical
+tables (`spin_turbo_setup_test`), and `spin_rs8_test avx2` checks the AVX2
+kernels against the scalar oracle (CTest `spin_rs8_avx2`).
+
+The AVX2 kernels keep the AVX-512 circuit: the s22 step is the same XOR
+network in the fast basis, the per-epoch GL22 update uses four-Russians
+tables instead of GFNI affine blocks, and the outer works on byte planes
+obtained by an 8x8 register bit transpose, with GF(256) and nibble maps as
+pshufb lookups instead of GFNI products.
+
+Peach (Ryzen 7950X, core 15, GCC 15.2, `SPIN_TUNE=generic`), 2026-11-12,
+medians, AVX2 / AVX-512 on the same machine (`spin_turbo_backends_bench`,
+`spin_setup_once_bench`; forward with streaming stores):
+
+| K | Transpose | Forward 128-bit | Exact setup | Exact single use | Banked single use |
+|---|---:|---:|---:|---:|---:|
+| 2^16 | 0.40 / 0.11 ms | 0.40 / 0.13 ms | 0.50 / 0.42 ms | 0.90 / 0.54 ms | 0.43 / 0.14 ms |
+| 2^18 | 1.63 / 0.46 ms | 1.64 / 0.54 ms | 2.02 / 1.69 ms | 3.80 / 2.24 ms | 1.74 / 0.60 ms |
+| 2^20 | 7.98 / 3.02 ms | 9.59 / 4.27 ms | 9.76 / 8.38 ms | 20.3 / 11.9 ms | 9.74 / 3.97 ms |
+
+For scale, on an AVX2-only laptop (i7-13700H, WSL, unpinned) the SSE2 oracle
+took about 35 ms for the 2^16 transpose and the scalar setup about 15 ms.
 
 ## Certificate scope
 

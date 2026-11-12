@@ -93,16 +93,21 @@ void BankState::refresh(std::uint64_t routeSeed,std::uint64_t innerSeed) noexcep
 //  - inner: a uniform order of the bank's GL22 epoch updates;
 //  - outer: fresh nonzero GF(2^32) scalars, exactly the Full-mode outer.
 // Refresh writes the live plan in place: no allocation, O(K) copying. The
-// scalar-only tables are kept in step only for the Portable backend.
+// scalar-only tables are kept in step only for the Portable backend; the
+// AVX-512 and AVX2 kernels read routeBytes, updates and field only.
 struct TurboBank {
     rs8::Plan bank,live;
+    Backend kernel;
     bool fast;
     std::array<std::uint32_t,64> regions{};
     std::array<std::uint32_t,64> shifts{};
     std::vector<std::uint32_t> epochs;
-    TurboBank(CodeSpec s,std::uint64_t bankSeed,bool f)
-        :bank(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL),
-         live(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL),fast(f),
+    static certified22::SetupPath setupPath(Backend k) noexcept {
+        return k==Backend::Avx2?certified22::SetupPath::Avx2:certified22::SetupPath::Automatic;
+    }
+    TurboBank(CodeSpec s,std::uint64_t bankSeed,Backend k)
+        :bank(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL,setupPath(k)),
+         live(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL,setupPath(k)),kernel(k),fast(k!=Backend::Portable),
          epochs(s.message_size/32) {
         refresh(s.route_seed,s.inner_seed);
     }
@@ -160,21 +165,24 @@ struct PreparedState {
         if(o.mode==SetupMode::Full)full.emplace(s,e);
         else if(o.mode==SetupMode::BankedHeuristic) {
             if(s.parameters==Parameters::PacketRs8T64) {
-                bool fast=false;
+                auto kernel=Backend::Portable;
                 switch(e.backend) {
-                case Backend::Automatic:fast=cpu_packet512();break;
+                case Backend::Automatic:
+                    kernel=cpu_packet512()?Backend::Avx512:capabilities().avx2?Backend::Avx2:Backend::Portable;
+                    break;
                 case Backend::Portable:break;
                 case Backend::Avx512:
                     if(!cpu_packet512()) throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
-                    fast=true;break;
+                    kernel=Backend::Avx512;break;
                 case Backend::Avx2:
-                    throw std::invalid_argument("SPIN packet has no AVX2 backend; select Portable or Automatic");
+                    if(!capabilities().avx2) throw std::runtime_error("SPIN Turbo AVX2 backend unavailable");
+                    kernel=Backend::Avx2;break;
                 default:throw std::invalid_argument("SPIN unknown backend");
                 }
 #if !SPIN_BCH_AVX512
-                fast=false;
+                if(kernel==Backend::Avx512) kernel=capabilities().avx2?Backend::Avx2:Backend::Portable;
 #endif
-                turbo.emplace(s,o.bank_seed,fast);
+                turbo.emplace(s,o.bank_seed,kernel);
                 return;
             }
             if(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRsT64S15K16 ||
@@ -257,7 +265,7 @@ std::size_t PreparedEncoder::setup_bytes() const noexcept {
 Backend PreparedEncoder::backend() const noexcept {
     if(!state_)return Backend::Automatic;
     if(state_->full)return state_->full->backend();
-    if(state_->turbo)return state_->turbo->fast?Backend::Avx512:Backend::Portable;
+    if(state_->turbo)return state_->turbo->kernel;
     return state_->four?Backend::Avx512:Backend::Avx2;
 }
 bool PreparedEncoder::supports_transpose(Width width) const noexcept {
@@ -336,8 +344,9 @@ static void turboTranspose(const detail::TurboBank& t,const std::byte* in,std::b
     auto* output=reinterpret_cast<detail::storage::block*>(out);
     auto* work=reinterpret_cast<detail::storage::block*>(s.turbo->bytes().data());
 #if SPIN_BCH_AVX512
-    if(t.fast) { detail::rs8::transposeFast(input,output,work,t.live); return; }
+    if(t.kernel==Backend::Avx512) { detail::rs8::transposeFast(input,output,work,t.live); return; }
 #endif
+    if(t.kernel==Backend::Avx2) { detail::rs8::transposeAvx2(input,output,work,t.live); return; }
     detail::rs8::transposeScalar(input,output,work,t.live);
 }
 static bool overlaps(const void* a,std::size_t na,const void* b,std::size_t nb) {

@@ -36,12 +36,19 @@ int main(int argc,char** argv) {try {
         state+=0x9e3779b97f4a7c15ULL;auto v=state;v=(v^(v>>30))*0xbf58476d1ce4e5b9ULL;
         v=(v^(v>>27))*0x94d049bb133111ebULL;v^=v>>31;std::memcpy(bytes+i,&v,8);
     }
-    rs8::outerForwardFast(input,scratch,plan,lanes);
+    const bool avx2=stage.rfind("a2",0)==0;
+    if(avx2) rs8::outerForwardAvx2(input,scratch,plan,lanes); else rs8::outerForwardFast(input,scratch,plan,lanes);
     std::optional<spin::detail::paired15::Plan> p15;
     if(stage.rfind("p15",0)==0) p15.emplace(k,1,2);
     const auto run=[&] {
         if(stage=="p15reverse") { spin::detail::paired15::reverseRouteFast(output,scratch,*p15); return; }
         if(stage=="p15transpose") { spin::detail::paired15::transposeFast(output,input,scratch,*p15); return; }
+        if(stage=="a2outer") { rs8::outerForwardAvx2(input,scratch,plan,lanes); return; }
+        if(stage=="a2inner") { rs8::forwardInnerAvx2(scratch,output,plan,lanes); return; }
+        if(stage=="a2treverse") { rs8::reverseRouteAvx2(output,scratch,plan); return; }
+        if(stage=="a2touter") { rs8::outerAvx2(scratch,input,plan); return; }
+        if(stage=="a2transpose") { rs8::transposeAvx2(output,input,scratch,plan); return; }
+        if(stage=="a2both") { rs8::forwardAvx2(input,output,scratch,plan,lanes,false); return; }
         if(stage=="outer") rs8::outerForwardFast(input,scratch,plan,lanes);
         else if(stage=="inner") c22::forwardInnerFast(scratch,output,*plan.certified22Plan,lanes,false,plan.scratchBlocks());
         else if(stage=="treverse") c22::reverseRouteFast(output,scratch,*plan.certified22Plan);

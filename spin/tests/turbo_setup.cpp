@@ -1,4 +1,4 @@
-// Turbo (PacketRs8T64) setup differential test: the automatic (AVX-512) setup
+// Turbo (PacketRs8T64) setup differential test: the AVX2 and AVX-512 setups
 // must reproduce the scalar setup's tables bit for bit, and the table-driven
 // outer coefficients must equal the literal bit-serial definitions.
 #include "../src/rs8/Rs8.h"
@@ -6,6 +6,7 @@
 #include "../src/Cpu.h"
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 using namespace spin::detail;
@@ -15,8 +16,8 @@ template<class A,class B> void same(const A& a,const B& b,const char* what,std::
         throw std::runtime_error(what);
     }
 }
-void check(std::size_t k,std::uint64_t route,std::uint64_t inner) {
-    const rs8::Plan fast(k,route,inner),scalar(k,route,inner,certified22::SetupPath::Scalar);
+void check(std::size_t k,std::uint64_t route,std::uint64_t inner,certified22::SetupPath path) {
+    const rs8::Plan fast(k,route,inner,path),scalar(k,route,inner,certified22::SetupPath::Scalar);
     const auto& f=*fast.certified22Plan;
     const auto& s=*scalar.certified22Plan;
     same(f.route,s.route,"route",k);
@@ -38,10 +39,14 @@ void check(std::size_t k,std::uint64_t route,std::uint64_t inner) {
 }
 int main() {
     try {
-        if(!cpu_packet512()) { std::cout<<"setup: packet AVX-512 unavailable; scalar only\n"; return 77; }
-        for(std::size_t k:{std::size_t{128},std::size_t{384},std::size_t{1}<<14,std::size_t{65664},std::size_t{1}<<18})
-            for(std::uint64_t seed:{1ULL,0x9e3779b97f4a7c15ULL,~0ULL}) check(k,seed,seed*3+7);
-        std::cout<<"setup: fast and scalar Turbo setup tables identical\n";
+        if(!cpu_avx2()) { std::cout<<"setup: AVX2 unavailable; scalar only\n"; return 77; }
+        // Avx2 forces the AVX2 setup; Automatic is the AVX-512 setup where present.
+        std::vector<certified22::SetupPath> paths{certified22::SetupPath::Avx2};
+        if(cpu_packet512()) paths.push_back(certified22::SetupPath::Automatic);
+        for(auto path:paths)
+            for(std::size_t k:{std::size_t{128},std::size_t{384},std::size_t{1}<<14,std::size_t{65664},std::size_t{1}<<18})
+                for(std::uint64_t seed:{1ULL,0x9e3779b97f4a7c15ULL,~0ULL}) check(k,seed,seed*3+7,path);
+        std::cout<<"setup: "<<(paths.size()>1?"AVX-512, AVX2":"AVX2")<<" and scalar Turbo setup tables identical\n";
         return 0;
     } catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
 }

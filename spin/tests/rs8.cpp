@@ -50,6 +50,9 @@ static_assert(static_cast<std::uint32_t>(family)==8);
 static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S15K16)==6);
 static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S22)==7);
 struct Block {std::uint64_t words[2]{};bool operator==(const Block&) const=default;};
+// Backend under test against the Portable oracle: Automatic, or Avx2 when
+// run as "spin_rs8_test avx2".
+spin::Backend tested=spin::Backend::Automatic;
 struct Context {const char* test="metadata";std::size_t k=0;std::uint64_t route=0,inner=0;unsigned width=16,offset=0;} context;
 void require(bool value,const char* message) {
     if(value)return;
@@ -142,7 +145,8 @@ void metadata() {
         require(descriptor[24+i]==std::byte((17ULL>>(8*i))&255),"descriptor route seed");
         require(descriptor[32+i]==std::byte((43ULL>>(8*i))&255),"descriptor inner seed");
     }
-    require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:spin::Backend::Portable),"automatic backend");
+    require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:
+        spin::capabilities().avx2?spin::Backend::Avx2:spin::Backend::Portable),"automatic backend");
     for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})
         require(code.supports_forward(width) && scalar.supports_forward(width),"forward width unsupported");
     require(code.supports_transpose() && !code.supports_transpose(spin::Width::Bits256) &&
@@ -152,14 +156,18 @@ void metadata() {
     std::array<std::uint64_t,6> packedMessage{};
     std::array<std::uint64_t,12> packedOutput{},packedScratch{};
     rejects([&]{code.forward_bits(packedMessage,packedOutput,packedScratch);});
-    rejects([&]{spin::Code wrong({384,family,17,43},{spin::Backend::Avx2});});
+    rejects([&]{spin::Code wrong({384,spin::Parameters::PacketRsT64S22,17,43},{spin::Backend::Avx2});});
+    if(!spin::capabilities().avx2) {
+        bool failed=false;try{spin::Code forced({384,family,17,43},{spin::Backend::Avx2});}
+        catch(const std::runtime_error&){failed=true;}require(failed,"unavailable AVX2 accepted");
+    }
     if(!spin::packet_fast_available()) {
         bool failed=false;try{spin::Code forced({384,family,17,43},{spin::Backend::Avx512});}
         catch(const std::runtime_error&){failed=true;}require(failed,"unavailable ISA accepted");
     }
 }
 void transposeCase(std::size_t k,std::uint64_t route,std::uint64_t inner) {
-    const auto n=2*k;spin::Code code({k,family,route,inner}),scalar(code.specification(),{spin::Backend::Portable});
+    const auto n=2*k;spin::Code code({k,family,route,inner},{tested}),scalar(code.specification(),{spin::Backend::Portable});
     context={"transpose/adjoint",k,route,inner};auto work=code.make_workspace(),sw=scalar.make_workspace();
     spin::Buffer source(n*16),input(n*16+128),output(k*16+128),expected(k*16),message(k*16),encoded(n*16);
     fill(source.bytes(),913);fill(message.bytes(),1949);
@@ -201,7 +209,7 @@ void transposeCase(std::size_t k,std::uint64_t route,std::uint64_t inner) {
 }
 void forwardWidths(std::size_t k,spin::Width width) {
     const std::size_t n=2*k;const auto bytes=static_cast<unsigned>(width);
-    spin::Code code({k,family,17,43}),scalar(code.specification(),{spin::Backend::Portable});
+    spin::Code code({k,family,17,43},{tested}),scalar(code.specification(),{spin::Backend::Portable});
     context={"forward widths",k,17,43,bytes};auto work=code.make_workspace(width),sw=scalar.make_workspace(width),narrow=code.make_workspace();
     spin::Buffer input(k*bytes+128),original(k*bytes),output(n*bytes+128),expected(n*bytes),plane(k*16),encoded(n*16);
     auto in=input.bytes().subspan(16,k*bytes);
@@ -269,7 +277,7 @@ void ownershipAndSeeds() {
 }
 void preparedFull() {
     constexpr std::size_t k=384,n=2*k;
-    for(auto backend:{spin::Backend::Portable,spin::Backend::Automatic}) {
+    for(auto backend:{spin::Backend::Portable,tested}) {
         context={"prepared Full",k,17,43};spin::PreparedEncoder prepared({k,family,17,43},{spin::SetupMode::Full},{backend});
         auto work=prepared.make_workspace();const auto bytes=work.bytes();
         require(prepared.supports_transpose() && !prepared.supports_generic_transpose(),"prepared capabilities");
@@ -318,7 +326,7 @@ void preparedBanked(std::size_t k) {
     const auto n=2*k;context={"prepared banked",k,17,43};
     const spin::SetupOptions banked{spin::SetupMode::BankedHeuristic,0x1234567};
     spin::PreparedEncoder portable({k,family,17,43},banked,{spin::Backend::Portable});
-    spin::PreparedEncoder automatic({k,family,17,43},banked,{spin::Backend::Automatic});
+    spin::PreparedEncoder automatic({k,family,17,43},banked,{tested});
     require(automatic.supports_transpose() && !automatic.supports_generic_transpose(),"banked capabilities");
     rejects([&]{automatic.generic_transpose();});rejects([&]{automatic.make_workspace(spin::Width::Bits256);});
     auto pw=portable.make_workspace(),aw=automatic.make_workspace();const auto bytes=aw.bytes();
@@ -349,7 +357,11 @@ void preparedBanked(std::size_t k) {
     require(!equal(actual.bytes(),first.bytes()),"bank seed has no effect");
     rejects([&]{automatic.transpose_bytes(input.bytes(),actual.bytes(),ow);});
 }
-int main() {try {
+int main(int argc,char** argv) {try {
+    if(argc>1 && !std::strcmp(argv[1],"avx2")) {
+        if(!spin::capabilities().avx2){std::cout<<"rs8 AVX2 SKIP: no AVX2\n";return 77;}
+        tested=spin::Backend::Avx2;
+    }
     metadata();
     for(auto k:{std::size_t{128},std::size_t{256},std::size_t{384},std::size_t{1920},std::size_t{2048},
                 std::size_t{2176},std::size_t{6144},std::size_t{65408},std::size_t{65536},std::size_t{65664},std::size_t{262016},std::size_t{262144},
@@ -360,6 +372,6 @@ int main() {try {
         for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})forwardWidths(k,width);
     ownershipAndSeeds();preparedFull();
     for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})preparedBanked(k);
-    std::cout<<"rs8 API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
+    std::cout<<(tested==spin::Backend::Avx2?"rs8 AVX2 ":"rs8 ")<<"API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
