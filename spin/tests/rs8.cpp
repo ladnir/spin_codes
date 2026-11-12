@@ -318,7 +318,7 @@ int main() {try {
                 std::size_t{262272}})transposeCase(k,17,43);
     transposeCase(1048576,41,41);
     transposeCase(2048,1,1);transposeCase(2048,913,1123);
-    for(auto k:{std::size_t{384},std::size_t{65664}})
+    for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})
         for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})forwardWidths(k,width);
     ownershipAndSeeds();preparedFull();
     std::cout<<"rs8 API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";

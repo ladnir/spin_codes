@@ -62,23 +62,32 @@ void prepareInner(Plan& p,std::uint64_t seed) {
     const auto epochs=p.n/64;
     p.reverseMatrices.resize(epochs);
     p.updates.resize(9*epochs);
+    p.forwardUpdates.resize(9*epochs);
     Words words(seed^0x3f625a92ULL);
+    const auto packBlocks=[](const Matrix& transformed,std::uint64_t* out) {
+        for(unsigned o=0; o<3; ++o)
+            for(unsigned in=0; in<3; ++in) {
+                std::uint64_t packed=0;
+                for(unsigned j=0; j<8; ++j) {
+                    const auto row=8*o+j;
+                    if(row<22) packed|=std::uint64_t((transformed[row]>>(8*in))&255U)<<(8*j);
+                }
+                out[3*o+in]=packed;
+            }
+    };
     for(std::size_t epoch=0; epoch<epochs; ++epoch) {
         auto& literal=p.reverseMatrices[epoch];
         // Exact uniform-GL22 rejection sampler from the certified setup.
         do {
             for(auto& row:literal) row=static_cast<std::uint32_t>(words())&0x3fffffU;
         } while(!fullRank(literal));
-        const auto transformed=multiply(multiply(map::basis,literal),map::inverseBasis);
-        for(unsigned out=0; out<3; ++out)
-            for(unsigned in=0; in<3; ++in) {
-                std::uint64_t packed=0;
-                for(unsigned j=0; j<8; ++j) {
-                    const auto row=8*out+j;
-                    if(row<22) packed|=std::uint64_t((transformed[row]>>(8*in))&255U)<<(8*j);
-                }
-                p.updates[9*epoch+3*out+in]=packed;
-            }
+        packBlocks(multiply(multiply(map::basis,literal),map::inverseBasis),p.updates.data()+9*epoch);
+        // The forward recurrence uses R^T in the same circuit basis.
+        Matrix transposed{};
+        for(unsigned row=0; row<22; ++row)
+            for(unsigned column=0; column<22; ++column)
+                transposed[column]|=((literal[row]>>column)&1U)<<row;
+        packBlocks(multiply(multiply(map::basis,transposed),map::inverseBasis),p.forwardUpdates.data()+9*epoch);
     }
 }
 std::uint8_t multiply8(std::uint8_t a, std::uint8_t b) {
@@ -142,6 +151,7 @@ std::size_t Plan::setupBytes() const noexcept {
     return route.capacity()*sizeof(route[0])+routeBytes.capacity()*sizeof(routeBytes[0])
         +reverseMatrices.capacity()*sizeof(reverseMatrices[0])
         +updates.capacity()*sizeof(updates[0])
+        +forwardUpdates.capacity()*sizeof(forwardUpdates[0])
         +outerMatrices16.capacity()*sizeof(outerMatrices16[0])
         +outerField.capacity()*sizeof(outerField[0]);
 }

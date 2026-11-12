@@ -114,9 +114,10 @@ void outerForward(const Block* message, Block* scratch, const std::array<std::ui
 void reverseRouteScalar(const Block* input, Block* scratch, const Plan& p) {
     inner<false>(input, scratch, p, 1, 0);
 }
-void forwardInnerScalar(const Block* scratch, Block* output, const Plan& p, unsigned lanes) {
+void forwardInnerScalar(const Block* scratch, Block* output, const Plan& p, unsigned lanes, std::size_t plane) {
+    if(!plane) plane = p.scratchBlocks();
     for(unsigned lane = 0; lane < lanes; ++lane)
-        inner<true>(scratch+lane*p.scratchBlocks(), output, p, lanes, lane);
+        inner<true>(scratch+lane*plane, output, p, lanes, lane);
 }
 void transposeScalar(const Block* input, Block* output, Block* scratch, const Plan& p) {
     reverseRouteScalar(input, scratch, p);

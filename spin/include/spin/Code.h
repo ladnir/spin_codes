@@ -119,8 +119,8 @@ public:
     // bytes according to the workspace; buffers require 16-byte alignment.
     // Exact sizes only, no overlap. Wider records apply the same map lane-wise.
     // Packet profiles support all forward widths and 128-bit transpose.
-    // PacketRsT64S22 and PacketRs8T64 forward encoding use the scalar fallback
-    // for every width; its optimized kernel is for 128-bit transpose.
+    // PacketRsT64S22 forward encoding uses the scalar fallback for every width.
+    // PacketRs8T64 has optimized AVX-512 forward at every width and 128-bit transpose.
     // Streaming is the default for large outputs. Use Cached when the next stage
     // immediately reuses a cache-resident result. Alignment is checked separately:
     // streaming stores use the backend's required alignment, otherwise cached stores.

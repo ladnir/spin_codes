@@ -25,6 +25,8 @@ struct Plan {
     std::vector<std::array<std::uint8_t,9>> field;
     // Column j of the literal reverse symbol map M_c, for scalar encoding.
     std::vector<std::array<std::uint32_t,32>> reverseColumns;
+    // GFNI matrices of the nine adjoint tower byte multiplications per column.
+    std::vector<std::array<std::uint64_t,9>> adjoint;
     std::size_t scratchBlocks() const noexcept { return groups * groupStride; }
     std::size_t setupBytes() const noexcept;
 };
@@ -36,6 +38,10 @@ struct Plan {
 void transposeScalar(const Block*, Block*, Block* scratch, const Plan&);
 void forwardScalar(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes);
 void transposeFast(const Block*, Block*, Block* scratch, const Plan&);
+// AVX-512 forward: same lanes/scratch contract as forwardScalar. Streaming
+// output stores are used only when requested and output is 64-byte aligned.
+void forwardFast(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
+void outerForwardFast(const Block*, Block* scratch, const Plan&, unsigned lanes);
 
 // Internal stage entry points and independent literal outer oracles. Fast
 // outer stores stream above K18 when output is 64-byte aligned.

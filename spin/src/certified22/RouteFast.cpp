@@ -2,8 +2,12 @@
 #include "Plan.h"
 #include "productionMap.h"
 #include "../packet/PacketInnerFast.h"
+#include "LaneMajor22.h"
+#include <algorithm>
+#include <cstddef>
 #include <array>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 namespace spin::detail::certified22 {
@@ -189,6 +193,23 @@ static SPIN_FORCEINLINE void updateGroupCarried(const Packed22& before,const std
     words.v[2*G+1]=_mm512_permutex2var_epi8(lo,unpackIndex<4>(),hi);
 }
 
+// Software prefetch distance, in epochs, of the routed packets gathered by
+// the forward inner (measured on Zen 4 at K = 2^16): two for one lane, one
+// for two lanes, none for the lane-major kernel or the reverse scatter.
+#ifndef SPIN_RS8_PF_NARROW
+#define SPIN_RS8_PF_NARROW 2
+#endif
+#ifndef SPIN_RS8_PF_WIDE
+#define SPIN_RS8_PF_WIDE 1
+#endif
+#ifndef SPIN_RS8_PF_LANE_MAJOR
+#define SPIN_RS8_PF_LANE_MAJOR 0
+#endif
+template<bool Write>
+static SPIN_FORCEINLINE void prefetchPackets(const void* base,const std::uint32_t* routeBytes) {
+    const auto* b=static_cast<const char*>(base);
+    for(unsigned i=0; i<16; ++i) __builtin_prefetch(b+routeBytes[i],Write?1:0,3);
+}
 template<bool Streaming>
 struct ByteRoute {
     std::byte* scratch; const std::uint32_t* offsets;
@@ -198,8 +219,8 @@ struct ByteRoute {
         else _mm512_store_si512(destination,value);
     }
 };
-template<bool RawFeedback=false,class Emit> static SPIN_FORCEINLINE void streamHigh(const Words22& state,
-const Block* raw,std::size_t packetBase,Emit& emit,__m512i* high) {
+template<bool RawFeedback=false,bool Gather=false,class Emit> static SPIN_FORCEINLINE void streamHigh(const Words22& state,
+const Block* raw,const std::uint32_t* route,std::size_t packetBase,Emit& emit,__m512i* high) {
 const auto c4=broadcast<4>(state),c8=broadcast<5>(state);
 const auto c16=broadcast<6>(state),c32=broadcast<7>(state);
 const auto c5=broadcast<8>(state),c9=broadcast<9>(state);
@@ -237,16 +258,16 @@ const auto b2=_mm512_xor_si512(_mm512_xor_si512(d2,d6),d10);
 const auto e1=_mm512_xor_si512(b0,b1);
 const auto e2=_mm512_xor_si512(b0,b2);
 const auto e3=_mm512_xor_si512(_mm512_xor_si512(e1,b2),d3);
-const auto x3=_mm512_loadu_si512(raw+60);
+const auto x3=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[15]):_mm512_loadu_si512(raw+60));
 const auto y3=RawFeedback?x3:_mm512_xor_si512(e3,x3);
 emit(packetBase+15,RawFeedback?_mm512_xor_si512(e3,x3):y3);
-const auto x2=_mm512_loadu_si512(raw+56);
+const auto x2=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[14]):_mm512_loadu_si512(raw+56));
 const auto y2=RawFeedback?x2:_mm512_xor_si512(e2,x2);
 emit(packetBase+14,RawFeedback?_mm512_xor_si512(e2,x2):y2);
-const auto x1=_mm512_loadu_si512(raw+52);
+const auto x1=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[13]):_mm512_loadu_si512(raw+52));
 const auto y1=RawFeedback?x1:_mm512_xor_si512(e1,x1);
 emit(packetBase+13,RawFeedback?_mm512_xor_si512(e1,x1):y1);
-const auto x0=_mm512_loadu_si512(raw+48);
+const auto x0=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[12]):_mm512_loadu_si512(raw+48));
 const auto y0=RawFeedback?x0:_mm512_xor_si512(b0,x0);
 emit(packetBase+12,RawFeedback?_mm512_xor_si512(b0,x0):y0);
 g31=_mm512_xor_si512(y1,y3);
@@ -262,16 +283,16 @@ const auto b2=_mm512_xor_si512(d2,d10);
 const auto e1=_mm512_xor_si512(b0,b1);
 const auto e2=_mm512_xor_si512(b0,b2);
 const auto e3=_mm512_xor_si512(_mm512_xor_si512(e1,b2),d3);
-const auto x3=_mm512_loadu_si512(raw+44);
+const auto x3=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[11]):_mm512_loadu_si512(raw+44));
 const auto y3=RawFeedback?x3:_mm512_xor_si512(e3,x3);
 emit(packetBase+11,RawFeedback?_mm512_xor_si512(e3,x3):y3);
-const auto x2=_mm512_loadu_si512(raw+40);
+const auto x2=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[10]):_mm512_loadu_si512(raw+40));
 const auto y2=RawFeedback?x2:_mm512_xor_si512(e2,x2);
 emit(packetBase+10,RawFeedback?_mm512_xor_si512(e2,x2):y2);
-const auto x1=_mm512_loadu_si512(raw+36);
+const auto x1=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[9]):_mm512_loadu_si512(raw+36));
 const auto y1=RawFeedback?x1:_mm512_xor_si512(e1,x1);
 emit(packetBase+9,RawFeedback?_mm512_xor_si512(e1,x1):y1);
-const auto x0=_mm512_loadu_si512(raw+32);
+const auto x0=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[8]):_mm512_loadu_si512(raw+32));
 const auto y0=RawFeedback?x0:_mm512_xor_si512(b0,x0);
 emit(packetBase+8,RawFeedback?_mm512_xor_si512(b0,x0):y0);
 g21=_mm512_xor_si512(y1,y3);
@@ -291,16 +312,16 @@ const auto b2=_mm512_xor_si512(d2,d6);
 const auto e1=_mm512_xor_si512(b0,b1);
 const auto e2=_mm512_xor_si512(b0,b2);
 const auto e3=_mm512_xor_si512(_mm512_xor_si512(e1,b2),d3);
-const auto x3=_mm512_loadu_si512(raw+28);
+const auto x3=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[7]):_mm512_loadu_si512(raw+28));
 const auto y3=RawFeedback?x3:_mm512_xor_si512(e3,x3);
 emit(packetBase+7,RawFeedback?_mm512_xor_si512(e3,x3):y3);
-const auto x2=_mm512_loadu_si512(raw+24);
+const auto x2=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[6]):_mm512_loadu_si512(raw+24));
 const auto y2=RawFeedback?x2:_mm512_xor_si512(e2,x2);
 emit(packetBase+6,RawFeedback?_mm512_xor_si512(e2,x2):y2);
-const auto x1=_mm512_loadu_si512(raw+20);
+const auto x1=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[5]):_mm512_loadu_si512(raw+20));
 const auto y1=RawFeedback?x1:_mm512_xor_si512(e1,x1);
 emit(packetBase+5,RawFeedback?_mm512_xor_si512(e1,x1):y1);
-const auto x0=_mm512_loadu_si512(raw+16);
+const auto x0=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[4]):_mm512_loadu_si512(raw+16));
 const auto y0=RawFeedback?x0:_mm512_xor_si512(b0,x0);
 emit(packetBase+4,RawFeedback?_mm512_xor_si512(b0,x0):y0);
 g11=_mm512_xor_si512(y1,y3);
@@ -316,16 +337,16 @@ const auto b2=d2;
 const auto e1=_mm512_xor_si512(b0,b1);
 const auto e2=_mm512_xor_si512(b0,b2);
 const auto e3=_mm512_xor_si512(_mm512_xor_si512(e1,b2),d3);
-const auto x3=_mm512_loadu_si512(raw+12);
+const auto x3=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[3]):_mm512_loadu_si512(raw+12));
 const auto y3=RawFeedback?x3:_mm512_xor_si512(e3,x3);
 emit(packetBase+3,RawFeedback?_mm512_xor_si512(e3,x3):y3);
-const auto x2=_mm512_loadu_si512(raw+8);
+const auto x2=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[2]):_mm512_loadu_si512(raw+8));
 const auto y2=RawFeedback?x2:_mm512_xor_si512(e2,x2);
 emit(packetBase+2,RawFeedback?_mm512_xor_si512(e2,x2):y2);
-const auto x1=_mm512_loadu_si512(raw+4);
+const auto x1=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[1]):_mm512_loadu_si512(raw+4));
 const auto y1=RawFeedback?x1:_mm512_xor_si512(e1,x1);
 emit(packetBase+1,RawFeedback?_mm512_xor_si512(e1,x1):y1);
-const auto x0=_mm512_loadu_si512(raw+0);
+const auto x0=(Gather?_mm512_loadu_si512(reinterpret_cast<const std::byte*>(raw)+route[0]):_mm512_loadu_si512(raw+0));
 const auto y0=RawFeedback?x0:_mm512_xor_si512(b0,x0);
 emit(packetBase+0,RawFeedback?_mm512_xor_si512(b0,x0):y0);
 g01=_mm512_xor_si512(y1,y3);
@@ -368,15 +389,437 @@ static SPIN_NOINLINE void reversePackedPeeled(const Block* __restrict input,
     for(std::size_t epoch=first;--epoch;) {
         Packed22 before;
         pack<0>(state,before);packCarried<1>(raw,before);packCarried<2>(raw,before);
-        streamHigh<true>(state,input+64*epoch,16*epoch,emit,high);
+        streamHigh<true>(state,input+64*epoch,nullptr,16*epoch,emit,high);
         const auto feedback=feedbackPacked(finishMonomials(high));
         updateGroup<0>(before,plan.updates.data()+9*epoch,feedback,state);
         updateGroupCarried<1>(before,plan.updates.data()+9*epoch,feedback,state,raw);
         updateGroupCarried<2>(before,plan.updates.data()+9*epoch,feedback,state,raw);
     }
-    streamHigh<true>(state,input,0,emit,high);
+    streamHigh<true>(state,input,nullptr,0,emit,high);
 }
 
+// Forward inner. The circuit basis w = basis*s turns the fixed map into the
+// same packed-carry schedule as the reverse pass: outputs y = x + A s,
+// feedback basis*A^T*x from the raw packets (the H circuit), and
+// w' = basis*R^T*inverseBasis*w + feedback. Epochs run forward, routed
+// packets are gathered from scratch, and output is written sequentially.
+#ifndef SPIN_RS8_W2_LANE_MAJOR
+#define SPIN_RS8_W2_LANE_MAJOR 0
+#endif
+#ifndef SPIN_RS8_LANE_MAJOR
+#define SPIN_RS8_LANE_MAJOR 1
+#endif
+#ifndef SPIN_RS8_L4_SHUF
+#define SPIN_RS8_L4_SHUF 0
+#endif
+#ifndef SPIN_RS8_WIDE_EPOCHS
+#define SPIN_RS8_WIDE_EPOCHS 4
+#endif
+struct ForwardLane {
+    Words22 state;
+    RawQuadratic22 raw;
+};
+template<bool Stream>
+static SPIN_FORCEINLINE void storeOutput(Block* output,__m512i value) {
+    if constexpr(Stream) _mm512_stream_si512(reinterpret_cast<__m512i*>(output),value);
+    else _mm512_storeu_si512(output,value);
+}
+template<bool Stream> struct DirectOutput {
+    Block* output;
+    SPIN_FORCEINLINE void operator()(std::size_t packet,__m512i value) const {
+        storeOutput<Stream>(output+4*packet,value);
+    }
+};
+struct EpochOutput {
+    __m512i* output;
+    SPIN_FORCEINLINE void operator()(std::size_t packet,__m512i value) const {
+        output[packet&15]=value;
+    }
+};
+template<std::size_t... I>
+static SPIN_FORCEINLINE void gatherPackets(const Block* input,const std::uint32_t* route,
+    __m512i* packets,std::index_sequence<I...>) {
+    ((packets[I]=_mm512_loadu_si512(reinterpret_cast<const std::byte*>(input)+route[I])),...);
+}
+template<class Emit>
+static SPIN_FORCEINLINE void forwardFirst(const Block* input,const Plan& plan,
+    ForwardLane& lane,Emit& emit) {
+    alignas(64) __m512i packets[16],high[16];
+    gatherPackets(input,plan.routeBytes.data(),packets,std::make_index_sequence<16>{});
+    // The initial state is zero, so the first epoch passes through unchanged.
+    for(unsigned packet=0; packet<16; ++packet) emit(packet,packets[packet]);
+    highFromPackets(packets,high);
+    const auto initial=feedbackPacked(finishMonomials(high));
+    lane.state=initialFeedback(initial);
+    lane.raw={{initial.packed[0],initial.packed[1],initial.packed[2],initial.packed[3]}};
+}
+template<bool Last,class Emit>
+static SPIN_FORCEINLINE void forwardStep(const Block* input,const Plan& plan,std::size_t epoch,
+    ForwardLane& lane,Emit& emit) {
+    alignas(64) __m512i high[16];
+    if constexpr(Last) {
+        streamHigh<true,true>(lane.state,input,plan.routeBytes.data()+16*epoch,16*epoch,emit,high);
+    } else {
+        Packed22 before;
+        pack<0>(lane.state,before);packCarried<1>(lane.raw,before);packCarried<2>(lane.raw,before);
+        streamHigh<true,true>(lane.state,input,plan.routeBytes.data()+16*epoch,16*epoch,emit,high);
+        const auto feedback=feedbackPacked(finishMonomials(high));
+        const auto* row=plan.forwardUpdates.data()+9*epoch;
+        updateGroup<0>(before,row,feedback,lane.state);
+        updateGroupCarried<1>(before,row,feedback,lane.state,lane.raw);
+        updateGroupCarried<2>(before,row,feedback,lane.state,lane.raw);
+    }
+}
+template<bool Stream>
+static SPIN_NOINLINE void forwardNarrow(const Block* __restrict input,Block* __restrict output,
+    const Plan& plan) {
+    const auto epochs=plan.n/64;
+    DirectOutput<Stream> emit{output};
+    ForwardLane lane;
+    forwardFirst(input,plan,lane,emit);
+    if(epochs==1) return;
+    for(std::size_t epoch=1; epoch+1<epochs; ++epoch) {
+        if constexpr(SPIN_RS8_PF_NARROW>0) if(epoch+SPIN_RS8_PF_NARROW<epochs)
+            prefetchPackets<false>(input,plan.routeBytes.data()+16*(epoch+SPIN_RS8_PF_NARROW));
+        forwardStep<false>(input,plan,epoch,lane,emit);
+    }
+    forwardStep<true>(input,plan,epochs-1,lane,emit);
+}
+// Interleave staged epochs of L lane planes into L-wide records: record i
+// of lane l is output block i*L+l. Every store writes a complete cache line.
+template<bool Stream,unsigned L,unsigned E>
+static SPIN_FORCEINLINE void storeEpoch(Block* output,const __m512i (&v)[L][16*E],unsigned e) {
+    const auto low=_mm512_setr_epi64(0,1,8,9,2,3,10,11);
+    const auto high=_mm512_setr_epi64(4,5,12,13,6,7,14,15);
+    for(unsigned packet=0; packet<16; ++packet) {
+        const auto i=16*e+packet;
+#if SPIN_RS8_L4_SHUF
+        if constexpr(L==4) {
+            const auto t=transpose4(v[0][i],v[1][i],v[2][i],v[3][i]);
+            storeOutput<Stream>(output+16*packet,t.a);
+            storeOutput<Stream>(output+16*packet+4,t.b);
+            storeOutput<Stream>(output+16*packet+8,t.c);
+            storeOutput<Stream>(output+16*packet+12,t.d);
+            continue;
+        }
+#endif
+        const auto a=_mm512_permutex2var_epi64(v[0][i],low,v[1][i]);
+        const auto b=_mm512_permutex2var_epi64(v[0][i],high,v[1][i]);
+        if constexpr(L==2) {
+            storeOutput<Stream>(output+8*packet,a);
+            storeOutput<Stream>(output+8*packet+4,b);
+        } else {
+            const auto c=_mm512_permutex2var_epi64(v[2][i],low,v[3][i]);
+            const auto d=_mm512_permutex2var_epi64(v[2][i],high,v[3][i]);
+            storeOutput<Stream>(output+16*packet,_mm512_shuffle_i32x4(a,c,0x44));
+            storeOutput<Stream>(output+16*packet+4,_mm512_shuffle_i32x4(a,c,0xee));
+            storeOutput<Stream>(output+16*packet+8,_mm512_shuffle_i32x4(b,d,0x44));
+            storeOutput<Stream>(output+16*packet+12,_mm512_shuffle_i32x4(b,d,0xee));
+        }
+    }
+}
+// Each lane runs up to E consecutive middle epochs with its state in
+// registers, staging outputs in L1; the chunk is then interleaved. The first
+// and last epochs are peeled so the hot loop contains one step variant.
+template<bool Stream,unsigned L,unsigned E>
+static SPIN_FORCEINLINE void storeChunk(Block* output,const __m512i (&values)[L][16*E],
+    std::size_t e0,unsigned count) {
+    for(unsigned e=0; e<count; ++e) storeEpoch<Stream,L,E>(output+64*L*(e0+e),values,e);
+}
+template<bool Stream,unsigned L,unsigned E>
+static SPIN_NOINLINE void forwardWide(const Block* __restrict input,Block* __restrict output,
+    const Plan& plan,std::size_t plane) {
+    const auto epochs=plan.n/64;
+    ForwardLane lanes[L];
+    alignas(64) __m512i values[L][16*E];
+    for(unsigned lane=0; lane<L; ++lane) {
+        EpochOutput emit{values[lane]};
+        forwardFirst(input+lane*plane,plan,lanes[lane],emit);
+    }
+    storeChunk<Stream,L,E>(output,values,0,1);
+    if(epochs==1) return;
+    for(std::size_t e0=1; e0+1<epochs; e0+=E) {
+        const auto count=unsigned(std::min<std::size_t>(E,epochs-1-e0));
+        for(unsigned lane=0; lane<L; ++lane) {
+            const auto* in=input+lane*plane;
+            auto state=lanes[lane];
+            for(unsigned e=0; e<count; ++e) {
+                if constexpr(SPIN_RS8_PF_WIDE>0) if(e0+e+SPIN_RS8_PF_WIDE<epochs)
+                    prefetchPackets<false>(in,plan.routeBytes.data()+16*(e0+e+SPIN_RS8_PF_WIDE));
+                EpochOutput emit{values[lane]+16*e};
+                forwardStep<false>(in,plan,e0+e,state,emit);
+            }
+            lanes[lane]=state;
+        }
+        storeChunk<Stream,L,E>(output,values,e0,count);
+    }
+    for(unsigned lane=0; lane<L; ++lane) {
+        EpochOutput emit{values[lane]};
+        forwardStep<true>(input+lane*plane,plan,epochs-1,lanes[lane],emit);
+    }
+    storeChunk<Stream,L,E>(output,values,epochs-1,1);
+}
+// Lane-major forward inner for 2 and 4 lanes. One vector holds one step
+// coordinate for every lane (256-bit for two lanes, 512-bit for four), so
+// the output records are already interleaved and the per-step evaluation and
+// feedback are the pure XOR networks in LaneMajor22.h. Only the GL22 update
+// converts the 22 state coordinates to the narrow packed layout and back.
+struct X512 {
+    static SPIN_FORCEINLINE __m512i x2(__m512i a,__m512i b) { return _mm512_xor_si512(a,b); }
+    static SPIN_FORCEINLINE __m512i x3(__m512i a,__m512i b,__m512i c) { return _mm512_ternarylogic_epi64(a,b,c,0x96); }
+};
+struct X256 {
+    static SPIN_FORCEINLINE __m256i x2(__m256i a,__m256i b) { return _mm256_xor_si256(a,b); }
+    static SPIN_FORCEINLINE __m256i x3(__m256i a,__m256i b,__m256i c) { return _mm256_ternarylogic_epi64(a,b,c,0x96); }
+};
+template<unsigned L> struct LaneVector;
+template<> struct LaneVector<4> { using V=__m512i; using X=X512; };
+template<> struct LaneVector<2> { using V=__m256i; using X=X256; };
+
+// The GL22 forward update in the narrow layout, without feedback.
+static SPIN_FORCEINLINE Words22 updateNarrow(const Words22& state,const std::uint64_t* row) {
+    Packed22 before;
+    pack<0>(state,before);pack<1>(state,before);pack<2>(state,before);
+    Words22 result;
+    const auto group=[&](auto g) {
+        constexpr unsigned G=decltype(g)::value;
+        const auto m0=_mm512_set1_epi64(row[3*G]),m1=_mm512_set1_epi64(row[3*G+1]),m2=_mm512_set1_epi64(row[3*G+2]);
+        const auto lo=_mm512_ternarylogic_epi64(
+            _mm512_gf2p8affine_epi64_epi8(m0,before.v[0],0),
+            _mm512_gf2p8affine_epi64_epi8(m1,before.v[2],0),
+            _mm512_gf2p8affine_epi64_epi8(m2,before.v[4],0),0x96);
+        const auto hi=_mm512_ternarylogic_epi64(
+            _mm512_gf2p8affine_epi64_epi8(m0,before.v[1],0),
+            _mm512_gf2p8affine_epi64_epi8(m1,before.v[3],0),
+            _mm512_gf2p8affine_epi64_epi8(m2,before.v[5],0),0x96);
+        result.v[2*G]=_mm512_permutex2var_epi8(lo,unpackIndex<0>(),hi);
+        result.v[2*G+1]=_mm512_permutex2var_epi8(lo,unpackIndex<4>(),hi);
+    };
+    group(std::integral_constant<unsigned,0>{});
+    group(std::integral_constant<unsigned,1>{});
+    group(std::integral_constant<unsigned,2>{});
+    return result;
+}
+// Four step coordinates of one routed packet, one vector per coordinate.
+template<unsigned L>
+static SPIN_FORCEINLINE void gatherPacket(const std::byte* at,std::size_t stride,
+    typename LaneVector<L>::V* x) {
+    if constexpr(L==4) {
+        const auto t=transpose4(_mm512_loadu_si512(at),_mm512_loadu_si512(at+stride),
+                                _mm512_loadu_si512(at+2*stride),_mm512_loadu_si512(at+3*stride));
+        x[0]=t.a;x[1]=t.b;x[2]=t.c;x[3]=t.d;
+    } else {
+        const auto q0=_mm512_loadu_si512(at),q1=_mm512_loadu_si512(at+stride);
+        const auto t0=_mm512_permutex2var_epi64(q0,_mm512_setr_epi64(0,1,8,9,2,3,10,11),q1);
+        const auto t1=_mm512_permutex2var_epi64(q0,_mm512_setr_epi64(4,5,12,13,6,7,14,15),q1);
+        x[0]=_mm512_castsi512_si256(t0);x[1]=_mm512_extracti64x4_epi64(t0,1);
+        x[2]=_mm512_castsi512_si256(t1);x[3]=_mm512_extracti64x4_epi64(t1,1);
+    }
+}
+template<unsigned L>
+static SPIN_FORCEINLINE void toNarrow(const typename LaneVector<L>::V* w,Words22 (&n)[L]) {
+    for(unsigned k=0; k<6; ++k) {
+        if constexpr(L==4) {
+            const auto zero=_mm512_setzero_si512();
+            const auto t=transpose4(w[4*k],w[4*k+1],4*k+2<22?w[4*k+2]:zero,4*k+3<22?w[4*k+3]:zero);
+            n[0].v[k]=t.a;n[1].v[k]=t.b;n[2].v[k]=t.c;n[3].v[k]=t.d;
+        } else {
+            const auto zero=_mm256_setzero_si256();
+            const auto a=_mm512_inserti64x4(_mm512_castsi256_si512(w[4*k]),w[4*k+1],1);
+            const auto b=_mm512_inserti64x4(_mm512_castsi256_si512(4*k+2<22?w[4*k+2]:zero),4*k+3<22?w[4*k+3]:zero,1);
+            n[0].v[k]=_mm512_shuffle_i32x4(a,b,0x88);
+            n[1].v[k]=_mm512_shuffle_i32x4(a,b,0xdd);
+        }
+    }
+}
+template<unsigned L>
+static SPIN_FORCEINLINE void fromNarrow(const Words22 (&n)[L],const typename LaneVector<L>::V* f,
+    typename LaneVector<L>::V* w) {
+    using X=typename LaneVector<L>::X;
+    for(unsigned k=0; k<6; ++k) {
+        if constexpr(L==4) {
+            const auto t=transpose4(n[0].v[k],n[1].v[k],n[2].v[k],n[3].v[k]);
+            w[4*k]=X::x2(t.a,f[4*k]);w[4*k+1]=X::x2(t.b,f[4*k+1]);
+            if(4*k+2<22) { w[4*k+2]=X::x2(t.c,f[4*k+2]);w[4*k+3]=X::x2(t.d,f[4*k+3]); }
+        } else {
+            const auto a=_mm512_permutex2var_epi64(n[0].v[k],_mm512_setr_epi64(0,1,8,9,2,3,10,11),n[1].v[k]);
+            w[4*k]=X::x2(_mm512_castsi512_si256(a),f[4*k]);
+            w[4*k+1]=X::x2(_mm512_extracti64x4_epi64(a,1),f[4*k+1]);
+            if(4*k+2<22) {
+                const auto b=_mm512_permutex2var_epi64(n[0].v[k],_mm512_setr_epi64(4,5,12,13,6,7,14,15),n[1].v[k]);
+                w[4*k+2]=X::x2(_mm512_castsi512_si256(b),f[4*k+2]);
+                w[4*k+3]=X::x2(_mm512_extracti64x4_epi64(b,1),f[4*k+3]);
+            }
+        }
+    }
+}
+template<bool Stream,unsigned L> struct LaneStore {
+    Block* output;
+    template<class V> SPIN_FORCEINLINE void operator()(unsigned j,V value) const {
+        auto* at=output+L*j;
+        if constexpr(L==4) storeOutput<Stream>(at,value);
+        else if constexpr(Stream) _mm256_stream_si256(reinterpret_cast<__m256i*>(at),value);
+        else _mm256_storeu_si256(reinterpret_cast<__m256i*>(at),value);
+    }
+};
+// Mask-indexed access to the fast-circuit state coordinates.
+constexpr unsigned stateIndex(unsigned mask) {
+    for(unsigned i=0; i<22; ++i) if(map::masks[i]==mask) return i;
+    return 22;
+}
+template<unsigned Mask> static constexpr unsigned SI=[] {
+    static_assert(stateIndex(Mask)<22,"monomial outside the s22 state");
+    return stateIndex(Mask);
+}();
+// One step coordinate j = 8h + l splits into three high bits h (masks bits
+// 3..5) and three low bits l (bits 0..2). Per step, the evaluation weights are
+// base A(h) = sum over monomials inside h and q_b(h) = w_b + sum_{a in h} w_ab,
+// so each 8-coordinate block needs a handful of live values; mono is its exact
+// transpose, accumulated per block. Checked against the definitions in the
+// generator's docstring and by the forward/transpose tests.
+template<class V,class X>
+struct StepWeights {
+    V A[8],q[3][8],p01,p02,p12,p0212;
+    SPIN_FORCEINLINE void prepare(const V* w) {
+        A[0]=w[SI<0>];
+        A[1]=X::x2(w[SI<0>],w[SI<8>]);A[2]=X::x2(w[SI<0>],w[SI<16>]);A[4]=X::x2(w[SI<0>],w[SI<32>]);
+        A[3]=X::x3(A[1],w[SI<16>],w[SI<24>]);A[5]=X::x3(A[1],w[SI<32>],w[SI<40>]);
+        A[6]=X::x3(A[2],w[SI<32>],w[SI<48>]);A[7]=X::x2(X::x3(A[3],w[SI<32>],w[SI<40>]),w[SI<48>]);
+        cross<0>(w);cross<1>(w);cross<2>(w);
+        p01=w[SI<3>];p02=w[SI<5>];p12=w[SI<6>];p0212=X::x2(p02,p12);
+    }
+    template<unsigned B> SPIN_FORCEINLINE void cross(const V* w) {
+        auto* r=q[B];
+        r[0]=w[SI<(1u<<B)>];
+        r[1]=X::x2(r[0],w[SI<(8u|(1u<<B))>]);r[2]=X::x2(r[0],w[SI<(16u|(1u<<B))>]);r[4]=X::x2(r[0],w[SI<(32u|(1u<<B))>]);
+        r[3]=X::x2(r[1],w[SI<(16u|(1u<<B))>]);r[5]=X::x2(r[1],w[SI<(32u|(1u<<B))>]);
+        r[6]=X::x2(r[2],w[SI<(32u|(1u<<B))>]);r[7]=X::x2(r[3],w[SI<(32u|(1u<<B))>]);
+    }
+};
+template<class V,class X>
+struct MonoAccumulator {
+    V B[8],Q[3][8],p01,p02,p12,p0212;
+    // Adjoint of one block's evaluation for raw inputs x0..x7 at block h.
+    SPIN_FORCEINLINE void block(unsigned h,const V* x) {
+        const auto a37=X::x2(x[3],x[7]),t2=X::x2(x[2],x[6]);
+        const auto t1=X::x3(x[1],x[5],a37);
+        B[h]=X::x2(X::x3(x[0],x[4],t2),t1);
+        Q[0][h]=t1;Q[1][h]=X::x2(a37,t2);Q[2][h]=X::x2(X::x3(x[4],x[5],x[6]),x[7]);
+        if(h==0) { p01=a37;p02=x[5];p12=x[6];p0212=x[7]; }
+        else { p01=X::x2(p01,a37);p02=X::x2(p02,x[5]);p12=X::x2(p12,x[6]);p0212=X::x2(p0212,x[7]); }
+    }
+    // mono[i] for every state monomial: superset sums over the high bits.
+    SPIN_FORCEINLINE void finish(V* mono) const {
+        const V* b=B;
+        const auto s1=X::x3(b[1],b[3],b[5]),s2=X::x3(b[2],b[3],b[6]),s4=X::x3(b[4],b[5],b[6]);
+        mono[SI<8>]=X::x2(s1,b[7]);mono[SI<16>]=X::x2(s2,b[7]);mono[SI<32>]=X::x2(s4,b[7]);
+        mono[SI<24>]=X::x2(b[3],b[7]);mono[SI<40>]=X::x2(b[5],b[7]);mono[SI<48>]=X::x2(b[6],b[7]);
+        mono[SI<0>]=X::x3(X::x3(b[0],b[1],b[2]),X::x3(b[3],b[4],b[5]),X::x2(b[6],b[7]));
+        lowCross<0>(mono);lowCross<1>(mono);lowCross<2>(mono);
+        mono[SI<3>]=p01;mono[SI<5>]=X::x2(p02,p0212);mono[SI<6>]=X::x2(p12,p0212);
+    }
+    template<unsigned Bit> SPIN_FORCEINLINE void lowCross(V* mono) const {
+        const V* r=Q[Bit];
+        const auto r13=X::x2(r[1],r[3]),r57=X::x2(r[5],r[7]),r26=X::x2(r[2],r[6]);
+        mono[SI<(8u|(1u<<Bit))>]=X::x2(r13,r57);
+        mono[SI<(16u|(1u<<Bit))>]=X::x3(r26,r[3],r[7]);
+        mono[SI<(32u|(1u<<Bit))>]=X::x2(X::x3(r[4],r[5],r[6]),r[7]);
+        mono[SI<(1u<<Bit)>]=X::x3(X::x3(r[0],r13,r57),r26,r[4]);
+    }
+};
+template<class V,class X,class Store>
+static SPIN_FORCEINLINE void evalBlock(const StepWeights<V,X>& s,unsigned h,const V* x,Store& st,unsigned j) {
+    const auto base=s.A[h],q0=s.q[0][h],q1=s.q[1][h],q2=s.q[2][h];
+    const auto t1=X::x2(base,q0),t2=X::x2(base,q1);
+    const auto v3=X::x3(t1,q1,s.p01);
+    st(j+0,X::x2(x[0],base));st(j+1,X::x2(x[1],t1));st(j+2,X::x2(x[2],t2));st(j+3,X::x2(x[3],v3));
+    st(j+4,X::x3(x[4],base,q2));st(j+5,X::x3(x[5],t1,X::x2(q2,s.p02)));
+    st(j+6,X::x3(x[6],t2,X::x2(q2,s.p12)));st(j+7,X::x3(x[7],v3,X::x2(q2,s.p0212)));
+}
+template<bool Stream,unsigned L>
+static SPIN_NOINLINE void forwardLaneMajor(const Block* __restrict input,Block* __restrict output,
+    const Plan& plan,std::size_t plane) {
+    using V=typename LaneVector<L>::V;
+    using X=typename LaneVector<L>::X;
+    const auto epochs=plan.n/64;
+    const auto* route=plan.routeBytes.data();
+    const auto* base=reinterpret_cast<const std::byte*>(input);
+    const auto stride=plane*sizeof(Block);
+    alignas(64) V w[22],f[22],mono[22];
+    {
+        MonoAccumulator<V,X> acc;
+        LaneStore<Stream,L> st{output};
+#pragma GCC unroll 8
+        for(unsigned h=0; h<8; ++h) {
+            V x[8];
+            gatherPacket<L>(base+route[2*h],stride,x);gatherPacket<L>(base+route[2*h+1],stride,x+4);
+            for(unsigned l=0; l<8; ++l) st(8*h+l,x[l]);
+            acc.block(h,x);
+        }
+        acc.finish(mono);
+        lanemajor::feedbackH<V,X>(mono,w);
+    }
+    if(epochs==1) return;
+    for(std::size_t epoch=1; epoch+1<epochs; ++epoch) {
+        if constexpr(SPIN_RS8_PF_LANE_MAJOR>0) if(epoch+SPIN_RS8_PF_LANE_MAJOR<epochs)
+            for(unsigned lane=0; lane<L; ++lane)
+                prefetchPackets<false>(base+lane*stride,route+16*(epoch+SPIN_RS8_PF_LANE_MAJOR));
+        const auto* r=route+16*epoch;
+        StepWeights<V,X> weights;
+        weights.prepare(w);
+        MonoAccumulator<V,X> acc;
+        LaneStore<Stream,L> st{output+64*L*epoch};
+#pragma GCC unroll 8
+        for(unsigned h=0; h<8; ++h) {
+            V x[8];
+            gatherPacket<L>(base+r[2*h],stride,x);gatherPacket<L>(base+r[2*h+1],stride,x+4);
+            evalBlock(weights,h,x,st,8*h);
+            acc.block(h,x);
+        }
+        acc.finish(mono);
+        lanemajor::feedbackH<V,X>(mono,f);
+        Words22 n[L];
+        toNarrow<L>(w,n);
+        for(unsigned lane=0; lane<L; ++lane) n[lane]=updateNarrow(n[lane],plan.forwardUpdates.data()+9*epoch);
+        fromNarrow<L>(n,f,w);
+    }
+    const auto* r=route+16*(epochs-1);
+    StepWeights<V,X> weights;
+    weights.prepare(w);
+    LaneStore<Stream,L> st{output+64*L*(epochs-1)};
+#pragma GCC unroll 8
+    for(unsigned h=0; h<8; ++h) {
+        V x[8];
+        gatherPacket<L>(base+r[2*h],stride,x);gatherPacket<L>(base+r[2*h+1],stride,x+4);
+        evalBlock(weights,h,x,st,8*h);
+    }
+}
+template<bool Stream>
+static void forwardInner(const Block* scratch,Block* output,const Plan& plan,unsigned lanes,std::size_t plane) {
+    if(lanes==1) forwardNarrow<Stream>(scratch,output,plan);
+    // Measured selection: packet layout with staged interleave for two
+    // lanes, lane-major XOR networks for four lanes.
+#if SPIN_RS8_W2_LANE_MAJOR
+    else if(lanes==2) forwardLaneMajor<Stream,2>(scratch,output,plan,plane);
+#else
+    else if(lanes==2) forwardWide<Stream,2,SPIN_RS8_WIDE_EPOCHS>(scratch,output,plan,plane);
+#endif
+#if SPIN_RS8_LANE_MAJOR
+    else forwardLaneMajor<Stream,4>(scratch,output,plan,plane);
+#else
+    else forwardWide<Stream,4,SPIN_RS8_WIDE_EPOCHS>(scratch,output,plan,plane);
+#endif
+    if constexpr(Stream) _mm_sfence();
+}
+
+}
+void forwardInnerFast(const Block* scratch,Block* output,const Plan& plan,unsigned lanes,bool stream,
+                      std::size_t plane) {
+    if(!plane) plane=plan.scratchBlocks();
+    if(stream && !(reinterpret_cast<std::uintptr_t>(output)&63U))
+        forwardInner<true>(scratch,output,plan,lanes,plane);
+    else
+        forwardInner<false>(scratch,output,plan,lanes,plane);
 }
 void reverseRouteFast(const Block* input,Block* scratch,const Plan& plan) {
     if(plan.k<=262144) {

@@ -333,6 +333,12 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
         const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
         auto* output=reinterpret_cast<detail::storage::block*>(out.data());
         auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
+#if SPIN_BCH_AVX512
+        if(plan_->selected==Backend::Avx512) {
+            detail::rs8::forwardFast(input,output,work,*plan_->rs8Code,width/16,stream);
+            return;
+        }
+#endif
         detail::rs8::forwardScalar(input,output,work,*plan_->rs8Code,width/16);
         return;
     }

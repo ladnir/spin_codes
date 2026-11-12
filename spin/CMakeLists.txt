@@ -60,7 +60,7 @@ if(SPIN_ENABLE_AVX512)
   # Packet-specific ISA stays in private translation units. Neither setup nor the
   # public API is compiled for AVX-512, and old kernel requirements stay intact.
   add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp
-    src/rs8/Fast.cpp
+    src/rs8/Fast.cpp src/rs8/ForwardFast.cpp
     src/certified22/RouteFast.cpp src/certified22/OuterFast.cpp src/certified22/Fast.cpp
     src/paired15/Paired15Fast.cpp src/paired15/Paired15ForwardOuter.cpp
     src/packet/PacketCachedInner.cpp src/packet/PacketCachedOuter.cpp
@@ -144,6 +144,8 @@ if(SPIN_BUILD_BENCHMARKS)
         -mavx512bw -mavx512dq -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
     endif()
   endif()
+  add_executable(spin_rs8_stages_bench bench/rs8_stages.cpp)
+  target_link_libraries(spin_rs8_stages_bench PRIVATE spin::spin)
   add_executable(spin_forward_batch_bench bench/forward_batch.cpp)
   target_link_libraries(spin_forward_batch_bench PRIVATE spin::spin)
   add_executable(spin_paired15_bench bench/paired15.cpp)

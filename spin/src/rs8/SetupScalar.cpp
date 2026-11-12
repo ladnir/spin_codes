@@ -45,10 +45,17 @@ static void prepareOuter(Plan& plan,std::uint64_t seed) {
     detail::kernel::setup::Words words(seed^0xdb835a7193b7e641ULL);
     plan.field.resize(8*plan.groups);
     plan.reverseColumns.resize(8*plan.groups);
+    plan.adjoint.resize(8*plan.groups);
     for(std::size_t symbol=0;symbol<8*plan.groups;++symbol) {
         std::uint32_t scalar;
         do { scalar=std::uint32_t(words()); } while(!scalar);
         plan.field[symbol]=field::coefficients(scalar);
+        for(unsigned i=0;i<9;++i) {
+            std::uint64_t matrix=0;
+            for(unsigned bit=0;bit<8;++bit)
+                matrix|=std::uint64_t(field::multiply8(plan.field[symbol][i],std::uint8_t(1U<<bit)))<<(8*(7-bit));
+            plan.adjoint[symbol][i]=matrix;
+        }
         for(unsigned bit=0;bit<32;++bit)
             plan.reverseColumns[symbol][bit]=field::multiply32(scalar,std::uint32_t{1}<<bit);
     }
@@ -73,7 +80,8 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed) {
 std::size_t Plan::setupBytes() const noexcept {
     const auto innerBytes=paired15Plan?paired15Plan->setupBytes():certified22Plan->setupBytes();
     return innerBytes+field.capacity()*sizeof(field[0])
-        +reverseColumns.capacity()*sizeof(reverseColumns[0]);
+        +reverseColumns.capacity()*sizeof(reverseColumns[0])
+        +adjoint.capacity()*sizeof(adjoint[0]);
 }
 
 void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
@@ -140,6 +148,6 @@ void forwardScalar(const Block* input,Block* output,Block* scratch,const Plan& p
     if(plan.paired15Plan)
         paired15::forwardInnerScalar(scratch,output,*plan.paired15Plan,lanes);
     else
-        certified22::forwardInnerScalar(scratch,output,*plan.certified22Plan,lanes);
+        certified22::forwardInnerScalar(scratch,output,*plan.certified22Plan,lanes,plan.scratchBlocks());
 }
 }

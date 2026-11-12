@@ -23,6 +23,9 @@ struct Plan {
     std::vector<std::uint32_t> route, routeBytes;
     std::vector<std::array<std::uint32_t,22>> reverseMatrices;
     std::vector<std::uint64_t> updates;
+    // Forward-direction updates in the same fast-circuit basis and packed
+    // 3x3 GFNI block layout: basis * R^T * inverseBasis per epoch.
+    std::vector<std::uint64_t> forwardUpdates;
     std::vector<std::array<std::uint16_t,16>> outerMatrices16;
     std::vector<std::array<std::uint8_t,3>> outerField;
     std::size_t scratchBlocks() const noexcept { return groups * groupStride; }
@@ -40,8 +43,13 @@ void transposeFast(const Block*, Block*, Block* scratch, const Plan&);
 // Internal stage entry points; also used for differential kernel checks.
 // withOuter=false retains identical route/inner streams without RS16 tables.
 void reverseRouteScalar(const Block*, Block* scratch, const Plan&);
-void forwardInnerScalar(const Block* scratch, Block*, const Plan&, unsigned lanes);
+// plane is the lane-plane stride in blocks; 0 selects scratchBlocks().
+void forwardInnerScalar(const Block* scratch, Block*, const Plan&, unsigned lanes, std::size_t plane = 0);
 void reverseRouteFast(const Block*, Block* scratch, const Plan&);
+// Forward inner: gathers routed packets from lanes contiguous scratch planes
+// and writes 2K interleaved records. Streaming requires 64-byte output.
+void forwardInnerFast(const Block* scratch, Block* output, const Plan&, unsigned lanes, bool stream,
+                      std::size_t plane = 0);
 void outerFastCached(const Block* scratch, Block*, const Plan&);
 void outerFastCachedUnrolled(const Block* scratch, Block*, const Plan&);
 void outerFastStreaming(const Block* scratch, Block*, const Plan&);
