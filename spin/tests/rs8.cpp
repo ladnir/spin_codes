@@ -269,7 +269,6 @@ void ownershipAndSeeds() {
 }
 void preparedFull() {
     constexpr std::size_t k=384,n=2*k;
-    rejects([&]{spin::PreparedEncoder bad({k,family,17,43},{spin::SetupMode::BankedHeuristic});});
     for(auto backend:{spin::Backend::Portable,spin::Backend::Automatic}) {
         context={"prepared Full",k,17,43};spin::PreparedEncoder prepared({k,family,17,43},{spin::SetupMode::Full},{backend});
         auto work=prepared.make_workspace();const auto bytes=work.bytes();
@@ -311,6 +310,45 @@ void preparedFull() {
     }
 }
 }
+// Banked Turbo is heuristic, so there is no independent oracle for its map.
+// Check that the AVX-512 live tables and the Portable (scalar) live tables
+// describe the same code after every refresh, that refresh is deterministic,
+// allocation-free and seed-sensitive, and that it differs from Full setup.
+void preparedBanked(std::size_t k) {
+    const auto n=2*k;context={"prepared banked",k,17,43};
+    const spin::SetupOptions banked{spin::SetupMode::BankedHeuristic,0x1234567};
+    spin::PreparedEncoder portable({k,family,17,43},banked,{spin::Backend::Portable});
+    spin::PreparedEncoder automatic({k,family,17,43},banked,{spin::Backend::Automatic});
+    require(automatic.supports_transpose() && !automatic.supports_generic_transpose(),"banked capabilities");
+    rejects([&]{automatic.generic_transpose();});rejects([&]{automatic.make_workspace(spin::Width::Bits256);});
+    auto pw=portable.make_workspace(),aw=automatic.make_workspace();const auto bytes=aw.bytes();
+    spin::Buffer input(n*16),actual(k*16),expected(k*16),first(k*16),inplace(n*16),full(k*16);fill(input.bytes(),913);
+    const std::array<spin::CodeSeed,4> seeds{{{17,43},{18,43},{18,44},{17,43}}};
+    for(unsigned i=0;i<seeds.size();++i) {
+        const auto seed=seeds[i];
+        noAlloc([&]{automatic.setCodeSeed(seed);});portable.setCodeSeed(seed);
+        portable.transpose_bytes(input.bytes(),expected.bytes(),pw);
+        noAlloc([&]{automatic.transpose_bytes(input.bytes(),actual.bytes(),aw);});
+        compare(actual.bytes(),expected.bytes(),"banked fast/scalar live tables disagree");
+        require(aw.bytes()==bytes,"banked refresh resized scratch");
+        if(i==0) std::memcpy(first.bytes().data(),actual.bytes().data(),k*16);
+        else if(i==3) compare(actual.bytes(),first.bytes(),"banked refresh not deterministic");
+        else require(!equal(actual.bytes(),first.bytes()),"banked seed has no effect");
+        std::memcpy(inplace.bytes().data(),input.bytes().data(),n*16);
+        noAlloc([&]{automatic.transpose_inplace_bytes(inplace.bytes(),aw);});
+        compare(inplace.bytes().first(k*16),expected.bytes(),"banked in-place prefix");
+        compare(inplace.bytes().subspan(k*16),input.bytes().subspan(k*16),"banked in-place suffix");
+        const auto d=automatic.descriptor();
+        require(d[8]==std::byte{8} && d[12]==std::byte{1} && d[40]==std::byte{0x67} && d[48]==std::byte{1},"banked descriptor");
+    }
+    spin::Code exact({k,family,17,43});auto ew=exact.make_workspace();
+    exact.transpose_bytes(input.bytes(),full.bytes(),ew);
+    require(!equal(full.bytes(),first.bytes()),"banked aliases Full setup");
+    spin::PreparedEncoder otherBank({k,family,17,43},{spin::SetupMode::BankedHeuristic,0x7654321});
+    auto ow=otherBank.make_workspace();otherBank.transpose_bytes(input.bytes(),actual.bytes(),ow);
+    require(!equal(actual.bytes(),first.bytes()),"bank seed has no effect");
+    rejects([&]{automatic.transpose_bytes(input.bytes(),actual.bytes(),ow);});
+}
 int main() {try {
     metadata();
     for(auto k:{std::size_t{128},std::size_t{256},std::size_t{384},std::size_t{1920},std::size_t{2048},
@@ -321,6 +359,7 @@ int main() {try {
     for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})
         for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})forwardWidths(k,width);
     ownershipAndSeeds();preparedFull();
+    for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})preparedBanked(k);
     std::cout<<"rs8 API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

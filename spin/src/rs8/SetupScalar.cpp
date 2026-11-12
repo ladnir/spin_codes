@@ -3,6 +3,7 @@
 #include "../kernels/SetupRandom.h"
 #include <stdexcept>
 #include <bit>
+#include <cstring>
 
 namespace spin::detail::rs8 {
 namespace {
@@ -38,34 +39,90 @@ constexpr auto rsRows=[] {
 }();
 }
 
-static void prepareOuter(Plan& plan,std::uint64_t seed) {
+// field::coefficients is GF(2)-linear in the scalar, and the adjoint GFNI
+// matrix is linear in its byte, so both are per-byte table lookups. The tables
+// are built from the literal definitions above; spin_setup_test compares every
+// symbol against them.
+struct OuterTables {
+    struct Coefficients { std::uint64_t low=0; std::uint8_t high=0; };
+    Coefficients coefficients[4][256];
+    std::uint64_t adjoint[256];
+};
+static std::uint64_t adjointMatrix(std::uint8_t c) {
+    std::uint64_t matrix=0;
+    for(unsigned bit=0;bit<8;++bit)
+        matrix|=std::uint64_t(field::multiply8(c,std::uint8_t(1U<<bit)))<<(8*(7-bit));
+    return matrix;
+}
+static const OuterTables& outerTables() {
+    static const OuterTables tables=[] {
+        OuterTables t{};
+        for(unsigned position=0;position<4;++position)
+            for(unsigned value=1;value<256;++value) {
+                const auto bit=unsigned(std::countr_zero(value));
+                const auto c=field::coefficients(std::uint32_t{1}<<(8*position+bit));
+                std::uint64_t low;std::memcpy(&low,c.data(),8);
+                const auto& rest=t.coefficients[position][value&(value-1)];
+                t.coefficients[position][value]={rest.low^low,std::uint8_t(rest.high^c[8])};
+            }
+        for(unsigned c=0;c<256;++c) t.adjoint[c]=adjointMatrix(std::uint8_t(c));
+        return t;
+    }();
+    return tables;
+}
+template<bool Forward,bool Scalars>
+static void fillOuter(Plan& plan,std::uint64_t seed) noexcept {
     // A distinct reproducible domain; no draws are shared with route or inner.
     // Under ideal independent word samples, zero rejection gives an exactly
     // uniform nonzero scalar. The executable retains the library's seeded setup.
     detail::kernel::setup::Words words(seed^0xdb835a7193b7e641ULL);
-    plan.field.resize(8*plan.groups);
-    plan.reverseColumns.resize(8*plan.groups);
-    plan.adjoint.resize(8*plan.groups);
-    for(std::size_t symbol=0;symbol<8*plan.groups;++symbol) {
+    const auto& t=outerTables();
+    const auto symbols=8*plan.groups;
+    for(std::size_t symbol=0;symbol<symbols;++symbol) {
         std::uint32_t scalar;
         do { scalar=std::uint32_t(words()); } while(!scalar);
-        plan.field[symbol]=field::coefficients(scalar);
-        for(unsigned i=0;i<9;++i) {
-            std::uint64_t matrix=0;
-            for(unsigned bit=0;bit<8;++bit)
-                matrix|=std::uint64_t(field::multiply8(plan.field[symbol][i],std::uint8_t(1U<<bit)))<<(8*(7-bit));
-            plan.adjoint[symbol][i]=matrix;
-        }
-        for(unsigned bit=0;bit<32;++bit)
-            plan.reverseColumns[symbol][bit]=field::multiply32(scalar,std::uint32_t{1}<<bit);
+        if constexpr(Scalars) plan.scalars[symbol]=scalar;
+        const auto& a=t.coefficients[0][scalar&255];
+        const auto& b=t.coefficients[1][(scalar>>8)&255];
+        const auto& c=t.coefficients[2][(scalar>>16)&255];
+        const auto& d=t.coefficients[3][scalar>>24];
+        const auto low=a.low^b.low^c.low^d.low;
+        auto& coefficients=plan.field[symbol];
+        std::memcpy(coefficients.data(),&low,8);
+        coefficients[8]=std::uint8_t(a.high^b.high^c.high^d.high);
+        if constexpr(Forward)
+            for(unsigned i=0;i<9;++i) plan.adjoint[symbol][i]=t.adjoint[coefficients[i]];
     }
+}
+static void prepareOuter(Plan& plan,std::uint64_t seed) {
+    const auto symbols=8*plan.groups;
+    plan.field.resize(symbols);
+    plan.scalars.resize(symbols);
+    plan.adjoint.resize(symbols);
+    fillOuter<true,true>(plan,seed);
+}
+void refreshOuterTranspose(Plan& plan,std::uint64_t seed,bool scalars) noexcept {
+    if(scalars) fillOuter<false,true>(plan,seed);
+    else fillOuter<false,false>(plan,seed);
+}
+// Literal definitions, for the scalar oracles and the setup differential test.
+std::array<std::uint32_t,32> reverseColumns(std::uint32_t scalar) noexcept {
+    std::array<std::uint32_t,32> columns{};
+    for(unsigned bit=0;bit<32;++bit) columns[bit]=field::multiply32(scalar,std::uint32_t{1}<<bit);
+    return columns;
+}
+std::array<std::uint64_t,9> literalAdjoint(std::uint32_t scalar) noexcept {
+    const auto c=field::coefficients(scalar);
+    std::array<std::uint64_t,9> result{};
+    for(unsigned i=0;i<9;++i) result[i]=adjointMatrix(c[i]);
+    return result;
 }
 
 bool validMessageSize(std::size_t k) noexcept {
     return certified22::validMessageSize(k);
 }
 
-Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed) {
+Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,certified22::SetupPath path) {
     if(!validMessageSize(size))
         throw std::invalid_argument("RS8 t64 K must be a positive multiple of 128 within the byte-route and workspace limits");
     k=size;
@@ -73,21 +130,22 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed) {
     groups=size/128;
     // The exact s22 inner at every size: it is the map the Lean development
     // certifies at K = 2^14..2^26 (paired-s15 was only numerically checked at K16).
-    certified22Plan.emplace(k,routeSeed,innerSeed,false);
+    certified22Plan.emplace(k,routeSeed,innerSeed,false,path);
     prepareOuter(*this,routeSeed);
 }
 
 std::size_t Plan::setupBytes() const noexcept {
     const auto innerBytes=paired15Plan?paired15Plan->setupBytes():certified22Plan->setupBytes();
     return innerBytes+field.capacity()*sizeof(field[0])
-        +reverseColumns.capacity()*sizeof(reverseColumns[0])
+        +scalars.capacity()*sizeof(scalars[0])
         +adjoint.capacity()*sizeof(adjoint[0]);
 }
 
 void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
     for(std::size_t group=0;group<plan.groups;++group) {
         const auto* input=scratch+groupStride*group;
-        const auto* matrices=plan.reverseColumns.data()+8*group;
+        std::array<std::uint32_t,32> matrices[8];
+        for(unsigned symbol=0;symbol<8;++symbol) matrices[symbol]=reverseColumns(plan.scalars[8*group+symbol]);
         Block mixed[256];
         for(unsigned symbol=0;symbol<8;++symbol)
             for(unsigned row=0;row<32;++row) {
@@ -113,7 +171,8 @@ void outerForwardScalar(const Block* message,Block* scratch,const Plan& plan,uns
     for(std::size_t group=0;group<plan.groups;++group)
         for(unsigned lane=0;lane<lanes;++lane) {
             auto* output=scratch+lane*plan.scratchBlocks()+groupStride*group;
-            const auto* matrices=plan.reverseColumns.data()+8*group;
+            std::array<std::uint32_t,32> matrices[8];
+            for(unsigned symbol=0;symbol<8;++symbol) matrices[symbol]=reverseColumns(plan.scalars[8*group+symbol]);
             Block coded[256];
             for(unsigned row=0;row<8;++row)
                 for(unsigned bit=0;bit<32;++bit) {

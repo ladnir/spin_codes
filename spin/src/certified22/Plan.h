@@ -11,12 +11,16 @@ inline constexpr std::size_t groupStride = 260;
 
 bool validMessageSize(std::size_t k) noexcept;
 
+// Automatic uses the AVX-512 setup when the CPU has the packet ISA; both paths
+// produce bit-identical tables. Scalar exists for differential tests.
+enum class SetupPath { Automatic, Scalar };
+
 // Four systematic GF(16) RS[16,8] rows per 128-to-256-coordinate group,
 // native GF(2^16) symbol maps, four-bit routing through 64 regions, and
 // the exact t64/s22 inner. State runs continuously across region boundaries.
 struct Plan {
     Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed,
-         bool withOuter = true);
+         bool withOuter = true, SetupPath path = SetupPath::Automatic);
     Plan(const Plan&) = delete;
     Plan& operator=(const Plan&) = delete;
     std::size_t k = 0, n = 0, groups = 0;
@@ -50,6 +54,10 @@ void reverseRouteFast(const Block*, Block* scratch, const Plan&);
 // and writes 2K interleaved records. Streaming requires 64-byte output.
 void forwardInnerFast(const Block* scratch, Block* output, const Plan&, unsigned lanes, bool stream,
                       std::size_t plane = 0);
+// AVX-512 exact inner setup (SetupFast.cpp); requires cpu_packet512().
+void prepareInnerFast(Plan&, std::uint64_t innerSeed);
+// Words first..first+count-1 (count a multiple of 8) of kernel::setup::Words(seed).
+void fillWords(std::uint64_t seed, std::uint64_t first, std::uint64_t* out, std::size_t count) noexcept;
 void outerFastCached(const Block* scratch, Block*, const Plan&);
 void outerFastCachedUnrolled(const Block* scratch, Block*, const Plan&);
 void outerFastStreaming(const Block* scratch, Block*, const Plan&);

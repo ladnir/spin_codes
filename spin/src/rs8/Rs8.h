@@ -16,15 +16,17 @@ bool validMessageSize(std::size_t k) noexcept;
 // through 64 regions, with the exact t64/s22 inner at every size (the map
 // certified in Lean at K = 2^14..2^26). State crosses region boundaries.
 struct Plan {
-    Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed);
+    Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed,
+         certified22::SetupPath path = certified22::SetupPath::Automatic);
     Plan(const Plan&) = delete;
     Plan& operator=(const Plan&) = delete;
     std::size_t k = 0, n = 0, groups = 0;
     std::optional<paired15::Plan> paired15Plan;
     std::optional<certified22::Plan> certified22Plan;
     std::vector<std::array<std::uint8_t,9>> field;
-    // Column j of the literal reverse symbol map M_c, for scalar encoding.
-    std::vector<std::array<std::uint32_t,32>> reverseColumns;
+    // The sampled nonzero GF(2^32) scalar per symbol; the scalar oracles derive
+    // the literal reverse map's columns from it on demand.
+    std::vector<std::uint32_t> scalars;
     // GFNI matrices of the nine adjoint tower byte multiplications per column.
     std::vector<std::array<std::uint64_t,9>> adjoint;
     std::size_t scratchBlocks() const noexcept { return groups * groupStride; }
@@ -50,4 +52,10 @@ void outerCached(const Block* scratch, Block*, const Plan&);
 void outerScalar(const Block* scratch, Block*, const Plan&);
 void outerForwardScalar(const Block*, Block* scratch, const Plan&, unsigned lanes);
 bool selfTest() noexcept;
+// Rewrites field (and scalars when requested) in place for a new outer seed,
+// exactly as the constructor would; adjoint is left stale. No allocation.
+void refreshOuterTranspose(Plan&, std::uint64_t seed, bool scalars) noexcept;
+// Literal per-symbol definitions (bit-serial field arithmetic), for oracles.
+std::array<std::uint32_t,32> reverseColumns(std::uint32_t scalar) noexcept;
+std::array<std::uint64_t,9> literalAdjoint(std::uint32_t scalar) noexcept;
 }

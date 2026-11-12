@@ -4,6 +4,8 @@
 #include "kernels/WorkspaceRouting.h"
 #include "Cpu.h"
 #include "MemoryPolicy.h"
+#include "rs8/Rs8.h"
+#include <cstring>
 #include <algorithm>
 #include <limits>
 #include <numeric>
@@ -81,21 +83,103 @@ void BankState::refresh(std::uint64_t routeSeed,std::uint64_t innerSeed) noexcep
     }
     spec.route_seed=routeSeed;spec.inner_seed=innerSeed;
 }
+// Banked Turbo (PacketRs8T64) is heuristic. Full setup is certified under an
+// ideal-randomness assumption on the seed expander; banked setup instead
+// samples a structurally different, correlated distribution (one bank reused
+// across codes) that the analysis does not cover. The bank is an exact Turbo
+// plan drawn from the bank seed. A code seed selects
+//  - route: a uniform order of the 64 bank regions and a rotation of each
+//    region's group destinations;
+//  - inner: a uniform order of the bank's GL22 epoch updates;
+//  - outer: fresh nonzero GF(2^32) scalars, exactly the Full-mode outer.
+// Refresh writes the live plan in place: no allocation, O(K) copying. The
+// scalar-only tables are kept in step only for the Portable backend.
+struct TurboBank {
+    rs8::Plan bank,live;
+    bool fast;
+    std::array<std::uint32_t,64> regions{};
+    std::array<std::uint32_t,64> shifts{};
+    std::vector<std::uint32_t> epochs;
+    TurboBank(CodeSpec s,std::uint64_t bankSeed,bool f)
+        :bank(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL),
+         live(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL),fast(f),
+         epochs(s.message_size/32) {
+        refresh(s.route_seed,s.inner_seed);
+    }
+    static std::uint32_t below(kernel::setup::Words& words,std::uint64_t n) noexcept {
+#ifdef _MSC_VER
+        return std::uint32_t(__umulh(words(),n));
+#else
+        return std::uint32_t((__uint128_t(words())*n)>>64);
+#endif
+    }
+    void refresh(std::uint64_t routeSeed,std::uint64_t innerSeed) noexcept {
+        using kernel::setup::Words;
+        const auto& b=*bank.certified22Plan;
+        auto& l=*live.certified22Plan;
+        const auto groups=b.groups;
+        Words routeWords(routeSeed^0x62616e6b726f7574ULL);
+        std::iota(regions.begin(),regions.end(),0U);
+        for(unsigned n=64;n>1;--n) std::swap(regions[n-1],regions[below(routeWords,n)]);
+        for(auto& shift:shifts) shift=below(routeWords,groups);
+        const auto copyRoute=[&](const std::vector<std::uint32_t>& from,std::vector<std::uint32_t>& to) {
+            for(unsigned region=0;region<64;++region) {
+                const auto* source=from.data()+regions[region]*groups;
+                auto* target=to.data()+region*groups;
+                const auto shift=shifts[region];
+                std::memcpy(target+shift,source,(groups-shift)*sizeof(std::uint32_t));
+                std::memcpy(target,source+groups-shift,shift*sizeof(std::uint32_t));
+            }
+        };
+        copyRoute(b.routeBytes,l.routeBytes);
+        if(!fast) copyRoute(b.route,l.route);
+        Words innerWords(innerSeed^0x62616e6b696e6e72ULL);
+        std::iota(epochs.begin(),epochs.end(),0U);
+        for(auto n=epochs.size();n>1;--n) std::swap(epochs[n-1],epochs[below(innerWords,n)]);
+        for(std::size_t e=0;e<epochs.size();++e) {
+            std::memcpy(l.updates.data()+9*e,b.updates.data()+9*epochs[e],9*sizeof(std::uint64_t));
+            if(!fast) l.reverseMatrices[e]=b.reverseMatrices[epochs[e]];
+        }
+        rs8::refreshOuterTranspose(live,routeSeed,!fast);
+    }
+    std::size_t bytes() const noexcept {
+        return bank.setupBytes()+live.setupBytes()+epochs.capacity()*sizeof(epochs[0]);
+    }
+};
 struct PreparedState {
     CodeSpec spec;
     SetupOptions setup;
     ExecutionOptions execution;
     std::optional<Code> full;
     std::shared_ptr<BankState> bank;
+    std::optional<TurboBank> turbo;
     std::optional<GenericTranspose> generic;
     bool four=false;
     PreparedState(CodeSpec s,SetupOptions o,ExecutionOptions e):spec(s),setup(o),execution(e) {
         if(!valid_message_size(s.parameters,s.message_size))throw std::invalid_argument("SPIN invalid prepared geometry");
         if(o.mode==SetupMode::Full)full.emplace(s,e);
         else if(o.mode==SetupMode::BankedHeuristic) {
+            if(s.parameters==Parameters::PacketRs8T64) {
+                bool fast=false;
+                switch(e.backend) {
+                case Backend::Automatic:fast=cpu_packet512();break;
+                case Backend::Portable:break;
+                case Backend::Avx512:
+                    if(!cpu_packet512()) throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
+                    fast=true;break;
+                case Backend::Avx2:
+                    throw std::invalid_argument("SPIN packet has no AVX2 backend; select Portable or Automatic");
+                default:throw std::invalid_argument("SPIN unknown backend");
+                }
+#if !SPIN_BCH_AVX512
+                fast=false;
+#endif
+                turbo.emplace(s,o.bank_seed,fast);
+                return;
+            }
             if(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRsT64S15K16 ||
-               s.parameters==Parameters::PacketRsT64S22 || s.parameters==Parameters::PacketRs8T64)
-                throw std::invalid_argument("SPIN packet profiles require full setup; banked setup is unsupported");
+               s.parameters==Parameters::PacketRsT64S22)
+                throw std::invalid_argument("SPIN packet profiles other than Turbo require full setup; banked setup is unsupported");
             if(!capabilities().avx2)throw std::runtime_error("SPIN requires AVX2 with OS support");
             if(e.backend!=Backend::Automatic && e.backend!=Backend::Avx2 && e.backend!=Backend::Avx512)
                 throw std::invalid_argument("SPIN unknown backend");
@@ -112,11 +196,16 @@ struct PreparedScratch {
     std::optional<spin::Workspace> full;
     std::vector<storage::block> values;
     std::vector<std::uint32_t> addresses;
+    std::optional<Buffer> turbo;
     PreparedScratch(std::shared_ptr<PreparedState> s,Width w,MemoryPolicy policy)
         :owner(std::move(s)),width(w) {
         (void)resolveMemoryPolicy(0,policy);
         if(owner->full)full.emplace(owner->full->make_workspace(w,policy));
-        else {
+        else if(owner->turbo) {
+            turbo.emplace(owner->turbo->live.scratchBlocks()*sizeof(storage::block),policy);
+            if(resolveMemoryPolicy(turbo->bytes().size(),policy)==MemoryPolicy::Normal)
+                kernel::workspace_routing::adviseOwned(turbo->bytes().data(),turbo->allocation_bytes());
+        } else {
             values.resize(2*owner->spec.message_size);addresses.resize(owner->bank->rows);
             if(resolveMemoryPolicy(values.size()*sizeof(storage::block),policy)==MemoryPolicy::PreferHugePages ||
                kernel::workspace_routing::eligible(true,owner->spec.message_size))
@@ -139,6 +228,7 @@ void PreparedEncoder::setCodeSeed(CodeSeed seed) {
     detail::checkedPreparedState(state_);
     if(seed==CodeSeed{state_->spec.route_seed,state_->spec.inner_seed})return;
     if(state_->bank)state_->bank->refresh(seed.route,seed.inner);
+    else if(state_->turbo)state_->turbo->refresh(seed.route,seed.inner);
     else {
         auto spec=state_->spec;spec.route_seed=seed.route;spec.inner_seed=seed.inner;
         Code next(spec,state_->execution);
@@ -160,12 +250,14 @@ std::size_t PreparedEncoder::code_size() const noexcept{return 2*message_size();
 std::size_t PreparedEncoder::setup_bytes() const noexcept {
     if(!state_)return 0;
     if(state_->bank)return state_->bank->bytes();
+    if(state_->turbo)return state_->turbo->bytes();
     return state_->full->setup_bytes()+
         (state_->generic?state_->generic->setup_bytes():0);
 }
 Backend PreparedEncoder::backend() const noexcept {
     if(!state_)return Backend::Automatic;
     if(state_->full)return state_->full->backend();
+    if(state_->turbo)return state_->turbo->fast?Backend::Avx512:Backend::Portable;
     return state_->four?Backend::Avx512:Backend::Avx2;
 }
 bool PreparedEncoder::supports_transpose(Width width) const noexcept {
@@ -174,7 +266,7 @@ bool PreparedEncoder::supports_transpose(Width width) const noexcept {
 }
 bool PreparedEncoder::supports_generic_transpose() const noexcept {
     if(!state_)return false;
-    return state_->full?state_->full->supports_generic_transpose():true;
+    return state_->full?state_->full->supports_generic_transpose():!state_->turbo;
 }
 std::array<std::byte,56> PreparedEncoder::descriptor() const noexcept {
     std::array<std::byte,56> out{};
@@ -183,7 +275,7 @@ std::array<std::byte,56> PreparedEncoder::descriptor() const noexcept {
     auto put=[&](unsigned pos,std::uint64_t x,unsigned n){for(unsigned i=0;i<n;++i)out[pos+i]=std::byte((x>>(8*i))&255);};
     put(4,2,4);put(8,std::uint32_t(state_->spec.parameters),4);put(12,std::uint32_t(state_->setup.mode),4);
     put(16,message_size(),8);put(24,state_->spec.route_seed,8);put(32,state_->spec.inner_seed,8);
-    if(state_->bank){put(40,state_->setup.bank_seed,8);put(48,1,8);}
+    if(state_->bank || state_->turbo){put(40,state_->setup.bank_seed,8);put(48,1,8);}
     return out;
 }
 PreparedEncoder::Workspace::Workspace(std::shared_ptr<detail::PreparedState> s,Width width,MemoryPolicy policy)
@@ -193,6 +285,7 @@ PreparedEncoder::Workspace::Workspace(Workspace&&) noexcept=default;
 PreparedEncoder::Workspace& PreparedEncoder::Workspace::operator=(Workspace&&) noexcept=default;
 std::size_t PreparedEncoder::Workspace::bytes() const noexcept {
     if(!scratch_)return 0;
+    if(scratch_->turbo)return scratch_->turbo->allocation_bytes();
     return scratch_->full?scratch_->full->bytes():
         scratch_->values.capacity()*16+scratch_->addresses.capacity()*4;
 }
@@ -238,6 +331,15 @@ GenericTranspose PreparedEncoder::generic_transpose() const {
 bool PreparedEncoder::owns(const GenericTranspose& view) const noexcept {
     return state_ && state_->generic && state_->generic->data_==view.data_;
 }
+static void turboTranspose(const detail::TurboBank& t,const std::byte* in,std::byte* out,detail::PreparedScratch& s) {
+    const auto* input=reinterpret_cast<const detail::storage::block*>(in);
+    auto* output=reinterpret_cast<detail::storage::block*>(out);
+    auto* work=reinterpret_cast<detail::storage::block*>(s.turbo->bytes().data());
+#if SPIN_BCH_AVX512
+    if(t.fast) { detail::rs8::transposeFast(input,output,work,t.live); return; }
+#endif
+    detail::rs8::transposeScalar(input,output,work,t.live);
+}
 static bool overlaps(const void* a,std::size_t na,const void* b,std::size_t nb) {
     const auto x=reinterpret_cast<std::uintptr_t>(a),y=reinterpret_cast<std::uintptr_t>(b);
     return x<=y?y-x<na:x-y<nb;
@@ -253,6 +355,7 @@ void PreparedEncoder::transpose_bytes(std::span<const std::byte> in,std::span<st
         throw std::invalid_argument("SPIN prepared buffer geometry or alignment mismatch");
     auto& s=*w.scratch_;
     if(state_->full){state_->full->prepare_workspace(*s.full);state_->full->transpose_bytes(in,out,*s.full);}
+    else if(state_->turbo)turboTranspose(*state_->turbo,in.data(),out.data(),s);
     else detail::kernel::bankTranspose(*state_->bank,state_->four,in.data(),out.data(),s.values.data(),s.addresses.data());
 }
 void PreparedEncoder::transpose_inplace_bytes(std::span<std::byte> buf,Workspace& w) const {
@@ -263,6 +366,7 @@ void PreparedEncoder::transpose_inplace_bytes(std::span<std::byte> buf,Workspace
         throw std::invalid_argument("SPIN prepared buffer geometry or alignment mismatch");
     auto& s=*w.scratch_;
     if(state_->full){state_->full->prepare_workspace(*s.full);state_->full->transpose_inplace_bytes(buf,*s.full);}
+    else if(state_->turbo)turboTranspose(*state_->turbo,buf.data(),buf.data(),s);
     else detail::kernel::bankTranspose(*state_->bank,state_->four,buf.data(),buf.data(),s.values.data(),s.addresses.data());
 }
 }

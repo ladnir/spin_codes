@@ -62,6 +62,7 @@ if(SPIN_ENABLE_AVX512)
   add_library(spin_packet512 OBJECT src/packet/PacketFast.cpp src/packet/PacketOuterFast.cpp
     src/rs8/Fast.cpp src/rs8/ForwardFast.cpp
     src/certified22/RouteFast.cpp src/certified22/OuterFast.cpp src/certified22/Fast.cpp
+    src/certified22/SetupFast.cpp
     src/paired15/Paired15Fast.cpp src/paired15/Paired15ForwardOuter.cpp
     src/packet/PacketCachedInner.cpp src/packet/PacketCachedOuter.cpp
     src/packet/PacketForwardOuter.cpp src/packet/PacketForwardInner.cpp
@@ -144,6 +145,8 @@ if(SPIN_BUILD_BENCHMARKS)
         -mavx512bw -mavx512dq -mavx512vbmi -mgfni -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
     endif()
   endif()
+  add_executable(spin_setup_once_bench bench/setup_once.cpp)
+  target_link_libraries(spin_setup_once_bench PRIVATE spin::spin)
   add_executable(spin_rs8_stages_bench bench/rs8_stages.cpp)
   target_link_libraries(spin_rs8_stages_bench PRIVATE spin::spin)
   add_executable(spin_forward_batch_bench bench/forward_batch.cpp)
@@ -168,6 +171,10 @@ if(SPIN_BUILD_TESTS)
   target_link_libraries(spin_rs8_test PRIVATE spin::spin)
   add_test(NAME spin_rs8 COMMAND spin_rs8_test)
   set_tests_properties(spin_rs8 PROPERTIES RUN_SERIAL TRUE)
+  add_executable(spin_turbo_setup_test tests/turbo_setup.cpp)
+  target_link_libraries(spin_turbo_setup_test PRIVATE spin::spin)
+  add_test(NAME spin_turbo_setup COMMAND spin_turbo_setup_test)
+  set_tests_properties(spin_turbo_setup PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
   add_executable(spin_certified22_test tests/certified22.cpp)
   target_link_libraries(spin_certified22_test PRIVATE spin::spin)
   add_test(NAME spin_certified22 COMMAND spin_certified22_test)

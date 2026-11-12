@@ -1,6 +1,7 @@
 #include "Plan.h"
 #include "productionMap.h"
 #include "../kernels/SetupRandom.h"
+#include "../Cpu.h"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -32,14 +33,28 @@ Matrix multiply(const Matrix& left,const Matrix& right) {
     return result;
 }
 
-template<class Container>
-void shuffle(Container& values, Words& words, const std::vector<Divisor>& divisors) {
+#if SPIN_BCH_AVX512
+// The same SplitMix stream as Words, generated eight words per vector.
+class BufferedWords {
+    std::uint64_t seed_, next_ = 0;
+    unsigned position_ = 256;
+    alignas(64) std::uint64_t words_[256];
+public:
+    explicit BufferedWords(std::uint64_t seed) : seed_(seed) {}
+    std::uint64_t operator()() noexcept {
+        if(position_ == 256) { fillWords(seed_, next_, words_, 256); next_ += 256; position_ = 0; }
+        return words_[position_++];
+    }
+};
+#endif
+template<class Container,class Source>
+void shuffle(Container& values, Source& words, const std::vector<Divisor>& divisors) {
     std::iota(values.begin(), values.end(), 0U);
     for(std::size_t i = values.size(); i > 1; --i)
         std::swap(values[i - 1], values[divisors[i].sample(words, i)]);
 }
-void prepareRoute(Plan& p, std::uint64_t seed) {
-    Words words(seed);
+template<class Source>
+void prepareRoute(Plan& p, Source& words) {
     std::vector<Divisor> divisors(std::max(p.groups, std::size_t{64}) + 1);
     for(std::size_t i = 2; i < divisors.size(); ++i) divisors[i] = Divisor(i);
     std::vector<std::array<std::uint32_t,64>> columns(p.groups);
@@ -137,14 +152,25 @@ bool validMessageSize(std::size_t k) noexcept {
         && groups<=maxSize/(groupStride*sizeof(Block)*4)
         && k<=maxSize/(2*sizeof(Block)*4);
 }
-Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool withOuter) {
+Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool withOuter,SetupPath path) {
     if(!validMessageSize(size))
         throw std::invalid_argument("certified-s22 K must be a positive multiple of 128 within the byte-route and workspace limits");
     k=size;
     n=2*size;
     groups=size/128;
-    prepareRoute(*this,routeSeed);
+#if SPIN_BCH_AVX512
+    if(path==SetupPath::Automatic && cpu_packet512()) {
+        BufferedWords words(routeSeed);
+        prepareRoute(*this,words);
+    } else
+#endif
+    { Words words(routeSeed); prepareRoute(*this,words); }
+#if SPIN_BCH_AVX512
+    if(path==SetupPath::Automatic && cpu_packet512()) prepareInnerFast(*this,innerSeed);
+    else
+#endif
     prepareInner(*this,innerSeed);
+    (void)path;
     if(withOuter) prepareOuter(*this,routeSeed);
 }
 std::size_t Plan::setupBytes() const noexcept {
