@@ -42,19 +42,26 @@ Owned buffers use the existing automatic large-page policy.
 
 ## Backends
 
-Three implementations of the same seeded map are selected at runtime:
+Implementations of the same seeded map are selected at runtime:
 
-| Backend | ISA | Kernels |
+| Backend | Runs on | Kernels |
 |---|---|---|
-| `Avx512` | AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
-| `Avx2` | AVX2 only (no GFNI, no AVX-512) | Tuned transpose, forward, and setup |
-| `Portable` | SSE2 | Literal scalar oracle |
+| `Avx512` | x86-64 with AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
+| `Avx2` | x86-64 with AVX2 (no GFNI or AVX-512 needed) | Tuned transpose, forward, and setup |
+| `Portable` | Any 64-bit CPU (plain C++) | Optimized transpose, forward, and setup |
+| `Reference` | Any 64-bit CPU | Literal oracle, for checking |
 
 `Automatic` picks the first available of `Avx512`, `Avx2`, `Portable`.
-Selecting `Avx2` explicitly also uses the AVX2 setup, so it measures the
-AVX2-only machine class on any CPU. Every setup path produces bit-identical
-tables (`spin_turbo_setup_test`), and `spin_rs8_test avx2` checks the AVX2
-kernels against the scalar oracle (CTest `spin_rs8_avx2`).
+Selecting `Avx2` or `Portable` explicitly also uses that setup, so it
+measures that machine class on any CPU. Every setup path produces
+bit-identical tables (`spin_turbo_setup_test`), and `spin_rs8_test avx2` /
+`spin_rs8_test portable` check those kernels against the oracle (CTests
+`spin_rs8_avx2`, `spin_rs8_portable`).
+
+The library builds on any 64-bit target. Off x86-64 the packet families
+(including Turbo) use their portable code and the BCH/IMT families report
+themselves unavailable. AArch64 is checked by cross-compiling and running the
+packet tests under QEMU.
 
 The AVX2 kernels keep the AVX-512 circuit: the s22 step is the same XOR
 network in the fast basis, the per-epoch GL22 update uses four-Russians

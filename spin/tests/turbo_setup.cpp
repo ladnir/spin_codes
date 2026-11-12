@@ -1,4 +1,4 @@
-// Turbo (PacketRs8T64) setup differential test: the AVX2 and AVX-512 setups
+// Turbo (PacketRs8T64) setup differential test: the portable, AVX2 and AVX-512 setups
 // must reproduce the scalar setup's tables bit for bit, and the table-driven
 // outer coefficients must equal the literal bit-serial definitions.
 #include "../src/rs8/Rs8.h"
@@ -6,6 +6,7 @@
 #include "../src/Cpu.h"
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace {
@@ -39,14 +40,16 @@ void check(std::size_t k,std::uint64_t route,std::uint64_t inner,certified22::Se
 }
 int main() {
     try {
-        if(!cpu_avx2()) { std::cout<<"setup: AVX2 unavailable; scalar only\n"; return 77; }
-        // Avx2 forces the AVX2 setup; Automatic is the AVX-512 setup where present.
-        std::vector<certified22::SetupPath> paths{certified22::SetupPath::Avx2};
-        if(cpu_packet512()) paths.push_back(certified22::SetupPath::Automatic);
+        // Every fast setup available here against the literal Scalar setup:
+        // Portable always, Avx2 where present, Automatic (AVX-512) where present.
+        std::vector<certified22::SetupPath> paths{certified22::SetupPath::Portable};
+        std::string names="portable";
+        if(cpu_avx2()) { paths.push_back(certified22::SetupPath::Avx2); names+=", AVX2"; }
+        if(cpu_packet512()) { paths.push_back(certified22::SetupPath::Automatic); names+=", AVX-512"; }
         for(auto path:paths)
             for(std::size_t k:{std::size_t{128},std::size_t{384},std::size_t{1}<<14,std::size_t{65664},std::size_t{1}<<18})
                 for(std::uint64_t seed:{1ULL,0x9e3779b97f4a7c15ULL,~0ULL}) check(k,seed,seed*3+7,path);
-        std::cout<<"setup: "<<(paths.size()>1?"AVX-512, AVX2":"AVX2")<<" and scalar Turbo setup tables identical\n";
+        std::cout<<"setup: "<<names<<" and scalar Turbo setup tables identical\n";
         return 0;
     } catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
 }

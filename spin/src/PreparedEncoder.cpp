@@ -93,21 +93,24 @@ void BankState::refresh(std::uint64_t routeSeed,std::uint64_t innerSeed) noexcep
 //  - inner: a uniform order of the bank's GL22 epoch updates;
 //  - outer: fresh nonzero GF(2^32) scalars, exactly the Full-mode outer.
 // Refresh writes the live plan in place: no allocation, O(K) copying. The
-// scalar-only tables are kept in step only for the Portable backend; the
-// AVX-512 and AVX2 kernels read routeBytes, updates and field only.
+// tables are kept in step only for the kernels that read them (see oracle,
+// scalars); every kernel reads routeBytes and updates.
 struct TurboBank {
     rs8::Plan bank,live;
     Backend kernel;
-    bool fast;
+    // oracle: the Reference kernel reads route and reverseMatrices; scalars:
+    // the Reference and Portable kernels read the outer scalars.
+    bool oracle,scalars;
     std::array<std::uint32_t,64> regions{};
     std::array<std::uint32_t,64> shifts{};
     std::vector<std::uint32_t> epochs;
     static certified22::SetupPath setupPath(Backend k) noexcept {
-        return k==Backend::Avx2?certified22::SetupPath::Avx2:certified22::SetupPath::Automatic;
+        return k==Backend::Avx2?certified22::SetupPath::Avx2:
+            k==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic;
     }
     TurboBank(CodeSpec s,std::uint64_t bankSeed,Backend k)
         :bank(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL,setupPath(k)),
-         live(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL,setupPath(k)),kernel(k),fast(k!=Backend::Portable),
+         live(s.message_size,bankSeed,bankSeed^0x7475726b62616e6bULL,setupPath(k)),kernel(k),oracle(k==Backend::Reference),scalars(k==Backend::Reference || k==Backend::Portable),
          epochs(s.message_size/32) {
         refresh(s.route_seed,s.inner_seed);
     }
@@ -137,15 +140,15 @@ struct TurboBank {
             }
         };
         copyRoute(b.routeBytes,l.routeBytes);
-        if(!fast) copyRoute(b.route,l.route);
+        if(oracle) copyRoute(b.route,l.route);
         Words innerWords(innerSeed^0x62616e6b696e6e72ULL);
         std::iota(epochs.begin(),epochs.end(),0U);
         for(auto n=epochs.size();n>1;--n) std::swap(epochs[n-1],epochs[below(innerWords,n)]);
         for(std::size_t e=0;e<epochs.size();++e) {
             std::memcpy(l.updates.data()+9*e,b.updates.data()+9*epochs[e],9*sizeof(std::uint64_t));
-            if(!fast) l.reverseMatrices[e]=b.reverseMatrices[epochs[e]];
+            if(oracle) l.reverseMatrices[e]=b.reverseMatrices[epochs[e]];
         }
-        rs8::refreshOuterTranspose(live,routeSeed,!fast);
+        rs8::refreshOuterTranspose(live,routeSeed,scalars);
     }
     std::size_t bytes() const noexcept {
         return bank.setupBytes()+live.setupBytes()+epochs.capacity()*sizeof(epochs[0]);
@@ -170,7 +173,7 @@ struct PreparedState {
                 case Backend::Automatic:
                     kernel=cpu_packet512()?Backend::Avx512:capabilities().avx2?Backend::Avx2:Backend::Portable;
                     break;
-                case Backend::Portable:break;
+                case Backend::Portable:case Backend::Reference:kernel=e.backend;break;
                 case Backend::Avx512:
                     if(!cpu_packet512()) throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
                     kernel=Backend::Avx512;break;
@@ -346,8 +349,11 @@ static void turboTranspose(const detail::TurboBank& t,const std::byte* in,std::b
 #if SPIN_BCH_AVX512
     if(t.kernel==Backend::Avx512) { detail::rs8::transposeFast(input,output,work,t.live); return; }
 #endif
+#if SPIN_X86
     if(t.kernel==Backend::Avx2) { detail::rs8::transposeAvx2(input,output,work,t.live); return; }
-    detail::rs8::transposeScalar(input,output,work,t.live);
+#endif
+    if(t.kernel==Backend::Reference) detail::rs8::transposeScalar(input,output,work,t.live);
+    else detail::rs8::transposePortable(input,output,work,t.live);
 }
 static bool overlaps(const void* a,std::size_t na,const void* b,std::size_t nb) {
     const auto x=reinterpret_cast<std::uintptr_t>(a),y=reinterpret_cast<std::uintptr_t>(b);

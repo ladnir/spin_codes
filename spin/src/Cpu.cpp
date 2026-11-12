@@ -1,14 +1,16 @@
 #include "Cpu.h"
 #include <spin/Code.h>
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
 #include <intrin.h>
 #endif
 namespace spin::detail {
 namespace {
 struct Features { bool avx2=false,f=false,vl=false,wide=false,masks=false,packet=false; };
+// x86-64 feature detection; other architectures report no x86 features.
 Features detect() noexcept {
     Features x;
-#ifdef _MSC_VER
+#if defined(__x86_64__) || defined(_M_X64)
+#if defined(_MSC_VER)
     int r[4]; __cpuid(r,0); if(r[0]<7) return x;
     __cpuidex(r,1,0);
     if((r[2]&(1<<27))==0 || (r[2]&(1<<28))==0) return x;
@@ -31,6 +33,7 @@ Features detect() noexcept {
     x.masks=x.wide && __builtin_cpu_supports("avx512vpopcntdq");
     x.packet=x.avx2 && x.wide &&
         __builtin_cpu_supports("avx512vbmi") && __builtin_cpu_supports("gfni");
+#endif
 #endif
     return x;
 }

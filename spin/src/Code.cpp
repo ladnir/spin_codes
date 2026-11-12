@@ -69,8 +69,8 @@ struct Plan {
             const auto rows=(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRs8T64)?8u:4u;
             if(o.tile_rows && o.tile_rows!=rows)
                 throw std::invalid_argument("SPIN packet tile geometry is fixed by its profile");
-            // Turbo (PacketRs8T64) also has an AVX2 backend; the other packet
-            // profiles are AVX-512 or Portable only.
+            // Turbo (PacketRs8T64) also has AVX2 and portable kernels; the other packet
+            // profiles are AVX-512 or the Portable oracle only.
             const bool turbo=s.parameters==Parameters::PacketRs8T64;
             switch(o.backend) {
             case Backend::Automatic:
@@ -78,6 +78,8 @@ struct Plan {
                          (turbo && capabilities().avx2)?Backend::Avx2:Backend::Portable;
                 break;
             case Backend::Portable:break;
+            // The literal oracle; for the other packet families it is Portable.
+            case Backend::Reference:if(!turbo) selected=Backend::Portable;break;
             case Backend::Avx512:
                 if(!cpu_packet512())
                     throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
@@ -90,9 +92,10 @@ struct Plan {
             default:throw std::invalid_argument("SPIN unknown backend");
             }
             if(s.parameters==Parameters::PacketRs8T64)
-                // An explicit AVX2 backend also uses the AVX2 setup (bit-identical).
+                // An explicit AVX2 or Portable backend also uses that setup (bit-identical).
                 rs8Code.emplace(s.message_size,s.route_seed,s.inner_seed,
-                    selected==Backend::Avx2?certified22::SetupPath::Avx2:certified22::SetupPath::Automatic);
+                    selected==Backend::Avx2?certified22::SetupPath::Avx2:
+                    selected==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic);
             else if(s.parameters==Parameters::PacketRsT64S22)
                 certified.emplace(s.message_size,s.route_seed,s.inner_seed);
             else if(s.parameters==Parameters::PacketRsT64S15K16)
@@ -102,7 +105,7 @@ struct Plan {
                 if(selected==Backend::Avx512)forward.emplace(*packets);
             }
         } else {
-            if(o.backend==Backend::Portable)
+            if(o.backend==Backend::Portable || o.backend==Backend::Reference)
                 throw std::invalid_argument("SPIN Portable backend is available only for packet profiles");
             if(!capabilities().avx2) throw std::runtime_error("SPIN requires AVX2 with OS support");
             code.emplace(config(s.parameters),kernel::MessageLength{s.message_size},
@@ -180,11 +183,14 @@ static void transposePacket(const Plan& plan,const storage::block* input,
             return;
         }
 #endif
+#if SPIN_X86
         if(plan.selected==Backend::Avx2) {
             rs8::transposeAvx2(input,output,work,*plan.rs8Code);
             return;
         }
-        rs8::transposeScalar(input,output,work,*plan.rs8Code);
+#endif
+        if(plan.selected==Backend::Reference) rs8::transposeScalar(input,output,work,*plan.rs8Code);
+        else rs8::transposePortable(input,output,work,*plan.rs8Code);
         return;
     }
     if(plan.certified) {
@@ -352,11 +358,14 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
             return;
         }
 #endif
+#if SPIN_X86
         if(plan_->selected==Backend::Avx2) {
             detail::rs8::forwardAvx2(input,output,work,*plan_->rs8Code,width/16,stream);
             return;
         }
-        detail::rs8::forwardScalar(input,output,work,*plan_->rs8Code,width/16);
+#endif
+        if(plan_->selected==Backend::Reference) detail::rs8::forwardScalar(input,output,work,*plan_->rs8Code,width/16);
+        else detail::rs8::forwardPortable(input,output,work,*plan_->rs8Code,width/16);
         return;
     }
     if(plan_->certified) {

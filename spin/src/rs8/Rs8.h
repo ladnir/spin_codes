@@ -44,6 +44,10 @@ void transposeFast(const Block*, Block*, Block* scratch, const Plan&);
 // output stores are used only when requested and output is 64-byte aligned.
 void forwardFast(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
 void outerForwardFast(const Block*, Block* scratch, const Plan&, unsigned lanes);
+// Portable kernels (Portable.cpp; plain C++, any 64-bit CPU): same contracts
+// as the scalar entry points.
+void transposePortable(const Block*, Block*, Block* scratch, const Plan&);
+void forwardPortable(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes);
 // AVX2 kernels (Avx2.cpp; no AVX-512, VBMI or GFNI): same contracts as the
 // scalar entry points, require cpu_avx2().
 void transposeAvx2(const Block*, Block*, Block* scratch, const Plan&);

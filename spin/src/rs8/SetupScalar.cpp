@@ -149,18 +149,18 @@ void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
         Block mixed[256];
         for(unsigned symbol=0;symbol<8;++symbol)
             for(unsigned row=0;row<32;++row) {
-                auto value=_mm_setzero_si128();
+                auto value=Block::zero();
                 for(unsigned column=0;column<32;++column)
                     if((matrices[symbol][column]>>row)&1U)
-                        value=_mm_xor_si128(value,input[32*symbol+column].mData);
+                        value=(value^input[32*symbol+column]);
                 mixed[32*symbol+row]=Block(value);
             }
         for(unsigned row=0;row<8;++row)
             for(unsigned messageBit=0;messageBit<16;++messageBit) {
-                auto value=_mm_setzero_si128();
+                auto value=Block::zero();
                 for(auto mask=rsRows[messageBit];mask;mask&=mask-1) {
                     const auto bit=std::countr_zero(mask);
-                    value=_mm_xor_si128(value,mixed[32*(bit/4)+4*row+bit%4].mData);
+                    value=(value^mixed[32*(bit/4)+4*row+bit%4]);
                 }
                 output[128*group+16*row+messageBit]=Block(value);
             }
@@ -176,21 +176,21 @@ void outerForwardScalar(const Block* message,Block* scratch,const Plan& plan,uns
             Block coded[256];
             for(unsigned row=0;row<8;++row)
                 for(unsigned bit=0;bit<32;++bit) {
-                    auto value=_mm_setzero_si128();
+                    auto value=Block::zero();
                     for(unsigned messageBit=0;messageBit<16;++messageBit)
                         if((rsRows[messageBit]>>bit)&1U)
-                            value=_mm_xor_si128(value,message[(128*group+16*row+messageBit)*lanes+lane].mData);
+                            value=(value^message[(128*group+16*row+messageBit)*lanes+lane]);
                     coded[32*(bit/4)+4*row+bit%4]=Block(value);
                 }
             for(unsigned symbol=0;symbol<8;++symbol)
                 for(unsigned column=0;column<32;++column) {
-                    auto value=_mm_setzero_si128();
+                    auto value=Block::zero();
                     for(auto mask=matrices[symbol][column];mask;mask&=mask-1)
-                        value=_mm_xor_si128(value,coded[32*symbol+std::countr_zero(mask)].mData);
+                        value=(value^coded[32*symbol+std::countr_zero(mask)]);
                     output[32*symbol+column]=Block(value);
                 }
             for(unsigned pad=256;pad<groupStride;++pad)
-                output[pad]=Block(_mm_setzero_si128());
+                output[pad]=Block::zero();
         }
 }
 

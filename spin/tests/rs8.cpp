@@ -50,8 +50,8 @@ static_assert(static_cast<std::uint32_t>(family)==8);
 static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S15K16)==6);
 static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S22)==7);
 struct Block {std::uint64_t words[2]{};bool operator==(const Block&) const=default;};
-// Backend under test against the Portable oracle: Automatic, or Avx2 when
-// run as "spin_rs8_test avx2".
+// Backend under test against the Reference oracle: Automatic, or Avx2 or
+// Portable when run as "spin_rs8_test avx2" or "spin_rs8_test portable".
 spin::Backend tested=spin::Backend::Automatic;
 struct Context {const char* test="metadata";std::size_t k=0;std::uint64_t route=0,inner=0;unsigned width=16,offset=0;} context;
 void require(bool value,const char* message) {
@@ -133,12 +133,12 @@ void metadata() {
         noAlloc([&]{require(!spin::valid_message_size(family,k),"invalid/overflow size accepted");});
         rejects([&]{spin::Code code({k,family,17,43});});
     }
-    spin::Code code({384,family,17,43}),scalar(code.specification(),{spin::Backend::Portable});
+    spin::Code code({384,family,17,43}),scalar(code.specification(),{spin::Backend::Reference});
     require(code.message_size()==384 && code.code_size()==768 && code.setup_bytes()>0,"shape/setup size");
     require(code.descriptor()==scalar.descriptor(),"backend changes map descriptor");
-    spin::Code tiled(code.specification(),{spin::Backend::Portable,8});
+    spin::Code tiled(code.specification(),{spin::Backend::Reference,8});
     require(code.descriptor()==tiled.descriptor(),"fixed tile changes descriptor");
-    for(unsigned tile:{1U,4U,16U})rejects([&]{spin::Code bad(code.specification(),{spin::Backend::Portable,tile});});
+    for(unsigned tile:{1U,4U,16U})rejects([&]{spin::Code bad(code.specification(),{spin::Backend::Reference,tile});});
     const auto descriptor=code.descriptor();require(descriptor[8]==std::byte{8},"descriptor family ID");
     for(unsigned i=0;i<8;++i) {
         require(descriptor[16+i]==std::byte((384ULL>>(8*i))&255),"descriptor K");
@@ -167,7 +167,7 @@ void metadata() {
     }
 }
 void transposeCase(std::size_t k,std::uint64_t route,std::uint64_t inner) {
-    const auto n=2*k;spin::Code code({k,family,route,inner},{tested}),scalar(code.specification(),{spin::Backend::Portable});
+    const auto n=2*k;spin::Code code({k,family,route,inner},{tested}),scalar(code.specification(),{spin::Backend::Reference});
     context={"transpose/adjoint",k,route,inner};auto work=code.make_workspace(),sw=scalar.make_workspace();
     spin::Buffer source(n*16),input(n*16+128),output(k*16+128),expected(k*16),message(k*16),encoded(n*16);
     fill(source.bytes(),913);fill(message.bytes(),1949);
@@ -209,7 +209,7 @@ void transposeCase(std::size_t k,std::uint64_t route,std::uint64_t inner) {
 }
 void forwardWidths(std::size_t k,spin::Width width) {
     const std::size_t n=2*k;const auto bytes=static_cast<unsigned>(width);
-    spin::Code code({k,family,17,43},{tested}),scalar(code.specification(),{spin::Backend::Portable});
+    spin::Code code({k,family,17,43},{tested}),scalar(code.specification(),{spin::Backend::Reference});
     context={"forward widths",k,17,43,bytes};auto work=code.make_workspace(width),sw=scalar.make_workspace(width),narrow=code.make_workspace();
     spin::Buffer input(k*bytes+128),original(k*bytes),output(n*bytes+128),expected(n*bytes),plane(k*16),encoded(n*16);
     auto in=input.bytes().subspan(16,k*bytes);
@@ -277,7 +277,7 @@ void ownershipAndSeeds() {
 }
 void preparedFull() {
     constexpr std::size_t k=384,n=2*k;
-    for(auto backend:{spin::Backend::Portable,tested}) {
+    for(auto backend:{spin::Backend::Reference,spin::Backend::Portable,tested}) {
         context={"prepared Full",k,17,43};spin::PreparedEncoder prepared({k,family,17,43},{spin::SetupMode::Full},{backend});
         auto work=prepared.make_workspace();const auto bytes=work.bytes();
         require(prepared.supports_transpose() && !prepared.supports_generic_transpose(),"prepared capabilities");
@@ -286,7 +286,7 @@ void preparedFull() {
         bool havePrevious=false;
         for(auto seed:{spin::CodeSeed{17,43},spin::CodeSeed{18,43},spin::CodeSeed{18,44}}) {
             prepared.setCodeSeed(seed);noAlloc([&]{prepared.setCodeSeed(seed);});
-            spin::Code fresh({k,family,seed.route,seed.inner},{spin::Backend::Portable});auto fw=fresh.make_workspace();
+            spin::Code fresh({k,family,seed.route,seed.inner},{spin::Backend::Reference});auto fw=fresh.make_workspace();
             fresh.transpose_bytes(input.bytes(),expected.bytes(),fw);
             noAlloc([&]{prepared.transpose_bytes(input.bytes(),actual.bytes(),work);});
             compare(actual.bytes(),expected.bytes(),"prepared refreshed map mismatch");require(work.bytes()==bytes,"refresh resized scratch");
@@ -303,7 +303,7 @@ void preparedFull() {
                 require(descriptor[32+i]==std::byte((seed.inner>>(8*i))&255),"prepared inner descriptor");
             }
         }
-        prepared.setCodeSeed({91,17});spin::Code fresh({k,family,91,17},{spin::Backend::Portable});auto fw=fresh.make_workspace();
+        prepared.setCodeSeed({91,17});spin::Code fresh({k,family,91,17},{spin::Backend::Reference});auto fw=fresh.make_workspace();
         fresh.transpose_bytes(input.bytes(),expected.bytes(),fw);
         noAlloc([&]{prepared.prepare_workspace(work);prepared.transpose_bytes(input.bytes(),actual.bytes(),work);});
         compare(actual.bytes(),expected.bytes(),"explicit prepared rebind");
@@ -325,7 +325,7 @@ void preparedFull() {
 void preparedBanked(std::size_t k) {
     const auto n=2*k;context={"prepared banked",k,17,43};
     const spin::SetupOptions banked{spin::SetupMode::BankedHeuristic,0x1234567};
-    spin::PreparedEncoder portable({k,family,17,43},banked,{spin::Backend::Portable});
+    spin::PreparedEncoder portable({k,family,17,43},banked,{spin::Backend::Reference});
     spin::PreparedEncoder automatic({k,family,17,43},banked,{tested});
     require(automatic.supports_transpose() && !automatic.supports_generic_transpose(),"banked capabilities");
     rejects([&]{automatic.generic_transpose();});rejects([&]{automatic.make_workspace(spin::Width::Bits256);});
@@ -361,6 +361,8 @@ int main(int argc,char** argv) {try {
     if(argc>1 && !std::strcmp(argv[1],"avx2")) {
         if(!spin::capabilities().avx2){std::cout<<"rs8 AVX2 SKIP: no AVX2\n";return 77;}
         tested=spin::Backend::Avx2;
+    } else if(argc>1 && !std::strcmp(argv[1],"portable")) {
+        tested=spin::Backend::Portable;
     }
     metadata();
     for(auto k:{std::size_t{128},std::size_t{256},std::size_t{384},std::size_t{1920},std::size_t{2048},
@@ -372,6 +374,6 @@ int main(int argc,char** argv) {try {
         for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})forwardWidths(k,width);
     ownershipAndSeeds();preparedFull();
     for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})preparedBanked(k);
-    std::cout<<(tested==spin::Backend::Avx2?"rs8 AVX2 ":"rs8 ")<<"API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
+    std::cout<<(tested==spin::Backend::Avx2?"rs8 AVX2 ":tested==spin::Backend::Portable?"rs8 portable ":"rs8 ")<<"API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

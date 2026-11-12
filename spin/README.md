@@ -32,15 +32,18 @@ target_link_libraries(my_target PRIVATE spin::spin)
 
 The target exports C++20 and its public include directory, not ISA flags or
 cryptoTools headers. Public headers contain no SIMD types. The implementation
-uses private x86 kernels with runtime AVX-512 dispatch. The IMT families require
-AVX2; the packet family also has an SSE2 fallback.
+uses private kernels with runtime ISA dispatch. The IMT families require x86-64
+with AVX2; the packet families are portable C++ with x86 fast paths, and Turbo
+(`PacketRs8T64`) has AVX-512, AVX2 and optimized portable kernels (RS8.md).
 `SPIN_ENABLE_AVX512=OFF` omits the AVX-512 objects. `SPIN_TUNE=znver4` changes
 GCC/Clang instruction scheduling without changing the required ISA.
 
 Linux/GCC and Windows/MSVC are supported. With a Visual Studio generator, use
 `--config Release` for building/installing and `-C Release` for CTest.
 Clang is accepted but has not been validated in this first package pass.
-ARM is not supported. On x86-64 CPUs without AVX2, only the packet family is supported.
+Any 64-bit target builds (AArch64 is checked under QEMU; a NEON Turbo kernel is
+planned). Off x86-64, and on x86-64 CPUs without AVX2, only the packet families
+are supported.
 
 ## Single-stream use
 
@@ -370,10 +373,11 @@ and outer field maps; `inner_seed` generates the GL20 updates.
 The seed expansion does not certify every individual seed.
 
 `Backend::Automatic` selects the AVX-512F/VL/BW/DQ, VBMI, and GFNI kernel when
-available, otherwise the literal SSE2 fallback. `Portable` forces the fallback;
+available, otherwise the literal portable fallback. `Portable` forces the fallback;
 `Avx512` requires the fast backend. Packet encoding rejects `Avx2`, except
 Turbo (`PacketRs8T64`), which also has AVX2 kernels and AVX2 setup; for Turbo,
-`Automatic` falls back to AVX2 before the SSE2 oracle (see RS8.md).
+`Automatic` falls back to AVX2 and then to an optimized portable kernel, and
+`Reference` selects the literal oracle (see RS8.md).
 `SPIN_ENABLE_AVX512=OFF` supports the fallback without compiling the fast kernel.
 The fallback is for compatibility and checking, not comparable performance.
 `PreparedEncoder` supports this family in `Full` mode only.

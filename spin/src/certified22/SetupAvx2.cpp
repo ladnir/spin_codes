@@ -3,11 +3,10 @@
 // stream and accepts the same candidates, so every table is bit-identical
 // (checked by spin_turbo_setup_test). Candidate c is words 22c..22c+21 of the
 // stream; epoch e takes the e-th full-rank candidate. Eight candidates are
-// rank-tested per vector, one per 32-bit lane. The basis transforms per epoch
-// use constant XOR patterns for constant left factors and byte tables for
-// constant right factors.
+// rank-tested per vector, one per 32-bit lane. The basis transforms are those
+// of SetupTransform.h, with vector packing.
 #include "Plan.h"
-#include "productionMap.h"
+#include "SetupTransform.h"
 #include "../kernels/Block.h"
 #include <immintrin.h>
 #include <array>
@@ -15,8 +14,7 @@
 
 namespace spin::detail::certified22 {
 namespace {
-using Matrix=std::array<std::uint32_t,22>;
-constexpr std::uint64_t step=0x9e3779b97f4a7c15ULL;
+using namespace transform;
 
 // Low 64 bits of a*c for a constant c, from three 32x32 multiplies.
 static SPIN_FORCEINLINE __m256i multiply(__m256i a,__m256i c,__m256i cHigh) {
@@ -78,40 +76,6 @@ static void rankBatches(std::uint64_t seed,std::uint64_t first,Batch* out) {
     for(unsigned b=0;b<NB;++b) out[b].alive=unsigned(_mm256_movemask_ps(_mm256_castsi256_ps(alive[b])));
 }
 
-constexpr Matrix transposeOf(const Matrix& m) {
-    Matrix result{};
-    for(unsigned r=0;r<22;++r)
-        for(unsigned c=0;c<22;++c) result[c]|=((m[r]>>c)&1U)<<r;
-    return result;
-}
-constexpr Matrix inverseTranspose=transposeOf(map::inverseBasis);
-constexpr Matrix basisTranspose=transposeOf(map::basis);
-
-// (M*X)[r] = XOR of X[b] over the bits b of the constant row M[r].
-template<std::uint32_t Mask,std::size_t... B>
-static SPIN_FORCEINLINE std::uint32_t combine(const std::uint32_t* x,std::index_sequence<B...>) {
-    return (((Mask>>B)&1U?x[B]:0U)^...);
-}
-template<const Matrix& M,std::size_t... R>
-static SPIN_FORCEINLINE void leftConstant(const std::uint32_t* x,std::uint32_t* out,std::index_sequence<R...>) {
-    ((out[R]=combine<M[R]>(x,std::make_index_sequence<22>{})),...);
-}
-// (X*C)[r] = XOR of C[c] over the bits c of X[r], three byte lookups.
-struct RightTables { std::uint32_t t[3][256]; };
-constexpr RightTables rightTables(const Matrix& c) {
-    RightTables result{};
-    for(unsigned i=0;i<3;++i)
-        for(unsigned v=0;v<256;++v)
-            for(unsigned b=0;b<8;++b)
-                if(((v>>b)&1U) && 8*i+b<22) result.t[i][v]^=c[8*i+b];
-    return result;
-}
-alignas(64) constexpr RightTables byInverse=rightTables(map::inverseBasis);
-alignas(64) constexpr RightTables byBasisTranspose=rightTables(basisTranspose);
-static SPIN_FORCEINLINE std::uint32_t right(const RightTables& t,std::uint32_t x) {
-    return t.t[0][x&255U]^t.t[1][(x>>8)&255U]^t.t[2][x>>16];
-}
-
 // Setup.cpp's packBlocks: qword 3o+i, byte j is byte i of row 8o+j. Rows of
 // block o give their bytes 0..3 in qwords 0..3 of one vector (rows 22, 23
 // are zero padding).
@@ -135,11 +99,8 @@ static SPIN_FORCEINLINE __m256i bitTranspose(__m256i x) {
 // inverseBasis, whose transpose is G = inverseBasis^T * L * basis^T; block
 // (o,i) of F is the bit transpose of block (i,o) of G.
 static void transformEpoch(const std::uint32_t* literal,std::uint64_t* reverse,std::uint64_t* forward) {
-    alignas(32) std::uint32_t a[24],u[24]{},g[24]{};
-    leftConstant<map::basis>(literal,a,std::make_index_sequence<22>{});
-    for(unsigned r=0;r<22;++r) u[r]=right(byInverse,a[r]);
-    leftConstant<inverseTranspose>(literal,a,std::make_index_sequence<22>{});
-    for(unsigned r=0;r<22;++r) g[r]=right(byBasisTranspose,a[r]);
+    alignas(32) std::uint32_t u[24],g[24];
+    transforms(literal,u,g);
     const auto three=_mm256_setr_epi64x(-1,-1,-1,0);
     alignas(32) std::uint64_t blocks[12];
     for(unsigned o=0;o<3;++o) {

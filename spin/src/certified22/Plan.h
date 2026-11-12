@@ -12,10 +12,10 @@ inline constexpr std::size_t groupStride = 260;
 bool validMessageSize(std::size_t k) noexcept;
 
 // Automatic uses the AVX-512 setup when the CPU has the packet ISA, else the
-// AVX2 setup when available; all paths
-// produce bit-identical tables. Scalar and Avx2 force a path for differential
-// tests (Avx2 requires cpu_avx2()).
-enum class SetupPath { Automatic, Scalar, Avx2 };
+// AVX2 setup when available, else the portable fast setup; all paths
+// produce bit-identical tables. Scalar (the literal oracle), Avx2 and Portable
+// force a path for differential tests (Avx2 requires cpu_avx2()).
+enum class SetupPath { Automatic, Scalar, Avx2, Portable };
 
 // Four systematic GF(16) RS[16,8] rows per 128-to-256-coordinate group,
 // native GF(2^16) symbol maps, four-bit routing through 64 regions, and
@@ -59,6 +59,8 @@ void forwardInnerFast(const Block* scratch, Block* output, const Plan&, unsigned
 // AVX-512 exact inner setup (SetupFast.cpp); requires cpu_packet512().
 void prepareInnerFast(Plan&, std::uint64_t innerSeed);
 // AVX2 exact inner setup (SetupAvx2.cpp), bit-identical; requires cpu_avx2().
+// Portable fast exact inner setup (SetupPortable.cpp), bit-identical.
+void prepareInnerPortable(Plan&, std::uint64_t innerSeed);
 void prepareInnerAvx2(Plan&, std::uint64_t innerSeed);
 // Words first..first+count-1 (count a multiple of 8) of kernel::setup::Words(seed).
 void fillWords(std::uint64_t seed, std::uint64_t first, std::uint64_t* out, std::size_t count) noexcept;

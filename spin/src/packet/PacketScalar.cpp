@@ -56,16 +56,16 @@ void outerForwardGroup(const Block* message,Block* routed,const std::array<std::
     Block coded[512];
     for(unsigned lane=0;lane<8;++lane)
         for(unsigned bit=0;bit<64;++bit) {
-            auto value=_mm_setzero_si128();
+            auto value=Block::zero();
             for(unsigned messageBit=0;messageBit<32;++messageBit)
-                if((rsRows[messageBit]>>bit)&1)value=_mm_xor_si128(value,message[32*lane+messageBit].mData);
+                if((rsRows[messageBit]>>bit)&1)value=(value^message[32*lane+messageBit]);
             coded[index(bit/4,4*lane+bit%4)]=Block(value);
         }
     for(unsigned symbol=0;symbol<16;++symbol)
         for(unsigned row=0;row<32;++row) {
-            auto value=_mm_setzero_si128();
+            auto value=Block::zero();
             for(unsigned c=0;c<32;++c)
-                if((matrices[symbol][c]>>row)&1)value=_mm_xor_si128(value,coded[index(symbol,c)].mData);
+                if((matrices[symbol][c]>>row)&1)value=(value^coded[index(symbol,c)]);
             routed[index(symbol,row)]=Block(value);
         }
 }
@@ -76,17 +76,17 @@ void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
         Block mixed[512];
         for(unsigned symbol=0;symbol<16;++symbol)
             for(unsigned row=0;row<32;++row) {
-                auto value=_mm_setzero_si128();
+                auto value=Block::zero();
                 for(auto mask=matrices[symbol][row];mask;mask&=mask-1)
-                    value=_mm_xor_si128(value,routed[index(symbol,std::countr_zero(mask))].mData);
+                    value=(value^routed[index(symbol,std::countr_zero(mask))]);
                 mixed[index(symbol,row)]=Block(value);
             }
         for(unsigned lane=0;lane<8;++lane)
             for(unsigned messageBit=0;messageBit<32;++messageBit) {
-                auto value=_mm_setzero_si128();
+                auto value=Block::zero();
                 for(auto mask=rsRows[messageBit];mask;mask&=mask-1) {
                     const auto bit=std::countr_zero(mask);
-                    value=_mm_xor_si128(value,mixed[index(bit/4,4*lane+bit%4)].mData);
+                    value=(value^mixed[index(bit/4,4*lane+bit%4)]);
                 }
                 output[256*group+32*lane+messageBit]=Block(value);
             }
@@ -95,21 +95,21 @@ void outerScalar(const Block* scratch,Block* output,const Plan& plan) {
 }
 
 void transposeScalar(const Block* input,Block* output,Block* scratch,const Plan& plan) {
-    __m128i state[20]{},next[20]{},feedback[20];
+    Block state[20]{},next[20]{},feedback[20];
     for(std::size_t epoch=plan.n/64;epoch-->0;) {
-        for(auto& value:feedback)value=_mm_setzero_si128();
+        for(auto& value:feedback)value=Block::zero();
         for(unsigned p=0;p<64;++p) {
-            const auto i=64*epoch+p;const auto raw=input[i].mData;auto value=raw;
+            const auto i=64*epoch+p;const auto raw=input[i];auto value=raw;
             for(unsigned mask=column(p);mask;mask&=mask-1) {
-                const auto j=std::countr_zero(mask);value=_mm_xor_si128(value,state[j]);
-                feedback[j]=_mm_xor_si128(feedback[j],raw);
+                const auto j=std::countr_zero(mask);value=(value^state[j]);
+                feedback[j]=(feedback[j]^raw);
             }
             scratch[plan.route[i/4]+(i&3)]=Block(value);
         }
         if(!epoch)break;
         for(unsigned j=0;j<20;++j) {
             auto value=feedback[j];
-            for(unsigned mask=plan.reverseMatrices[epoch][j];mask;mask&=mask-1)value=_mm_xor_si128(value,state[std::countr_zero(mask)]);
+            for(unsigned mask=plan.reverseMatrices[epoch][j];mask;mask&=mask-1)value=(value^state[std::countr_zero(mask)]);
             next[j]=value;
         }
         std::memcpy(state,next,sizeof(state));
@@ -126,21 +126,21 @@ void forwardScalar(const Block* message,Block* encoded,Block* routed,const Plan&
     for(std::size_t group=0;group<plan.groups;++group)
         outerForwardGroup(message+256*group,routed+groupStride*group,plan.outerMatrices.data()+16*group);
     for(std::size_t i=0;i<plan.n;++i)encoded[i]=routed[plan.route[i/4]+(i&3)];
-    __m128i state[20]{},next[20]{},feedback[20];
+    Block state[20]{},next[20]{},feedback[20];
     for(std::size_t epoch=0;epoch<plan.n/64;++epoch) {
-        for(auto& value:feedback)value=_mm_setzero_si128();
+        for(auto& value:feedback)value=Block::zero();
         for(unsigned p=0;p<64;++p) {
-            const auto i=64*epoch+p;const auto raw=encoded[i].mData;auto value=raw;
+            const auto i=64*epoch+p;const auto raw=encoded[i];auto value=raw;
             for(unsigned mask=column(p);mask;mask&=mask-1) {
-                const auto j=std::countr_zero(mask);value=_mm_xor_si128(value,state[j]);
-                feedback[j]=_mm_xor_si128(feedback[j],raw);
+                const auto j=std::countr_zero(mask);value=(value^state[j]);
+                feedback[j]=(feedback[j]^raw);
             }
             encoded[i]=Block(value);
         }
         if(epoch+1==plan.n/64)break;
         for(unsigned j=0;j<20;++j) {
             auto value=feedback[j];
-            for(unsigned c=0;c<20;++c)if((plan.reverseMatrices[epoch][c]>>j)&1)value=_mm_xor_si128(value,state[c]);
+            for(unsigned c=0;c<20;++c)if((plan.reverseMatrices[epoch][c]>>j)&1)value=(value^state[c]);
             next[j]=value;
         }
         std::memcpy(state,next,sizeof(state));
@@ -153,21 +153,21 @@ template<unsigned L> static void scalarWide(const Block* message,Block* encoded,
             for(unsigned i=0;i<256;++i)local[i]=message[(256*group+i)*L+lane];
             outerForwardGroup(local,routed+groupStride*group,plan.outerMatrices.data()+16*group);
         }
-        __m128i state[20]{},next[20]{},feedback[20];
+        Block state[20]{},next[20]{},feedback[20];
         for(std::size_t epoch=0;epoch<plan.n/64;++epoch) {
-            for(auto& value:feedback)value=_mm_setzero_si128();
+            for(auto& value:feedback)value=Block::zero();
             for(unsigned p=0;p<64;++p) {
-                const auto i=64*epoch+p;const auto raw=routed[plan.route[i/4]+(i&3)].mData;auto value=raw;
+                const auto i=64*epoch+p;const auto raw=routed[plan.route[i/4]+(i&3)];auto value=raw;
                 for(unsigned mask=column(p);mask;mask&=mask-1) {
-                    const auto j=std::countr_zero(mask);value=_mm_xor_si128(value,state[j]);
-                    feedback[j]=_mm_xor_si128(feedback[j],raw);
+                    const auto j=std::countr_zero(mask);value=(value^state[j]);
+                    feedback[j]=(feedback[j]^raw);
                 }
                 encoded[i*L+lane]=Block(value);
             }
             if(epoch+1==plan.n/64)break;
             for(unsigned j=0;j<20;++j) {
                 auto value=feedback[j];
-                for(unsigned c=0;c<20;++c)if((plan.reverseMatrices[epoch][c]>>j)&1)value=_mm_xor_si128(value,state[c]);
+                for(unsigned c=0;c<20;++c)if((plan.reverseMatrices[epoch][c]>>j)&1)value=(value^state[c]);
                 next[j]=value;
             }
             std::memcpy(state,next,sizeof(state));

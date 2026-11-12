@@ -45,18 +45,18 @@ constexpr auto rsRows = [] {
 
 template<bool Forward>
 void inner(const Block* input, Block* output, const Plan& p, unsigned lanes, unsigned lane) {
-    alignas(16) __m128i state[16]{}, next[16], feedback[16];
+    Block state[16]{}, next[16], feedback[16];
     for(std::size_t step = 0; step < p.n/64; ++step) {
         const auto epoch = Forward ? step : p.n/64 - 1 - step;
-        for(auto& value : feedback) value = _mm_setzero_si128();
+        for(auto& value : feedback) value = Block::zero();
         for(unsigned j = 0; j < 64; ++j) {
             const auto i = 64*epoch+j, routed = p.route[i/4]+(i&3);
-            const auto raw = input[Forward ? routed : i].mData;
+            const auto raw = input[Forward ? routed : i];
             auto value = raw;
             for(unsigned mask = columns[j]; mask; mask &= mask-1) {
                 const auto c = std::countr_zero(mask);
-                value = _mm_xor_si128(value, state[c]);
-                feedback[c] = _mm_xor_si128(feedback[c], raw);
+                value = (value^ state[c]);
+                feedback[c] = (feedback[c]^ raw);
             }
             output[Forward ? i*lanes+lane : routed] = Block(value);
         }
@@ -66,10 +66,10 @@ void inner(const Block* input, Block* output, const Plan& p, unsigned lanes, uns
             if constexpr(Forward) {
                 for(unsigned c = 0; c < 16; ++c)
                     if((p.reverseMatrices[epoch][c] >> j) & 1U)
-                        value = _mm_xor_si128(value, state[c]);
+                        value = (value^ state[c]);
             } else {
                 for(unsigned mask = p.reverseMatrices[epoch][j]; mask; mask &= mask-1)
-                    value = _mm_xor_si128(value, state[std::countr_zero(mask)]);
+                    value = (value^ state[std::countr_zero(mask)]);
             }
             next[j] = value;
         }
@@ -80,18 +80,18 @@ void outerTranspose(const Block* input, Block* output, const std::array<std::uin
     alignas(16) Block mixed[256];
     for(unsigned symbol = 0; symbol < 16; ++symbol)
         for(unsigned row = 0; row < 16; ++row) {
-            auto value = _mm_setzero_si128();
+            auto value = Block::zero();
             for(unsigned mask = matrices[symbol][row]; mask; mask &= mask-1) {
                 const auto c = std::countr_zero(mask);
-                value = _mm_xor_si128(value, input[4*(4*symbol+c%4)+c/4].mData);
+                value = (value^ input[4*(4*symbol+c%4)+c/4]);
             }
             mixed[4*(4*symbol+row%4)+row/4] = Block(value);
         }
     for(unsigned row = 0; row < 4; ++row)
         for(unsigned bit = 0; bit < 32; ++bit) {
-            auto value = _mm_setzero_si128();
+            auto value = Block::zero();
             for(auto mask = rsRows[bit]; mask; mask &= mask-1)
-                value = _mm_xor_si128(value, mixed[4*std::countr_zero(mask)+row].mData);
+                value = (value^ mixed[4*std::countr_zero(mask)+row]);
             output[32*row+bit] = Block(value);
         }
 }
@@ -100,18 +100,18 @@ void outerForward(const Block* message, Block* scratch, const std::array<std::ui
     alignas(16) Block coded[256];
     for(unsigned row = 0; row < 4; ++row)
         for(unsigned bit = 0; bit < 64; ++bit) {
-            auto value = _mm_setzero_si128();
+            auto value = Block::zero();
             for(unsigned m = 0; m < 32; ++m)
                 if((rsRows[m] >> bit) & 1U)
-                    value = _mm_xor_si128(value, message[(32*row+m)*lanes+lane].mData);
+                    value = (value^ message[(32*row+m)*lanes+lane]);
             coded[4*bit+row] = Block(value);
         }
     for(unsigned symbol = 0; symbol < 16; ++symbol)
         for(unsigned row = 0; row < 16; ++row) {
-            auto value = _mm_setzero_si128();
+            auto value = Block::zero();
             for(unsigned column = 0; column < 16; ++column)
                 if((matrices[symbol][column] >> row) & 1U)
-                    value = _mm_xor_si128(value, coded[4*(4*symbol+column%4)+column/4].mData);
+                    value = (value^ coded[4*(4*symbol+column%4)+column/4]);
             scratch[4*(4*symbol+row%4)+row/4] = Block(value);
         }
 }

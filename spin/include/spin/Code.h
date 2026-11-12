@@ -11,7 +11,10 @@ namespace spin {
 // Stable identifiers for supplied maps, not arbitrary (t,s) synthesis.
 // Value 4 identified the retired BCH packet construction; it is not reused.
 enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketRsT64S20=5, PacketRsT64S15K16=6, PacketRsT64S22=7, PacketRs8T64=8 };
-enum class Backend { Automatic, Avx2, Avx512, Portable };
+// Portable runs on any 64-bit CPU. For Turbo (PacketRs8T64) it is an
+// optimized plain-C++ kernel and Reference selects the literal oracle; for the
+// other packet families both select the oracle.
+enum class Backend { Automatic, Avx2, Avx512, Portable, Reference };
 enum class Width : unsigned { Bits128=16, Bits256=32, Bits512=64 };
 enum class MemoryPolicy { Normal, PreferHugePages, Automatic };
 // Forward output stores only; does not change the code or its descriptor.
