@@ -171,9 +171,13 @@ struct PreparedState {
                 auto kernel=Backend::Portable;
                 switch(e.backend) {
                 case Backend::Automatic:
-                    kernel=cpu_packet512()?Backend::Avx512:capabilities().avx2?Backend::Avx2:Backend::Portable;
+                    kernel=cpu_packet512()?Backend::Avx512:capabilities().avx2?Backend::Avx2:
+                           SPIN_AARCH64?Backend::Neon:Backend::Portable;
                     break;
                 case Backend::Portable:case Backend::Reference:kernel=e.backend;break;
+                case Backend::Neon:
+                    if(!SPIN_AARCH64) throw std::runtime_error("SPIN Turbo NEON backend unavailable");
+                    kernel=Backend::Neon;break;
                 case Backend::Avx512:
                     if(!cpu_packet512()) throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
                     kernel=Backend::Avx512;break;
@@ -351,6 +355,9 @@ static void turboTranspose(const detail::TurboBank& t,const std::byte* in,std::b
 #endif
 #if SPIN_X86
     if(t.kernel==Backend::Avx2) { detail::rs8::transposeAvx2(input,output,work,t.live); return; }
+#endif
+#if SPIN_AARCH64
+    if(t.kernel==Backend::Neon) { detail::rs8::transposeNeon(input,output,work,t.live); return; }
 #endif
     if(t.kernel==Backend::Reference) detail::rs8::transposeScalar(input,output,work,t.live);
     else detail::rs8::transposePortable(input,output,work,t.live);

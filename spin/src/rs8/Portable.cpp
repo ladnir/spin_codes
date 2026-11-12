@@ -2,10 +2,9 @@
 // block, for any 64-bit CPU. Same linear map as the oracle and the ISA
 // kernels (spin_rs8_test portable checks it against the oracle).
 //
-// Inner: the fixed s22 step XOR network of certified22/StepCircuit.h in the
-// fast basis, with the per-epoch GL22 update applied by four-Russians tables
-// (as in rs8/Avx2.cpp). Forward records are lane-major: one vector of L
-// blocks per step coordinate.
+// Inner: the shared generic inner (InnerGeneric.h) on the common block: the
+// s22 step XOR network with a four-Russians GL22 update; forward records are
+// lane-major.
 //
 // Outer, bitsliced: multiplication of the 32 coordinates of a symbol by its
 // GF(2^32) scalar is a 32x32 binary matrix, applied by four-Russians tables
@@ -16,177 +15,25 @@
 #include "Rs8.h"
 #include "Field.h"
 #include "../certified22/productionMap.h"
-#include "../certified22/LaneMajor22.h"
-#include "../certified22/StepCircuit.h"
+#include "InnerGeneric.h"
 #include <bit>
 #include <cstddef>
 #include <utility>
 
 namespace spin::detail::rs8 {
 namespace {
-using namespace certified22::step;
 using B=Block;
 
-// ------------------------------------------------------------ vectors --
-struct XB {
+// The common block as the inner kernel's 128-bit vector.
+struct Ops {
+    using V=B;
+    static SPIN_FORCEINLINE B load(const void* p) { B b; std::memcpy(&b,p,16); return b; }
+    static SPIN_FORCEINLINE void store(void* p,B b) { std::memcpy(p,&b,16); }
     static SPIN_FORCEINLINE B x2(B a,B b) { return a^b; }
     static SPIN_FORCEINLINE B x3(B a,B b,B c) { return a^b^c; }
     static SPIN_FORCEINLINE B zero() { return B::zero(); }
 };
-// One step coordinate of L record lanes.
-template<unsigned L> struct alignas(16) R { B v[L]; };
-template<unsigned L> struct XR {
-    static SPIN_FORCEINLINE R<L> x2(const R<L>& a,const R<L>& b) {
-        R<L> r; for(unsigned i=0;i<L;++i) r.v[i]=a.v[i]^b.v[i]; return r;
-    }
-    static SPIN_FORCEINLINE R<L> x3(const R<L>& a,const R<L>& b,const R<L>& c) {
-        R<L> r; for(unsigned i=0;i<L;++i) r.v[i]=a.v[i]^b.v[i]^c.v[i]; return r;
-    }
-    static SPIN_FORCEINLINE R<L> zero() { R<L> r; for(auto& x:r.v) x=B::zero(); return r; }
-};
-template<unsigned L> struct LaneTypes { using W=R<L>; using X=XR<L>; };
-template<> struct LaneTypes<1> { using W=B; using X=XB; };
-
-static SPIN_FORCEINLINE B load(const void* p) { B b; std::memcpy(&b,p,16); return b; }
-static SPIN_FORCEINLINE void store(void* p,B b) { std::memcpy(p,&b,16); }
-
-// t[v] = t[v&(v-1)] + p[ctz v] for every nonzero nibble value v < N.
-template<class W,class X,std::size_t... V>
-static SPIN_FORCEINLINE void gray(W* t,const W* p,std::index_sequence<V...>) {
-    ((t[V+1]=X::x2(t[(V+1)&V],p[std::countr_zero(unsigned(V+1))])),...);
-}
-
-// ------------------------------------------------------------- inner --
-// w = U w + f for the packed 3x3-block GL22 table of one epoch (qword 3o+i,
-// byte j is byte i of row 8o+j; bit c of row r is U[r][c]).
-template<class W,class X>
-static SPIN_FORCEINLINE void update(W* w,const W* f,const std::uint64_t* packed) {
-    W t[6][16];
-    for(unsigned k=0;k<6;++k) {
-        t[k][0]=X::zero();
-        if(k<5) gray<W,X>(t[k],w+4*k,std::make_index_sequence<15>{});
-        else gray<W,X>(t[k],w+4*k,std::make_index_sequence<3>{});
-    }
-    const auto* bytes=reinterpret_cast<const std::uint8_t*>(packed);
-    for(unsigned r=0;r<22;++r) {
-        const auto* row=bytes+24*(r/8)+(r%8);
-        const unsigned b0=row[0],b1=row[8],b2=row[16];
-        w[r]=X::x3(X::x3(f[r],t[0][b0&15],t[1][b0>>4]),X::x2(t[2][b1&15],t[3][b1>>4]),
-                   X::x2(t[4][b2&15],t[5][b2>>4]));
-    }
-}
-// Transpose inner: epochs backwards, sequential input, packets scattered.
-struct Scatter {
-    std::byte* base; const std::uint32_t* route;
-    SPIN_FORCEINLINE void operator()(unsigned j,B v) const { store(base+route[j>>2]+16*(j&3),v); }
-};
-static SPIN_NOINLINE void reverseInner(const B* __restrict input,B* __restrict scratch,
-    const certified22::Plan& plan) {
-    const auto epochs=plan.n/64;
-    auto* base=reinterpret_cast<std::byte*>(scratch);
-    const auto* route=plan.routeBytes.data();
-    B w[22],f[22],mono[22];
-    {
-        const auto e=epochs-1;
-        const Scatter st{base,route+16*e};
-        MonoAccumulator<B,XB> acc;
-        for(unsigned h=0;h<8;++h) {
-            B x[8];
-            for(unsigned l=0;l<8;++l) { x[l]=input[64*e+8*h+l];st(8*h+l,x[l]); }
-            acc.block(h,x);
-        }
-        acc.finish(mono);
-        certified22::lanemajor::feedbackH<B,XB>(mono,w);
-    }
-    if(epochs==1) return;
-    for(std::size_t e=epochs-2;e>0;--e) {
-        const Scatter st{base,route+16*e};
-        StepWeights<B,XB> weights;
-        weights.prepare(w);
-        MonoAccumulator<B,XB> acc;
-        for(unsigned h=0;h<8;++h) {
-            B x[8];
-            for(unsigned l=0;l<8;++l) x[l]=input[64*e+8*h+l];
-            evalBlock(weights,h,x,st,8*h);
-            acc.block(h,x);
-        }
-        acc.finish(mono);
-        certified22::lanemajor::feedbackH<B,XB>(mono,f);
-        update<B,XB>(w,f,plan.updates.data()+9*e);
-    }
-    const Scatter st{base,route};
-    StepWeights<B,XB> weights;
-    weights.prepare(w);
-    for(unsigned h=0;h<8;++h) {
-        B x[8];
-        for(unsigned l=0;l<8;++l) x[l]=input[8*h+l];
-        evalBlock(weights,h,x,st,8*h);
-    }
-}
-// Forward inner, lane-major: gathers routed packets from L scratch planes.
-template<unsigned L>
-static SPIN_FORCEINLINE void gather(const std::byte* at,std::size_t stride,typename LaneTypes<L>::W* x) {
-    for(unsigned k=0;k<4;++k) {
-        if constexpr(L==1) x[k]=load(at+16*k);
-        else for(unsigned lane=0;lane<L;++lane) x[k].v[lane]=load(at+lane*stride+16*k);
-    }
-}
-template<unsigned L> struct LaneStore {
-    B* output;
-    template<class W> SPIN_FORCEINLINE void operator()(unsigned j,const W& v) const {
-        if constexpr(L==1) output[j]=v;
-        else for(unsigned lane=0;lane<L;++lane) output[L*j+lane]=v.v[lane];
-    }
-};
-template<unsigned L>
-static SPIN_NOINLINE void forwardInner(const B* __restrict input,B* __restrict output,
-    const certified22::Plan& plan,std::size_t plane) {
-    using W=typename LaneTypes<L>::W;
-    using X=typename LaneTypes<L>::X;
-    const auto epochs=plan.n/64;
-    const auto* route=plan.routeBytes.data();
-    const auto* base=reinterpret_cast<const std::byte*>(input);
-    const auto stride=plane*sizeof(B);
-    W w[22],f[22],mono[22];
-    {
-        MonoAccumulator<W,X> acc;
-        const LaneStore<L> st{output};
-        for(unsigned h=0;h<8;++h) {
-            W x[8];
-            gather<L>(base+route[2*h],stride,x);gather<L>(base+route[2*h+1],stride,x+4);
-            for(unsigned l=0;l<8;++l) st(8*h+l,x[l]);
-            acc.block(h,x);
-        }
-        acc.finish(mono);
-        certified22::lanemajor::feedbackH<W,X>(mono,w);
-    }
-    if(epochs==1) return;
-    for(std::size_t e=1;e+1<epochs;++e) {
-        const auto* r=route+16*e;
-        StepWeights<W,X> weights;
-        weights.prepare(w);
-        MonoAccumulator<W,X> acc;
-        const LaneStore<L> st{output+64*L*e};
-        for(unsigned h=0;h<8;++h) {
-            W x[8];
-            gather<L>(base+r[2*h],stride,x);gather<L>(base+r[2*h+1],stride,x+4);
-            evalBlock(weights,h,x,st,8*h);
-            acc.block(h,x);
-        }
-        acc.finish(mono);
-        certified22::lanemajor::feedbackH<W,X>(mono,f);
-        update<W,X>(w,f,plan.forwardUpdates.data()+9*e);
-    }
-    const auto* r=route+16*(epochs-1);
-    StepWeights<W,X> weights;
-    weights.prepare(w);
-    const LaneStore<L> st{output+64*L*(epochs-1)};
-    for(unsigned h=0;h<8;++h) {
-        W x[8];
-        gather<L>(base+r[2*h],stride,x);gather<L>(base+r[2*h+1],stride,x+4);
-        evalBlock(weights,h,x,st,8*h);
-    }
-}
+using XB=inner::X1<Ops>;
 
 // ------------------------------------------------------------- outer --
 // Rows (Mult(c)[r] as a mask over input coordinates) and columns (c*e_col)
@@ -221,7 +68,7 @@ static SPIN_FORCEINLINE void apply32(const B* in,const std::uint32_t* masks,B* o
     B t[8][16];
     for(unsigned k=0;k<8;++k) {
         t[k][0]=B::zero();
-        gray<B,XB>(t[k],in+4*k,std::make_index_sequence<15>{});
+        inner::gray<B,XB>(t[k],in+4*k,std::make_index_sequence<15>{});
     }
     for(unsigned i=0;i<32;++i) {
         const auto m=masks[i];
@@ -325,7 +172,7 @@ static SPIN_FORCEINLINE void groupForward(const B* message,unsigned lanes,unsign
 }
 
 void transposePortable(const Block* input,Block* output,Block* scratch,const Plan& plan) {
-    reverseInner(input,scratch,*plan.certified22Plan);
+    inner::reverse<Ops>(input,scratch,*plan.certified22Plan);
     for(std::size_t g=0;g<plan.groups;++g)
         groupTranspose(scratch+groupStride*g,output+128*g,plan.scalars.data()+8*g);
 }
@@ -334,8 +181,6 @@ void forwardPortable(const Block* input,Block* output,Block* scratch,const Plan&
     for(std::size_t g=0;g<plan.groups;++g)
         for(unsigned lane=0;lane<lanes;++lane)
             groupForward(input+128*lanes*g,lanes,lane,scratch+lane*plane+groupStride*g,plan.scalars.data()+8*g);
-    if(lanes==1) forwardInner<1>(scratch,output,*plan.certified22Plan,plane);
-    else if(lanes==2) forwardInner<2>(scratch,output,*plan.certified22Plan,plane);
-    else forwardInner<4>(scratch,output,*plan.certified22Plan,plane);
+    inner::forwardLanes<Ops>(scratch,output,*plan.certified22Plan,lanes,plane);
 }
 }

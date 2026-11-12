@@ -43,7 +43,7 @@ else()
   set(SPIN_BCH_OBJECTS ${KERNEL}/Unsupported.cpp)
 endif()
 add_library(spin STATIC src/Code.cpp src/PreparedEncoder.cpp src/PacketCode.cpp src/Buffer.cpp
-  src/rs8/SetupScalar.cpp src/rs8/Portable.cpp
+  src/rs8/SetupScalar.cpp src/rs8/Portable.cpp src/rs8/Neon.cpp
   src/certified22/Setup.cpp src/certified22/SetupPortable.cpp src/certified22/Scalar.cpp
   src/paired15/Paired15.cpp src/paired15/Paired15Scalar.cpp
   src/packet/PacketSetup.cpp src/packet/PacketForwardSetup.cpp src/packet/PacketScalar.cpp src/Cpu.cpp ${SPIN_BCH_OBJECTS})
@@ -205,6 +205,8 @@ if(SPIN_BUILD_TESTS)
   add_test(NAME spin_rs8_avx2 COMMAND spin_rs8_test avx2)
   add_test(NAME spin_rs8_portable COMMAND spin_rs8_test portable)
   set_tests_properties(spin_rs8_portable PROPERTIES RUN_SERIAL TRUE)
+  add_test(NAME spin_rs8_neon COMMAND spin_rs8_test neon)
+  set_tests_properties(spin_rs8_neon PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
   set_tests_properties(spin_rs8_avx2 PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
   add_executable(spin_turbo_setup_test tests/turbo_setup.cpp)
   target_link_libraries(spin_turbo_setup_test PRIVATE spin::spin)

@@ -34,15 +34,15 @@ The target exports C++20 and its public include directory, not ISA flags or
 cryptoTools headers. Public headers contain no SIMD types. The implementation
 uses private kernels with runtime ISA dispatch. The IMT families require x86-64
 with AVX2; the packet families are portable C++ with x86 fast paths, and Turbo
-(`PacketRs8T64`) has AVX-512, AVX2 and optimized portable kernels (RS8.md).
+(`PacketRs8T64`) has AVX-512, AVX2, NEON and optimized portable kernels (RS8.md).
 `SPIN_ENABLE_AVX512=OFF` omits the AVX-512 objects. `SPIN_TUNE=znver4` changes
 GCC/Clang instruction scheduling without changing the required ISA.
 
 Linux/GCC and Windows/MSVC are supported. With a Visual Studio generator, use
 `--config Release` for building/installing and `-C Release` for CTest.
 Clang is accepted but has not been validated in this first package pass.
-Any 64-bit target builds (AArch64 is checked under QEMU; a NEON Turbo kernel is
-planned). Off x86-64, and on x86-64 CPUs without AVX2, only the packet families
+Any 64-bit target builds (AArch64, including the NEON Turbo kernel, is checked
+under QEMU). Off x86-64, and on x86-64 CPUs without AVX2, only the packet families
 are supported.
 
 ## Single-stream use
@@ -376,7 +376,8 @@ The seed expansion does not certify every individual seed.
 available, otherwise the literal portable fallback. `Portable` forces the fallback;
 `Avx512` requires the fast backend. Packet encoding rejects `Avx2`, except
 Turbo (`PacketRs8T64`), which also has AVX2 kernels and AVX2 setup; for Turbo,
-`Automatic` falls back to AVX2 and then to an optimized portable kernel, and
+`Automatic` falls back to AVX2, then NEON on AArch64, then an optimized portable
+kernel, and
 `Reference` selects the literal oracle (see RS8.md).
 `SPIN_ENABLE_AVX512=OFF` supports the fallback without compiling the fast kernel.
 The fallback is for compatibility and checking, not comparable performance.

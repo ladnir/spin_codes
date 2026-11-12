@@ -17,10 +17,10 @@ template<class F> static double time(unsigned reps,F f) {
     return median(t);
 }
 int main(int argc,char** argv){try{
-    if(argc!=4) throw std::invalid_argument("usage: spin_turbo_backends_bench auto|avx2|avx512|portable|reference K reps");
+    if(argc!=4) throw std::invalid_argument("usage: spin_turbo_backends_bench auto|avx2|avx512|portable|reference|neon K reps");
     const std::string b=argv[1];const auto k=std::stoull(argv[2]);const auto reps=unsigned(std::stoul(argv[3]));
     const spin::ExecutionOptions exec{b=="avx2"?spin::Backend::Avx2:b=="avx512"?spin::Backend::Avx512:
-        b=="portable"?spin::Backend::Portable:b=="reference"?spin::Backend::Reference:spin::Backend::Automatic};
+        b=="portable"?spin::Backend::Portable:b=="reference"?spin::Backend::Reference:b=="neon"?spin::Backend::Neon:spin::Backend::Automatic};
     spin::Code code({k,spin::Parameters::PacketRs8T64,17,43},exec);
     std::cout<<b<<','<<k<<std::fixed<<std::setprecision(4);
     {

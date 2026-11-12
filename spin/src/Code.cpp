@@ -69,13 +69,19 @@ struct Plan {
             const auto rows=(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRs8T64)?8u:4u;
             if(o.tile_rows && o.tile_rows!=rows)
                 throw std::invalid_argument("SPIN packet tile geometry is fixed by its profile");
-            // Turbo (PacketRs8T64) also has AVX2 and portable kernels; the other packet
-            // profiles are AVX-512 or the Portable oracle only.
+            // Turbo (PacketRs8T64) also has AVX2, NEON and portable kernels; the
+            // other packet profiles are AVX-512 or the Portable oracle only.
             const bool turbo=s.parameters==Parameters::PacketRs8T64;
             switch(o.backend) {
             case Backend::Automatic:
                 selected=cpu_packet512()?Backend::Avx512:
-                         (turbo && capabilities().avx2)?Backend::Avx2:Backend::Portable;
+                         (turbo && capabilities().avx2)?Backend::Avx2:
+                         (turbo && SPIN_AARCH64)?Backend::Neon:Backend::Portable;
+                break;
+            case Backend::Neon:
+                if(!turbo)
+                    throw std::invalid_argument("SPIN packet has no NEON backend; select Portable or Automatic");
+                if(!SPIN_AARCH64) throw std::runtime_error("SPIN Turbo NEON backend unavailable");
                 break;
             case Backend::Portable:break;
             // The literal oracle; for the other packet families it is Portable.
@@ -186,6 +192,12 @@ static void transposePacket(const Plan& plan,const storage::block* input,
 #if SPIN_X86
         if(plan.selected==Backend::Avx2) {
             rs8::transposeAvx2(input,output,work,*plan.rs8Code);
+            return;
+        }
+#endif
+#if SPIN_AARCH64
+        if(plan.selected==Backend::Neon) {
+            rs8::transposeNeon(input,output,work,*plan.rs8Code);
             return;
         }
 #endif
@@ -361,6 +373,12 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
 #if SPIN_X86
         if(plan_->selected==Backend::Avx2) {
             detail::rs8::forwardAvx2(input,output,work,*plan_->rs8Code,width/16,stream);
+            return;
+        }
+#endif
+#if SPIN_AARCH64
+        if(plan_->selected==Backend::Neon) {
+            detail::rs8::forwardNeon(input,output,work,*plan_->rs8Code,width/16);
             return;
         }
 #endif

@@ -48,6 +48,10 @@ void outerForwardFast(const Block*, Block* scratch, const Plan&, unsigned lanes)
 // as the scalar entry points.
 void transposePortable(const Block*, Block*, Block* scratch, const Plan&);
 void forwardPortable(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes);
+// NEON kernels (Neon.cpp; defined on AArch64 only): same contracts as the
+// scalar entry points.
+void transposeNeon(const Block*, Block*, Block* scratch, const Plan&);
+void forwardNeon(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes);
 // AVX2 kernels (Avx2.cpp; no AVX-512, VBMI or GFNI): same contracts as the
 // scalar entry points, require cpu_avx2().
 void transposeAvx2(const Block*, Block*, Block* scratch, const Plan&);

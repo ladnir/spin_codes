@@ -48,18 +48,21 @@ Implementations of the same seeded map are selected at runtime:
 |---|---|---|
 | `Avx512` | x86-64 with AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
 | `Avx2` | x86-64 with AVX2 (no GFNI or AVX-512 needed) | Tuned transpose, forward, and setup |
+| `Neon` | AArch64 (NEON; EOR3 when built with the SHA3 extension) | Tuned transpose and forward; portable setup |
 | `Portable` | Any 64-bit CPU (plain C++) | Optimized transpose, forward, and setup |
 | `Reference` | Any 64-bit CPU | Literal oracle, for checking |
 
-`Automatic` picks the first available of `Avx512`, `Avx2`, `Portable`.
+`Automatic` picks the first available of `Avx512`, `Avx2`, `Neon`, `Portable`.
 Selecting `Avx2` or `Portable` explicitly also uses that setup, so it
 measures that machine class on any CPU. Every setup path produces
 bit-identical tables (`spin_turbo_setup_test`), and `spin_rs8_test avx2` /
-`spin_rs8_test portable` check those kernels against the oracle (CTests
-`spin_rs8_avx2`, `spin_rs8_portable`).
+`spin_rs8_test portable` / `spin_rs8_test neon` check those kernels against
+the oracle (CTests
+`spin_rs8_avx2`, `spin_rs8_portable`, `spin_rs8_neon`).
 
 The library builds on any 64-bit target. Off x86-64 the packet families
-(including Turbo) use their portable code and the BCH/IMT families report
+(including Turbo) use their portable code (Turbo uses NEON on AArch64) and the
+BCH/IMT families report
 themselves unavailable. AArch64 is checked by cross-compiling and running the
 packet tests under QEMU.
 

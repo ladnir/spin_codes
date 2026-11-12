@@ -15,10 +15,10 @@ using Clock=std::chrono::steady_clock;
 static double ms(Clock::time_point a,Clock::time_point b){return std::chrono::duration<double,std::milli>(b-a).count();}
 static double median(std::vector<double> x){std::sort(x.begin(),x.end());return x[x.size()/2];}
 int main(int argc,char** argv){try{
-    if(argc!=4 && argc!=5) throw std::invalid_argument("usage: spin_setup_once_bench turbo|imt|imtbank|turbobank K reps [auto|avx2|avx512|portable|reference]");
+    if(argc!=4 && argc!=5) throw std::invalid_argument("usage: spin_setup_once_bench turbo|imt|imtbank|turbobank K reps [auto|avx2|avx512|portable|reference|neon]");
     const std::string b=argc==5?argv[4]:"auto";
     const spin::ExecutionOptions exec{b=="avx2"?spin::Backend::Avx2:b=="avx512"?spin::Backend::Avx512:
-        b=="portable"?spin::Backend::Portable:b=="reference"?spin::Backend::Reference:spin::Backend::Automatic};
+        b=="portable"?spin::Backend::Portable:b=="reference"?spin::Backend::Reference:b=="neon"?spin::Backend::Neon:spin::Backend::Automatic};
     const std::string mode=argv[1];const auto k=std::stoull(argv[2]);const auto reps=std::stoul(argv[3]);
     std::vector<Word> input(2*k);
     std::vector<double> setup,first,warm;
