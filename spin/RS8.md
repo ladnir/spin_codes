@@ -47,24 +47,24 @@ Implementations of the same seeded map are selected at runtime:
 | Backend | Runs on | Kernels |
 |---|---|---|
 | `Avx512` | x86-64 with AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
+| `Avx2Gfni` | x86-64 with AVX2 and GFNI (e.g. Intel 12th gen and later) | AVX2 kernels with GFNI byte maps and transposes; AVX2 setup |
 | `Avx2` | x86-64 with AVX2 (no GFNI or AVX-512 needed) | Tuned transpose, forward, and setup |
 | `Neon` | AArch64 (NEON; EOR3 when built with the SHA3 extension) | Tuned transpose and forward; portable setup |
 | `Portable` | Any 64-bit CPU (plain C++) | Optimized transpose, forward, and setup |
 | `Reference` | Any 64-bit CPU | Literal oracle, for checking |
 
-`Automatic` picks the first available of `Avx512`, `Avx2`, `Neon`, `Portable`.
-Selecting `Avx2` or `Portable` explicitly also uses that setup, so it
-measures that machine class on any CPU. Every setup path produces
-bit-identical tables (`spin_turbo_setup_test`), and `spin_rs8_test avx2` /
-`spin_rs8_test portable` / `spin_rs8_test neon` check those kernels against
-the oracle (CTests
-`spin_rs8_avx2`, `spin_rs8_portable`, `spin_rs8_neon`).
+`Automatic` picks the first available of `Avx512`, `Avx2Gfni`, `Avx2`, `Neon`,
+`Portable`. Selecting `Avx2`, `Avx2Gfni` or `Portable` explicitly also uses
+that tier's setup, so it measures that machine class on any CPU. Every setup
+path produces bit-identical tables (`spin_turbo_setup_test`), and
+`spin_rs8_test avx2|gfni|portable|neon` checks each kernel against the oracle
+(CTests `spin_rs8_avx2`, `spin_rs8_gfni`, `spin_rs8_portable`,
+`spin_rs8_neon`; each skips where its ISA is absent).
 
 The library builds on any 64-bit target. Off x86-64 the packet families
-(including Turbo) use their portable code (Turbo uses NEON on AArch64) and the
-BCH/IMT families report
-themselves unavailable. AArch64 is checked by cross-compiling and running the
-packet tests under QEMU.
+(including Turbo) use their portable code, Turbo uses NEON on AArch64, and the
+BCH/IMT families report themselves unavailable. AArch64 is checked by
+cross-compiling and running the packet tests under QEMU.
 
 The AVX2 kernels keep the AVX-512 circuit: the s22 step is the same XOR
 network in the fast basis, the per-epoch GL22 update uses four-Russians

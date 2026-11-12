@@ -77,4 +77,21 @@ alignas(32) inline constexpr NibbleMap a6=nibbleMap(Affine{m6});
 alignas(32) inline constexpr NibbleMap a8=nibbleMap(Affine{m8});
 alignas(32) inline constexpr NibbleMap a6t=nibbleMap(Affine{transposeAffine(m6)});
 alignas(32) inline constexpr NibbleMap a8t=nibbleMap(Affine{transposeAffine(m8)});
+// The same maps as GFNI affine matrices (byte 7-i of the matrix is the mask
+// of input bits that make output bit i): multiplication by c and its adjoint.
+struct AffineMaps { std::uint64_t multiply[256],adjoint[256]; };
+inline constexpr AffineMaps makeAffineMaps() {
+    AffineMaps result{};
+    for(unsigned c=0;c<256;++c)
+        for(unsigned b=0;b<8;++b) {
+            const auto column=mul8(std::uint8_t(c),std::uint8_t(1U<<b));
+            // Adjoint: output bit b is parity(c*e_b & y).
+            result.adjoint[c]|=std::uint64_t(column)<<(8*(7-b));
+            // Multiply: output bit i takes input bit b when bit i of c*e_b is set.
+            for(unsigned i=0;i<8;++i)
+                if((column>>i)&1U) result.multiply[c]|=std::uint64_t(1U<<b)<<(8*(7-i));
+        }
+    return result;
+}
+alignas(64) inline constexpr AffineMaps affineMaps=makeAffineMaps();
 }

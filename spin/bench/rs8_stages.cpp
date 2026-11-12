@@ -36,13 +36,17 @@ int main(int argc,char** argv) {try {
         state+=0x9e3779b97f4a7c15ULL;auto v=state;v=(v^(v>>30))*0xbf58476d1ce4e5b9ULL;
         v=(v^(v>>27))*0x94d049bb133111ebULL;v^=v>>31;std::memcpy(bytes+i,&v,8);
     }
-    const bool avx2=stage.rfind("a2",0)==0;
+    const bool avx2=stage.rfind("a2",0)==0 || stage.rfind("g2",0)==0;
     if(avx2) rs8::outerForwardAvx2(input,scratch,plan,lanes); else rs8::outerForwardFast(input,scratch,plan,lanes);
     std::optional<spin::detail::paired15::Plan> p15;
     if(stage.rfind("p15",0)==0) p15.emplace(k,1,2);
     const auto run=[&] {
         if(stage=="p15reverse") { spin::detail::paired15::reverseRouteFast(output,scratch,*p15); return; }
         if(stage=="p15transpose") { spin::detail::paired15::transposeFast(output,input,scratch,*p15); return; }
+        if(stage=="g2outer") { rs8::outerForwardAvx2Gfni(input,scratch,plan,lanes); return; }
+        if(stage=="g2touter") { rs8::outerAvx2Gfni(scratch,input,plan); return; }
+        if(stage=="g2transpose") { rs8::transposeAvx2Gfni(output,input,scratch,plan); return; }
+        if(stage=="g2both") { rs8::forwardAvx2Gfni(input,output,scratch,plan,lanes,false); return; }
         if(stage=="a2outer") { rs8::outerForwardAvx2(input,scratch,plan,lanes); return; }
         if(stage=="a2inner") { rs8::forwardInnerAvx2(scratch,output,plan,lanes); return; }
         if(stage=="a2treverse") { rs8::reverseRouteAvx2(output,scratch,plan); return; }

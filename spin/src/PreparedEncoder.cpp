@@ -105,7 +105,7 @@ struct TurboBank {
     std::array<std::uint32_t,64> shifts{};
     std::vector<std::uint32_t> epochs;
     static certified22::SetupPath setupPath(Backend k) noexcept {
-        return k==Backend::Avx2?certified22::SetupPath::Avx2:
+        return (k==Backend::Avx2 || k==Backend::Avx2Gfni)?certified22::SetupPath::Avx2:
             k==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic;
     }
     TurboBank(CodeSpec s,std::uint64_t bankSeed,Backend k)
@@ -171,10 +171,14 @@ struct PreparedState {
                 auto kernel=Backend::Portable;
                 switch(e.backend) {
                 case Backend::Automatic:
-                    kernel=cpu_packet512()?Backend::Avx512:capabilities().avx2?Backend::Avx2:
+                    kernel=cpu_packet512()?Backend::Avx512:cpu_avx2gfni()?Backend::Avx2Gfni:
+                           capabilities().avx2?Backend::Avx2:
                            SPIN_AARCH64?Backend::Neon:Backend::Portable;
                     break;
                 case Backend::Portable:case Backend::Reference:kernel=e.backend;break;
+                case Backend::Avx2Gfni:
+                    if(!cpu_avx2gfni()) throw std::runtime_error("SPIN Turbo AVX2+GFNI backend unavailable");
+                    kernel=Backend::Avx2Gfni;break;
                 case Backend::Neon:
                     if(!SPIN_AARCH64) throw std::runtime_error("SPIN Turbo NEON backend unavailable");
                     kernel=Backend::Neon;break;
@@ -354,6 +358,7 @@ static void turboTranspose(const detail::TurboBank& t,const std::byte* in,std::b
     if(t.kernel==Backend::Avx512) { detail::rs8::transposeFast(input,output,work,t.live); return; }
 #endif
 #if SPIN_X86
+    if(t.kernel==Backend::Avx2Gfni) { detail::rs8::transposeAvx2Gfni(input,output,work,t.live); return; }
     if(t.kernel==Backend::Avx2) { detail::rs8::transposeAvx2(input,output,work,t.live); return; }
 #endif
 #if SPIN_AARCH64

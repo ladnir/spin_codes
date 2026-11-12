@@ -57,6 +57,13 @@ void forwardNeon(const Block*, Block*, Block* scratch, const Plan&, unsigned lan
 void transposeAvx2(const Block*, Block*, Block* scratch, const Plan&);
 void forwardAvx2(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
 void reverseRouteAvx2(const Block*, Block* scratch, const Plan&);
+// AVX2 + GFNI kernels (Avx2Gfni.cpp): the same, requires cpu_avx2gfni().
+void transposeAvx2Gfni(const Block*, Block*, Block* scratch, const Plan&);
+void forwardAvx2Gfni(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes, bool stream);
+void reverseRouteAvx2Gfni(const Block*, Block* scratch, const Plan&);
+void outerAvx2Gfni(const Block* scratch, Block*, const Plan&);
+void outerForwardAvx2Gfni(const Block*, Block* scratch, const Plan&, unsigned lanes);
+void forwardInnerAvx2Gfni(const Block* scratch, Block*, const Plan&, unsigned lanes);
 void outerAvx2(const Block* scratch, Block*, const Plan&);
 void outerForwardAvx2(const Block*, Block* scratch, const Plan&, unsigned lanes);
 void forwardInnerAvx2(const Block* scratch, Block*, const Plan&, unsigned lanes);

@@ -1,6 +1,7 @@
 #include <spin/Code.h>
 #include <spin/PacketCode.h>
 #include <spin/PreparedEncoder.h>
+#include "../src/Cpu.h"
 #include <algorithm>
 #include <atomic>
 #include <cstdint>
@@ -51,7 +52,8 @@ static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S15K16)==6
 static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S22)==7);
 struct Block {std::uint64_t words[2]{};bool operator==(const Block&) const=default;};
 // Backend under test against the Reference oracle: Automatic, or Avx2 or
-// Portable or Neon when run as "spin_rs8_test avx2", "portable" or "neon".
+// Avx2Gfni, Portable or Neon when run as "spin_rs8_test avx2", "gfni",
+// "portable" or "neon".
 spin::Backend tested=spin::Backend::Automatic;
 #if defined(__aarch64__) || defined(_M_ARM64)
 constexpr bool aarch64=true;
@@ -151,7 +153,8 @@ void metadata() {
         require(descriptor[32+i]==std::byte((43ULL>>(8*i))&255),"descriptor inner seed");
     }
     require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:
-        spin::capabilities().avx2?spin::Backend::Avx2:aarch64?spin::Backend::Neon:spin::Backend::Portable),"automatic backend");
+        spin::detail::cpu_avx2gfni()?spin::Backend::Avx2Gfni:spin::capabilities().avx2?spin::Backend::Avx2:
+        aarch64?spin::Backend::Neon:spin::Backend::Portable),"automatic backend");
     for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})
         require(code.supports_forward(width) && scalar.supports_forward(width),"forward width unsupported");
     require(code.supports_transpose() && !code.supports_transpose(spin::Width::Bits256) &&
@@ -368,6 +371,9 @@ int main(int argc,char** argv) {try {
         tested=spin::Backend::Avx2;
     } else if(argc>1 && !std::strcmp(argv[1],"portable")) {
         tested=spin::Backend::Portable;
+    } else if(argc>1 && !std::strcmp(argv[1],"gfni")) {
+        if(!spin::detail::cpu_avx2gfni()){std::cout<<"rs8 AVX2+GFNI SKIP: unavailable\n";return 77;}
+        tested=spin::Backend::Avx2Gfni;
     } else if(argc>1 && !std::strcmp(argv[1],"neon")) {
         if(!aarch64){std::cout<<"rs8 NEON SKIP: not AArch64\n";return 77;}
         tested=spin::Backend::Neon;
@@ -382,6 +388,6 @@ int main(int argc,char** argv) {try {
         for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})forwardWidths(k,width);
     ownershipAndSeeds();preparedFull();
     for(auto k:{std::size_t{128},std::size_t{384},std::size_t{65536},std::size_t{65664}})preparedBanked(k);
-    std::cout<<(tested==spin::Backend::Avx2?"rs8 AVX2 ":tested==spin::Backend::Portable?"rs8 portable ":tested==spin::Backend::Neon?"rs8 NEON ":"rs8 ")<<"API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
+    std::cout<<(tested==spin::Backend::Avx2?"rs8 AVX2 ":tested==spin::Backend::Portable?"rs8 portable ":tested==spin::Backend::Neon?"rs8 NEON ":tested==spin::Backend::Avx2Gfni?"rs8 AVX2+GFNI ":"rs8 ")<<"API PASS: natural sizing, scalar/automatic transpose, wide forward lanes, bitwise adjoints, guards, seeds, ownership, refresh, allocation-free encoding\n";
     return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

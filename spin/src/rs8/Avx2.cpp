@@ -1,5 +1,5 @@
-// AVX2 Turbo (PacketRs8T64) kernels: transpose and forward, no AVX-512,
-// VBMI or GFNI. Same linear map as the scalar oracle and the AVX-512 kernels.
+// AVX2 Turbo (PacketRs8T64) kernels: transpose and forward, no AVX-512 or
+// VBMI, with or without GFNI. Same linear map as the oracle and AVX-512 kernels.
 //
 // Inner: the fixed s22 step circuit is the generic lane-major XOR network of
 // certified22/StepCircuit.h in the fast basis w = basis*s. The per-epoch GL22
@@ -14,8 +14,19 @@
 // fixed affine byte maps are two nibble lookups (pshufb). Each 256-bit vector
 // carries two independent jobs in its 128-bit halves (two groups, or two
 // record lanes of one group); pshufb is lane-local, so each half has its own
-// tables.
+// tables. With GFNI (Avx2Gfni.cpp) every byte map is one affine instruction
+// and the transposes gather bytes and transpose each qword with one affine.
 #include "Rs8.h"
+// Built twice: Avx2.cpp (SPIN_RS8_GFNI 0, AVX2 only) and Avx2Gfni.cpp
+// (SPIN_RS8_GFNI 1, AVX2 with GFNI), with distinct entry-point names.
+#ifndef SPIN_RS8_GFNI
+#define SPIN_RS8_GFNI 0
+#endif
+#if SPIN_RS8_GFNI
+#define SPIN_RS8_AVX2_NAME(stem) stem##Avx2Gfni
+#else
+#define SPIN_RS8_AVX2_NAME(stem) stem##Avx2
+#endif
 #include "../certified22/productionMap.h"
 #include "../certified22/LaneMajor22.h"
 #include "../certified22/StepCircuit.h"
@@ -32,6 +43,75 @@ using V=__m256i;
 // ------------------------------------------------------------ primitives --
 static SPIN_FORCEINLINE __m128i load(const void* p) { return _mm_loadu_si128(static_cast<const __m128i*>(p)); }
 static SPIN_FORCEINLINE V join(__m128i a,__m128i b) { return _mm256_inserti128_si256(_mm256_castsi128_si256(a),b,1); }
+static SPIN_FORCEINLINE V xor2(V a,V b) { return _mm256_xor_si256(a,b); }
+static SPIN_FORCEINLINE V xor3(V a,V b,V c) { return _mm256_xor_si256(_mm256_xor_si256(a,b),c); }
+
+#if SPIN_RS8_GFNI
+// A linear byte map is one GFNI affine matrix per 128-bit half.
+struct Table { V m; };
+static SPIN_FORCEINLINE Table table(std::uint64_t a,std::uint64_t b) {
+    return {_mm256_setr_epi64x(std::int64_t(a),std::int64_t(a),std::int64_t(b),std::int64_t(b))};
+}
+static SPIN_FORCEINLINE Table table(std::uint64_t a) { return {_mm256_set1_epi64x(std::int64_t(a))}; }
+static SPIN_FORCEINLINE Table multiplyTable(std::uint8_t a,std::uint8_t b) {
+    return table(affineMaps.multiply[a],affineMaps.multiply[b]);
+}
+static SPIN_FORCEINLINE Table adjointTable(std::uint8_t a,std::uint8_t b) {
+    return table(affineMaps.adjoint[a],affineMaps.adjoint[b]);
+}
+static SPIN_FORCEINLINE Table parityTable(const NibbleMap&,std::uint64_t matrix) { return table(matrix); }
+// No nibble split is needed: maps apply to whole bytes.
+using Nibbles=V;
+static SPIN_FORCEINLINE V nibbles(V x) { return x; }
+static SPIN_FORCEINLINE V apply(V x,const Table& t) { return _mm256_gf2p8affine_epi64_epi8(x,t.m,0); }
+static SPIN_FORCEINLINE V xorN(V a,V b) { return xor2(a,b); }
+
+// Rows r[0..7] (16 bytes per half) to qword columns: c[m] holds columns 2m
+// and 2m+1, where column p byte j is byte p of r[j].
+static SPIN_FORCEINLINE void columns(const V* r,V* c) {
+    const auto a0=_mm256_unpacklo_epi8(r[0],r[1]),a1=_mm256_unpackhi_epi8(r[0],r[1]);
+    const auto a2=_mm256_unpacklo_epi8(r[2],r[3]),a3=_mm256_unpackhi_epi8(r[2],r[3]);
+    const auto a4=_mm256_unpacklo_epi8(r[4],r[5]),a5=_mm256_unpackhi_epi8(r[4],r[5]);
+    const auto a6=_mm256_unpacklo_epi8(r[6],r[7]),a7=_mm256_unpackhi_epi8(r[6],r[7]);
+    const auto b0=_mm256_unpacklo_epi16(a0,a2),b1=_mm256_unpackhi_epi16(a0,a2);
+    const auto b2=_mm256_unpacklo_epi16(a1,a3),b3=_mm256_unpackhi_epi16(a1,a3);
+    const auto b4=_mm256_unpacklo_epi16(a4,a6),b5=_mm256_unpackhi_epi16(a4,a6);
+    const auto b6=_mm256_unpacklo_epi16(a5,a7),b7=_mm256_unpackhi_epi16(a5,a7);
+    c[0]=_mm256_unpacklo_epi32(b0,b4);c[1]=_mm256_unpackhi_epi32(b0,b4);
+    c[2]=_mm256_unpacklo_epi32(b1,b5);c[3]=_mm256_unpackhi_epi32(b1,b5);
+    c[4]=_mm256_unpacklo_epi32(b2,b6);c[5]=_mm256_unpackhi_epi32(b2,b6);
+    c[6]=_mm256_unpacklo_epi32(b3,b7);c[7]=_mm256_unpackhi_epi32(b3,b7);
+}
+// With the data as the matrix, affine by 0x8040201008040201 sends bit k of
+// byte 7-i of each qword to bit i of byte k.
+static SPIN_FORCEINLINE V flipTranspose(V q) {
+    return _mm256_gf2p8affine_epi64_epi8(_mm256_set1_epi64x(std::int64_t(0x8040201008040201ULL)),q,0);
+}
+// Coordinates b[0..7] to byte planes: byte k of qword p of each half holds
+// the eight coordinates (bit j = coordinate j) of OT 8p+k. Every plane and
+// symbol uses this same OT order, and the byte maps act on every byte alike.
+static SPIN_FORCEINLINE void toPlanes(const V* b,V* chunk) {
+    V r[8];
+    for(unsigned j=0;j<8;++j) r[j]=b[7-j];
+    columns(r,chunk);
+    for(unsigned m=0;m<8;++m) chunk[m]=flipTranspose(chunk[m]);
+}
+// Exact inverse of toPlanes: reverse the bytes of every qword and transpose
+// back (byte j bit k = bit k of coordinate j), then un-gather the columns.
+static SPIN_FORCEINLINE void fromPlanes(const V* chunk,V* b) {
+    const auto reverse=_mm256_setr_epi8(7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,
+                                        7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8);
+    V t[8],c[8];
+    for(unsigned m=0;m<8;++m) t[m]=flipTranspose(_mm256_shuffle_epi8(chunk[m],reverse));
+    columns(t,c);
+    for(unsigned n=0;n<4;++n) {
+        b[2*n]=_mm256_unpacklo_epi8(c[n],c[n+4]);
+        b[2*n+1]=_mm256_unpackhi_epi8(c[n],c[n+4]);
+    }
+}
+static SPIN_FORCEINLINE void toNibblePlanes(V* x,Nibbles* n) { toPlanes(x,n); }
+#else
+// A linear byte map is two nibble lookup tables per 128-bit half.
 struct Table { V lo,hi; };
 static SPIN_FORCEINLINE Table table(const NibbleMap& a,const NibbleMap& b) {
     return {join(load(a.lo),load(b.lo)),join(load(a.hi),load(b.hi))};
@@ -39,6 +119,13 @@ static SPIN_FORCEINLINE Table table(const NibbleMap& a,const NibbleMap& b) {
 static SPIN_FORCEINLINE Table table(const NibbleMap& a) {
     return {_mm256_broadcastsi128_si256(load(a.lo)),_mm256_broadcastsi128_si256(load(a.hi))};
 }
+static SPIN_FORCEINLINE Table multiplyTable(std::uint8_t a,std::uint8_t b) {
+    return table(maps.multiply[a],maps.multiply[b]);
+}
+static SPIN_FORCEINLINE Table adjointTable(std::uint8_t a,std::uint8_t b) {
+    return table(maps.adjoint[a],maps.adjoint[b]);
+}
+static SPIN_FORCEINLINE Table parityTable(const NibbleMap& map,std::uint64_t) { return table(map); }
 struct Nibbles { V lo,hi; };
 static SPIN_FORCEINLINE Nibbles nibbles(V x) {
     const auto mask=_mm256_set1_epi8(0x0f);
@@ -48,8 +135,9 @@ static SPIN_FORCEINLINE V apply(const Nibbles& x,const Table& t) {
     return _mm256_xor_si256(_mm256_shuffle_epi8(t.lo,x.lo),_mm256_shuffle_epi8(t.hi,x.hi));
 }
 static SPIN_FORCEINLINE V apply(V x,const Table& t) { return apply(nibbles(x),t); }
-static SPIN_FORCEINLINE V xor2(V a,V b) { return _mm256_xor_si256(a,b); }
-static SPIN_FORCEINLINE V xor3(V a,V b,V c) { return _mm256_xor_si256(_mm256_xor_si256(a,b),c); }
+static SPIN_FORCEINLINE Nibbles xorN(const Nibbles& a,const Nibbles& b) {
+    return {_mm256_xor_si256(a.lo,b.lo),_mm256_xor_si256(a.hi,b.hi)};
+}
 
 // Bit k+D of a <-> bit k of b in every byte, for the bits k selected by Mask.
 template<int D,int Mask>
@@ -89,9 +177,7 @@ static SPIN_FORCEINLINE void toNibblePlanes(V* x,Nibbles* n) {
         n[r+4]={_mm256_and_si256(_mm256_srli_epi16(x[r],4),mask),_mm256_and_si256(_mm256_srli_epi16(x[r+4],4),mask)};
     }
 }
-static SPIN_FORCEINLINE Nibbles xorN(const Nibbles& a,const Nibbles& b) {
-    return {_mm256_xor_si256(a.lo,b.lo),_mm256_xor_si256(a.hi,b.hi)};
-}
+#endif
 
 // ------------------------------------------------------------------ outer --
 // Byte planes of one group per half: [symbol][byte][chunk].
@@ -124,8 +210,7 @@ static SPIN_FORCEINLINE void flat9Adjoint(V& x0,V& x1,V& x2,V& x3,const Table* m
 }
 template<bool Adjoint>
 static SPIN_FORCEINLINE void coefficients(const Coeff& a,const Coeff& b,Table* t) {
-    const auto* m=Adjoint?maps.adjoint:maps.multiply;
-    for(unsigned i=0;i<9;++i) t[i]=table(m[a[i]],m[b[i]]);
+    for(unsigned i=0;i<9;++i) t[i]=Adjoint?adjointTable(a[i],b[i]):multiplyTable(a[i],b[i]);
 }
 
 // Systematic message bit j of byte plane i of column q (one RS row nibble
@@ -151,7 +236,7 @@ static SPIN_FORCEINLINE void outerTranspose(In in,Out out,const Coeff* ca,const 
         for(unsigned m=0;m<8;++m)
             flat9(n[0][m],n[1][m],n[2][m],n[3][m],t,p.v[s][0][m],p.v[s][1][m],p.v[s][2][m],p.v[s][3][m]);
     }
-    const auto t6=table(a6),t8=table(a8);
+    const auto t6=parityTable(a6,m6),t8=parityTable(a8,m8);
     for(unsigned i=0;i<4;++i)
         for(unsigned m=0;m<8;++m) {
             auto x0=p.v[4][i][m],x1=p.v[5][i][m],x2=p.v[6][i][m],x3=p.v[7][i][m];
@@ -182,7 +267,7 @@ static SPIN_FORCEINLINE void outerForward(In in,Out out,const Coeff* ca,const Co
             for(unsigned j=0;j<8;++j) b[j]=in(messageBlock(q,i,j));
             toPlanes(b,p.v[q][i]);
         }
-    const auto t6=table(a6t),t8=table(a8t);
+    const auto t6=parityTable(a6t,transposeAffine(m6)),t8=parityTable(a8t,transposeAffine(m8));
     for(unsigned i=0;i<4;++i)
         for(unsigned m=0;m<8;++m) {
             auto y0=p.v[0][i][m],y1=p.v[1][i][m],y2=p.v[2][i][m],y3=p.v[3][i][m];
@@ -540,7 +625,7 @@ static SPIN_NOINLINE void forwardInner(const Block* __restrict input,Block* __re
 
 // Streaming output needs 16-byte alignment for one lane and 32 for wider
 // records (forward_bytes guarantees 16).
-static void forwardInnerAvx2(const Block* scratch,Block* output,const certified22::Plan& plan,
+static void forwardInnerDispatch(const Block* scratch,Block* output,const certified22::Plan& plan,
     unsigned lanes,bool stream,std::size_t plane) {
     if(stream && (lanes==1 || !(reinterpret_cast<std::uintptr_t>(output)&31U))) {
         if(lanes==1) forwardInner<1,true>(scratch,output,plan,plane);
@@ -553,23 +638,23 @@ static void forwardInnerAvx2(const Block* scratch,Block* output,const certified2
         else forwardInner<4,false>(scratch,output,plan,plane);
     }
 }
-void transposeAvx2(const Block* input,Block* output,Block* scratch,const Plan& plan) {
+void SPIN_RS8_AVX2_NAME(transpose)(const Block* input,Block* output,Block* scratch,const Plan& plan) {
     reverseInner(input,scratch,*plan.certified22Plan);
     transposeOuter(scratch,output,plan);
 }
-void forwardAvx2(const Block* input,Block* output,Block* scratch,const Plan& plan,unsigned lanes,bool stream) {
+void SPIN_RS8_AVX2_NAME(forward)(const Block* input,Block* output,Block* scratch,const Plan& plan,unsigned lanes,bool stream) {
     forwardOuter(input,scratch,plan,lanes);
-    forwardInnerAvx2(scratch,output,*plan.certified22Plan,lanes,stream,plan.scratchBlocks());
+    forwardInnerDispatch(scratch,output,*plan.certified22Plan,lanes,stream,plan.scratchBlocks());
 }
 // Stage entry points for differential checks and stage timing.
-void reverseRouteAvx2(const Block* input,Block* scratch,const Plan& plan) {
+void SPIN_RS8_AVX2_NAME(reverseRoute)(const Block* input,Block* scratch,const Plan& plan) {
     reverseInner(input,scratch,*plan.certified22Plan);
 }
-void outerAvx2(const Block* scratch,Block* output,const Plan& plan) { transposeOuter(scratch,output,plan); }
-void outerForwardAvx2(const Block* input,Block* scratch,const Plan& plan,unsigned lanes) {
+void SPIN_RS8_AVX2_NAME(outer)(const Block* scratch,Block* output,const Plan& plan) { transposeOuter(scratch,output,plan); }
+void SPIN_RS8_AVX2_NAME(outerForward)(const Block* input,Block* scratch,const Plan& plan,unsigned lanes) {
     forwardOuter(input,scratch,plan,lanes);
 }
-void forwardInnerAvx2(const Block* scratch,Block* output,const Plan& plan,unsigned lanes) {
-    forwardInnerAvx2(scratch,output,*plan.certified22Plan,lanes,false,plan.scratchBlocks());
+void SPIN_RS8_AVX2_NAME(forwardInner)(const Block* scratch,Block* output,const Plan& plan,unsigned lanes) {
+    forwardInnerDispatch(scratch,output,*plan.certified22Plan,lanes,false,plan.scratchBlocks());
 }
 }

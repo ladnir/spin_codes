@@ -75,8 +75,14 @@ struct Plan {
             switch(o.backend) {
             case Backend::Automatic:
                 selected=cpu_packet512()?Backend::Avx512:
+                         (turbo && cpu_avx2gfni())?Backend::Avx2Gfni:
                          (turbo && capabilities().avx2)?Backend::Avx2:
                          (turbo && SPIN_AARCH64)?Backend::Neon:Backend::Portable;
+                break;
+            case Backend::Avx2Gfni:
+                if(!turbo)
+                    throw std::invalid_argument("SPIN packet has no AVX2+GFNI backend; select Portable or Automatic");
+                if(!cpu_avx2gfni()) throw std::runtime_error("SPIN Turbo AVX2+GFNI backend unavailable");
                 break;
             case Backend::Neon:
                 if(!turbo)
@@ -100,7 +106,7 @@ struct Plan {
             if(s.parameters==Parameters::PacketRs8T64)
                 // An explicit AVX2 or Portable backend also uses that setup (bit-identical).
                 rs8Code.emplace(s.message_size,s.route_seed,s.inner_seed,
-                    selected==Backend::Avx2?certified22::SetupPath::Avx2:
+                    (selected==Backend::Avx2 || selected==Backend::Avx2Gfni)?certified22::SetupPath::Avx2:
                     selected==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic);
             else if(s.parameters==Parameters::PacketRsT64S22)
                 certified.emplace(s.message_size,s.route_seed,s.inner_seed);
@@ -190,6 +196,10 @@ static void transposePacket(const Plan& plan,const storage::block* input,
         }
 #endif
 #if SPIN_X86
+        if(plan.selected==Backend::Avx2Gfni) {
+            rs8::transposeAvx2Gfni(input,output,work,*plan.rs8Code);
+            return;
+        }
         if(plan.selected==Backend::Avx2) {
             rs8::transposeAvx2(input,output,work,*plan.rs8Code);
             return;
@@ -371,6 +381,10 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
         }
 #endif
 #if SPIN_X86
+        if(plan_->selected==Backend::Avx2Gfni) {
+            detail::rs8::forwardAvx2Gfni(input,output,work,*plan_->rs8Code,width/16,stream);
+            return;
+        }
         if(plan_->selected==Backend::Avx2) {
             detail::rs8::forwardAvx2(input,output,work,*plan_->rs8Code,width/16,stream);
             return;
