@@ -47,7 +47,7 @@ Implementations of the same seeded map are selected at runtime:
 | Backend | Runs on | Kernels |
 |---|---|---|
 | `Avx512` | x86-64 with AVX-512F/VL/BW/DQ, VBMI, GFNI | Tuned transpose, forward, and setup |
-| `Avx2Gfni` | x86-64 with AVX2 and GFNI (e.g. Intel 12th gen and later) | AVX2 kernels with GFNI byte maps, transposes and one-lane GL22 update; AVX2 setup |
+| `Avx2Gfni` | x86-64 with AVX2 and GFNI (e.g. Intel 12th gen and later) | AVX2 kernels with GFNI byte maps, bit transposes and GL22 updates (every width); AVX2 setup |
 | `Avx2` | x86-64 with AVX2 (no GFNI or AVX-512 needed) | Tuned transpose, forward, and setup |
 | `Neon` | AArch64 (NEON; EOR3 when built with the SHA3 extension) | Tuned transpose and forward; portable setup |
 | `Portable` | Any 64-bit CPU (plain C++) | Optimized transpose, forward, and setup |
@@ -70,7 +70,13 @@ The AVX2 kernels keep the AVX-512 circuit: the s22 step is the same XOR
 network in the fast basis, the per-epoch GL22 update uses four-Russians
 tables instead of GFNI affine blocks, and the outer works on byte planes
 obtained by an 8x8 register bit transpose, with GF(256) and nibble maps as
-pshufb lookups instead of GFNI products.
+pshufb lookups instead of GFNI products. `Avx2Gfni` restores the GFNI
+products and does the GL22 update as nine 8x8 affine blocks on byte planes.
+
+Consumers that gate wide forward encoding should ask the code
+(`Code::supports_forward(Width::Bits256)`), not `capabilities()`: the latter
+describes the CPU's BCH/IMT kernels, while Turbo supports 128/256/512-bit
+forward encoding on every backend, including `Portable` and `Neon`.
 
 Peach (Ryzen 7950X, core 15, GCC 15.2, `SPIN_TUNE=generic`), 2026-11-12,
 medians, AVX2 / AVX-512 on the same machine (`spin_turbo_backends_bench`,
@@ -81,6 +87,14 @@ medians, AVX2 / AVX-512 on the same machine (`spin_turbo_backends_bench`,
 | 2^16 | 0.40 / 0.11 ms | 0.40 / 0.13 ms | 0.50 / 0.42 ms | 0.90 / 0.54 ms | 0.43 / 0.14 ms |
 | 2^18 | 1.63 / 0.46 ms | 1.64 / 0.54 ms | 2.02 / 1.69 ms | 3.80 / 2.24 ms | 1.74 / 0.60 ms |
 | 2^20 | 7.98 / 3.02 ms | 9.59 / 4.27 ms | 9.76 / 8.38 ms | 20.3 / 11.9 ms | 9.74 / 3.97 ms |
+
+`Avx2Gfni` on the same machine and settings (forward with streaming stores):
+
+| K | Transpose | Forward 128-bit | Forward 256-bit | Forward 512-bit | Exact single use |
+|---|---:|---:|---:|---:|---:|
+| 2^16 | 0.27 ms | 0.28 ms | 0.46 ms | 1.03 ms | 0.79 ms |
+| 2^18 | 1.12 ms | 1.15 ms | 1.88 ms | 8.66 ms | 3.27 ms |
+| 2^20 | 5.81 ms | 7.07 ms | 18.2 ms | 47.9 ms | 18.8 ms |
 
 For scale, on an AVX2-only laptop (i7-13700H, WSL, unpinned) the SSE2 oracle
 took about 35 ms for the 2^16 transpose and the scalar setup about 15 ms.

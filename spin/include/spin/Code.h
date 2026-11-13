@@ -48,6 +48,8 @@ struct ExecutionOptions {
     // PacketRs8T64 accepts only 0 or 8 (its RS row count).
     unsigned tile_rows=0;
 };
+// CPU support of the BCH/IMT kernels. Packet profiles (including Turbo,
+// PacketRs8T64) encode every width on any CPU: query Code::supports_forward.
 struct Capabilities { bool avx2, avx512_bch, forward256, forward512; };
 Capabilities capabilities() noexcept;
 std::size_t message_alignment(Parameters);

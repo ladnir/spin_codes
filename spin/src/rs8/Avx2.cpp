@@ -456,11 +456,44 @@ static SPIN_FORCEINLINE void updateGfni(__m128i* w,const __m128i* f,const std::u
         if(j<6) w[16+j]=_mm_xor_si128(_mm256_castsi256_si128(c[j]),f[16+j]);
     }
 }
+// Two record lanes per vector (lane-local planes): each coordinate group is
+// one plane set, and y_o = sum_i A_oi g_i is nine broadcast affines per plane.
+template<class Get,class Put>
+static SPIN_FORCEINLINE void updateGfniWide(Get get,Put put,const std::uint64_t* packed) {
+    const auto zero=_mm256_setzero_si256();
+    V g[8],s[3][8];
+    for(unsigned i=0;i<3;++i) {
+        for(unsigned j=0;j<8;++j) g[j]=8*i+j<22?get(8*i+j):zero;
+        toPlanes(g,s[i]);
+    }
+    V a[9];
+    for(unsigned q=0;q<9;++q) a[q]=_mm256_set1_epi64x(std::int64_t(__builtin_bswap64(packed[q])));
+    for(unsigned o=0;o<3;++o) {
+        V y[8];
+        for(unsigned m=0;m<8;++m)
+            y[m]=xor3(affine(s[0][m],a[3*o]),affine(s[1][m],a[3*o+1]),affine(s[2][m],a[3*o+2]));
+        fromPlanes(y,g);
+        for(unsigned j=0;j<8 && 8*o+j<22;++j) put(8*o+j,g[j]);
+    }
+}
 #endif
 template<class W,class X>
 static SPIN_FORCEINLINE void update(W* w,const W* f,const std::uint64_t* packed) {
 #if SPIN_RS8_GFNI
     if constexpr(std::is_same_v<W,__m128i>) { updateGfni(w,f,packed); return; }
+    if constexpr(std::is_same_v<W,__m256i>) {
+        updateGfniWide([&](unsigned r) { return w[r]; },
+                       [&](unsigned r,V v) { w[r]=xor2(v,f[r]); },packed);
+        return;
+    }
+    if constexpr(std::is_same_v<W,Y2>) {
+        // Outputs are written only after all inputs of that half are read.
+        updateGfniWide([&](unsigned r) { return w[r].a; },
+                       [&](unsigned r,V v) { w[r].a=xor2(v,f[r].a); },packed);
+        updateGfniWide([&](unsigned r) { return w[r].b; },
+                       [&](unsigned r,V v) { w[r].b=xor2(v,f[r].b); },packed);
+        return;
+    }
 #endif
     using P=PairOf<W>;
     using E=typename P::E;
