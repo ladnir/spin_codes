@@ -20,17 +20,17 @@ in Lean.
 \qquad After precomputation, Turbo SPIN transposed encoding produces
 $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.85$\,ms
 on one Ryzen 9 7950X thread.
-A separately certified BCH--IMT implementation supports our application
+A separately certified BCH--IMT implementation supports our Silent OT
 measurements. With this encoder, libOTe's regular-noise Silent OT sender
 achieves $89.0$ million hashed OTs per second on one core. This OT timing
 excludes initial setup, base-correlation generation, and network transport.
 
-\qquad We also use SPIN in a Brakedown-style polynomial commitment scheme
+\qquad We also use Turbo SPIN in a Brakedown-style polynomial commitment scheme
 and integrate it into Flock. Commitment and one opening of $512$\,MiB
-take $509$\,ms on one core, with a 100-bit interactive fixed-matrix testing
+take $274$\,ms on one core, with a 100-bit interactive fixed-matrix testing
 target; this excludes code-setup failure, extraction, and Fiat--Shamir reductions.
 Within an optimized Flock implementation, replacing Ligerito with
-SPIN--Brakedown improves prover throughput by $1.63$--$2.29\times$ at the
+SPIN--Brakedown improves prover throughput by $1.74$--$2.48\times$ at the
 measured workloads, with larger proofs and slower verification. The comparison gives both
 backends the applicable shared implementation optimizations.\footnote{Generative AI tools were used extensively in this work. See Section~\ref{sec:ai-disclosure} for details.}
 \end{abstract}

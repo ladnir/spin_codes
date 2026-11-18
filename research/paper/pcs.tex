@@ -1,12 +1,12 @@
 \subsection{Polynomial Commitment Details}
 \label{app:pcs-details}
 
-We use SPIN as the row encoder in a Brakedown-style polynomial commitment
+We use Turbo SPIN as the row encoder in a Brakedown-style polynomial commitment
 scheme~\cite{brakedown23}. This application tests whether fast ordinary
 encoding translates into fast commitment and opening. The implementation
 has two principal changes: it instantiates the code with SPIN, and it
 organizes the computation around packed binary data. At $512$\,MiB of
-input, the resulting prover commits and opens in $509$\,ms on one core.
+input, the resulting prover commits and opens in $274$\,ms on one core.
 
 \paragraph{Construction.}
 Let a Boolean evaluation table define a multilinear polynomial $f$ over
@@ -55,14 +55,18 @@ Expanding every bit to an extension-field element would erase much of
 SPIN's encoding advantage. We therefore keep the matrix packed and
 encode bounded groups of rows. The internal layout follows the input
 index mapping, avoiding a full-matrix bit transpose. Batched column
-processing and table-based row combinations reduce the data movement
-and arithmetic around the encoder. Workspaces are allocated before
-repeated proving. These changes make encoding and column hashing account
-for approximately $79\%$ of the fastest standalone prover time.
+processing and table-based row combinations processing reduce the data movement
+and arithmetic around the encoder. Column hashing applies each BLAKE3
+compression block to every column in one sequential pass over the encoded
+matrix; the roots are standard BLAKE3. Workspaces are allocated before
+repeated proving. Encoding and column hashing account for approximately
+$72\%$ of the standalone prover time.
 
 \paragraph{Parameters.}
-We condition once on the selected code satisfying the distance bound
-of Theorem~\ref{thm:finite-bch-spin}. Extending its binary generator to
+We condition once on the Turbo SPIN code having minimum distance above
+$N/10$, as Theorem~\ref{thm:turbo-spin} guarantees at $K=2^{16}$ and
+$2^{18}$ except with setup probability below $2^{-62.3}$ and $2^{-60.3}$.
+Extending its binary generator to
 $\mathbb F$ preserves minimum distance. At $K=2^{16}$ and $2^{18}$,
 we use $2045$ column samples and one random testing fold. For a complete
 matrix fixed before the testing challenge, the generic-code proximity
@@ -79,14 +83,15 @@ Ligerito~\cite{ligerito25} on the same $2^{32}$-bit input. SPIN uses
 $R=K=2^{16}$ for the square shape. The longer-row shape has $R=2^{14}$
 and $K=2^{18}$. Both encode to $1$\,GiB.
 Longer rows reduce the SPIN proof
-size by $31.6\%$ for a $3.1\%$ increase in prover time. The square
-configuration spends $221$\,ms encoding, $180$\,ms hashing columns,
-and approximately $96$\,ms computing the two row combinations.
+size by $31.7\%$ at the same prover time. The square configuration
+spends $69$\,ms encoding, $129$\,ms hashing columns, and $64$\,ms
+computing the two row combinations.
 
 All measurements use one worker on the Ryzen 9 7950X, pinned to CPU~15,
 with a requested $4.5$\,GHz frequency and boost disabled. Each SPIN entry is
-the pooled median of ten trials from two processes, each excluding one
-warmup. For SPIN, setup, workspace allocation, outer serialization, and independent
+the pooled median of fourteen trials from two processes, each excluding one
+warmup. Each process starts only after the host has been otherwise idle for
+one minute. For SPIN, setup, workspace allocation, outer serialization, and independent
 evaluation for validation are outside the prover timer. Verification
 excludes decoding and workspace allocation. Every timed proof verifies.
 
@@ -105,8 +110,8 @@ at higher prover cost.
 \paragraph{Comparison with Bolt.}
 \label{app:bolt-estimate}
 At the same $512$\,MiB input volume and on one core, the fastest measured
-Bolt-max commitment takes $1342$\,ms, compared with $401$\,ms for
-SPIN--Brakedown: a $3.34\times$ difference. Both are measured on the
+Bolt-max commitment takes $1342$\,ms, compared with $199$\,ms for
+SPIN--Brakedown: a $6.75\times$ difference. Both are measured on the
 same host. Bolt~\cite{bolt26} encodes
 $2^{27}$ elements of $\F_{2^{32}}$; our input has $2^{32}$ Boolean entries.
 The comparison therefore matches input bytes, rather than polynomial
@@ -126,7 +131,7 @@ boundaries\repositorycite.
 
 \paragraph{Opening Cost in Isolation.}
 Table~\ref{tab:pcs-opening} separates opening from commitment. The two
-SPIN configurations both open in approximately $108$\,ms, including the
+SPIN configurations open in $75$ and $73$\,ms, including the
 row combinations and authenticated column queries. These are measured
 opening times from the same trials as Table~\ref{tab:spin-pcs-standalone};
 they exclude outer serialization. Sending the folded messages explicitly

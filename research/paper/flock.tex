@@ -5,8 +5,8 @@ We integrate SPIN--Brakedown into Flock~\cite{flock26} to measure its
 effect inside a larger prover. Flock checks batches of Boolean constraints
 and reduces them to claims about a committed witness. Our integration
 replaces its Ligerito PCS~\cite{ligerito25} with the construction in
-Section~\ref{sec:spin-pcs}. SPIN improves prover throughput
-by $2.29\times$ and $1.63\times$ at the two measured workloads.
+Section~\ref{sec:spin-pcs}, with Turbo SPIN. SPIN improves prover throughput
+by $2.48\times$ and $1.74\times$ at the two measured workloads.
 
 \paragraph{Adapting the Opening Interface.}
 Flock's final claims carry interpolation weights on a small group
@@ -52,37 +52,37 @@ Compressions & PCS & Prover (ms) & Verify (ms) & Proof (MiB) \\
 \end{table}
 
 \paragraph{Measurement Method.}
-The SPIN and Ligerito configurations run in one executable with the same deterministic
-input stream and compiler settings. They use the single-worker hardware
-environment of the standalone PCS experiment: one Ryzen 9 7950X core at
-$4.5$\,GHz, with boost disabled. The build uses Rust 1.96.0, GCC 15.2,
-native CPU instructions, and 64-byte function alignment. Each workload has
-two processes per backend in a balanced serial order. Each process excludes
-five warmup and settling proofs and measures four trials; each entry is
-the mean of two process medians. Every generated proof is verified.
+Both backends use the same Flock implementation, deterministic input stream,
+and compiler settings, and the single-worker hardware environment of the
+standalone PCS experiment: one Ryzen 9 7950X core at $4.5$\,GHz, with boost
+disabled. The build uses Rust 1.96.0, GCC 15.2, native CPU instructions, and
+64-byte function alignment. The Turbo SPIN rows come from a later campaign on
+the same host than the Ligerito rows. For SPIN, each workload has two
+processes; each excludes one warmup proof and measures nine, and each entry
+is the pooled median of eighteen proofs. Each process starts only after the
+host has been otherwise idle for one minute. For Ligerito, each workload has
+two processes that each exclude five warmup and settling proofs and measure
+four; each entry is the mean of two process medians. Every generated proof
+is verified.
 Prover time includes witness generation, commitment, and proving. Setup,
 verification, and outer proof serialization are outside the interval.
 Serialization inside the SPIN opening remains timed because its bytes
 enter the protocol transcript.
 
 \paragraph{Prover Costs.}
-At the smaller workload, commitment takes $15.7$\,ms with SPIN--Brakedown
-and $43.7$\,ms with Ligerito; opening takes $17.1$ and $102.8$\,ms.
-At the larger workload, these costs are $62.2$ versus $162.0$\,ms for
-commitment and $46.0$ versus $141.7$\,ms for opening. The larger-workload
-PCS savings account for about $195$\,ms of the $221$\,ms total reduction.
-Encoding alone takes $7.9$ and $28.0$\,ms with SPIN, versus $26.9$ and
-$98.6$\,ms with Reed--Solomon. These are complete integrations with
-different layouts and hashing; the measurements do not isolate an
-encoder-only substitution.
+At the smaller workload, commitment takes $12.1$\,ms with SPIN--Brakedown
+and $43.7$\,ms with Ligerito; opening takes $13.3$ and $102.8$\,ms.
+At the larger workload, these costs are $51.9$ versus $162.0$\,ms for
+commitment and $35.6$ versus $141.7$\,ms for opening. The larger-workload
+PCS savings account for about $216$\,ms of the $244$\,ms total reduction.
+These are complete integrations with different layouts and hashing; the
+measurements do not isolate an encoder-only substitution.
 
-Four times the workload raises SPIN commitment and opening from $32.7$
-to $108.2$\,ms, improving their cost per compression. The surrounding
-prover takes $242.7$\,ms at the larger size, about $69\%$ of the total.
+Four times the workload raises SPIN commitment and opening from $25.5$
+to $87.5$\,ms, improving their cost per compression. The surrounding
+prover takes $240.2$\,ms at the larger size, about $73\%$ of the total.
 Ligerito opening grows only from $102.8$ to $141.7$\,ms, which helps
-explain the smaller relative prover speedup at that size. Within SPIN
-commitment, leaf hashing grows from $6.7$ to $33.1$\,ms and is a
-remaining optimization target.
+explain the smaller relative prover speedup at that size.
 
 \paragraph{An Optimistic Bolt Projection.}
 Table~\ref{tab:spin-flock} also considers replacing the PCS with
@@ -92,11 +92,11 @@ claims, shared opening work across its two claims, and negligible
 matrix-proof cost per opening in the amortized limit. We keep the
 surrounding prover time measured with SPIN and substitute Bolt's measured
 commitment and projected opening costs. The resulting totals are
-$228$ and $967$\,ms, compared with the measured SPIN totals of $94$
-and $351$\,ms. Thus the projected Bolt configuration remains slower even
+$228$ and $965$\,ms, compared with the measured SPIN totals of $87$
+and $328$\,ms. Thus the projected Bolt configuration remains slower even
 with these allowances. We did not implement Bolt--Flock; the projection
 describes this substitution and is not a runtime bound.
 
 The SPIN--Brakedown integration favors prover time at a substantial
-communication cost. At the larger workload, its proof is $10.5$\,MiB,
+communication cost. At the larger workload, its proof is $10.6$\,MiB,
 compared with $0.4$\,MiB for Ligerito, which also verifies faster.

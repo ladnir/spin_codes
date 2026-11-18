@@ -15,6 +15,8 @@ class BoltCommitmentRefreshTests(unittest.TestCase):
         def read(name):
             return json.loads((ROOT / "data" / name).read_text(encoding="utf-8"))
         self.data = read("application_results.json")
+        # The SPIN Flock residual comes from the Turbo receipt, as in the tables.
+        self.data["turbo"] = read("turbo_applications_20261117.json")
         self.opening = read("bolt_opening_projection.json")
         self.commit = read("bolt_x86_commitment.json")
         self.ligerito = read("ligerito_standalone.json")
@@ -35,7 +37,7 @@ class BoltCommitmentRefreshTests(unittest.TestCase):
             new_total = flock_projection(self.data, case, new["commit_ms"])
             self.assertAlmostEqual(old_total - new_total,
                                    case["commit_measured_ms"] - new["commit_ms"])
-            self.assertEqual(round(new_total), {32: 228, 128: 983}[case["input_mib"]])
+            self.assertEqual(round(new_total), {32: 228, 128: 965}[case["input_mib"]])
 
     def test_receipt_scope(self):
         self.assertEqual(self.commit["threads"], 1)

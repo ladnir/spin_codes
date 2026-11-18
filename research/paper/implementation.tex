@@ -53,12 +53,13 @@ code. A data-movement skeleton with the same access pattern bounds the
 remaining headroom at $9$--$16\%$ for $K=2^{20},\ldots,2^{24}$.
 Appendix~\ref{app:implementation} gives the implementation scope.
 
-The measured applications instantiate the bit-level design with a fixed
+The Silent OT measurements instantiate the bit-level design with a fixed
 BCH outer and the IMT inner. This BCH--IMT instantiation has
 five finite half-rate certificates and optimized ordinary and transposed
 encoders. Its $K=2^{20}$ transposed time is $9.289$\,ms, measured in a
 separate campaign with a different memory policy. Appendix~\ref{app:implementation}
 gives the BCH--IMT implementation and its comparison with other encoders.
 We have no matched BAA or ordinary-encoding timing for Turbo SPIN, so we
-report no corresponding speedup or direction comparison. The OT and PCS
-application results in Section~\ref{sec:applications} use BCH--IMT.
+report no corresponding speedup or direction comparison. The OT
+application results in Section~\ref{sec:applications} use BCH--IMT; the
+polynomial commitment and Flock results use Turbo SPIN.

@@ -15,6 +15,8 @@ DATA = ROOT / "data" / "application_results.json"
 BOLT_DATA = ROOT / "data" / "bolt_opening_projection.json"
 BOLT_COMMIT_DATA = ROOT / "data" / "bolt_x86_commitment.json"
 LIGERITO_DATA = ROOT / "data" / "ligerito_standalone.json"
+# Turbo SPIN receipt (PCS and Flock SPIN rows); Ligerito and Bolt rows unchanged.
+TURBO_DATA = ROOT / "data" / "turbo_applications_20261117.json"
 PATHS = {
     "encoding": "results/spin-brakedown/peach-paired/summary.json",
     "pcs": "results/spin-brakedown/peach-security/summary.json",
@@ -130,9 +132,25 @@ def import_flock(data, source):
     return data
 
 
+def spin_flock(data, log):
+    """SPIN Flock row: the Turbo receipt when present, else the historical row."""
+    if "turbo" in data:
+        return data["turbo"]["flock"][log]
+    return data["flock"][log]["spin"]
+
+
+def spin_pcs(data):
+    """SPIN standalone PCS rows as (key, label) pairs and their source."""
+    if "turbo" in data:
+        rows = data["turbo"]["pcs"]
+        return [(rows["k16-w1"], "square"), (rows["k18-w1"], "longer rows")]
+    rows = data["pcs"]["rows"]
+    return [(rows["k16-w2"], "square"), (rows["k18-w2"], "longer rows")]
+
+
 def flock_projection(data, case, commitment):
     log = {32: "14", 128: "16"}[case["input_mib"]]
-    spin = data["flock"][log]["spin"]
+    spin = spin_flock(data, log)
     outer = spin["total_ms"] - spin["commit_ms"] - spin["open_ms"]
     p = case["phase_medians_ms"]
     shared = (2 * p["row_evaluations"] + p["random_column_fold"]
@@ -146,15 +164,21 @@ def flock_projection(data, case, commitment):
 
 
 def render(data, bolt, ligerito, bolt_commit):
+    tables = {}
+    # The encoding table needs retained author-side runs; leave the committed
+    # table unchanged when they are not present.
+    try:
+        optimized = precomputed_results.load()
+    except (ValueError, FileNotFoundError):
+        optimized = None
+    if optimized is not None:
+        rows = []
+        for direction, label in (("forward", "Ordinary"), ("transpose", "Transposed")):
+            values = [optimized[k, direction]['median_ms'] for k in (16, 18, 20)]
+            rows.append(label + " & " + " & ".join(f"{v:.3f}" for v in values) + r" \\")
+        tables["ordinary_encoding"] = rows
     rows = []
-    optimized = precomputed_results.load()
-    for direction, label in (("forward", "Ordinary"), ("transpose", "Transposed")):
-        values = [optimized[k, direction]['median_ms'] for k in (16, 18, 20)]
-        rows.append(label + " & " + " & ".join(f"{v:.3f}" for v in values) + r" \\")
-    tables = {"ordinary_encoding": rows}
-    rows = []
-    for key, label in (("k16-w2", "square"), ("k18-w2", "longer rows")):
-        r = data["pcs"]["rows"][key]
+    for r, label in spin_pcs(data):
         rows.append(f"SPIN--Brakedown ({label}) & {r['total_ms']:.0f} & "
                     f"{r['verify_ms']:.0f} & {r['proof_bytes']/2**20:.1f}" + r" \\")
     for key, label in (("fast100", "Fast100"), ("slim100", "Slim100")):
@@ -169,8 +193,8 @@ def render(data, bolt, ligerito, bolt_commit):
     tables["pcs_standalone"] = rows
     case = bolt["case"]
     rows = []
-    for key, label in (("k16-w2", "square"), ("k18-w2", "longer rows")):
-        value = data["pcs"]["rows"][key]["open_ms"]
+    for r, label in spin_pcs(data):
+        value = r["open_ms"]
         rows.append(f"SPIN--Brakedown ({label}) & Measured & {value:.0f}" + r" \\")
     for key, label in (("fast100", "Fast100"), ("slim100", "Slim100")):
         value = ligerito["rows"][key]["open_ms"]
@@ -183,7 +207,7 @@ def render(data, bolt, ligerito, bolt_commit):
     cases = {c["input_mib"]: c for c in bolt["flock_cases"]}
     for log in ("14", "16"):
         for backend, label in (("spin", "SPIN--Brakedown"), ("native-fast100", "Ligerito")):
-            r = data["flock"][log][backend]
+            r = spin_flock(data, log) if backend == "spin" else data["flock"][log][backend]
             rows.append(f"${2**int(log):,}$ & {label} & {r['total_ms']:.0f} & "
                         f"{r['verify_ms']:.0f} & {r['proof_bytes']/2**20:.1f}" + r" \\")
         case = cases[{"14": 32, "16": 128}[log]]
@@ -191,13 +215,18 @@ def render(data, bolt, ligerito, bolt_commit):
                     f"{flock_projection(data, case, bolt_commit['cases'][str(case['input_mib'])]['commit_ms']):.0f} & --- & ---" + r" \\")
     tables["flock_comparison"] = rows
     digest = hashlib.sha256(DATA.read_bytes()).hexdigest()
+    turbo_digest = (hashlib.sha256(TURBO_DATA.read_bytes()).hexdigest()
+                    if TURBO_DATA.is_file() else None)
     bolt_digest = hashlib.sha256(BOLT_DATA.read_bytes()).hexdigest()
-    bolt_commit_digest = hashlib.sha256(BOLT_COMMIT_DATA.read_bytes()).hexdigest()
+    bolt_commit_digest = hashlib.sha256(BOLT_COMMIT_DATA.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     communication_digest = hashlib.sha256((ROOT / "bolt_communication.py").read_bytes()
                                           .replace(b"\r\n", b"\n")).hexdigest()
     ligerito_digest = hashlib.sha256(LIGERITO_DATA.read_bytes()).hexdigest()
     outputs = {ROOT / "tables" / (name + ".tex"):
             f"% Generated by build_application_tables.py; data SHA-256 {digest}\n"
+            + (f"% Turbo SPIN receipt SHA-256 {turbo_digest}\n"
+               if turbo_digest and name in ("pcs_standalone", "pcs_opening", "flock_comparison")
+               else "")
             + (f"% Optimized precomputed runs SHA-256 {precomputed_results.RAW_PIN}\n"
                if name == "ordinary_encoding" else "")
             + (f"% Bolt projection SHA-256 {bolt_digest}\n"
@@ -231,6 +260,13 @@ def main():
         DATA.parent.mkdir(parents=True, exist_ok=True)
         DATA.write_text(json.dumps(import_results(args.source), indent=2) + "\n", encoding="utf-8")
     data = json.loads(DATA.read_text(encoding="utf-8"))
+    if TURBO_DATA.is_file():
+        turbo = json.loads(TURBO_DATA.read_text(encoding="utf-8"))
+        assert set(turbo["pcs"]) == {"k16-w1", "k18-w1"} and set(turbo["flock"]) == {"14", "16"}
+        assert all(r["samples"] == 14 for r in turbo["pcs"].values())
+        assert all(r["samples"] == 18 for r in turbo["flock"].values())
+        assert all(r["queries"] == 2045 for r in turbo["pcs"].values())
+        data["turbo"] = turbo
     if args.imt_summary:
         data = import_imt(data, args.imt_summary)
         DATA.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")

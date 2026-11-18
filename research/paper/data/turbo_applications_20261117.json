@@ -1,0 +1,81 @@
+{
+  "campaign": "turbo-paper-20261117",
+  "host": "Peach: Ryzen 9 7950X, CPU 15, userspace governor 4.5 GHz, boost disabled",
+  "sources": {
+    "hypercat": "d45fee6426ba6da4def8ed3241e4d5cb61ed64f4",
+    "spin_codes": "bac3385df939a3fc2842229c6993d1c80c24c6b9",
+    "flock_optimized": "375ec837db9facf81f348002286e107347fc7727"
+  },
+  "method": {
+    "pcs": "spin_pipeline --method baseline (BLAKE3-256, block-major sweep), one lane, pcs-profile; two processes in alternating case order, each 7 measured trials after one excluded warmup; pooled median of 14. Every proof verified.",
+    "flock": "hypercat-flock spin (two lanes, independent binary testing fold per opening, legacy query sampler); two processes per workload, each 9 measured proofs after one excluded warmup; pooled median of 18. Every proof verified.",
+    "gating": "Each process starts after 60 s with no other process above 25% CPU; a process during which any other process exceeded 25% CPU is discarded and rerun. None were."
+  },
+  "pcs": {
+    "k16-w1": {
+      "case": "square",
+      "samples": 14,
+      "total_ms": 273.5519115,
+      "commit_ms": 198.713518,
+      "open_ms": 74.801185,
+      "verify_ms": 13.982107,
+      "encoding_ms": 69.0532965,
+      "leaf_ms": 128.6140705,
+      "parent_ms": 1.045763,
+      "random_folds_ms": 64.377402,
+      "query_openings_ms": 9.1513275,
+      "proof_bytes": 19080120,
+      "queries": 2045,
+      "leaves": 131072
+    },
+    "k18-w1": {
+      "case": "rect",
+      "samples": 14,
+      "total_ms": 273.262802,
+      "commit_ms": 200.3941015,
+      "open_ms": 72.908134,
+      "verify_ms": 8.834922,
+      "encoding_ms": 69.4920815,
+      "leaf_ms": 126.5696055,
+      "parent_ms": 4.3047375,
+      "random_folds_ms": 65.785841,
+      "query_openings_ms": 3.7856185,
+      "proof_bytes": 13039608,
+      "queries": 2045,
+      "leaves": 524288
+    }
+  },
+  "flock": {
+    "14": {
+      "total_ms": 86.833706,
+      "verify_ms": 33.62525,
+      "witness_ms": 14.2956775,
+      "commit_ms": 12.134788,
+      "zerocheck_ms": 40.328457,
+      "lincheck_ms": 6.597168,
+      "open_ms": 13.3410805,
+      "compressions": 16384,
+      "proof_bytes": 6491860,
+      "samples": 18
+    },
+    "16": {
+      "total_ms": 327.6764345,
+      "verify_ms": 38.653099999999995,
+      "witness_ms": 56.9619625,
+      "commit_ms": 51.906633,
+      "zerocheck_ms": 159.42175550000002,
+      "lincheck_ms": 23.787442,
+      "open_ms": 35.578258500000004,
+      "compressions": 65536,
+      "proof_bytes": 11073044,
+      "samples": 18
+    }
+  },
+  "raw_sha256": {
+    "final.out": "2d2e2b912059c7c19159ff77b91ef39da3cd81b3cf37894ac3ec78ff5ea84f1d",
+    "flock-14-p1.csv": "bfabc5423ab4b1ede0214869e7220bf2b4a942d8cceca8bd4b7cf18d9e2f65fb",
+    "flock-14-p2.csv": "71b1f4aaeb397f30ad6130c9d6e4758b4ff5ddf4e3010c4a29e7010a288ae6f6",
+    "flock-16-p1.csv": "cd08be70ed9cc02423cadd24b3d3afb0266e43d492ece9f6f5b9b99601a40eb7",
+    "flock-16-p2.csv": "727ecbcb00da15b34c9f6c710bf592a34ec1c763b661e8e77bd1afc5097c90fc"
+  }
+}

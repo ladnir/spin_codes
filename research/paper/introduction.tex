@@ -80,7 +80,7 @@ terminated-encoder interpretation of Appendix~\ref{sec:bms-question}.
 On one Ryzen 9 7950X thread, Turbo SPIN's precomputed transposed encoder
 produces $2^{20}$ $128$-bit blocks from $2^{21}$ input blocks in $2.85$\,ms,
 and $2^{26}$ blocks in $216$\,ms.
-The application backend uses the bit-level route with a fixed BCH outer
+The Silent OT backend uses the bit-level route with a fixed BCH outer
 and IMT inner. It has certified distance above $0.10N$ at five lengths
 through $K=2^{24}$, using rigorous BCH spectrum inequalities; two
 rate-$1/4$ bounds are also given in Appendix~\ref{sec:finite-certificates}.
@@ -97,11 +97,11 @@ It measures local computation with supplied base correlations,
 excluding initial setup and network transport; Section~\ref{sec:spin-pcg}
 specifies the timing scope.
 
-As application evidence, we substitute SPIN into a Brakedown-style
+As application evidence, we substitute Turbo SPIN into a Brakedown-style
 PCS~\cite{brakedown23} and integrate it into Flock~\cite{flock26}.
-Standalone commitment and one opening of $512$\,MiB take $509$\,ms on one
+Standalone commitment and one opening of $512$\,MiB take $274$\,ms on one
 core. Replacing Ligerito~\cite{ligerito25} within Flock improves throughput
-by $1.63$--$2.29\times$ at the measured workloads, with larger proofs and
+by $1.74$--$2.48\times$ at the measured workloads, with larger proofs and
 slower verification. Both backends receive the applicable shared
 optimizations. Sections~\ref{sec:spin-pcs} and~\ref{sec:spin-flock}
 state the security targets, what they exclude, and the comparison scope.
