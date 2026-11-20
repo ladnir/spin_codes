@@ -1,5 +1,4 @@
 #include <spin/Code.h>
-#include <spin/PacketCode.h>
 #include <spin/PreparedEncoder.h>
 #include "../src/Cpu.h"
 #include <algorithm>
@@ -48,8 +47,6 @@ void operator delete[](void* p,std::size_t,std::align_val_t a) noexcept {::opera
 namespace {
 constexpr auto family=spin::Parameters::PacketRs8T64;
 static_assert(static_cast<std::uint32_t>(family)==8);
-static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S15K16)==6);
-static_assert(static_cast<std::uint32_t>(spin::Parameters::PacketRsT64S22)==7);
 struct Block {std::uint64_t words[2]{};bool operator==(const Block&) const=default;};
 // Backend under test against the Reference oracle: Automatic, or Avx2 or
 // Avx2Gfni, Portable or Neon when run as "spin_rs8_test avx2", "gfni",
@@ -152,24 +149,31 @@ void metadata() {
         require(descriptor[24+i]==std::byte((17ULL>>(8*i))&255),"descriptor route seed");
         require(descriptor[32+i]==std::byte((43ULL>>(8*i))&255),"descriptor inner seed");
     }
-    require(code.backend()==(spin::packet_fast_available()?spin::Backend::Avx512:
+    require(code.backend()==(spin::capabilities().avx512?spin::Backend::Avx512:
         spin::detail::cpu_avx2gfni()?spin::Backend::Avx2Gfni:spin::capabilities().avx2?spin::Backend::Avx2:
         aarch64?spin::Backend::Neon:spin::Backend::Portable),"automatic backend");
     for(auto width:{spin::Width::Bits128,spin::Width::Bits256,spin::Width::Bits512})
         require(code.supports_forward(width) && scalar.supports_forward(width),"forward width unsupported");
     require(code.supports_transpose() && !code.supports_transpose(spin::Width::Bits256) &&
-        !code.supports_transpose(spin::Width::Bits512) && !code.supports_generic_transpose(),"transpose capabilities");
-    rejects([&]{code.generic_transpose();});
+        !code.supports_transpose(spin::Width::Bits512),"transpose capabilities");
     rejects([&]{code.make_workspace(static_cast<spin::Width>(17));});
-    std::array<std::uint64_t,6> packedMessage{};
-    std::array<std::uint64_t,12> packedOutput{},packedScratch{};
-    rejects([&]{code.forward_bits(packedMessage,packedOutput,packedScratch);});
-    rejects([&]{spin::Code wrong({384,spin::Parameters::PacketRsT64S22,17,43},{spin::Backend::Avx2});});
+    // Identifiers 1-7 named retired families; they are never accepted.
+    for(std::uint32_t retired=0;retired<8;++retired) {
+        const auto p=static_cast<spin::Parameters>(retired);
+        require(!spin::valid_message_size(p,16384),"retired family accepted");
+        rejects([&]{spin::Code wrong({16384,p,17,43});});
+        rejects([&]{spin::PreparedEncoder wrong({16384,p,17,43});});
+        rejects([&]{(void)spin::message_alignment(p);});
+    }
+    require(spin::CodeSpec{384}.parameters==family,"default family");
+    const auto caps=spin::capabilities();
+    require(caps.avx2==spin::detail::cpu_avx2() && caps.avx2gfni==spin::detail::cpu_avx2gfni() &&
+            caps.avx512==spin::detail::cpu_packet512(),"capabilities");
     if(!spin::capabilities().avx2) {
         bool failed=false;try{spin::Code forced({384,family,17,43},{spin::Backend::Avx2});}
         catch(const std::runtime_error&){failed=true;}require(failed,"unavailable AVX2 accepted");
     }
-    if(!spin::packet_fast_available()) {
+    if(!spin::capabilities().avx512) {
         bool failed=false;try{spin::Code forced({384,family,17,43},{spin::Backend::Avx512});}
         catch(const std::runtime_error&){failed=true;}require(failed,"unavailable ISA accepted");
     }
@@ -264,32 +268,23 @@ void ownershipAndSeeds() {
         noAlloc([&]{retained.transpose_bytes(input.bytes(),actual.bytes(),movedWork);});
         compare(actual.bytes(),expected.bytes(),"move/share invalidates workspace");work=std::move(movedWork);
     }
-    spin::Code old({2048,spin::Parameters::PacketRsT64S20,17,43}),small({2048,family,17,43});
-    require(old.descriptor()!=small.descriptor(),"RS8 aliases larger-outer descriptor");
-    auto otherFamily=old.make_workspace();spin::Buffer largerInput(4096*16),largerOutput(2048*16);
-    rejects([&]{small.transpose_bytes(largerInput.bytes(),largerOutput.bytes(),otherFamily);});
-    // Cross-family rebinding may allocate, but must discard the old geometry.
-    small.prepare_workspace(otherFamily);
-    noAlloc([&]{small.transpose_bytes(largerInput.bytes(),largerOutput.bytes(),otherFamily);});
-    // These profiles share the 260-record group layout. Cross-family rebind
-    // should reuse its allocation but must replace the outer tables.
-    spin::Code paired({65536,spin::Parameters::PacketRsT64S15K16,17,43}),certified({65536,family,17,43});
-    auto shared=paired.make_workspace(),own=certified.make_workspace();
-    spin::Buffer sharedInput(131072*16),sharedOutput(65536*16),sharedExpected(65536*16);fill(sharedInput.bytes(),913);
-    certified.transpose_bytes(sharedInput.bytes(),sharedExpected.bytes(),own);
-    noAlloc([&]{certified.prepare_workspace(shared);certified.transpose_bytes(sharedInput.bytes(),sharedOutput.bytes(),shared);});
-    compare(sharedOutput.bytes(),sharedExpected.bytes(),"paired15 to RS8 rebind map mismatch");
-    auto pairedOwn=paired.make_workspace();paired.transpose_bytes(sharedInput.bytes(),sharedExpected.bytes(),pairedOwn);
-    noAlloc([&]{paired.prepare_workspace(shared);paired.transpose_bytes(sharedInput.bytes(),sharedOutput.bytes(),shared);});
-    compare(sharedOutput.bytes(),sharedExpected.bytes(),"RS8 to paired15 rebind map mismatch");
+    // Rebinding across sizes may allocate, but must discard the old geometry.
+    spin::Code large({2048,family,17,43}),small({1920,family,17,43});
+    auto otherSize=large.make_workspace();spin::Buffer smallInput(3840*16),smallOutput(1920*16),smallExpected(1920*16);
+    fill(smallInput.bytes(),913);
+    rejects([&]{small.transpose_bytes(smallInput.bytes(),smallOutput.bytes(),otherSize);});
+    auto own=small.make_workspace();small.transpose_bytes(smallInput.bytes(),smallExpected.bytes(),own);
+    small.prepare_workspace(otherSize);
+    noAlloc([&]{small.transpose_bytes(smallInput.bytes(),smallOutput.bytes(),otherSize);});
+    compare(smallOutput.bytes(),smallExpected.bytes(),"cross-size rebind map mismatch");
 }
 void preparedFull() {
     constexpr std::size_t k=384,n=2*k;
     for(auto backend:{spin::Backend::Reference,spin::Backend::Portable,tested}) {
         context={"prepared Full",k,17,43};spin::PreparedEncoder prepared({k,family,17,43},{spin::SetupMode::Full},{backend});
         auto work=prepared.make_workspace();const auto bytes=work.bytes();
-        require(prepared.supports_transpose() && !prepared.supports_generic_transpose(),"prepared capabilities");
-        rejects([&]{prepared.generic_transpose();});rejects([&]{prepared.make_workspace(spin::Width::Bits256);});
+        require(prepared.supports_transpose(),"prepared capabilities");
+        rejects([&]{prepared.make_workspace(spin::Width::Bits256);});
         spin::Buffer input(n*16),actual(k*16),expected(k*16),previous(k*16),inplace(n*16);fill(input.bytes(),913);
         bool havePrevious=false;
         for(auto seed:{spin::CodeSeed{17,43},spin::CodeSeed{18,43},spin::CodeSeed{18,44}}) {
@@ -335,8 +330,8 @@ void preparedBanked(std::size_t k) {
     const spin::SetupOptions banked{spin::SetupMode::BankedHeuristic,0x1234567};
     spin::PreparedEncoder portable({k,family,17,43},banked,{spin::Backend::Reference});
     spin::PreparedEncoder automatic({k,family,17,43},banked,{tested});
-    require(automatic.supports_transpose() && !automatic.supports_generic_transpose(),"banked capabilities");
-    rejects([&]{automatic.generic_transpose();});rejects([&]{automatic.make_workspace(spin::Width::Bits256);});
+    require(automatic.supports_transpose(),"banked capabilities");
+    rejects([&]{automatic.make_workspace(spin::Width::Bits256);});
     auto pw=portable.make_workspace(),aw=automatic.make_workspace();const auto bytes=aw.bytes();
     spin::Buffer input(n*16),actual(k*16),expected(k*16),first(k*16),inplace(n*16),full(k*16);fill(input.bytes(),913);
     const std::array<spin::CodeSeed,4> seeds{{{17,43},{18,43},{18,44},{17,43}}};

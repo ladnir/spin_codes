@@ -1,12 +1,10 @@
 #pragma once
-#include "../paired15/Paired15.h"
 #include "../certified22/Plan.h"
 #include <optional>
 
 namespace spin::detail::rs8 {
 using Block = storage::block;
 inline constexpr std::size_t groupStride = 260;
-static_assert(groupStride == paired15::groupStride);
 static_assert(groupStride == certified22::groupStride);
 
 bool validMessageSize(std::size_t k) noexcept;
@@ -21,7 +19,6 @@ struct Plan {
     Plan(const Plan&) = delete;
     Plan& operator=(const Plan&) = delete;
     std::size_t k = 0, n = 0, groups = 0;
-    std::optional<paired15::Plan> paired15Plan;
     std::optional<certified22::Plan> certified22Plan;
     std::vector<std::array<std::uint8_t,9>> field;
     // The sampled nonzero GF(2^32) scalar per symbol; the scalar oracles derive

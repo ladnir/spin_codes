@@ -33,7 +33,7 @@ Matrix multiply(const Matrix& left,const Matrix& right) {
     return result;
 }
 
-#if SPIN_BCH_AVX512
+#if SPIN_AVX512
 // The same SplitMix stream as Words, generated eight words per vector.
 class BufferedWords {
     std::uint64_t seed_, next_ = 0;
@@ -105,41 +105,6 @@ void prepareInner(Plan& p,std::uint64_t seed) {
         packBlocks(multiply(multiply(map::basis,transposed),map::inverseBasis),p.forwardUpdates.data()+9*epoch);
     }
 }
-std::uint8_t multiply8(std::uint8_t a, std::uint8_t b) {
-    std::uint8_t result = 0;
-    for(unsigned bit = 0; bit < 8; ++bit) {
-        if(b & 1U) result ^= a;
-        a = std::uint8_t((unsigned(a) << 1) ^ ((a & 128U) ? 0x11bU : 0U));
-        b >>= 1;
-    }
-    return result;
-}
-std::uint16_t multiply16(std::uint16_t a, std::uint16_t b) {
-    const auto a0 = std::uint8_t(a), a1 = std::uint8_t(a >> 8);
-    const auto b0 = std::uint8_t(b), b1 = std::uint8_t(b >> 8);
-    const auto lo = multiply8(a0,b0) ^ multiply8(0x20,multiply8(a1,b1));
-    const auto hi = multiply8(a0,b1) ^ multiply8(a1,b0) ^ multiply8(a1,b1);
-    return std::uint16_t(lo | (unsigned(hi) << 8));
-}
-
-void prepareOuter(Plan& p, std::uint64_t seed) {
-    Words words(seed ^ 0x75a1dc09ULL);
-    p.outerMatrices16.resize(16*p.groups);
-    p.outerField.resize(16*p.groups);
-    for(std::size_t symbol = 0; symbol < 16*p.groups; ++symbol) {
-        std::uint16_t scalar;
-        do { scalar = std::uint16_t(words()); } while(!scalar);
-        const auto c0 = std::uint8_t(scalar), c1 = std::uint8_t(scalar >> 8);
-        p.outerField[symbol] = {c0, multiply8(0x20,c1), std::uint8_t(c0 ^ c1)};
-        auto& rows = p.outerMatrices16[symbol];
-        for(unsigned column = 0; column < 16; ++column) {
-            const auto image = multiply16(scalar, std::uint16_t(1U << column));
-            const auto physical = 4*(column%4) + column/4;
-            for(unsigned row = 0; row < 16; ++row)
-                rows[row] |= std::uint16_t(((image >> row) & 1U) << physical);
-        }
-    }
-}
 }
 bool validMessageSize(std::size_t k) noexcept {
     if(!k || k%128) return false;
@@ -152,19 +117,19 @@ bool validMessageSize(std::size_t k) noexcept {
         && groups<=maxSize/(groupStride*sizeof(Block)*4)
         && k<=maxSize/(2*sizeof(Block)*4);
 }
-Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool withOuter,SetupPath path) {
+Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,SetupPath path) {
     if(!validMessageSize(size))
-        throw std::invalid_argument("certified-s22 K must be a positive multiple of 128 within the byte-route and workspace limits");
+        throw std::invalid_argument("Turbo s22 K must be a positive multiple of 128 within the byte-route and workspace limits");
     k=size;
     n=2*size;
     groups=size/128;
-#if SPIN_BCH_AVX512
+#if SPIN_AVX512
     const bool packet512=path==SetupPath::Automatic && cpu_packet512();
 #else
     const bool packet512=false;
 #endif
     const bool avx2=SPIN_X86 && !packet512 && (path==SetupPath::Avx2 || (path==SetupPath::Automatic && cpu_avx2()));
-#if SPIN_BCH_AVX512
+#if SPIN_AVX512
     if(packet512) {
         BufferedWords words(routeSeed);
         prepareRoute(*this,words);
@@ -172,7 +137,7 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool
 #endif
     { Words words(routeSeed); prepareRoute(*this,words); }
     if(packet512) {
-#if SPIN_BCH_AVX512
+#if SPIN_AVX512
         prepareInnerFast(*this,innerSeed);
 #endif
     } else if(avx2) {
@@ -181,14 +146,11 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,bool
 #endif
     } else if(path==SetupPath::Scalar) prepareInner(*this,innerSeed);
     else prepareInnerPortable(*this,innerSeed);
-    if(withOuter) prepareOuter(*this,routeSeed);
 }
 std::size_t Plan::setupBytes() const noexcept {
     return route.capacity()*sizeof(route[0])+routeBytes.capacity()*sizeof(routeBytes[0])
         +reverseMatrices.capacity()*sizeof(reverseMatrices[0])
         +updates.capacity()*sizeof(updates[0])
-        +forwardUpdates.capacity()*sizeof(forwardUpdates[0])
-        +outerMatrices16.capacity()*sizeof(outerMatrices16[0])
-        +outerField.capacity()*sizeof(outerField[0]);
+        +forwardUpdates.capacity()*sizeof(forwardUpdates[0]);
 }
 }

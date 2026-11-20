@@ -1,5 +1,5 @@
 #pragma once
-#include "Generic.h"
+#include "Code.h"
 
 namespace spin {
 enum class SetupMode : std::uint32_t { Full=0, BankedHeuristic=1 };
@@ -14,8 +14,8 @@ struct SetupOptions {
 namespace detail { struct PreparedState; struct PreparedScratch; }
 
 // Mutable, move-only setup controller for transposed encoding. Code remains the
-// immutable forward/transpose API. Refresh requires exclusive access, including
-// all generic views; encoding is concurrent with distinct workspaces only.
+// immutable forward/transpose API. Refresh requires exclusive access;
+// encoding is concurrent with distinct workspaces only.
 class PreparedEncoder {
 public:
     class Workspace {
@@ -48,7 +48,6 @@ public:
     std::size_t setup_bytes() const noexcept;
     Backend backend() const noexcept;
     bool supports_transpose(Width=Width::Bits128) const noexcept;
-    bool supports_generic_transpose() const noexcept;
     // Version 2 includes setup mode, bank seed, and bank-family revision.
     // Execution backend and workspace layout do not identify the binary map.
     std::array<std::byte,56> descriptor() const noexcept;
@@ -58,9 +57,6 @@ public:
     // outside a critical path. Compatible scratch does not allocate. Encoding
     // also prepares automatically for existing callers. Banked scratch is unchanged.
     void prepare_workspace(Workspace&) const;
-    // Live view where supported: follows seed updates; scratch remains valid.
-    GenericTranspose generic_transpose() const;
-    bool owns(const GenericTranspose&) const noexcept;
     void transpose_bytes(std::span<const std::byte>,std::span<std::byte>,Workspace&) const;
     void transpose_inplace_bytes(std::span<std::byte>,Workspace&) const;
     template<class E> void transpose(std::span<const E> in,std::span<E> out,Workspace& w) const {

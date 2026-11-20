@@ -1,6 +1,6 @@
 // Single-use cost: fresh code seed, then one 128-bit transposed encode.
-// "turbo"/"imt": full setup from a new seed (Code construction) into a reused
-// workspace. "imtbank"/"turbobank": BankedHeuristic PreparedEncoder refresh. One process
+// "turbo": full setup from a new seed (Code construction) into a reused
+// workspace. "turbobank": BankedHeuristic PreparedEncoder refresh. One process
 // per invocation; run serially. Workspace creation and input fill are excluded.
 #include <spin/Code.h>
 #include <spin/PreparedEncoder.h>
@@ -15,7 +15,7 @@ using Clock=std::chrono::steady_clock;
 static double ms(Clock::time_point a,Clock::time_point b){return std::chrono::duration<double,std::milli>(b-a).count();}
 static double median(std::vector<double> x){std::sort(x.begin(),x.end());return x[x.size()/2];}
 int main(int argc,char** argv){try{
-    if(argc!=4 && argc!=5) throw std::invalid_argument("usage: spin_setup_once_bench turbo|imt|imtbank|turbobank K reps [auto|avx2|gfni|avx512|portable|reference|neon]");
+    if(argc!=4 && argc!=5) throw std::invalid_argument("usage: spin_setup_once_bench turbo|turbobank K reps [auto|avx2|gfni|avx512|portable|reference|neon]");
     const std::string b=argc==5?argv[4]:"auto";
     const spin::ExecutionOptions exec{b=="avx2"?spin::Backend::Avx2:b=="gfni"?spin::Backend::Avx2Gfni:b=="avx512"?spin::Backend::Avx512:
         b=="portable"?spin::Backend::Portable:b=="reference"?spin::Backend::Reference:b=="neon"?spin::Backend::Neon:spin::Backend::Automatic};
@@ -23,8 +23,9 @@ int main(int argc,char** argv){try{
     std::vector<Word> input(2*k);
     std::vector<double> setup,first,warm;
     const auto fill=[&](unsigned r){for(std::size_t i=0;i<input.size();++i)input[i]={i*0x9e3779b97f4a7c15ULL+r,i^0xa531b78420ULL};};
-    if(mode=="imtbank" || mode=="turbobank") {
-        const auto p=mode=="turbobank"?spin::Parameters::PacketRs8T64:spin::Parameters::T128S19;
+    if(mode!="turbo" && mode!="turbobank") throw std::invalid_argument("mode must be turbo or turbobank");
+    constexpr auto p=spin::Parameters::PacketRs8T64;
+    if(mode=="turbobank") {
         spin::PreparedEncoder enc({k,p,17,29},{spin::SetupMode::BankedHeuristic,913},exec);
         auto w=enc.make_workspace();
         for(unsigned r=0;r<reps+3;++r){
@@ -34,7 +35,6 @@ int main(int argc,char** argv){try{
             if(r>=3){setup.push_back(ms(a,b));first.push_back(ms(b,c));warm.push_back(ms(c,d));}
         }
     } else {
-        const auto p=mode=="turbo"?spin::Parameters::PacketRs8T64:spin::Parameters::T128S19;
         spin::Code base({k,p,1,2},exec);auto w=base.make_workspace();
         for(unsigned r=0;r<reps+3;++r){
             fill(r);const auto a=Clock::now();spin::Code c({k,p,100+r,200+r},exec);c.prepare_workspace(w);

@@ -17,12 +17,12 @@ bool validMessageSize(std::size_t k) noexcept;
 // force a path for differential tests (Avx2 requires cpu_avx2()).
 enum class SetupPath { Automatic, Scalar, Avx2, Portable };
 
-// Four systematic GF(16) RS[16,8] rows per 128-to-256-coordinate group,
-// native GF(2^16) symbol maps, four-bit routing through 64 regions, and
-// the exact t64/s22 inner. State runs continuously across region boundaries.
+// Turbo's routing and exact t64/s22 inner: four-bit routing through 64
+// regions and GL22 epoch updates. State runs continuously across region
+// boundaries. The outer code lives in rs8::Plan.
 struct Plan {
     Plan(std::size_t k, std::uint64_t routeSeed, std::uint64_t innerSeed,
-         bool withOuter = true, SetupPath path = SetupPath::Automatic);
+         SetupPath path = SetupPath::Automatic);
     Plan(const Plan&) = delete;
     Plan& operator=(const Plan&) = delete;
     std::size_t k = 0, n = 0, groups = 0;
@@ -32,8 +32,6 @@ struct Plan {
     // Forward-direction updates in the same fast-circuit basis and packed
     // 3x3 GFNI block layout: basis * R^T * inverseBasis per epoch.
     std::vector<std::uint64_t> forwardUpdates;
-    std::vector<std::array<std::uint16_t,16>> outerMatrices16;
-    std::vector<std::array<std::uint8_t,3>> outerField;
     std::size_t scratchBlocks() const noexcept { return groups * groupStride; }
     std::size_t setupBytes() const noexcept;
 };
@@ -42,12 +40,7 @@ struct Plan {
 // allocates. Exact input/output aliasing is supported at 16-byte alignment.
 // Forward lanes=1,2,4 means interleaved 128/256/512-bit records; scratch
 // consists of lanes contiguous planes of scratchBlocks() 128-bit blocks.
-void transposeScalar(const Block*, Block*, Block* scratch, const Plan&);
-void forwardScalar(const Block*, Block*, Block* scratch, const Plan&, unsigned lanes);
-void transposeFast(const Block*, Block*, Block* scratch, const Plan&);
-
-// Internal stage entry points; also used for differential kernel checks.
-// withOuter=false retains identical route/inner streams without RS16 tables.
+// Stage entry points; also used for differential kernel checks.
 void reverseRouteScalar(const Block*, Block* scratch, const Plan&);
 // plane is the lane-plane stride in blocks; 0 selects scratchBlocks().
 void forwardInnerScalar(const Block* scratch, Block*, const Plan&, unsigned lanes, std::size_t plane = 0);
@@ -64,7 +57,4 @@ void prepareInnerPortable(Plan&, std::uint64_t innerSeed);
 void prepareInnerAvx2(Plan&, std::uint64_t innerSeed);
 // Words first..first+count-1 (count a multiple of 8) of kernel::setup::Words(seed).
 void fillWords(std::uint64_t seed, std::uint64_t first, std::uint64_t* out, std::size_t count) noexcept;
-void outerFastCached(const Block* scratch, Block*, const Plan&);
-void outerFastCachedUnrolled(const Block* scratch, Block*, const Plan&);
-void outerFastStreaming(const Block* scratch, Block*, const Plan&);
 }

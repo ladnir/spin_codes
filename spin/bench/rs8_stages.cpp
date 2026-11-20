@@ -8,7 +8,6 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <optional>
 #include <vector>
 
 namespace rs8=spin::detail::rs8;
@@ -38,11 +37,7 @@ int main(int argc,char** argv) {try {
     }
     const bool avx2=stage.rfind("a2",0)==0 || stage.rfind("g2",0)==0;
     if(avx2) rs8::outerForwardAvx2(input,scratch,plan,lanes); else rs8::outerForwardFast(input,scratch,plan,lanes);
-    std::optional<spin::detail::paired15::Plan> p15;
-    if(stage.rfind("p15",0)==0) p15.emplace(k,1,2);
     const auto run=[&] {
-        if(stage=="p15reverse") { spin::detail::paired15::reverseRouteFast(output,scratch,*p15); return; }
-        if(stage=="p15transpose") { spin::detail::paired15::transposeFast(output,input,scratch,*p15); return; }
         if(stage=="g2outer") { rs8::outerForwardAvx2Gfni(input,scratch,plan,lanes); return; }
         if(stage=="g2inner") { rs8::forwardInnerAvx2Gfni(scratch,output,plan,lanes); return; }
         if(stage=="g2treverse") { rs8::reverseRouteAvx2Gfni(output,scratch,plan); return; }

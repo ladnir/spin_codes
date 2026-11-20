@@ -9,8 +9,10 @@ import json
 import math
 from pathlib import Path
 import re
+import subprocess
 import statistics
 import imt_results
+IMT_SOURCE_COMMIT = '584a7fb654e824bf296aeb92ef7c6edd92e63fc2'
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / 'workstreams/spin_optimized/measurements/forward_schedule'
@@ -83,7 +85,9 @@ def load():
     require((inner['t'], inner['s'], inner['transvection_rounds']) == (64, 12, 2), 'Wrong R2 inner')
     bound = imt_results.exact_union(r2['component_upper'], r2['union_upper'], 49)
     require(abs(bound - r2['margin_bits']) < 1e-8, 'Wrong R2 margin')
-    source = (ROOT.parent / 'spin/src/kernels/Map64S12.h').read_text()
+    # SPIN 0.4 removed the IMT kernels; read the map from the last tree that had them.
+    source = subprocess.run(['git', 'show', f'{IMT_SOURCE_COMMIT}:spin/src/kernels/Map64S12.h'],
+                            cwd=ROOT.parent, check=True, capture_output=True, text=True).stdout
     for field, name in [('expansion_columns', 'columns'), ('feedback_columns', 'feedbackColumns')]:
         match = re.search(r'\b' + name + r'\{([^}]+)\}', source)
         require(match is not None, 'Missing selected map')

@@ -8,13 +8,13 @@
 #include <type_traits>
 
 namespace spin {
-// Stable identifiers for supplied maps, not arbitrary (t,s) synthesis.
-// Value 4 identified the retired BCH packet construction; it is not reused.
-enum class Parameters : std::uint32_t { T128S19=1, T64S12=2, T64S12R2=3, PacketRsT64S20=5, PacketRsT64S15K16=6, PacketRsT64S22=7, PacketRs8T64=8 };
-// Portable runs on any 64-bit CPU. For Turbo (PacketRs8T64) it is an
-// optimized plain-C++ kernel and Reference selects the literal oracle; for the
-// other packet families both select the oracle. Neon (AArch64) and Avx2Gfni
-// (x86-64 AVX2 with GFNI) are Turbo only.
+// Stable identifier of the supplied map; it is part of the descriptor.
+// SPIN 0.4 supports only Turbo SPIN (PacketRs8T64). Values 1-7 identified
+// retired families (BCH-IMT, earlier packet profiles) and are not reused.
+enum class Parameters : std::uint32_t { PacketRs8T64=8 };
+// Portable is an optimized plain-C++ kernel for any 64-bit CPU; Reference is
+// the literal oracle. Avx2 and Avx2Gfni need x86-64 AVX2 (and GFNI); Avx512
+// needs AVX-512 F/VL/BW/DQ with VBMI and GFNI; Neon is AArch64.
 enum class Backend { Automatic, Avx2, Avx512, Portable, Reference, Neon, Avx2Gfni };
 enum class Width : unsigned { Bits128=16, Bits256=32, Bits512=64 };
 enum class MemoryPolicy { Normal, PreferHugePages, Automatic };
@@ -24,39 +24,28 @@ enum class MemoryPolicy { Normal, PreferHugePages, Automatic };
 enum class OutputStores { Streaming, Cached };
 struct CodeSpec {
     std::size_t message_size;
-    Parameters parameters=Parameters::T128S19;
-    // For PacketRsT64S20, route_seed also generates the GF(2^32) outer maps;
-    // inner_seed generates GL20 updates. Equal seeds reproduce PacketCode(seed).
-    // PacketRsT64S15K16 uses the frozen K16 small-outer/paired-s15 map.
-    // It accepts exactly K=65536 and has its own stable descriptor identifier.
-    // PacketRsT64S22 uses the small GF(2^16)-randomized outer and exact s22
-    // inner. route_seed selects routing and outer maps; inner_seed selects
-    // GL22 updates. It accepts natural sizes returned by valid_message_size;
-    // accepting a size does not imply a distance certificate for that size.
-    // PacketRs8T64 uses eight RS[8,4] rows over GF(16), GF(2^32) column maps,
-    // and the exact s22 inner at every size. Natural sizes are positive
-    // multiples of 128; only explicitly documented sizes have certificates.
+    Parameters parameters=Parameters::PacketRs8T64;
+    // Turbo SPIN: eight RS[8,4] rows over GF(16), GF(2^32) column maps, and
+    // the exact s22 inner at every size. route_seed selects routing and the
+    // outer column maps; inner_seed selects GL22 updates. Natural sizes are
+    // positive multiples of 128 (see valid_message_size); only explicitly
+    // documented sizes have distance certificates.
     std::uint64_t route_seed=1;
     std::uint64_t inner_seed=2;
 };
 struct ExecutionOptions {
     Backend backend=Backend::Automatic;
-    // 0 selects the family default: 256 for IMT, 8 for PacketRsT64S20,
-    // 4 for PacketRsT64S15K16 and PacketRsT64S22.
-    // PacketRsT64S20 accepts only 0 or 8; its eight-row geometry is fixed.
-    // PacketRsT64S15K16 and PacketRsT64S22 accept only 0 or 4.
-    // PacketRs8T64 accepts only 0 or 8 (its RS row count).
+    // Only 0 or 8 (the RS row count); the geometry is fixed.
     unsigned tile_rows=0;
 };
-// CPU support of the BCH/IMT kernels. Packet profiles (including Turbo,
-// PacketRs8T64) encode every width on any CPU: query Code::supports_forward.
-struct Capabilities { bool avx2, avx512_bch, forward256, forward512; };
+// Optimized Turbo kernels this CPU (and build) can run. Every width encodes
+// on any 64-bit CPU through the portable kernel.
+struct Capabilities { bool avx2, avx2gfni, avx512; };
 Capabilities capabilities() noexcept;
 std::size_t message_alignment(Parameters);
 bool valid_message_size(Parameters, std::size_t) noexcept;
 
 namespace detail { struct Plan; struct Scratch; struct BufferAllocation; }
-class GenericTranspose;
 class Code;
 
 // Optional zero-initialized owned storage, independent of the selected family.
@@ -112,21 +101,17 @@ public:
     std::array<std::byte,40> descriptor() const noexcept;
     bool supports_forward(Width=Width::Bits128) const noexcept;
     bool supports_transpose(Width=Width::Bits128) const noexcept;
-    bool supports_generic_transpose() const noexcept;
     Workspace make_workspace(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // Optional storage for exactly code_size() records at the selected width.
     Buffer make_buffer(Width=Width::Bits128,MemoryPolicy=MemoryPolicy::Automatic) const;
     // Rebind compatible 128-bit or packet scratch without clearing or allocating; otherwise
     // recreate it at the same width (128 bits if moved-from). No concurrent use.
     void prepare_workspace(Workspace&) const;
-    GenericTranspose generic_transpose() const;
 
     // Byte views are the zero-copy foreign-buffer interface. Records are 16/32/64
     // bytes according to the workspace; buffers require 16-byte alignment.
     // Exact sizes only, no overlap. Wider records apply the same map lane-wise.
-    // Packet profiles support all forward widths and 128-bit transpose.
-    // PacketRsT64S22 forward encoding uses the scalar fallback for every width.
-    // PacketRs8T64 has optimized AVX-512 forward at every width and 128-bit transpose.
+    // Forward supports every width; transpose is 128-bit only.
     // Streaming is the default for large outputs. Use Cached when the next stage
     // immediately reuses a cache-resident result. Alignment is checked separately:
     // streaming stores use the backend's required alignment, otherwise cached stores.
@@ -156,10 +141,6 @@ public:
         if(buffer.size()!=code_size())throw std::invalid_argument("SPIN inplace element count mismatch");
         transpose_inplace_bytes(std::as_writable_bytes(buffer), w);
     }
-    // One bit-packed binary message: word bit j is coordinate 64*i+j.
-    // Caller scratch is exactly code_size()/64 words. All three ranges disjoint.
-    void forward_bits(std::span<const std::uint64_t>, std::span<std::uint64_t>,
-                      std::span<std::uint64_t> scratch) const;
 private:
     std::shared_ptr<const detail::Plan> plan_;
     template<class E> static void check_record(const Workspace& w) {

@@ -1,177 +1,76 @@
 #include <spin/Code.h>
-#include <spin/Generic.h>
 #include "Cpu.h"
 #include "MemoryPolicy.h"
-#include "kernels/Spin.h"
 #include "kernels/WorkspaceRouting.h"
-#include "packet/PacketForward.h"
-#include "paired15/Paired15.h"
-#include "certified22/Plan.h"
-#include "rs8/Rs8.h"
+#include "Turbo.h"
 #include <limits>
-#include <optional>
-#include <vector>
 
-#define WIDE_DECL(B) \
-extern "C" void* spin_internal_wide_workspace##B(const void*) noexcept; \
-extern "C" void spin_internal_wide_destroy##B(void*) noexcept; \
-extern "C" std::size_t spin_internal_wide_bytes##B(const void*) noexcept; \
-extern "C" int spin_internal_wide_encode##B(const void*,void*,const void*,std::size_t,void*,std::size_t,bool) noexcept;
-WIDE_DECL(256)
-#if SPIN_BCH_AVX512
-WIDE_DECL(512)
-#endif
-#undef WIDE_DECL
-
-namespace spin::detail::kernel {
-struct Access {
-    static const std::vector<u32>& route(const Spin& c) {return c.mRoute;}
-    static const std::vector<u32>& masks(const Spin& c) {return c.mFieldRows;}
-};
-}
 namespace spin::detail {
-static kernel::Configuration config(Parameters p) {
-    switch(p) {
-    case Parameters::T128S19:return kernel::Configuration::T128S19;
-    case Parameters::T64S12:return kernel::Configuration::T64S12;
-    case Parameters::T64S12R2:return kernel::Configuration::T64S12R2;
-    case Parameters::PacketRsT64S20:case Parameters::PacketRsT64S15K16:
-    case Parameters::PacketRsT64S22:case Parameters::PacketRs8T64:break;
-    }
-    throw std::invalid_argument("SPIN unknown parameter set");
-}
-static kernel::BchBackend backend(Backend b) {
-    switch(b) {
-    case Backend::Automatic:return kernel::BchBackend::Auto;
-    case Backend::Avx2:return kernel::BchBackend::Avx2;
-    case Backend::Avx512:return kernel::BchBackend::Avx512;
-    case Backend::Portable:break;
+Backend selectTurboBackend(Backend requested) {
+    switch(requested) {
+    case Backend::Automatic:
+        return cpu_packet512()?Backend::Avx512:cpu_avx2gfni()?Backend::Avx2Gfni:
+               cpu_avx2()?Backend::Avx2:SPIN_AARCH64?Backend::Neon:Backend::Portable;
+    case Backend::Portable:case Backend::Reference:return requested;
+    case Backend::Avx2Gfni:
+        if(!cpu_avx2gfni()) throw std::runtime_error("SPIN Turbo AVX2+GFNI backend unavailable");
+        return requested;
+    case Backend::Neon:
+        if(!SPIN_AARCH64) throw std::runtime_error("SPIN Turbo NEON backend unavailable");
+        return requested;
+    case Backend::Avx512:
+        if(!cpu_packet512()) throw std::runtime_error("SPIN Turbo AVX512/VBMI/GFNI backend unavailable");
+        return requested;
+    case Backend::Avx2:
+        if(!cpu_avx2()) throw std::runtime_error("SPIN Turbo AVX2 backend unavailable");
+        return requested;
     }
     throw std::invalid_argument("SPIN unknown backend");
 }
+certified22::SetupPath turboSetupPath(Backend b) noexcept {
+    // An explicit AVX2 or Portable backend also uses that setup (bit-identical).
+    return (b==Backend::Avx2 || b==Backend::Avx2Gfni)?certified22::SetupPath::Avx2:
+        b==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic;
+}
+void turboTranspose(Backend b,const storage::block* input,storage::block* output,
+                    storage::block* work,const rs8::Plan& plan) {
+#if SPIN_AVX512
+    if(b==Backend::Avx512) { rs8::transposeFast(input,output,work,plan); return; }
+#endif
+#if SPIN_X86
+    if(b==Backend::Avx2Gfni) { rs8::transposeAvx2Gfni(input,output,work,plan); return; }
+    if(b==Backend::Avx2) { rs8::transposeAvx2(input,output,work,plan); return; }
+#endif
+#if SPIN_AARCH64
+    if(b==Backend::Neon) { rs8::transposeNeon(input,output,work,plan); return; }
+#endif
+    if(b==Backend::Reference) rs8::transposeScalar(input,output,work,plan);
+    else rs8::transposePortable(input,output,work,plan);
+}
 struct Plan {
     const CodeSpec spec;
-    Backend selected;
-    std::optional<kernel::Spin> code;
-    std::optional<packet::Plan> packets;
-    std::optional<packet::ForwardPlan> forward;
-    std::optional<paired15::Plan> paired;
-    std::optional<certified22::Plan> certified;
-    std::optional<rs8::Plan> rs8Code;
-    bool packetProfile() const noexcept { return packets || paired || certified || rs8Code; }
-    std::size_t packetScratchBlocks() const noexcept {
-        if(rs8Code)return rs8Code->scratchBlocks();
-        return certified?certified->scratchBlocks():paired?paired->scratchBlocks():packets?packets->scratchBlocks():0;
-    }
-    Plan(CodeSpec s,ExecutionOptions o):spec(s),selected(o.backend) {
-        if(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRsT64S15K16 ||
-           s.parameters==Parameters::PacketRsT64S22 || s.parameters==Parameters::PacketRs8T64) {
-            const auto rows=(s.parameters==Parameters::PacketRsT64S20 || s.parameters==Parameters::PacketRs8T64)?8u:4u;
-            if(o.tile_rows && o.tile_rows!=rows)
-                throw std::invalid_argument("SPIN packet tile geometry is fixed by its profile");
-            // Turbo (PacketRs8T64) also has AVX2, NEON and portable kernels; the
-            // other packet profiles are AVX-512 or the Portable oracle only.
-            const bool turbo=s.parameters==Parameters::PacketRs8T64;
-            switch(o.backend) {
-            case Backend::Automatic:
-                selected=cpu_packet512()?Backend::Avx512:
-                         (turbo && cpu_avx2gfni())?Backend::Avx2Gfni:
-                         (turbo && capabilities().avx2)?Backend::Avx2:
-                         (turbo && SPIN_AARCH64)?Backend::Neon:Backend::Portable;
-                break;
-            case Backend::Avx2Gfni:
-                if(!turbo)
-                    throw std::invalid_argument("SPIN packet has no AVX2+GFNI backend; select Portable or Automatic");
-                if(!cpu_avx2gfni()) throw std::runtime_error("SPIN Turbo AVX2+GFNI backend unavailable");
-                break;
-            case Backend::Neon:
-                if(!turbo)
-                    throw std::invalid_argument("SPIN packet has no NEON backend; select Portable or Automatic");
-                if(!SPIN_AARCH64) throw std::runtime_error("SPIN Turbo NEON backend unavailable");
-                break;
-            case Backend::Portable:break;
-            // The literal oracle; for the other packet families it is Portable.
-            case Backend::Reference:if(!turbo) selected=Backend::Portable;break;
-            case Backend::Avx512:
-                if(!cpu_packet512())
-                    throw std::runtime_error("SPIN packet AVX512/VBMI/GFNI backend unavailable");
-                break;
-            case Backend::Avx2:
-                if(!turbo)
-                    throw std::invalid_argument("SPIN packet has no AVX2 backend; select Portable or Automatic");
-                if(!capabilities().avx2) throw std::runtime_error("SPIN Turbo AVX2 backend unavailable");
-                break;
-            default:throw std::invalid_argument("SPIN unknown backend");
-            }
-            if(s.parameters==Parameters::PacketRs8T64)
-                // An explicit AVX2 or Portable backend also uses that setup (bit-identical).
-                rs8Code.emplace(s.message_size,s.route_seed,s.inner_seed,
-                    (selected==Backend::Avx2 || selected==Backend::Avx2Gfni)?certified22::SetupPath::Avx2:
-                    selected==Backend::Portable?certified22::SetupPath::Portable:certified22::SetupPath::Automatic);
-            else if(s.parameters==Parameters::PacketRsT64S22)
-                certified.emplace(s.message_size,s.route_seed,s.inner_seed);
-            else if(s.parameters==Parameters::PacketRsT64S15K16)
-                paired.emplace(s.message_size,s.route_seed,s.inner_seed);
-            else {
-                packets.emplace(s.message_size,s.route_seed,s.inner_seed);
-                if(selected==Backend::Avx512)forward.emplace(*packets);
-            }
-        } else {
-            if(o.backend==Backend::Portable || o.backend==Backend::Reference)
-                throw std::invalid_argument("SPIN Portable backend is available only for packet profiles");
-            if(!capabilities().avx2) throw std::runtime_error("SPIN requires AVX2 with OS support");
-            code.emplace(config(s.parameters),kernel::MessageLength{s.message_size},
-                s.route_seed,s.inner_seed,o.tile_rows?o.tile_rows:256,backend(o.backend),true);
-            code->compact();
-            selected=code->bchBackend()==kernel::BchBackend::Avx512?Backend::Avx512:Backend::Avx2;
-        }
-    }
+    const Backend selected;
+    const rs8::Plan turbo;
+    Plan(CodeSpec s,ExecutionOptions o)
+        :spec(s),selected(selectTurboBackend(o.backend)),
+         turbo(s.message_size,s.route_seed,s.inner_seed,turboSetupPath(selected)) {}
+    std::size_t scratchBlocks() const noexcept { return turbo.scratchBlocks(); }
 };
 struct Scratch {
     std::shared_ptr<const Plan> plan;
     Width width;
     MemoryPolicy policy;
-    std::unique_ptr<kernel::Spin::Workspace> single;
-    std::optional<Buffer> packetScratch;
-    void* wide=nullptr;
+    Buffer buffer;
     Scratch(std::shared_ptr<const Plan> p,Width w,MemoryPolicy memory)
-        :plan(std::move(p)),width(w),policy(memory) {
-        (void)resolveMemoryPolicy(0,memory);
-        if(plan->packetProfile()) {
-            packetScratch.emplace(plan->packetScratchBlocks()*static_cast<unsigned>(w),memory);
-            // The allocation is owned here, so all advised whole pages belong
-            // to this workspace. Foreign input/output buffers are never advised.
-            // PreferHugePages already advises its owned allocation in Buffer.
-            if(resolveMemoryPolicy(packetScratch->bytes().size(),memory)==MemoryPolicy::Normal)
-                kernel::workspace_routing::adviseOwned(packetScratch->bytes().data(),
-                                                       packetScratch->allocation_bytes());
-        } else if(w==Width::Bits128)
-            single=std::make_unique<kernel::Spin::Workspace>(*plan->code);
-        else {
-            if(w==Width::Bits256) wide=spin_internal_wide_workspace256(&*plan->code);
-#if SPIN_BCH_AVX512
-            else wide=spin_internal_wide_workspace512(&*plan->code);
-#endif
-            if(!wide) throw std::bad_alloc();
-        }
+        :plan(std::move(p)),width(w),policy(memory),
+         buffer(plan->scratchBlocks()*static_cast<unsigned>(w),memory) {
+        // The allocation is owned here, so all advised whole pages belong
+        // to this workspace. Foreign input/output buffers are never advised.
+        // PreferHugePages already advises its owned allocation in Buffer.
+        if(resolveMemoryPolicy(buffer.bytes().size(),memory)==MemoryPolicy::Normal)
+            kernel::workspace_routing::adviseOwned(buffer.bytes().data(),buffer.allocation_bytes());
     }
-    ~Scratch() {
-        if(!wide) return;
-        if(width==Width::Bits256) spin_internal_wide_destroy256(wide);
-#if SPIN_BCH_AVX512
-        else spin_internal_wide_destroy512(wide);
-#endif
-    }
-    std::size_t bytes() const noexcept {
-        if(packetScratch) return packetScratch->allocation_bytes();
-        if(single) return single->bytes();
-        if(width==Width::Bits256) return spin_internal_wide_bytes256(wide);
-#if SPIN_BCH_AVX512
-        return spin_internal_wide_bytes512(wide);
-#else
-        return 0;
-#endif
-    }
+    storage::block* work() noexcept { return reinterpret_cast<storage::block*>(buffer.bytes().data()); }
 };
 static void aligned(const void* p) {
     if(!p || reinterpret_cast<std::uintptr_t>(p)%16)
@@ -185,104 +84,27 @@ static const Plan& checkedPlan(const std::shared_ptr<const Plan>& plan) {
     if(!plan) throw std::invalid_argument("SPIN moved-from code");
     return *plan;
 }
-static void transposePacket(const Plan& plan,const storage::block* input,
-                            storage::block* output,Scratch& scratch) {
-    auto* work=reinterpret_cast<storage::block*>(scratch.packetScratch->bytes().data());
-    if(plan.rs8Code) {
-#if SPIN_BCH_AVX512
-        if(plan.selected==Backend::Avx512) {
-            rs8::transposeFast(input,output,work,*plan.rs8Code);
-            return;
-        }
-#endif
-#if SPIN_X86
-        if(plan.selected==Backend::Avx2Gfni) {
-            rs8::transposeAvx2Gfni(input,output,work,*plan.rs8Code);
-            return;
-        }
-        if(plan.selected==Backend::Avx2) {
-            rs8::transposeAvx2(input,output,work,*plan.rs8Code);
-            return;
-        }
-#endif
-#if SPIN_AARCH64
-        if(plan.selected==Backend::Neon) {
-            rs8::transposeNeon(input,output,work,*plan.rs8Code);
-            return;
-        }
-#endif
-        if(plan.selected==Backend::Reference) rs8::transposeScalar(input,output,work,*plan.rs8Code);
-        else rs8::transposePortable(input,output,work,*plan.rs8Code);
-        return;
-    }
-    if(plan.certified) {
-#if SPIN_BCH_AVX512
-        if(plan.selected==Backend::Avx512) {
-            certified22::transposeFast(input,output,work,*plan.certified);
-            return;
-        }
-#endif
-        certified22::transposeScalar(input,output,work,*plan.certified);
-        return;
-    }
-    if(plan.paired) {
-#if SPIN_BCH_AVX512
-        if(plan.selected==Backend::Avx512) {
-            paired15::transposeFast(input,output,work,*plan.paired);
-            return;
-        }
-#endif
-        paired15::transposeScalar(input,output,work,*plan.paired);
-        return;
-    }
-    const auto& prepared=*plan.packets;
-#if SPIN_BCH_AVX512
-    if(plan.selected==Backend::Avx512) {
-        packet::transposeFast(input,output,work,prepared);
-        return;
-    }
-#endif
-    packet::transposeScalar(input,output,work,prepared);
-}
 }
 namespace spin {
 std::size_t message_alignment(Parameters p) {
-    switch(p) {
-    case Parameters::T128S19:return 16384;
-    case Parameters::T64S12:case Parameters::T64S12R2:return 8192;
-    case Parameters::PacketRsT64S20:return 256;
-    case Parameters::PacketRsT64S15K16:return 65536;
-    case Parameters::PacketRsT64S22:case Parameters::PacketRs8T64:return 128;
-    }
+    if(p==Parameters::PacketRs8T64) return 128;
     throw std::invalid_argument("SPIN unknown parameter set");
 }
 bool valid_message_size(Parameters p,std::size_t k) noexcept {
-    if(p==Parameters::PacketRsT64S20) return detail::packet::validMessageSize(k);
-    if(p==Parameters::PacketRsT64S15K16) return k==65536;
-    if(p==Parameters::PacketRsT64S22) return detail::certified22::validMessageSize(k);
-    if(p==Parameters::PacketRs8T64) return detail::rs8::validMessageSize(k);
-    const auto unit=p==Parameters::T128S19?16384u:
-        (p==Parameters::T64S12 || p==Parameters::T64S12R2)?8192u:0u;
-    return unit && k && k<=std::numeric_limits<std::uint32_t>::max()/2 && k%unit==0;
+    return p==Parameters::PacketRs8T64 && detail::rs8::validMessageSize(k);
 }
 Code::Code(CodeSpec s,ExecutionOptions o) {
     if(!valid_message_size(s.parameters,s.message_size))
         throw std::invalid_argument("SPIN invalid parameter set or message length");
+    if(o.tile_rows && o.tile_rows!=8)
+        throw std::invalid_argument("SPIN Turbo tile geometry is fixed (8 rows)");
     plan_=std::make_shared<detail::Plan>(s,o);
 }
 std::size_t Code::message_size() const noexcept {return plan_?plan_->spec.message_size:0;}
 std::size_t Code::code_size() const noexcept {return 2*message_size();}
 CodeSpec Code::specification() const noexcept {return plan_?plan_->spec:CodeSpec{0};}
-Backend Code::backend() const noexcept {
-    return plan_?plan_->selected:Backend::Automatic;
-}
-std::size_t Code::setup_bytes() const noexcept {
-    if(!plan_) return 0;
-    if(plan_->rs8Code)return plan_->rs8Code->setupBytes();
-    if(plan_->certified)return plan_->certified->setupBytes();
-    if(plan_->paired)return plan_->paired->setupBytes();
-    return plan_->packets?plan_->packets->setupBytes()+(plan_->forward?plan_->forward->setupBytes():0):plan_->code->setupBytes();
-}
+Backend Code::backend() const noexcept {return plan_?plan_->selected:Backend::Automatic;}
+std::size_t Code::setup_bytes() const noexcept {return plan_?plan_->turbo.setupBytes():0;}
 std::array<std::byte,40> Code::descriptor() const noexcept {
     std::array<std::byte,40> out{};
     if(!plan_) return out;
@@ -296,29 +118,21 @@ std::array<std::byte,40> Code::descriptor() const noexcept {
     return out;
 }
 bool Code::supports_forward(Width width) const noexcept {
-    if(!plan_) return false;
-    if(plan_->packetProfile())return width==Width::Bits128 || width==Width::Bits256 || width==Width::Bits512;
-    if(width==Width::Bits128) return true;
-    if(plan_->spec.parameters==Parameters::T64S12) return false;
-    return width==Width::Bits256?capabilities().forward256:
-        width==Width::Bits512?capabilities().forward512:false;
+    return plan_ && (width==Width::Bits128 || width==Width::Bits256 || width==Width::Bits512);
 }
 bool Code::supports_transpose(Width width) const noexcept {
     return plan_ && width==Width::Bits128;
 }
-bool Code::supports_generic_transpose() const noexcept {
-    return plan_ && !plan_->packetProfile();
-}
 Workspace Code::make_workspace(Width width,MemoryPolicy policy) const {
     detail::checkedPlan(plan_);
-    if(!supports_forward(width) && !supports_transpose(width))
-        throw std::invalid_argument("SPIN unsupported record width, map, or CPU");
+    if(!supports_forward(width))
+        throw std::invalid_argument("SPIN unsupported record width");
     return Workspace(plan_,width,policy);
 }
 Buffer Code::make_buffer(Width width,MemoryPolicy policy) const {
     detail::checkedPlan(plan_);
-    if(!supports_forward(width) && !supports_transpose(width))
-        throw std::invalid_argument("SPIN unsupported record width, map, or CPU");
+    if(!supports_forward(width))
+        throw std::invalid_argument("SPIN unsupported record width");
     const auto element=static_cast<unsigned>(width);
     if(code_size()>std::numeric_limits<std::size_t>::max()/element)
         throw std::length_error("SPIN buffer size overflow");
@@ -327,15 +141,8 @@ Buffer Code::make_buffer(Width width,MemoryPolicy policy) const {
 void Code::prepare_workspace(Workspace& w) const {
     detail::checkedPlan(plan_);
     if(w.scratch_ && w.scratch_->plan==plan_)return;
-    if(w.scratch_ && supports_forward(w.scratch_->width) && plan_->packetProfile() &&
-       w.scratch_->packetScratch &&
-       w.scratch_->packetScratch->bytes().size()==plan_->packetScratchBlocks()*static_cast<unsigned>(w.scratch_->width)) {
-        w.scratch_->plan=plan_;
-        return;
-    }
-    if(w.scratch_ && w.scratch_->width==Width::Bits128 && plan_->code && w.scratch_->single &&
-       w.scratch_->single->buckets.size()==code_size() &&
-       w.scratch_->single->tile.size()==plan_->code->tileBlocks()) {
+    if(w.scratch_ &&
+       w.scratch_->buffer.bytes().size()==plan_->scratchBlocks()*static_cast<unsigned>(w.scratch_->width)) {
         w.scratch_->plan=plan_;
         return;
     }
@@ -348,7 +155,7 @@ Workspace::Workspace(std::shared_ptr<const detail::Plan> p,Width w,MemoryPolicy 
 Workspace::~Workspace()=default;
 Workspace::Workspace(Workspace&&) noexcept=default;
 Workspace& Workspace::operator=(Workspace&&) noexcept=default;
-std::size_t Workspace::bytes() const noexcept {return scratch_?scratch_->bytes():0;}
+std::size_t Workspace::bytes() const noexcept {return scratch_?scratch_->buffer.allocation_bytes():0;}
 Width Workspace::width() const noexcept {return scratch_?scratch_->width:Width::Bits128;}
 detail::Scratch& Code::check_workspace(Workspace& w) const {
     detail::checkedPlan(plan_);
@@ -362,94 +169,31 @@ void Code::forward_bytes(std::span<const std::byte> in,std::span<std::byte> out,
     if(stores!=OutputStores::Streaming && stores!=OutputStores::Cached)
         throw std::invalid_argument("SPIN unknown forward output store policy");
     const bool stream=stores==OutputStores::Streaming;
-    if(!supports_forward(scratch.width))
-        throw std::invalid_argument("SPIN selected family does not support forward encoding at this width");
     const auto width=static_cast<unsigned>(scratch.width);
     if(in.size()!=message_size()*width || out.size()!=code_size()*width)
         throw std::invalid_argument("SPIN forward buffer size mismatch");
     detail::aligned(in.data());detail::aligned(out.data());
     if(detail::overlap(in.data(),in.size(),out.data(),out.size()))
         throw std::invalid_argument("SPIN forward buffers overlap");
-    if(plan_->rs8Code) {
-        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
-        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
-#if SPIN_BCH_AVX512
-        if(plan_->selected==Backend::Avx512) {
-            detail::rs8::forwardFast(input,output,work,*plan_->rs8Code,width/16,stream);
-            return;
-        }
+    const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
+    auto* output=reinterpret_cast<detail::storage::block*>(out.data());
+    auto* work=scratch.work();
+    const auto& turbo=plan_->turbo;
+    const unsigned lanes=width/16;
+    switch(plan_->selected) {
+#if SPIN_AVX512
+    case Backend::Avx512:detail::rs8::forwardFast(input,output,work,turbo,lanes,stream);return;
 #endif
 #if SPIN_X86
-        if(plan_->selected==Backend::Avx2Gfni) {
-            detail::rs8::forwardAvx2Gfni(input,output,work,*plan_->rs8Code,width/16,stream);
-            return;
-        }
-        if(plan_->selected==Backend::Avx2) {
-            detail::rs8::forwardAvx2(input,output,work,*plan_->rs8Code,width/16,stream);
-            return;
-        }
+    case Backend::Avx2Gfni:detail::rs8::forwardAvx2Gfni(input,output,work,turbo,lanes,stream);return;
+    case Backend::Avx2:detail::rs8::forwardAvx2(input,output,work,turbo,lanes,stream);return;
 #endif
 #if SPIN_AARCH64
-        if(plan_->selected==Backend::Neon) {
-            detail::rs8::forwardNeon(input,output,work,*plan_->rs8Code,width/16);
-            return;
-        }
+    case Backend::Neon:detail::rs8::forwardNeon(input,output,work,turbo,lanes);return;
 #endif
-        if(plan_->selected==Backend::Reference) detail::rs8::forwardScalar(input,output,work,*plan_->rs8Code,width/16);
-        else detail::rs8::forwardPortable(input,output,work,*plan_->rs8Code,width/16);
-        return;
+    case Backend::Reference:detail::rs8::forwardScalar(input,output,work,turbo,lanes);return;
+    default:detail::rs8::forwardPortable(input,output,work,turbo,lanes);return;
     }
-    if(plan_->certified) {
-        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
-        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
-        detail::certified22::forwardScalar(input,output,work,*plan_->certified,width/16);
-        return;
-    }
-    if(plan_->paired) {
-        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
-        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
-#if SPIN_BCH_AVX512
-        if(plan_->selected==Backend::Avx512) {
-            detail::paired15::forwardFast(input,output,work,*plan_->paired,width/16,stream);
-            return;
-        }
-#endif
-        detail::paired15::forwardScalar(input,output,work,*plan_->paired,width/16);
-        return;
-    }
-    if(plan_->packets) {
-        const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
-        auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-        auto* work=reinterpret_cast<detail::storage::block*>(scratch.packetScratch->bytes().data());
-#if SPIN_BCH_AVX512
-        if(plan_->selected==Backend::Avx512) {
-            if(width==16)detail::packet::forwardSelected(input,output,work,*plan_->packets,*plan_->forward,stream);
-            else {
-                detail::packet::forwardOuterWide(input,work,*plan_->packets,*plan_->forward,unsigned(width/16));
-                detail::packet::forwardInnerWide(work,output,*plan_->packets,*plan_->forward,unsigned(width/16),stream);
-            }
-            return;
-        }
-#endif
-        if(width==16)detail::packet::forwardScalar(input,output,work,*plan_->packets);
-        else detail::packet::forwardScalarWide(input,output,work,*plan_->packets,unsigned(width/16));
-        return;
-    }
-    if(width==16) {
-        plan_->code->forwardUnchecked(reinterpret_cast<const detail::storage::block*>(in.data()),
-            reinterpret_cast<detail::storage::block*>(out.data()),*scratch.single,
-            detail::kernel::Layout::Auto,stream);
-        return;
-    }
-    int error=1;
-    if(width==32) error=spin_internal_wide_encode256(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16,stream);
-#if SPIN_BCH_AVX512
-    else error=spin_internal_wide_encode512(&*plan_->code,scratch.wide,in.data(),in.size()/16,out.data(),out.size()/16,stream);
-#endif
-    if(error) throw std::runtime_error("SPIN wide kernel rejected validated buffers");
 }
 void Code::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> out,Workspace& w) const {
     auto& scratch=check_workspace(w);
@@ -458,10 +202,8 @@ void Code::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> ou
     detail::aligned(in.data());detail::aligned(out.data());
     if(detail::overlap(in.data(),in.size(),out.data(),out.size()))
         throw std::invalid_argument("SPIN transpose buffers overlap; use transpose_inplace");
-    const auto* input=reinterpret_cast<const detail::storage::block*>(in.data());
-    auto* output=reinterpret_cast<detail::storage::block*>(out.data());
-    if(plan_->packetProfile()) detail::transposePacket(*plan_,input,output,scratch);
-    else plan_->code->encodeUnchecked(input,output,*scratch.single);
+    detail::turboTranspose(plan_->selected,reinterpret_cast<const detail::storage::block*>(in.data()),
+        reinterpret_cast<detail::storage::block*>(out.data()),scratch.work(),plan_->turbo);
 }
 void Code::transpose_inplace_bytes(std::span<std::byte> buffer,Workspace& w) const {
     auto& scratch=check_workspace(w);
@@ -469,21 +211,6 @@ void Code::transpose_inplace_bytes(std::span<std::byte> buffer,Workspace& w) con
         throw std::invalid_argument("SPIN in-place transpose requires 2K 128-bit records");
     detail::aligned(buffer.data());
     auto* p=reinterpret_cast<detail::storage::block*>(buffer.data());
-    if(plan_->packetProfile()) detail::transposePacket(*plan_,p,p,scratch);
-    else plan_->code->encodeUnchecked(p,p,*scratch.single);
-}
-void Code::forward_bits(std::span<const std::uint64_t> in,std::span<std::uint64_t> out,
-                        std::span<std::uint64_t> scratch) const {
-    detail::checkedPlan(plan_);
-    if(plan_->packetProfile())
-        throw std::invalid_argument("SPIN packet profiles do not support bit-packed forward encoding");
-    plan_->code->forwardBits(in.data(),in.size(),out.data(),out.size(),scratch.data(),scratch.size());
-}
-GenericTranspose Code::generic_transpose() const {
-    detail::checkedPlan(plan_);
-    if(!supports_generic_transpose())
-        throw std::invalid_argument("SPIN packet profiles do not support generic transpose");
-    return GenericTranspose(plan_->spec.parameters,message_size(),
-        detail::kernel::Access::route(*plan_->code),detail::kernel::Access::masks(*plan_->code));
+    detail::turboTranspose(plan_->selected,p,p,scratch.work(),plan_->turbo);
 }
 }

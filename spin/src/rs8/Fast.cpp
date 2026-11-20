@@ -145,10 +145,7 @@ void outerCached(const Block* in,Block* out,const Plan& plan) {
 }
 
 void transposeFast(const Block* input,Block* output,Block* scratch,const Plan& plan) {
-    if(plan.paired15Plan)
-        paired15::reverseRouteFast(input,scratch,*plan.paired15Plan);
-    else
-        certified22::reverseRouteFast(input,scratch,*plan.certified22Plan);
+    certified22::reverseRouteFast(input,scratch,*plan.certified22Plan);
     outerFast(scratch,output,plan);
 }
 

@@ -1,9 +1,9 @@
-# RS8 packet profile
+# Turbo SPIN (RS8 packet code)
 
-`Parameters::PacketRs8T64` selects a precomputed half-rate binary code, with
-stable descriptor identifier 8. It is optimized for transposed encoding of
-128-bit records. The public interface is `Code`, `Workspace`, and the full
-mode of `PreparedEncoder`.
+`Parameters::PacketRs8T64` (Turbo SPIN) is the library's only code: a
+precomputed half-rate binary code with stable descriptor identifier 8. It is
+optimized for transposed encoding of 128-bit records. The public interface is
+`Code`, `Workspace`, and `PreparedEncoder`.
 
 ```cpp
 spin::Code code({.message_size=1u<<18,
@@ -20,8 +20,7 @@ first K records and preserves the remaining K. Separate-buffer transpose is
 also supported. Forward encoding supports 128/256/512-bit records.
 `PreparedEncoder` supports `Full` and `BankedHeuristic` setup; banked setup
 reuses one exact plan under a structured, correlated refresh that the
-certificate does not cover. Generic XOR records and bit-packed forward
-encoding are not supported by this profile.
+certificate does not cover.
 
 ## Construction and sizing
 
@@ -61,10 +60,10 @@ path produces bit-identical tables (`spin_turbo_setup_test`), and
 (CTests `spin_rs8_avx2`, `spin_rs8_gfni`, `spin_rs8_portable`,
 `spin_rs8_neon`; each skips where its ISA is absent).
 
-The library builds on any 64-bit target. Off x86-64 the packet families
-(including Turbo) use their portable code, Turbo uses NEON on AArch64, and the
-BCH/IMT families report themselves unavailable. AArch64 is checked by
-cross-compiling and running the packet tests under QEMU.
+The library builds on any 64-bit target. Off x86-64 it uses NEON on AArch64
+and the portable kernel elsewhere. AArch64 is checked by cross-compiling and
+running the tests under QEMU; `tools/arm_check.sh` builds, tests and times the
+NEON and portable tiers on a native AArch64 machine.
 
 The AVX2 kernels keep the AVX-512 circuit: the s22 step is the same XOR
 network in the fast basis, the per-epoch GL22 update uses four-Russians
@@ -73,10 +72,9 @@ obtained by an 8x8 register bit transpose, with GF(256) and nibble maps as
 pshufb lookups instead of GFNI products. `Avx2Gfni` restores the GFNI
 products and does the GL22 update as nine 8x8 affine blocks on byte planes.
 
-Consumers that gate wide forward encoding should ask the code
-(`Code::supports_forward(Width::Bits256)`), not `capabilities()`: the latter
-describes the CPU's BCH/IMT kernels, while Turbo supports 128/256/512-bit
-forward encoding on every backend, including `Portable` and `Neon`.
+Every backend supports 128/256/512-bit forward encoding, including
+`Portable` and `Neon`. `capabilities()` reports which optimized x86 kernels
+(`avx2`, `avx2gfni`, `avx512`) this CPU and build can run.
 
 Peach (Ryzen 7950X, core 15, GCC 15.2, `SPIN_TUNE=generic`), 2026-11-12,
 medians, AVX2 / AVX-512 on the same machine (`spin_turbo_backends_bench`,
@@ -120,9 +118,8 @@ Every margin is a Lean theorem (`Spin.Turbo.G{e}Final.g{e}_endpoint` in
 `research/lean`; regeneration inputs in `research/lean/ladder_plans/`), using
 only Lean's standard axioms.
 
-Earlier profiles remain available with their original identifiers and seeded
-maps. In particular, RS8 does not inherit the larger margin of the RS16 s22
-profile: its separate certificate accounts for the changed outer.
+These margins are Turbo's own: they account for the RS8 outer and do not
+inherit the larger margin of the retired RS16 s22 profile.
 
 ## Validation
 
@@ -152,37 +149,10 @@ The small aggregate differences show no material promotion regression.
 
 `spin_rs8_test` exercises public API behavior, portable/optimized agreement,
 natural-size boundaries, forward adjoints at all widths, in-place suffix
-preservation, workspace reuse, and full prepared encoding.
-`SPIN_BUILD_RESEARCH_ORACLE_TESTS=ON` adds byte-for-byte comparisons with the
-frozen RS8 research implementation. `SPIN_BUILD_BENCHMARKS=ON` builds the
-public API timing driver. Neither option is needed by consumers.
+preservation, workspace reuse, and both prepared modes.
+`SPIN_BUILD_BENCHMARKS=ON` builds the timing drivers; consumers need neither.
 
-Promotion validation passed all 12 Linux Release CTests and all nine Windows
-Release CTests. Installed-package consumers passed on Linux and Windows.
-The RS8 API suite also passed with AVX-512 disabled. A full-library Linux
-AddressSanitizer/UndefinedBehaviorSanitizer rebuild passed both RS8 test targets,
-including the optional frozen oracle. Fixed forward/transpose known answers
-are checked in ordinary builds. All eight K18 certificate tests and four
-retained K16 certificate tests passed. Independent source review found no blocker.
-
-The optional comparison driver is built with both switches enabled:
-
-```sh
-cmake -S spin -B build-rs8 -DCMAKE_BUILD_TYPE=Release -DSPIN_TUNE=znver4 \
-  -DSPIN_BUILD_TESTS=ON -DSPIN_BUILD_RESEARCH_ORACLE_TESTS=ON \
-  -DSPIN_BUILD_BENCHMARKS=ON
-cmake --build build-rs8 -j2
-ctest --test-dir build-rs8 --output-on-failure -j1
-# Run these sequentially under the same affinity and with no competing benchmark.
-taskset -c 15 build-rs8/spin_rs8_bench public 262144 113 1001
-taskset -c 15 build-rs8/spin_rs8_bench frozen 262144 113 1001
-```
-
-Local raw evidence remains ignored under `tmp/`. The measured source archive
-`rs8-promote-v2.tar.gz` has SHA256
-`315f266fd11fbd108e9b843ecd9a174112b55d9594295333cde30281dca4bb33`.
-The timing log `rs8-promotion-holdout.txt` has SHA256
-`43ddb7606521e0b6d6214fbda1e1a5f407cbb6e5e203c81a9d1416e1826100a9`.
-The later test-only overlay `rs8-promote-tests-v3.tar.gz` adds fixed known
-answers without changing kernels; its SHA256 is
-`b228200e022233dc16390752f1f6898335b9263d4f4d63de868e4bd7fba943ac`.
+The 2026-10-03 promotion also compared the public path byte-for-byte with the
+frozen research implementation (an optional oracle test, removed in SPIN 0.4
+with the research experiments; see commit `584a7fb6`). The fixed
+forward/transpose known answers in `spin_rs8_test` carry that check forward.

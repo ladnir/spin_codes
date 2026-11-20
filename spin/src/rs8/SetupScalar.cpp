@@ -130,12 +130,12 @@ Plan::Plan(std::size_t size,std::uint64_t routeSeed,std::uint64_t innerSeed,cert
     groups=size/128;
     // The exact s22 inner at every size: it is the map the Lean development
     // certifies at K = 2^14..2^26 (paired-s15 was only numerically checked at K16).
-    certified22Plan.emplace(k,routeSeed,innerSeed,false,path);
+    certified22Plan.emplace(k,routeSeed,innerSeed,path);
     prepareOuter(*this,routeSeed);
 }
 
 std::size_t Plan::setupBytes() const noexcept {
-    const auto innerBytes=paired15Plan?paired15Plan->setupBytes():certified22Plan->setupBytes();
+    const auto innerBytes=certified22Plan->setupBytes();
     return innerBytes+field.capacity()*sizeof(field[0])
         +scalars.capacity()*sizeof(scalars[0])
         +adjoint.capacity()*sizeof(adjoint[0]);
@@ -195,18 +195,12 @@ void outerForwardScalar(const Block* message,Block* scratch,const Plan& plan,uns
 }
 
 void transposeScalar(const Block* input,Block* output,Block* scratch,const Plan& plan) {
-    if(plan.paired15Plan)
-        paired15::reverseRouteScalar(input,scratch,*plan.paired15Plan);
-    else
-        certified22::reverseRouteScalar(input,scratch,*plan.certified22Plan);
+    certified22::reverseRouteScalar(input,scratch,*plan.certified22Plan);
     outerScalar(scratch,output,plan);
 }
 
 void forwardScalar(const Block* input,Block* output,Block* scratch,const Plan& plan,unsigned lanes) {
     outerForwardScalar(input,scratch,plan,lanes);
-    if(plan.paired15Plan)
-        paired15::forwardInnerScalar(scratch,output,*plan.paired15Plan,lanes);
-    else
-        certified22::forwardInnerScalar(scratch,output,*plan.certified22Plan,lanes,plan.scratchBlocks());
+    certified22::forwardInnerScalar(scratch,output,*plan.certified22Plan,lanes,plan.scratchBlocks());
 }
 }
