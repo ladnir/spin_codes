@@ -70,6 +70,23 @@ confirms it: vaesenc, gf2p8affineqb and vpshufb mixes add up, they do not
 overlap. Peach runs one thread per core, so SMT co-scheduling was not
 available to test.
 
+### Ported into libOTe (2026-11-20)
+
+The direct hash and the GGM loop structure (YMM internal levels with register
+sums; leaf level with both keys interleaved) are now in libOTe
+(`SilentOtExtSender.cpp`, `RegularPprf.h`, sender and receiver). Fixed-seed
+output digests are identical to the old code at logN 13, 18 and 20, with
+regular and stationary noise; the Pprf, SilentOt and Spin tests pass.
+`frontend_libOTe -spinOtBench -logN 18 -regular -trials 101`, sender, Peach
+core 15, medians from two alternating runs each:
+
+| | expansion | compress | hash | total |
+|---|---:|---:|---:|---:|
+| old, streaming stores (`-nt`) | 0.774 | 0.464 | 0.411 | 1.651 ms |
+| new, streaming stores (`-nt`) | 0.560 | 0.470 | 0.343 | 1.373 ms |
+| old, cached stores | 0.780 | 0.549 | 0.820 | 2.152 ms |
+| new, cached stores | 0.565 | 0.572 | 0.346 | 1.483 ms |
+
 ### What this means for one core
 
 With no overlap, the single-core limit is the sum of the stage floors:
