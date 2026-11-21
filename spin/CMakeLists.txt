@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(spin VERSION 0.4.0 LANGUAGES CXX)
+project(spin VERSION 0.4.1 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 option(SPIN_ENABLE_AVX512 "Build runtime-dispatched AVX-512 kernels" ON)

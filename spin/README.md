@@ -145,7 +145,7 @@ language bindings. Sizes are in bytes and the workspace fixes the record width.
 ## Bit-vector transposed encoding
 
 A 128-bit record transpose is 128 independent copies of one binary map, one
-per bit lane. `transpose_bits` applies that map to a single bit per
+per bit lane. `transpose_bits` (since 0.4.1) applies that map to a single bit per
 position, for example a choice-bit vector, at a fraction of the record cost
 (one Ryzen 9 7950X core: 0.15 ms against 0.47 ms at K = 2^18, 0.62 ms
 against 2.90 ms at K = 2^20):
