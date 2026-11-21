@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 #include <limits>
+#include <mutex>
 #include <numeric>
 #include <optional>
 
@@ -73,9 +74,20 @@ struct TurboBank {
             if(oracle) l.reverseMatrices[e]=b.reverseMatrices[epochs[e]];
         }
         rs8::refreshOuterTranspose(live,routeSeed,scalars);
+        // Bit tables follow the live routes, updates and field (refresh is exclusive).
+        if(bitsBuilt) bits.build(live,turboBitsFast(kernel));
     }
+    // Built on the first bit workspace, then kept current by refresh.
+    const rs8::bits::Tables& bitTables() {
+        std::lock_guard<std::mutex> lock(bitMutex);
+        if(!bitsBuilt) { bits.build(live,turboBitsFast(kernel)); bitsBuilt=true; }
+        return bits;
+    }
+    rs8::bits::Tables bits;
+    bool bitsBuilt=false;
+    std::mutex bitMutex;
     std::size_t bytes() const noexcept {
-        return bank.setupBytes()+live.setupBytes()+epochs.capacity()*sizeof(epochs[0]);
+        return bank.setupBytes()+live.setupBytes()+epochs.capacity()*sizeof(epochs[0])+bits.bytes();
     }
 };
 struct PreparedState {
@@ -108,6 +120,15 @@ struct PreparedScratch {
             if(resolveMemoryPolicy(turbo->bytes().size(),policy)==MemoryPolicy::Normal)
                 kernel::workspace_routing::adviseOwned(turbo->bytes().data(),turbo->allocation_bytes());
         }
+    }
+};
+struct PreparedBitScratch {
+    std::shared_ptr<PreparedState> owner;
+    std::optional<spin::BitWorkspace> full;
+    std::optional<rs8::bits::Scratch> turbo;
+    explicit PreparedBitScratch(std::shared_ptr<PreparedState> s):owner(std::move(s)) {
+        if(owner->full)full.emplace(owner->full->make_bit_workspace());
+        else { (void)owner->turbo->bitTables(); turbo.emplace(owner->turbo->live); }
     }
 };
 static const PreparedState& checkedPreparedState(const std::shared_ptr<PreparedState>& state) {
@@ -213,6 +234,36 @@ void PreparedEncoder::transpose_bytes(std::span<const std::byte> in,std::span<st
     auto& s=*w.scratch_;
     if(state_->full){state_->full->prepare_workspace(*s.full);state_->full->transpose_bytes(in,out,*s.full);}
     else turboTranspose(*state_->turbo,in.data(),out.data(),s);
+}
+PreparedEncoder::BitWorkspace::BitWorkspace(std::shared_ptr<detail::PreparedState> s)
+    :scratch_(std::make_unique<detail::PreparedBitScratch>(std::move(s))) {}
+PreparedEncoder::BitWorkspace::~BitWorkspace()=default;
+PreparedEncoder::BitWorkspace::BitWorkspace(BitWorkspace&&) noexcept=default;
+PreparedEncoder::BitWorkspace& PreparedEncoder::BitWorkspace::operator=(BitWorkspace&&) noexcept=default;
+std::size_t PreparedEncoder::BitWorkspace::bytes() const noexcept {
+    if(!scratch_)return 0;
+    return scratch_->full?scratch_->full->bytes():scratch_->turbo->bytes();
+}
+PreparedEncoder::BitWorkspace PreparedEncoder::make_bit_workspace() const {
+    detail::checkedPreparedState(state_);
+    return BitWorkspace(state_);
+}
+void PreparedEncoder::transpose_bits(std::span<const std::uint64_t> in,std::span<std::uint64_t> out,BitWorkspace& w) const {
+    detail::checkedPreparedState(state_);
+    if(!w.scratch_ || w.scratch_->owner!=state_)
+        throw std::invalid_argument("SPIN prepared bit workspace mismatch");
+    auto& s=*w.scratch_;
+    if(state_->full) {
+        state_->full->prepare_bit_workspace(*s.full);
+        state_->full->transpose_bits(in,out,*s.full);
+        return;
+    }
+    if(in.size()!=code_size()/64 || out.size()!=message_size()/64 || !in.data() || !out.data())
+        throw std::invalid_argument("SPIN bit transpose requires 2K input bits and K output bits");
+    if(overlaps(in.data(),in.size()*8,out.data(),out.size()*8))
+        throw std::invalid_argument("SPIN bit transpose buffers overlap");
+    auto& t=*state_->turbo;
+    detail::turboTransposeBits(t.kernel,in.data(),out.data(),t.live,t.bits,*s.turbo);
 }
 void PreparedEncoder::transpose_inplace_bytes(std::span<std::byte> buf,Workspace& w) const {
     detail::checkedPreparedState(state_);

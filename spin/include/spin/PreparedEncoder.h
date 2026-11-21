@@ -11,7 +11,7 @@ struct SetupOptions {
     SetupMode mode=SetupMode::Full;
     std::uint64_t bank_seed=0x5350494e42414e4bULL;
 };
-namespace detail { struct PreparedState; struct PreparedScratch; }
+namespace detail { struct PreparedState; struct PreparedScratch; struct PreparedBitScratch; }
 
 // Mutable, move-only setup controller for transposed encoding. Code remains the
 // immutable forward/transpose API. Refresh requires exclusive access;
@@ -31,6 +31,20 @@ public:
         friend class PreparedEncoder;
         Workspace(std::shared_ptr<detail::PreparedState>,Width,MemoryPolicy);
         std::unique_ptr<detail::PreparedScratch> scratch_;
+    };
+    // Scratch for transpose_bits; see Code::transpose_bits.
+    class BitWorkspace {
+    public:
+        ~BitWorkspace();
+        BitWorkspace(BitWorkspace&&) noexcept;
+        BitWorkspace& operator=(BitWorkspace&&) noexcept;
+        BitWorkspace(const BitWorkspace&)=delete;
+        BitWorkspace& operator=(const BitWorkspace&)=delete;
+        std::size_t bytes() const noexcept;
+    private:
+        friend class PreparedEncoder;
+        explicit BitWorkspace(std::shared_ptr<detail::PreparedState>);
+        std::unique_ptr<detail::PreparedBitScratch> scratch_;
     };
     explicit PreparedEncoder(CodeSpec,SetupOptions={},ExecutionOptions={});
     ~PreparedEncoder();
@@ -58,6 +72,11 @@ public:
     // also prepares automatically for existing callers. Banked scratch is unchanged.
     void prepare_workspace(Workspace&) const;
     void transpose_bytes(std::span<const std::byte>,std::span<std::byte>,Workspace&) const;
+    // Bit-vector transpose of the current map (Code::transpose_bits contract).
+    // The first bit workspace builds the bit tables; with BankedHeuristic setup,
+    // setCodeSeed then refreshes them in place, O(K) without allocation.
+    BitWorkspace make_bit_workspace() const;
+    void transpose_bits(std::span<const std::uint64_t>,std::span<std::uint64_t>,BitWorkspace&) const;
     void transpose_inplace_bytes(std::span<std::byte>,Workspace&) const;
     template<class E> void transpose(std::span<const E> in,std::span<E> out,Workspace& w) const {
         static_assert(std::is_trivially_copyable_v<E> && sizeof(E)==16);

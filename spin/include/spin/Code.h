@@ -45,7 +45,7 @@ Capabilities capabilities() noexcept;
 std::size_t message_alignment(Parameters);
 bool valid_message_size(Parameters, std::size_t) noexcept;
 
-namespace detail { struct Plan; struct Scratch; struct BufferAllocation; }
+namespace detail { struct Plan; struct Scratch; struct BitScratch; struct BufferAllocation; }
 class Code;
 
 // Optional zero-initialized owned storage, independent of the selected family.
@@ -85,6 +85,23 @@ private:
     std::unique_ptr<detail::Scratch> scratch_;
 };
 
+// Move-only scratch for bit-vector transposed encoding (Code::transpose_bits).
+// Retains its plan. One workspace per concurrent call; no allocation occurs
+// during encoding.
+class BitWorkspace {
+public:
+    ~BitWorkspace();
+    BitWorkspace(BitWorkspace&&) noexcept;
+    BitWorkspace& operator=(BitWorkspace&&) noexcept;
+    BitWorkspace(const BitWorkspace&)=delete;
+    BitWorkspace& operator=(const BitWorkspace&)=delete;
+    std::size_t bytes() const noexcept;
+private:
+    friend class Code;
+    explicit BitWorkspace(std::shared_ptr<const detail::Plan>);
+    std::unique_ptr<detail::BitScratch> scratch_;
+};
+
 // Immutable shared setup. Copying a handle shares the plan, not its scratch.
 // Supplied half-rate codes: forward K -> 2K; transpose 2K -> K.
 class Code {
@@ -122,6 +139,18 @@ public:
     void transpose_bytes(std::span<const std::byte>, std::span<std::byte>, Workspace&) const;
     // Exactly 2K 128-bit records; overwrite the first K and preserve the suffix.
     void transpose_inplace_bytes(std::span<std::byte>, Workspace&) const;
+
+    // Bit-vector transposed encoding: the same map as transpose, on one bit per
+    // position. Bit i of a vector is bit i%64 of word i/64. Input is exactly
+    // code_size()/64 words (2K bits), output message_size()/64 words (K bits),
+    // no overlap. For every bit lane j, the result equals bit j of the 128-bit
+    // record transpose. The first workspace builds the plan's bit tables once
+    // (routing inverse, coefficient lanes); later workspaces share them.
+    BitWorkspace make_bit_workspace() const;
+    // Rebind a bit workspace of the same geometry to this plan without
+    // reallocating its scratch; otherwise recreate it.
+    void prepare_bit_workspace(BitWorkspace&) const;
+    void transpose_bits(std::span<const std::uint64_t> in, std::span<std::uint64_t> out, BitWorkspace&) const;
 
     template<class E> void forward(std::span<const E> in, std::span<E> out, Workspace& w,
                                   OutputStores stores=OutputStores::Streaming) const {

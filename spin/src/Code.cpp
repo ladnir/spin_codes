@@ -4,6 +4,7 @@
 #include "kernels/WorkspaceRouting.h"
 #include "Turbo.h"
 #include <limits>
+#include <mutex>
 
 namespace spin::detail {
 Backend selectTurboBackend(Backend requested) {
@@ -47,6 +48,21 @@ void turboTranspose(Backend b,const storage::block* input,storage::block* output
     if(b==Backend::Reference) rs8::transposeScalar(input,output,work,plan);
     else rs8::transposePortable(input,output,work,plan);
 }
+bool turboBitsFast(Backend b) noexcept {
+#if SPIN_AVX512
+    return b==Backend::Avx512;
+#else
+    (void)b;return false;
+#endif
+}
+void turboTransposeBits(Backend b,const std::uint64_t* input,std::uint64_t* output,const rs8::Plan& plan,
+                        const rs8::bits::Tables& tables,rs8::bits::Scratch& scratch) {
+#if SPIN_AVX512
+    if(turboBitsFast(b) && tables.fast) { rs8::bits::transposeFast(input,output,plan,tables,scratch); return; }
+#endif
+    (void)b;
+    rs8::bits::transposePortable(input,output,plan,tables,scratch);
+}
 struct Plan {
     const CodeSpec spec;
     const Backend selected;
@@ -55,6 +71,21 @@ struct Plan {
         :spec(s),selected(selectTurboBackend(o.backend)),
          turbo(s.message_size,s.route_seed,s.inner_seed,turboSetupPath(selected)) {}
     std::size_t scratchBlocks() const noexcept { return turbo.scratchBlocks(); }
+    // Bit tables are built on the first bit workspace and then immutable.
+    const rs8::bits::Tables& bitTables() const {
+        std::call_once(bitOnce,[&] { bits.build(turbo,turboBitsFast(selected)); });
+        return bits;
+    }
+private:
+    mutable std::once_flag bitOnce;
+    mutable rs8::bits::Tables bits;
+};
+struct BitScratch {
+    std::shared_ptr<const Plan> plan;
+    const rs8::bits::Tables* tables;
+    rs8::bits::Scratch scratch;
+    explicit BitScratch(std::shared_ptr<const Plan> p)
+        :plan(std::move(p)),tables(&plan->bitTables()),scratch(plan->turbo) {}
 };
 struct Scratch {
     std::shared_ptr<const Plan> plan;
@@ -205,6 +236,36 @@ void Code::transpose_bytes(std::span<const std::byte> in,std::span<std::byte> ou
     detail::turboTranspose(plan_->selected,reinterpret_cast<const detail::storage::block*>(in.data()),
         reinterpret_cast<detail::storage::block*>(out.data()),scratch.work(),plan_->turbo);
 }
+BitWorkspace Code::make_bit_workspace() const {
+    detail::checkedPlan(plan_);
+    return BitWorkspace(plan_);
+}
+void Code::prepare_bit_workspace(BitWorkspace& w) const {
+    detail::checkedPlan(plan_);
+    if(w.scratch_ && w.scratch_->plan==plan_)return;
+    if(w.scratch_ && w.scratch_->plan->spec.message_size==plan_->spec.message_size) {
+        w.scratch_->tables=&plan_->bitTables();
+        w.scratch_->plan=plan_;
+        return;
+    }
+    w=make_bit_workspace();
+}
+void Code::transpose_bits(std::span<const std::uint64_t> in,std::span<std::uint64_t> out,BitWorkspace& w) const {
+    detail::checkedPlan(plan_);
+    if(!w.scratch_ || w.scratch_->plan!=plan_)
+        throw std::invalid_argument("SPIN bit workspace belongs to another plan or was moved");
+    if(in.size()!=code_size()/64 || out.size()!=message_size()/64 || !in.data() || !out.data())
+        throw std::invalid_argument("SPIN bit transpose requires 2K input bits and K output bits");
+    if(detail::overlap(in.data(),in.size()*8,out.data(),out.size()*8))
+        throw std::invalid_argument("SPIN bit transpose buffers overlap");
+    detail::turboTransposeBits(plan_->selected,in.data(),out.data(),plan_->turbo,*w.scratch_->tables,w.scratch_->scratch);
+}
+BitWorkspace::BitWorkspace(std::shared_ptr<const detail::Plan> p)
+    :scratch_(std::make_unique<detail::BitScratch>(std::move(p))) {}
+BitWorkspace::~BitWorkspace()=default;
+BitWorkspace::BitWorkspace(BitWorkspace&&) noexcept=default;
+BitWorkspace& BitWorkspace::operator=(BitWorkspace&&) noexcept=default;
+std::size_t BitWorkspace::bytes() const noexcept {return scratch_?scratch_->scratch.bytes():0;}
 void Code::transpose_inplace_bytes(std::span<std::byte> buffer,Workspace& w) const {
     auto& scratch=check_workspace(w);
     if(scratch.width!=Width::Bits128 || buffer.size()!=code_size()*16)

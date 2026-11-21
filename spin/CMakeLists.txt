@@ -22,7 +22,7 @@ else()
   set(SPIN_ENABLE_AVX512 OFF CACHE BOOL "Build runtime-dispatched AVX-512 kernels" FORCE)
 endif()
 add_library(spin STATIC src/Code.cpp src/PreparedEncoder.cpp src/Buffer.cpp src/Cpu.cpp
-  src/rs8/SetupScalar.cpp src/rs8/Portable.cpp src/rs8/Neon.cpp
+  src/rs8/SetupScalar.cpp src/rs8/Portable.cpp src/rs8/Neon.cpp src/rs8/Bits.cpp
   src/certified22/Setup.cpp src/certified22/SetupPortable.cpp src/certified22/Scalar.cpp)
 add_library(spin::spin ALIAS spin)
 target_compile_features(spin PUBLIC cxx_std_20)
@@ -51,7 +51,7 @@ endif()
 if(SPIN_ENABLE_AVX512)
   # AVX-512 ISA stays in private translation units. Neither setup dispatch nor
   # the public API is compiled for AVX-512.
-  add_library(spin_turbo512 OBJECT src/rs8/Fast.cpp src/rs8/ForwardFast.cpp
+  add_library(spin_turbo512 OBJECT src/rs8/Fast.cpp src/rs8/ForwardFast.cpp src/rs8/BitsFast.cpp
     src/certified22/RouteFast.cpp src/certified22/SetupFast.cpp)
   target_compile_features(spin_turbo512 PRIVATE cxx_std_20)
   target_compile_definitions(spin_turbo512 PRIVATE SPIN_AVX512=1)
@@ -97,6 +97,10 @@ if(SPIN_BUILD_TESTS)
   add_test(NAME spin_rs8_neon COMMAND spin_rs8_test neon)
   set_tests_properties(spin_rs8 spin_rs8_portable PROPERTIES RUN_SERIAL TRUE)
   set_tests_properties(spin_rs8_avx2 spin_rs8_gfni spin_rs8_neon PROPERTIES RUN_SERIAL TRUE SKIP_RETURN_CODE 77)
+  add_executable(spin_bits_test tests/bits.cpp)
+  target_link_libraries(spin_bits_test PRIVATE spin::spin)
+  add_test(NAME spin_bits COMMAND spin_bits_test)
+  set_tests_properties(spin_bits PROPERTIES RUN_SERIAL TRUE)
   add_executable(spin_turbo_setup_test tests/turbo_setup.cpp)
   target_link_libraries(spin_turbo_setup_test PRIVATE spin::spin)
   add_test(NAME spin_turbo_setup COMMAND spin_turbo_setup_test)

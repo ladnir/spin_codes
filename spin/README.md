@@ -142,6 +142,27 @@ choosing.
 zero-copy byte views; this is the boundary for foreign record types and
 language bindings. Sizes are in bytes and the workspace fixes the record width.
 
+## Bit-vector transposed encoding
+
+A 128-bit record transpose is 128 independent copies of one binary map, one
+per bit lane. `transpose_bits` applies that map to a single bit per
+position, for example a choice-bit vector, at a fraction of the record cost
+(one Ryzen 9 7950X core: 0.15 ms against 0.47 ms at K = 2^18, 0.62 ms
+against 2.90 ms at K = 2^20):
+
+```cpp
+auto bits=code.make_bit_workspace();
+std::vector<std::uint64_t> in(code.code_size()/64), out(code.message_size()/64);
+code.transpose_bits(in, out, bits); // 2K bits -> K bits
+```
+
+Bit i is bit `i%64` of word `i/64`. For every lane j the result equals bit j
+of `transpose`. The first bit workspace builds the plan's bit tables (routing
+inverse and coefficient lanes, about 0.7 MiB at K = 2^18); later workspaces
+share them. `PreparedEncoder` offers the same calls; with `BankedHeuristic`
+setup, `setCodeSeed` refreshes the bit tables in place. AVX-512 runs a GFNI
+kernel; every other backend runs a portable kernel with the same output.
+
 ## Repeated transposed encoding and seed updates
 
 For successive code seeds, use the move-only `PreparedEncoder` and choose the
@@ -212,7 +233,11 @@ natural sizes and overflow bounds, forward/transpose adjoints at every width,
 in-place suffix preservation, buffer guards, descriptors, retired identifiers,
 workspace ownership and rebinding, allocation-free encoding, and both prepared
 modes. `spin_turbo_setup_test` checks that every setup path produces
-bit-identical tables. `tests/consumer` is a separate installed-package
+bit-identical tables. `spin_bits_test` checks `transpose_bits` against bit
+lanes 0, 1, 63, 64 and 127 of the record transpose on every backend the CPU
+runs, at natural sizes from 128 to 65,536, on dense and sparse inputs, for
+`Code` and both prepared modes across reseeds, with allocation-free calls.
+`tests/consumer` is a separate installed-package
 project that checks no imported type leaks into consumers.
 
 `SPIN_BUILD_BENCHMARKS=ON` builds `spin_turbo_backends_bench`,
