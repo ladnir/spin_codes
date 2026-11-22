@@ -436,7 +436,7 @@ static SPIN_FORCEINLINE void updateGfni(__m128i* w,const __m128i* f,const std::u
     for(unsigned j=0;j<8;++j) { b[j]=join(w[j],w[8+j]);c[j]=join(j<6?w[16+j]:zero,zero); }
     toPlanes(b,s01);toPlanes(c,s2);
     std::uint64_t a[9];
-    for(unsigned q=0;q<9;++q) a[q]=__builtin_bswap64(packed[q]);
+    for(unsigned q=0;q<9;++q) a[q]=byteswap64(packed[q]);
     const auto m0011=pair(a[0],a[4]),m0110=pair(a[1],a[3]),m0212=pair(a[2],a[5]);
     const auto m2021=pair(a[6],a[7]),m22=pair(a[8],0);
     for(unsigned m=0;m<8;++m) {
@@ -467,7 +467,7 @@ static SPIN_FORCEINLINE void updateGfniWide(Get get,Put put,const std::uint64_t*
         toPlanes(g,s[i]);
     }
     V a[9];
-    for(unsigned q=0;q<9;++q) a[q]=_mm256_set1_epi64x(std::int64_t(__builtin_bswap64(packed[q])));
+    for(unsigned q=0;q<9;++q) a[q]=_mm256_set1_epi64x(std::int64_t(byteswap64(packed[q])));
     for(unsigned o=0;o<3;++o) {
         V y[8];
         for(unsigned m=0;m<8;++m)
@@ -547,7 +547,7 @@ static SPIN_NOINLINE void reverseInner(const Block* __restrict input,Block* __re
         const auto e=epochs-1;
         const Scatter st{base,route+16*e};
         MonoAccumulator<W,X128> acc;
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0;h<8;++h) {
             W x[8];
             for(unsigned l=0;l<8;++l) { x[l]=load(input+64*e+8*h+l);st(8*h+l,x[l]); }
@@ -562,7 +562,7 @@ static SPIN_NOINLINE void reverseInner(const Block* __restrict input,Block* __re
         StepWeights<W,X128> weights;
         weights.prepare(w);
         MonoAccumulator<W,X128> acc;
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0;h<8;++h) {
             W x[8];
             for(unsigned l=0;l<8;++l) x[l]=load(input+64*e+8*h+l);
@@ -576,7 +576,7 @@ static SPIN_NOINLINE void reverseInner(const Block* __restrict input,Block* __re
     const Scatter st{base,route};
     StepWeights<W,X128> weights;
     weights.prepare(w);
-#pragma GCC unroll 8
+SPIN_UNROLL8
     for(unsigned h=0;h<8;++h) {
         W x[8];
         for(unsigned l=0;l<8;++l) x[l]=load(input+8*h+l);
@@ -656,7 +656,7 @@ static SPIN_NOINLINE void forwardInner(const Block* __restrict input,Block* __re
     {
         MonoAccumulator<W,X> acc;
         const LaneStore st{output};
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0;h<8;++h) {
             W x[8];
             Lanes<L>::gather(base+route[2*h],stride,x);Lanes<L>::gather(base+route[2*h+1],stride,x+4);
@@ -674,7 +674,7 @@ static SPIN_NOINLINE void forwardInner(const Block* __restrict input,Block* __re
         weights.prepare(w);
         MonoAccumulator<W,X> acc;
         const LaneStore st{output+64*L*e};
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0;h<8;++h) {
             W x[8];
             Lanes<L>::gather(base+r[2*h],stride,x);Lanes<L>::gather(base+r[2*h+1],stride,x+4);
@@ -689,7 +689,7 @@ static SPIN_NOINLINE void forwardInner(const Block* __restrict input,Block* __re
     StepWeights<W,X> weights;
     weights.prepare(w);
     const LaneStore st{output+64*L*(epochs-1)};
-#pragma GCC unroll 8
+SPIN_UNROLL8
     for(unsigned h=0;h<8;++h) {
         W x[8];
         Lanes<L>::gather(base+r[2*h],stride,x);Lanes<L>::gather(base+r[2*h+1],stride,x+4);

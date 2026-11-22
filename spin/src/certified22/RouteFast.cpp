@@ -210,7 +210,7 @@ static SPIN_FORCEINLINE void updateGroupCarried(const Packed22& before,const std
 template<bool Write>
 static SPIN_FORCEINLINE void prefetchPackets(const void* base,const std::uint32_t* routeBytes) {
     const auto* b=static_cast<const char*>(base);
-    for(unsigned i=0; i<16; ++i) __builtin_prefetch(b+routeBytes[i],Write?1:0,3);
+    for(unsigned i=0; i<16; ++i) SPIN_PREFETCH(b+routeBytes[i],Write?1:0);
 }
 template<bool Streaming>
 struct ByteRoute {
@@ -677,7 +677,7 @@ static SPIN_NOINLINE void forwardLaneMajor(const Block* __restrict input,Block* 
     {
         MonoAccumulator<V,X> acc;
         LaneStore<Stream,L> st{output};
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0; h<8; ++h) {
             V x[8];
             gatherPacket<L>(base+route[2*h],stride,x);gatherPacket<L>(base+route[2*h+1],stride,x+4);
@@ -697,7 +697,7 @@ static SPIN_NOINLINE void forwardLaneMajor(const Block* __restrict input,Block* 
         weights.prepare(w);
         MonoAccumulator<V,X> acc;
         LaneStore<Stream,L> st{output+64*L*epoch};
-#pragma GCC unroll 8
+SPIN_UNROLL8
         for(unsigned h=0; h<8; ++h) {
             V x[8];
             gatherPacket<L>(base+r[2*h],stride,x);gatherPacket<L>(base+r[2*h+1],stride,x+4);
@@ -715,7 +715,7 @@ static SPIN_NOINLINE void forwardLaneMajor(const Block* __restrict input,Block* 
     StepWeights<V,X> weights;
     weights.prepare(w);
     LaneStore<Stream,L> st{output+64*L*(epochs-1)};
-#pragma GCC unroll 8
+SPIN_UNROLL8
     for(unsigned h=0; h<8; ++h) {
         V x[8];
         gatherPacket<L>(base+r[2*h],stride,x);gatherPacket<L>(base+r[2*h+1],stride,x+4);

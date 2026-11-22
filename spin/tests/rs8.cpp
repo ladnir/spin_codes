@@ -52,11 +52,7 @@ struct Block {std::uint64_t words[2]{};bool operator==(const Block&) const=defau
 // Avx2Gfni, Portable or Neon when run as "spin_rs8_test avx2", "gfni",
 // "portable" or "neon".
 spin::Backend tested=spin::Backend::Automatic;
-#if defined(__aarch64__) || defined(_M_ARM64)
-constexpr bool aarch64=true;
-#else
-constexpr bool aarch64=false;
-#endif
+constexpr bool aarch64=SPIN_AARCH64; // NEON kernel built (not SPIN_PORTABLE)
 struct Context {const char* test="metadata";std::size_t k=0;std::uint64_t route=0,inner=0;unsigned width=16,offset=0;} context;
 void require(bool value,const char* message) {
     if(value)return;

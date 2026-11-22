@@ -1,4 +1,5 @@
 #pragma once
+#include "Block.h"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -80,9 +81,7 @@ inline void scatterWrite(const Block* values,Block* tile,const std::uint8_t* off
         } else return offsets32[position];
     };
     for(std::size_t j=0;j<count;++j) {
-#if defined(__GNUC__) || defined(__clang__)
-        if(j+32<count) __builtin_prefetch(tile+offset(base+j+32),1,3);
-#endif
+        if(j+32<count) SPIN_PREFETCH(tile+offset(base+j+32),1);
         tile[offset(base+j)]=values[base+j];
     }
 }

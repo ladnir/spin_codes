@@ -68,7 +68,7 @@ template<class Ops> struct Scatter {
     SPIN_FORCEINLINE void operator()(unsigned j,typename Ops::V v) const { Ops::store(base+route[j>>2]+16*(j&3),v); }
 };
 template<class Ops>
-SPIN_NOINLINE void reverse(const Block* __restrict input,Block* __restrict scratch,const certified22::Plan& plan) {
+SPIN_NOINLINE void reverse(const Block* SPIN_RESTRICT input,Block* SPIN_RESTRICT scratch,const certified22::Plan& plan) {
     using V=typename Ops::V;
     using X=X1<Ops>;
     const auto epochs=plan.n/64;
@@ -129,7 +129,7 @@ template<class Ops,unsigned L> struct LaneStore {
     }
 };
 template<class Ops,unsigned L>
-SPIN_NOINLINE void forward(const Block* __restrict input,Block* __restrict output,
+SPIN_NOINLINE void forward(const Block* SPIN_RESTRICT input,Block* SPIN_RESTRICT output,
     const certified22::Plan& plan,std::size_t plane) {
     using W=typename Lane<Ops,L>::W;
     using X=typename Lane<Ops,L>::X;

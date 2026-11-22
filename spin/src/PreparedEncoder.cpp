@@ -40,11 +40,7 @@ struct TurboBank {
         refresh(s.route_seed,s.inner_seed);
     }
     static std::uint32_t below(kernel::setup::Words& words,std::uint64_t n) noexcept {
-#ifdef _MSC_VER
-        return std::uint32_t(__umulh(words(),n));
-#else
-        return std::uint32_t((__uint128_t(words())*n)>>64);
-#endif
+        return std::uint32_t(kernel::setup::mulhi(words(),n));
     }
     void refresh(std::uint64_t routeSeed,std::uint64_t innerSeed) noexcept {
         using kernel::setup::Words;

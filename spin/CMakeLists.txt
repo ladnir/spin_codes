@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(spin VERSION 0.4.1 LANGUAGES CXX)
+project(spin VERSION 0.4.2 LANGUAGES CXX)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 option(SPIN_ENABLE_AVX512 "Build runtime-dispatched AVX-512 kernels" ON)
+option(SPIN_PORTABLE "Build only the portable C++ kernel (no ISA-specific code)" OFF)
 set(SPIN_TESTS_DEFAULT OFF)
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   set(SPIN_TESTS_DEFAULT ON)
@@ -10,16 +11,15 @@ endif()
 option(SPIN_BUILD_TESTS "Build standalone API tests" ${SPIN_TESTS_DEFAULT})
 option(SPIN_BUILD_BENCHMARKS "Build serial setup/encoding benchmarks" OFF)
 set(SPIN_TUNE generic CACHE STRING "Compiler scheduling target (not required ISA)")
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-  message(FATAL_ERROR "SPIN requires a 64-bit target")
-endif()
-# Turbo SPIN (PacketRs8T64) is portable C++ with runtime-dispatched ISA kernels:
-# AVX-512 and AVX2(+GFNI) on x86-64, NEON on AArch64, portable elsewhere.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+# Turbo SPIN (PacketRs8T64) is portable C++ (any little-endian 32- or 64-bit
+# target) with runtime-dispatched ISA kernels: AVX-512 and AVX2(+GFNI) on
+# x86-64, NEON on AArch64. SPIN_PORTABLE builds the portable kernel alone.
+if(NOT SPIN_PORTABLE AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
   set(SPIN_X86 ON)
+  set(SPIN_BUILD_AVX512 ${SPIN_ENABLE_AVX512})
 else()
   set(SPIN_X86 OFF)
-  set(SPIN_ENABLE_AVX512 OFF CACHE BOOL "Build runtime-dispatched AVX-512 kernels" FORCE)
+  set(SPIN_BUILD_AVX512 OFF)
 endif()
 add_library(spin STATIC src/Code.cpp src/PreparedEncoder.cpp src/Buffer.cpp src/Cpu.cpp
   src/rs8/SetupScalar.cpp src/rs8/Portable.cpp src/rs8/Neon.cpp src/rs8/Bits.cpp
@@ -28,9 +28,13 @@ add_library(spin::spin ALIAS spin)
 target_compile_features(spin PUBLIC cxx_std_20)
 target_include_directories(spin PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_compile_definitions(spin PRIVATE SPIN_AVX512=$<BOOL:${SPIN_ENABLE_AVX512}> SPIN_WORKSPACE_ROUTING_OPT=1)
+target_compile_definitions(spin PRIVATE SPIN_AVX512=$<BOOL:${SPIN_BUILD_AVX512}> SPIN_PORTABLE=$<BOOL:${SPIN_PORTABLE}>
+  SPIN_WORKSPACE_ROUTING_OPT=1)
 set_target_properties(spin PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
-if(NOT MSVC)
+if(MSVC)
+  # The RS8 outer's constant nibble tables exceed MSVC's default constexpr steps.
+  target_compile_options(spin PRIVATE /constexpr:steps10000000)
+else()
   target_compile_options(spin PRIVATE -fno-strict-aliasing -fno-lto)
 endif()
 # AVX2 kernels, runtime-dispatched: AVX2 only, plus a GFNI variant.
@@ -42,13 +46,13 @@ if(SPIN_X86)
   target_compile_features(spin_turbo256 PRIVATE cxx_std_20)
   set_target_properties(spin_turbo256 PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
   if(MSVC)
-    target_compile_options(spin_turbo256 PRIVATE /arch:AVX2)
+    target_compile_options(spin_turbo256 PRIVATE /arch:AVX2 /constexpr:steps10000000)
   else()
     target_compile_options(spin_turbo256 PRIVATE -mavx2 -mtune=${SPIN_TUNE} -fno-strict-aliasing -fno-lto)
   endif()
   target_sources(spin PRIVATE $<TARGET_OBJECTS:spin_turbo256>)
 endif()
-if(SPIN_ENABLE_AVX512)
+if(SPIN_BUILD_AVX512)
   # AVX-512 ISA stays in private translation units. Neither setup dispatch nor
   # the public API is compiled for AVX-512.
   add_library(spin_turbo512 OBJECT src/rs8/Fast.cpp src/rs8/ForwardFast.cpp src/rs8/BitsFast.cpp
@@ -57,7 +61,7 @@ if(SPIN_ENABLE_AVX512)
   target_compile_definitions(spin_turbo512 PRIVATE SPIN_AVX512=1)
   set_target_properties(spin_turbo512 PROPERTIES POSITION_INDEPENDENT_CODE ON INTERPROCEDURAL_OPTIMIZATION FALSE)
   if(MSVC)
-    target_compile_options(spin_turbo512 PRIVATE /arch:AVX512)
+    target_compile_options(spin_turbo512 PRIVATE /arch:AVX512 /constexpr:steps10000000)
     target_compile_definitions(spin_turbo512 PRIVATE SPIN_PACKET_ENABLE_VBMI=1)
   else()
     target_compile_options(spin_turbo512 PRIVATE -mavx2 -mavx512f -mavx512vl -mavx512bw -mavx512dq
@@ -81,7 +85,7 @@ if(SPIN_BUILD_BENCHMARKS)
   add_executable(spin_setup_once_bench bench/setup_once.cpp)
   target_link_libraries(spin_setup_once_bench PRIVATE spin::spin)
 endif()
-if(SPIN_BUILD_BENCHMARKS AND SPIN_ENABLE_AVX512)
+if(SPIN_BUILD_BENCHMARKS AND SPIN_BUILD_AVX512)
   # Stage timing calls internal AVX2 and AVX-512 entry points directly.
   add_executable(spin_rs8_stages_bench bench/rs8_stages.cpp)
   target_link_libraries(spin_rs8_stages_bench PRIVATE spin::spin)
@@ -108,4 +112,8 @@ if(SPIN_BUILD_TESTS)
   add_executable(spin_setup_test tests/setup.cpp)
   target_compile_features(spin_setup_test PRIVATE cxx_std_20)
   add_test(NAME spin_setup COMMAND spin_setup_test)
+  # Tests that include private headers see the library's architecture choice.
+  foreach(t spin_rs8_test spin_bits_test spin_turbo_setup_test spin_setup_test)
+    target_compile_definitions(${t} PRIVATE SPIN_PORTABLE=$<BOOL:${SPIN_PORTABLE}>)
+  endforeach()
 endif()

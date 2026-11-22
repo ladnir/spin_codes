@@ -38,12 +38,19 @@ target_link_libraries(my_target PRIVATE spin::spin)
 
 The target exports C++20 and its public include directory, not ISA flags.
 Public headers contain no SIMD types. Kernels are private and selected at
-runtime: AVX-512, AVX2+GFNI, and AVX2 on x86-64, NEON on AArch64, and an
-optimized portable kernel on any 64-bit CPU. `SPIN_ENABLE_AVX512=OFF` omits
-the AVX-512 objects. `SPIN_TUNE=znver4` changes GCC/Clang instruction
-scheduling without changing the required ISA. Linux/GCC and Windows/MSVC are
-supported; with a Visual Studio generator, use `--config Release` for
-building/installing and `-C Release` for CTest.
+runtime: AVX-512, AVX2+GFNI, and AVX2 on x86-64, NEON on AArch64 (including
+Apple silicon), and a portable C++ kernel everywhere else. Any little-endian
+32- or 64-bit target with a C++20 compiler is supported; big-endian targets
+are rejected at compile time.
+
+`SPIN_PORTABLE=ON` builds the portable kernel alone: no ISA headers,
+intrinsics, CPU feature detection or compiler builtins (the 64x64-bit high
+multiply uses standard C++). It is for targets without a dedicated kernel and
+for testing that path. `SPIN_ENABLE_AVX512=OFF` omits the AVX-512 objects.
+`SPIN_TUNE=znver4` changes GCC/Clang instruction scheduling without changing
+the required ISA. Linux/GCC, macOS/Clang and Windows/MSVC are supported; with a
+Visual Studio generator, use `--config Release` for building/installing and
+`-C Release` for CTest.
 
 ## Single-stream use
 
@@ -238,7 +245,9 @@ lanes 0, 1, 63, 64 and 127 of the record transpose on every backend the CPU
 runs, at natural sizes from 128 to 65,536, on dense and sparse inputs, for
 `Code` and both prepared modes across reseeds, with allocation-free calls.
 `tests/consumer` is a separate installed-package
-project that checks no imported type leaks into consumers.
+project that checks no imported type leaks into consumers. The full suite
+passes on x86-64 (default and `SPIN_PORTABLE`) and on AArch64 (NEON and
+`SPIN_PORTABLE`, cross-built and run under QEMU).
 
 `SPIN_BUILD_BENCHMARKS=ON` builds `spin_turbo_backends_bench`,
 `spin_setup_once_bench`, and (with AVX-512) `spin_rs8_stages_bench`. Run

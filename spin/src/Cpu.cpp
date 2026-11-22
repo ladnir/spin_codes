@@ -1,15 +1,16 @@
 #include "Cpu.h"
 #include <spin/Code.h>
-#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+#if defined(_MSC_VER) && SPIN_X86
 #include <intrin.h>
 #endif
 namespace spin::detail {
 namespace {
 struct Features { bool avx2=false,gfni=false,packet=false; };
-// x86-64 feature detection; other architectures report no x86 features.
+// x86-64 feature detection; other architectures and portable builds report
+// no x86 features.
 Features detect() noexcept {
     Features x;
-#if defined(__x86_64__) || defined(_M_X64)
+#if SPIN_X86
 #if defined(_MSC_VER)
     int r[4]; __cpuid(r,0); if(r[0]<7) return x;
     __cpuidex(r,1,0);

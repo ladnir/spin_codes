@@ -3,7 +3,7 @@
 #pragma once
 namespace spin::detail::certified22::lanemajor {
 template<class V,class X>
-static SPIN_FORCEINLINE void feedbackH(const V* __restrict mono,V* __restrict f) {
+static SPIN_FORCEINLINE void feedbackH(const V* SPIN_RESTRICT mono,V* SPIN_RESTRICT f) {
 f[0]=mono[0];
 f[1]=mono[1];
 f[2]=mono[2];
