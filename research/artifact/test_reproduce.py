@@ -60,7 +60,7 @@ class ArtifactChecks(unittest.TestCase):
         # Explicit inputs only: no Git metadata or parent-worktree fallback.
         root = reproduce.ROOT
         names = {Path('artifact/reproduce.py'), Path('paper/build_parameter_figures.py'),
-                 Path('paper/check_finite_integration.py'),
+                 Path('paper/check_finite_integration.py'), Path('paper/precomputed_results.py'),
                  Path('paper/imt_results.py'), Path('paper/build_imt_comparison.py'),
                  Path('paper/build_imt_parameter_figures.py'),
                  Path('paper/build_imt_length_figure.py'),

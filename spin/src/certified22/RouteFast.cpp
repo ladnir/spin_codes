@@ -112,8 +112,9 @@ static SPIN_FORCEINLINE Feedback22 feedbackPacked(const Words22& mono) {
     // H row3 is z3+z34+z20+z40. The other seven affine coordinates
     // pass through unchanged; they need no packed feedback calculation.
     Feedback22 feedback;
+    // Only lane 3 contributes here, and mono.v[3] already holds z34 in that lane.
     const auto extra=_mm512_ternarylogic_epi64(
-        broadcast<15>(mono),broadcast<17>(mono),broadcast<20>(mono),0x96);
+        mono.v[3],broadcast<17>(mono),broadcast<20>(mono),0x96);
     feedback.word0=_mm512_mask_xor_epi64(mono.v[0],0xc0,mono.v[0],extra);
     feedback.word1=mono.v[1];
     // Pack8,...,21,3,0: no cross-vector gathers are needed.
@@ -223,32 +224,22 @@ struct ByteRoute {
 };
 template<bool RawFeedback=false,bool Gather=false,class Emit> static SPIN_FORCEINLINE void streamHigh(const Words22& state,
 const Block* raw,const std::uint32_t* route,std::size_t packetBase,Emit& emit,__m512i* high) {
-const auto c4=broadcast<4>(state),c8=broadcast<5>(state);
-const auto c16=broadcast<6>(state),c32=broadcast<7>(state);
-const auto c5=broadcast<8>(state),c9=broadcast<9>(state);
-const auto c17=broadcast<10>(state),c33=broadcast<11>(state);
-const auto c6=broadcast<12>(state),c10=broadcast<13>(state);
-const auto c18=broadcast<14>(state),c34=broadcast<15>(state);
+// Each of these registers holds one coefficient for each of four affine
+// terms. Evaluate at 00, 01, 10, 11 before transposing to one term per register.
+const auto row0=state.v[1];
+const auto row1=_mm512_xor_si512(row0,state.v[2]);
+const auto row2=_mm512_xor_si512(row0,state.v[3]);
+const auto row3=_mm512_xor_si512(row1,state.v[3]);
+const auto terms=transpose4(row0,row1,row2,row3);
+const auto d1=terms.a,d2=terms.b,d4=terms.c,d8=terms.d;
 const auto c12=broadcast<16>(state),c20=broadcast<17>(state);
 const auto c24=broadcast<18>(state),c36=broadcast<19>(state);
 const auto c40=broadcast<20>(state),c48=broadcast<21>(state);
 const auto d0a=_mm512_mask_xor_epi64(state.v[0],0xcc,state.v[0],_mm512_shuffle_i32x4(state.v[0],state.v[0],0xa0));
 const auto d0=_mm512_mask_xor_epi64(d0a,0xf0,d0a,_mm512_shuffle_i32x4(d0a,d0a,0x44));
-auto d1=c4;
-d1=_mm512_mask_xor_epi64(d1,0xcc,d1,c5);
-d1=_mm512_mask_xor_epi64(d1,0xf0,d1,c6);
-auto d2=c8;
-d2=_mm512_mask_xor_epi64(d2,0xcc,d2,c9);
-d2=_mm512_mask_xor_epi64(d2,0xf0,d2,c10);
 auto d3=c12;
-auto d4=c16;
-d4=_mm512_mask_xor_epi64(d4,0xf0,d4,c18);
-d4=_mm512_mask_xor_epi64(d4,0xcc,d4,c17);
 auto d5=c20;
 auto d6=c24;
-auto d8=c32;
-d8=_mm512_mask_xor_epi64(d8,0xcc,d8,c33);
-d8=_mm512_mask_xor_epi64(d8,0xf0,d8,c34);
 auto d9=c36;
 auto d10=c40;
 auto d12=c48;

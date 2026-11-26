@@ -24,10 +24,11 @@ static SPIN_FORCEINLINE void flat9(__m512i& x0,__m512i& x1,
     const auto r1=product<7>(_mm512_xor_si512(x1,x3),c);
     const auto r2=product<8>(_mm512_xor_si512(x01,x23),c);
     const auto pq=_mm512_xor_si512(p0,q0),pr=_mm512_xor_si512(p0,r0);
-    x0=_mm512_ternarylogic_epi64(pq,p1,q1,0x96);
-    x1=_mm512_ternarylogic_epi64(pq,p2,q2,0x96);
-    x2=_mm512_ternarylogic_epi64(pr,p1,r1,0x96);
-    x3=_mm512_ternarylogic_epi64(pr,p2,r2,0x96);
+    // Give each destructive ternary XOR a product used only by that output.
+    x0=_mm512_ternarylogic_epi64(q1,p1,pq,0x96);
+    x1=_mm512_ternarylogic_epi64(q2,p2,pq,0x96);
+    x2=_mm512_ternarylogic_epi64(r1,p1,pr,0x96);
+    x3=_mm512_ternarylogic_epi64(r2,p2,pr,0x96);
 }
 
 
@@ -63,27 +64,25 @@ static SPIN_FORCEINLINE PlaneValues parityValues(const __m512i* packed) {
     // Adjoint nibble multiplication, independently in the two nibbles.
     const auto m6=_mm512_set1_epi64(0x060c0b0560c0b050ULL);
     const auto m8=_mm512_set1_epi64(0x0803060c803060c0ULL);
-    auto x0=_mm512_load_si512(packed+32+Plane);
-    auto x1=_mm512_load_si512(packed+40+Plane);
-    auto x2=_mm512_load_si512(packed+48+Plane);
-    auto x3=_mm512_load_si512(packed+56+Plane);
-    x0=_mm512_xor_si512(x0,x1);x2=_mm512_xor_si512(x2,x3);
-    x0=_mm512_xor_si512(x0,x2);x1=_mm512_xor_si512(x1,x3);
-    const auto t6=_mm512_gf2p8affine_epi64_epi8(x0,m6,0);
-    const auto t8=_mm512_gf2p8affine_epi64_epi8(x0,m8,0);
-    auto y0=x0;
-    auto y1=_mm512_xor_si512(x1,t8);
-    auto y2=_mm512_xor_si512(x2,t6);
-    auto y3=xor3(x3,t6,x0);
-    y3=xor3(y3,_mm512_gf2p8affine_epi64_epi8(x1,m6,0),
-                  _mm512_gf2p8affine_epi64_epi8(x2,m8,0));
-    y0=_mm512_xor_si512(y0,y1);y2=_mm512_xor_si512(y2,y3);
-    y0=_mm512_xor_si512(y0,y2);y1=_mm512_xor_si512(y1,y3);
+    const auto x0=_mm512_load_si512(packed+32+Plane);
+    const auto x1=_mm512_load_si512(packed+40+Plane);
+    const auto x2=_mm512_load_si512(packed+48+Plane);
+    const auto x3=_mm512_load_si512(packed+56+Plane);
+    const auto odd=_mm512_xor_si512(x1,x3);
+    const auto upper=_mm512_xor_si512(x2,x3);
+    const auto total=xor3(x0,x2,odd);
+    const auto t6=_mm512_gf2p8affine_epi64_epi8(total,m6,0);
+    const auto t8=_mm512_gf2p8affine_epi64_epi8(total,m8,0);
+    // Cancel repeated terms in the adjoint parity map. All four outputs add
+    // common; outputs 0 and 1 also add t8, and outputs 1 and 3 add t6.
+    const auto common=xor3(_mm512_gf2p8affine_epi64_epi8(odd,m6,0),
+                           _mm512_gf2p8affine_epi64_epi8(upper,m8,0),total);
+    const auto common8=_mm512_xor_si512(common,t8);
     return {{
-        _mm512_xor_si512(_mm512_load_si512(packed+0+Plane),y0),
-        _mm512_xor_si512(_mm512_load_si512(packed+8+Plane),y1),
-        _mm512_xor_si512(_mm512_load_si512(packed+16+Plane),y2),
-        _mm512_xor_si512(_mm512_load_si512(packed+24+Plane),y3)}};
+        xor3(x0,common8,_mm512_load_si512(packed+Plane)),
+        xor3(x1,_mm512_xor_si512(common8,t6),_mm512_load_si512(packed+8+Plane)),
+        xor3(x2,common,_mm512_load_si512(packed+16+Plane)),
+        xor3(x3,_mm512_xor_si512(common,t6),_mm512_load_si512(packed+24+Plane))}};
 }
 
 template<bool Stream,unsigned Symbol,unsigned Plane>
